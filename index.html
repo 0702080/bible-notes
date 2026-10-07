@@ -3,6 +3,19 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
+<meta name="app-build" content="2026-10-07-01">
+<script>
+/* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
+(function(){try{
+  if(!/^https?:$/.test(location.protocol)||!window.fetch)return;
+  var mine=document.querySelector('meta[name="app-build"]').content;
+  fetch(location.href.split("#")[0],{cache:"reload"}).then(function(r){return r.text()}).then(function(t){
+    var m=t.match(/name="app-build" content="([^"]+)"/); if(!m||m[1]===mine)return;
+    var k="bible-reloaded-"+m[1]; try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1")}catch(e){}
+    location.reload();
+  }).catch(function(){});
+}catch(e){}})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
