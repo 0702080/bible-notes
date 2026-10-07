@@ -770,6 +770,27 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .reader{display:flex}
 .reader[hidden]{display:none}
 .rdalt{margin:8px 18px 0;font-size:12px;color:var(--faint);text-align:center;line-height:1.6}
+.rdframe{display:none;flex:1;width:100%;max-width:1000px;margin:0 auto;border:0;background:#fff}
+.reader.framed .rdframe{display:block}
+.reader.framed .rdscroll,.reader.framed .rdhb,.reader.framed .rdalt{display:none}
+.rdbtns{display:flex;align-items:center;gap:8px}
+.rdout{display:none;width:36px;height:36px;border:1px solid #34333A;border-radius:18px;color:var(--ink);font-size:16px;text-decoration:none;place-items:center}
+.reader.framed .rdout{display:grid}
+.rdpbar{display:none;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px 16px 14px;border-top:1px solid #222126}
+.reader.nosample .rdpbar{display:flex}
+.reader.nosample .rdhb,.reader.nosample .rdalt{display:none}
+.rdpbar button{height:38px;padding:0 14px;border:1px solid #34333A;border-radius:19px;background:transparent;color:var(--ink);font-size:13.5px;white-space:nowrap}
+.rdpbar .rdpaste{border-color:color-mix(in srgb,var(--mint) 55%,#34333A);color:var(--mint);font-weight:700}
+.rdsrc,.rdmine{display:none}
+.reader.showmine .rdsrc{display:inline-block}
+.reader.hasmine:not(.showmine) .rdmine{display:inline-block}
+.rdpform{position:absolute;left:0;right:0;bottom:0;max-width:720px;margin:0 auto;padding:16px;background:#141418;border:1px solid #2E2D33;border-radius:16px 16px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:10px}
+.rdpform[hidden]{display:none}
+.rdphint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.rdptext{min-height:38vh;font-size:15px;line-height:1.7;resize:vertical}
+.rdpbtns{display:flex;justify-content:flex-end;gap:8px}
+.rdpbtns button{height:40px;padding:0 18px;border-radius:20px;font-size:14.5px}
+.rdpcancel{border:1px solid #34333A;background:transparent;color:var(--ink)}
 .rdalt a{color:var(--muted);text-decoration:underline;text-underline-offset:3px}
 .chapmain{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 13px;border:1px solid color-mix(in srgb,var(--orange) 55%,var(--rule));border-radius:15px;background:color-mix(in srgb,var(--orange) 12%,transparent);color:var(--orange);font-size:13.5px;font-weight:700;text-decoration:none;white-space:nowrap}
 .chapmain::before{content:"";width:14px;height:14px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z'/%3E%3Cpath d='M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z'/%3E%3Cpath d='M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z'/%3E%3C/svg%3E") center/contain no-repeat}
@@ -2482,8 +2503,6 @@ button:active{filter:brightness(1.15)}
       return;
     }
     if(b.classList.contains("chapread")){
-      var pcl=onDesktop()&&chapLinks(n);   // PC에서는 홀리바이블 개역개정 장 전체를 새 탭으로
-      if(pcl){window.open(pcl.hbpc,"_blank","noopener");return}
       openReader(n);return;
     }
     if(b.classList.contains("apall")){openProg();return}
@@ -4098,7 +4117,7 @@ button:active{filter:brightness(1.15)}
       if(/^하/.test(nx)&&/(게|려|도록|고자|기를|게도)$/.test(x))return R(null,true);   // 행하게 하려 하심이니라 → 한 덩어리
       if(/(과|와)$/.test(x)&&nx==="함께")return R(null,true);
       if(x==="함께")return R("누구와 함께?");
-      if(/(위하여|위해|위한)$/.test(x))return R("무엇을 위해?");
+      if(/(위하여|위해|위한)$/.test(x)){if(nx&&w[i+2]){var rr=R("무엇을 위해?",true);rr.keep=1;return rr}return R("무엇을 위해?")}   // 선한 일을 위하여 지으심을 받은 자니 → 한 덩어리
       if(/(므로|니까|때문에|까닭에|인하여|인하여서)$/.test(x))return R("왜?");
       if(/(도록|려고|고자)$/.test(x))return R("무엇을 하려고?");
       if(/(에게|에게서|께|한테)$/.test(x))return R("누구에게?");
@@ -4142,12 +4161,12 @@ button:active{filter:brightness(1.15)}
       }
       return R(null,true);
     }
-    var out=[], cur=[], qs=[];
+    var out=[], cur=[], qs=[], keepQ=null;
     for(var i=0;i<w.length;i++){
-      var r=role(i); cur.push(w[i]); if(r.q)qs.push(r.q);
-      var end=i===w.length-1;
-      if((!r.hold&&r.q)||cur.length>=5||end){
-        var q=qs.length?qs[qs.length-1]:"그다음은?";
+      var r=role(i); cur.push(w[i]); if(r.q)qs.push(r.q); if(r.keep)keepQ=r.q;
+      var end=i===w.length-1, verbEnd=keepQ&&/(니|라|며|고|사|나니|도다|느니라)$/.test(w[i].replace(/[^가-힣]/g,""));
+      if(keepQ?(verbEnd||cur.length>=7||end):((!r.hold&&r.q)||cur.length>=5||end)){
+        var q=keepQ||(qs.length?qs[qs.length-1]:"그다음은?"); keepQ=null;
         if(WEAK[q]){for(var k=0;k<qs.length-1;k++)if(!WEAK[qs[k]]){q=qs[k];break}}
         out.push({q:q,a:cur.join(" ")}); cur=[]; qs=[];
       }
@@ -4607,12 +4626,27 @@ button:active{filter:brightness(1.15)}
     var cl=chapLinks(n); if(!cl)return;
     if(!rd){
       rd=document.createElement("div"); rd.className="reader"; rd.setAttribute("role","dialog"); rd.setAttribute("aria-modal","true");
-      rd.innerHTML='<div class="rdbar"><div class="rdtitle"><b class="rdname"></b><span class="rdver">개역한글</span></div><button type="button" class="rdclose">닫기</button></div>'+
+      rd.innerHTML='<div class="rdbar"><div class="rdtitle"><b class="rdname"></b><span class="rdver">개역한글</span></div><div class="rdbtns"><a class="rdout" target="_blank" rel="noopener" title="새 탭에서 열기" aria-label="새 탭에서 열기">↗</a><button type="button" class="rdclose">닫기</button></div></div>'+
         '<a class="rdhb" target="_blank" rel="noopener">개역개정으로 보기 (대한성서공회) ↗</a>'+
         '<p class="rdalt">안 열리면 <a class="rdhb2" target="_blank" rel="noopener">홀리바이블로 보기</a>를 길게 눌러 크롬에서 열어 주세요.</p>'+
-        '<div class="rdscroll"><ol class="rdlist"></ol><div class="rdmsg" aria-live="polite"></div>'+'</div>';
+        '<div class="rdscroll"><ol class="rdlist"></ol><div class="rdmsg" aria-live="polite"></div>'+'</div>'+
+        '<iframe class="rdframe" title="개역개정 장 전체 (대한성서공회)" referrerpolicy="no-referrer"></iframe>'+
+        '<div class="rdpbar"><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 성서공회 원문</button><button type="button" class="rdmine">📖 내 본문으로 보기</button></div>'+
+        '<div class="rdpform" hidden><p class="rdphint">성서공회나 홀리바이블에서 장 본문을 복사해 붙여 넣으세요. 절 번호(1, 2, 3 …)가 있으면 절마다 나눠요. 이 기기에만 저장돼요.</p>'+
+        '<textarea class="field rdptext" placeholder="1 그는 허물과 죄로 죽었던 너희를 살리셨도다&#10;2 그 때에 너희는 …" aria-label="장 본문 붙여넣기"></textarea>'+
+        '<div class="rdpbtns"><button type="button" class="rdpcancel">취소</button><button type="button" class="primary rdpsave">저장</button></div></div>';
       document.body.appendChild(rd);
       rd.querySelector(".rdclose").addEventListener("click",closeReader);
+      rd.querySelector(".rdpaste").addEventListener("click",function(){var f=rd.querySelector(".rdpform");f.hidden=false;var t=f.querySelector(".rdptext");t.value="";t.focus()});
+      rd.querySelector(".rdpcancel").addEventListener("click",function(){rd.querySelector(".rdpform").hidden=true});
+      rd.querySelector(".rdpsave").addEventListener("click",function(){
+        var vs=parseChapterPaste(rd.querySelector(".rdptext").value);
+        if(vs.length<2){toast("절 번호를 찾지 못했어요. 절 번호까지 함께 복사해 주세요.");return}
+        saveMyChapter(rd.dataset.key,vs); rd.querySelector(".rdpform").hidden=true;
+        showMine(true); toast(vs.length+"절을 저장했어요");
+      });
+      rd.querySelector(".rdsrc").addEventListener("click",function(){showMine(false)});
+      rd.querySelector(".rdmine").addEventListener("click",function(){showMine(true)});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&rd&&!rd.hidden)closeReader()});
     }
     var key=USFM[n.book]+"-"+n.chapter;
@@ -4621,8 +4655,43 @@ button:active{filter:brightness(1.15)}
     rd.querySelector(".rdlist").textContent=""; rd.querySelector(".rdmsg").textContent="";
     rd.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     rd.dataset.hl=String(n.verse||0); rd.dataset.key=key;
+    // Claude가 없으면: 대한성서공회 개역개정 페이지를 앱 안 창에 그대로 띄움 (본문을 가져오지 않음)
+    var framed=!sampleFn, fr=rd.querySelector(".rdframe");
+    rd.classList.toggle("framed",framed); rd.querySelector(".rdver").textContent=framed?"개역개정":"개역한글";
+    rd.querySelector(".rdout").href=cl.bs;
+    rd.dataset.bs=cl.bs; rd.querySelector(".rdpform").hidden=true; rd.classList.toggle("nosample",framed);
+    if(framed){showMine(!!myChapters()[key]);return}
     if(chapCache[key]&&chapCache[key].done){drawReader(chapCache[key].verses,n.verse);return}
     loadChapter(n,key);
+  }
+  /* ---------- 내가 붙여 넣은 장 본문 (개역개정을 직접 복사해 이 기기에만 저장) ---------- */
+  var MYCH="bible-my-chapters";
+  function myChapters(){try{var o=JSON.parse(localStorage.getItem(MYCH)||"{}");return o&&typeof o==="object"?o:{}}catch(e){return {}}}
+  function saveMyChapter(key,verses){var o=myChapters();o[key]={v:verses,at:Date.now()};try{localStorage.setItem(MYCH,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")}}
+  function parseChapterPaste(txt){
+    var clean=function(t){return t.replace(/\d+\)/g,"").replace(/\s+/g," ").trim()}, out=[];
+    // 한 줄에 한 절: "1 본문", "1. 본문", "1절 본문" (절 번호 없는 줄은 소제목으로 보고 건너뜀)
+    String(txt||"").replace(/\r/g,"").split("\n").forEach(function(L){
+      var m=L.trim().match(/^(\d{1,3})(?:\s*(?:절|[.):]))?\s*(?!장|편)(\S.*)$/);
+      if(!m)return;
+      if(+m[1]===1)out=[];   // 1절이 나오면 거기서부터 다시 (앞의 제목 숫자 무시)
+      if(+m[1]===(out.length?out[out.length-1].v+1:+m[1]))out.push({v:+m[1],t:clean(m[2])});
+    });
+    if(out.length>=2)return out.filter(function(x){return x.t});
+    // 절 번호가 한 줄에 이어진 경우: 1, 2, 3 … 차례대로 나오는 숫자에서만 자름
+    var flat=String(txt||"").replace(/\s+/g," "), re=/(\d{1,3})\s*\.?\s*/g, m2, marks=[], next=null;
+    while((m2=re.exec(flat))){var v=+m2[1]; if(next===null?v<=2:v===next){marks.push({v:v,at:m2.index,body:re.lastIndex});next=v+1}}
+    out=marks.map(function(k,i){return {v:k.v,t:clean(flat.slice(k.body,i+1<marks.length?marks[i+1].at:flat.length))}});
+    return out.filter(function(x){return x.t});
+  }
+  function showMine(mine){
+    var key=rd.dataset.key, saved=myChapters()[key], fr=rd.querySelector(".rdframe");
+    mine=mine&&!!saved;
+    rd.classList.toggle("framed",!mine); rd.classList.toggle("hasmine",!!saved);
+    rd.querySelector(".rdpaste").textContent=saved?"📋 다시 붙여넣기":"📋 복사한 본문 붙여넣기";
+    if(mine){rd.querySelector(".rdmsg").textContent="";drawReader(saved.v,+rd.dataset.hl)}
+    else if(fr.dataset.src!==rd.dataset.bs){fr.dataset.src=rd.dataset.bs;fr.src=rd.dataset.bs}
+    rd.classList.toggle("showmine",mine);
   }
   function closeReader(){if(!rd)return; if(rdCtl)rdCtl.abort(); rd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
   function drawReader(verses,hl){
@@ -5000,7 +5069,7 @@ button:active{filter:brightness(1.15)}
   /* ---------- 백업 저장 / 불러오기 (claude.ai ↔ 내 GitHub 노트 옮기기) ---------- */
   function backupData(){
     flushAll();
-    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values())});
+    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values()),chapters:myChapters()});
   }
   $("backupSave").addEventListener("click",function(){
     var d=new Date(), name="말씀묵상노트_백업_"+d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2)+".json", data=backupData();
@@ -5020,6 +5089,7 @@ button:active{filter:brightness(1.15)}
       try{
         var obj=JSON.parse(String(r.result||"")), arr=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.notes)?obj.notes:null);
         if(!arr){toast("말씀 묵상 노트 백업 파일이 아니에요");return}
+        if(obj&&obj.chapters&&typeof obj.chapters==="object"){var mc=myChapters();Object.keys(obj.chapters).forEach(function(k){var c=obj.chapters[k];if(c&&Array.isArray(c.v)&&(!mc[k]||(+c.at||0)>(+mc[k].at||0)))mc[k]=c});try{localStorage.setItem(MYCH,JSON.stringify(mc))}catch(e){}}
         var added=0, updated=0;
         arr.forEach(function(x){
           if(!x||!x.id||!x.text)return;
