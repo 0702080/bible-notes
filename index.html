@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-07-03">
+<meta name="app-build" content="2026-10-07-04">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1030,10 +1030,29 @@ body.reorder .note .chead .copyv{display:none}
 .mreveal svg,.mlicon{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mreveal:disabled{opacity:.35}
 /* ===== 말씀 활용 제안 ===== */
-.useopen,.vedit,.vtopic{display:inline-flex;align-items:center;height:30px;padding:0 12px;border:1px solid var(--rule);border-radius:15px;background:transparent;color:var(--muted);font-size:13px}
+.useopen,.vedit,.vtopic,.vxref{display:inline-flex;align-items:center;height:30px;padding:0 12px;border:1px solid var(--rule);border-radius:15px;background:transparent;color:var(--muted);font-size:13px}
 .useopen.on{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,var(--rule))}
-body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic{display:none}
+body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic,body.reorder .note .vxref,body.reorder .note .xpanel{display:none}
 .vtopic{white-space:nowrap}
+.vxref{white-space:nowrap}
+.vxref[aria-expanded="true"]{color:var(--mint);border-color:color-mix(in srgb,var(--mint) 55%,var(--rule))}
+.note:not(.open) .xpanel{display:none}
+.xpanel{margin:0 0 12px;padding:12px 14px;border-radius:14px;background:#101013;border:1px solid #232229}
+.xpanel[hidden]{display:none}
+.xhd{font-size:14px;font-weight:700;color:var(--mint);margin-bottom:6px}
+.xsec{margin:10px 0 4px;font-size:12.5px;font-weight:700;color:var(--ink)}
+.xsec span{font-weight:400;color:var(--faint);margin-left:4px}
+.xlist{list-style:none;margin:0;padding:0}
+.xlist li{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px dashed #232229;min-width:0}
+.xlist li:last-child{border-bottom:0}
+.xlist .xref{font-size:14px;color:var(--violet);white-space:nowrap}
+.xlist .xsnip{flex:1;min-width:0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xcross .xref{flex:1}
+.xgo{font-size:12.5px;color:var(--muted);text-decoration:none;white-space:nowrap}
+.xadd,.xopen{height:28px;padding:0 11px;border:1px solid #34333A;border-radius:14px;background:transparent;color:var(--ink);font-size:12.5px;white-space:nowrap}
+.xadd{color:var(--mint);border-color:color-mix(in srgb,var(--mint) 50%,#34333A)}
+.xmsg{font-size:12.5px;color:var(--faint)}
+.xsrc{margin:8px 0 0;font-size:11px;color:var(--faint)}
 .vedit[aria-expanded="true"]{color:var(--green);border-color:color-mix(in srgb,var(--green) 55%,var(--rule))}
 .usepanel{margin:2px 0 14px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 30%,var(--rule));border-radius:14px;background:#101013}
 .usepanel[hidden]{display:none}
@@ -1910,7 +1929,8 @@ button:active{filter:brightness(1.15)}
       '<div class="verse"></div>'+
       '<div class="hits"></div>'+
       '<div class="editbox" hidden><input class="field eref" aria-label="성경 구절"><textarea class="field etext" aria-label="말씀"></textarea><button type="button" class="small donedit">완료</button></div>'+
-      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">💡 언제 쓸까</button><button type="button" class="vedit" aria-expanded="false">✏️ 말씀 고치기</button><button type="button" class="vtopic">🏷️ 주제 정하기</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
+      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">💡 언제 쓸까</button><button type="button" class="vedit" aria-expanded="false">✏️ 말씀 고치기</button><button type="button" class="vtopic">🏷️ 주제 정하기</button><button type="button" class="vxref" aria-expanded="false">🔗 연결 말씀</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
+      '<div class="xpanel" hidden></div>'+
       '<div class="usepanel" hidden></div>'+
       '<div class="mempanel" hidden></div>'+
       '<div class="trow"><button type="button" class="toggle" aria-expanded="false"><span class="chev" aria-hidden="true"></span><span class="tl"></span><span class="meta"></span></button></div>'+
@@ -2439,7 +2459,7 @@ button:active{filter:brightness(1.15)}
       return;
     }
     var tapCard=e.target.closest(".note");
-    if(tapCard&&!e.target.closest("button,textarea,input,select,a,details,summary,.pop,.editbox,.focusrow,.chip,.sugg,.himgs,.pastezone,.sform,.hsheets,.essays,.topics,.verse.picking,.verse.picking .w,.verse.memv,.mempanel,.usepanel")){
+    if(tapCard&&!e.target.closest("button,textarea,input,select,a,details,summary,.pop,.editbox,.xpanel,.focusrow,.chip,.sugg,.himgs,.pastezone,.sform,.hsheets,.essays,.topics,.verse.picking,.verse.picking .w,.verse.memv,.mempanel,.usepanel")){
       var tid=tapCard.dataset.id, isOpen=openIds.has(tid);
       if(!isOpen||!e.target.closest(".body")){
         var sel=window.getSelection&&String(window.getSelection()||"");
@@ -2454,6 +2474,9 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("tab")){tabOf.set(id,b.dataset.tab);render();return}
     if(b.classList.contains("mtopic")){b.closest("details").open=false;openPicker(id);return}
     if(b.classList.contains("vtopic")){openPicker(id);return}
+    if(b.classList.contains("vxref")){toggleXref(card,n);return}
+    if(b.classList.contains("xadd")){addFromXref(b.dataset.b,b.dataset.c,b.dataset.v,b.dataset.label);return}
+    if(b.classList.contains("xopen")){var xo=b.dataset.id;openOne(xo);render();var xe=cards.get(xo);if(xe)setTimeout(function(){xe.scrollIntoView({block:"start",behavior:"smooth"})},80);return}
     if(b.classList.contains("medit")||b.classList.contains("vedit")){
       var ve=card.querySelector(".vedit"), eb=card.querySelector(".editbox");
       if(b.classList.contains("vedit")&&!eb.hidden){eb.hidden=true;ve.setAttribute("aria-expanded","false");ve.textContent="✏️ 말씀 고치기";flushNow(id);toast("말씀을 고쳤어요");return}
@@ -4734,6 +4757,70 @@ button:active{filter:brightness(1.15)}
     if(chapCache[key]&&chapCache[key].done){drawReader(chapCache[key].verses,n.verse);return}
     loadChapter(n,key);
   }
+  /* ---------- 연결 말씀 추천: 성경 관주(OpenBible.info, CC BY) + 내가 담은 말씀 ---------- */
+  var XREF=null, xrefLoading=null;
+  function loadXref(){
+    if(XREF)return Promise.resolve(XREF); if(xrefLoading)return xrefLoading;
+    xrefLoading=fetch("xref.txt").then(function(r){if(!r.ok)throw new Error("x");return r.text()}).then(function(t){
+      var m={}; t.split("\n").forEach(function(l){var k=l.indexOf(">");if(k>0)m[l.slice(0,k)]=l.slice(k+1)}); XREF=m; return m;
+    }).catch(function(e){xrefLoading=null;throw e});
+    return xrefLoading;
+  }
+  function parseX(s){var a=s.split("-"),p=a[0].split(".").map(Number),r={b:p[0],c:p[1],v:p[2]};if(a[1]){var q=a[1].split(".").map(Number);if(q.length===1)r.ve=q[0];else r.more=true}return r}
+  function xLabel(r){return BOOKS[r.b]+" "+r.c+":"+r.v+(r.ve?"-"+r.ve:r.more?" 이하":"")}
+  function myNoteAt(b,c,v){var hit=null;notes.forEach(function(x){if(!hit&&x.book===b&&x.chapter===c&&x.verse===v)hit=x});return hit}
+  var XSTOP=/^(여호|하나|우리|너희|그의|그가|그는|이는|있는|하는|하여|하고|하니|하라|하리|그러|이제|모든|자는|자가|것이|것을|내가|나의|너의|저희)$/;
+  function stemsOf(text){var o={};wordsOf(text).forEach(function(w){w=w.replace(/[^가-힣]/g,"");if(w.length>=2){var k=w.slice(0,2);if(!XSTOP.test(k))o[k]=1}});return o}
+  function relatedMine(n){
+    var my=stemsOf(n.text), out=[];
+    notes.forEach(function(x){
+      if(x.id===n.id)return;
+      var sc=0, st=stemsOf(x.text);
+      Object.keys(my).forEach(function(k){if(st[k])sc+=1});
+      var shared=x.topics.filter(function(t){return n.topics.indexOf(t)>=0}); sc+=shared.length*3;
+      if(sc>=2)out.push({n:x,sc:sc,topics:shared});
+    });
+    return out.sort(function(a,b){return b.sc-a.sc}).slice(0,5);
+  }
+  function toggleXref(card,n){
+    var pn=card.querySelector(".xpanel"), bt=card.querySelector(".vxref"), open=pn.hidden;
+    pn.hidden=!open; bt.setAttribute("aria-expanded",String(open));
+    if(open)fillXref(pn,n);
+  }
+  function fillXref(pn,n){
+    pn.innerHTML='<div class="xhd">🔗 연결 말씀</div><div class="xsec">성경 관주 <span>서로 연결된 구절</span></div><ul class="xlist xcross"><li class="xmsg">불러오는 중이에요…</li></ul>'+
+      '<div class="xsec">내 말씀 중에서 <span>같은 낱말·주제</span></div><ul class="xlist xmine"></ul><p class="xsrc">관주 자료: OpenBible.info (CC BY)</p>';
+    var mine=pn.querySelector(".xmine"), rel=relatedMine(n);
+    if(!rel.length)mine.innerHTML='<li class="xmsg">아직 이어지는 내 말씀이 없어요.</li>';
+    rel.forEach(function(r){
+      var li=document.createElement("li"); li.innerHTML='<b class="xref"></b><span class="xsnip"></span><button type="button" class="xopen">열기</button>';
+      li.querySelector(".xref").textContent=r.n.ref; li.querySelector(".xsnip").textContent=(r.topics.length?"#"+r.topics.join(" #")+"  ":"")+r.n.text.replace(/\s+/g," ").slice(0,28)+"…";
+      li.querySelector(".xopen").dataset.id=r.n.id; mine.appendChild(li);
+    });
+    var cross=pn.querySelector(".xcross");
+    if(!(n.book>=0&&n.chapter>0&&n.verse>0)){cross.innerHTML='<li class="xmsg">구절 주소(예: 시편 111:10)가 있어야 관주를 찾을 수 있어요.</li>';return}
+    loadXref().then(function(m){
+      var line=m[n.book+"."+n.chapter+"."+n.verse]; cross.textContent="";
+      if(!line){cross.innerHTML='<li class="xmsg">이 구절은 관주 자료가 없어요.</li>';return}
+      line.split(",").forEach(function(s){
+        var r=parseX(s), have=myNoteAt(r.b,r.c,r.v), li=document.createElement("li"), lab=xLabel(r);
+        var hb="http://www.holybible.or.kr/"+(onDesktop()?"":"mobile/")+"B_GAE/cgi/bibleftxt.php?VR=GAE&VL="+(r.b+1)+"&CN="+r.c+"&CV=99";
+        li.innerHTML='<b class="xref"></b><a class="xgo" target="_blank" rel="noopener">보기 ↗</a>'+(have?'<button type="button" class="xopen">담은 말씀</button>':'<button type="button" class="xadd">+ 담기</button>');
+        li.querySelector(".xref").textContent=lab; li.querySelector(".xgo").href=hb;
+        var bb=li.querySelector("button"); if(have)bb.dataset.id=have.id; else {bb.dataset.b=r.b;bb.dataset.c=r.c;bb.dataset.v=r.v;bb.dataset.label=BOOKS[r.b]+" "+r.c+":"+r.v}
+        cross.appendChild(li);
+      });
+    }).catch(function(){cross.innerHTML='<li class="xmsg">관주를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'});
+  }
+  // 관주 구절 담기: 말씀 담기 창을 열고 구절 주소를 채움 (장 본문을 붙여 둔 적이 있으면 본문도 채움)
+  function addFromXref(b,c,v,label){
+    openSheet(); openManual(true); $("mRef").value=label;
+    var ch=myChapters()[USFM[+b]+"-"+(+c)], vv=ch&&ch.v.filter(function(x){return x.v===+v})[0];
+    $("mText").value=vv?vv.t:"";
+    setTimeout(function(){$("mText").focus()},120);
+    if(!vv)toast("홀리바이블에서 본문을 복사해 붙여 넣으세요");
+  }
+
   /* ---------- 내가 붙여 넣은 장 본문 (개역개정을 직접 복사해 이 기기에만 저장) ---------- */
   var MYCH="bible-my-chapters";
   function myChapters(){try{var o=JSON.parse(localStorage.getItem(MYCH)||"{}");return o&&typeof o==="object"?o:{}}catch(e){return {}}}
