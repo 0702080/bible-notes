@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-02">
+<meta name="app-build" content="2026-10-08-03">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1564,6 +1564,46 @@ button:active{filter:brightness(1.15)}
 .mrow3.nextstep .mdate{color:var(--green);font-weight:700}
 .msteps{margin-top:10px}
 .rvchip.on{background:var(--gold);color:#141416}
+.daily{position:fixed;inset:0;z-index:66;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.daily[hidden]{display:none}
+.dlbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #222126}
+.dltitle{font-size:18px;color:var(--gold)}
+.dlclose{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:14.5px}
+.dlbody{flex:1;overflow:auto;padding:12px 16px 28px;max-width:640px;width:100%;margin:0 auto;box-sizing:border-box;scrollbar-width:none}
+.dlbody::-webkit-scrollbar{display:none}
+.dlday{display:flex;align-items:center;justify-content:center;gap:14px}
+.dlday button{width:36px;height:36px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:13px}
+.dlday button:disabled{opacity:.3}
+.dldate{font-size:16px;color:var(--ink);min-width:120px;text-align:center}
+.dlprog{display:flex;align-items:center;gap:10px;margin:12px 0 4px}
+.dlcnt{font-size:15px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
+.dlbarw{flex:1;height:8px;border-radius:4px;background:#222126;overflow:hidden}
+.dlbarw i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .35s}
+.dlweek{display:flex;justify-content:space-between;gap:6px;margin:10px 0 6px}
+.dlw{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.dlw i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;color:#141416;background:color-mix(in srgb,var(--gold) calc(var(--f) * 100%),#1c1b21)}
+.dlw b{font-size:11px;color:var(--faint);font-weight:500}
+.dlw.cur b{color:var(--gold);font-weight:700}
+.dlw.cur i{box-shadow:0 0 0 2px var(--gold)}
+.dlgh{margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--muted)}
+.dlitem{display:flex;align-items:center;gap:6px}
+.dlrow{flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:10px 10px;margin:2px 0;border:1px solid #232229;border-radius:12px;background:#121216;color:var(--ink);font-size:15px;text-align:left}
+.dlbox{flex:0 0 22px;height:22px;border:2px solid color-mix(in srgb,var(--gold) 70%,var(--rule));border-radius:6px;display:grid;place-items:center}
+.dlrow.on{background:color-mix(in srgb,var(--gold) 10%,#121216);border-color:color-mix(in srgb,var(--gold) 40%,#232229)}
+.dlrow.on .dlbox{background:var(--gold);border-color:var(--gold)}
+.dlrow.on .dlbox::after{content:"✓";color:#141416;font-size:14px;font-weight:700}
+.dlrow.on .dlt{color:var(--muted)}
+.dlt{flex:1;min-width:0;word-break:keep-all}
+.dlauto{flex:0 0 auto;font-size:10.5px;color:var(--sky);white-space:nowrap}
+.dldel{flex:0 0 auto;height:30px;min-width:30px;padding:0 8px;border:0;border-radius:15px;background:transparent;color:var(--faint);font-size:16px;white-space:nowrap}
+.dldel.sure{color:var(--pink);font-size:12px}
+.dladd{display:flex;gap:6px;margin-top:14px}
+.dladd[hidden]{display:none}
+.dlg{flex:0 0 auto;width:auto;height:40px;font-size:13px;padding:0 6px}
+.dlin{flex:1;min-width:0;height:40px;font-size:14px}
+.dladd button{flex:0 0 auto;height:40px;padding:0 14px;border-radius:20px;white-space:nowrap}
+.dledit{display:block;margin:16px auto 0;height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--muted);font-size:13.5px}
+@media (max-width:400px){.dlg{max-width:96px}}
 .note.spotin{animation:spotin .45s cubic-bezier(.2,1.3,.4,1)}
 @keyframes spotin{0%{transform:translateY(-10px);opacity:.4}100%{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.note.spotin{animation:none}}
@@ -3237,6 +3277,7 @@ button:active{filter:brightness(1.15)}
   }
   $("reviewBar").addEventListener("click",function(e){
     var b=e.target.closest(".rvchip"); if(!b)return;
+    if(b.dataset.act==="daily"){openDaily();return}
     var id=b.dataset.id, act=b.dataset.act||"mem"; setTopics([]);
     if(act==="mem")memOpen.add(id);
     if(act==="med"||act==="act")tabOf.set(id,act==="med"?"m":"a");
@@ -4281,6 +4322,104 @@ button:active{filter:brightness(1.15)}
   }
   var spotId=null;
   function lastOpenId(){try{return localStorage.getItem("bible-last-open")||""}catch(e){return ""}}
+  /* ---------- 하루 돌아보기 체크리스트 (이 기기에 저장, 백업에 함께 들어감) ---------- */
+  var DAILY_KEY="bible-daily";
+  var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도"},{g:"word",e:"📖",t:"말씀"},{g:"fruit",e:"🍇",t:"성령의 열매"},{g:"thanks",e:"💛",t:"감사·나눔"}];
+  var DAILY_DEFAULT=[
+    ["pray","대적 기도를 했는가"],["pray","필요한 것을 구하는 기도를 했는가"],["pray","버리는(내려놓는) 기도를 했는가"],["pray","회개 기도를 했는가"],["pray","누군가를 위해 중보 기도를 했는가"],
+    ["word","말씀을 읽고 묵상했는가"],["word","붙든 말씀을 하루 중에 다시 떠올렸는가"],
+    ["fruit","인내했는가"],["fruit","절제했는가"],["fruit","온유하게 말했는가"],["fruit","미워하는 마음 없이 용서했는가"],
+    ["thanks","감사한 것을 적었는가","thanks"],["thanks","하나님을 찬양했는가"],["thanks","받은 은혜를 누군가와 나눴는가"]
+  ];
+  function dailyData(){
+    var o=null; try{o=JSON.parse(localStorage.getItem(DAILY_KEY)||"null")}catch(e){}
+    if(!o||!Array.isArray(o.items))o={items:DAILY_DEFAULT.map(function(x,i){var it={id:"d"+i,g:x[0],t:x[1]};if(x[2])it.auto=x[2];return it}),days:{}};
+    if(!o.days||typeof o.days!=="object")o.days={};
+    return o;
+  }
+  function saveDaily(o){try{localStorage.setItem(DAILY_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")}}
+  // 그날 '감사' 실천에 한 줄을 적었으면 "감사한 것을 적었는가"는 저절로 체크
+  function thanksOn(day){var hit=false;notes.forEach(function(n){(n.acts||[]).forEach(function(a){if(!hit&&actWord(a.t)==="감사"&&(a.logs||[]).some(function(l){return dkey(l.at)===day}))hit=true})});return hit}
+  function dailyChecked(o,day){
+    var on=(o.days[day]||[]).slice(), th=null;
+    o.items.forEach(function(it){if(it.auto==="thanks"&&on.indexOf(it.id)<0){if(th===null)th=thanksOn(day);if(th)on.push(it.id)}});
+    return on.filter(function(id){return o.items.some(function(it){return it.id===id})});
+  }
+  var dl=null, dlDay="", dlEdit=false;
+  function dayName(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"}
+  function openDaily(){
+    if(!dl){
+      dl=document.createElement("div"); dl.className="daily"; dl.setAttribute("role","dialog"); dl.setAttribute("aria-modal","true"); dl.hidden=true;
+      dl.innerHTML='<div class="dlbar"><b class="dltitle">🌙 하루 돌아보기</b><button type="button" class="dlclose">닫기</button></div>'+
+        '<div class="dlbody"><div class="dlday"><button type="button" class="dlprev" aria-label="전날">◀</button><b class="dldate"></b><button type="button" class="dlnext" aria-label="다음 날">▶</button></div>'+
+        '<div class="dlprog"><span class="dlcnt"></span><span class="dlbarw"><i></i></span></div><div class="dlweek" aria-label="최근 7일"></div>'+
+        '<div class="dllist"></div>'+
+        '<form class="dladd" autocomplete="off" hidden><select class="field dlg" aria-label="묶음"></select><input class="field dlin" maxlength="40" placeholder="새 항목 (예: 먼저 인사했는가)" aria-label="새 항목"><button type="submit" class="primary">추가</button></form>'+
+        '<button type="button" class="dledit">✏️ 항목 고치기</button></div>';
+      document.body.appendChild(dl);
+      dl.querySelector(".dlg").innerHTML=DAILY_GROUPS.map(function(g){return '<option value="'+g.g+'">'+g.e+' '+g.t+'</option>'}).join("");
+      dl.querySelector(".dlclose").addEventListener("click",closeDaily);
+      dl.querySelector(".dlprev").addEventListener("click",function(){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()-864e5);drawDaily()});
+      dl.querySelector(".dlnext").addEventListener("click",function(){var t=dkey(Date.now());if(dlDay<t){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()+864e5);drawDaily()}});
+      dl.querySelector(".dledit").addEventListener("click",function(){dlEdit=!dlEdit;drawDaily()});
+      dl.querySelector(".dladd").addEventListener("submit",function(e){
+        e.preventDefault(); var inp=dl.querySelector(".dlin"), t=inp.value.trim(); if(!t){inp.focus();return}
+        var o=dailyData(); o.items.push({id:"d"+Date.now().toString(36),g:dl.querySelector(".dlg").value,t:t.slice(0,40)}); saveDaily(o); inp.value=""; drawDaily(); inp.focus();
+      });
+      dl.querySelector(".dllist").addEventListener("click",function(e){
+        var b=e.target.closest("button"); if(!b)return; var o=dailyData(), id=b.dataset.id;
+        if(b.classList.contains("dldel")){
+          if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
+          o.items=o.items.filter(function(it){return it.id!==id}); saveDaily(o); drawDaily(); return;
+        }
+        if(b.classList.contains("dlrow")&&!dlEdit){
+          var it=o.items.filter(function(x){return x.id===id})[0]; if(!it)return;
+          var day=o.days[dlDay]||[], k=day.indexOf(id), wasAll=dailyChecked(o,dlDay).length===o.items.length;
+          if(it.auto==="thanks"&&k<0&&thanksOn(dlDay)){toast("한 줄 감사를 적어서 저절로 체크됐어요");return}
+          if(k>=0)day.splice(k,1);else day.push(id);
+          o.days[dlDay]=day; saveDaily(o); drawDaily(); renderReviewBar();
+          var nowAll=dailyChecked(o,dlDay).length===o.items.length;
+          if(nowAll&&!wasAll){toast("오늘 하루를 다 돌아봤어요 🙌");buzz([12,40,18,40,24]);confetti(dl.querySelector(".dlcnt"))}
+        }
+      });
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dl&&!dl.hidden)closeDaily()});
+    }
+    dlDay=dkey(Date.now()); dlEdit=false; drawDaily();
+    dl.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+  }
+  function closeDaily(){if(!dl)return; dl.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
+  function drawDaily(){
+    var o=dailyData(), on=dailyChecked(o,dlDay), today=dkey(Date.now());
+    dl.querySelector(".dldate").textContent=(dlDay===today?"오늘 ":dlDay===dkey(Date.now()-864e5)?"어제 ":"")+dayName(dlDay);
+    dl.querySelector(".dlnext").disabled=dlDay>=today;
+    var tot=o.items.length, c=on.length;
+    dl.querySelector(".dlcnt").textContent=c+" / "+tot;
+    dl.querySelector(".dlbarw i").style.width=(tot?Math.round(c/tot*100):0)+"%";
+    var wk=dl.querySelector(".dlweek"); wk.textContent="";
+    for(var i=6;i>=0;i--){
+      var k=dkey(Date.now()-i*864e5), cc=dailyChecked(o,k).length, d=document.createElement("span");
+      d.className="dlw"+(k===dlDay?" cur":""); d.title=dayName(k)+" "+cc+"/"+tot;
+      d.innerHTML='<i></i><b></b>'; d.querySelector("b").textContent="일월화수목금토".charAt(new Date(k+"T12:00:00").getDay());
+      d.querySelector("i").style.setProperty("--f",tot?(cc/tot):0); d.querySelector("i").textContent=cc||"";
+      wk.appendChild(d);
+    }
+    var list=dl.querySelector(".dllist"); list.textContent="";
+    DAILY_GROUPS.forEach(function(g){
+      var its=o.items.filter(function(it){return it.g===g.g}); if(!its.length)return;
+      var h=document.createElement("div"); h.className="dlgh"; h.textContent=g.e+" "+g.t+"  "+its.filter(function(it){return on.indexOf(it.id)>=0}).length+"/"+its.length; list.appendChild(h);
+      its.forEach(function(it){
+        var row=document.createElement("div"); row.className="dlitem";
+        var b=document.createElement("button"); b.type="button"; b.className="dlrow"+(on.indexOf(it.id)>=0?" on":""); b.dataset.id=it.id; b.setAttribute("aria-pressed",String(on.indexOf(it.id)>=0));
+        b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>'+(it.auto?'<span class="dlauto">한 줄 감사로 자동</span>':'');
+        b.querySelector(".dlt").textContent=it.t; row.appendChild(b);
+        if(dlEdit){var x=document.createElement("button");x.type="button";x.className="dldel";x.dataset.id=it.id;x.textContent="×";x.setAttribute("aria-label","이 항목 지우기");row.appendChild(x)}
+        list.appendChild(row);
+      });
+    });
+    dl.querySelector(".dladd").hidden=!dlEdit;
+    dl.querySelector(".dledit").textContent=dlEdit?"✓ 고치기 끝":"✏️ 항목 고치기";
+  }
+
   function renderReviewBar(){
     var bar=$("reviewBar"); if(!bar)return;
     bar.textContent="";
@@ -4304,6 +4443,8 @@ button:active{filter:brightness(1.15)}
     // 4) 이어서 보기
     var lo=notes.get(lastOpenId());
     if(lo&&!openIds.has(lo.id)&&!rows.some(function(r){return r.chips.some(function(c){return c.id===lo.id})}))rows.push({icon:"↩️",label:"이어서",chips:[{id:lo.id,t:lo.ref,act:"open"}]});
+    var dd=dailyData(), dc=dailyChecked(dd,dkey(Date.now())).length, dt=dd.items.length;
+    rows.push({icon:"🌙",label:"하루 돌아보기",chips:[{id:"",t:dc+" / "+dt,act:"daily"}],done:dt>0&&dc===dt});
     bar.hidden=!rows.length;
     if(!rows.length)return;
     var h=document.createElement("div"); h.className="tdh"; h.textContent="오늘"; bar.appendChild(h);
@@ -5420,7 +5561,7 @@ button:active{filter:brightness(1.15)}
   /* ---------- 백업 저장 / 불러오기 (claude.ai ↔ 내 GitHub 노트 옮기기) ---------- */
   function backupData(){
     flushAll();
-    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values()),chapters:myChapters()});
+    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values()),chapters:myChapters(),daily:dailyData()});
   }
   $("backupSave").addEventListener("click",function(){
     var d=new Date(), name="말씀묵상노트_백업_"+d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2)+".json", data=backupData();
@@ -5440,6 +5581,10 @@ button:active{filter:brightness(1.15)}
       try{
         var obj=JSON.parse(String(r.result||"")), arr=Array.isArray(obj)?obj:(obj&&Array.isArray(obj.notes)?obj.notes:null);
         if(!arr){toast("말씀 묵상 노트 백업 파일이 아니에요");return}
+        if(obj&&obj.daily&&Array.isArray(obj.daily.items)){var od=dailyData(),hasOwn=false;try{hasOwn=!!localStorage.getItem(DAILY_KEY)}catch(e){}
+          if(!hasOwn)od.items=obj.daily.items; else obj.daily.items.forEach(function(it){if(it&&it.id&&!od.items.some(function(x){return x.id===it.id}))od.items.push(it)});
+          Object.keys(obj.daily.days||{}).forEach(function(k){var a=od.days[k]||[];(obj.daily.days[k]||[]).forEach(function(id){if(a.indexOf(id)<0)a.push(id)});od.days[k]=a});
+          saveDaily(od); renderReviewBar()}
         if(obj&&obj.chapters&&typeof obj.chapters==="object"){var mc=myChapters();Object.keys(obj.chapters).forEach(function(k){var c=obj.chapters[k];if(c&&Array.isArray(c.v)&&(!mc[k]||(+c.at||0)>(+mc[k].at||0)))mc[k]=c});try{localStorage.setItem(MYCH,JSON.stringify(mc))}catch(e){}}
         var added=0, updated=0;
         arr.forEach(function(x){
