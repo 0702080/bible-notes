@@ -2482,7 +2482,7 @@ button:active{filter:brightness(1.15)}
       return;
     }
     if(b.classList.contains("chapread")){
-      var pcl=isPC&&isPC.matches&&chapLinks(n);   // PC에서는 홀리바이블 개역개정 장 전체를 새 탭으로
+      var pcl=onDesktop()&&chapLinks(n);   // PC에서는 홀리바이블 개역개정 장 전체를 새 탭으로
       if(pcl){window.open(pcl.hbpc,"_blank","noopener");return}
       openReader(n);return;
     }
@@ -3273,6 +3273,8 @@ button:active{filter:brightness(1.15)}
   },true);
 
   /* ---------- PC에서 누를 때 '띡' 소리 (휴대폰은 진동) ---------- */
+  // 휴대폰이 아닌 컴퓨터 브라우저인지 (터치 노트북도 컴퓨터로 봄)
+  function onDesktop(){return !/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent||"")}
   var tickCtx=null, isPC=window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)");
   function tick(){
     try{
@@ -4615,7 +4617,7 @@ button:active{filter:brightness(1.15)}
     }
     var key=USFM[n.book]+"-"+n.chapter;
     rd.querySelector(".rdname").textContent=chapLabel(n);
-    rd.querySelector(".rdhb").href=cl.bs; rd.querySelector(".rdhb2").href=cl.hb;
+    rd.querySelector(".rdhb").href=cl.bs; rd.querySelector(".rdhb2").href=onDesktop()?cl.hbpc:cl.hb;
     rd.querySelector(".rdlist").textContent=""; rd.querySelector(".rdmsg").textContent="";
     rd.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     rd.dataset.hl=String(n.verse||0); rd.dataset.key=key;
