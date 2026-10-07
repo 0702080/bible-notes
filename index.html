@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-01">
+<meta name="app-build" content="2026-10-08-02">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3519,10 +3519,10 @@ button:active{filter:brightness(1.15)}
     document.body.appendChild(box); setTimeout(function(){box.remove()},1300);
   }
   // 실천 이름에서 짧은 이름 뽑기: "감사한 것을 글로 썼는가" → "감사"
-  var ACTWORDS=["감사","기도","찬양","말씀","묵상","칭찬","섬김","용서","전도","회개","사랑","순종","나눔","봉사","필사","암송","큐티"];
+  var ACTWORDS=["감사","기도","찬양","칭찬","섬김","용서","전도","회개","순종","나눔","봉사","필사","암송","큐티"];
   function actWord(t){
-    t=String(t||""); for(var i=0;i<ACTWORDS.length;i++)if(t.indexOf(ACTWORDS[i])>=0)return ACTWORDS[i];
-    var w=(t.trim().split(/\s+/)[0]||"").replace(/[^가-힣A-Za-z0-9]/g,"").replace(/(을|를|이|가|은|는|에|에서|으로|로|의|와|과|도|하기|하는|한)$/,"");
+    t=String(t||"").replace(/[(][^)]*[)]/g," "); for(var i=0;i<ACTWORDS.length;i++)if(t.indexOf(ACTWORDS[i])>=0)return ACTWORDS[i];
+    var ws=t.trim().split(/\s+/), w=(ws[ws.length-1]||"").replace(/[^가-힣A-Za-z0-9]/g,"").replace(/(했는가|하였는가|는가|었는가|았는가|하기)$/,function(m){return m==="하기"?"하기":""});   // 마지막 낱말(하는 일): "말씀으로 바라보기" → "바라보기"
     return w?w.slice(0,6):"기록";
   }
   /* ---------- 실천 한 줄 기록 (예: 한 줄 감사). 하루에 여러 줄, 적으면 오늘 칸이 체크됨 ---------- */
