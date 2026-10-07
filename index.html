@@ -808,7 +808,7 @@ body.reorder .note .pinbtn{display:none!important}
 .memopen,.fopen{height:30px;padding:0 13px;border:1px solid var(--rule);border-radius:15px;background:transparent;color:var(--muted);font-size:13px}
 .memopen.on,.fopen[aria-expanded="true"]{color:var(--ink);border-color:var(--ink)}
 .memopen.done{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,var(--rule))}
-.pop a.mgae{display:block;height:40px;line-height:40px;padding:0 12px;border-radius:8px;color:var(--ink);font-size:14.5px;text-decoration:none}
+.pop a.mgae{display:block;min-height:40px;line-height:1.35;padding-top:10px!important;padding-bottom:10px!important;padding:0 12px;border-radius:8px;color:var(--ink);font-size:14.5px;text-decoration:none}
 .pop a.mgae[hidden]{display:none}
 /* ===== 암송 ===== */
 .mempanel{margin:2px 0 14px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 35%,var(--rule));border-radius:14px;background:color-mix(in srgb,var(--gold) 6%,#101013)}
@@ -981,9 +981,10 @@ body.reorder .note .chead .copyv{display:none}
 .mreveal svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mreveal:disabled{opacity:.35}
 /* ===== 말씀 활용 제안 ===== */
-.useopen,.vedit{display:inline-flex;align-items:center;height:30px;padding:0 12px;border:1px solid var(--rule);border-radius:15px;background:transparent;color:var(--muted);font-size:13px}
+.useopen,.vedit,.vtopic{display:inline-flex;align-items:center;height:30px;padding:0 12px;border:1px solid var(--rule);border-radius:15px;background:transparent;color:var(--muted);font-size:13px}
 .useopen.on{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,var(--rule))}
-body.reorder .note .useopen,body.reorder .note .vedit{display:none}
+body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic{display:none}
+.vtopic{white-space:nowrap}
 .vedit[aria-expanded="true"]{color:var(--green);border-color:color-mix(in srgb,var(--green) 55%,var(--rule))}
 .usepanel{margin:2px 0 14px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 30%,var(--rule));border-radius:14px;background:#101013}
 .usepanel[hidden]{display:none}
@@ -1851,7 +1852,7 @@ button:active{filter:brightness(1.15)}
       '<div class="verse"></div>'+
       '<div class="hits"></div>'+
       '<div class="editbox" hidden><input class="field eref" aria-label="성경 구절"><textarea class="field etext" aria-label="말씀"></textarea><button type="button" class="small donedit">완료</button></div>'+
-      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">💡 언제 쓸까</button><button type="button" class="vedit" aria-expanded="false">✏️ 말씀 고치기</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
+      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">💡 언제 쓸까</button><button type="button" class="vedit" aria-expanded="false">✏️ 말씀 고치기</button><button type="button" class="vtopic">🏷️ 주제 정하기</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
       '<div class="usepanel" hidden></div>'+
       '<div class="mempanel" hidden></div>'+
       '<div class="trow"><button type="button" class="toggle" aria-expanded="false"><span class="chev" aria-hidden="true"></span><span class="tl"></span><span class="meta"></span></button></div>'+
@@ -2393,6 +2394,7 @@ button:active{filter:brightness(1.15)}
     var id=card.dataset.id, n=notes.get(id); if(!n)return;
     if(b.classList.contains("tab")){tabOf.set(id,b.dataset.tab);render();return}
     if(b.classList.contains("mtopic")){b.closest("details").open=false;openPicker(id);return}
+    if(b.classList.contains("vtopic")){openPicker(id);return}
     if(b.classList.contains("medit")||b.classList.contains("vedit")){
       var ve=card.querySelector(".vedit"), eb=card.querySelector(".editbox");
       if(b.classList.contains("vedit")&&!eb.hidden){eb.hidden=true;ve.setAttribute("aria-expanded","false");ve.textContent="✏️ 말씀 고치기";flushNow(id);toast("말씀을 고쳤어요");return}
