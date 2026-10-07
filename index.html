@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-03">
+<meta name="app-build" content="2026-10-08-04">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5963,7 +5963,9 @@ button:active{filter:brightness(1.15)}
     if(show)f.focus(); else if(f.value){f.value="";filterText="";render()}
   });
   document.addEventListener("click",function(e){
-    document.querySelectorAll("details.menu[open]").forEach(function(d){if(!d.contains(e.target))d.open=false});
+    // 누른 버튼이 바로 다른 버튼으로 바뀌어도(노트 삭제 → 삭제하기) 메뉴 안을 누른 것으로 봄
+    var path=e.composedPath?e.composedPath():[];
+    document.querySelectorAll("details.menu[open]").forEach(function(d){if(!d.contains(e.target)&&path.indexOf(d)<0)d.open=false});
   });
   $("topMenu").addEventListener("click",function(e){if(e.target.closest(".pop button"))this.open=false});
   $("openProgBtn").addEventListener("click",openProg);
