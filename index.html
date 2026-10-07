@@ -1316,6 +1316,9 @@ button:active{filter:brightness(1.15)}
 .lquiz[hidden]{display:none}
 .lqlist{flex:1;overflow:auto;padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px}
 .lqlist[hidden]{display:none}
+/* 질문·순서 맞추기·가리기 창: 스크롤은 되고 스크롤바는 숨김 */
+.lqlist,.oqbuilt,.bqbody{scrollbar-width:none;-ms-overflow-style:none}
+.lqlist::-webkit-scrollbar,.oqbuilt::-webkit-scrollbar,.bqbody::-webkit-scrollbar{display:none}
 /* PC 넓은 화면: 질문/순서 맞추기 창을 가운데로 좁게 */
 @media (min-width:760px){.lquiz>*,.oquiz>*{width:calc(100% - 32px);max-width:680px;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}}
 .lqcard{position:relative;display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;column-gap:10px;row-gap:6px;width:100%;padding:14px 14px;border-radius:16px;border:1px solid #26252c;background:#141318;color:var(--ink);text-align:left;opacity:.45;animation:bwenter .35s cubic-bezier(.2,1.4,.4,1) both}
