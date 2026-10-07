@@ -770,20 +770,14 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .reader{display:flex}
 .reader[hidden]{display:none}
 .rdalt{margin:8px 18px 0;font-size:12px;color:var(--faint);text-align:center;line-height:1.6}
-.rdframe{display:none;flex:1;width:100%;max-width:1000px;margin:0 auto;border:0;background:#fff}
-.reader.framed .rdframe{display:block}
-.reader.framed .rdscroll,.reader.framed .rdhb,.reader.framed .rdalt{display:none}
 .rdbtns{display:flex;align-items:center;gap:8px}
 .rdout{display:none;width:36px;height:36px;border:1px solid #34333A;border-radius:18px;color:var(--ink);font-size:16px;text-decoration:none;place-items:center}
-.reader.framed .rdout{display:grid}
+.reader.nosample .rdout{display:grid}
 .rdpbar{display:none;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px 16px 14px;border-top:1px solid #222126}
 .reader.nosample .rdpbar{display:flex}
 .reader.nosample .rdhb,.reader.nosample .rdalt{display:none}
 .rdpbar button{height:38px;padding:0 14px;border:1px solid #34333A;border-radius:19px;background:transparent;color:var(--ink);font-size:13.5px;white-space:nowrap}
 .rdpbar .rdpaste{border-color:color-mix(in srgb,var(--mint) 55%,#34333A);color:var(--mint);font-weight:700}
-.rdsrc,.rdmine{display:none}
-.reader.showmine .rdsrc{display:inline-block}
-.reader.hasmine:not(.showmine) .rdmine{display:inline-block}
 .rdpform{position:absolute;left:0;right:0;bottom:0;max-width:720px;margin:0 auto;padding:16px;background:#141418;border:1px solid #2E2D33;border-radius:16px 16px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:10px}
 .rdpform[hidden]{display:none}
 .rdphint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
@@ -2503,6 +2497,8 @@ button:active{filter:brightness(1.15)}
       return;
     }
     if(b.classList.contains("chapread")){
+      var ccl=!sampleFn&&chapLinks(n);
+      if(ccl&&!myChapters()[USFM[n.book]+"-"+n.chapter])window.open(onDesktop()?ccl.hbpc:ccl.hb,"_blank","noopener");
       openReader(n);return;
     }
     if(b.classList.contains("apall")){openProg();return}
@@ -4630,8 +4626,7 @@ button:active{filter:brightness(1.15)}
         '<a class="rdhb" target="_blank" rel="noopener">개역개정으로 보기 (대한성서공회) ↗</a>'+
         '<p class="rdalt">안 열리면 <a class="rdhb2" target="_blank" rel="noopener">홀리바이블로 보기</a>를 길게 눌러 크롬에서 열어 주세요.</p>'+
         '<div class="rdscroll"><ol class="rdlist"></ol><div class="rdmsg" aria-live="polite"></div>'+'</div>'+
-        '<iframe class="rdframe" title="개역개정 장 전체 (대한성서공회)" referrerpolicy="no-referrer"></iframe>'+
-        '<div class="rdpbar"><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 성서공회 원문</button><button type="button" class="rdmine">📖 내 본문으로 보기</button></div>'+
+        '<div class="rdpbar"><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button></div>'+
         '<div class="rdpform" hidden><p class="rdphint">성서공회나 홀리바이블에서 장 본문을 복사해 붙여 넣으세요. 절 번호(1, 2, 3 …)가 있으면 절마다 나눠요. 이 기기에만 저장돼요.</p>'+
         '<textarea class="field rdptext" placeholder="1 그는 허물과 죄로 죽었던 너희를 살리셨도다&#10;2 그 때에 너희는 …" aria-label="장 본문 붙여넣기"></textarea>'+
         '<div class="rdpbtns"><button type="button" class="rdpcancel">취소</button><button type="button" class="primary rdpsave">저장</button></div></div>';
@@ -4645,8 +4640,7 @@ button:active{filter:brightness(1.15)}
         saveMyChapter(rd.dataset.key,vs); rd.querySelector(".rdpform").hidden=true;
         showMine(true); toast(vs.length+"절을 저장했어요");
       });
-      rd.querySelector(".rdsrc").addEventListener("click",function(){showMine(false)});
-      rd.querySelector(".rdmine").addEventListener("click",function(){showMine(true)});
+      rd.querySelector(".rdsrc").addEventListener("click",function(){window.open(rd.dataset.hb,"_blank","noopener")});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&rd&&!rd.hidden)closeReader()});
     }
     var key=USFM[n.book]+"-"+n.chapter;
@@ -4656,11 +4650,12 @@ button:active{filter:brightness(1.15)}
     rd.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     rd.dataset.hl=String(n.verse||0); rd.dataset.key=key;
     // Claude가 없으면: 대한성서공회 개역개정 페이지를 앱 안 창에 그대로 띄움 (본문을 가져오지 않음)
-    var framed=!sampleFn, fr=rd.querySelector(".rdframe");
-    rd.classList.toggle("framed",framed); rd.querySelector(".rdver").textContent=framed?"개역개정":"개역한글";
-    rd.querySelector(".rdout").href=cl.bs;
-    rd.dataset.bs=cl.bs; rd.querySelector(".rdpform").hidden=true; rd.classList.toggle("nosample",framed);
-    if(framed){showMine(!!myChapters()[key]);return}
+    // Claude가 없으면: 홀리바이블(개역개정)은 새 탭으로 열고, 복사해 붙여 넣은 본문을 여기서 읽음
+    var nos=!sampleFn, hbu=onDesktop()?cl.hbpc:cl.hb;
+    rd.querySelector(".rdver").textContent=nos?"개역개정":"개역한글";
+    rd.querySelector(".rdout").href=hbu; rd.dataset.hb=hbu;
+    rd.querySelector(".rdpform").hidden=true; rd.classList.toggle("nosample",nos);
+    if(nos){showMine();return}
     if(chapCache[key]&&chapCache[key].done){drawReader(chapCache[key].verses,n.verse);return}
     loadChapter(n,key);
   }
@@ -4684,14 +4679,12 @@ button:active{filter:brightness(1.15)}
     out=marks.map(function(k,i){return {v:k.v,t:clean(flat.slice(k.body,i+1<marks.length?marks[i+1].at:flat.length))}});
     return out.filter(function(x){return x.t});
   }
-  function showMine(mine){
-    var key=rd.dataset.key, saved=myChapters()[key], fr=rd.querySelector(".rdframe");
-    mine=mine&&!!saved;
-    rd.classList.toggle("framed",!mine); rd.classList.toggle("hasmine",!!saved);
+  function showMine(){
+    var saved=myChapters()[rd.dataset.key], msg=rd.querySelector(".rdmsg");
     rd.querySelector(".rdpaste").textContent=saved?"📋 다시 붙여넣기":"📋 복사한 본문 붙여넣기";
-    if(mine){rd.querySelector(".rdmsg").textContent="";drawReader(saved.v,+rd.dataset.hl)}
-    else if(fr.dataset.src!==rd.dataset.bs){fr.dataset.src=rd.dataset.bs;fr.src=rd.dataset.bs}
-    rd.classList.toggle("showmine",mine);
+    if(saved){msg.textContent="";drawReader(saved.v,+rd.dataset.hl);return}
+    rd.querySelector(".rdlist").textContent="";
+    msg.textContent="홀리바이블 탭에서 이 장 본문을 절 번호까지 복사한 뒤, 아래 [복사한 본문 붙여넣기]를 눌러 붙여 넣으세요. 한 번 저장하면 다음부터는 여기서 바로 읽을 수 있어요.";
   }
   function closeReader(){if(!rd)return; if(rdCtl)rdCtl.abort(); rd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
   function drawReader(verses,hl){
