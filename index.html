@@ -829,6 +829,7 @@ body.reorder .note .pinbtn{display:none!important}
 .verse.picking .w{padding:5px 2px;margin:-5px -2px;border-radius:7px;transition:background .12s}
 .verse.picking .w:active{background:color-mix(in srgb,var(--orange) 18%,transparent)}
 .verse.picking .w.on{opacity:1}
+.verse .vmark{font-weight:700;color:var(--hi)}
 /* ===== simpler card ===== */
 .note .grip{display:none!important}
 .note .chead .saved{display:none}
@@ -4921,6 +4922,15 @@ button:active{filter:brightness(1.15)}
       v.classList.remove("focus");
       if(filterText&&has(n.text))markInto(v,n.text,filterText);
       else if(topicFilter&&n.topics.indexOf(topicFilter)>=0){v.classList.toggle("kwon",markKeywords(v,n.text,kwFor(n,topicFilter)));return}
+      else if(marksOf(n).length){   // 직접 고른 낱말은 평소에도 진하게
+        var mk2=marksOf(n), wj=0; v.textContent="";
+        tokens(n.text).forEach(function(tok){
+          if(/^\s+$/.test(tok)){v.appendChild(document.createTextNode(tok));return}
+          if(mk2.indexOf(wj)>=0){var sb=document.createElement("b");sb.className="vmark";sb.textContent=tok;v.appendChild(sb)}
+          else v.appendChild(document.createTextNode(tok));
+          wj++;
+        });
+      }
       else v.textContent=n.text;
       v.classList.remove("kwon");
       return;
