@@ -735,9 +735,6 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .chapread{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border:1px solid color-mix(in srgb,var(--orange) 45%,var(--rule));border-radius:14px;color:var(--orange);font-size:13px;font-weight:500;text-decoration:none;white-space:nowrap}
 .chapread::before{content:"";width:14px;height:14px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z'/%3E%3Cpath d='M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H2z'/%3E%3Cpath d='M22 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z'/%3E%3C/svg%3E") center/contain no-repeat}
 .chapread[hidden]{display:none}
-.pop a.mchap{display:block;height:40px;line-height:40px;padding:0 12px;border-radius:8px;color:var(--ink);font-size:14.5px;text-decoration:none}
-.pop a.mchap[hidden]{display:none}
-.pop a.mchap:hover{background:var(--paper)}
 .focusrow{flex-wrap:wrap}
 /* ===== in-app chapter reader ===== */
 .chapread{background:transparent;cursor:pointer}
@@ -810,6 +807,7 @@ body.reorder .note .pinbtn{display:none!important}
 .memopen.done{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,var(--rule))}
 .pop a.mgae{display:block;min-height:40px;line-height:1.35;padding-top:10px!important;padding-bottom:10px!important;padding:0 12px;border-radius:8px;color:var(--ink);font-size:14.5px;text-decoration:none}
 .pop a.mgae[hidden]{display:none}
+.pop a.mgae:hover{background:var(--paper)}
 /* ===== 암송 ===== */
 .mempanel{margin:2px 0 14px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 35%,var(--rule));border-radius:14px;background:color-mix(in srgb,var(--gold) 6%,#101013)}
 .mempanel[hidden]{display:none}
@@ -1849,7 +1847,6 @@ button:active{filter:brightness(1.15)}
           '<button type="button" class="mtopic">주제 정하기</button>'+
           '<button type="button" class="mpin">맨 위에 고정</button>'+
           '<a class="mgae" target="_blank" rel="noopener" hidden>개역개정으로 보기 (성서공회)</a>'+
-          '<a class="mchap" target="_blank" rel="noopener" hidden>장 전체 (네이버에서 보기)</a>'+
           '<button type="button" class="exportone" data-fmt="txt" hidden>txt로 저장</button>'+
           '<button type="button" class="exportone" data-fmt="pdf" hidden>PDF로 저장</button>'+
           '<button type="button" class="fagain" hidden>문장 다시 살펴보기</button>'+
@@ -2009,15 +2006,15 @@ button:active{filter:brightness(1.15)}
     var mpc=el.querySelector(".medprog"); if(mpc){var mt=medChipText(); if(mpc.textContent!==mt)mpc.textContent=mt}
     renderMem(el,n);
     renderUses(el,n);
-    var cl=chapLinks(n), cr=el.querySelector(".chapread"), mc=el.querySelector(".mchap");
+    var cl=chapLinks(n), cr=el.querySelector(".chapread");
     var cg=el.querySelector(".chapgae");
     var cm=el.querySelector(".chapmain");
     if(cl){
       cr.hidden=false; cr.textContent=n.chapter+(n.book===18?"편":"장")+" 전체 읽기"; cr.setAttribute("aria-label",chapLabel(n)+" 전체를 앱 안에서 읽기");
       cm.hidden=false; cm.href=cl.bs; cm.textContent="개역개정"; cm.setAttribute("aria-label",chapLabel(n)+" 전체를 대한성서공회 개역개정으로 읽기");
-      mc.hidden=false; mc.href=cl.naver; cg.hidden=true; cm.hidden=true;
+      cg.hidden=true; cm.hidden=true;
       var mg=el.querySelector(".mgae"); if(mg){mg.hidden=false;mg.href=cl.bs}
-    }else{cm.hidden=true;cr.hidden=true;mc.hidden=true;cg.hidden=true}
+    }else{cm.hidden=true;cr.hidden=true;cg.hidden=true}
     var pb=el.querySelector(".pinbtn"); pb.setAttribute("aria-pressed",String(n.pinned)); pb.setAttribute("aria-label",n.pinned?"고정 풀기":"맨 위에 고정");
     el.classList.toggle("pinned",n.pinned);
     var mp=el.querySelector(".mpin"); if(mp)mp.textContent=n.pinned?"고정 풀기":"맨 위에 고정";
