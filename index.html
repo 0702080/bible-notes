@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-07-05">
+<meta name="app-build" content="2026-10-07-06">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -743,6 +743,18 @@ body.reorder .note .topics{display:none}
 .binfo .bdim{color:var(--faint)}
 .bcheck{align-self:flex-start;height:32px;padding:0 14px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--sky) 12%,transparent);color:var(--sky);font-size:13px;font-weight:700;white-space:nowrap}
 @media (max-width:640px){.bside{display:none}.bbody{display:block}}
+.blog{margin-top:10px;padding-top:10px;border-top:1px dashed #2A2930}
+.blform{display:flex;gap:6px}
+.blin{flex:1;min-width:0;height:36px;font-size:14px;padding:0 12px}
+.bladd{flex:0 0 auto;height:36px;padding:0 14px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);border-radius:18px;background:color-mix(in srgb,var(--sky) 12%,transparent);color:var(--sky);font-size:13.5px;font-weight:700;white-space:nowrap}
+.bllist{list-style:none;margin:6px 0 0;padding:0}
+.bllist li{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:8px;padding:5px 2px;font-size:14px;line-height:1.5}
+.bldate{font-size:11.5px;color:var(--sky);font-weight:700;font-variant-numeric:tabular-nums}
+.bltxt{color:var(--ink);min-width:0;word-break:keep-all;overflow-wrap:anywhere}
+.bldel{height:24px;min-width:24px;padding:0 6px;border:0;border-radius:12px;background:transparent;color:var(--faint);font-size:14px;white-space:nowrap}
+.bldel.sure{color:var(--pink);font-size:12px}
+.blmore{margin-top:4px;height:26px;padding:0 10px;border:0;border-radius:13px;background:transparent;color:var(--muted);font-size:12.5px}
+.blmore[hidden]{display:none}
 .bstat{white-space:pre;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .aplist:empty{display:none}
 .toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);z-index:90;max-width:min(88vw,420px);
@@ -1689,7 +1701,7 @@ button:active{filter:brightness(1.15)}
       hymns:Array.isArray(n.hymns)?n.hymns.filter(function(x){return x&&x.id}).map(function(x){var no=parseInt(x.no,10);return {id:String(x.id),no:no>0&&no<1000?no:null,title:String(x.title||""),why:String(x.why||""),sure:x.sure!==false,sheets:Array.isArray(x.sheets)?x.sheets.map(String).filter(function(u){return /^https?:\/\//i.test(u)}).slice(0,6):[],imgs:Array.isArray(x.imgs)?x.imgs.map(String).filter(function(v){return /^[A-Za-z0-9_-]{8,64}$/.test(v)}).slice(0,6):[]}}):[],
       essays:Array.isArray(n.essays)?n.essays.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),title:String(x.title||""),body:String(x.body||""),at:+x.at||Date.now()}}):[],
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
-      acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[]}}):[],
+      acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
       uses:Array.isArray(n.uses)?n.uses.filter(function(u){return u&&u.when}).slice(0,30).map(function(u){return {when:String(u.when),why:String(u.why||""),how:String(u.how||""),mine:!!u.mine}}):[],
@@ -1995,7 +2007,8 @@ button:active{filter:brightness(1.15)}
     var d=document.createElement("div");
     d.className="act"; d.dataset.aid=a.id;
     d.innerHTML='<button type="button" class="chk" aria-pressed="false" aria-label="실천했어요"></button><textarea class="at" rows="1" placeholder="실천할 일을 적어 보세요" aria-label="실천"></textarea><button type="button" class="icon dela" aria-label="실천 삭제">×</button>'+
-      '<div class="board"><div class="bhead"><span class="bstat"></span><span class="bgoal" role="group" aria-label="목표 일수"><button type="button" class="bg" data-g="7">7일</button><button type="button" class="bg" data-g="21">21일</button><button type="button" class="bg" data-g="40">40일</button></span></div><div class="bbody"><div class="bgrid"></div><div class="bside" aria-live="polite"></div></div></div>';
+      '<div class="board"><div class="bhead"><span class="bstat"></span><span class="bgoal" role="group" aria-label="목표 일수"><button type="button" class="bg" data-g="7">7일</button><button type="button" class="bg" data-g="21">21일</button><button type="button" class="bg" data-g="40">40일</button></span></div><div class="bbody"><div class="bgrid"></div><div class="bside" aria-live="polite"></div></div>'+
+        '<div class="blog"><form class="blform" autocomplete="off"><input class="field blin" maxlength="120" placeholder="오늘 한 줄 적기 (예: 아침 햇살에 감사)" aria-label="오늘 한 줄"><button type="submit" class="bladd">적기</button></form><ul class="bllist"></ul><button type="button" class="blmore" hidden></button></div></div>';
     return d;
   }
   var deepBusy=new Map();
@@ -2418,6 +2431,11 @@ button:active{filter:brightness(1.15)}
     if(file&&n&&h){zone.hidden=true;himsg(hyEl,"");uploadHymnImg(card,n,h,file)}
     else himsg(hyEl,"붙여넣은 것이 사진이 아니에요. 이미지를 길게 눌러 '이미지 복사'를 한 뒤 다시 붙여넣어 주세요.");
   });
+  list.addEventListener("submit",function(e){
+    var f=e.target.closest&&e.target.closest(".blform"); if(!f)return; e.preventDefault();
+    var card=f.closest(".note"), n=card&&notes.get(card.dataset.id), a=n&&n.acts.find(function(x){return x.id===f.closest(".act").dataset.aid});
+    if(a)addLog(card,n,a,f.querySelector(".blin"));
+  });
   list.addEventListener("input",function(e){var z=e.target.closest&&e.target.closest(".pastezone");if(z&&!z.querySelector("img"))z.textContent=""});
   list.addEventListener("change",function(e){
     var inp=e.target.closest(".hfile"); if(!inp)return;
@@ -2771,6 +2789,13 @@ button:active{filter:brightness(1.15)}
       var na={id:qid(),t:"",done:false}; n.acts.push(na); render(); scheduleSave(id);
       var at=card.querySelector('.act[data-aid="'+na.id+'"] .at'); if(at)at.focus();
       return;
+    }
+    if(b.classList.contains("bldel")||b.classList.contains("blmore")){
+      var lac=n.acts.find(function(x){return x.id===b.closest(".act").dataset.aid}); if(!lac)return;
+      if(b.classList.contains("blmore")){if(logAll.has(lac.id))logAll.delete(lac.id);else logAll.add(lac.id);render();return}
+      var lid=b.closest("li").dataset.lid;
+      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
+      lac.logs=lac.logs.filter(function(l){return l.id!==lid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("bcheck")){
       var ack=n.acts.find(function(x){return x.id===b.closest(".act").dataset.aid}), nc=b.closest(".board").querySelector(".cell.next");
@@ -3426,7 +3451,8 @@ button:active{filter:brightness(1.15)}
   }
   function renderBoard(d,a){
     var b=d.querySelector(".board"); if(!b)return;
-    if(!a.stamps)a.stamps=[]; if(!a.goal)a.goal=21;
+    if(!a.stamps)a.stamps=[]; if(!a.goal)a.goal=21; if(!a.logs)a.logs=[];
+    renderLogs(b,a);
     b.hidden=!a.t.trim();
     var n=a.stamps.length, goal=a.goal, today=dkey(Date.now()), todayDone=a.stamps.indexOf(today)>=0, st=streakOf(a);
     var stat=n>=goal?"🎉 "+goal+"일 완주!":n+" / "+goal+"일"+(st>=2?"   🔥 "+st+"일 연속":"");
@@ -3457,6 +3483,32 @@ button:active{filter:brightness(1.15)}
     }
     document.body.appendChild(box); setTimeout(function(){box.remove()},1300);
   }
+  /* ---------- 실천 한 줄 기록 (예: 한 줄 감사). 하루에 여러 줄, 적으면 오늘 칸이 체크됨 ---------- */
+  var logAll=new Set();
+  function renderLogs(b,a){
+    var ul=b.querySelector(".bllist"), more=b.querySelector(".blmore"); if(!ul)return;
+    var list=a.logs.slice().sort(function(x,y){return y.at-x.at}), all=logAll.has(a.id), cut=all?list.length:5;
+    var key=list.map(function(l){return l.id+l.t}).join("|")+"/"+all+"/"+dkey(Date.now());
+    if(ul.dataset.key===key)return; ul.dataset.key=key; ul.textContent="";
+    var lastDay="", today=dkey(Date.now());
+    list.slice(0,cut).forEach(function(l){
+      var day=dkey(l.at), li=document.createElement("li"); li.dataset.lid=l.id;
+      li.innerHTML='<span class="bldate"></span><span class="bltxt"></span><button type="button" class="bldel" aria-label="이 줄 지우기">×</button>';
+      li.querySelector(".bldate").textContent=day===lastDay?"":(day===today?"오늘":dlabel(day));
+      li.querySelector(".bltxt").textContent=l.t; lastDay=day; ul.appendChild(li);
+    });
+    more.hidden=list.length<=5; more.textContent=all?"접기":"지난 기록 "+(list.length-5)+"줄 더 보기";
+  }
+  function addLog(card,n,a,input){
+    var t=input.value.trim(); if(!t){input.focus();return}
+    a.logs.push({id:"l"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),at:Date.now(),t:t.slice(0,200)});
+    input.value=""; buzz(8);
+    var today=dkey(Date.now()), nc=card.querySelector('.act[data-aid="'+a.id+'"] .cell.next');
+    if(a.stamps.indexOf(today)<0&&a.stamps.length<a.goal&&nc){stampCell(card,n,a,nc)}   // 오늘 칸 자동 체크 (저장·그리기 포함)
+    else{toast("한 줄을 적었어요");render();scheduleSave(n.id)}
+    setTimeout(function(){var c2=cards.get(n.id),i2=c2&&c2.querySelector('.act[data-aid="'+a.id+'"] .blin');if(i2)i2.focus()},60);
+  }
+
   // 넓은 화면에서 진도판 오른쪽 빈자리: 진행률 원, 오늘 체크, 연속, 완주 예정일
   function renderBside(sd,a,n,goal,todayDone,st){
     if(!sd)return;
