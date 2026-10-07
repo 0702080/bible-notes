@@ -830,6 +830,9 @@ body.reorder .note .pinbtn{display:none!important}
 .verse.picking .w:active{background:color-mix(in srgb,var(--orange) 18%,transparent)}
 .verse.picking .w.on{opacity:1}
 .verse .vmark{font-weight:700;color:var(--hi)}
+.verse.picking{cursor:text}
+.fselbold{height:28px;padding:0 11px;border:1px dashed color-mix(in srgb,var(--hi) 50%,#34333A);border-radius:14px;background:transparent;color:var(--hi);font-size:12.5px;white-space:nowrap}
+.fselbold[hidden]{display:none}
 /* ===== simpler card ===== */
 .note .grip{display:none!important}
 .note .chead .saved{display:none}
@@ -1643,7 +1646,7 @@ button:active{filter:brightness(1.15)}
   function medCount(n){return n.meds.filter(function(m){return m.text.trim()}).length}
   function cleanNote(n){
     return {id:n.id,ref:String(n.ref||""),text:String(n.text||""),book:typeof n.book==="number"?n.book:-1,chapter:+n.chapter||0,verse:+n.verse||0,
-      marks:(n.marks&&typeof n.marks.src==="string"&&Array.isArray(n.marks.idx))?{src:n.marks.src,idx:n.marks.idx.map(Number).filter(function(x){return x>=0&&x<2000})}:null,
+      marks:(n.marks&&typeof n.marks.src==="string"&&Array.isArray(n.marks.idx))?{src:n.marks.src,idx:n.marks.idx.map(Number).filter(function(x){return x>=0&&x<2000}),rng:Array.isArray(n.marks.rng)?n.marks.rng.filter(function(r){return Array.isArray(r)&&r.length===2}).slice(0,200).map(function(r){return [+r[0]||0,+r[1]||0]}):[]}:null,
       parse:(n.parse&&typeof n.parse.src==="string"&&Array.isArray(n.parse.labels))?{src:n.parse.src,labels:n.parse.labels.map(function(x){return String(x)}),v:+n.parse.v||1}:null,
       after:typeof n.after==="string"?n.after.slice(0,200):"",
       ladder:(n.ladder&&Array.isArray(n.ladder.steps)&&typeof n.ladder.src==="string")?{src:n.ladder.src,steps:n.ladder.steps.filter(function(x){return x&&x.a}).slice(0,12).map(function(x){return {q:String(x.q||"").slice(0,40),a:String(x.a).slice(0,120)}})}:null,
@@ -1889,7 +1892,7 @@ button:active{filter:brightness(1.15)}
       '<div class="verse"></div>'+
       '<div class="hits"></div>'+
       '<div class="editbox" hidden><input class="field eref" aria-label="성경 구절"><textarea class="field etext" aria-label="말씀"></textarea><button type="button" class="small donedit">완료</button></div>'+
-      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">💡 언제 쓸까</button><button type="button" class="vedit" aria-expanded="false">✏️ 말씀 고치기</button><button type="button" class="vtopic">🏷️ 주제 정하기</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
+      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">💡 언제 쓸까</button><button type="button" class="vedit" aria-expanded="false">✏️ 말씀 고치기</button><button type="button" class="vtopic">🏷️ 주제 정하기</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
       '<div class="usepanel" hidden></div>'+
       '<div class="mempanel" hidden></div>'+
       '<div class="trow"><button type="button" class="toggle" aria-expanded="false"><span class="chev" aria-hidden="true"></span><span class="tl"></span><span class="meta"></span></button></div>'+
@@ -2410,8 +2413,10 @@ button:active{filter:brightness(1.15)}
     }
     var pv=e.target.closest(".verse.picking");
     if(pv){
-      var w=e.target.closest(".w")||nearestWord(pv,e.clientX,e.clientY);
       var wc=pv.closest(".note"), wn=wc&&notes.get(wc.dataset.id);
+      var sr=selRangeIn(pv);
+      if(sr&&wn){window.getSelection().removeAllRanges(); if(toggleRange(wc,wn,sr[0],sr[1]))buzz(6); return}
+      var w=e.target.closest(".w")||nearestWord(pv,e.clientX,e.clientY);
       if(w&&wn){togglePick(wc,wn,+w.dataset.wi);buzz(6)}
       return;
     }
@@ -2692,7 +2697,12 @@ button:active{filter:brightness(1.15)}
       return;
     }
     if(b.classList.contains("fbtn")){ toggleFocus(card,n,b.dataset.f); return }
-    if(b.classList.contains("fclear")){ n.marks={src:n.text,idx:[]}; renderVerse(card,n); scheduleSave(id); setFmsg(card,"진하게 볼 말을 눌러 고르세요."); return }
+    if(b.classList.contains("fselbold")){
+      var fv=card.querySelector(".verse.picking"), fr2=fv&&(selRangeIn(fv)||(lastPickSel&&lastPickSel.v===fv&&Date.now()-lastPickSel.at<15000?lastPickSel.r:null));
+      if(!fr2){toast("진하게 할 글자를 먼저 드래그해서 고르세요");return}
+      window.getSelection().removeAllRanges(); lastPickSel=null; toggleRange(card,n,fr2[0],fr2[1]); return;
+    }
+    if(b.classList.contains("fclear")){ n.marks={src:n.text,idx:[]}; renderVerse(card,n); scheduleSave(id); setFmsg(card,"낱말을 누르거나, 진하게 할 글자만 드래그해서 고르세요."); return }
     if(b.classList.contains("fagain")){
       b.closest("details").open=false;
       var keep=focusMode.get(id); n.parse=null; focusMode.delete(id); renderVerse(card,n);
@@ -4905,32 +4915,20 @@ button:active{filter:brightness(1.15)}
     fr.classList.toggle("on",fon); var fo=el.querySelector(".fopen"); fo.setAttribute("aria-expanded",String(fon)); fo.setAttribute("aria-label",fon?"집중 끄기":"집중해서 보기"); fo.title=fon?"집중 끄기":"집중해서 보기";
     el.querySelectorAll(".fbtn").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.f===mode));b.disabled=parsing.has(n.id)});
     var again=el.querySelector(".fagain"); if(again)again.hidden=!parseOk(n)||parsing.has(n.id);
-    var clr=el.querySelector(".fclear"), mk=marksOf(n);
-    if(clr)clr.hidden=!(mode==="P"&&mk.length);
+    var clr=el.querySelector(".fclear"), anyMk=hasMarks(n);
+    if(clr)clr.hidden=!(mode==="P"&&anyMk);
+    var fsel=el.querySelector(".fselbold"); if(fsel)fsel.hidden=mode!=="P";
     v.classList.remove("picking","has");
     if(mode==="P"){
-      v.classList.add("focus","picking"); if(mk.length)v.classList.add("has"); v.textContent="";
-      var pi=0;
-      tokens(n.text).forEach(function(tok){
-        if(/^\s+$/.test(tok)){v.appendChild(document.createTextNode(tok));return}
-        var sp=document.createElement("span"); sp.className="w"+(mk.indexOf(pi)>=0?" on":""); sp.dataset.wi=String(pi); sp.textContent=tok;
-        v.appendChild(sp); pi++;
-      });
+      v.classList.add("focus","picking"); if(anyMk)v.classList.add("has");
+      renderMarked(v,n,true);
       return;
     }
     if(!mode||!parseOk(n)){
       v.classList.remove("focus");
       if(filterText&&has(n.text))markInto(v,n.text,filterText);
       else if(topicFilter&&n.topics.indexOf(topicFilter)>=0){v.classList.toggle("kwon",markKeywords(v,n.text,kwFor(n,topicFilter)));return}
-      else if(marksOf(n).length){   // 직접 고른 낱말은 평소에도 진하게
-        var mk2=marksOf(n), wj=0; v.textContent="";
-        tokens(n.text).forEach(function(tok){
-          if(/^\s+$/.test(tok)){v.appendChild(document.createTextNode(tok));return}
-          if(mk2.indexOf(wj)>=0){var sb=document.createElement("b");sb.className="vmark";sb.textContent=tok;v.appendChild(sb)}
-          else v.appendChild(document.createTextNode(tok));
-          wj++;
-        });
-      }
+      else if(hasMarks(n))renderMarked(v,n,false);   // 직접 고른 말은 평소에도 진하게
       else v.textContent=n.text;
       v.classList.remove("kwon");
       return;
@@ -4945,6 +4943,57 @@ button:active{filter:brightness(1.15)}
     });
   }
   function marksOf(n){return (n.marks&&n.marks.src===n.text)?n.marks.idx:[]}
+  /* 진하게 볼 말: 낱말 단위(idx) + 글자 범위(rng, 드래그로 고른 부분)를 글자마다 참/거짓으로 */
+  function wordSpans(text){var out=[],at=0;tokens(text).forEach(function(tok){if(!/^\s+$/.test(tok))out.push([at,at+tok.length]);at+=tok.length});return out}
+  function markMask(n){
+    var m=new Array(n.text.length).fill(false); if(!n.marks||n.marks.src!==n.text)return m;
+    var ws=wordSpans(n.text);
+    (n.marks.idx||[]).forEach(function(i){var w=ws[i];if(w)for(var k=w[0];k<w[1];k++)m[k]=true});
+    (n.marks.rng||[]).forEach(function(r){for(var k=Math.max(0,r[0]);k<Math.min(m.length,r[1]);k++)m[k]=true});
+    return m;
+  }
+  function hasMarks(n){return markMask(n).some(Boolean)}
+  function saveMask(n,m){
+    var rng=[],s=-1; for(var k=0;k<=m.length;k++){if(k<m.length&&m[k]&&!/\s/.test(n.text[k])){if(s<0)s=k}else if(s>=0){rng.push([s,k]);s=-1}}
+    n.marks={src:n.text,idx:[],rng:rng}; scheduleSave(n.id);
+  }
+  // 글자 범위 [s,e)를 진하게 하거나, 이미 다 진하면 빼기
+  function toggleRange(card,n,s,e){
+    while(s<e&&/\s/.test(n.text[s]))s++; while(e>s&&/\s/.test(n.text[e-1]))e--;
+    if(e<=s)return false;
+    var m=markMask(n), all=true; for(var k=s;k<e;k++)if(!/\s/.test(n.text[k])&&!m[k])all=false;
+    for(var k2=s;k2<e;k2++)m[k2]=!all;
+    saveMask(n,m); renderVerse(card,n); setFmsg(card,""); return true;
+  }
+  // 말씀을 그리면서 진한 글자는 <b class="vmark">로 (picking이면 낱말마다 .w 칸)
+  function renderMarked(v,n,picking){
+    var m=markMask(n), at=0, pi=0; v.textContent="";
+    function seg(parent,str,from){
+      var i=0; while(i<str.length){var b=m[from+i], j=i; while(j<str.length&&m[from+j]===b)j++;
+        var part=str.slice(i,j); if(b){var x=document.createElement("b");x.className="vmark";x.textContent=part;parent.appendChild(x)}else parent.appendChild(document.createTextNode(part)); i=j}
+    }
+    tokens(n.text).forEach(function(tok){
+      if(/^\s+$/.test(tok)){v.appendChild(document.createTextNode(tok));at+=tok.length;return}
+      if(picking){var sp=document.createElement("span"),on=false;for(var k=at;k<at+tok.length;k++)if(m[k])on=true;sp.className="w"+(on?" on":"");sp.dataset.wi=String(pi);seg(sp,tok,at);v.appendChild(sp)}
+      else seg(v,tok,at);
+      at+=tok.length; pi++;
+    });
+  }
+  // 휴대폰: 버튼을 누르는 순간 선택이 풀려도 쓸 수 있게 마지막 선택을 기억
+  var lastPickSel=null;
+  document.addEventListener("selectionchange",function(){
+    var sel=window.getSelection&&window.getSelection(); if(!sel||sel.isCollapsed||!sel.rangeCount)return;
+    var node=sel.anchorNode, v=node&&(node.nodeType===1?node:node.parentElement); v=v&&v.closest&&v.closest(".verse.picking");
+    if(v){var r=selRangeIn(v); if(r)lastPickSel={v:v,r:r,at:Date.now()}}
+  });
+  document.addEventListener("mousedown",function(e){if(e.target.closest&&e.target.closest(".fselbold"))e.preventDefault()},true);
+  // 말씀 안에서 드래그로 고른 글자 범위 (없으면 null)
+  function selRangeIn(v){
+    var sel=window.getSelection&&window.getSelection(); if(!sel||sel.isCollapsed||!sel.rangeCount)return null;
+    var r=sel.getRangeAt(0); if(!v.contains(r.startContainer)||!v.contains(r.endContainer))return null;
+    var pre=document.createRange(); pre.selectNodeContents(v); pre.setEnd(r.startContainer,r.startOffset);
+    var s=pre.toString().length; return [s,s+r.toString().length];
+  }
   function nearestWord(v,x,y,sel){
     var best=null, bd=1e9;
     v.querySelectorAll(sel||".w").forEach(function(w){
@@ -4956,11 +5005,9 @@ button:active{filter:brightness(1.15)}
     return bd<=30?best:null;
   }
   function togglePick(card,n,wi){
-    var cur=marksOf(n).slice(), k=cur.indexOf(wi);
-    if(k>=0)cur.splice(k,1);else cur.push(wi);
-    cur.sort(function(a,b){return a-b});
-    n.marks={src:n.text,idx:cur}; renderVerse(card,n); scheduleSave(n.id);
-    setFmsg(card,cur.length?"":"진하게 볼 말을 눌러 고르세요.");
+    var w=wordSpans(n.text)[wi]; if(!w)return;
+    toggleRange(card,n,w[0],w[1]);
+    setFmsg(card,hasMarks(n)?"":"진하게 볼 말을 누르거나 드래그해 고르세요.");
   }
   function setFmsg(el,t){var m=el.querySelector(".fmsg");if(m)m.textContent=t}
   // Claude 없이 낱말 끝(조사, 어미)을 보고 주어(S·G), 목적어(O), 동사(V)를 어림잡아 표시
@@ -5031,7 +5078,7 @@ button:active{filter:brightness(1.15)}
     if(focusMode.get(n.id)===mode){focusMode.delete(n.id);renderVerse(card,n);setFmsg(card,"");return}
     if(mode==="P"){
       focusMode.set(n.id,"P"); renderVerse(card,n);
-      setFmsg(card,marksOf(n).length?"":"진하게 볼 말을 눌러 고르세요. 다시 누르면 빠져요.");
+      setFmsg(card,hasMarks(n)?"":"낱말을 누르거나, 진하게 할 글자만 드래그해서 고르세요. 다시 하면 빠져요.");
       return;
     }
     if(!parseOk(n)){var ok=await analyze(card,n); if(!ok)return; n=notes.get(n.id)||n; card=cards.get(n.id)||card}
