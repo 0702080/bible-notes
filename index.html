@@ -713,6 +713,23 @@ body.reorder .note .topics{display:none}
 @keyframes conf{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--x),calc(var(--y) + 120px)) rotate(540deg);opacity:0}}
 @media (prefers-reduced-motion:reduce){.cell.next,.cell.stamped,.cell.next.hint{animation:none}}
 .board{margin-left:0}
+.bbody{display:flex;gap:16px;align-items:center}
+.bbody .bgrid{flex:0 1 300px;min-width:0}
+.bside{flex:1;min-width:0;display:flex;align-items:center;gap:14px;padding:6px 4px 6px 16px;border-left:1px dashed #2A2930}
+.bring{position:relative;width:64px;height:64px;flex:0 0 64px}
+.bring svg{width:64px;height:64px;transform:rotate(-90deg)}
+.bring circle{fill:none;stroke-width:6}
+.bring0{stroke:#24232a}
+.bring1{stroke:var(--sky);stroke-linecap:round;transition:stroke-dashoffset .5s}
+.board.finished .bring1{stroke:var(--green)}
+.bring b{position:absolute;inset:0;display:grid;place-items:center;font-size:13px;color:var(--ink);font-variant-numeric:tabular-nums}
+.binfo{display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:var(--muted);min-width:0}
+.binfo span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.binfo .bok{color:var(--sky);font-weight:700}
+.board.finished .binfo .bok{color:var(--green)}
+.binfo .bdim{color:var(--faint)}
+.bcheck{align-self:flex-start;height:32px;padding:0 14px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--sky) 12%,transparent);color:var(--sky);font-size:13px;font-weight:700;white-space:nowrap}
+@media (max-width:640px){.bside{display:none}.bbody{display:block}}
 .bstat{white-space:pre;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .aplist:empty{display:none}
 .toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);z-index:90;max-width:min(88vw,420px);
@@ -1935,7 +1952,7 @@ button:active{filter:brightness(1.15)}
     var d=document.createElement("div");
     d.className="act"; d.dataset.aid=a.id;
     d.innerHTML='<button type="button" class="chk" aria-pressed="false" aria-label="실천했어요"></button><textarea class="at" rows="1" placeholder="실천할 일을 적어 보세요" aria-label="실천"></textarea><button type="button" class="icon dela" aria-label="실천 삭제">×</button>'+
-      '<div class="board"><div class="bhead"><span class="bstat"></span><span class="bgoal" role="group" aria-label="목표 일수"><button type="button" class="bg" data-g="7">7일</button><button type="button" class="bg" data-g="21">21일</button><button type="button" class="bg" data-g="40">40일</button></span></div><div class="bgrid"></div></div>';
+      '<div class="board"><div class="bhead"><span class="bstat"></span><span class="bgoal" role="group" aria-label="목표 일수"><button type="button" class="bg" data-g="7">7일</button><button type="button" class="bg" data-g="21">21일</button><button type="button" class="bg" data-g="40">40일</button></span></div><div class="bbody"><div class="bgrid"></div><div class="bside" aria-live="polite"></div></div></div>';
     return d;
   }
   var deepBusy=new Map();
@@ -2699,6 +2716,10 @@ button:active{filter:brightness(1.15)}
       var at=card.querySelector('.act[data-aid="'+na.id+'"] .at'); if(at)at.focus();
       return;
     }
+    if(b.classList.contains("bcheck")){
+      var ack=n.acts.find(function(x){return x.id===b.closest(".act").dataset.aid}), nc=b.closest(".board").querySelector(".cell.next");
+      if(ack&&nc)stampCell(card,n,ack,nc); return;
+    }
     if(b.classList.contains("cell")){
       var ac=n.acts.find(function(x){return x.id===b.closest(".act").dataset.aid}); if(ac)stampCell(card,n,ac,b); return;
     }
@@ -3365,6 +3386,7 @@ button:active{filter:brightness(1.15)}
       if((i+1)%7===0)c.classList.add("wk");
       g.appendChild(c);
     }
+    renderBside(b.querySelector(".bside"),a,n,goal,todayDone,st);
   }
   function confetti(el){
     if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
@@ -3378,6 +3400,22 @@ button:active{filter:brightness(1.15)}
       box.appendChild(p);
     }
     document.body.appendChild(box); setTimeout(function(){box.remove()},1300);
+  }
+  // 넓은 화면에서 진도판 오른쪽 빈자리: 진행률 원, 오늘 체크, 연속, 완주 예정일
+  function renderBside(sd,a,n,goal,todayDone,st){
+    if(!sd)return;
+    var pct=Math.min(100,Math.round(n/goal*100)), R=26, C=2*Math.PI*R, fin=n>=goal;
+    var left=goal-n, endT=Date.now()+(todayDone?left:left-1)*864e5;
+    sd.innerHTML='<div class="bring"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="'+R+'" class="bring0"/><circle cx="32" cy="32" r="'+R+'" class="bring1" stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-pct/100)).toFixed(1)+'"/></svg><b>'+pct+'%</b></div>'+
+      '<div class="binfo"></div>';
+    var inf=sd.querySelector(".binfo"), rows=[];
+    if(fin)rows.push('<span class="bok">🎉 '+goal+'일 완주</span>');
+    else if(todayDone)rows.push('<span class="bok">✓ 오늘 실천 완료</span>');
+    else rows.push('<button type="button" class="bcheck">오늘 실천 체크</button>');
+    rows.push('<span>'+(st>=2?'🔥 '+st+'일 연속':'🔥 연속 기록 시작해요')+'</span>');
+    if(!fin){rows.push('<span>남은 '+left+'일</span>');rows.push('<span>완주 예정 '+dlabel(dkey(endT))+'</span>')}
+    if(a.stamps.length)rows.push('<span class="bdim">시작 '+dlabel(a.stamps[0])+'</span>');
+    inf.innerHTML=rows.join("");
   }
   function stampCell(card,n,a,cell){
     var i=+cell.dataset.i, cnt=a.stamps.length, today=dkey(Date.now());
