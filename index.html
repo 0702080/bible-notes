@@ -1905,7 +1905,6 @@ button:active{filter:brightness(1.15)}
     el.querySelector(".sugq").hidden=!sampleFn;
     el.querySelector(".suga").hidden=!sampleFn;
     el.querySelector(".sugh").hidden=!sampleFn;
-    el.querySelectorAll('.fbtn:not(.pickb)').forEach(function(b){b.hidden=!sampleFn});
     el.querySelectorAll(".exportone").forEach(function(b){b.hidden=!downloadsNs});
     return el;
   }
@@ -2196,7 +2195,7 @@ button:active{filter:brightness(1.15)}
   });
   function hideSampling(){
     sampleFn=null; $("searchArea").hidden=true;
-    document.querySelectorAll('.sugq,.suga,.sugh,.deeprow,.fbtn:not(.pickb)').forEach(function(b){b.hidden=true});
+    document.querySelectorAll('.sugq,.suga,.sugh,.deeprow').forEach(function(b){b.hidden=true});   // 주어·목적어·동사는 규칙으로 계속 쓸 수 있음
     openManual(true);
   }
 
@@ -4842,7 +4841,35 @@ button:active{filter:brightness(1.15)}
     setFmsg(card,cur.length?"":"진하게 볼 말을 눌러 고르세요.");
   }
   function setFmsg(el,t){var m=el.querySelector(".fmsg");if(m)m.textContent=t}
+  // Claude 없이 낱말 끝(조사, 어미)을 보고 주어(S·G), 목적어(O), 동사(V)를 어림잡아 표시
+  function ruleParse(text){
+    var GOD=/^(하나님|여호와|주|예수|그리스도|성령|아버지|주님|그리스도예수)$/;
+    var NOUNW=/^(우리|너희|너|나|내|저희|저|그|그들|자|자들|사람|사람들|성도|백성|아들|형제|이웃|왕|종|의인|악인|무리|제자|제자들|일|말씀|마음|빛|어둠|세상|길|걸음|평강|사랑|은혜|믿음|소망|지혜|생명|영생|죄|줄|이)$/;
+    var LINK=/^(다|곧|또|또한|그리고|이에|그러므로|그런즉|오직|다만|이|그|저|모든|온|한|두|세|참|더|가장|심히|함께|내게|네게)$/;
+    return wordsOf(text).map(function(w,i,all){
+      var x=String(w).replace(/[^가-힣A-Za-z0-9]/g,""), last=i===all.length-1, m;
+      if(!x||LINK.test(x))return "-";
+      if(/(을|를)$/.test(x))return "O";
+      if(m=x.match(/^(.+?)(께서|은|는|이|가)$/)){
+        var st=m[1], p=m[2];
+        if(GOD.test(st))return "G";
+        if(NOUNW.test(st)||/(함|심|음|기)$/.test(st))return "S";
+        if((p==="은"||p==="는")&&/(하|되|있|없|받|좋|굽|바르|작|크|많|키|믿|보|시|드리|섬기|르|살|찾|가|오|주|얻|알|듣|옳|높|깊|넓|같|는)$/.test(st))return "-";
+        if(/(같이|많이|깊이|높이|길이)$/.test(x))return "-";
+        if(p==="이"&&/(이시니라|이니라|이라|이니)$/.test(x))return "V";
+        return "S";
+      }
+      if(/(위하여|위해|안에서|안에|에서|데서|가운데|에게|께|으로|로|처럼|같이|게|히|면|마다)$/.test(x))return "-";
+      if(/(신|던|한|된|실|할|될|는|은)$/.test(x)&&!last)return "-";
+      if(/(다|라|니라|리라|도다|로다|지어다|니|며|고|사|어|아|여|서|나|되|매|니와|거늘|지만|으니|으며|요|시니|이라|이니라)$/.test(x))return "V";
+      return "-";
+    });
+  }
   async function analyze(card,n){
+    if(!sampleFn&&!parsing.has(n.id)){
+      var ws=wordsOf(n.text); if(!ws.length)return false;
+      n.parse={src:n.text,labels:ruleParse(n.text),v:1}; scheduleSave(n.id); return true;
+    }
     if(!sampleFn||parsing.has(n.id))return false;
     var words=wordsOf(n.text); if(!words.length)return false;
     parsing.add(n.id); renderVerse(card,n); setFmsg(card,"문장을 살펴보는 중이에요.");
