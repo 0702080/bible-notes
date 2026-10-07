@@ -4070,8 +4070,88 @@ button:active{filter:brightness(1.15)}
   var lq=null, lqState=null, ladderBusy=new Set();
   function normW(t){return String(t).replace(/[^가-힣A-Za-z0-9]/g,"")}
   function ladderFor(n){return (n.ladder&&n.ladder.src===n.text&&n.ladder.steps.length)?n.ladder.steps:null}
+  // Claude 없이 만드는 질문: 낱말 끝(조사, 어미)을 보고 육하원칙(누가, 언제, 어디서, 무엇을, 어떻게, 왜) 질문을 붙임
+  function sixWLadder(text){
+    var w=String(text).split(/\s+/).filter(Boolean);
+    var GOD=/^(하나님|여호와|주|예수|그리스도|성령|아버지|주님|하늘\s?아버지)$/;
+    var WHO=/^(우리|너희|너|나|내|저희|저|그|그들|자|자들|사람|사람들|성도|성도들|백성|아들|아들들|딸|아이|형제|형제들|이웃|왕|종|의인|악인|아내|남편|어미|아비|부모|무리|제자|제자들|하나님|여호와|주|예수|그리스도|성령|아버지|주님|그리스도\s?예수)$/;
+    var TIME=/(때|전|후|날|밤|낮|아침|저녁|오늘|내일|이제|항상|영원|날마다|처음|마지막|끝|동안|태초|옛|세세|평생|새벽)/;
+    var PLACE=/(길|곳|땅|집|성|하늘|세상|산|바다|광야|성전|나라|들)$/;
+    var LINK=/^(다|곧|또|또한|그리고|이에|그러므로|그런즉|오직|다만|이|그|저|이런|그런|모든|온|한|두|세|네|참|더|가장|심히|크게)$/;
+    var WEAK={"어떻게 되나?":1,"무엇을 하나?":1,"그다음은?":1};
+    function bare(x){return String(x||"").replace(/[^가-힣A-Za-z0-9]/g,"")}
+    // 낱말 하나가 어떤 질문의 답이 되는지와, 여기서 끊을지(hold=false)
+    function role(i){
+      var x=bare(w[i]), nx=bare(w[i+1]), last=!w[i+1], m;
+      function R(q,hold){return {q:q,hold:!!hold}}
+      if(!x)return R(null,true);
+      if(LINK.test(x)&&!last)return R(null,true);
+      if((WHO.test(x)||GOD.test(x))&&!last)return R(null,true);   // 그리스도 예수 안에서
+      if(/^(내게|네게|제게|그에게|저에게)$/.test(x))return R("누구에게?");
+      if(/^(위하|위해|대하|통하|따라|향하|인하|받|입)/.test(nx))return R(/(을|를)$/.test(x)?"무엇을?":null,true);
+      if(/^하/.test(nx)&&/(게|려|도록|고자|기를|게도)$/.test(x))return R(null,true);   // 행하게 하려 하심이니라 → 한 덩어리
+      if(/(과|와)$/.test(x)&&nx==="함께")return R(null,true);
+      if(x==="함께")return R("누구와 함께?");
+      if(/(위하여|위해|위한)$/.test(x))return R("무엇을 위해?");
+      if(/(므로|니까|때문에|까닭에|인하여|인하여서)$/.test(x))return R("왜?");
+      if(/(도록|려고|고자)$/.test(x))return R("무엇을 하려고?");
+      if(/(에게|에게서|께|한테)$/.test(x))return R("누구에게?");
+      if(/^(가운데서|가운데|안에서|안에|속에서)$/.test(x)){var pv=bare(w[i-1]);return R(/^안/.test(x)&&(WHO.test(pv)||GOD.test(pv))?"누구 안에서?":"어디에서?")}
+      if(m=x.match(/^(.+?)(안에서|안에|가운데서|가운데|속에서|속에)$/))return R(GOD.test(m[1])||WHO.test(m[1])?"누구 안에서?":"어디에서?");
+      if(/^(영원히|항상|늘|이제|날마다|오늘|내일|먼저|전에|후에|평생|세세토록|영원토록)$/.test(x))return R("언제?");
+      if(m=x.match(/^(.+?)(에서|에|으로|로)$/)){
+        if(WHO.test(m[1])&&/로$/.test(x))return R(null,true);
+        if(TIME.test(m[1])&&!/로$/.test(x))return R("언제?");
+        if(PLACE.test(m[1]))return R(/로$/.test(x)?"어디로?":"어디에서?");
+        if(/로$/.test(x))return R("어떻게?");
+        return R("어디에서?");
+      }
+      if(m=x.match(/^(.+?)(을|를)$/)){
+        if(/^(.+)(함|심|음|기)$/.test(nx)||/(함이|함은|함을|심이|심을)$/.test(nx))return R(WHO.test(m[1])?"누구를?":"무엇을?",true);
+        return R(WHO.test(m[1])?"누구를?":"무엇을?");
+      }
+      if(m=x.match(/^(.+?)마다$/))return R(WHO.test(m[1])?"누가?":"언제?");
+      if(m=x.match(/^(.+?)(시니라|시니|시라|시요)$/)){if(m[1].length>=2&&!/(하|되|계|주|오|가|보|으|이)$/.test(m[1]))return R("누구신가?")}
+      if(/(이면|으면|면)$/.test(x)&&!/(하면서|으면서)$/.test(x))return R("어떤 경우에?");
+      if(m=x.match(/^(자|사람|자들|사람들|백성|아들|아들들|종|자녀)(니|이니|요|이요|라|이라|니라|이니라|로다|이로다|이시라)$/))return R("누구인가?");
+      if(m=x.match(/^(.+?)(이시니라|이시라|이시니|이니라|이라|이요|이니|이로다|이다)$/)){
+        if(/(함|심|음|기|하심|하심)$/.test(m[1]))return R("무엇을 하나?");
+        return R(GOD.test(m[1])?"누구신가?":"무엇인가?");
+      }
+      if(m=x.match(/^(.+?)(께서|은|는|이|가)$/)){
+        var st=m[1], p=m[2];
+        if(WHO.test(st)||GOD.test(st)){
+          if(nx&&/(신|한|된|든|던|는|은|실)$/.test(nx)&&w[i+2])return R("누가?",true);   // 그가 만드신 바라
+          return R("누가?");
+        }
+        if((p==="은"||p==="는")&&!last&&/(하|되|있|없|받|좋|굽|바르|작|크|많|키|믿|보|시|드리|섬기|르|살|찾|가|오|주|얻|알|듣|싫|옳|선|악|높|깊|넓|같|는)$/.test(st))return R(null,true);   // 꾸미는 말 (행하는, 받은, 좋은)
+        if(/(같이|처럼|게|히)$/.test(x))return R("어떻게?");
+        return R("무엇이?");
+      }
+      if(/(신|던|한|된|실|할|될|ㄴ)$/.test(x)&&!last)return R(null,true);
+      if(/(같이|처럼|듯이|대로|게|히|만큼|으로써|로써)$/.test(x))return R("어떻게?");
+      if(/(다|라|니라|리라|도다|로다|지어다|니|며|고|사|어|아|여|서|나|되|매|니와|거늘|지만|으니|으며|도|요)$/.test(x)){
+        if(/(려니와|거니와)$/.test(x))return R("어떻게 되나?");
+        return R(/(하|행|지키|드리|사랑|믿|따르|구하|찾|섬기|찬양|기도|감사|말하|가르치|외우)/.test(x)&&!/(되|받|하심)/.test(x)?"무엇을 하나?":"어떻게 되나?");
+      }
+      return R(null,true);
+    }
+    var out=[], cur=[], qs=[];
+    for(var i=0;i<w.length;i++){
+      var r=role(i); cur.push(w[i]); if(r.q)qs.push(r.q);
+      var end=i===w.length-1;
+      if((!r.hold&&r.q)||cur.length>=5||end){
+        var q=qs.length?qs[qs.length-1]:"그다음은?";
+        if(WEAK[q]){for(var k=0;k<qs.length-1;k++)if(!WEAK[qs[k]]){q=qs[k];break}}
+        out.push({q:q,a:cur.join(" ")}); cur=[]; qs=[];
+      }
+    }
+    for(var j=1;j<out.length;j++)if(out[j].q===out[j-1].q&&out[j].q.indexOf("그리고")<0)out[j].q="그리고 "+out[j].q;
+    return out;
+  }
   function fallbackLadder(n){
-    var Q=["누가?","무엇을?","어디서?","무엇을 위해?","어떻게?","그다음은?"];
+    var st=sixWLadder(n.text);
+    if(st.length>=2&&normW(st.map(function(x){return x.a}).join(""))===normW(n.text))return st;
     return chunksOf(n.text).map(function(c,i){return {q:i===0?"처음은?":"그다음은?",a:c}});
   }
   async function makeLadder(n){
