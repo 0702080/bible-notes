@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-07-01">
+<meta name="app-build" content="2026-10-07-02">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1814,8 +1814,12 @@ button:active{filter:brightness(1.15)}
     return out;
   }
   function has(t){return !!filterText&&matchAll(t,filterText,true).length>0}
-  var topicFilter="";
-  function visibleNote(n){return (!topicFilter||n.topics.indexOf(topicFilter)>=0)&&matches(n)}
+  var topicFilter="", topicSel=[];   // 주제는 여러 개 고를 수 있음 (하나라도 붙은 말씀을 보여 줌). topicFilter는 마지막에 고른 주제
+  function selHas(t){return topicSel.indexOf(t)>=0}
+  function setTopics(arr){topicSel=arr.slice();topicFilter=topicSel[topicSel.length-1]||""}
+  function toggleTopic(t){if(!t){setTopics([]);return} var a=topicSel.slice(),k=a.indexOf(t); if(k>=0)a.splice(k,1);else a.push(t); setTopics(a)}
+  function noteSelTopics(n){return n.topics.filter(selHas)}
+  function visibleNote(n){return (!topicSel.length||noteSelTopics(n).length>0)&&matches(n)}
   function matches(n){
     if(!filterText)return true;
     return has(n.ref)||has(n.text)||n.topics.some(function(t){return has(t)})||n.meds.some(function(m){return has(m.text)})||n.qs.some(function(q){return has(q.q)||has(q.a)})||n.acts.some(function(a){return has(a.t)})||n.hymns.some(function(h){return has(h.title)||has((h.no||"")+"장")})||n.vids.some(function(v){return has(v.title)})||n.essays.some(function(x){return has(x.title)||has(x.body)});
@@ -2148,7 +2152,7 @@ button:active{filter:brightness(1.15)}
       var vis=visibleNote(n); el.hidden=!vis; if(vis)shown++;
       if(list.children[i]!==el)list.insertBefore(el,list.children[i]||null);
     });
-    $("count").textContent=!notes.size?"":((filterText||topicFilter)?shown+" / "+notes.size+"개":notes.size+"개");
+    $("count").textContent=!notes.size?"":((filterText||topicSel.length)?shown+" / "+notes.size+"개":notes.size+"개");
     $("empty").hidden=notes.size>0;
     if(notes.size&&!shown){$("empty").hidden=false;$("emptyMsg").textContent="\u201C"+filterText+"\u201D이(가) 들어 있는 노트가 없어요.";$("emptyAdd").hidden=true}
     else{$("emptyMsg").textContent="아직 담은 말씀이 없어요. 아래 버튼으로 첫 말씀을 담아 보세요.";$("emptyAdd").hidden=false}
@@ -2544,7 +2548,7 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("apall")){openProg();return}
     if(b.classList.contains("ctopicadd")){openPicker(id);return}
-    if(b.classList.contains("ctopic")){topicFilter=b.dataset.topic===topicFilter?"":b.dataset.topic;render();return}
+    if(b.classList.contains("ctopic")){toggleTopic(b.dataset.topic);render();return}
     if(b.classList.contains("hchev")){
       if(openIds.has(id))openIds.delete(id);else openOne(id);
       render(); return;
@@ -3131,15 +3135,15 @@ button:active{filter:brightness(1.15)}
     tcolors=out;
   }
   function topicColor(t){return tcolors[t]||"var(--violet)"}
-  function cardTopic(n){if(topicFilter&&n.topics.indexOf(topicFilter)>=0)return topicFilter;return n.topics[0]||""}
+  function cardTopic(n){var st=noteSelTopics(n);return st[0]||n.topics[0]||""}
   function renderTopicBar(){
     computeTopicColors();
     var bar=$("topicBar"), ts=allTopics(); bar.textContent="";
-    if(topicFilter&&!ts.some(function(x){return x[0]===topicFilter}))topicFilter="";
+    if(topicSel.some(function(t){return !ts.some(function(x){return x[0]===t})}))setTopics(topicSel.filter(function(t){return ts.some(function(x){return x[0]===t})}));
     if(ts.length){
-      var all=document.createElement("button"); all.type="button"; all.className="tchip"+(topicFilter?"":" on"); all.dataset.topic=""; all.textContent="전체"; bar.appendChild(all);
+      var all=document.createElement("button"); all.type="button"; all.className="tchip"+(topicSel.length?"":" on"); all.dataset.topic=""; all.textContent="전체"; bar.appendChild(all);
       ts.forEach(function(x){
-        var b=document.createElement("button"); b.type="button"; b.className="tchip"+(topicFilter===x[0]?" on":""); b.dataset.topic=x[0];
+        var b=document.createElement("button"); b.type="button"; b.className="tchip"+(selHas(x[0])?" on":""); b.setAttribute("aria-pressed",String(selHas(x[0]))); b.dataset.topic=x[0];
         b.style.setProperty("--tc",topicColor(x[0]));
         var dot=document.createElement("span"); dot.className="tdot"; b.appendChild(dot);
         b.appendChild(document.createTextNode("#"+x[0])); var c=document.createElement("span"); c.className="tcnt"; c.textContent=x[1]; b.appendChild(c);
@@ -3150,7 +3154,7 @@ button:active{filter:brightness(1.15)}
   }
   $("reviewBar").addEventListener("click",function(e){
     var b=e.target.closest(".rvchip"); if(!b)return;
-    var id=b.dataset.id, act=b.dataset.act||"mem"; topicFilter="";
+    var id=b.dataset.id, act=b.dataset.act||"mem"; setTopics([]);
     if(act==="mem")memOpen.add(id);
     if(act==="med"||act==="act")tabOf.set(id,act==="med"?"m":"a");
     openIds.clear(); openIds.add(id); try{localStorage.setItem("bible-last-open",id)}catch(err){}
@@ -3162,14 +3166,14 @@ button:active{filter:brightness(1.15)}
   $("topicBar").addEventListener("click",function(e){
     var b=e.target.closest("button"); if(!b)return;
     if(b.id==="openCollect"){openCollect("");return}
-    topicFilter=b.dataset.topic||""; render();
-    if(topicFilter)window.scrollTo({top:Math.max(0,$("topicBar").getBoundingClientRect().top+window.scrollY-70),behavior:"smooth"});
+    var addT=b.dataset.topic&&!selHas(b.dataset.topic); toggleTopic(b.dataset.topic||""); render();
+    if(addT&&topicSel.length===1)window.scrollTo({top:Math.max(0,$("topicBar").getBoundingClientRect().top+window.scrollY-70),behavior:"smooth"});
   });
   function renderCardTopics(el,n){
     var ct=cardTopic(n); el.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)");
-    var box=el.querySelector(".topics"), key=n.topics.join("|")+"/"+topicFilter+"/"+n.topics.map(topicColor).join(",");
+    var box=el.querySelector(".topics"), key=n.topics.join("|")+"/"+topicSel.join("|")+"/"+n.topics.map(topicColor).join(",");
     if(box.dataset.key===key)return; box.dataset.key=key; box.textContent="";
-    n.topics.forEach(function(t){var c=document.createElement("button");c.type="button";c.className="ctopic"+(t===topicFilter?" on":"");c.dataset.topic=t;c.textContent="#"+t;c.style.setProperty("--tc",topicColor(t));box.appendChild(c)});
+    n.topics.forEach(function(t){var c=document.createElement("button");c.type="button";c.className="ctopic"+(selHas(t)?" on":"");c.dataset.topic=t;c.textContent="#"+t;c.style.setProperty("--tc",topicColor(t));box.appendChild(c)});
     box.hidden=!n.topics.length;
   }
   var ts={mode:"",nid:"",results:[]};
@@ -3298,7 +3302,7 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("mlview")){memListMode=b.dataset.v;memListPeek={};if(memListMode){memListSeed=newSeed();buzz(8)}openMemList();return}
     if(b.classList.contains("mlshuffle")){memListSeed=newSeed();memListPeek={};buzz(8);openMemList();return}
     if(b.classList.contains("mrref")){
-      var rid=b.dataset.id; closeTS(); topicFilter=""; openIds.add(rid); memOpen.add(rid); render();
+      var rid=b.dataset.id; closeTS(); setTopics([]); openIds.add(rid); memOpen.add(rid); render();
       var ce=cards.get(rid); if(ce)setTimeout(function(){ce.scrollIntoView({block:"start",behavior:"smooth"})},80);
       return;
     }
@@ -3309,7 +3313,7 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("tsdone")){closeTS();return}
     if(b.classList.contains("mrow")){
-      var rid=b.dataset.id; closeTS(); topicFilter=""; openIds.add(rid); memOpen.add(rid); render();
+      var rid=b.dataset.id; closeTS(); setTopics([]); openIds.add(rid); memOpen.add(rid); render();
       var ce=cards.get(rid); if(ce)setTimeout(function(){ce.scrollIntoView({block:"start",behavior:"smooth"})},80);
       return;
     }
@@ -4941,7 +4945,7 @@ button:active{filter:brightness(1.15)}
     if(!mode||!parseOk(n)){
       v.classList.remove("focus");
       if(filterText&&has(n.text))markInto(v,n.text,filterText);
-      else if(topicFilter&&n.topics.indexOf(topicFilter)>=0){v.classList.toggle("kwon",markKeywords(v,n.text,kwFor(n,topicFilter)));return}
+      else if(noteSelTopics(n).length){var kws=[];noteSelTopics(n).forEach(function(t){kwFor(n,t).forEach(function(w){if(kws.indexOf(w)<0)kws.push(w)})});kws.sort(function(a,b){return b.length-a.length});v.classList.toggle("kwon",markKeywords(v,n.text,kws));return}
       else if(hasMarks(n))renderMarked(v,n,false);   // 직접 고른 말은 평소에도 진하게
       else v.textContent=n.text;
       v.classList.remove("kwon");
@@ -5428,7 +5432,7 @@ button:active{filter:brightness(1.15)}
     var blob;
     try{
       await loadPdfFonts(list);
-      var sub="저장한 날 "+todayStr()+", 노트 "+list.length+"개"+(topicFilter?", 주제 #"+topicFilter:"")+(filterText&&list.length>1?", 찾기: "+filterText:"");
+      var sub="저장한 날 "+todayStr()+", 노트 "+list.length+"개"+(topicSel.length?", 주제 #"+topicSel.join(" #"):"")+(filterText&&list.length>1?", 찾기: "+filterText:"");
       blob=await buildPdf(layoutPdf(list,sub));
     }catch(e){
       setStatus("PDF를 만들지 못했어요. txt로 저장해 주세요.");
