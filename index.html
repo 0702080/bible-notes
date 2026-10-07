@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-04">
+<meta name="app-build" content="2026-10-08-05">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1871,7 +1871,9 @@ button:active{filter:brightness(1.15)}
   /* ---------- rendering ---------- */
   function sorted(){
     var all=Array.from(notes.values());
-    var pins=all.filter(function(n){return n.pinned}).sort(function(a,b){return (b.pinnedAt||0)-(a.pinnedAt||0)});
+    var pins=all.filter(function(n){return n.pinned});
+    // 고정한 카드끼리도 '내 순서'면 끌어서 옮긴 순서를 따름 (아니면 최근에 고정한 것부터)
+    if(sortMode==="custom")pins=sortedRest(pins); else pins.sort(function(a,b){return (b.pinnedAt||0)-(a.pinnedAt||0)});
     return pins.concat(sortedRest(all.filter(function(n){return !n.pinned})));
   }
   function sortedRest(arr){
