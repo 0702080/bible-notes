@@ -582,6 +582,7 @@ body.reorder .note:not(.dragging){border-style:dashed;border-color:color-mix(in 
 /* ===== topics ===== */
 .topicbar{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:12px 2px 2px;margin:0 -2px;scrollbar-width:none}
 .topicbar::-webkit-scrollbar{display:none}
+@media (hover:hover) and (pointer:fine){.topicbar,.shelf{cursor:grab}.topicbar.dragging,.shelf.dragging{cursor:grabbing;user-select:none}.topicbar.dragging *,.shelf.dragging *{cursor:grabbing}}
 .tchip{flex:0 0 auto;height:34px;padding:0 13px;border:1px solid var(--rule);border-radius:17px;background:rgba(255,255,255,.02);color:var(--muted);font-size:13.5px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .tchip.on{background:var(--violet);border-color:var(--violet);color:#141416;font-weight:700}
 .tchip .tcnt{font-size:11.5px;opacity:.8}
@@ -3258,6 +3259,33 @@ button:active{filter:brightness(1.15)}
     if(!t||t.disabled)return;
     setTimeout(function(){if(Date.now()-lastBuzz>60)buzz(22)},0);
   },true);
+
+  /* ---------- PC 마우스로 가로 줄 끌어서 넘기기 (주제 줄, 배지 선반) ---------- */
+  (function(){
+    var drag=null, dragged=false;
+    document.addEventListener("pointerdown",function(e){
+      if(e.pointerType!=="mouse"||e.button!==0)return;
+      var el=e.target.closest&&e.target.closest(".topicbar,.shelf");
+      if(!el||el.scrollWidth<=el.clientWidth)return;
+      drag={el:el,x:e.clientX,left:el.scrollLeft,moved:false}; dragged=false;
+    });
+    document.addEventListener("pointermove",function(e){
+      if(!drag)return;
+      var dx=e.clientX-drag.x;
+      if(!drag.moved&&Math.abs(dx)<6)return;
+      if(!drag.moved){drag.moved=true;drag.el.classList.add("dragging")}
+      drag.el.scrollLeft=drag.left-dx; e.preventDefault();
+    });
+    function end(){
+      if(!drag)return;
+      if(drag.moved){dragged=true;drag.el.classList.remove("dragging");setTimeout(function(){dragged=false},0)}
+      drag=null;
+    }
+    document.addEventListener("pointerup",end);
+    document.addEventListener("pointercancel",end);
+    // 끌고 난 뒤 손을 뗄 때 주제가 눌리지 않게
+    document.addEventListener("click",function(e){if(dragged){e.stopPropagation();e.preventDefault();dragged=false}},true);
+  })();
 
 
   var toastEl=null, toastT=0;

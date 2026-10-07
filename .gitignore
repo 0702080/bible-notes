@@ -4,3 +4,4 @@ node_modules/
 .env
 *.zip
 말씀묵상노트_백업_*.json
+.claude/
