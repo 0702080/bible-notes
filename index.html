@@ -9,7 +9,7 @@
 <style>
 :root{
   --paper:#ECECE8; --sheet:#F7F7F4; --rule:#D6D4CD; --ink:#2C2833; --muted:#6D6776; --faint:#9C97A3;
-  --violet:#6A45B0; --orange:#D86E0C; --hi:#F07800; --green:#1F7A45; --blue:#2447B8; --sky:#1C93CF; --pink:#D94A90;
+  --violet:#6A45B0; --orange:#D86E0C; --hi:#F07800; --green:#1F7A45; --blue:#2447B8; --sky:#1C93CF; --pink:#D94A90; --mint:#4FD1B5;
   --btn:#2C2833; --btn-ink:#F7F7F4; --focus:#2447B8;
   --serif:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --sans:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
@@ -852,7 +852,7 @@ body.reorder .note .pinbtn{display:none!important}
 .mshuffle,.mlshuffle{height:30px;padding:0 12px;border:1px solid color-mix(in srgb,var(--gold) 50%,var(--rule));border-radius:15px;background:transparent;color:var(--gold);font-size:12.5px;font-weight:700;white-space:nowrap}
 .mlshuffle[hidden]{display:none}
 .rw.masked{color:var(--gold);letter-spacing:.06em;cursor:pointer;border-radius:5px;padding:2px 1px;margin:-2px -1px}
-.rw.masked.peek{color:var(--hi);letter-spacing:normal;background:color-mix(in srgb,var(--gold) 14%,transparent)}
+.rw.masked.peek{color:var(--hi);letter-spacing:normal;background:color-mix(in srgb,var(--mint) 30%,transparent)}
 .mlctl{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:4px 0 6px}
 .mlctl .mviews{margin:0;flex:1}
 .mlview{flex:1;height:32px;border:1px solid var(--rule);border-radius:10px;background:transparent;color:var(--muted);font-size:13px}
@@ -1028,7 +1028,7 @@ body.typing .fab{opacity:0;pointer-events:none;transform:translateY(20px)}
 @media (prefers-reduced-motion:reduce){.uitem.fresh{animation:none}}
 /* ===== solid-box hiding ===== */
 .rw.masked.box{color:transparent;background:color-mix(in srgb,var(--orange) 30%,#2a2420);border-radius:6px;letter-spacing:normal;padding:2px 2px;margin:-2px -2px}
-.rw.masked.box.peek{color:var(--hi);background:color-mix(in srgb,var(--gold) 14%,transparent)}
+.rw.masked.box.peek{color:var(--hi);background:color-mix(in srgb,var(--mint) 30%,transparent)}
 .mprow{gap:6px}
 .mprow .mpractice{min-width:0;padding:0 8px;font-size:14px}
 .mboxp{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:42px;padding:0 12px;border:1px solid color-mix(in srgb,var(--orange) 50%,var(--rule));border-radius:12px;background:transparent;color:var(--orange);font-size:14px;font-weight:700}
@@ -1576,6 +1576,7 @@ button:active{filter:brightness(1.15)}
     if(!(n.book>=0&&n.book<66&&n.chapter>0))return null;
     return {
       bs:"https://www.bskorea.or.kr/bible/korbibReadpage.php?version=GAE&book="+USFM[n.book]+"&chap="+n.chapter+(n.verse?"&sec="+n.verse:""),
+      hbpc:"http://www.holybible.or.kr/B_GAE/cgi/bibleftxt.php?VR=GAE&VL="+(n.book+1)+"&CN="+n.chapter+"&CV=99",
       hb:"http://www.holybible.or.kr/mobile/B_GAE/cgi/bibleftxt.php?VR=GAE&VL="+(n.book+1)+"&CN="+n.chapter+"&CV=99",
       naver:"https://search.naver.com/search.naver?query="+encodeURIComponent(chapLabel(n)+" 개역개정")
     };
@@ -2481,7 +2482,11 @@ button:active{filter:brightness(1.15)}
       if(n.pinned){var ce=cards.get(id); if(ce)setTimeout(function(){ce.scrollIntoView({block:"nearest",behavior:"smooth"})},60)}
       return;
     }
-    if(b.classList.contains("chapread")){openReader(n);return}
+    if(b.classList.contains("chapread")){
+      var pcl=isPC&&isPC.matches&&chapLinks(n);   // PC에서는 홀리바이블 개역개정 장 전체를 새 탭으로
+      if(pcl){window.open(pcl.hbpc,"_blank","noopener");return}
+      openReader(n);return;
+    }
     if(b.classList.contains("apall")){openProg();return}
     if(b.classList.contains("ctopicadd")){openPicker(id);return}
     if(b.classList.contains("ctopic")){topicFilter=b.dataset.topic===topicFilter?"":b.dataset.topic;render();return}
