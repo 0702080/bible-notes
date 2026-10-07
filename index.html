@@ -4203,6 +4203,14 @@ button:active{filter:brightness(1.15)}
         out.push({q:q,a:cur.join(" ")}); cur=[]; qs=[];
       }
     }
+    // "무엇인가?"가 앞 조각(주어)에 이어지면 주어를 넣어 묻기: 여호와를 경외함이 / 지혜의 근본이라 → "여호와를 경외함은 무엇인가?"
+    for(var j2=1;j2<out.length;j2++){
+      var pq=out[j2-1].q.replace(/^그리고 /,""), cq=out[j2].q;
+      if((cq==="무엇인가?"||cq==="누구신가?"||cq==="누구인가?")&&(pq==="무엇이?"||pq==="누가?")){
+        var base=out[j2-1].a.replace(/[^가-힣A-Za-z0-9\s]/g,"").trim().replace(/(께서|이|가|은|는)$/,"");
+        if(base&&base.length<=12){var lc=base.charCodeAt(base.length-1)-0xAC00;out[j2].q=base+(lc>=0&&lc<11172&&lc%28?"은 ":"는 ")+cq}
+      }
+    }
     for(var j=1;j<out.length;j++)if(out[j].q===out[j-1].q&&out[j].q.indexOf("그리고")<0)out[j].q="그리고 "+out[j].q;
     return out;
   }
