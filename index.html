@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-07-09">
+<meta name="app-build" content="2026-10-08-01">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2099,10 +2099,12 @@ button:active{filter:brightness(1.15)}
   }
   function updateCard(el,n){
     markInto(el.querySelector(".ref"),n.ref||"구절 미입력",filterText&&has(n.ref)?filterText:"");
-    // 이 말씀으로 적은 한 줄 기록 수 (예: 한 줄 감사): 구절 옆에 "✍️ 12줄 · 오늘 3"
-    var lgAll=0, lgToday=0, tdk=dkey(Date.now());
-    (n.acts||[]).forEach(function(a){(a.logs||[]).forEach(function(l){lgAll++;if(dkey(l.at)===tdk)lgToday++})});
-    if(lgAll){var lc=document.createElement("span");lc.className="logcnt";lc.textContent="✍️ "+lgAll+"줄"+(lgToday?" · 오늘 "+lgToday:"");lc.title="이 말씀으로 적은 한 줄 기록 "+lgAll+"줄";el.querySelector(".ref").appendChild(lc)}
+    // 오늘 적은 한 줄 기록 수를 실천 이름으로: "감사 5" (내일이 되면 다시 0부터, 오늘 안 적으면 안 보임)
+    var tdk=dkey(Date.now()), refEl=el.querySelector(".ref");
+    (n.acts||[]).forEach(function(a){
+      var c=(a.logs||[]).filter(function(l){return dkey(l.at)===tdk}).length; if(!c)return;
+      var lc=document.createElement("span"); lc.className="logcnt"; lc.textContent=actWord(a.t)+" "+c; lc.title="오늘 적은 한 줄: "+a.t+" "+c+"줄"; refEl.appendChild(lc);
+    });
     renderVerse(el,n);
     var open=openIds.has(n.id);
     el.classList.toggle("open",open);
@@ -3515,6 +3517,13 @@ button:active{filter:brightness(1.15)}
       box.appendChild(p);
     }
     document.body.appendChild(box); setTimeout(function(){box.remove()},1300);
+  }
+  // 실천 이름에서 짧은 이름 뽑기: "감사한 것을 글로 썼는가" → "감사"
+  var ACTWORDS=["감사","기도","찬양","말씀","묵상","칭찬","섬김","용서","전도","회개","사랑","순종","나눔","봉사","필사","암송","큐티"];
+  function actWord(t){
+    t=String(t||""); for(var i=0;i<ACTWORDS.length;i++)if(t.indexOf(ACTWORDS[i])>=0)return ACTWORDS[i];
+    var w=(t.trim().split(/\s+/)[0]||"").replace(/[^가-힣A-Za-z0-9]/g,"").replace(/(을|를|이|가|은|는|에|에서|으로|로|의|와|과|도|하기|하는|한)$/,"");
+    return w?w.slice(0,6):"기록";
   }
   /* ---------- 실천 한 줄 기록 (예: 한 줄 감사). 하루에 여러 줄, 적으면 오늘 칸이 체크됨 ---------- */
   var logAll=new Set();
