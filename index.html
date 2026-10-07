@@ -831,6 +831,7 @@ body.reorder .note .pinbtn{display:none!important}
 .verse.picking .w.on{opacity:1}
 .verse .vmark{font-weight:700;color:var(--hi)}
 .verse.picking{cursor:text}
+.verse.picking .w.on .wdim{opacity:.42}
 .fselbold{height:28px;padding:0 11px;border:1px dashed color-mix(in srgb,var(--hi) 50%,#34333A);border-radius:14px;background:transparent;color:var(--hi);font-size:12.5px;white-space:nowrap}
 .fselbold[hidden]{display:none}
 /* ===== simpler card ===== */
@@ -4970,7 +4971,11 @@ button:active{filter:brightness(1.15)}
     var m=markMask(n), at=0, pi=0; v.textContent="";
     function seg(parent,str,from){
       var i=0; while(i<str.length){var b=m[from+i], j=i; while(j<str.length&&m[from+j]===b)j++;
-        var part=str.slice(i,j); if(b){var x=document.createElement("b");x.className="vmark";x.textContent=part;parent.appendChild(x)}else parent.appendChild(document.createTextNode(part)); i=j}
+        var part=str.slice(i,j);
+        if(b){var x=document.createElement("b");x.className="vmark";x.textContent=part;parent.appendChild(x)}
+        else if(picking){var d=document.createElement("span");d.className="wdim";d.textContent=part;parent.appendChild(d)}   // 고르기 중: 안 고른 글자는 흐리게
+        else parent.appendChild(document.createTextNode(part));
+        i=j}
     }
     tokens(n.text).forEach(function(tok){
       if(/^\s+$/.test(tok)){v.appendChild(document.createTextNode(tok));at+=tok.length;return}
