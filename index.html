@@ -981,9 +981,10 @@ body.reorder .note .chead .copyv{display:none}
 .mreveal svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mreveal:disabled{opacity:.35}
 /* ===== 말씀 활용 제안 ===== */
-.useopen{display:inline-flex;align-items:center;height:30px;padding:0 12px;border:1px solid var(--rule);border-radius:15px;background:transparent;color:var(--muted);font-size:13px}
+.useopen,.vedit{display:inline-flex;align-items:center;height:30px;padding:0 12px;border:1px solid var(--rule);border-radius:15px;background:transparent;color:var(--muted);font-size:13px}
 .useopen.on{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,var(--rule))}
-body.reorder .note .useopen{display:none}
+body.reorder .note .useopen,body.reorder .note .vedit{display:none}
+.vedit[aria-expanded="true"]{color:var(--green);border-color:color-mix(in srgb,var(--green) 55%,var(--rule))}
 .usepanel{margin:2px 0 14px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 30%,var(--rule));border-radius:14px;background:#101013}
 .usepanel[hidden]{display:none}
 .note:not(.open) .usepanel{display:none}
@@ -1850,7 +1851,7 @@ button:active{filter:brightness(1.15)}
       '<div class="verse"></div>'+
       '<div class="hits"></div>'+
       '<div class="editbox" hidden><input class="field eref" aria-label="성경 구절"><textarea class="field etext" aria-label="말씀"></textarea><button type="button" class="small donedit">완료</button></div>'+
-      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">💡 언제 쓸까</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
+      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">💡 언제 쓸까</button><button type="button" class="vedit" aria-expanded="false">✏️ 말씀 고치기</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
       '<div class="usepanel" hidden></div>'+
       '<div class="mempanel" hidden></div>'+
       '<div class="trow"><button type="button" class="toggle" aria-expanded="false"><span class="chev" aria-hidden="true"></span><span class="tl"></span><span class="meta"></span></button></div>'+
@@ -2392,13 +2393,15 @@ button:active{filter:brightness(1.15)}
     var id=card.dataset.id, n=notes.get(id); if(!n)return;
     if(b.classList.contains("tab")){tabOf.set(id,b.dataset.tab);render();return}
     if(b.classList.contains("mtopic")){b.closest("details").open=false;openPicker(id);return}
-    if(b.classList.contains("medit")){
-      b.closest("details").open=false;
-      var eb=card.querySelector(".editbox"); eb.hidden=false; var er=eb.querySelector(".eref"); setVal(er,n.ref); setVal(eb.querySelector(".etext"),n.text);
+    if(b.classList.contains("medit")||b.classList.contains("vedit")){
+      var ve=card.querySelector(".vedit"), eb=card.querySelector(".editbox");
+      if(b.classList.contains("vedit")&&!eb.hidden){eb.hidden=true;ve.setAttribute("aria-expanded","false");ve.textContent="✏️ 말씀 고치기";flushNow(id);toast("말씀을 고쳤어요");return}
+      if(b.classList.contains("medit"))b.closest("details").open=false;
+      if(ve){ve.setAttribute("aria-expanded","true");ve.textContent="✓ 고치기 끝"} eb.hidden=false; var er=eb.querySelector(".eref"); setVal(er,n.ref); setVal(eb.querySelector(".etext"),n.text);
       requestAnimationFrame(function(){grow(eb.querySelector(".etext"));er.focus()});
       return;
     }
-    if(b.classList.contains("donedit")){card.querySelector(".editbox").hidden=true;flushNow(id);return}
+    if(b.classList.contains("donedit")){card.querySelector(".editbox").hidden=true;var ve2=card.querySelector(".vedit");if(ve2){ve2.setAttribute("aria-expanded","false");ve2.textContent="✏️ 말씀 고치기"}flushNow(id);toast("말씀을 고쳤어요");return}
     if(b.classList.contains("grip")){return}
     if(b.classList.contains("copyv")){copyVerse(n,b);return}
     if(b.classList.contains("medprog")){openMedProgress();return}
@@ -3258,7 +3261,22 @@ button:active{filter:brightness(1.15)}
     var t=e.target.closest&&e.target.closest("button,a,summary,label,[role=button],input[type=checkbox],.tchip,.hya,.bw,.rw.masked,.mw,.w,.dcell,.note .verse,.note .chead,.note .ref");
     if(!t||t.disabled)return;
     setTimeout(function(){if(Date.now()-lastBuzz>60)buzz(22)},0);
+    tick();
   },true);
+
+  /* ---------- PC에서 누를 때 '띡' 소리 (휴대폰은 진동) ---------- */
+  var tickCtx=null, isPC=window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)");
+  function tick(){
+    try{
+      if(!isPC||!isPC.matches)return;
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+      if(!tickCtx)tickCtx=new AC(); if(tickCtx.state==="suspended")tickCtx.resume();
+      var t=tickCtx.currentTime, o=tickCtx.createOscillator(), g=tickCtx.createGain();
+      o.type="sine"; o.frequency.setValueAtTime(1800,t);
+      g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.12,t+0.004); g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+      o.connect(g); g.connect(tickCtx.destination); o.start(t); o.stop(t+0.06);
+    }catch(e){}
+  }
 
   /* ---------- PC 마우스로 가로 줄 끌어서 넘기기 (주제 줄, 배지 선반) ---------- */
   (function(){
