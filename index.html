@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-07-04">
+<meta name="app-build" content="2026-10-07-05">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2158,7 +2158,7 @@ button:active{filter:brightness(1.15)}
   }
   function render(){
     if(drag)return;
-    renderTopicBar(); renderReviewBar();
+    renderTopicBar(); renderReviewBar(); refreshXrefs();
     var list=$("list"), order=sorted(), shown=0;
     if(spotId&&!openIds.has(spotId))spotId=null;
     if(spotId&&notes.has(spotId)){var sp0=notes.get(spotId);order=[sp0].concat(order.filter(function(x){return x!==sp0}))}
@@ -4782,12 +4782,20 @@ button:active{filter:brightness(1.15)}
     });
     return out.sort(function(a,b){return b.sc-a.sc}).slice(0,5);
   }
+  // 말씀을 새로 담거나 고치면 열려 있는 연결 말씀 목록도 다시 그림 (담은 말씀 표시가 바로 바뀌게)
+  function xrefSig(){var a=[];notes.forEach(function(x){a.push(x.id+":"+x.book+"."+x.chapter+"."+x.verse+":"+x.topics.join(",")+":"+x.text.length)});return a.join("|")}
+  function refreshXrefs(){
+    var open=document.querySelectorAll(".note .xpanel:not([hidden])"); if(!open.length)return;
+    var sig=xrefSig();
+    open.forEach(function(pn){var c=pn.closest(".note"), n=c&&notes.get(c.dataset.id); if(n&&pn.dataset.sig!==sig)fillXref(pn,n)});
+  }
   function toggleXref(card,n){
     var pn=card.querySelector(".xpanel"), bt=card.querySelector(".vxref"), open=pn.hidden;
     pn.hidden=!open; bt.setAttribute("aria-expanded",String(open));
     if(open)fillXref(pn,n);
   }
   function fillXref(pn,n){
+    pn.dataset.sig=xrefSig();
     pn.innerHTML='<div class="xhd">🔗 연결 말씀</div><div class="xsec">성경 관주 <span>서로 연결된 구절</span></div><ul class="xlist xcross"><li class="xmsg">불러오는 중이에요…</li></ul>'+
       '<div class="xsec">내 말씀 중에서 <span>같은 낱말·주제</span></div><ul class="xlist xmine"></ul><p class="xsrc">관주 자료: OpenBible.info (CC BY)</p>';
     var mine=pn.querySelector(".xmine"), rel=relatedMine(n);
