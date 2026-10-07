@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-07-02">
+<meta name="app-build" content="2026-10-07-03">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1675,7 +1675,7 @@ button:active{filter:brightness(1.15)}
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
       uses:Array.isArray(n.uses)?n.uses.filter(function(u){return u&&u.when}).slice(0,30).map(function(u){return {when:String(u.when),why:String(u.why||""),how:String(u.how||""),mine:!!u.mine}}):[],
       drill:Array.isArray(n.drill)?n.drill.filter(function(d){return d&&+d.at>0}).slice(-300).map(function(d){return {at:+d.at,ms:+d.ms||0,b:["best","fast","fire","done"].indexOf(d.b)>=0?d.b:"done"}}):[],
-      mem:(n.mem&&Array.isArray(n.mem.s))?{s:[0,1,2,3,4].map(function(i){return +n.mem.s[i]||0})}:{s:[0,0,0,0,0]},
+      mem:(n.mem&&Array.isArray(n.mem.s))?{s:(function(a){if(a.length>=5)a=[a[0],a[1],a[2],a[4]||a[3]];return [0,1,2,3].map(function(i){return +a[i]||0})})(n.mem.s)}:{s:[0,0,0,0]},   // 예전 5단계(다음 날, 내일)는 4단계(내일) 하나로
       pinned:!!n.pinned, pinnedAt:n.pinned?(+n.pinnedAt||0):0,
       tw:(function(o){var r={};if(o&&typeof o==="object"&&!Array.isArray(o)){Object.keys(o).slice(0,20).forEach(function(k){if(Array.isArray(o[k]))r[String(k).slice(0,20)]=o[k].map(String).map(function(w){return w.trim()}).filter(Boolean).slice(0,8)})}return r})(n.tw),
       topics:Array.isArray(n.topics)?n.topics.map(function(t){return String(t).replace(/^#+/,"").trim().slice(0,20)}).filter(function(t,i,a){return t&&a.indexOf(t)===i}).slice(0,12):[],
@@ -4468,20 +4468,19 @@ button:active{filter:brightness(1.15)}
   }
 
   /* ---------- 말씀 암송 ---------- */
-  var MEMSTEPS=["소리 내어 3번 읽기","첫 글자만 보고 말하기","안 보고 외우기","다음 날 다시 외우기","내일 다시 외우기"];
+  var MEMSTEPS=["소리 내어 3번 읽기","첫 글자만 보고 말하기","안 보고 외우기","내일 다시 외우기"];
   var memOpen=new Set(), memView=new Map(), memPeek=new Map(), memSeed=new Map(), memStep=new Map(), drillOpen=new Set(), afterOpen=new Set();
   function memNextStep(n){
-    var st=n.mem&&n.mem.s?n.mem.s:[0,0,0,0,0], now=Date.now();
-    for(var i=0;i<5;i++){
+    var st=n.mem&&n.mem.s?n.mem.s:[0,0,0,0], now=Date.now();
+    for(var i=0;i<MEMSTEPS.length;i++){
       if(st[i])continue;
       if(i===3){if(!st[2])return -1; var d=new Date(st[2]); d.setHours(0,0,0,0); if(now<d.getTime()+864e5)return -1}
-      if(i===4){if(!st[3])return -1; var d2=new Date(st[3]); d2.setHours(0,0,0,0); if(now<d2.getTime()+864e5)return -1}
       return i;
     }
     return -1;
   }
-  var STEPVIEW=["","hint","hide","hide","hide"];
-  var STAMP=[{e:"🗣️",t:"읽기",c:"#F4A45E"},{e:"🔤",t:"첫 글자",c:"#6ECBF4"},{e:"🙈",t:"가리기",c:"#B79CF2"},{e:"🌅",t:"다음 날",c:"#F48FB6"},{e:"🌤️",t:"내일",c:"#6FD09A"}];
+  var STEPVIEW=["","hint","hide","hide"];
+  var STAMP=[{e:"🗣️",t:"읽기",c:"#F4A45E"},{e:"🔤",t:"첫 글자",c:"#6ECBF4"},{e:"🙈",t:"가리기",c:"#B79CF2"},{e:"🌤️",t:"내일",c:"#6FD09A"}];
   var lastStamp=null;
   function stampRow(n,big){
     var row=document.createElement("div"); row.className="srow"+(big?" big":"")+(memDone(n)?" full":"");
@@ -4521,20 +4520,19 @@ button:active{filter:brightness(1.15)}
     });
   }
   function memCount(n){return (n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length}
-  function memDone(n){return memCount(n)>=5}
+  function memDone(n){return memCount(n)>=MEMSTEPS.length}
   function memHint(n,i){
     var s=n.mem.s;
     if(i===3&&s[2]&&!s[3]){var d=new Date(s[2]+864e5);return (d.getMonth()+1)+"/"+d.getDate()+"부터"}
-    if(i===4&&s[3]&&!s[4]){var d2=new Date(s[3]+864e5);return (d2.getMonth()+1)+"/"+d2.getDate()+"부터"}
     return "";
   }
   function renderMem(el,n){
-    if(!n.mem)n.mem={s:[0,0,0,0,0]};
+    if(!n.mem)n.mem={s:[0,0,0,0]};
     var btn=el.querySelector(".memopen"), panel=el.querySelector(".mempanel"), open=memOpen.has(n.id);
     var c=memCount(n);
     btn.setAttribute("aria-expanded",String(open)); btn.classList.toggle("on",open); btn.classList.toggle("done",memDone(n));
     btn.dataset.c=memDone(n)?"✓":(c?String(c):"");
-    btn.setAttribute("aria-label",memDone(n)?"말씀 암송 (완료)":(c?"말씀 암송 ("+c+"/5단계)":"말씀 암송")); btn.title=btn.getAttribute("aria-label");
+    btn.setAttribute("aria-label",memDone(n)?"말씀 암송 (완료)":(c?"말씀 암송 ("+c+"/"+MEMSTEPS.length+"단계)":"말씀 암송")); btn.title=btn.getAttribute("aria-label");
     panel.hidden=!open;
     if(!open){panel.textContent="";panel.dataset.key="";return}
     var view=memView.get(n.id)||"";
@@ -4542,7 +4540,7 @@ button:active{filter:brightness(1.15)}
     if(panel.dataset.key===key)return; panel.dataset.key=key; panel.textContent="";
     var head=document.createElement("div"); head.className="mhd";
     head.innerHTML='<b>말씀 암송</b><span class="mcnt"></span>';
-    head.querySelector(".mcnt").textContent=memDone(n)?"🏅 암송 완료!":"도장 "+c+" / 5";
+    head.querySelector(".mcnt").textContent=memDone(n)?"🏅 암송 완료!":"도장 "+c+" / "+MEMSTEPS.length;
     panel.appendChild(head);
     panel.appendChild(stampRow(n,true));
     var act=memStep.has(n.id)?memStep.get(n.id):-1;
@@ -4663,7 +4661,7 @@ button:active{filter:brightness(1.15)}
     var shh=document.createElement("div"); shh.className="pgh"; shh.textContent="🏅 메달 진열장"; body.appendChild(shh);
     if(done.length){
       done.forEach(function(n){var m=document.createElement("button");m.type="button";m.className="mcoin mrref";m.dataset.id=n.id;m.innerHTML='<span class="mci">🏅</span><span class="mcr"></span>';m.querySelector(".mcr").textContent=n.ref;sh.appendChild(m)});
-    }else{var em=document.createElement("p");em.className="shelfempty";em.textContent="5개 도장을 모두 모으면 여기에 메달이 걸려요.";sh.appendChild(em)}
+    }else{var em=document.createElement("p");em.className="shelfempty";em.textContent=MEMSTEPS.length+"개 도장을 모두 모으면 여기에 메달이 걸려요.";sh.appendChild(em)}
     body.appendChild(sh);
     // legend
     var lg=document.createElement("div"); lg.className="slegend";
@@ -5117,7 +5115,7 @@ button:active{filter:brightness(1.15)}
     var out=[];
     out.push(n.ref||"구절 미입력");
     if(n.topics.length)out.push("주제: "+n.topics.map(function(t){return "#"+t}).join(" "));
-    if(memCount(n))out.push("암송: "+(memDone(n)?"완료":memCount(n)+"/5 단계"));
+    if(memCount(n))out.push("암송: "+(memDone(n)?"완료":memCount(n)+"/"+MEMSTEPS.length+" 단계"));
     if(n.uses&&n.uses.length){out.push("");out.push("[이 말씀, 언제 쓸까]");n.uses.forEach(function(u){out.push("· "+u.when+": "+u.how)})}
     out.push(n.text);
     var meds=newestFirst(n.meds.filter(function(m){return m.text.trim()}));
