@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-07-08">
+<meta name="app-build" content="2026-10-07-09">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -91,6 +91,7 @@ textarea.field{resize:vertical;min-height:80px;font-family:var(--serif);line-hei
 .empty{padding:28px 4px;color:var(--muted);font-size:15px;text-align:center}
 .note{padding:18px 0 16px;border-bottom:1px solid var(--rule)}
 .note .ref{font-weight:700;color:var(--violet);font-size:14px;letter-spacing:.01em}
+.ref .logcnt{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:10px;background:color-mix(in srgb,var(--sky) 14%,transparent);color:var(--sky);font-size:11.5px;font-weight:700;letter-spacing:0;vertical-align:1px;white-space:nowrap}
 .note .verse{font-family:var(--serif);font-size:18px;line-height:1.75;margin:4px 0 10px;color:var(--orange);white-space:pre-wrap;word-break:keep-all}
 .toggle{display:inline-flex;align-items:center;gap:8px;background:none;border:0;padding:6px 0;font-size:14px;color:var(--green);font-weight:500}
 .toggle .chev{display:inline-block;width:8px;height:8px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .15s}
@@ -2098,6 +2099,10 @@ button:active{filter:brightness(1.15)}
   }
   function updateCard(el,n){
     markInto(el.querySelector(".ref"),n.ref||"구절 미입력",filterText&&has(n.ref)?filterText:"");
+    // 이 말씀으로 적은 한 줄 기록 수 (예: 한 줄 감사): 구절 옆에 "✍️ 12줄 · 오늘 3"
+    var lgAll=0, lgToday=0, tdk=dkey(Date.now());
+    (n.acts||[]).forEach(function(a){(a.logs||[]).forEach(function(l){lgAll++;if(dkey(l.at)===tdk)lgToday++})});
+    if(lgAll){var lc=document.createElement("span");lc.className="logcnt";lc.textContent="✍️ "+lgAll+"줄"+(lgToday?" · 오늘 "+lgToday:"");lc.title="이 말씀으로 적은 한 줄 기록 "+lgAll+"줄";el.querySelector(".ref").appendChild(lc)}
     renderVerse(el,n);
     var open=openIds.has(n.id);
     el.classList.toggle("open",open);
