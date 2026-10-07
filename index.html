@@ -978,7 +978,7 @@ body.reorder .note .chead .copyv{display:none}
 .mprow{display:flex;gap:8px;margin:12px 0 4px}
 .mprow .mpractice{flex:1;margin:0}
 .mreveal{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:42px;padding:0 14px;border:1px solid var(--rule);border-radius:12px;background:transparent;color:var(--ink);font-size:14px;font-weight:500}
-.mreveal svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.mreveal svg,.mlicon{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .mreveal:disabled{opacity:.35}
 /* ===== 말씀 활용 제안 ===== */
 .useopen,.vedit,.vtopic{display:inline-flex;align-items:center;height:30px;padding:0 12px;border:1px solid var(--rule);border-radius:15px;background:transparent;color:var(--muted);font-size:13px}
@@ -1316,6 +1316,8 @@ button:active{filter:brightness(1.15)}
 .lquiz[hidden]{display:none}
 .lqlist{flex:1;overflow:auto;padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px}
 .lqlist[hidden]{display:none}
+/* PC 넓은 화면: 질문/순서 맞추기 창을 가운데로 좁게 */
+@media (min-width:760px){.lquiz>*,.oquiz>*{width:calc(100% - 32px);max-width:680px;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}}
 .lqcard{position:relative;display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;column-gap:10px;row-gap:6px;width:100%;padding:14px 14px;border-radius:16px;border:1px solid #26252c;background:#141318;color:var(--ink);text-align:left;opacity:.45;animation:bwenter .35s cubic-bezier(.2,1.4,.4,1) both}
 .lqcard.cur{opacity:1;border-color:color-mix(in srgb,#9FB4FF 60%,#26252c);box-shadow:0 0 0 3px color-mix(in srgb,#9FB4FF 14%,transparent)}
 .lqcard.open{opacity:1;border-color:#2c2b33;box-shadow:none}
@@ -4377,7 +4379,7 @@ button:active{filter:brightness(1.15)}
     prow.appendChild(rev); prow.appendChild(prac); prow.appendChild(boxb); panel.appendChild(prow);
     var prow2=document.createElement("div"); prow2.className="mprow mprow2";
     var lb=document.createElement("button"); lb.type="button"; lb.className="mladder"; lb.disabled=ladderBusy.has(n.id);
-    lb.innerHTML=ladderBusy.has(n.id)?'<span>질문 만드는 중…</span>':'<span aria-hidden="true">❓</span><span>질문으로</span>';
+    lb.innerHTML=ladderBusy.has(n.id)?'<span>질문 만드는 중…</span>':'<svg class="mlicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h7A2.5 2.5 0 0 1 16 5.5v4A2.5 2.5 0 0 1 13.5 12H9l-3.5 3v-3A2.5 2.5 0 0 1 4 9.5z"/><path d="M19 9.2a2.3 2.3 0 0 1 1 1.9v3.7a2.3 2.3 0 0 1-2.3 2.3V20l-3.3-2.9H11a2.3 2.3 0 0 1-2-1.1"/></svg><span>질문으로</span>';
     prow2.appendChild(lb);
     if(canSpeak){var sb=document.createElement("button");sb.type="button";sb.className="mspeak"+(speakingId===n.id?" on":"");sb.innerHTML=speakingId===n.id?'<span aria-hidden="true">■</span><span>멈추기</span>':'<span aria-hidden="true">🔊</span><span>듣기</span>';prow2.appendChild(sb)}
     panel.appendChild(prow2);
