@@ -3,17 +3,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-04">
+<meta name="app-build" content="2026-10-09-05">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
   if(!/^https?:$/.test(location.protocol)||!window.fetch)return;
-  var mine=document.querySelector('meta[name="app-build"]').content;
-  fetch(location.href.split("#")[0],{cache:"reload"}).then(function(r){return r.text()}).then(function(t){
-    var m=t.match(/name="app-build" content="([^"]+)"/); if(!m||m[1]===mine)return;
-    var k="bible-reloaded-"+m[1]; try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1")}catch(e){}
-    location.reload();
-  }).catch(function(){});
+  var mine=document.querySelector('meta[name="app-build"]').content, last=0;
+  function check(){
+    if(Date.now()-last<60000)return; last=Date.now();
+    fetch(location.href.split("#")[0],{cache:"reload"}).then(function(r){return r.text()}).then(function(t){
+      var m=t.match(/name="app-build" content="([^"]+)"/); if(!m||m[1]===mine)return;
+      var k="bible-reloaded-"+m[1]; try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1")}catch(e){}
+      var a=document.activeElement; if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;   // 글을 쓰는 중이면 다음에
+      location.reload();
+    }).catch(function(){});
+  }
+  check();
+  // 탭을 열어 둔 채 다른 일을 하다 돌아와도 새 버전이면 한 번 새로고침
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")check()});
 }catch(e){}})();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
