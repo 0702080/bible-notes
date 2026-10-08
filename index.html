@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-12">
+<meta name="app-build" content="2026-10-09-13">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1706,24 +1706,24 @@ button:active{filter:brightness(1.15)}
 /* 말씀 속 진한 글씨: 짙은 노란색 */
 :root{--boldy:#FFC21A}
 .verse .tk,.verse .vmark,.verse.focus .w.on,.verse b,.verse strong{color:var(--boldy)!important;-webkit-text-stroke:0!important}
-/* ===== 심플 디자인: 카드 아래 버튼 줄과 탭 (테두리·배경을 빼고 글자만) ===== */
-.note .focusrow{gap:2px 14px;margin:6px 0 12px;padding:0 2px}
+/* ===== 심플 디자인: 테두리 없는 옅은 알약 버튼 + 고른 탭은 색으로 채움 ===== */
+.note .focusrow{gap:6px;margin:8px 0 12px;padding:0}
 .note .focusrow .chapread.primary-read,.note .focusrow .useopen,.note .focusrow .vedit,.note .focusrow .vtopic,.note .focusrow .vxref{
-  height:28px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;
-  font-size:13px;font-weight:500;color:var(--muted);gap:4px}
-.note .focusrow .chapread.primary-read{color:var(--orange);font-weight:700}
+  height:30px;padding:0 12px;border:0;border-radius:15px;background:#1E1D24;box-shadow:none;
+  font-size:13px;font-weight:600;color:#D9D5E0;gap:4px}
+.note .focusrow .chapread.primary-read{background:color-mix(in srgb,var(--orange) 22%,#1E1D24);color:var(--orange);font-weight:700}
 .note .focusrow .chapread.primary-read::before{display:none}
-@media (hover:hover){.note .focusrow .useopen:hover,.note .focusrow .vedit:hover,.note .focusrow .vtopic:hover,.note .focusrow .vxref:hover{color:var(--ink)}}
-.note .focusrow .useopen[aria-expanded="true"],.note .focusrow .vedit[aria-expanded="true"],.note .focusrow .vxref[aria-expanded="true"]{color:var(--ink);text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px}
-.note .focusrow .ctopic{height:auto;padding:0;border-radius:0;background:transparent;font-size:13px;font-weight:700;color:var(--tc,var(--violet))}
-.note .focusrow .ctopic.on{background:transparent;color:var(--tc,var(--violet));text-decoration:underline;text-underline-offset:5px}
-/* 탭: 상자 없이 글자 + 고른 탭만 색 밑줄 */
-.note .tabs{background:transparent;border:0;border-bottom:1px solid #26252B;border-radius:0;padding:0;margin:4px 0 14px}
+@media (hover:hover){.note .focusrow .useopen:hover,.note .focusrow .vedit:hover,.note .focusrow .vtopic:hover,.note .focusrow .vxref:hover{background:#2A2932;color:#fff}}
+.note .focusrow .useopen[aria-expanded="true"],.note .focusrow .vedit[aria-expanded="true"],.note .focusrow .vxref[aria-expanded="true"]{background:color-mix(in srgb,var(--mint) 22%,#1E1D24);color:var(--mint)}
+.note .focusrow .ctopic{height:30px;padding:0 12px;border-radius:15px;font-size:13px;font-weight:700;background:color-mix(in srgb,var(--tc,var(--violet)) 20%,#1E1D24);color:var(--tc,var(--violet))}
+.note .focusrow .ctopic.on{background:var(--tc,var(--violet));color:#141416}
+/* 탭: 하나의 바 안에서 고른 탭만 색으로 채움 */
+.note .tabs{background:#141418;border:0;border-radius:14px;padding:4px;margin:6px 0 14px;gap:2px}
 .note .tabs::before{display:none}
-.note .tab{height:40px;border-radius:0;color:var(--faint);font-weight:500}
+.note .tab{height:40px;border-radius:10px;color:#A9A4B3;font-size:14px;font-weight:600;transition:background .15s,color .15s}
 .note .tab .ic{display:none}
-.note .tab[aria-selected="true"]{color:var(--c);font-weight:700;box-shadow:inset 0 -2px 0 var(--c)}
-.note .tab .tc{min-width:0;height:auto;padding:0;background:transparent!important;border-radius:0;font-size:11px;font-weight:700;color:var(--faint)!important;vertical-align:super}
+.note .tab[aria-selected="true"]{background:color-mix(in srgb,var(--c) 24%,#141418);color:var(--c);font-weight:800;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 45%,transparent)}
+.note .tab .tc{min-width:0;height:auto;padding:0;margin-left:3px;background:transparent!important;border-radius:0;font-size:11.5px;font-weight:700;color:#7C7686!important}
 .note .tab[aria-selected="true"] .tc{color:var(--c)!important}
 </style>
 </head>
