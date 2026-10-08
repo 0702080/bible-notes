@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-06">
+<meta name="app-build" content="2026-10-09-07">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -861,9 +861,13 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .reader.nosample .rdpbar{display:flex}
 .reader.nosample .rdhb,.reader.nosample .rdalt{display:none}
 .rdpbar button{height:38px;padding:0 14px;border:1px solid #34333A;border-radius:19px;background:transparent;color:var(--ink);font-size:13.5px;white-space:nowrap}
+.rdpbar .rdcard{border-color:color-mix(in srgb,var(--violet) 55%,#34333A);color:var(--violet);font-weight:700}
+.rdpbar .rdcard[hidden]{display:none}
 .rdpbar .rdpaste{border-color:color-mix(in srgb,var(--mint) 55%,#34333A);color:var(--mint);font-weight:700}
 .rdpform{position:absolute;left:0;right:0;bottom:0;max-width:720px;margin:0 auto;padding:16px;background:#141418;border:1px solid #2E2D33;border-radius:16px 16px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:10px}
 .rdpform[hidden]{display:none}
+.mhint{margin:2px 0 8px;font-size:12px;color:var(--faint);line-height:1.6}
+.mhint b{color:var(--muted);font-weight:700}
 .rdphint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
 .rdptext{min-height:38vh;font-size:15px;line-height:1.7;resize:vertical}
 .rdpbtns{display:flex;justify-content:flex-end;gap:8px}
@@ -1741,6 +1745,7 @@ button:active{filter:brightness(1.15)}
       <input class="field" id="mRef" placeholder="요한복음 1:5">
       <label for="mText">말씀</label>
       <textarea class="field" id="mText" placeholder="빛이 어둠에 비치되 어둠이 깨닫지 못하더라"></textarea>
+      <p class="mhint">장 전체도 담을 수 있어요. 구절에 <b>시편 91편</b>처럼 장까지만 쓰고, 본문을 절 번호까지 붙여 넣으세요.</p>
       <button class="primary" type="submit">노트에 추가</button>
     </form>
   </section>
@@ -2488,6 +2493,10 @@ button:active{filter:brightness(1.15)}
     var ref=$("mRef").value.trim(), text=$("mText").value.trim();
     if(!text){$("mText").focus();setStatus("말씀을 적어 주세요.");return}
     var p=parseRef(ref);
+    if(p.book>=0&&p.chapter>0&&!p.verse){   // 장 전체: 절마다 한 줄로 정리하고, 장 읽기 본문으로도 저장
+      var vs=parseChapterPaste(text);
+      if(vs.length>=2){text=vs.map(function(x){return x.v+" "+x.t}).join("\n"); var ck=USFM[p.book]+"-"+p.chapter; if(!myChapters()[ck])saveMyChapter(ck,vs)}
+    }
     if(addNote({ref:ref,text:text,book:p.book,chapter:p.chapter,verse:p.verse})){$("mRef").value="";$("mText").value="";closeSheet()}
   });
 
@@ -2763,8 +2772,6 @@ button:active{filter:brightness(1.15)}
       return;
     }
     if(b.classList.contains("chapread")){
-      var ccl=!sampleFn&&chapLinks(n);
-      if(ccl&&!myChapters()[USFM[n.book]+"-"+n.chapter])window.open(onDesktop()?ccl.hbpc:ccl.hb,"_blank","noopener");
       openReader(n);return;
     }
     if(b.classList.contains("apall")){openProg();return}
@@ -5180,7 +5187,7 @@ button:active{filter:brightness(1.15)}
         '<a class="rdhb" target="_blank" rel="noopener">개역개정으로 보기 (대한성서공회) ↗</a>'+
         '<p class="rdalt">안 열리면 <a class="rdhb2" target="_blank" rel="noopener">홀리바이블로 보기</a>를 길게 눌러 크롬에서 열어 주세요.</p>'+
         '<div class="rdscroll"><ol class="rdlist"></ol><div class="rdmsg" aria-live="polite"></div>'+'</div>'+
-        '<div class="rdpbar"><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button></div>'+
+        '<div class="rdpbar"><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button><button type="button" class="rdcard" hidden>📌 이 장을 말씀 카드로 담기</button></div>'+
         '<div class="rdpform" hidden><p class="rdphint">성서공회나 홀리바이블에서 장 본문을 복사해 붙여 넣으세요. 절 번호(1, 2, 3 …)가 있으면 절마다 나눠요. 이 기기에만 저장돼요.</p>'+
         '<textarea class="field rdptext" placeholder="1 그는 허물과 죄로 죽었던 너희를 살리셨도다&#10;2 그 때에 너희는 …" aria-label="장 본문 붙여넣기"></textarea>'+
         '<div class="rdpbtns"><button type="button" class="rdpcancel">취소</button><button type="button" class="primary rdpsave">저장</button></div></div>';
@@ -5193,6 +5200,11 @@ button:active{filter:brightness(1.15)}
         if(vs.length<2){toast("절 번호를 찾지 못했어요. 절 번호까지 함께 복사해 주세요.");return}
         saveMyChapter(rd.dataset.key,vs); rd.querySelector(".rdpform").hidden=true;
         showMine(true); toast(vs.length+"절을 저장했어요");
+      });
+      rd.querySelector(".rdcard").addEventListener("click",function(){
+        var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1], sv=myChapters()[rd.dataset.key]; if(!sv||bk<0)return;
+        var nn=addNote({ref:BOOKS[bk]+" "+ch+(bk===18?"편":"장"),text:sv.v.map(function(x){return x.v+" "+x.t}).join("\n"),book:bk,chapter:ch,verse:0});
+        if(nn){closeReader();toast(BOOKS[bk]+" "+ch+(bk===18?"편":"장")+" 전체를 말씀 카드로 담았어요")}
       });
       rd.querySelector(".rdsrc").addEventListener("click",function(){window.open(rd.dataset.hb,"_blank","noopener")});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&rd&&!rd.hidden)closeReader()});
@@ -5372,8 +5384,11 @@ button:active{filter:brightness(1.15)}
   function showMine(){
     var saved=myChapters()[rd.dataset.key], msg=rd.querySelector(".rdmsg");
     rd.querySelector(".rdpaste").textContent=saved?"📋 다시 붙여넣기":"📋 복사한 본문 붙여넣기";
+    var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1], cardBtn=rd.querySelector(".rdcard");
+    cardBtn.hidden=!saved||!!myNoteAt(bk,ch,0);
     if(saved){msg.textContent="";drawReader(saved.v,+rd.dataset.hl);return}
     rd.querySelector(".rdlist").textContent="";
+    var pf=rd.querySelector(".rdpform"); if(pf.hidden){pf.hidden=false;setTimeout(function(){var t=pf.querySelector(".rdptext");if(t&&!t.value)t.focus()},120)}
     msg.textContent="홀리바이블 탭에서 이 장 본문을 절 번호까지 복사한 뒤, 아래 [복사한 본문 붙여넣기]를 눌러 붙여 넣으세요. 한 번 저장하면 다음부터는 여기서 바로 읽을 수 있어요.";
   }
   function closeReader(){if(!rd)return; if(rdCtl)rdCtl.abort(); rd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
