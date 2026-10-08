@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-16">
+<meta name="app-build" content="2026-10-08-17">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1352,6 +1352,7 @@ button:active{filter:brightness(1.15)}
 .mprow2 .mspeak.on{color:var(--sky);border-color:color-mix(in srgb,var(--sky) 55%,var(--rule))}
 .mnext{margin:8px 2px 0;font-size:12.5px;color:var(--muted)}
 .mnext.due{color:var(--gold);font-weight:700}
+.mnext.mlast + .mnext{margin-top:2px}
 .oquiz{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .oquiz[hidden]{display:none}
 .oqhint{margin:12px 18px 0;font-size:13px;color:var(--faint)}
@@ -4991,6 +4992,8 @@ button:active{filter:brightness(1.15)}
     });
     panel.appendChild(ul);
     var ri2=reviewInfo(n);
+    var md2=memDays(n);
+    if(md2.days&&md2.last){var lp=document.createElement("p");lp.className="mnext mlast";var lk=dkey(md2.last),tk2=dkey(Date.now()),yk=dkey(Date.now()-864e5);lp.textContent="✏️ 마지막 연습 "+dlabel(lk)+(lk===tk2?" (오늘)":lk===yk?" (어제)":"")+" · 연습한 날 "+md2.days+"일";panel.appendChild(lp)}
     if(ri2){var nx2=document.createElement("p");nx2.className="mnext"+(ri2.due?" due":"");var dd2=new Date(ri2.next);nx2.textContent=ri2.due?"🔁 오늘 복습할 차례예요":"🔁 다음 복습 "+(dd2.getMonth()+1)+"/"+dd2.getDate()+" ("+ri2.gap+"일 뒤)";panel.appendChild(nx2)}
     var more=document.createElement("div"); more.className="mmore"; panel.appendChild(more);
     renderHooks(more,n);
