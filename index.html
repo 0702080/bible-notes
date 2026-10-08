@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-28">
+<meta name="app-build" content="2026-10-09-01">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1629,12 +1629,13 @@ button:active{filter:brightness(1.15)}
 .dlw b{font-size:11px;color:var(--faint);font-weight:500}
 .dlw.cur b{color:var(--gold);font-weight:700}
 .dlw.cur i{box-shadow:0 0 0 2px var(--gold)}
-.dlgh{margin:16px 0 6px;font-size:13px;font-weight:700;color:var(--muted)}
+.dlgh{margin:18px 0 6px;padding-left:8px;border-left:3px solid var(--gc,var(--gold));font-size:13.5px;font-weight:700;color:var(--gc,var(--muted))}
 .dlitem{display:flex;align-items:center;gap:6px}
 .dlrow{flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:10px 10px;margin:2px 0;border:1px solid #232229;border-radius:12px;background:#121216;color:var(--ink);font-size:15px;text-align:left}
-.dlbox{flex:0 0 22px;height:22px;border:2px solid color-mix(in srgb,var(--gold) 70%,var(--rule));border-radius:6px;display:grid;place-items:center}
-.dlrow.on{background:color-mix(in srgb,var(--gold) 10%,#121216);border-color:color-mix(in srgb,var(--gold) 40%,#232229)}
-.dlrow.on .dlbox{background:var(--gold);border-color:var(--gold)}
+.dlbox{flex:0 0 22px;height:22px;border:2px solid color-mix(in srgb,var(--gc,var(--gold)) 70%,var(--rule));border-radius:6px;display:grid;place-items:center}
+.dlrow{border-left:3px solid color-mix(in srgb,var(--gc,var(--gold)) 55%,#232229)}
+.dlrow.on{background:color-mix(in srgb,var(--gc,var(--gold)) 12%,#121216);border-color:color-mix(in srgb,var(--gc,var(--gold)) 45%,#232229)}
+.dlrow.on .dlbox{background:var(--gc,var(--gold));border-color:var(--gc,var(--gold))}
 .dlrow.on .dlbox::after{content:"✓";color:#141416;font-size:14px;font-weight:700}
 .dlrow.on .dlt{color:var(--muted)}
 .dlt{flex:1;min-width:0;word-break:keep-all}
@@ -4476,7 +4477,7 @@ button:active{filter:brightness(1.15)}
   function lastOpenId(){try{return localStorage.getItem("bible-last-open")||""}catch(e){return ""}}
   /* ---------- 하루 돌아보기 체크리스트 (이 기기에 저장, 백업에 함께 들어감) ---------- */
   var DAILY_KEY="bible-daily";
-  var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도"},{g:"word",e:"📖",t:"말씀"},{g:"fruit",e:"🍇",t:"성령의 열매"},{g:"thanks",e:"💛",t:"감사·나눔"}];
+  var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도",c:"var(--violet)"},{g:"word",e:"📖",t:"말씀",c:"var(--orange)"},{g:"fruit",e:"🍇",t:"성령의 열매",c:"var(--green)"},{g:"thanks",e:"💛",t:"감사·나눔",c:"var(--gold)"}];   // 묶음마다 색
   var DAILY_DEFAULT=[
     ["pray","대적 기도를 했는가"],["pray","필요한 것을 구하는 기도를 했는가"],["pray","버리는(내려놓는) 기도를 했는가"],["pray","회개 기도를 했는가"],["pray","누군가를 위해 중보 기도를 했는가"],
     ["word","말씀을 읽고 묵상했는가"],["word","붙든 말씀을 하루 중에 다시 떠올렸는가"],
@@ -4558,9 +4559,9 @@ button:active{filter:brightness(1.15)}
     var list=dl.querySelector(".dllist"); list.textContent="";
     DAILY_GROUPS.forEach(function(g){
       var its=o.items.filter(function(it){return it.g===g.g}); if(!its.length)return;
-      var h=document.createElement("div"); h.className="dlgh"; h.textContent=g.e+" "+g.t+"  "+its.filter(function(it){return on.indexOf(it.id)>=0}).length+"/"+its.length; list.appendChild(h);
+      var h=document.createElement("div"); h.className="dlgh"; h.style.setProperty("--gc",g.c); h.textContent=g.e+" "+g.t+"  "+its.filter(function(it){return on.indexOf(it.id)>=0}).length+"/"+its.length; list.appendChild(h);
       its.forEach(function(it){
-        var row=document.createElement("div"); row.className="dlitem";
+        var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc",g.c);
         var b=document.createElement("button"); b.type="button"; b.className="dlrow"+(on.indexOf(it.id)>=0?" on":""); b.dataset.id=it.id; b.setAttribute("aria-pressed",String(on.indexOf(it.id)>=0));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>'+(it.auto?'<span class="dlauto">한 줄 감사로 자동</span>':'');
         b.querySelector(".dlt").textContent=it.t; row.appendChild(b);
