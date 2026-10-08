@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-07">
+<meta name="app-build" content="2026-10-08-08">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2035,9 +2035,9 @@ button:active{filter:brightness(1.15)}
         '</div>'+
         '<div class="pane" data-pane="a" hidden>'+
           '<div class="aprog" hidden></div>'+
+          '<div class="qbtns"><button type="button" class="addbtn s adda">+ 실천</button><button type="button" class="addbtn s suga" hidden>추천받기</button></div>'+
           '<div class="atools" hidden><button type="button" class="afoldall">모두 접기</button></div>'+
           '<div class="acts"></div>'+
-          '<div class="qbtns"><button type="button" class="addbtn s adda">+ 실천</button><button type="button" class="addbtn s suga" hidden>추천받기</button></div>'+
           '<div class="sugg sugga"></div>'+
         '</div>'+
         '<div class="pane" data-pane="e" hidden>'+
@@ -2603,7 +2603,7 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("uact")){
       var uu=n.uses[+b.dataset.i]; if(!uu||!uu.how)return;
-      n.acts.push({id:qid(),t:uu.how,done:false,doneAt:0,goal:21,stamps:[]}); render(); scheduleSave(id);
+      n.acts.unshift({id:qid(),t:uu.how,done:false,doneAt:0,goal:21,stamps:[]}); render(); scheduleSave(id);
       toast("실천에 담았어요"); buzz(10); return;
     }
     if(b.classList.contains("mcopy")){b.closest("details").open=false;copyVerse(n,null);return}
@@ -2820,7 +2820,7 @@ button:active{filter:brightness(1.15)}
       var vid=b.closest(".vd").dataset.vid; n.vids=n.vids.filter(function(x){return x.id!==vid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("chip")){
-      if(b.classList.contains("s"))n.acts.push({id:qid(),t:b.textContent,done:false});
+      if(b.classList.contains("s"))n.acts.unshift({id:qid(),t:b.textContent,done:false});
       else n.qs.push({id:qid(),q:b.textContent,a:""});
       var holder=b.parentNode; b.remove();
       if(holder&&!holder.querySelector(".chip"))holder.innerHTML="";
@@ -2828,10 +2828,12 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("addall")){
       var hold=b.closest(".sugg");
+      var newActs=[];
       hold.querySelectorAll(".chip").forEach(function(c){
-        if(c.classList.contains("s"))n.acts.push({id:qid(),t:c.textContent,done:false});
+        if(c.classList.contains("s"))newActs.push({id:qid(),t:c.textContent,done:false});
         else n.qs.push({id:qid(),q:c.textContent,a:""});
       });
+      if(newActs.length)n.acts=newActs.concat(n.acts);
       hold.innerHTML=""; render(); scheduleSave(id); return;
     }
     if(b.classList.contains("fopen")){
@@ -2882,7 +2884,7 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("sugq")){ suggest(card,n,b); return }
     if(b.classList.contains("suga")){ suggestActs(card,n,b); return }
     if(b.classList.contains("adda")){
-      var na={id:qid(),t:"",done:false}; n.acts.push(na); render(); scheduleSave(id);
+      var na={id:qid(),t:"",done:false}; n.acts.unshift(na); render(); scheduleSave(id);
       var at=card.querySelector('.act[data-aid="'+na.id+'"] .at'); if(at)at.focus();
       return;
     }
