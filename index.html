@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-10">
+<meta name="app-build" content="2026-10-08-11">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1132,6 +1132,8 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .usave{flex:1;height:40px;border:0;border-radius:10px;background:var(--gold);color:#141416;font-size:14.5px;font-weight:700}
 .ucancel{height:40px;padding:0 16px;border:1px solid var(--rule);border-radius:10px;background:transparent;color:var(--muted);font-size:14px}
 .ubtns{display:flex;gap:8px;margin-top:12px}
+.usepanel .ubtns.utopb{margin:0 0 12px}
+.usepanel .uform + .ulist,.usepanel .utopb + .ulist{margin-top:0}
 .ubtns .uagain{margin:0;flex:1;width:auto}
 .umanual{flex:1;height:38px;border:1px solid color-mix(in srgb,var(--gold) 55%,var(--rule));border-radius:12px;background:color-mix(in srgb,var(--gold) 12%,transparent);color:var(--gold);font-size:14px;font-weight:700}
 .uform{margin-top:10px}
@@ -3841,6 +3843,11 @@ button:active{filter:brightness(1.15)}
     var key=JSON.stringify(n.uses)+"/"+useBusy.has(n.id)+"/"+!!sampleFn+"/"+formOn+"/"+n.acts.map(function(x){return x.t}).join("|");
     if(panel.dataset.key===key)return; panel.dataset.key=key; panel.textContent="";
     var h=document.createElement("div"); h.className="uhd"; h.innerHTML='<b>💡 이 말씀, 언제 쓸까</b>'; panel.appendChild(h);
+    // 추가 버튼은 맨 위에 (새로 적은 것도 맨 위에 생김)
+    var acts=document.createElement("div"); acts.className="ubtns utopb";
+    if(!formOn){var mb=document.createElement("button");mb.type="button";mb.className="umanual";mb.textContent="+ 언제 쓸지 추가";acts.appendChild(mb)}
+    if(sampleFn&&!useBusy.has(n.id)){var r=document.createElement("button");r.type="button";r.className="uagain";r.textContent=n.uses.some(function(u){return !u.mine})?"다른 제안 받기":"제안 받기";acts.appendChild(r)}
+    if(acts.children.length)panel.appendChild(acts);
     if(formOn){
       var f=document.createElement("div"); f.className="uform";
       f.innerHTML='<input class="field ufin uf-when" maxlength="40" enterkeyhint="next" placeholder="언제 (예: 마음이 지칠 때)" aria-label="언제">'+
@@ -3869,10 +3876,6 @@ button:active{filter:brightness(1.15)}
       var p=document.createElement("p"); p.className="umsg"; p.textContent=sampleFn?"어떤 때, 어떤 목적으로 이 말씀을 꺼내 쓰면 좋을지 제안받거나 직접 적어 보세요.":"이 말씀을 꺼내 쓰고 싶은 때를 직접 적어 보세요.";
       panel.appendChild(p);
     }
-    var acts=document.createElement("div"); acts.className="ubtns";
-    if(!formOn){var mb=document.createElement("button");mb.type="button";mb.className="umanual";mb.textContent="✏️ 직접 적기";acts.appendChild(mb)}
-    if(sampleFn&&!useBusy.has(n.id)){var r=document.createElement("button");r.type="button";r.className="uagain";r.textContent=n.uses.some(function(u){return !u.mine})?"다른 제안 받기":"제안 받기";acts.appendChild(r)}
-    if(acts.children.length)panel.appendChild(acts);
   }
   async function fetchUses(card,n){
     if(!sampleFn||useBusy.has(n.id))return;
