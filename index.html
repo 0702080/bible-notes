@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-22">
+<meta name="app-build" content="2026-10-08-23">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1096,6 +1096,7 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .xlist .xsnip{flex:1;min-width:0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .xcross .xref{flex:1}
 .xgo{font-size:12.5px;color:var(--muted);text-decoration:none;white-space:nowrap}
+.xdel{height:28px;padding:0 10px;border:1px solid #4A2A38;border-radius:14px;background:transparent;color:var(--pink);font-size:12.5px;white-space:nowrap}
 .xadd,.xopen{height:28px;padding:0 11px;border:1px solid #34333A;border-radius:14px;background:transparent;color:var(--ink);font-size:12.5px;white-space:nowrap}
 .xadd{color:var(--mint);border-color:color-mix(in srgb,var(--mint) 50%,#34333A)}
 .xmsg{font-size:12.5px;color:var(--faint)}
@@ -2651,6 +2652,14 @@ button:active{filter:brightness(1.15)}
       var lid=b.closest("li").dataset.lid; n.links=(n.links||[]).filter(function(l){return l.id!==lid}); scheduleSave(id); renderMyLinks(card.querySelector(".xpanel"),n); return;
     }
     if(b.classList.contains("xadd")){addFromXref(b.dataset.b,b.dataset.c,b.dataset.v,b.dataset.label);return}
+    if(b.classList.contains("xdel")){
+      var xd=b.dataset.id;
+      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";setStatus("한 번 더 누르면 중복된 말씀 노트가 지워져요. (묵상·질문·실천도 함께)");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="삭제"}},3000);return}
+      notes.delete(xd); openIds.delete(xd); clearTimeout(timers.get(xd)); timers.delete(xd); dirtyIds.delete(xd); addTomb(xd);
+      render();
+      try{await backend.del(xd);toast("중복된 말씀을 지웠어요")}catch(err){setStatus("삭제하지 못했어요. 다시 시도해 주세요.")}
+      return;
+    }
     if(b.classList.contains("xopen")){var xo=b.dataset.id;openOne(xo);render();var xe=cards.get(xo);if(xe)setTimeout(function(){xe.scrollIntoView({block:"start",behavior:"smooth"})},80);return}
     if(b.classList.contains("medit")||b.classList.contains("vedit")){
       var ve=card.querySelector(".vedit"), eb=card.querySelector(".editbox");
@@ -5232,10 +5241,14 @@ button:active{filter:brightness(1.15)}
     renderMyLinks(pn,n);
     var mine=pn.querySelector(".xmine"), rel=relatedMine(n);
     if(!rel.length)mine.innerHTML='<li class="xmsg">아직 이어지는 내 말씀이 없어요.</li>';
+    // 같은 구절·같은 본문으로 두 번 담긴 말씀은 [삭제] 버튼을 보여 줌
+    var dupKey=function(x){return String(x.ref||"").replace(/\s+/g,"")+"|"+String(x.text||"").replace(/\s+/g,"")}, dupCnt={};
+    notes.forEach(function(x){var k=dupKey(x);dupCnt[k]=(dupCnt[k]||0)+1});
     rel.forEach(function(r){
-      var li=document.createElement("li"); li.innerHTML='<b class="xref"></b><span class="xsnip"></span><button type="button" class="xopen">열기</button>';
+      var dup=dupCnt[dupKey(r.n)]>1, li=document.createElement("li");
+      li.innerHTML='<b class="xref"></b><span class="xsnip"></span>'+(dup?'<button type="button" class="xdel">삭제</button>':'')+'<button type="button" class="xopen">열기</button>';
       li.querySelector(".xref").textContent=r.n.ref; li.querySelector(".xsnip").textContent=(r.topics.length?"#"+r.topics.join(" #")+"  ":"")+r.n.text.replace(/\s+/g," ").slice(0,28)+"…";
-      li.querySelector(".xopen").dataset.id=r.n.id; mine.appendChild(li);
+      li.querySelector(".xopen").dataset.id=r.n.id; if(dup)li.querySelector(".xdel").dataset.id=r.n.id; mine.appendChild(li);
     });
     var cross=pn.querySelector(".xcross");
     if(!(n.book>=0&&n.chapter>0&&n.verse>0)){cross.innerHTML='<li class="xmsg">구절 주소(예: 시편 111:10)가 있어야 관주를 찾을 수 있어요.</li>';return}
