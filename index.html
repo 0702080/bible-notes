@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-11">
+<meta name="app-build" content="2026-10-09-12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1712,7 +1712,7 @@ button:active{filter:brightness(1.15)}
   height:28px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;
   font-size:13px;font-weight:500;color:var(--muted);gap:4px}
 .note .focusrow .chapread.primary-read{color:var(--orange);font-weight:700}
-.note .focusrow .chapread.primary-read::before{width:13px;height:13px}
+.note .focusrow .chapread.primary-read::before{display:none}
 @media (hover:hover){.note .focusrow .useopen:hover,.note .focusrow .vedit:hover,.note .focusrow .vtopic:hover,.note .focusrow .vxref:hover{color:var(--ink)}}
 .note .focusrow .useopen[aria-expanded="true"],.note .focusrow .vedit[aria-expanded="true"],.note .focusrow .vxref[aria-expanded="true"]{color:var(--ink);text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px}
 .note .focusrow .ctopic{height:auto;padding:0;border-radius:0;background:transparent;font-size:13px;font-weight:700;color:var(--tc,var(--violet))}
@@ -2145,7 +2145,7 @@ button:active{filter:brightness(1.15)}
       '<div class="verse"></div>'+
       '<div class="hits"></div>'+
       '<div class="editbox" hidden><input class="field eref" aria-label="성경 구절"><textarea class="field etext" aria-label="말씀"></textarea><button type="button" class="small donedit">완료</button></div>'+
-      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">💡 언제 쓸까</button><button type="button" class="vedit" aria-expanded="false">✏️ 말씀 고치기</button><button type="button" class="vtopic">🏷️ 주제 정하기</button><button type="button" class="vxref" aria-expanded="false">🔗 연결 말씀</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
+      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">언제 쓸까</button><button type="button" class="vedit" aria-expanded="false">말씀 고치기</button><button type="button" class="vtopic">주제 정하기</button><button type="button" class="vxref" aria-expanded="false">연결 말씀</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
       '<div class="xpanel" hidden></div>'+
       '<div class="usepanel" hidden></div>'+
       '<div class="mempanel" hidden></div>'+
@@ -2757,13 +2757,13 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("xopen")){var xo=b.dataset.id;openOne(xo);render();var xe=cards.get(xo);if(xe)setTimeout(function(){xe.scrollIntoView({block:"start",behavior:"smooth"})},80);return}
     if(b.classList.contains("medit")||b.classList.contains("vedit")){
       var ve=card.querySelector(".vedit"), eb=card.querySelector(".editbox");
-      if(b.classList.contains("vedit")&&!eb.hidden){eb.hidden=true;ve.setAttribute("aria-expanded","false");ve.textContent="✏️ 말씀 고치기";flushNow(id);toast("말씀을 고쳤어요");return}
+      if(b.classList.contains("vedit")&&!eb.hidden){eb.hidden=true;ve.setAttribute("aria-expanded","false");ve.textContent="말씀 고치기";flushNow(id);toast("말씀을 고쳤어요");return}
       if(b.classList.contains("medit"))b.closest("details").open=false;
-      if(ve){ve.setAttribute("aria-expanded","true");ve.textContent="✓ 고치기 끝"} eb.hidden=false; var er=eb.querySelector(".eref"); setVal(er,n.ref); setVal(eb.querySelector(".etext"),n.text);
+      if(ve){ve.setAttribute("aria-expanded","true");ve.textContent="고치기 끝"} eb.hidden=false; var er=eb.querySelector(".eref"); setVal(er,n.ref); setVal(eb.querySelector(".etext"),n.text);
       requestAnimationFrame(function(){grow(eb.querySelector(".etext"));er.focus()});
       return;
     }
-    if(b.classList.contains("donedit")){card.querySelector(".editbox").hidden=true;var ve2=card.querySelector(".vedit");if(ve2){ve2.setAttribute("aria-expanded","false");ve2.textContent="✏️ 말씀 고치기"}flushNow(id);toast("말씀을 고쳤어요");return}
+    if(b.classList.contains("donedit")){card.querySelector(".editbox").hidden=true;var ve2=card.querySelector(".vedit");if(ve2){ve2.setAttribute("aria-expanded","false");ve2.textContent="말씀 고치기"}flushNow(id);toast("말씀을 고쳤어요");return}
     if(b.classList.contains("grip")){return}
     if(b.classList.contains("copyv")){copyVerse(n,b);return}
     if(b.classList.contains("medprog")){openMedProgress();return}
@@ -4682,7 +4682,7 @@ button:active{filter:brightness(1.15)}
       });
     });
     dl.querySelector(".dladd").hidden=!dlEdit;
-    dl.querySelector(".dledit").textContent=dlEdit?"✓ 고치기 끝":"✏️ 항목 고치기";
+    dl.querySelector(".dledit").textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기";
   }
 
   function renderReviewBar(){
