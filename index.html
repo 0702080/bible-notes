@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-25">
+<meta name="app-build" content="2026-10-08-26">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1093,7 +1093,9 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .xlist li{display:flex;align-items:center;gap:8px;padding:7px 2px;border-bottom:1px dashed #232229;min-width:0}
 .xlist li:last-child{border-bottom:0}
 .xlist .xref{font-size:14px;color:var(--violet);white-space:nowrap}
-.xlist .xsnip{flex:1;min-width:0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xlist .xsnip{flex:1;min-width:0;font-size:13px;line-height:1.6;color:var(--muted);word-break:keep-all;overflow-wrap:anywhere}
+.xmine li{align-items:flex-start}
+.xmine li .xref,.xmine li button,.xmine li .xkeep{margin-top:1px}
 .xcross .xref{flex:1}
 .xgo{font-size:12.5px;color:var(--muted);text-decoration:none;white-space:nowrap}
 .xkeep{flex:0 0 auto;font-size:11.5px;color:var(--green);white-space:nowrap}
@@ -5263,7 +5265,7 @@ button:active{filter:brightness(1.15)}
       var k=dupKey(r.n), dup=dupCnt[k]>1, keep=dup&&keepOf[k].id===r.n.id, li=document.createElement("li");
       li.innerHTML='<b class="xref"></b><span class="xsnip"></span>'+(dup&&!keep?'<button type="button" class="xdel">삭제</button>':'')+(keep?'<span class="xkeep">남길 말씀</span>':'')+'<button type="button" class="xopen">열기</button>';
       li.querySelector(".xref").textContent=r.n.ref;
-      li.querySelector(".xsnip").textContent=dup?("중복 · "+noteSummary(r.n)):((r.topics.length?"#"+r.topics.join(" #")+"  ":"")+r.n.text.replace(/\s+/g," ").slice(0,28)+"…");
+      li.querySelector(".xsnip").textContent=dup?("중복 · "+noteSummary(r.n)):((r.topics.length?"#"+r.topics.join(" #")+"  ":"")+r.n.text.replace(/\s+/g," "));
       li.querySelector(".xopen").dataset.id=r.n.id; if(dup&&!keep)li.querySelector(".xdel").dataset.id=r.n.id; mine.appendChild(li);
     });
     var cross=pn.querySelector(".xcross");
