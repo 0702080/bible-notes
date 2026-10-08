@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-26">
+<meta name="app-build" content="2026-10-08-27">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5275,12 +5275,24 @@ button:active{filter:brightness(1.15)}
       if(!line){cross.innerHTML='<li class="xmsg">이 구절은 관주 자료가 없어요.</li>';return}
       line.split(",").forEach(function(s){
         var r=parseX(s), have=myNoteAt(r.b,r.c,r.v), li=document.createElement("li"), lab=xLabel(r);
+        // 이미 담은 관주 구절은 위에서 빼고 '내 말씀 중에서'에만 보여 줌
+        if(have){
+          if(have.id===n.id)return;
+          if(!mine.querySelector('.xopen[data-id="'+have.id+'"]')){
+            var em=mine.querySelector(".xmsg"); if(em)em.remove();
+            var ml=document.createElement("li"); ml.innerHTML='<b class="xref"></b><span class="xsnip"></span><button type="button" class="xopen">열기</button>';
+            ml.querySelector(".xref").textContent=have.ref; ml.querySelector(".xsnip").textContent="관주  "+have.text.replace(/\s+/g," ");
+            ml.querySelector(".xopen").dataset.id=have.id; mine.appendChild(ml);
+          }
+          return;
+        }
         var hb="http://www.holybible.or.kr/"+(onDesktop()?"":"mobile/")+"B_GAE/cgi/bibleftxt.php?VR=GAE&VL="+(r.b+1)+"&CN="+r.c+"&CV=99";
         li.innerHTML='<b class="xref"></b><a class="xgo" target="_blank" rel="noopener">보기 ↗</a>'+(have?'<button type="button" class="xopen">담은 말씀</button>':'<button type="button" class="xadd">+ 담기</button>');
         li.querySelector(".xref").textContent=lab; li.querySelector(".xgo").href=hb;
         var bb=li.querySelector("button"); if(have)bb.dataset.id=have.id; else {bb.dataset.b=r.b;bb.dataset.c=r.c;bb.dataset.v=r.v;bb.dataset.label=BOOKS[r.b]+" "+r.c+":"+r.v}
         cross.appendChild(li);
       });
+      if(!cross.children.length)cross.innerHTML='<li class="xmsg">관주 구절은 모두 담았어요. 아래 내 말씀에서 볼 수 있어요.</li>';
     }).catch(function(){cross.innerHTML='<li class="xmsg">관주를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'});
   }
   // 내가 직접 연결한 말씀
