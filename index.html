@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-13">
+<meta name="app-build" content="2026-10-09-14">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1717,13 +1717,16 @@ button:active{filter:brightness(1.15)}
 .note .focusrow .useopen[aria-expanded="true"],.note .focusrow .vedit[aria-expanded="true"],.note .focusrow .vxref[aria-expanded="true"]{background:color-mix(in srgb,var(--mint) 22%,#1E1D24);color:var(--mint)}
 .note .focusrow .ctopic{height:30px;padding:0 12px;border-radius:15px;font-size:13px;font-weight:700;background:color-mix(in srgb,var(--tc,var(--violet)) 20%,#1E1D24);color:var(--tc,var(--violet))}
 .note .focusrow .ctopic.on{background:var(--tc,var(--violet));color:#141416}
-/* 탭: 하나의 바 안에서 고른 탭만 색으로 채움 */
+/* 탭: 위쪽 아이콘처럼 아이콘만 (이름은 마우스를 올리면, 화면읽기용으로는 그대로) */
 .note .tabs{background:#141418;border:0;border-radius:14px;padding:4px;margin:6px 0 14px;gap:2px}
 .note .tabs::before{display:none}
-.note .tab{height:40px;border-radius:10px;color:#A9A4B3;font-size:14px;font-weight:600;transition:background .15s,color .15s}
-.note .tab .ic{display:none}
-.note .tab[aria-selected="true"]{background:color-mix(in srgb,var(--c) 24%,#141418);color:var(--c);font-weight:800;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 45%,transparent)}
-.note .tab .tc{min-width:0;height:auto;padding:0;margin-left:3px;background:transparent!important;border-radius:0;font-size:11.5px;font-weight:700;color:#7C7686!important}
+.note .tab{height:40px;border-radius:10px;color:#A9A4B3;gap:2px;transition:background .15s,color .15s}
+.note .tab .ic{display:block!important;width:20px;height:20px;stroke-width:1.9}
+.note .tab .tn{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (hover:hover){.note .tab:hover{color:#fff;background:#1E1D24}}
+.note .tab[aria-selected="true"]{background:color-mix(in srgb,var(--c) 24%,#141418);color:var(--c);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 45%,transparent)}
+.note .tab .tc{display:inline-block!important;min-width:0;height:auto;padding:0;margin:-10px 0 0 1px;background:transparent!important;border-radius:0;font-size:11px;font-weight:700;color:#7C7686!important}
+.note .tab .tc:empty{display:none!important}
 .note .tab[aria-selected="true"] .tc{color:var(--c)!important}
 </style>
 </head>
@@ -2152,12 +2155,12 @@ button:active{filter:brightness(1.15)}
       '<div class="trow"><button type="button" class="toggle" aria-expanded="false"><span class="chev" aria-hidden="true"></span><span class="tl"></span><span class="meta"></span></button></div>'+
       '<div class="body">'+
         '<div class="tabs" role="tablist" data-active="m">'+
-          '<button type="button" class="tab" role="tab" data-tab="m"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L18.5 9.5l-4-4L4 16v4z"/><path d="M13 7l4 4"/></svg><span class="tn">묵상</span><span class="tc"></span></button>'+
-          '<button type="button" class="tab" role="tab" data-tab="p"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c-1.2 3-3.5 4.6-3.5 8.2V16l-3 3.5h13l-3-3.5v-4.8C15.5 7.6 13.2 6 12 3z"/></svg><span class="tn">기도</span><span class="tc"></span></button>'+
-          '<button type="button" class="tab" role="tab" data-tab="a"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7L16.2 9.6"/></svg><span class="tn">실천</span><span class="tc"></span></button>'+
-          '<button type="button" class="tab" role="tab" data-tab="q"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6"/><path d="M12 16.9v.2"/></svg><span class="tn">질문</span><span class="tc"></span></button>'+
-          '<button type="button" class="tab" role="tab" data-tab="e"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6M9 8h3"/></svg><span class="tn">경험</span><span class="tc"></span></button>'+
-          '<button type="button" class="tab" role="tab" data-tab="r"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg><span class="tn">자료</span><span class="tc"></span></button>'+
+          '<button type="button" class="tab" role="tab" data-tab="m" title="묵상"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L18.5 9.5l-4-4L4 16v4z"/><path d="M13 7l4 4"/></svg><span class="tn">묵상</span><span class="tc"></span></button>'+
+          '<button type="button" class="tab" role="tab" data-tab="p" title="기도"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c-1.2 3-3.5 4.6-3.5 8.2V16l-3 3.5h13l-3-3.5v-4.8C15.5 7.6 13.2 6 12 3z"/></svg><span class="tn">기도</span><span class="tc"></span></button>'+
+          '<button type="button" class="tab" role="tab" data-tab="a" title="실천"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7L16.2 9.6"/></svg><span class="tn">실천</span><span class="tc"></span></button>'+
+          '<button type="button" class="tab" role="tab" data-tab="q" title="질문"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6"/><path d="M12 16.9v.2"/></svg><span class="tn">질문</span><span class="tc"></span></button>'+
+          '<button type="button" class="tab" role="tab" data-tab="e" title="경험"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6M9 8h3"/></svg><span class="tn">경험</span><span class="tc"></span></button>'+
+          '<button type="button" class="tab" role="tab" data-tab="r" title="자료"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg><span class="tn">자료</span><span class="tc"></span></button>'+
         '</div>'+
         '<div class="pane" data-pane="m">'+
           '<div class="qbtns"><button type="button" class="newmed addm" aria-label="새 묵상 쓰기"><span class="nmplus" aria-hidden="true">+</span>새 묵상</button><button type="button" class="medprog" aria-label="묵상 진도표"></button></div>'+
