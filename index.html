@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-11">
+<meta name="app-build" content="2026-10-08-12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1124,6 +1124,13 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .umine{font-size:11px;font-weight:700;color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 50%,var(--rule));border-radius:9px;padding:0 6px;line-height:18px}
 .uitem.mine{border-color:color-mix(in srgb,var(--gold) 35%,#26252B)}
 .udel{flex:0 0 auto;min-width:26px;height:26px;padding:0 6px;border:0;border-radius:13px;background:transparent;color:var(--faint);font-size:16px;line-height:1}
+.ufold{flex:0 0 auto;width:34px;height:30px;margin:-4px -6px 0 0;border:0;background:transparent;border-radius:6px;display:grid;place-items:center;color:var(--gold);padding:0}
+.ufold[aria-expanded="false"] .qchev{transform:rotate(-45deg) translate(-1px,-1px)}
+.uitem.ufolded{padding-top:10px;padding-bottom:10px}
+.uitem.ufolded .uwhy,.uitem.ufolded .uhow,.uitem.ufolded .ufoot{display:none!important}
+.ufoot{display:flex;justify-content:flex-end;margin-top:8px}
+.ufoot .udel{height:28px;min-width:0;padding:0 12px;border:1px solid #2f2e36;font-size:12.5px}
+.ufoldall{flex:0 0 auto;height:38px;padding:0 10px;border:0;background:transparent;color:var(--gold);font-size:13px}
 .udel.sure{font-size:12px;color:var(--pink);background:color-mix(in srgb,var(--pink) 12%,transparent)}
 .uwhy[hidden]{display:none}
 .uform{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding:12px;border:1px dashed color-mix(in srgb,var(--gold) 45%,var(--rule));border-radius:12px}
@@ -2609,8 +2616,10 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("umanual")){useForm.add(id);render();var fw=card.querySelector(".uf-when");if(fw)fw.focus();return}
     if(b.classList.contains("ucancel")){useForm.delete(id);render();return}
     if(b.classList.contains("usave")){addUse(card,n);return}
+    if(b.classList.contains("ufold")){var fk=b.closest(".uitem").dataset.fk; if(uFold.has(fk))uFold.delete(fk);else uFold.add(fk); saveUFold(); render(); return}
+    if(b.classList.contains("ufoldall")){var allU=n.uses.every(function(u){return uFold.has(id+"|"+u.when)}); n.uses.forEach(function(u){var k=id+"|"+u.when; if(allU)uFold.delete(k);else uFold.add(k)}); saveUFold(); render(); return}
     if(b.classList.contains("udel")){
-      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
+      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="한 번 더 누르면 지워져요";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="지우기";b.classList.remove("sure")}},3000);return}
       n.uses.splice(+b.dataset.i,1); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("uact")){
@@ -3823,6 +3832,9 @@ button:active{filter:brightness(1.15)}
   /* ---------- 말씀 활용 제안 ---------- */
   var useOpen=new Set(), useBusy=new Set();
   var useForm=new Set(), lastUse=null;
+  var uFold=new Set();   // 접은 '언제 쓸까' 항목 (말씀id|언제)
+  try{JSON.parse(localStorage.getItem("bible-notes-ufold")||"[]").forEach(function(x){uFold.add(String(x))})}catch(e){}
+  function saveUFold(){try{localStorage.setItem("bible-notes-ufold",JSON.stringify(Array.from(uFold).slice(-800)))}catch(e){}}
   function addUse(card,n){
     var uf=card.querySelector(".uform"); if(!uf)return;
     var wv=uf.querySelector(".uf-when").value.trim();
@@ -3840,13 +3852,14 @@ button:active{filter:brightness(1.15)}
     panel.hidden=!open;
     if(!open){panel.textContent="";panel.dataset.key="";return}
     var formOn=useForm.has(n.id)||(!n.uses.length&&!sampleFn);
-    var key=JSON.stringify(n.uses)+"/"+useBusy.has(n.id)+"/"+!!sampleFn+"/"+formOn+"/"+n.acts.map(function(x){return x.t}).join("|");
+    var key=JSON.stringify(n.uses)+"/"+n.uses.map(function(u){return uFold.has(n.id+"|"+u.when)?1:0}).join("")+"/"+useBusy.has(n.id)+"/"+!!sampleFn+"/"+formOn+"/"+n.acts.map(function(x){return x.t}).join("|");
     if(panel.dataset.key===key)return; panel.dataset.key=key; panel.textContent="";
     var h=document.createElement("div"); h.className="uhd"; h.innerHTML='<b>💡 이 말씀, 언제 쓸까</b>'; panel.appendChild(h);
     // 추가 버튼은 맨 위에 (새로 적은 것도 맨 위에 생김)
     var acts=document.createElement("div"); acts.className="ubtns utopb";
     if(!formOn){var mb=document.createElement("button");mb.type="button";mb.className="umanual";mb.textContent="+ 언제 쓸지 추가";acts.appendChild(mb)}
     if(sampleFn&&!useBusy.has(n.id)){var r=document.createElement("button");r.type="button";r.className="uagain";r.textContent=n.uses.some(function(u){return !u.mine})?"다른 제안 받기":"제안 받기";acts.appendChild(r)}
+    if(n.uses.length>=2){var fa=document.createElement("button");fa.type="button";fa.className="ufoldall";fa.textContent=n.uses.every(function(u){return uFold.has(n.id+"|"+u.when)})?"모두 펼치기":"모두 접기";acts.appendChild(fa)}
     if(acts.children.length)panel.appendChild(acts);
     if(formOn){
       var f=document.createElement("div"); f.className="uform";
@@ -3860,7 +3873,9 @@ button:active{filter:brightness(1.15)}
       var ul=document.createElement("ul"); ul.className="ulist";
       n.uses.forEach(function(u,i){
         var li=document.createElement("li"); li.className="uitem"+(u.mine?" mine":"")+(u===lastUse?" fresh":"");
-        li.innerHTML='<div class="utop"><div class="uwhen"></div><button type="button" class="udel" data-i="'+i+'" aria-label="이 제안 지우기">×</button></div><div class="uwhy"></div><div class="uhow"><span class="uhowt"></span><button type="button" class="uact" data-i="'+i+'">+ 실천</button></div>';
+        var fk=n.id+"|"+u.when, uf=uFold.has(fk); if(uf)li.classList.add("ufolded");
+        li.dataset.fk=fk;
+        li.innerHTML='<div class="utop"><div class="uwhen"></div><button type="button" class="ufold" aria-expanded="'+!uf+'" aria-label="'+(uf?"펼치기":"접기")+'"><span class="qchev" aria-hidden="true"></span></button></div><div class="uwhy"></div><div class="uhow"><span class="uhowt"></span><button type="button" class="uact" data-i="'+i+'">+ 실천</button></div><div class="ufoot"><button type="button" class="udel" data-i="'+i+'" aria-label="이 항목 지우기">지우기</button></div>';
         var wh=li.querySelector(".uwhen"); wh.textContent=u.when;
         if(u.mine){var tg=document.createElement("span");tg.className="umine";tg.textContent="내가 적음";wh.appendChild(tg)}
         var wy=li.querySelector(".uwhy"); wy.textContent=u.why; if(!u.why)wy.hidden=true;
