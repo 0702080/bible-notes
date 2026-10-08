@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-20">
+<meta name="app-build" content="2026-10-08-21">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4611,7 +4611,8 @@ button:active{filter:brightness(1.15)}
       if(/(에게|에게서|께|한테)$/.test(x))return R("누구에게?");
       if(/^(가운데서|가운데|안에서|안에|속에서)$/.test(x)){var pv=bare(w[i-1]);return R(/^안/.test(x)&&(WHO.test(pv)||GOD.test(pv))?"누구 안에서?":"어디에서?")}
       if(m=x.match(/^(.+?)(안에서|안에|가운데서|가운데|속에서|속에)$/))return R(GOD.test(m[1])||WHO.test(m[1])?"누구 안에서?":"어디에서?");
-      if(/^(영원히|항상|늘|이제|날마다|오늘|내일|먼저|전에|후에|평생|세세토록|영원토록)$/.test(x))return R("언제?");
+      if(/^(영원히|평생|세세토록|영원토록|영원까지|끝까지|세상\s?끝날까지|대대로|종일|날이\s?저물도록)$/.test(x)||/까지$/.test(x)&&!/(에게|께)까지$/.test(x))return R("언제까지?");   // 기간: 영원히 → 언제까지?
+      if(/^(항상|늘|이제|날마다|오늘|내일|먼저|전에|후에)$/.test(x))return R("언제?");
       if(m=x.match(/^(.+?)(에서|에|으로|로)$/)){
         if(WHO.test(m[1])&&/로$/.test(x))return R(null,true);
         if(TIME.test(m[1])&&!/로$/.test(x))return R("언제?");
