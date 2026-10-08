@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-14">
+<meta name="app-build" content="2026-10-08-15">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1099,6 +1099,15 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .xadd,.xopen{height:28px;padding:0 11px;border:1px solid #34333A;border-radius:14px;background:transparent;color:var(--ink);font-size:12.5px;white-space:nowrap}
 .xadd{color:var(--mint);border-color:color-mix(in srgb,var(--mint) 50%,#34333A)}
 .xmsg{font-size:12.5px;color:var(--faint)}
+.xlform{display:flex;flex-direction:column;gap:6px;margin:4px 0 2px}
+.xlform .xlrow{display:flex;gap:6px}
+.xlform .field{flex:1;min-width:0;height:38px;font-size:14px}
+.xladd{flex:0 0 auto;height:38px;padding:0 14px;border:1px solid color-mix(in srgb,var(--mint) 55%,#34333A);border-radius:12px;background:color-mix(in srgb,var(--mint) 12%,transparent);color:var(--mint);font-size:14px;font-weight:700}
+.xmy li{flex-wrap:wrap;row-gap:2px}
+.xmy .xref{flex:1}
+.xmy .xmemo{flex-basis:100%;font-size:12.5px;color:var(--muted);line-height:1.5;word-break:keep-all}
+.xldel{height:28px;padding:0 9px;border:0;border-radius:14px;background:transparent;color:var(--faint);font-size:12px;white-space:nowrap}
+.xldel.sure{color:var(--pink);background:color-mix(in srgb,var(--pink) 12%,transparent)}
 .xsrc{margin:8px 0 0;font-size:11px;color:var(--faint)}
 .vedit[aria-expanded="true"]{color:var(--green);border-color:color-mix(in srgb,var(--green) 55%,var(--rule))}
 .usepanel{margin:2px 0 14px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 30%,var(--rule));border-radius:14px;background:#101013}
@@ -1793,6 +1802,7 @@ button:active{filter:brightness(1.15)}
       mem:(n.mem&&Array.isArray(n.mem.s))?{s:(function(a){if(a.length>=5)a=[a[0],a[1],a[2],a[4]||a[3]];return [0,1,2,3].map(function(i){return +a[i]||0})})(n.mem.s)}:{s:[0,0,0,0]},   // 예전 5단계(다음 날, 내일)는 4단계(내일) 하나로
       pinned:!!n.pinned, pinnedAt:n.pinned?(+n.pinnedAt||0):0,
       tw:(function(o){var r={};if(o&&typeof o==="object"&&!Array.isArray(o)){Object.keys(o).slice(0,20).forEach(function(k){if(Array.isArray(o[k]))r[String(k).slice(0,20)]=o[k].map(String).map(function(w){return w.trim()}).filter(Boolean).slice(0,8)})}return r})(n.tw),
+      links:Array.isArray(n.links)?n.links.filter(function(l){return l&&String(l.ref||"").trim()}).slice(0,60).map(function(l){return {id:String(l.id||("k"+Math.random().toString(36).slice(2,8))),ref:String(l.ref).trim().slice(0,40),memo:String(l.memo||"").trim().slice(0,120)}}):[],
       topics:Array.isArray(n.topics)?n.topics.map(function(t){return String(t).replace(/^#+/,"").trim().slice(0,20)}).filter(function(t,i,a){return t&&a.indexOf(t)===i}).slice(0,12):[],
       createdAt:+n.createdAt||Date.now(),updatedAt:+n.updatedAt||+n.createdAt||0};
   }
@@ -2535,7 +2545,11 @@ button:active{filter:brightness(1.15)}
     if(file&&n&&h){zone.hidden=true;himsg(hyEl,"");uploadHymnImg(card,n,h,file)}
     else himsg(hyEl,"붙여넣은 것이 사진이 아니에요. 이미지를 길게 눌러 '이미지 복사'를 한 뒤 다시 붙여넣어 주세요.");
   });
+  // 연결 말씀: 구절 칸에서 엔터 → 메모 칸으로
+  list.addEventListener("keydown",function(e){var t=e.target; if(e.key==="Enter"&&!e.isComposing&&t.classList&&t.classList.contains("xlref")&&t.value.trim()){e.preventDefault();var m=t.form&&t.form.querySelector(".xlmemo");if(m)m.focus()}});
   list.addEventListener("submit",function(e){
+    var xf=e.target.closest&&e.target.closest(".xlform");
+    if(xf){e.preventDefault(); var xc=xf.closest(".note"), xn=xc&&notes.get(xc.dataset.id); if(xn)addMyLink(xc,xn,xf); return}
     var f=e.target.closest&&e.target.closest(".blform"); if(!f)return; e.preventDefault();
     var card=f.closest(".note"), n=card&&notes.get(card.dataset.id), a=n&&n.acts.find(function(x){return x.id===f.closest(".act").dataset.aid});
     if(a)addLog(card,n,a,f.querySelector(".blin"));
@@ -2597,6 +2611,10 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("mtopic")){b.closest("details").open=false;openPicker(id);return}
     if(b.classList.contains("vtopic")){openPicker(id);return}
     if(b.classList.contains("vxref")){toggleXref(card,n);return}
+    if(b.classList.contains("xldel")){
+      if(!b.dataset.sure){b.dataset.sure="1";b.classList.add("sure");b.textContent="한 번 더";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.classList.remove("sure");b.textContent="지우기"}},3000);return}
+      var lid=b.closest("li").dataset.lid; n.links=(n.links||[]).filter(function(l){return l.id!==lid}); scheduleSave(id); renderMyLinks(card.querySelector(".xpanel"),n); return;
+    }
     if(b.classList.contains("xadd")){addFromXref(b.dataset.b,b.dataset.c,b.dataset.v,b.dataset.label);return}
     if(b.classList.contains("xopen")){var xo=b.dataset.id;openOne(xo);render();var xe=cards.get(xo);if(xe)setTimeout(function(){xe.scrollIntoView({block:"start",behavior:"smooth"})},80);return}
     if(b.classList.contains("medit")||b.classList.contains("vedit")){
@@ -5165,8 +5183,14 @@ button:active{filter:brightness(1.15)}
   }
   function fillXref(pn,n){
     pn.dataset.sig=xrefSig();
-    pn.innerHTML='<div class="xhd">🔗 연결 말씀</div><div class="xsec">성경 관주 <span>서로 연결된 구절</span></div><ul class="xlist xcross"><li class="xmsg">불러오는 중이에요…</li></ul>'+
+    pn.innerHTML='<div class="xhd">🔗 연결 말씀</div>'+
+      '<div class="xsec">내가 연결한 말씀 <span>직접 적기</span></div>'+
+      '<form class="xlform" autocomplete="off"><div class="xlrow"><input class="field xlref" maxlength="40" enterkeyhint="next" placeholder="구절 (예: 요한복음 14:27)" aria-label="연결할 구절"><button type="submit" class="xladd">추가</button></div>'+
+      '<input class="field xlmemo" maxlength="120" enterkeyhint="done" placeholder="왜 연결했는지 한 줄 (선택)" aria-label="연결한 이유"></form>'+
+      '<ul class="xlist xmy"></ul>'+
+      '<div class="xsec">성경 관주 <span>서로 연결된 구절</span></div><ul class="xlist xcross"><li class="xmsg">불러오는 중이에요…</li></ul>'+
       '<div class="xsec">내 말씀 중에서 <span>같은 낱말·주제</span></div><ul class="xlist xmine"></ul><p class="xsrc">관주 자료: OpenBible.info (CC BY)</p>';
+    renderMyLinks(pn,n);
     var mine=pn.querySelector(".xmine"), rel=relatedMine(n);
     if(!rel.length)mine.innerHTML='<li class="xmsg">아직 이어지는 내 말씀이 없어요.</li>';
     rel.forEach(function(r){
@@ -5188,6 +5212,33 @@ button:active{filter:brightness(1.15)}
         cross.appendChild(li);
       });
     }).catch(function(){cross.innerHTML='<li class="xmsg">관주를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'});
+  }
+  // 내가 직접 연결한 말씀
+  function hbLink(b,c){return "http://www.holybible.or.kr/"+(onDesktop()?"":"mobile/")+"B_GAE/cgi/bibleftxt.php?VR=GAE&VL="+(b+1)+"&CN="+c+"&CV=99"}
+  function renderMyLinks(pn,n){
+    var ul=pn.querySelector(".xmy"); if(!ul)return; ul.textContent="";
+    if(!n.links)n.links=[];
+    n.links.forEach(function(l){
+      var r=parseRef(l.ref), ok=r.book>=0&&r.chapter>0, have=ok&&r.verse>0?myNoteAt(r.book,r.chapter,r.verse):null;
+      var li=document.createElement("li"); li.dataset.lid=l.id;
+      li.innerHTML='<b class="xref"></b>'+(ok?'<a class="xgo" target="_blank" rel="noopener">보기 ↗</a>':'')+(have?'<button type="button" class="xopen">담은 말씀</button>':'')+'<button type="button" class="xldel" aria-label="이 연결 지우기">지우기</button>'+(l.memo?'<span class="xmemo"></span>':'');
+      li.querySelector(".xref").textContent=l.ref;
+      if(ok)li.querySelector(".xgo").href=hbLink(r.book,r.chapter);
+      if(have)li.querySelector(".xopen").dataset.id=have.id;
+      if(l.memo)li.querySelector(".xmemo").textContent=l.memo;
+      ul.appendChild(li);
+    });
+  }
+  function addMyLink(card,n,f){
+    var ri=f.querySelector(".xlref"), mi=f.querySelector(".xlmemo"), ref=ri.value.trim();
+    if(!ref){ri.focus();toast("연결할 구절을 적어 주세요");return}
+    var r=parseRef(ref);
+    if(r.book>=0&&r.chapter>0)ref=BOOKS[r.book]+" "+r.chapter+(r.verse?":"+r.verse:"")+(ref.match(/-\s*\d+\s*$/)?ref.match(/-\s*\d+\s*$/)[0].replace(/\s/g,""):"");
+    if(!n.links)n.links=[];
+    if(n.links.some(function(l){return l.ref===ref})){toast("이미 연결한 말씀이에요");return}
+    n.links.unshift({id:"k"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),ref:ref,memo:mi.value.trim()});
+    ri.value=""; mi.value=""; scheduleSave(n.id); renderMyLinks(card.querySelector(".xpanel"),n);
+    toast(r.book>=0?"연결했어요":"연결했어요 (성경 이름을 못 알아봐서 보기 링크는 없어요)"); buzz(8);
   }
   // 관주 구절 담기: 말씀 담기 창을 열고 구절 주소를 채움 (장 본문을 붙여 둔 적이 있으면 본문도 채움)
   function addFromXref(b,c,v,label){
