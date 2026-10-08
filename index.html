@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-15">
+<meta name="app-build" content="2026-10-08-16">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1646,6 +1646,9 @@ button:active{filter:brightness(1.15)}
 .note.spotin{animation:spotin .45s cubic-bezier(.2,1.3,.4,1)}
 @keyframes spotin{0%{transform:translateY(-10px);opacity:.4}100%{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.note.spotin{animation:none}}
+/* 말씀 속 진한 글씨: 짙은 노란색 */
+:root{--boldy:#FFC21A}
+.verse .tk,.verse .vmark,.verse.focus .w.on,.verse b,.verse strong{color:var(--boldy)!important;-webkit-text-stroke:0!important}
 </style>
 </head>
 <body>
