@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-02">
+<meta name="app-build" content="2026-10-09-03">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1624,7 +1624,7 @@ button:active{filter:brightness(1.15)}
 .dlbarw{flex:1;height:8px;border-radius:4px;background:#222126;overflow:hidden}
 .dlbarw i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .35s}
 .dlweek{display:flex;justify-content:space-between;gap:6px;margin:10px 0 6px}
-.dlw{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px}
+.dlw{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 0;border:0;background:transparent;font:inherit;cursor:pointer}
 .dlw i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;color:#141416;background:color-mix(in srgb,var(--gold) calc(var(--f) * 100%),#1c1b21)}
 .dlw b{font-size:11px;color:var(--faint);font-weight:500}
 .dlw.cur b{color:var(--gold);font-weight:700}
@@ -4514,6 +4514,7 @@ button:active{filter:brightness(1.15)}
       dl.querySelector(".dlclose").addEventListener("click",closeDaily);
       dl.querySelector(".dlprev").addEventListener("click",function(){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()-864e5);drawDaily()});
       dl.querySelector(".dlnext").addEventListener("click",function(){var t=dkey(Date.now());if(dlDay<t){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()+864e5);drawDaily()}});
+      dl.querySelector(".dlweek").addEventListener("click",function(e){var b=e.target.closest(".dlw");if(b&&b.dataset.day&&b.dataset.day!==dlDay){dlDay=b.dataset.day;drawDaily()}});   // 요일 칸을 누르면 그날로
       dl.querySelector(".dledit").addEventListener("click",function(){dlEdit=!dlEdit;drawDaily()});
       dl.querySelector(".dladd").addEventListener("submit",function(e){
         e.preventDefault(); var inp=dl.querySelector(".dlin"), t=inp.value.trim(); if(!t){inp.focus();return}
@@ -4550,7 +4551,7 @@ button:active{filter:brightness(1.15)}
     dl.querySelector(".dlbarw i").style.width=(tot?Math.round(c/tot*100):0)+"%";
     var wk=dl.querySelector(".dlweek"); wk.textContent="";
     for(var i=6;i>=0;i--){
-      var k=dkey(Date.now()-i*864e5), cc=dailyChecked(o,k).length, d=document.createElement("span");
+      var k=dkey(Date.now()-i*864e5), cc=dailyChecked(o,k).length, d=document.createElement("button"); d.type="button"; d.dataset.day=k; d.setAttribute("aria-label",dayName(k)+" 보기, "+cc+"/"+tot);
       d.className="dlw"+(k===dlDay?" cur":""); d.title=dayName(k)+" "+cc+"/"+tot;
       d.innerHTML='<i></i><b></b>'; d.querySelector("b").textContent="일월화수목금토".charAt(new Date(k+"T12:00:00").getDay());
       d.querySelector("i").style.setProperty("--f",tot?(cc/tot):0); d.querySelector("i").textContent=cc||"";
