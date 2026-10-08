@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-05">
+<meta name="app-build" content="2026-10-09-06">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4485,7 +4485,8 @@ button:active{filter:brightness(1.15)}
   function lastOpenId(){try{return localStorage.getItem("bible-last-open")||""}catch(e){return ""}}
   /* ---------- 하루 돌아보기 체크리스트 (이 기기에 저장, 백업에 함께 들어감) ---------- */
   var DAILY_KEY="bible-daily";
-  var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도",c:"var(--violet)"},{g:"word",e:"📖",t:"말씀",c:"var(--orange)"},{g:"fruit",e:"🍇",t:"성령의 열매",c:"var(--green)"},{g:"thanks",e:"💛",t:"감사·나눔",c:"var(--gold)"}];   // 묶음마다 색
+  var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도",c:"var(--violet)"},{g:"word",e:"📖",t:"말씀",c:"var(--orange)"},{g:"fruit",e:"🍇",t:"성령의 열매",c:"var(--green)"},{g:"sow",e:"🌱",t:"하나님 나라에 심기",c:"var(--sky)"},{g:"thanks",e:"💛",t:"감사·나눔",c:"var(--gold)"}];   // 묶음마다 색
+  var DAILY_SOW=["돈을 하나님 나라를 위해 쓴 것이 있는가","시간을 하나님 나라를 위해 드렸는가","내 재능으로 누군가를 섬겼는가"];
   var DAILY_DEFAULT=[
     ["pray","대적 기도를 했는가"],["pray","필요한 것을 구하는 기도를 했는가"],["pray","버리는(내려놓는) 기도를 했는가"],["pray","회개 기도를 했는가"],["pray","누군가를 위해 중보 기도를 했는가"],
     ["word","말씀을 읽고 묵상했는가"],["word","붙든 말씀을 하루 중에 다시 떠올렸는가"],
@@ -4496,6 +4497,13 @@ button:active{filter:brightness(1.15)}
     var o=null; try{o=JSON.parse(localStorage.getItem(DAILY_KEY)||"null")}catch(e){}
     if(!o||!Array.isArray(o.items))o={items:DAILY_DEFAULT.map(function(x,i){var it={id:"d"+i,g:x[0],t:x[1]};if(x[2])it.auto=x[2];return it}),days:{}};
     if(!o.days||typeof o.days!=="object")o.days={};
+    // 나중에 생긴 묶음은 이미 쓰던 사람에게도 한 번 넣어 줌 (지운 뒤에는 다시 넣지 않음)
+    if(!o.seeded)o.seeded={};
+    if(!o.seeded.sow){
+      o.seeded.sow=1;
+      if(!o.items.some(function(it){return it.g==="sow"}))DAILY_SOW.forEach(function(t,i){o.items.push({id:"sow"+i,g:"sow",t:t})});
+      try{localStorage.setItem(DAILY_KEY,JSON.stringify(o))}catch(e){}
+    }
     return o;
   }
   function saveDaily(o){try{localStorage.setItem(DAILY_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")}}
