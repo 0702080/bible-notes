@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-06">
+<meta name="app-build" content="2026-10-08-07">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -704,7 +704,11 @@ body.reorder .note .topics{display:none}
 .kwon .tk{color:var(--hi)}
 /* ===== 실천 체크표 ===== */
 .act{grid-template-columns:32px 1fr auto auto;row-gap:2px}
-.afold{width:30px;height:32px;border:0;background:transparent;border-radius:6px;display:grid;place-items:center;color:var(--sky);padding:0}
+.act .dela[hidden]{display:none}
+.bfoot{display:flex;justify-content:flex-end;margin-top:10px;padding-top:8px;border-top:1px dashed #2A2930}
+.adel{height:30px;padding:0 10px;border:1px solid #2f2e36;border-radius:15px;background:transparent;color:var(--faint);font-size:12.5px}
+.adel.sure{border-color:var(--pink);color:var(--pink);font-weight:700}
+.afold{width:36px;height:34px;border:0;background:transparent;border-radius:6px;display:grid;place-items:center;color:var(--sky);padding:0}
 .afold[hidden]{display:none}
 .afold[aria-expanded="false"] .qchev{transform:rotate(-45deg) translate(-1px,-1px)}
 .asum{grid-column:2/-1;justify-self:start;margin:-2px 0 2px;padding:2px 0;border:0;background:transparent;color:var(--faint);font-size:12.5px;text-align:left;font-variant-numeric:tabular-nums}
@@ -2075,7 +2079,8 @@ button:active{filter:brightness(1.15)}
     d.innerHTML='<button type="button" class="chk" aria-pressed="false" aria-label="실천했어요"></button><textarea class="at" rows="1" placeholder="실천할 일을 적어 보세요" aria-label="실천"></textarea><button type="button" class="afold" aria-label="체크표 접기" aria-expanded="true" hidden><span class="qchev" aria-hidden="true"></span></button><button type="button" class="icon dela" aria-label="실천 삭제">×</button>'+
       '<button type="button" class="asum" hidden></button>'+
       '<div class="board"><div class="bhead"><span class="bstat"></span><span class="bgoal" role="group" aria-label="목표 일수"><button type="button" class="bg" data-g="7">7일</button><button type="button" class="bg" data-g="21">21일</button><button type="button" class="bg" data-g="40">40일</button></span></div><div class="bbody"><div class="bgrid"></div><div class="bside" aria-live="polite"></div></div>'+
-        '<div class="blog"><form class="blform" autocomplete="off"><input class="field blin" maxlength="120" placeholder="오늘 한 줄 적기 (예: 아침 햇살에 감사)" aria-label="오늘 한 줄"><button type="submit" class="bladd">적기</button></form><ul class="bllist"></ul><button type="button" class="blmore" hidden></button><div class="lbadges" aria-label="한 줄 배지"></div></div></div>';
+        '<div class="blog"><form class="blform" autocomplete="off"><input class="field blin" maxlength="120" placeholder="오늘 한 줄 적기 (예: 아침 햇살에 감사)" aria-label="오늘 한 줄"><button type="submit" class="bladd">적기</button></form><ul class="bllist"></ul><button type="button" class="blmore" hidden></button><div class="lbadges" aria-label="한 줄 배지"></div></div>'+
+        '<div class="bfoot"><button type="button" class="adel">이 실천 지우기</button></div></div>';
     return d;
   }
   var deepBusy=new Map();
@@ -2929,6 +2934,11 @@ button:active{filter:brightness(1.15)}
       }
       return;
     }
+    if(b.classList.contains("adel")){
+      var dd=b.closest(".act");
+      if(!b.dataset.sure){b.dataset.sure="1";b.classList.add("sure");b.textContent="한 번 더 누르면 지워져요";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.classList.remove("sure");b.textContent="이 실천 지우기"}},3000);return}
+      n.acts=n.acts.filter(function(x){return x.id!==dd.dataset.aid}); aFold.delete(dd.dataset.aid); saveAFold(); toast("실천을 지웠어요"); render(); scheduleSave(id); return;
+    }
     if(b.classList.contains("dela")){
       var ad=b.closest(".act"), ax=n.acts.find(function(x){return x.id===ad.dataset.aid});
       if(ax&&ax.t.trim()&&!b.dataset.sure){b.dataset.sure="1";b.textContent="?";b.setAttribute("aria-label","한 번 더 누르면 지워져요");setStatus("한 번 더 누르면 이 실천이 지워져요.");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.setAttribute("aria-label","실천 삭제")}},3000);return}
@@ -3567,6 +3577,7 @@ button:active{filter:brightness(1.15)}
     b.querySelector(".bstat").textContent=stat;
     var named=!!a.t.trim(), fold=named&&aFold.has(a.id);
     b.hidden=!named||fold;
+    var dx=d.querySelector(".dela"); if(dx)dx.hidden=named;   // 이름이 있으면 ×는 숨기고, 지우기는 펼친 체크표 맨 아래에서
     var fb=d.querySelector(".afold"); if(fb){fb.hidden=!named; fb.setAttribute("aria-expanded",String(!fold)); fb.setAttribute("aria-label",fold?"체크표 펼치기":"체크표 접기")}
     var sm=d.querySelector(".asum");
     if(sm){
