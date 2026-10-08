@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-23">
+<meta name="app-build" content="2026-10-08-24">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1096,6 +1096,7 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .xlist .xsnip{flex:1;min-width:0;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .xcross .xref{flex:1}
 .xgo{font-size:12.5px;color:var(--muted);text-decoration:none;white-space:nowrap}
+.xkeep{flex:0 0 auto;font-size:11.5px;color:var(--green);white-space:nowrap}
 .xdel{height:28px;padding:0 10px;border:1px solid #4A2A38;border-radius:14px;background:transparent;color:var(--pink);font-size:12.5px;white-space:nowrap}
 .xadd,.xopen{height:28px;padding:0 11px;border:1px solid #34333A;border-radius:14px;background:transparent;color:var(--ink);font-size:12.5px;white-space:nowrap}
 .xadd{color:var(--mint);border-color:color-mix(in srgb,var(--mint) 50%,#34333A)}
@@ -5224,6 +5225,18 @@ button:active{filter:brightness(1.15)}
     var sig=xrefSig();
     open.forEach(function(pn){var c=pn.closest(".note"), n=c&&notes.get(c.dataset.id); if(n&&pn.dataset.sig!==sig)fillXref(pn,n)});
   }
+  // 노트에 적힌 내용 (중복 정리할 때 어느 쪽을 남길지 보려고)
+  function noteParts(x){
+    var logs=0; (x.acts||[]).forEach(function(a){logs+=(a.logs||[]).length});
+    return {med:(x.meds||[]).filter(function(m){return String(m.text||"").trim()}).length, q:(x.qs||[]).filter(function(q){return String(q.q||"").trim()}).length,
+      act:(x.acts||[]).filter(function(a){return String(a.t||"").trim()}).length, log:logs, es:(x.essays||[]).length, mem:(x.mem&&x.mem.s?x.mem.s.filter(Boolean).length:0), tp:(x.topics||[]).length};
+  }
+  function noteWeight(x){var p=noteParts(x);return p.med*3+p.q*3+p.act*2+p.log*2+p.es*3+p.mem+p.tp}
+  function noteSummary(x){
+    var p=noteParts(x), o=[];
+    if(p.med)o.push("묵상 "+p.med); if(p.q)o.push("질문 "+p.q); if(p.act)o.push("실천 "+p.act); if(p.log)o.push("한 줄 "+p.log); if(p.es)o.push("경험 "+p.es); if(p.mem)o.push("암송 "+p.mem); if(p.tp)o.push("주제 "+p.tp);
+    return o.length?o.join(" · "):"적은 내용 없음";
+  }
   function toggleXref(card,n){
     var pn=card.querySelector(".xpanel"), bt=card.querySelector(".vxref"), open=pn.hidden;
     pn.hidden=!open; bt.setAttribute("aria-expanded",String(open));
@@ -5244,11 +5257,14 @@ button:active{filter:brightness(1.15)}
     // 같은 구절·같은 본문으로 두 번 담긴 말씀은 [삭제] 버튼을 보여 줌
     var dupKey=function(x){return String(x.ref||"").replace(/\s+/g,"")+"|"+String(x.text||"").replace(/\s+/g,"")}, dupCnt={};
     notes.forEach(function(x){var k=dupKey(x);dupCnt[k]=(dupCnt[k]||0)+1});
+    // 중복끼리는 무엇이 들어 있는지 보여 주고, 내용이 가장 많은 것은 남기도록 [삭제]를 빼 둠
+    var keepOf={}; notes.forEach(function(x){var k=dupKey(x);if(dupCnt[k]<2)return;var c=noteWeight(x);if(!keepOf[k]||c>keepOf[k].w||(c===keepOf[k].w&&x.createdAt<keepOf[k].at))keepOf[k]={id:x.id,w:c,at:x.createdAt}});
     rel.forEach(function(r){
-      var dup=dupCnt[dupKey(r.n)]>1, li=document.createElement("li");
-      li.innerHTML='<b class="xref"></b><span class="xsnip"></span>'+(dup?'<button type="button" class="xdel">삭제</button>':'')+'<button type="button" class="xopen">열기</button>';
-      li.querySelector(".xref").textContent=r.n.ref; li.querySelector(".xsnip").textContent=(r.topics.length?"#"+r.topics.join(" #")+"  ":"")+r.n.text.replace(/\s+/g," ").slice(0,28)+"…";
-      li.querySelector(".xopen").dataset.id=r.n.id; if(dup)li.querySelector(".xdel").dataset.id=r.n.id; mine.appendChild(li);
+      var k=dupKey(r.n), dup=dupCnt[k]>1, keep=dup&&keepOf[k].id===r.n.id, li=document.createElement("li");
+      li.innerHTML='<b class="xref"></b><span class="xsnip"></span>'+(dup&&!keep?'<button type="button" class="xdel">삭제</button>':'')+(keep?'<span class="xkeep">남길 말씀</span>':'')+'<button type="button" class="xopen">열기</button>';
+      li.querySelector(".xref").textContent=r.n.ref;
+      li.querySelector(".xsnip").textContent=dup?("중복 · "+noteSummary(r.n)):((r.topics.length?"#"+r.topics.join(" #")+"  ":"")+r.n.text.replace(/\s+/g," ").slice(0,28)+"…");
+      li.querySelector(".xopen").dataset.id=r.n.id; if(dup&&!keep)li.querySelector(".xdel").dataset.id=r.n.id; mine.appendChild(li);
     });
     var cross=pn.querySelector(".xcross");
     if(!(n.book>=0&&n.chapter>0&&n.verse>0)){cross.innerHTML='<li class="xmsg">구절 주소(예: 시편 111:10)가 있어야 관주를 찾을 수 있어요.</li>';return}
