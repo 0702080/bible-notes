@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-08">
+<meta name="app-build" content="2026-10-09-09">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6008,7 +6008,10 @@ button:active{filter:brightness(1.15)}
     if(ghCfg()||pubBusy||!navigator.onLine||!backend)return;
     pubBusy=true;
     try{
-      var r=await fetch(PUB_NOTES+"?t="+Date.now(),{cache:"no-store"}); if(!r.ok)return;
+      // GitHub API는 올린 즉시 최신 파일을 줌 (시간당 60번 제한) → 막히면 raw 주소로 (몇 분 늦을 수 있음)
+      var r=null; try{r=await fetch("https://api.github.com/repos/0702080/bible-notes-data/contents/notes.json?t="+Date.now(),{cache:"no-store",headers:{"Accept":"application/vnd.github.raw+json"}})}catch(e){}
+      if(!r||!r.ok)r=await fetch(PUB_NOTES+"?t="+Date.now(),{cache:"no-store"});
+      if(!r.ok)return;
       var obj=JSON.parse(await r.text()); if(!obj||!Array.isArray(obj.notes))return;
       var res=mergeData(obj,true);
       if(res.added||res.updated||res.removed){render(); if(why==="start")toast("GitHub에서 노트를 받아 왔어요 ("+(res.added+res.updated)+"개)")}
