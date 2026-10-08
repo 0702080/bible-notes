@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-09">
+<meta name="app-build" content="2026-10-08-10">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -280,8 +280,8 @@ details.menu>summary::-webkit-details-marker{display:none}
   background:color-mix(in srgb,var(--tabc) 13%,var(--sheet));
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tabc) 40%,transparent),0 1px 2px rgba(0,0,0,.06);
   transition:transform .28s cubic-bezier(.3,.8,.25,1),background-color .28s,box-shadow .28s}
-.tabs[data-active="q"]::before{transform:translateX(100%)}
-.tabs[data-active="a"]::before{transform:translateX(200%)}
+.tabs[data-active="a"]::before{transform:translateX(100%)}
+.tabs[data-active="q"]::before{transform:translateX(200%)}
 .tabs[data-active="e"]::before{transform:translateX(300%)}
 .tabs[data-active="r"]::before{transform:translateX(400%)}
 .tabs[data-active="e"]{--tabc:var(--gold)}
@@ -2026,8 +2026,8 @@ button:active{filter:brightness(1.15)}
       '<div class="body">'+
         '<div class="tabs" role="tablist" data-active="m">'+
           '<button type="button" class="tab" role="tab" data-tab="m"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L18.5 9.5l-4-4L4 16v4z"/><path d="M13 7l4 4"/></svg><span class="tn">묵상</span><span class="tc"></span></button>'+
-          '<button type="button" class="tab" role="tab" data-tab="q"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6"/><path d="M12 16.9v.2"/></svg><span class="tn">질문</span><span class="tc"></span></button>'+
           '<button type="button" class="tab" role="tab" data-tab="a"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7L16.2 9.6"/></svg><span class="tn">실천</span><span class="tc"></span></button>'+
+          '<button type="button" class="tab" role="tab" data-tab="q"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6"/><path d="M12 16.9v.2"/></svg><span class="tn">질문</span><span class="tc"></span></button>'+
           '<button type="button" class="tab" role="tab" data-tab="e"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6M9 8h3"/></svg><span class="tn">경험</span><span class="tc"></span></button>'+
           '<button type="button" class="tab" role="tab" data-tab="r"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg><span class="tn">자료</span><span class="tc"></span></button>'+
         '</div>'+
@@ -2035,18 +2035,18 @@ button:active{filter:brightness(1.15)}
           '<div class="qbtns"><button type="button" class="newmed addm" aria-label="새 묵상 쓰기"><span class="nmplus" aria-hidden="true">+</span>새 묵상</button><button type="button" class="medprog" aria-label="묵상 진도표"></button></div>'+
           '<div class="meds"></div>'+
         '</div>'+
-        '<div class="pane" data-pane="q" hidden>'+
-          '<div class="qtools" hidden><button type="button" class="qfoldall">모두 접기</button></div>'+
-          '<div class="qs"></div>'+
-          '<div class="qbtns"><button type="button" class="addbtn v addq">+ 질문</button><button type="button" class="addbtn v sugq" hidden>추천받기</button></div>'+
-          '<div class="sugg"></div>'+
-        '</div>'+
         '<div class="pane" data-pane="a" hidden>'+
           '<div class="aprog" hidden></div>'+
           '<div class="qbtns"><button type="button" class="addbtn s adda">+ 실천</button><button type="button" class="addbtn s suga" hidden>추천받기</button></div>'+
           '<div class="atools" hidden><button type="button" class="afoldall">모두 접기</button></div>'+
           '<div class="acts"></div>'+
           '<div class="sugg sugga"></div>'+
+        '</div>'+
+        '<div class="pane" data-pane="q" hidden>'+
+          '<div class="qtools" hidden><button type="button" class="qfoldall">모두 접기</button></div>'+
+          '<div class="qs"></div>'+
+          '<div class="qbtns"><button type="button" class="addbtn v addq">+ 질문</button><button type="button" class="addbtn v sugq" hidden>추천받기</button></div>'+
+          '<div class="sugg"></div>'+
         '</div>'+
         '<div class="pane" data-pane="e" hidden>'+
           '<div class="eintro">이 말씀이 내 삶에서 살아 움직인 순간을 이야기로 적어 보세요.</div>'+
