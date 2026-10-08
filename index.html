@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-15">
+<meta name="app-build" content="2026-10-09-16">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1640,6 +1640,25 @@ button:active{filter:brightness(1.15)}
 .rvchip.on{background:var(--gold);color:#141416}
 .daily{position:fixed;inset:0;z-index:66;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .daily[hidden]{display:none}
+.rvq{position:fixed;inset:0;z-index:66;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.rvq[hidden]{display:none}
+.rqcnt{margin-left:auto;margin-right:10px;font-size:14px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.rqbody{flex:1;overflow:auto;display:flex;flex-direction:column;justify-content:center;gap:20px;padding:20px max(18px,calc((100% - 620px) / 2)) 28px}
+.rqcard{border-radius:18px;background:#141418;border:1px solid #26252B;padding:22px 20px;min-height:220px}
+.rqref{font-size:20px;font-weight:800;color:var(--violet)}
+.rqtip{margin-top:6px;font-size:13px;color:var(--faint)}
+.rqtext{margin-top:16px;font-size:21px;line-height:1.85;color:var(--hi);word-break:keep-all;white-space:pre-line}
+.rqtext.hint{color:color-mix(in srgb,var(--gold) 85%,var(--ink));letter-spacing:.04em}
+.rqcard.fin{text-align:center}
+.rqcard.fin .rqref{font-size:24px;color:var(--gold)}
+.rqcard.fin .rqtext{font-size:15px;color:var(--muted)}
+.rqbtns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.rqb{height:48px;padding:0 20px;border:1px solid #34333A;border-radius:24px;background:#17161b;color:var(--ink);font-size:15.5px;font-weight:700;white-space:nowrap}
+.rqb.main{background:color-mix(in srgb,var(--violet) 26%,#17161b);border-color:color-mix(in srgb,var(--violet) 55%,#34333A);color:#fff}
+.rqb.ok{background:color-mix(in srgb,var(--green) 24%,#17161b);border-color:color-mix(in srgb,var(--green) 55%,#34333A);color:var(--green)}
+.rqb.miss{background:color-mix(in srgb,var(--orange) 18%,#17161b);border-color:color-mix(in srgb,var(--orange) 50%,#34333A);color:var(--orange)}
+.rqb.say{width:48px;padding:0}
+@media (max-width:400px){.rqb{padding:0 14px;font-size:14.5px}}
 .dlbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #222126}
 .dltitle{font-size:18px;color:var(--gold)}
 .dlclose{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:14.5px}
@@ -1880,6 +1899,7 @@ button:active{filter:brightness(1.15)}
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
       prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000)}}):[],
+      rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0}:null,
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
       uses:Array.isArray(n.uses)?n.uses.filter(function(u){return u&&u.when}).slice(0,30).map(function(u){return {when:String(u.when),why:String(u.why||""),how:String(u.how||""),mine:!!u.mine}}):[],
@@ -3514,6 +3534,7 @@ button:active{filter:brightness(1.15)}
   $("reviewBar").addEventListener("click",function(e){
     var b=e.target.closest(".rvchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
+    if(b.dataset.act==="rvall"){openRecall();return}
     var id=b.dataset.id, act=b.dataset.act||"mem"; setTopics([]);
     if(act==="mem")memOpen.add(id);
     if(act==="med"||act==="act")tabOf.set(id,act==="med"?"m":"a");
@@ -4573,12 +4594,71 @@ button:active{filter:brightness(1.15)}
     return {days:Object.keys(set).length,last:last};
   }
   function reviewInfo(n){
-    var m=memDays(n); if(!m.days)return null;
-    var gap=REVIEW_GAP[Math.min(m.days-1,REVIEW_GAP.length-1)];
-    var d=new Date(m.last); d.setHours(0,0,0,0); var next=d.getTime()+gap*864e5;
+    var m=memDays(n); if(!m.days&&!(n.rv&&n.rv.at))return null;
+    var gap=REVIEW_GAP[Math.min(Math.max(m.days,1)-1,REVIEW_GAP.length-1)], base=m.last;
+    if(n.rv&&n.rv.at&&n.rv.at>=m.last){gap=n.rv.gap;base=n.rv.at}   // 떠올려 보고 고른 결과로 정한 간격
+    var d=new Date(base); d.setHours(0,0,0,0); var next=d.getTime()+gap*864e5;
     var today=new Date(); today.setHours(0,0,0,0);
     return {next:next,due:today.getTime()>=next,gap:gap};
   }
+  /* ---------- 한 번에 복습: 먼저 떠올리고 → 확인하고 → 기억난 만큼 다음 복습 날을 늘림 ---------- */
+  var rq=null, rqList=[], rqI=0, rqStage=0, rqDone={ok:0,miss:0};
+  function firstLetters(t){return tokens(t).map(function(w){if(/^\s+$/.test(w))return w;var a=Array.from(w),out="",first=true;a.forEach(function(ch){if(/[가-힣A-Za-z0-9]/.test(ch)){out+=first?ch:"○";first=false}else out+=ch});return out}).join("")}
+  function nextGap(cur){for(var i=0;i<REVIEW_GAP.length;i++)if(REVIEW_GAP[i]>cur)return REVIEW_GAP[i];return Math.min(180,Math.round(cur*2))}
+  function openRecall(){
+    rqList=Array.from(notes.values()).filter(function(n){var r=reviewInfo(n);return r&&r.due}).sort(function(a,b){return reviewInfo(a).next-reviewInfo(b).next});
+    if(!rqList.length){toast("오늘 복습할 말씀이 없어요");return}
+    if(!rq){
+      rq=document.createElement("div"); rq.className="rvq"; rq.setAttribute("role","dialog"); rq.setAttribute("aria-modal","true"); rq.hidden=true;
+      rq.innerHTML='<div class="dlbar"><b class="dltitle">🔁 한 번에 복습</b><span class="rqcnt"></span><button type="button" class="dlclose rqclose">닫기</button></div>'+
+        '<div class="rqbody"><div class="rqcard"><div class="rqref"></div><div class="rqtip"></div><div class="rqtext"></div></div>'+
+        '<div class="rqbtns"></div></div>';
+      document.body.appendChild(rq);
+      rq.querySelector(".rqclose").addEventListener("click",closeRecall);
+      rq.querySelector(".rqbtns").addEventListener("click",function(e){
+        var b=e.target.closest("button"); if(!b)return; var n=rqList[rqI]; if(!n)return;
+        var k=b.dataset.k;
+        if(k==="hint"){rqStage=1;drawRecall();return}
+        if(k==="show"){rqStage=2;drawRecall();return}
+        if(k==="say"){if(typeof sayWord==="function"&&canSpeak){try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(n.text);u.lang="ko-KR";u.rate=.9;window.speechSynthesis.speak(u)}catch(err){}}return}
+        if(k==="ok"||k==="miss"){
+          var cur=(n.rv&&n.rv.gap)||(reviewInfo(n)||{}).gap||1, ok=k==="ok";
+          n.rv={at:Date.now(),gap:ok?nextGap(cur):1,ok:((n.rv&&n.rv.ok)||0)+(ok?1:0),miss:((n.rv&&n.rv.miss)||0)+(ok?0:1)};
+          scheduleSave(n.id); ok?rqDone.ok++:rqDone.miss++;
+          toast(ok?"🙂 "+n.rv.gap+"일 뒤에 다시 만나요":"😅 내일 다시 복습해요"); buzz(ok?[12,40,18]:15);
+          rqI++; rqStage=0; drawRecall(); return;
+        }
+        if(k==="end"){closeRecall();return}
+      });
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&rq&&!rq.hidden)closeRecall()});
+    }
+    rqI=0; rqStage=0; rqDone={ok:0,miss:0}; drawRecall();
+    rq.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+  }
+  function closeRecall(){if(!rq)return; try{window.speechSynthesis.cancel()}catch(e){} rq.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; render()}
+  function drawRecall(){
+    var n=rqList[rqI], card=rq.querySelector(".rqcard"), bt=rq.querySelector(".rqbtns");
+    rq.querySelector(".rqcnt").textContent=n?(rqI+1)+" / "+rqList.length:"";
+    if(!n){
+      card.classList.add("fin");
+      rq.querySelector(".rqref").textContent="🎉 오늘 복습 끝!";
+      rq.querySelector(".rqtip").textContent="기억났어요 "+rqDone.ok+"  ·  헷갈렸어요 "+rqDone.miss;
+      rq.querySelector(".rqtext").textContent=rqDone.miss?"헷갈린 말씀은 내일 다시 나와요. 자기 전에 한 번 더 떠올려 보세요.":"기억난 말씀은 다음 복습까지 간격이 늘어나요.";
+      bt.innerHTML='<button type="button" class="rqb main" data-k="end">닫기</button>';
+      if(!rqDone.miss)confetti(rq.querySelector(".rqref"));
+      return;
+    }
+    card.classList.remove("fin");
+    rq.querySelector(".rqref").textContent=n.ref;
+    var tip=rq.querySelector(".rqtip"), tx=rq.querySelector(".rqtext");
+    tx.classList.toggle("hint",rqStage===1); tx.classList.toggle("shown",rqStage===2);
+    if(rqStage===0){tip.textContent="보지 말고 먼저 소리 내어 떠올려 보세요.";tx.textContent=""}
+    else if(rqStage===1){tip.textContent="첫 글자를 실마리로 떠올려 보세요.";tx.textContent=firstLetters(n.text)}
+    else{tip.textContent="떠올린 것과 맞춰 보세요. 얼마나 기억났나요?";tx.textContent=n.text}
+    if(rqStage<2)bt.innerHTML=(rqStage===0?'<button type="button" class="rqb" data-k="hint">첫 글자 보기</button>':'')+'<button type="button" class="rqb main" data-k="show">다 보기</button>';
+    else bt.innerHTML='<button type="button" class="rqb miss" data-k="miss">😅 헷갈렸어요</button><button type="button" class="rqb ok" data-k="ok">🙂 기억났어요</button>'+(canSpeak?'<button type="button" class="rqb say" data-k="say" aria-label="듣기">🔊</button>':'');
+  }
+
   var spotId=null;
   function lastOpenId(){try{return localStorage.getItem("bible-last-open")||""}catch(e){return ""}}
   /* ---------- 하루 돌아보기 체크리스트 (이 기기에 저장, 백업에 함께 들어감) ---------- */
@@ -4695,7 +4775,7 @@ button:active{filter:brightness(1.15)}
     var all=sorted(), rows=[];
     // 1) 복습할 말씀
     var due=all.filter(function(n){var r=reviewInfo(n);return r&&r.due});
-    if(due.length)rows.push({icon:"🔁",label:"복습할 말씀",chips:due.slice(0,6).map(function(n){return {id:n.id,t:n.ref,act:"mem"}})});
+    if(due.length)rows.push({icon:"🔁",label:"복습할 말씀",chips:[{id:"",t:"▶ 한 번에 복습 "+due.length,act:"rvall"}].concat(due.slice(0,6).map(function(n){return {id:n.id,t:n.ref,act:"mem"}}))});
     // 2) 오늘 묵상
     var st=medStats(), today=dkey(Date.now()), didToday=!!st.days[today];
     var lastMedNote=null, lastAt=0;
