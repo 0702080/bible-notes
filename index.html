@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-24">
+<meta name="app-build" content="2026-10-08-25">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2655,7 +2655,7 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("xadd")){addFromXref(b.dataset.b,b.dataset.c,b.dataset.v,b.dataset.label);return}
     if(b.classList.contains("xdel")){
       var xd=b.dataset.id;
-      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";setStatus("한 번 더 누르면 중복된 말씀 노트가 지워져요. (묵상·질문·실천도 함께)");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="삭제"}},3000);return}
+      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";setStatus("한 번 더 누르면 중복된 말씀 노트가 지워져요. (묵상·질문·실천도 함께)");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="삭제"}},6000);return}
       notes.delete(xd); openIds.delete(xd); clearTimeout(timers.get(xd)); timers.delete(xd); dirtyIds.delete(xd); addTomb(xd);
       render();
       try{await backend.del(xd);toast("중복된 말씀을 지웠어요")}catch(err){setStatus("삭제하지 못했어요. 다시 시도해 주세요.")}
