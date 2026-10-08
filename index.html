@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-09">
+<meta name="app-build" content="2026-10-09-10">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -242,6 +242,19 @@ details.menu>summary::-webkit-details-marker{display:none}
 .med{border-width:1px;min-height:92px;padding:10px 12px}
 .medi{margin:0 0 14px}
 .mfoot{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:2px}
+.prays{display:flex;flex-direction:column;gap:12px}
+.pempty{margin:4px 2px;font-size:13px;color:var(--faint);line-height:1.6}
+.pri{border-radius:12px}
+.pt,.pan{display:block;width:100%;box-sizing:border-box;border:1px solid color-mix(in srgb,var(--orange) 30%,#2E2D33);border-radius:10px;background:#101013;padding:10px 12px;font:inherit;font-size:16px;line-height:1.7;color:color-mix(in srgb,var(--orange) 85%,var(--ink));resize:none;overflow:hidden;min-height:56px}
+.pri.answered .pt{color:var(--muted);border-color:#2E2D33}
+.pans{display:flex;flex-direction:column;gap:4px;margin-top:6px;padding-left:10px;border-left:2px solid var(--gold)}
+.panl{font-size:12.5px;font-weight:700;color:var(--gold)}
+.pan{min-height:44px;font-size:15px;color:var(--gold);border-color:color-mix(in srgb,var(--gold) 35%,#2E2D33)}
+.pfoot{display:flex;justify-content:flex-end;align-items:center;gap:6px;margin-top:4px}
+.pdl{margin-right:auto;font-size:12px;color:var(--faint)}
+.pansbtn{height:30px;padding:0 12px;border:1px solid color-mix(in srgb,var(--gold) 50%,#34333A);border-radius:15px;background:transparent;color:var(--gold);font-size:12.5px;font-weight:700;white-space:nowrap}
+.pri.answered .pansbtn{color:var(--faint);border-color:#34333A;font-weight:500}
+.pdel{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--faint);white-space:nowrap}
 .mfoot .delm{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--faint)}
 .mfoot .delm[data-sure]{color:var(--pink)}
 .qa{border-bottom-color:transparent;padding:6px 0 8px}
@@ -279,18 +292,20 @@ details.menu>summary::-webkit-details-marker{display:none}
 /* ===== pretty tabs ===== */
 .trow{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .trow .saved{font-size:12px}
-.tabs{position:relative;display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:stretch;
+.tabs{position:relative;display:grid;grid-template-columns:repeat(6,1fr);gap:0;align-items:stretch;
   padding:4px;margin:4px 0 16px;background:var(--sheet);border:1px solid var(--rule);border-radius:14px;--tabc:var(--green)}
 .tabs[data-active="q"]{--tabc:var(--violet)}
 .tabs[data-active="a"]{--tabc:var(--sky)}
-.tabs::before{content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px) / 5);border-radius:10px;
+.tabs::before{content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px) / 6);border-radius:10px;
   background:color-mix(in srgb,var(--tabc) 13%,var(--sheet));
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tabc) 40%,transparent),0 1px 2px rgba(0,0,0,.06);
   transition:transform .28s cubic-bezier(.3,.8,.25,1),background-color .28s,box-shadow .28s}
-.tabs[data-active="a"]::before{transform:translateX(100%)}
-.tabs[data-active="q"]::before{transform:translateX(200%)}
-.tabs[data-active="e"]::before{transform:translateX(300%)}
-.tabs[data-active="r"]::before{transform:translateX(400%)}
+.tabs[data-active="p"]::before{transform:translateX(100%)}
+.tabs[data-active="a"]::before{transform:translateX(200%)}
+.tabs[data-active="q"]::before{transform:translateX(300%)}
+.tabs[data-active="e"]::before{transform:translateX(400%)}
+.tabs[data-active="r"]::before{transform:translateX(500%)}
+.tabs[data-active="p"]{--tabc:var(--orange)}
 .tabs[data-active="e"]{--tabc:var(--gold)}
 .tabs[data-active="r"]{--tabc:var(--pink)}
 .tab{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 4px;margin:0;
@@ -300,6 +315,9 @@ details.menu>summary::-webkit-details-marker{display:none}
 .tab[data-tab="a"]{--c:var(--sky)}
 .tab[data-tab="r"]{--c:var(--pink)}
 .tab[data-tab="e"]{--c:var(--gold)}
+.tab[data-tab="p"]{--c:var(--orange)}
+/* 탭이 6개라 좁은 화면에서는 숫자를 고른 탭에만 */
+@media (max-width:480px){.tab[aria-selected="false"] .tc{display:none}.tab{letter-spacing:-.02em}}
 .tab .ic{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .tab[aria-selected="true"]{color:var(--c);font-weight:700}
 .tab:not([aria-selected="true"]):hover{color:var(--ink)}
@@ -633,7 +651,7 @@ body.reorder .note .topics{display:none}
 .newmed .nmplus{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--green);color:#101013;font-size:17px;font-weight:700;line-height:1}
 /* new-meditation button sized exactly like one tab pill */
 .pane[data-pane="m"] .qbtns{display:block;margin:0 0 14px;padding:0 4px}
-.newmed{box-sizing:border-box;width:calc((100% - 0px) / 5);min-width:0;height:42px;padding:0 4px;border-radius:10px;justify-content:center;gap:3px;
+.newmed{box-sizing:border-box;width:calc((100% - 0px) / 6);min-width:84px;min-width:0;height:42px;padding:0 4px;border-radius:10px;justify-content:center;gap:3px;
   font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden}
 .newmed .nmplus{width:auto;height:auto;background:none;color:var(--green);font-size:16px;border-radius:0}
 .pane[data-pane="m"] .qbtns{padding:0 5px}
@@ -1839,6 +1857,7 @@ button:active{filter:brightness(1.15)}
       essays:Array.isArray(n.essays)?n.essays.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),title:String(x.title||""),body:String(x.body||""),at:+x.at||Date.now()}}):[],
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
+      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000)}}):[],
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
       uses:Array.isArray(n.uses)?n.uses.filter(function(u){return u&&u.when}).slice(0,30).map(function(u){return {when:String(u.when),why:String(u.why||""),how:String(u.how||""),mine:!!u.mine}}):[],
@@ -2052,6 +2071,30 @@ button:active{filter:brightness(1.15)}
   function setVal(el,v){if(document.activeElement!==el&&el.value!==v){el.value=v;grow(el)}}
 
   var tabOf=new Map();
+  /* ---------- 기도: 이 말씀으로 드리는 기도 제목, 응답되면 표시 ---------- */
+  function renderPrays(el,n){
+    var box=el.querySelector(".prays"); if(!box)return; if(!n.prays)n.prays=[];
+    var have=new Map(); Array.prototype.forEach.call(box.children,function(c){have.set(c.dataset.pid,c)});
+    var list=n.prays.slice().sort(function(a,b){return (a.ans?1:0)-(b.ans?1:0)||b.at-a.at});   // 응답 기다리는 기도 먼저, 최근 것 위
+    if(!list.length&&!box.querySelector(".pempty")){box.innerHTML='<p class="pempty">이 말씀을 붙들고 드리는 기도를 적어 보세요. 응답되면 🙌 응답을 눌러 기록해요.</p>';return}
+    var em=box.querySelector(".pempty"); if(em&&list.length)em.remove();
+    list.forEach(function(x,i){
+      var d=have.get(x.id); have.delete(x.id);
+      if(!d){
+        d=document.createElement("div"); d.className="pri"; d.dataset.pid=x.id;
+        d.innerHTML='<textarea class="pt" rows="1" placeholder="기도 제목 (예: 이 말씀처럼 가족을 하나님께 맡기게 하소서)" aria-label="기도"></textarea>'+
+          '<div class="pans" hidden><span class="panl">🙌 응답</span><textarea class="pan" rows="1" placeholder="어떻게 응답하셨는지 적어 보세요" aria-label="응답"></textarea></div>'+
+          '<div class="pfoot"><span class="pdl"></span><button type="button" class="pansbtn"></button><button type="button" class="pdel" aria-label="이 기도 지우기">지우기</button></div>';
+      }
+      if(box.children[i]!==d)box.insertBefore(d,box.children[i]||null);
+      setVal(d.querySelector(".pt"),x.t); setVal(d.querySelector(".pan"),x.an||"");
+      d.classList.toggle("answered",!!x.ans);
+      d.querySelector(".pans").hidden=!x.ans;
+      d.querySelector(".pdl").textContent=dateLabel(x.at)+(x.ans?"  ·  응답 "+dlabel(dkey(x.ans)):"");
+      d.querySelector(".pansbtn").textContent=x.ans?"응답 취소":"🙌 응답됐어요";
+    });
+    have.forEach(function(d){d.remove()});
+  }
   function syncCounts(el,n){
     var open=openIds.has(n.id), mc=medCount(n), qc=n.qs.length, ad=n.acts.filter(function(a){return a.done}).length, ac=n.acts.length;
     var tg=el.querySelector(".toggle");
@@ -2062,6 +2105,7 @@ button:active{filter:brightness(1.15)}
     tc("m",mc?String(mc):""); tc("q",qc?String(qc):""); tc("a",ac?ad+"/"+ac:"");
     var ec=n.essays.filter(function(x){return x.title.trim()||x.body.trim()}).length; tc("e",ec?String(ec):"");
     var rc=n.hymns.length+n.vids.length; tc("r",rc?String(rc):"");
+    var pr=(n.prays||[]).filter(function(x){return x.t.trim()}), pa=pr.filter(function(x){return x.ans}).length; tc("p",pr.length?(pa?pa+"/"+pr.length:String(pr.length)):"");
   }
   function makeCard(n){
     var el=document.createElement("article");
@@ -2090,6 +2134,7 @@ button:active{filter:brightness(1.15)}
       '<div class="body">'+
         '<div class="tabs" role="tablist" data-active="m">'+
           '<button type="button" class="tab" role="tab" data-tab="m"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L18.5 9.5l-4-4L4 16v4z"/><path d="M13 7l4 4"/></svg><span class="tn">묵상</span><span class="tc"></span></button>'+
+          '<button type="button" class="tab" role="tab" data-tab="p"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c-1.2 3-3.5 4.6-3.5 8.2V16l-3 3.5h13l-3-3.5v-4.8C15.5 7.6 13.2 6 12 3z"/></svg><span class="tn">기도</span><span class="tc"></span></button>'+
           '<button type="button" class="tab" role="tab" data-tab="a"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 12.4l2.7 2.7L16.2 9.6"/></svg><span class="tn">실천</span><span class="tc"></span></button>'+
           '<button type="button" class="tab" role="tab" data-tab="q"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6"/><path d="M12 16.9v.2"/></svg><span class="tn">질문</span><span class="tc"></span></button>'+
           '<button type="button" class="tab" role="tab" data-tab="e"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10l4 4v12H5z"/><path d="M9 12h6M9 16h6M9 8h3"/></svg><span class="tn">경험</span><span class="tc"></span></button>'+
@@ -2098,6 +2143,10 @@ button:active{filter:brightness(1.15)}
         '<div class="pane" data-pane="m">'+
           '<div class="qbtns"><button type="button" class="newmed addm" aria-label="새 묵상 쓰기"><span class="nmplus" aria-hidden="true">+</span>새 묵상</button><button type="button" class="medprog" aria-label="묵상 진도표"></button></div>'+
           '<div class="meds"></div>'+
+        '</div>'+
+        '<div class="pane" data-pane="p" hidden>'+
+          '<div class="qbtns"><button type="button" class="addbtn s addp">+ 기도</button></div>'+
+          '<div class="prays"></div>'+
         '</div>'+
         '<div class="pane" data-pane="a" hidden>'+
           '<div class="aprog" hidden></div>'+
@@ -2283,6 +2332,7 @@ button:active{filter:brightness(1.15)}
       setVal(d.querySelector(".med"),m.text);
     });
     mhave.forEach(function(d){d.remove()});
+    renderPrays(el,n);
     setVal(el.querySelector(".eref"),n.ref);
     setVal(el.querySelector(".etext"),n.text);
     var box=el.querySelector(".qs"), have=new Map();
@@ -2506,7 +2556,11 @@ button:active{filter:brightness(1.15)}
     var t=e.target, card=t.closest(".note"); if(!card)return;
     var n=notes.get(card.dataset.id); if(!n)return;
     if(t.tagName==="TEXTAREA")grow(t);
-    if(t.classList.contains("med")){
+    if(t.classList.contains("pt")||t.classList.contains("pan")){
+      var pp=(n.prays||[]).find(function(x){return x.id===t.closest(".pri").dataset.pid}); if(!pp)return;
+      if(t.classList.contains("pt"))pp.t=t.value; else pp.an=t.value;
+    }
+    else if(t.classList.contains("med")){
       var m=n.meds.find(function(x){return x.id===t.closest(".medi").dataset.mid}); if(!m)return; m.text=t.value; scheduleMedBadges();
     }
     else if(t.classList.contains("q")||t.classList.contains("a")){
@@ -2786,6 +2840,21 @@ button:active{filter:brightness(1.15)}
       render();return;
     }
     if(b.classList.contains("addm")||b.classList.contains("addq")||b.classList.contains("adda")){tabOf.set(id,b.classList.contains("addm")?"m":b.classList.contains("addq")?"q":"a")}
+    if(b.classList.contains("addp")){
+      tabOf.set(id,"p"); if(!n.prays)n.prays=[]; var np={id:qid(),t:"",at:Date.now(),ans:0,an:""}; n.prays.push(np); render(); scheduleSave(id);
+      var pc=cards.get(id), pe=pc&&pc.querySelector('.pri[data-pid="'+np.id+'"] .pt'); if(pe)setTimeout(function(){pe.focus()},40);
+      return;
+    }
+    if(b.classList.contains("pansbtn")||b.classList.contains("pdel")){
+      var pid=b.closest(".pri").dataset.pid, px=(n.prays||[]).find(function(x){return x.id===pid}); if(!px)return;
+      if(b.classList.contains("pansbtn")){
+        px.ans=px.ans?0:Date.now(); render(); scheduleSave(id);
+        if(px.ans){toast("🙌 기도 응답을 기록했어요"); buzz([12,40,18]); var ac=cards.get(id), ae=ac&&ac.querySelector('.pri[data-pid="'+pid+'"]'); if(ae){confetti(ae);var at=ae.querySelector(".pan");if(at)setTimeout(function(){at.focus()},60)}}
+        return;
+      }
+      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="지우기"}},4000);return}
+      n.prays=n.prays.filter(function(x){return x.id!==pid}); render(); scheduleSave(id); return;
+    }
     if(b.classList.contains("addm")){
       var nm={id:mid(),text:"",at:Date.now()}; n.meds.push(nm); render(); scheduleSave(id);
       var mt=card.querySelector('.medi[data-mid="'+nm.id+'"] .med'); if(mt){mt.focus({preventScroll:true});mt.scrollIntoView({block:"center",behavior:"smooth"})}
