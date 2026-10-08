@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-13">
+<meta name="app-build" content="2026-10-08-14">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4585,6 +4585,9 @@ button:active{filter:brightness(1.15)}
         return R("어디에서?");
       }
       if(m=x.match(/^(.+?)(을|를)$/)){
+        // 목적어 바로 뒤가 그 문장을 끝내는 동사면 한 덩어리: "너희 마음을 / 주장하게 하라" → "너희 마음을 주장하게 하라"
+        var n2=bare(w[i+2]);
+        if(nx&&((/(게|도록)$/.test(nx)&&/^하/.test(n2)&&/(라|다|니라|소서|지어다)$/.test(n2))||(/(하라|하소서|지어다|할지니라|하리라|하였느니라)$/.test(nx)&&nx.length<=7)))return R(WHO.test(m[1])?"누구를?":"무엇을?",true);
         if(/^(.+)(함|심|음|기)$/.test(nx)||/(함이|함은|함을|심이|심을)$/.test(nx))return R(WHO.test(m[1])?"누구를?":"무엇을?",true);
         return R(WHO.test(m[1])?"누구를?":"무엇을?");
       }
@@ -4620,7 +4623,8 @@ button:active{filter:brightness(1.15)}
       var end=i===w.length-1, verbEnd=keepQ&&/(니|라|며|고|사|나니|도다|느니라)$/.test(w[i].replace(/[^가-힣]/g,""));
       if(keepQ?(verbEnd||cur.length>=7||end):((!r.hold&&r.q)||cur.length>=5||end)){
         var q=keepQ||(qs.length?qs[qs.length-1]:"그다음은?"); keepQ=null;
-        if(WEAK[q]){for(var k=0;k<qs.length-1;k++)if(!WEAK[qs[k]]){q=qs[k];break}}
+        var objOnly=q==="무엇을 하나?"&&qs.slice(0,-1).every(function(z){return z==="무엇을?"||z==="누구를?"||WEAK[z]});
+        if(WEAK[q]&&!objOnly){for(var k=0;k<qs.length-1;k++)if(!WEAK[qs[k]]){q=qs[k];break}}
         out.push({q:q,a:cur.join(" ")}); cur=[]; qs=[];
       }
     }
