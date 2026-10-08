@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-07">
+<meta name="app-build" content="2026-10-09-08">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1745,7 +1745,7 @@ button:active{filter:brightness(1.15)}
       <input class="field" id="mRef" placeholder="요한복음 1:5">
       <label for="mText">말씀</label>
       <textarea class="field" id="mText" placeholder="빛이 어둠에 비치되 어둠이 깨닫지 못하더라"></textarea>
-      <p class="mhint">장 전체도 담을 수 있어요. 구절에 <b>시편 91편</b>처럼 장까지만 쓰고, 본문을 절 번호까지 붙여 넣으세요.</p>
+      <p class="mhint">장 전체도 담을 수 있어요. 구절에 <b>시편 91편</b>처럼 장까지만 쓰고, 본문을 붙여 넣으세요. 절 번호가 없으면 한 줄을 한 절로 보고 번호를 붙여요.</p>
       <button class="primary" type="submit">노트에 추가</button>
     </form>
   </section>
@@ -5188,8 +5188,8 @@ button:active{filter:brightness(1.15)}
         '<p class="rdalt">안 열리면 <a class="rdhb2" target="_blank" rel="noopener">홀리바이블로 보기</a>를 길게 눌러 크롬에서 열어 주세요.</p>'+
         '<div class="rdscroll"><ol class="rdlist"></ol><div class="rdmsg" aria-live="polite"></div>'+'</div>'+
         '<div class="rdpbar"><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button><button type="button" class="rdcard" hidden>📌 이 장을 말씀 카드로 담기</button></div>'+
-        '<div class="rdpform" hidden><p class="rdphint">성서공회나 홀리바이블에서 장 본문을 복사해 붙여 넣으세요. 절 번호(1, 2, 3 …)가 있으면 절마다 나눠요. 이 기기에만 저장돼요.</p>'+
-        '<textarea class="field rdptext" placeholder="1 그는 허물과 죄로 죽었던 너희를 살리셨도다&#10;2 그 때에 너희는 …" aria-label="장 본문 붙여넣기"></textarea>'+
+        '<div class="rdpform" hidden><p class="rdphint">성서공회나 홀리바이블에서 장 본문을 복사해 붙여 넣으세요. 절 번호(1, 2, 3 …)가 있으면 그대로 나누고, 없으면 한 줄을 한 절로 보고 번호를 붙여요. 이 기기에만 저장돼요.</p>'+
+        '<textarea class="field rdptext" placeholder="1 그는 허물과 죄로 죽었던 너희를 살리셨도다&#10;2 그 때에 너희는 …&#10;(절 번호가 없으면 한 줄을 한 절로 봐요)" aria-label="장 본문 붙여넣기"></textarea>'+
         '<div class="rdpbtns"><button type="button" class="rdpcancel">취소</button><button type="button" class="primary rdpsave">저장</button></div></div>';
       document.body.appendChild(rd);
       rd.querySelector(".rdclose").addEventListener("click",closeReader);
@@ -5378,8 +5378,15 @@ button:active{filter:brightness(1.15)}
     // 절 번호가 한 줄에 이어진 경우: 1, 2, 3 … 차례대로 나오는 숫자에서만 자름
     var flat=String(txt||"").replace(/\s+/g," "), re=/(\d{1,3})\s*\.?\s*/g, m2, marks=[], next=null;
     while((m2=re.exec(flat))){var v=+m2[1]; if(next===null?v<=2:v===next){marks.push({v:v,at:m2.index,body:re.lastIndex});next=v+1}}
-    out=marks.map(function(k,i){return {v:k.v,t:clean(flat.slice(k.body,i+1<marks.length?marks[i+1].at:flat.length))}});
-    return out.filter(function(x){return x.t});
+    out=marks.map(function(k,i){return {v:k.v,t:clean(flat.slice(k.body,i+1<marks.length?marks[i+1].at:flat.length))}}).filter(function(x){return x.t});
+    if(out.length>=2)return out;
+    // 절 번호가 아예 없으면: 빈 줄과 제목 줄(예: "시편 111편 [개역개정]")은 빼고 한 줄을 한 절로 보고 1부터 번호를 붙임
+    var lines=String(txt||"").replace(/\r/g,"").split("\n").map(clean).filter(function(L){
+      if(!L)return false;
+      if(/^[가-힣]+\s*\d+\s*(편|장)/.test(L)&&L.length<30)return false;
+      return true;
+    });
+    return lines.length>=2?lines.map(function(L,i){return {v:i+1,t:L}}):out;
   }
   function showMine(){
     var saved=myChapters()[rd.dataset.key], msg=rd.querySelector(".rdmsg");
