@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-19">
+<meta name="app-build" content="2026-10-08-20">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2201,10 +2201,16 @@ button:active{filter:brightness(1.15)}
     markInto(el.querySelector(".ref"),n.ref||"구절 미입력",filterText&&has(n.ref)?filterText:"");
     // 오늘 적은 한 줄 기록 수를 실천 이름으로: "감사 5" (내일이 되면 다시 0부터, 오늘 안 적으면 안 보임)
     var tdk=dkey(Date.now()), refEl=el.querySelector(".ref");
+    // 오늘 이 말씀을 암송 연습한 횟수(단계 완료 + 가리기·질문 연습)도 "암송 N"으로 함께 셈
+    var cnt={}, order=[], tips={};
+    function addCnt(w,c,tip){if(!c)return; if(!(w in cnt)){cnt[w]=0;order.push(w);tips[w]=[]} cnt[w]+=c; tips[w].push(tip)}
     (n.acts||[]).forEach(function(a){
-      var c=(a.logs||[]).filter(function(l){return dkey(l.at)===tdk}).length; if(!c)return;
-      var lc=document.createElement("span"); lc.className="logcnt"; lc.textContent=actWord(a.t)+" "+c; lc.title="오늘 적은 한 줄: "+a.t+" "+c+"줄"; refEl.appendChild(lc);
+      var c=(a.logs||[]).filter(function(l){return dkey(l.at)===tdk}).length;
+      addCnt(actWord(a.t),c,"오늘 적은 한 줄: "+a.t+" "+c+"줄");
     });
+    var mc=(n.drill||[]).filter(function(d){return dkey(d.at)===tdk}).length+((n.mem&&n.mem.s)||[]).filter(function(t){return t&&dkey(t)===tdk}).length;
+    addCnt("암송",mc,"오늘 암송 연습 "+mc+"번");
+    order.forEach(function(w){var lc=document.createElement("span"); lc.className="logcnt"; lc.textContent=w+" "+cnt[w]; lc.title=tips[w].join(", "); refEl.appendChild(lc)});
     renderVerse(el,n);
     var open=openIds.has(n.id);
     el.classList.toggle("open",open);
