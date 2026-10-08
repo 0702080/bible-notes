@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-08">
+<meta name="app-build" content="2026-10-08-09">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -705,13 +705,21 @@ body.reorder .note .topics{display:none}
 /* ===== 실천 체크표 ===== */
 .act{grid-template-columns:32px 1fr auto auto;row-gap:2px}
 .act .dela[hidden]{display:none}
+.act{grid-template-columns:22px 32px 1fr auto auto}
+.agrip{align-self:start;width:22px;height:34px;margin-left:-6px;display:grid;place-items:center;color:#4a4954;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.agrip svg{width:14px;height:18px;fill:currentColor}
+.acts.one .agrip{visibility:hidden}
+.act.adragging{position:relative;z-index:20;background:var(--sheet);border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,.7),0 0 0 1.5px var(--sky);transition:none}
+.act.adragging .agrip{color:var(--sky);cursor:grabbing}
+.acts.asorting .board,.acts.asorting .asum{display:none}
+.acts.asorting .act textarea{pointer-events:none}
 .bfoot{display:flex;justify-content:flex-end;margin-top:10px;padding-top:8px;border-top:1px dashed #2A2930}
 .adel{height:30px;padding:0 10px;border:1px solid #2f2e36;border-radius:15px;background:transparent;color:var(--faint);font-size:12.5px}
 .adel.sure{border-color:var(--pink);color:var(--pink);font-weight:700}
 .afold{width:36px;height:34px;border:0;background:transparent;border-radius:6px;display:grid;place-items:center;color:var(--sky);padding:0}
 .afold[hidden]{display:none}
 .afold[aria-expanded="false"] .qchev{transform:rotate(-45deg) translate(-1px,-1px)}
-.asum{grid-column:2/-1;justify-self:start;margin:-2px 0 2px;padding:2px 0;border:0;background:transparent;color:var(--faint);font-size:12.5px;text-align:left;font-variant-numeric:tabular-nums}
+.asum{grid-column:3/-1;justify-self:start;margin:-2px 0 2px;padding:2px 0;border:0;background:transparent;color:var(--faint);font-size:12.5px;text-align:left;font-variant-numeric:tabular-nums}
 .asum[hidden]{display:none}
 .asum .aok{color:var(--sky);font-weight:700}
 .atools{display:flex;justify-content:flex-end;margin:-6px 0 2px}
@@ -2076,7 +2084,7 @@ button:active{filter:brightness(1.15)}
   function makeAct(a){
     var d=document.createElement("div");
     d.className="act"; d.dataset.aid=a.id;
-    d.innerHTML='<button type="button" class="chk" aria-pressed="false" aria-label="실천했어요"></button><textarea class="at" rows="1" placeholder="실천할 일을 적어 보세요" aria-label="실천"></textarea><button type="button" class="afold" aria-label="체크표 접기" aria-expanded="true" hidden><span class="qchev" aria-hidden="true"></span></button><button type="button" class="icon dela" aria-label="실천 삭제">×</button>'+
+    d.innerHTML='<span class="agrip" aria-hidden="true" title="끌어서 순서 바꾸기"><svg viewBox="0 0 14 18"><circle cx="4" cy="3" r="1.6"/><circle cx="10" cy="3" r="1.6"/><circle cx="4" cy="9" r="1.6"/><circle cx="10" cy="9" r="1.6"/><circle cx="4" cy="15" r="1.6"/><circle cx="10" cy="15" r="1.6"/></svg></span><button type="button" class="chk" aria-pressed="false" aria-label="실천했어요"></button><textarea class="at" rows="1" placeholder="실천할 일을 적어 보세요" aria-label="실천"></textarea><button type="button" class="afold" aria-label="체크표 접기" aria-expanded="true" hidden><span class="qchev" aria-hidden="true"></span></button><button type="button" class="icon dela" aria-label="실천 삭제">×</button>'+
       '<button type="button" class="asum" hidden></button>'+
       '<div class="board"><div class="bhead"><span class="bstat"></span><span class="bgoal" role="group" aria-label="목표 일수"><button type="button" class="bg" data-g="7">7일</button><button type="button" class="bg" data-g="21">21일</button><button type="button" class="bg" data-g="40">40일</button></span></div><div class="bbody"><div class="bgrid"></div><div class="bside" aria-live="polite"></div></div>'+
         '<div class="blog"><form class="blform" autocomplete="off"><input class="field blin" maxlength="120" placeholder="오늘 한 줄 적기 (예: 아침 햇살에 감사)" aria-label="오늘 한 줄"><button type="submit" class="bladd">적기</button></form><ul class="bllist"></ul><button type="button" class="blmore" hidden></button><div class="lbadges" aria-label="한 줄 배지"></div></div>'+
@@ -2087,6 +2095,7 @@ button:active{filter:brightness(1.15)}
   var qFold=new Set();
   try{JSON.parse(localStorage.getItem("bible-notes-qfold")||"[]").forEach(function(x){qFold.add(String(x))})}catch(e){}
   function saveFold(){try{localStorage.setItem("bible-notes-qfold",JSON.stringify(Array.from(qFold).slice(-500)))}catch(e){}}
+  var actDrag=null;   // 실천 끌어 옮기기 중
   // 실천 체크표 접기 (이 기기에 기억)
   var aFold=new Set();
   try{JSON.parse(localStorage.getItem("bible-notes-afold")||"[]").forEach(function(x){aFold.add(String(x))})}catch(e){}
@@ -2246,6 +2255,7 @@ button:active{filter:brightness(1.15)}
     });
     ahave.forEach(function(d){d.remove()});
     var named=n.acts.filter(function(a){return a.t.trim()});
+    abox.classList.toggle("one",n.acts.length<2);
     var atl=el.querySelector(".atools"); atl.hidden=named.length<2;
     atl.querySelector(".afoldall").textContent=named.length&&named.every(function(a){return aFold.has(a.id)})?"모두 펼치기":"모두 접기";
     if(!n.qs.length&&!box.children.length){box.innerHTML=""}
@@ -2255,7 +2265,7 @@ button:active{filter:brightness(1.15)}
     setTimeout(function(){var el=cards.get(id); if(!el)return; var r=el.getBoundingClientRect(); if(r.top<0||r.top>window.innerHeight*0.45)el.scrollIntoView({block:"start",behavior:"smooth"})},60);
   }
   function render(){
-    if(drag)return;
+    if(drag||actDrag)return;
     renderTopicBar(); renderReviewBar(); refreshXrefs();
     var list=$("list"), order=sorted(), shown=0;
     if(spotId&&!openIds.has(spotId))spotId=null;
@@ -5927,7 +5937,7 @@ button:active{filter:brightness(1.15)}
     if(reorderMode){document.querySelectorAll("details.menu[open]").forEach(function(d){d.open=false}); setStatus("")}
     render();
   }
-  var NODRAG=".usepanel,.verse.memv,.mempanel,.verse.picking,.topics,button,a,input,textarea,select,label,summary,details,.pop,[contenteditable],.editbox,.verse.picking .w,.himgs,.sform,.fpills,.essays,.pastezone";
+  var NODRAG=".agrip,.usepanel,.verse.memv,.mempanel,.verse.picking,.topics,button,a,input,textarea,select,label,summary,details,.pop,[contenteditable],.editbox,.verse.picking .w,.himgs,.sform,.fpills,.essays,.pastezone";
   function startDrag(el,pid,clientY,capEl){
     var r=el.getBoundingClientRect();
     drag={el:el,grip:capEl||el,pid:pid,tx:0,grab:clientY-r.top,y:clientY,startY:clientY,moved:false,startIdx:Array.prototype.indexOf.call($("list").children,el)};
@@ -5939,6 +5949,55 @@ button:active{filter:brightness(1.15)}
     cancelAnimationFrame(dragRAF); dragRAF=requestAnimationFrame(autoScroll);
   }
   function clearPress(){if(press){clearTimeout(press.timer);if(press.card)press.card.classList.remove("pressing");press=null}}
+  /* ---------- 실천 끌어서 순서 바꾸기 (왼쪽 점 손잡이) ---------- */
+  function actMove(y){
+    var a=actDrag; if(!a)return; a.y=y;
+    var el=a.el, box=a.box, prev=el.previousElementSibling, next=el.nextElementSibling;
+    if(prev){var pr=prev.getBoundingClientRect(); if(y<pr.top+pr.height/2)box.insertBefore(el,prev)}
+    if(next){var nr=next.getBoundingClientRect(); if(y>nr.top+nr.height/2)box.insertBefore(el,next.nextSibling)}
+    el.style.transform=""; var top=el.getBoundingClientRect().top;
+    el.style.transform="translateY("+(y-a.grab-top)+"px)";
+  }
+  function actScroll(){
+    var a=actDrag; if(!a)return;
+    var h=window.innerHeight, v=0;
+    if(a.y<90)v=-Math.ceil((90-a.y)/8); else if(a.y>h-90)v=Math.ceil((a.y-(h-90))/8);
+    if(v){window.scrollBy(0,v);actMove(a.y)}
+    a.raf=requestAnimationFrame(actScroll);
+  }
+  function actEnd(){
+    var a=actDrag; if(!a)return; actDrag=null;
+    cancelAnimationFrame(a.raf); document.body.style.userSelect="";
+    try{a.grip.releasePointerCapture(a.pid)}catch(e){}
+    a.el.classList.remove("adragging"); a.el.style.transform=""; a.box.classList.remove("asorting");
+    var ids=Array.prototype.map.call(a.box.children,function(c){return c.dataset.aid});
+    var n=notes.get(a.nid);
+    if(n&&ids.join()!==a.before){
+      var byId={}; n.acts.forEach(function(x){byId[x.id]=x});
+      var nx=ids.map(function(i){return byId[i]}).filter(Boolean);
+      n.acts.forEach(function(x){if(nx.indexOf(x)<0)nx.push(x)});
+      n.acts=nx; scheduleSave(n.id); toast("실천 순서를 바꿨어요");
+    }
+    render();
+    var c=cards.get(a.nid), it=c&&c.querySelector('.act[data-aid="'+a.aid+'"]'); if(it){var r=it.getBoundingClientRect(); if(r.top<60||r.top>window.innerHeight-80)it.scrollIntoView({block:"center"})}
+  }
+  $("list").addEventListener("pointerdown",function(e){
+    var g=e.target.closest(".agrip"); if(!g||actDrag||drag||e.button>0)return;
+    var el=g.closest(".act"), box=el&&el.parentElement, card=el&&el.closest(".note"); if(!box||!card||box.children.length<2)return;
+    e.preventDefault(); e.stopPropagation(); clearPress();
+    if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+    box.classList.add("asorting"); el.classList.add("adragging");
+    var r=el.getBoundingClientRect();
+    actDrag={el:el,box:box,grip:g,pid:e.pointerId,nid:card.dataset.id,aid:el.dataset.aid,grab:Math.min(Math.max(e.clientY-r.top,0),r.height),y:e.clientY,raf:0,
+      before:Array.prototype.map.call(box.children,function(c){return c.dataset.aid}).join()};
+    try{g.setPointerCapture(e.pointerId)}catch(err){}
+    document.body.style.userSelect="none";
+    if(navigator.vibrate)try{navigator.vibrate(15)}catch(err){}
+    actMove(e.clientY); actDrag.raf=requestAnimationFrame(actScroll);
+  },true);
+  $("list").addEventListener("pointermove",function(e){if(actDrag&&e.pointerId===actDrag.pid){e.preventDefault();e.stopPropagation();actMove(e.clientY)}},true);
+  $("list").addEventListener("pointerup",function(e){if(actDrag&&e.pointerId===actDrag.pid){e.stopPropagation();actEnd()}},true);
+  $("list").addEventListener("pointercancel",function(e){if(actDrag&&e.pointerId===actDrag.pid){e.stopPropagation();actEnd()}},true);
   $("list").addEventListener("pointerdown",function(e){
     if(drag||e.button>0)return;
     var card=e.target.closest(".note"); if(!card)return;
