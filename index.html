@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-08-17">
+<meta name="app-build" content="2026-10-08-18">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2120,9 +2120,11 @@ button:active{filter:brightness(1.15)}
   function saveFold(){try{localStorage.setItem("bible-notes-qfold",JSON.stringify(Array.from(qFold).slice(-500)))}catch(e){}}
   var actDrag=null;   // 실천 끌어 옮기기 중
   // 실천 체크표 접기 (이 기기에 기억)
-  var aFold=new Set();
-  try{JSON.parse(localStorage.getItem("bible-notes-afold")||"[]").forEach(function(x){aFold.add(String(x))})}catch(e){}
-  function saveAFold(){try{localStorage.setItem("bible-notes-afold",JSON.stringify(Array.from(aFold).slice(-500)))}catch(e){}}
+  // 기본은 접힘. 펼친 실천만 기억함 (aFold.has = 접혀 있나?)
+  var aOpen=new Set();
+  try{JSON.parse(localStorage.getItem("bible-notes-aopen")||"[]").forEach(function(x){aOpen.add(String(x))})}catch(e){}
+  var aFold={has:function(id){return !aOpen.has(id)},add:function(id){aOpen.delete(id)},delete:function(id){aOpen.add(id)}};
+  function saveAFold(){try{localStorage.setItem("bible-notes-aopen",JSON.stringify(Array.from(aOpen).slice(-500)))}catch(e){}}
   function rootOf(n,q){var cur=q,g=0;while(cur&&cur.from&&g++<20){var p=n.qs.find(function(x){return x.id===cur.from});if(!p)break;cur=p}return cur}
   function threadSize(n,root){return n.qs.filter(function(x){return rootOf(n,x)===root}).length}
   function syncDeep(d,n,q){
@@ -2927,7 +2929,7 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("sugq")){ suggest(card,n,b); return }
     if(b.classList.contains("suga")){ suggestActs(card,n,b); return }
     if(b.classList.contains("adda")){
-      var na={id:qid(),t:"",done:false}; n.acts.unshift(na); render(); scheduleSave(id);
+      var na={id:qid(),t:"",done:false}; n.acts.unshift(na); aOpen.add(na.id); saveAFold(); render(); scheduleSave(id);
       var at=card.querySelector('.act[data-aid="'+na.id+'"] .at'); if(at)at.focus();
       return;
     }
@@ -2982,7 +2984,7 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("adel")){
       var dd=b.closest(".act");
       if(!b.dataset.sure){b.dataset.sure="1";b.classList.add("sure");b.textContent="한 번 더 누르면 지워져요";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.classList.remove("sure");b.textContent="이 실천 지우기"}},3000);return}
-      n.acts=n.acts.filter(function(x){return x.id!==dd.dataset.aid}); aFold.delete(dd.dataset.aid); saveAFold(); toast("실천을 지웠어요"); render(); scheduleSave(id); return;
+      n.acts=n.acts.filter(function(x){return x.id!==dd.dataset.aid}); aOpen.delete(dd.dataset.aid); saveAFold(); toast("실천을 지웠어요"); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("dela")){
       var ad=b.closest(".act"), ax=n.acts.find(function(x){return x.id===ad.dataset.aid});
