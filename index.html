@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-10">
+<meta name="app-build" content="2026-10-09-11">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1706,6 +1706,25 @@ button:active{filter:brightness(1.15)}
 /* 말씀 속 진한 글씨: 짙은 노란색 */
 :root{--boldy:#FFC21A}
 .verse .tk,.verse .vmark,.verse.focus .w.on,.verse b,.verse strong{color:var(--boldy)!important;-webkit-text-stroke:0!important}
+/* ===== 심플 디자인: 카드 아래 버튼 줄과 탭 (테두리·배경을 빼고 글자만) ===== */
+.note .focusrow{gap:2px 14px;margin:6px 0 12px;padding:0 2px}
+.note .focusrow .chapread.primary-read,.note .focusrow .useopen,.note .focusrow .vedit,.note .focusrow .vtopic,.note .focusrow .vxref{
+  height:28px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;
+  font-size:13px;font-weight:500;color:var(--muted);gap:4px}
+.note .focusrow .chapread.primary-read{color:var(--orange);font-weight:700}
+.note .focusrow .chapread.primary-read::before{width:13px;height:13px}
+@media (hover:hover){.note .focusrow .useopen:hover,.note .focusrow .vedit:hover,.note .focusrow .vtopic:hover,.note .focusrow .vxref:hover{color:var(--ink)}}
+.note .focusrow .useopen[aria-expanded="true"],.note .focusrow .vedit[aria-expanded="true"],.note .focusrow .vxref[aria-expanded="true"]{color:var(--ink);text-decoration:underline;text-underline-offset:5px;text-decoration-thickness:2px}
+.note .focusrow .ctopic{height:auto;padding:0;border-radius:0;background:transparent;font-size:13px;font-weight:700;color:var(--tc,var(--violet))}
+.note .focusrow .ctopic.on{background:transparent;color:var(--tc,var(--violet));text-decoration:underline;text-underline-offset:5px}
+/* 탭: 상자 없이 글자 + 고른 탭만 색 밑줄 */
+.note .tabs{background:transparent;border:0;border-bottom:1px solid #26252B;border-radius:0;padding:0;margin:4px 0 14px}
+.note .tabs::before{display:none}
+.note .tab{height:40px;border-radius:0;color:var(--faint);font-weight:500}
+.note .tab .ic{display:none}
+.note .tab[aria-selected="true"]{color:var(--c);font-weight:700;box-shadow:inset 0 -2px 0 var(--c)}
+.note .tab .tc{min-width:0;height:auto;padding:0;background:transparent!important;border-radius:0;font-size:11px;font-weight:700;color:var(--faint)!important;vertical-align:super}
+.note .tab[aria-selected="true"] .tc{color:var(--c)!important}
 </style>
 </head>
 <body>
