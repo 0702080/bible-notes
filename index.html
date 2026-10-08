@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-16">
+<meta name="app-build" content="2026-10-09-17">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4616,8 +4616,9 @@ button:active{filter:brightness(1.15)}
       document.body.appendChild(rq);
       rq.querySelector(".rqclose").addEventListener("click",closeRecall);
       rq.querySelector(".rqbtns").addEventListener("click",function(e){
-        var b=e.target.closest("button"); if(!b)return; var n=rqList[rqI]; if(!n)return;
-        var k=b.dataset.k;
+        var b=e.target.closest("button"); if(!b)return; var k=b.dataset.k;
+        if(k==="end"){closeRecall();return}
+        var n=rqList[rqI]; if(!n)return;
         if(k==="hint"){rqStage=1;drawRecall();return}
         if(k==="show"){rqStage=2;drawRecall();return}
         if(k==="say"){if(typeof sayWord==="function"&&canSpeak){try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(n.text);u.lang="ko-KR";u.rate=.9;window.speechSynthesis.speak(u)}catch(err){}}return}
