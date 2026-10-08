@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-03">
+<meta name="app-build" content="2026-10-09-04">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -822,7 +822,7 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .rdname{font-size:19px;color:var(--ink)}
 .rdver{font-size:12px;color:var(--faint);border:1px solid #2E2D33;border-radius:10px;padding:1px 8px}
 .rdclose{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:14.5px}
-.rdscroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:14px 18px 28px;max-width:720px;width:100%;margin:0 auto}
+.rdscroll{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:14px max(18px,calc((100% - 684px) / 2)) 28px;width:100%;box-sizing:border-box}
 .rdlist{list-style:none;margin:0;padding:0}
 .rdv{display:grid;grid-template-columns:30px 1fr;gap:6px;padding:9px 8px;border-radius:10px;line-height:1.85;font-size:17.5px;color:color-mix(in srgb,var(--orange) 80%,var(--ink))}
 .rdn{font-size:12.5px;color:var(--faint);font-weight:700;padding-top:5px;text-align:right;padding-right:4px}
@@ -1458,7 +1458,8 @@ button:active{filter:brightness(1.15)}
 .lqlist,.oqbuilt,.bqbody{scrollbar-width:none;-ms-overflow-style:none}
 .lqlist::-webkit-scrollbar,.oqbuilt::-webkit-scrollbar,.bqbody::-webkit-scrollbar{display:none}
 /* PC 넓은 화면: 질문/순서 맞추기 창을 가운데로 좁게 */
-@media (min-width:760px){.lquiz>*,.oquiz>*{width:calc(100% - 32px);max-width:680px;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}}
+@media (min-width:760px){.lquiz>*,.oquiz>*{width:calc(100% - 32px);max-width:680px;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}
+.lquiz>.lqlist,.oquiz>.oqbuilt{width:100%;max-width:none;padding-left:calc((100% - 680px) / 2);padding-right:calc((100% - 680px) / 2)}}
 .lqcard{position:relative;display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;column-gap:10px;row-gap:6px;width:100%;padding:14px 14px;border-radius:16px;border:1px solid #26252c;background:#141318;color:var(--ink);text-align:left;opacity:.45;animation:bwenter .35s cubic-bezier(.2,1.4,.4,1) both}
 .lqcard.cur{opacity:1;border-color:color-mix(in srgb,#9FB4FF 60%,#26252c);box-shadow:0 0 0 3px color-mix(in srgb,#9FB4FF 14%,transparent)}
 .lqcard.open{opacity:1;border-color:#2c2b33;box-shadow:none}
@@ -1613,7 +1614,7 @@ button:active{filter:brightness(1.15)}
 .dlbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #222126}
 .dltitle{font-size:18px;color:var(--gold)}
 .dlclose{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:14.5px}
-.dlbody{flex:1;overflow:auto;padding:12px 16px 28px;max-width:640px;width:100%;margin:0 auto;box-sizing:border-box;scrollbar-width:none}
+.dlbody{flex:1;overflow:auto;padding:12px max(16px,calc((100% - 608px) / 2)) 28px;width:100%;box-sizing:border-box;scrollbar-width:none}
 .dlbody::-webkit-scrollbar{display:none}
 .dlday{display:flex;align-items:center;justify-content:center;gap:14px}
 .dlday button{width:36px;height:36px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:13px}
