@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-10">
+<meta name="app-build" content="2026-10-10-11">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -267,6 +267,61 @@ details.menu>summary::-webkit-details-marker{display:none}
 .pdl{margin-right:auto;font-size:12px;color:var(--faint)}
 .pansbtn{height:30px;padding:0 12px;border:1px solid color-mix(in srgb,var(--gold) 50%,#34333A);border-radius:15px;background:transparent;color:var(--gold);font-size:12.5px;font-weight:700;white-space:nowrap}
 .pri.answered .pansbtn{color:var(--faint);border-color:#34333A;font-weight:500}
+.pshare{height:28px;padding:0 8px;border:1px solid var(--rule);border-radius:14px;background:transparent;color:var(--faint);font-size:12px;white-space:nowrap}
+.pshare.on{border-color:color-mix(in srgb,var(--sky) 50%,#34333A);color:var(--sky)}
+.pshare[hidden]{display:none}
+.frbox{margin:2px 0 12px}
+.frbox[hidden]{display:none}
+.frstrip{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.frall{height:34px;padding:0 12px;border:1px solid color-mix(in srgb,var(--sky) 45%,#34333A);border-radius:17px;background:color-mix(in srgb,var(--sky) 10%,transparent);color:var(--sky);font-size:13px;font-weight:700;white-space:nowrap}
+.frava{width:36px;height:36px;padding:0;border:1px solid #34333A;border-radius:50%;background:#1C1C21;font-size:19px;line-height:1;display:grid;place-items:center}
+.frava.on{border-color:var(--sky);box-shadow:0 0 0 2px color-mix(in srgb,var(--sky) 35%,transparent)}
+.frposts{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.frpost{padding:12px 14px;border:1px solid color-mix(in srgb,var(--sky) 25%,#2A2930);border-radius:14px;background:color-mix(in srgb,var(--sky) 5%,#141418)}
+.frwho{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:14px}
+.frwho b{color:var(--sky)}
+.fremo{font-size:20px;line-height:1}
+.fremo.big{font-size:30px}
+.frref{margin-left:auto;font-size:13px;font-weight:700;color:var(--violet)}
+.frverse{margin:0 0 8px;font-size:14px;line-height:1.6;color:var(--orange)}
+.frmed{padding:6px 0;border-top:1px dashed #2E2D33}
+.frmed:first-of-type{border-top:0}
+.frmt{margin:0;font-size:15px;line-height:1.7;white-space:pre-wrap;color:var(--ink)}
+.frthx,.frtodo{margin:6px 0 0;font-size:13.5px;line-height:1.6;white-space:pre-wrap;color:var(--gold)}
+.frtodo{color:var(--green)}
+.frdate{display:block;margin-top:4px;font-size:11.5px;color:var(--faint)}
+.frlab2{margin:10px 0 4px;font-size:12px;font-weight:700;color:var(--muted)}
+.fracts{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:1.7;color:var(--muted)}
+.fracts li.done{color:var(--mint)}
+.frpray{margin:0 0 4px;font-size:14px;line-height:1.6;white-space:pre-wrap;color:var(--ink)}
+.frans{margin:0 0 6px;font-size:13px;color:var(--gold)}
+.frmain{max-height:88vh;overflow-y:auto}
+.frsec{padding:12px 0;border-top:1px solid var(--rule)}
+.frsec:first-child{border-top:0;padding-top:0}
+.frh{margin-bottom:8px;font-size:13px;font-weight:700;color:var(--muted)}
+.frme,.frcoderow{display:flex;align-items:center;gap:8px}
+.frme .field,.frcoderow .field{flex:1;min-width:0;height:42px}
+.fremos{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-top:10px}
+.frpick{height:40px;padding:0;border:1px solid transparent;border-radius:10px;background:#1C1C21;font-size:20px}
+.frpick.on{border-color:var(--sky);background:color-mix(in srgb,var(--sky) 15%,#1C1C21)}
+.frcode{flex:1;font-size:26px;letter-spacing:4px;color:var(--gold);font-variant-numeric:tabular-nums}
+.frsmall{flex:0 0 auto;height:42px;padding:0 14px;border:1px solid color-mix(in srgb,var(--mint) 55%,#34333A);border-radius:12px;background:color-mix(in srgb,var(--mint) 14%,transparent);color:var(--mint);font-size:14px;font-weight:700;white-space:nowrap}
+.frrow{display:flex;align-items:center;gap:8px;padding:6px 0}
+.frnm{flex:1;min-width:0;font-size:14px;color:var(--ink)}
+.frx{flex:0 0 auto;height:36px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:var(--faint);font-size:13px;white-space:nowrap}
+.frx[data-sure]{color:var(--pink);font-weight:700}
+.frfriend{flex:1;min-width:0;display:flex;align-items:center;gap:10px;height:48px;padding:0 10px;border:1px solid var(--rule);border-radius:12px;background:#1A1A1F;color:var(--ink);font-size:15px;text-align:left}
+.frfriend b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.frcnt{margin-left:auto;font-size:12.5px;color:var(--faint);white-space:nowrap}
+.frback{height:36px;padding:0 4px;margin-bottom:8px;border:0;background:transparent;color:var(--sky);font-size:14px}
+.frvh{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:17px}
+.frvh + .frpost,.frpost + .frpost{margin-top:10px}
+.frtoggle{width:100%;display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 14px;border:1px solid var(--rule);border-radius:12px;background:transparent;color:var(--muted);font-size:14px}
+.frtoggle .frts{font-weight:700;color:var(--faint)}
+.frtoggle.on{border-color:color-mix(in srgb,var(--mint) 50%,#34333A);color:var(--ink)}
+.frtoggle.on .frts{color:var(--mint)}
+.frerr{color:var(--pink)}
+.frtip{margin:8px 0 0;font-size:12.5px}
 .pdel{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--faint);white-space:nowrap}
 .mend{margin-top:8px;padding:10px 12px 12px;border-radius:12px;background:#121216;border:1px solid #232229;display:flex;flex-direction:column;gap:4px}
 .mendl{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-top:4px}
@@ -1855,6 +1910,7 @@ button:active{filter:brightness(1.15)}
         <button type="button" id="backupSave">백업 파일 저장</button>
         <button type="button" id="backupLoad">백업 불러오기</button>
         <button type="button" id="sbBtn">☁️ 로그인 · 동기화</button>
+        <button type="button" id="frBtn">👥 친구</button>
         <button type="button" id="ghSyncBtn">GitHub 동기화 (예전 방식)</button>
       </div>
     </details>
@@ -1987,14 +2043,14 @@ button:active{filter:brightness(1.15)}
       essays:Array.isArray(n.essays)?n.essays.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),title:String(x.title||""),body:String(x.body||""),at:+x.at||Date.now()}}):[],
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
-      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000)}}):[],
+      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),sh:x.sh?1:0}}):[],
       rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0}:null,
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
       uses:Array.isArray(n.uses)?n.uses.filter(function(u){return u&&u.when}).slice(0,30).map(function(u){return {when:String(u.when),why:String(u.why||""),how:String(u.how||""),mine:!!u.mine}}):[],
       drill:Array.isArray(n.drill)?n.drill.filter(function(d){return d&&+d.at>0}).slice(-300).map(function(d){return {at:+d.at,ms:+d.ms||0,b:["best","fast","fire","done"].indexOf(d.b)>=0?d.b:"done"}}):[],
       mem:(n.mem&&Array.isArray(n.mem.s))?{s:(function(a){if(a.length>=5)a=[a[0],a[1],a[2],a[4]||a[3]];return [0,1,2,3].map(function(i){return +a[i]||0})})(n.mem.s)}:{s:[0,0,0,0]},   // 예전 5단계(다음 날, 내일)는 4단계(내일) 하나로
-      pinned:!!n.pinned, pinnedAt:n.pinned?(+n.pinnedAt||0):0,
+      pinned:!!n.pinned, pinnedAt:n.pinned?(+n.pinnedAt||0):0, priv:!!n.priv,
       tw:(function(o){var r={};if(o&&typeof o==="object"&&!Array.isArray(o)){Object.keys(o).slice(0,20).forEach(function(k){if(Array.isArray(o[k]))r[String(k).slice(0,20)]=o[k].map(String).map(function(w){return w.trim()}).filter(Boolean).slice(0,8)})}return r})(n.tw),
       links:Array.isArray(n.links)?n.links.filter(function(l){return l&&String(l.ref||"").trim()}).slice(0,60).map(function(l){return {id:String(l.id||("k"+Math.random().toString(36).slice(2,8))),ref:String(l.ref).trim().slice(0,40),memo:String(l.memo||"").trim().slice(0,120)}}):[],
       topics:Array.isArray(n.topics)?n.topics.map(function(t){return String(t).replace(/^#+/,"").trim().slice(0,20)}).filter(function(t,i,a){return t&&a.indexOf(t)===i}).slice(0,12):[],
@@ -2217,7 +2273,7 @@ button:active{filter:brightness(1.15)}
         d.innerHTML='<div class="prv" title="두 번 누르면 고치기"><p class="prvt"></p><div class="prva"><b>🙌 응답</b><p></p></div></div>'+
           '<textarea class="pt" rows="1" placeholder="기도 제목 (예: 이 말씀처럼 가족을 하나님께 맡기게 하소서)" aria-label="기도"></textarea>'+
           '<div class="pans" hidden><span class="panl">🙌 응답</span><textarea class="pan" rows="1" placeholder="어떻게 응답하셨는지 적어 보세요" aria-label="응답"></textarea></div>'+
-          '<div class="pfoot"><span class="pdl"></span><button type="button" class="pansbtn"></button><button type="button" class="pdel" aria-label="이 기도 지우기">지우기</button></div>';
+          '<div class="pfoot"><span class="pdl"></span><button type="button" class="pshare"></button><button type="button" class="pansbtn"></button><button type="button" class="pdel" aria-label="이 기도 지우기">지우기</button></div>';
       }
       if(box.children[i]!==d)box.insertBefore(d,box.children[i]||null);
       setVal(d.querySelector(".pt"),x.t); setVal(d.querySelector(".pan"),x.an||"");
@@ -2229,6 +2285,8 @@ button:active{filter:brightness(1.15)}
       var pa=d.querySelector(".prva"); pa.hidden=!x.ans||!(x.an||"").trim(); pa.querySelector("p").textContent=x.an||"";
       d.querySelector(".pdl").textContent=dateLabel(x.at)+(x.ans?"  ·  응답 "+dlabel(dkey(x.ans)):"");
       d.querySelector(".pansbtn").textContent=x.ans?"응답 취소":"🙌 응답됐어요";
+      var psb=d.querySelector(".pshare"); psb.textContent=x.sh?"👥 친구":"🔒 나만"; psb.classList.toggle("on",!!x.sh);
+      psb.title=x.sh?"친구도 이 기도를 볼 수 있어요 (누르면 나만 보기)":"이 기도는 나만 봐요 (누르면 친구에게 보여 주기)"; psb.hidden=!sbSession();
     });
     have.forEach(function(d){d.remove()});
     var hint=el.querySelector(".phint"); if(!hint){hint=document.createElement("p");hint.className="phint";hint.textContent="두 번 누르면 고칠 수 있어요";box.parentNode.insertBefore(hint,box.nextSibling)}
@@ -2309,6 +2367,7 @@ button:active{filter:brightness(1.15)}
           '<button type="button" class="mcopy">말씀 복사</button>'+
           '<button type="button" class="mtopic">주제 정하기</button>'+
           '<button type="button" class="mpin">맨 위에 고정</button>'+
+          '<button type="button" class="mpriv" hidden></button>'+
           '<a class="mgae" target="_blank" rel="noopener" hidden>개역개정으로 보기 (성서공회)</a>'+
           '<button type="button" class="exportone" data-fmt="txt" hidden>txt로 저장</button>'+
           '<button type="button" class="exportone" data-fmt="pdf" hidden>PDF로 저장</button>'+
@@ -2335,6 +2394,7 @@ button:active{filter:brightness(1.15)}
         '<div class="pane" data-pane="m">'+
           '<div class="qbtns"><button type="button" class="newmed addm" aria-label="새 묵상 쓰기"><span class="nmplus" aria-hidden="true">+</span>새 묵상</button><button type="button" class="medprog" aria-label="묵상 진도표"></button></div>'+
           '<div class="mtools" hidden><button type="button" class="mfoldall">모두 접기</button></div>'+
+          '<div class="frbox" hidden></div>'+
           '<div class="meds"></div>'+
         '</div>'+
         '<div class="pane" data-pane="p" hidden>'+
@@ -2544,6 +2604,8 @@ button:active{filter:brightness(1.15)}
     mhave.forEach(function(d){d.remove()});
     var mt=el.querySelector(".mtools"); if(mt){var wm=n.meds.filter(function(m){return (m.text||"").trim()});mt.hidden=wm.length<2;mt.querySelector(".mfoldall").textContent=wm.length&&wm.every(function(m){return medFold.has(m.id)})?"모두 펼치기":"모두 접기"}
     renderPrays(el,n);
+    renderFriendBox(el,n);
+    var mpv=el.querySelector(".mpriv"); if(mpv){mpv.hidden=!sbSession(); mpv.textContent=n.priv?"👥 친구에게 다시 보여 주기":"🔒 이 말씀은 나만 보기"}
     setVal(el.querySelector(".eref"),n.ref);
     setVal(el.querySelector(".etext"),n.text);
     var box=el.querySelector(".qs"), have=new Map();
@@ -3072,6 +3134,14 @@ button:active{filter:brightness(1.15)}
       if(n.mem.s[si]){buzz([12,40,18]); if(memDone(n)){toast("암송 완료! 🎉 "+n.ref);var pc=cards.get(id);if(pc){var bb2=pc.querySelector(".memopen");if(bb2)confetti(bb2)}} else toast(STAMP[si].e+" 도장을 받았어요  "+memCount(n)+"/5")}
       return;
     }
+    if(b.classList.contains("mpriv")){
+      b.closest("details").open=false; n.priv=!n.priv; render(); scheduleSave(id);
+      toast(n.priv?"이 말씀은 친구에게 보이지 않아요":"이 말씀의 묵상·실천을 친구도 볼 수 있어요"); return;
+    }
+    if(b.classList.contains("frava")||b.classList.contains("frall")){
+      var fo=frOpen.get(id), want=b.classList.contains("frall")?"*":b.dataset.uid;
+      if(fo===want)frOpen.delete(id); else frOpen.set(id,want); render(); return;
+    }
     if(b.classList.contains("pinbtn")||b.classList.contains("mpin")){
       if(b.classList.contains("mpin"))b.closest("details").open=false;
       n.pinned=!n.pinned; n.pinnedAt=n.pinned?Date.now():0;
@@ -3099,6 +3169,11 @@ button:active{filter:brightness(1.15)}
       tabOf.set(id,"p"); if(!n.prays)n.prays=[]; var np={id:qid(),t:"",at:Date.now(),ans:0,an:""}; n.prays.push(np); prEdit.add(np.id); render(); scheduleSave(id);
       var pc=cards.get(id), pe=pc&&pc.querySelector('.pri[data-pid="'+np.id+'"] .pt'); if(pe)setTimeout(function(){pe.focus()},40);
       return;
+    }
+    if(b.classList.contains("pshare")){
+      var spx=(n.prays||[]).find(function(x){return x.id===b.closest(".pri").dataset.pid}); if(!spx)return;
+      spx.sh=spx.sh?0:1; render(); scheduleSave(id);
+      toast(spx.sh?"이 기도는 친구도 볼 수 있어요":"이 기도는 이제 나만 봐요"); return;
     }
     if(b.classList.contains("pansbtn")||b.classList.contains("pdel")){
       var pid=b.closest(".pri").dataset.pid, px=(n.prays||[]).find(function(x){return x.id===pid}); if(!px)return;
@@ -3772,6 +3847,7 @@ button:active{filter:brightness(1.15)}
     var b=e.target.closest(".rvchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
     if(b.dataset.act==="prog"){openProg();return}
+    if(b.dataset.act==="friends"){openFr();return}
     if(b.dataset.act==="sync"){if(ghCfg())ghSync("manual");else openGh();return}
     if(b.dataset.act==="sbsync"){sbSync("manual");return}
     if(b.dataset.act==="sblogin"){openSb();return}
@@ -5054,6 +5130,8 @@ button:active{filter:brightness(1.15)}
     else if(gc){var ago=gs.at?Math.round((Date.now()-gs.at)/60000):-1;
       rows.push({icon:"☁️",label:gs.ok===false?"동기화가 안 됐어요":ghBusy?"맞추는 중…":ago<0?"GitHub 동기화 켜짐":ago<1?"GitHub과 맞춰졌어요 · 방금":"GitHub과 맞춰졌어요 · "+ago+"분 전",chips:[{id:"",t:"지금 맞추기",act:"sync"}],done:gs.ok===true})}
     else rows.push({icon:"☁️",label:"로그인하면 모든 기기에 바로 맞춰져요",chips:[{id:"",t:"로그인",act:"sblogin"}]});
+    if(ss){var fin=(frData&&frData.incoming||[]).length, fct=(frData&&frData.friends||[]).length;
+      rows.push({icon:"👥",label:fin?"친구 신청이 "+fin+"개 왔어요":fct?"친구 "+fct+"명":"친구와 묵상 나누기",chips:[{id:"",t:fin?"확인하기":fct?"친구 보기":"친구 맺기",act:"friends"}]})}
     var dd=dailyData(), dc=dailyChecked(dd,dkey(Date.now())).length, dt=dd.items.length;
     rows.push({icon:"🌙",label:"하루 돌아보기",chips:[{id:"",t:dc+" / "+dt,act:"daily"}],done:dt>0&&dc===dt});
     if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))rows.push({icon:"📊",label:"실천 진도표",chips:[{id:"",t:"전체 보기",act:"prog"}]});
@@ -6474,7 +6552,7 @@ button:active{filter:brightness(1.15)}
     var u=await fetch(SB_URL+"/auth/v1/user",{headers:sbH(tok)}); if(!u.ok)throw new Error("user");
     return u.json();
   }
-  function sbMarkAll(){notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");try{localStorage.removeItem(SB_LAST)}catch(e){}}
+  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");try{localStorage.removeItem(SB_LAST)}catch(e){}}
   function sbMark(id){if(sbApplying||!sbSession())return; sbDirty.add(id); clearTimeout(sbTimer); sbTimer=setTimeout(function(){sbSync("auto")},1500)}
   async function sbSync(why){
     if(!sbSession())return false;
@@ -6487,6 +6565,15 @@ button:active{filter:brightness(1.15)}
       var tok=await sbToken(); if(!tok)throw {msg:"다시 로그인해 주세요"};
       var uid=sbSession().user.id, now=Date.now(), rows=[], tb=tombs();
       ids.forEach(function(id){
+        if(id==="__me"){
+          var me={emoji:myEmoji(),on:shareOn()?1:0}, mjs=JSON.stringify(me);
+          if(sbLastJson["s:__me"]!==mjs){rows.push({user_id:uid,id:"s:__me",data:me,updated_at:now,deleted:false,visibility:"friends"});sbLastJson["s:__me"]=mjs}
+          return;
+        }
+        if(id!=="__daily"&&id!=="__chapters"){
+          var sd=shareData(notes.get(id)), skey="s:"+id, sjs=JSON.stringify(sd);
+          if(sbLastJson[skey]!==sjs){rows.push({user_id:uid,id:skey,data:sd||{},updated_at:now,deleted:!sd,visibility:"friends"});sbLastJson[skey]=sjs}
+        }
         if(id==="__daily"||id==="__chapters"){
           var d=id==="__daily"?dailyData():myChapters(), js=JSON.stringify(d);
           if(sbLastJson[id]!==js){rows.push({user_id:uid,id:id,data:d,updated_at:now,deleted:false});sbLastJson[id]=js}
@@ -6496,6 +6583,7 @@ button:active{filter:brightness(1.15)}
         if(n)rows.push({user_id:uid,id:id,data:cleanNote(n),updated_at:now,deleted:false});
         else if(tb[id])rows.push({user_id:uid,id:id,data:{at:tb[id]},updated_at:now,deleted:true});
       });
+      rows.forEach(function(r){if(!r.visibility)r.visibility="private"});
       for(var k=0;k<rows.length;k+=200){
         var pr=await fetch(SB_URL+"/rest/v1/notes?on_conflict=user_id,id",{method:"POST",headers:Object.assign(sbH(tok),{"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(rows.slice(k,k+200))});
         if(!pr.ok){throw {msg:"올리지 못했어요 ("+pr.status+")"}}
@@ -6510,6 +6598,10 @@ button:active{filter:brightness(1.15)}
         var list=[], del={};
         arr.forEach(function(r){
           maxAt=Math.max(maxAt,+r.updated_at||0);
+          if(String(r.id).indexOf("s:")===0){   // 친구용 사본은 노트가 아님
+            if(r.id==="s:__me"&&r.data){sbLastJson["s:__me"]=JSON.stringify(r.data);try{if(r.data.emoji)localStorage.setItem("bible-my-emoji",String(r.data.emoji));localStorage.setItem("bible-share",r.data.on===0?"0":"1")}catch(e){}}
+            return;
+          }
           if(r.id==="__daily"){sbLastJson.__daily=JSON.stringify(r.data);mergeData({daily:r.data},true);return}
           if(r.id==="__chapters"){var before=JSON.stringify(myChapters());mergeData({chapters:r.data},true);sbLastJson.__chapters=JSON.stringify(myChapters());return}
           if(r.deleted)del[r.id]=(r.data&&+r.data.at)||+r.updated_at; else if(r.data&&r.data.id)list.push(r.data);
@@ -6606,6 +6698,225 @@ button:active{filter:brightness(1.15)}
     }
   }
   $("sbBtn").addEventListener("click",function(){$("topMenu").open=false;openSb()});
+
+  /* ---------- 친구: 친구 코드로 맺고, 서로의 묵상·실천을 봄 ----------
+     원본 노트는 언제나 나만 볼 수 있고, 친구에게는 따로 만든 사본(s:노트id)만 보임.
+     사본에는 묵상(감사·결론 포함)과 실천, 그리고 '👥 친구'로 바꾼 기도만 들어감. '나만 보기' 말씀은 사본이 없음 */
+  var FR_EMOJI=["😊","🙂","😄","🥰","😇","🤗","🌱","🌿","🍀","🌸","🌻","🌷","🕊️","🐑","🦁","🐻","🐰","🦊","🐥","🌈","☀️","🌙","⭐","🔥","💧","📖","🙏","💛"];
+  var frData=null, frBusy=false, frOpen=new Map(), frBox=null, frView="", frMsg="";
+  function myEmoji(){try{return localStorage.getItem("bible-my-emoji")||"😊"}catch(e){return "😊"}}
+  function shareOn(){try{return localStorage.getItem("bible-share")!=="0"}catch(e){return true}}
+  function shareData(n){
+    if(!n||n.priv||!shareOn())return null;
+    var meds=(n.meds||[]).filter(function(m){return String(m.text||"").trim()||String(m.thx||"").trim()||String(m.todo||"").trim()})
+      .map(function(m){return {text:String(m.text||""),thx:String(m.thx||""),todo:String(m.todo||""),at:+m.at||0}});
+    var acts=(n.acts||[]).filter(function(a){return a.t&&a.t.trim()}).map(function(a){return {t:a.t,done:a.done?1:0,doneAt:+a.doneAt||0,days:(a.stamps||[]).length,goal:+a.goal||21}});
+    var prays=(n.prays||[]).filter(function(x){return x.sh&&String(x.t||"").trim()}).map(function(x){return {t:x.t,at:+x.at||0,ans:+x.ans||0,an:String(x.an||"")}});
+    if(!meds.length&&!acts.length&&!prays.length)return null;
+    return {ref:n.ref,text:n.text,book:n.book,chapter:n.chapter,verse:n.verse,meds:meds,acts:acts,prays:prays};
+  }
+  function verseKey(o){return (typeof o.book==="number"&&o.book>=0&&+o.chapter)?o.book+":"+o.chapter+":"+(+o.verse||0):String(o.ref||"").replace(/\s+/g,"")}
+  function friendPostsFor(n){
+    if(!frData||!frData.friends||!sbSession())return [];
+    var k=verseKey(n), out=[];
+    frData.friends.forEach(function(f){f.notes.forEach(function(d){if(verseKey(d)===k)out.push({f:f,d:d})})});
+    return out;
+  }
+  function mk(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+  // 친구 한 명이 한 말씀에 남긴 것 (친구 글은 textContent로만 넣음)
+  function friendPost(f,d,withRef){
+    var w=mk("div","frpost");
+    var who=mk("div","frwho"); who.appendChild(mk("span","fremo",f.emoji)); who.appendChild(mk("b","",f.name||"친구"));
+    if(withRef)who.appendChild(mk("span","frref",d.ref||""));
+    w.appendChild(who);
+    if(withRef&&d.text)w.appendChild(mk("p","frverse",d.text));
+    (d.meds||[]).slice().sort(function(a,b){return (b.at||0)-(a.at||0)}).forEach(function(m){
+      var c=mk("div","frmed");
+      if(String(m.text||"").trim())c.appendChild(mk("p","frmt",m.text));
+      if(String(m.thx||"").trim())c.appendChild(mk("p","frthx","🙏 감사  "+m.thx));
+      if(String(m.todo||"").trim())c.appendChild(mk("p","frtodo","✅ 결론 · 할 일  "+m.todo));
+      if(m.at)c.appendChild(mk("span","frdate",dateLabel(m.at)));
+      w.appendChild(c);
+    });
+    if((d.acts||[]).length){
+      var ul=mk("ul","fracts");
+      d.acts.forEach(function(a){var li=mk("li",a.done?"done":"",(a.done?"✓ ":"○ ")+a.t+(a.days?"  ·  "+a.days+"일 체크":""));ul.appendChild(li)});
+      w.appendChild(mk("div","frlab2","실천")); w.appendChild(ul);
+    }
+    if((d.prays||[]).length){
+      w.appendChild(mk("div","frlab2","나눈 기도"));
+      d.prays.forEach(function(x){var pp=mk("p","frpray",x.t);w.appendChild(pp);if(x.ans)w.appendChild(mk("p","frans","🙌 응답"+(String(x.an||"").trim()?"  "+x.an:"")))});
+    }
+    return w;
+  }
+  function renderFriendBox(el,n){
+    var box=el.querySelector(".frbox"); if(!box)return;
+    var posts=friendPostsFor(n), open=(frOpen&&frOpen.get(n.id))||"";
+    var sig=JSON.stringify([open,posts.map(function(p){return [p.f.id,p.f.emoji,p.f.name,p.d]})]);
+    if(box.dataset.sig===sig)return; box.dataset.sig=sig;
+    box.textContent=""; box.hidden=!posts.length; if(!posts.length)return;
+    var strip=mk("div","frstrip");
+    var all=mk("button","frall",""); all.type="button"; all.setAttribute("aria-expanded",String(!!open));
+    all.textContent="친구 묵상 "+posts.length; strip.appendChild(all);
+    posts.forEach(function(p){var b=mk("button","frava"+(open===p.f.id?" on":""),p.f.emoji);b.type="button";b.dataset.uid=p.f.id;b.title=(p.f.name||"친구")+"의 묵상 보기";b.setAttribute("aria-label",b.title);strip.appendChild(b)});
+    box.appendChild(strip);
+    if(open){
+      var ps=mk("div","frposts");
+      posts.forEach(function(p){if(open==="*"||open===p.f.id)ps.appendChild(friendPost(p.f,p.d,false))});
+      box.appendChild(ps);
+    }
+  }
+  async function frFetch(path,opt){
+    var tok=await sbToken(); if(!tok)throw {msg:"다시 로그인해 주세요"};
+    opt=opt||{}; var r=await fetch(SB_URL+path,Object.assign({cache:"no-store"},opt,{headers:Object.assign(sbH(tok),opt.headers||{})}));
+    if(!r.ok)throw {msg:"친구 정보를 받지 못했어요 ("+r.status+")"};
+    var t=await r.text(); return t?JSON.parse(t):null;
+  }
+  async function frLoad(){
+    var x=sbSession(); if(!x){frData=null;return}
+    if(frBusy)return; frBusy=true;
+    try{
+      var uid=x.user.id;
+      var fr=await frFetch("/rest/v1/friendships?select=requester,addressee,status");
+      var others=[]; fr.forEach(function(f){var o=f.requester===uid?f.addressee:f.requester;if(others.indexOf(o)<0)others.push(o)});
+      var pr=await frFetch("/rest/v1/profiles?select=id,name,friend_code&id=in.("+[uid].concat(others).join(",")+")");
+      var pm={}; (pr||[]).forEach(function(p){pm[p.id]=p});
+      var acc=fr.filter(function(f){return f.status==="accepted"}).map(function(f){return f.requester===uid?f.addressee:f.requester});
+      var sh=acc.length?await frFetch("/rest/v1/notes?select=user_id,id,data,updated_at&user_id=in.("+acc.join(",")+")&id=like.s:*&deleted=is.false&limit=5000"):[];
+      var byU={}; acc.forEach(function(u){byU[u]={id:u,name:(pm[u]&&pm[u].name)||"친구",emoji:"🙂",notes:[]}});
+      (sh||[]).forEach(function(r){var f=byU[r.user_id];if(!f||!r.data)return; if(r.id==="s:__me"){if(r.data.emoji)f.emoji=String(r.data.emoji).slice(0,8);return} if(r.data.ref)f.notes.push(r.data)});
+      frData={me:{id:uid,name:(pm[uid]&&pm[uid].name)||"",code:(pm[uid]&&pm[uid].friend_code)||""},
+        friends:acc.map(function(u){return byU[u]}),
+        incoming:fr.filter(function(f){return f.status==="pending"&&f.addressee===uid}).map(function(f){return {id:f.requester,name:(pm[f.requester]&&pm[f.requester].name)||"이름 없음"}}),
+        outgoing:fr.filter(function(f){return f.status==="pending"&&f.requester===uid}).map(function(f){return {id:f.addressee,name:(pm[f.addressee]&&pm[f.addressee].name)||"이름 없음"}}),
+        at:Date.now()};
+      frMsg="";
+    }catch(e){frMsg=(e&&e.msg)||"친구 정보를 받지 못했어요"}
+    finally{frBusy=false; try{render()}catch(e){} try{renderReviewBar()}catch(e){} drawFr()}
+  }
+  function openFr(){
+    try{$("topMenu").open=false}catch(e){}
+    if(!frBox){
+      frBox=mk("div","ghsheet frsheet"); frBox.hidden=true; frBox.setAttribute("role","dialog"); frBox.setAttribute("aria-modal","true");
+      frBox.innerHTML='<div class="ghbox frmain"><div class="ghhd"><b>👥 친구</b><button type="button" class="ghclose frclose">닫기</button></div><div class="frin"></div></div>';
+      document.body.appendChild(frBox);
+      frBox.addEventListener("click",frClick);
+      frBox.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target.classList.contains("frcodein")){e.preventDefault();frBox.querySelector(".frreq").click()}});
+    }
+    frBox.hidden=false; document.body.style.overflow="hidden"; frView="";
+    drawFr(); if(sbSession())frLoad();
+  }
+  function closeFr(){if(frBox){frBox.hidden=true;document.body.style.overflow=""}}
+  function drawFr(){
+    if(!frBox||frBox.hidden)return;
+    var box=frBox.querySelector(".frin"), keep=box.querySelector(".frcodein"), typed=keep?keep.value:"", nm=box.querySelector(".frname"), typedName=nm&&document.activeElement===nm?nm.value:null;
+    box.textContent="";
+    if(!sbSession()){
+      box.appendChild(mk("p","ghtip","친구와 묵상을 나누려면 먼저 이메일로 로그인해 주세요. 내 노트는 그대로 나만 보고, 내가 허락한 것만 친구가 봐요."));
+      var lb=mk("button","ghconnect frlogin","☁️ 로그인하기"); lb.type="button"; box.appendChild(lb); return;
+    }
+    if(frMsg)box.appendChild(mk("p","ghtip frerr",frMsg));
+    if(!frData){box.appendChild(mk("p","ghtip","친구 정보를 불러오는 중…"));return}
+    // 친구 한 명의 나눈 말씀 보기
+    if(frView){
+      var f=frData.friends.find(function(x){return x.id===frView});
+      var back=mk("button","frback","← 친구 목록"); back.type="button"; box.appendChild(back);
+      if(!f){box.appendChild(mk("p","ghtip","친구를 찾지 못했어요"));return}
+      var hd=mk("div","frvh"); hd.appendChild(mk("span","fremo big",f.emoji)); hd.appendChild(mk("b","",f.name)); hd.appendChild(mk("span","frcnt",f.notes.length+"개 말씀")); box.appendChild(hd);
+      if(!f.notes.length)box.appendChild(mk("p","ghtip","아직 나눈 묵상이 없어요."));
+      f.notes.slice().sort(function(a,b){return lastAt(b)-lastAt(a)}).forEach(function(d){box.appendChild(friendPost(f,d,true))});
+      return;
+    }
+    // 내 모습
+    var sec=mk("div","frsec"); sec.appendChild(mk("div","frh","내 모습"));
+    var me=mk("div","frme"); me.appendChild(mk("span","fremo big",myEmoji()));
+    var ni=mk("input","field frname"); ni.value=typedName!=null?typedName:frData.me.name; ni.placeholder="친구에게 보일 이름"; ni.maxLength=20; ni.setAttribute("aria-label","내 이름"); me.appendChild(ni);
+    var ns=mk("button","frsmall frsavename","저장"); ns.type="button"; me.appendChild(ns); sec.appendChild(me);
+    var eg=mk("div","fremos"); FR_EMOJI.forEach(function(e){var b=mk("button","frpick"+(e===myEmoji()?" on":""),e);b.type="button";b.dataset.e=e;b.setAttribute("aria-label","이모티콘 "+e);eg.appendChild(b)}); sec.appendChild(eg);
+    box.appendChild(sec);
+    // 내 친구 코드
+    sec=mk("div","frsec"); sec.appendChild(mk("div","frh","내 친구 코드"));
+    var cr=mk("div","frcoderow"); cr.appendChild(mk("b","frcode",frData.me.code||"------"));
+    var cb=mk("button","frsmall frcopy",navigator.share?"코드 보내기":"코드 복사"); cb.type="button"; cr.appendChild(cb); sec.appendChild(cr);
+    sec.appendChild(mk("p","ghtip frtip","이 코드를 친구에게 알려 주세요. 친구가 코드를 넣고 내가 수락하면 친구가 돼요."));
+    box.appendChild(sec);
+    // 친구 추가
+    sec=mk("div","frsec"); sec.appendChild(mk("div","frh","친구 추가"));
+    var ar=mk("div","frcoderow"); var ci=mk("input","field frcodein"); ci.placeholder="친구 코드 6자리"; ci.maxLength=8; ci.autocapitalize="characters"; ci.value=typed; ci.setAttribute("aria-label","친구 코드"); ar.appendChild(ci);
+    var rb=mk("button","frsmall frreq","신청"); rb.type="button"; ar.appendChild(rb); sec.appendChild(ar);
+    box.appendChild(sec);
+    // 받은 신청 / 보낸 신청
+    if(frData.incoming.length||frData.outgoing.length){
+      sec=mk("div","frsec"); sec.appendChild(mk("div","frh","친구 신청"));
+      frData.incoming.forEach(function(x){var r=mk("div","frrow");r.appendChild(mk("span","frnm",x.name+" 님이 친구 신청을 했어요"));var a=mk("button","frsmall frok","수락");a.type="button";a.dataset.uid=x.id;r.appendChild(a);var d=mk("button","frx frno","거절");d.type="button";d.dataset.uid=x.id;r.appendChild(d);sec.appendChild(r)});
+      frData.outgoing.forEach(function(x){var r=mk("div","frrow");r.appendChild(mk("span","frnm",x.name+" 님 · 수락을 기다리는 중"));var d=mk("button","frx frcancel","취소");d.type="button";d.dataset.uid=x.id;r.appendChild(d);sec.appendChild(r)});
+      box.appendChild(sec);
+    }
+    // 친구 목록
+    sec=mk("div","frsec"); sec.appendChild(mk("div","frh","내 친구 "+frData.friends.length));
+    if(!frData.friends.length)sec.appendChild(mk("p","ghtip frtip","아직 친구가 없어요."));
+    frData.friends.forEach(function(f){
+      var r=mk("div","frrow"); var v=mk("button","frfriend"); v.type="button"; v.dataset.uid=f.id;
+      v.appendChild(mk("span","fremo",f.emoji)); v.appendChild(mk("b","",f.name)); v.appendChild(mk("span","frcnt",f.notes.length+"개 말씀 ›"));
+      r.appendChild(v); var d=mk("button","frx frun","끊기"); d.type="button"; d.dataset.uid=f.id; r.appendChild(d); sec.appendChild(r);
+    });
+    box.appendChild(sec);
+    // 나눔 설정
+    sec=mk("div","frsec"); sec.appendChild(mk("div","frh","친구에게 보여 줄 것"));
+    var sw=mk("button","frtoggle"+(shareOn()?" on":"")); sw.type="button"; sw.setAttribute("aria-pressed",String(shareOn()));
+    sw.appendChild(mk("span","frtl","내 묵상 · 감사 · 결론 · 실천")); sw.appendChild(mk("span","frts",shareOn()?"보여 줌":"숨김")); sec.appendChild(sw);
+    sec.appendChild(mk("p","ghtip frtip","기도는 사생활이라 기본은 🔒 나만 봐요. 기도 아래 '🔒 나만'을 눌러 '👥 친구'로 바꾼 기도만 친구가 봐요. 숨기고 싶은 말씀은 카드의 ⋯ 메뉴에서 '이 말씀은 나만 보기'를 고르세요."));
+    box.appendChild(sec);
+  }
+  function lastAt(d){var t=0;(d.meds||[]).forEach(function(m){t=Math.max(t,m.at||0)});(d.acts||[]).forEach(function(a){t=Math.max(t,a.doneAt||0)});(d.prays||[]).forEach(function(x){t=Math.max(t,x.at||0)});return t}
+  function shareAll(){notes.forEach(function(n){sbDirty.add(n.id)});sbDirty.add("__me");clearTimeout(sbTimer);sbTimer=setTimeout(function(){sbSync("auto")},300)}
+  async function frClick(e){
+    if(e.target===frBox){closeFr();return}
+    var b=e.target.closest("button"); if(!b)return;
+    if(b.classList.contains("frclose")){closeFr();return}
+    if(b.classList.contains("frlogin")){closeFr();openSb();return}
+    if(b.classList.contains("frback")){frView="";drawFr();frBox.querySelector(".frmain").scrollTop=0;return}
+    if(b.classList.contains("frfriend")){frView=b.dataset.uid;drawFr();frBox.querySelector(".frmain").scrollTop=0;return}
+    if(b.classList.contains("frpick")){try{localStorage.setItem("bible-my-emoji",b.dataset.e)}catch(err){} sbDirty.add("__me");clearTimeout(sbTimer);sbTimer=setTimeout(function(){sbSync("auto")},300); drawFr(); toast("내 이모티콘을 "+b.dataset.e+" 로 바꿨어요"); return}
+    if(b.classList.contains("frtoggle")){try{localStorage.setItem("bible-share",shareOn()?"0":"1")}catch(err){} shareAll(); drawFr(); toast(shareOn()?"친구에게 내 묵상과 실천을 보여 줘요":"친구에게 아무것도 보이지 않아요"); return}
+    if(b.classList.contains("frcopy")){
+      var code=frData&&frData.me.code; if(!code)return;
+      var msg="말씀 묵상 노트에서 친구 해요! 내 친구 코드: "+code+"\n"+SB_SITE;
+      if(navigator.share){try{await navigator.share({text:msg})}catch(err){}return}
+      try{await navigator.clipboard.writeText(code);toast("친구 코드를 복사했어요")}catch(err){toast("코드: "+code)}
+      return;
+    }
+    try{
+      var uid=sbSession()&&sbSession().user.id; if(!uid)return;
+      if(b.classList.contains("frsavename")){
+        var nv=frBox.querySelector(".frname").value.trim().slice(0,20);
+        await frFetch("/rest/v1/profiles?id=eq."+uid,{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({name:nv})});
+        toast("이름을 저장했어요"); frLoad(); return;
+      }
+      if(b.classList.contains("frreq")){
+        var cv=frBox.querySelector(".frcodein").value.trim().toUpperCase(); if(!cv){frBox.querySelector(".frcodein").focus();return}
+        var res=await frFetch("/rest/v1/rpc/request_friend",{method:"POST",body:JSON.stringify({code:cv})});
+        var M={requested:"친구 신청을 보냈어요. 친구가 수락하면 서로의 묵상이 보여요",accepted:"친구가 됐어요! 🎉",already:"이미 친구예요",self:"내 코드예요. 친구의 코드를 넣어 주세요",notfound:"그 코드를 가진 사람이 없어요",login:"다시 로그인해 주세요"};
+        toast(M[res]||"신청하지 못했어요"); if(res==="requested"||res==="accepted")frBox.querySelector(".frcodein").value="";
+        frLoad(); return;
+      }
+      var o=b.dataset.uid; if(!o)return;
+      if(b.classList.contains("frok")){
+        await frFetch("/rest/v1/friendships?requester=eq."+o+"&addressee=eq."+uid,{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({status:"accepted"})});
+        toast("친구가 됐어요! 🎉"); buzz([12,40,18]); frLoad(); return;
+      }
+      if(b.classList.contains("frun")&&!b.dataset.sure){b.dataset.sure="1";b.textContent="정말 끊기";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="끊기"}},3000);return}
+      if(b.classList.contains("frno")||b.classList.contains("frcancel")||b.classList.contains("frun")){
+        await frFetch("/rest/v1/friendships?or=(and(requester.eq."+o+",addressee.eq."+uid+"),and(requester.eq."+uid+",addressee.eq."+o+"))",{method:"DELETE",headers:{"Prefer":"return=minimal"}});
+        toast(b.classList.contains("frun")?"친구를 끊었어요":b.classList.contains("frno")?"신청을 거절했어요":"신청을 취소했어요"); frLoad(); return;
+      }
+    }catch(err){toast((err&&err.msg)||"하지 못했어요. 인터넷 연결을 확인해 주세요")}
+  }
+  $("frBtn").addEventListener("click",openFr);
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&frBox&&!frBox.hidden)closeFr()});
+  setTimeout(function(){if(sbSession()){sbDirty.add("__me");frLoad()}},2500);
+  setInterval(function(){if(sbSession()&&document.visibilityState==="visible"&&navigator.onLine){var a=document.activeElement;if(!(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName)))frLoad()}},300000);
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible"&&sbSession()&&(!frData||Date.now()-frData.at>60000))frLoad()});
   (function wait(){if(typeof backend!=="undefined"&&backend)setTimeout(sbFromHash,300);else setTimeout(wait,200)})();
   setTimeout(function(){if(sbSession())sbSync("start")},1200);
   setInterval(function(){
