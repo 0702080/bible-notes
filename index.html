@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-23">
+<meta name="app-build" content="2026-10-10-24">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -220,7 +220,7 @@ details.menu>summary::-webkit-details-marker{display:none}
 .note.vediting .editbox .eref{height:34px;margin-bottom:6px;font-size:13.5px;color:var(--violet);font-weight:700}
 .note.vediting .editbox .etext{font-family:var(--serif);font-size:18px;line-height:1.75;color:var(--orange);word-break:keep-all;padding:6px 10px;background:#141418;border:1px dashed color-mix(in srgb,var(--orange) 50%,#34333A);border-radius:12px;caret-color:var(--hi)}
 .note.vediting .editbox .etext:focus{outline:none;border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 18%,transparent)}
-.note.vediting .editbox .donedit{margin-top:6px}
+.note.vediting .editbox .donedit,.note.vediting .vedit{display:none}
 .focusrow{gap:6px;margin:0 0 8px}
 .focusrow .fl{font-size:12.5px}
 .fbtn{height:28px;padding:0 11px;font-size:13px;border-width:1px;border-radius:14px}
@@ -3088,7 +3088,6 @@ button:active{filter:brightness(1.15)}
     try{window.getSelection().removeAllRanges()}catch(e){}
     card.classList.add("vediting");
     var ve=card.querySelector(".vedit"), eb=card.querySelector(".editbox");
-    if(ve){ve.setAttribute("aria-expanded","true");ve.textContent="고치기 끝"}
     eb.hidden=false; setVal(eb.querySelector(".eref"),n.ref); var et=eb.querySelector(".etext"); setVal(et,n.text);
     vEditFrom[id]=n.text+"|"+n.ref;
     setTimeout(function(){
@@ -3099,12 +3098,26 @@ button:active{filter:brightness(1.15)}
     buzz(10);
   }
   function exitVerseEdit(id){
-    var card=cards.get(id); if(!card)return;
+    var card=cards.get(id); if(!card||!card.classList.contains("vediting"))return;
     card.classList.remove("vediting"); card.querySelector(".editbox").hidden=true;
     var ve=card.querySelector(".vedit"); if(ve){ve.setAttribute("aria-expanded","false");ve.textContent="말씀 고치기"}
     flushNow(id); render();
     var n=notes.get(id); if(n&&vEditFrom[id]!==n.text+"|"+n.ref)toast("말씀을 고쳤어요"); delete vEditFrom[id];
   }
+  list.addEventListener("focusout",function(e){
+    var eb=e.target.closest&&e.target.closest(".note.vediting .editbox"); if(!eb)return;
+    if(e.relatedTarget&&eb.contains(e.relatedTarget))return;   // 구절 칸 ↔ 말씀 칸 이동은 그대로
+    var card=eb.closest(".note"), id=card.dataset.id;
+    setTimeout(function(){if(card.classList.contains("vediting")&&!eb.contains(document.activeElement))exitVerseEdit(id)},120);
+  });
+  list.addEventListener("keydown",function(e){
+    if(e.key==="Escape"&&e.target.closest&&e.target.closest(".note.vediting .editbox")){e.target.blur()}
+  });
+  document.addEventListener("pointerdown",function(e){   // 편집 칸 밖을 누르면 고치기 끝
+    document.querySelectorAll(".note.vediting").forEach(function(card){
+      var eb=card.querySelector(".editbox"); if(eb&&!eb.contains(e.target))exitVerseEdit(card.dataset.id);
+    });
+  },true);
   list.addEventListener("click",async function(e){
     var rvv=e.target.closest(".verse.memv");
     var rww=e.target.closest(".verse.memv .rw.masked")||(rvv&&!e.target.closest(".mw")&&rvv.querySelector(".rw")?nearestWord(rvv,e.clientX,e.clientY,".rw.masked"):null);
