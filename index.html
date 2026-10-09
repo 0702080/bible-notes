@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-15">
+<meta name="app-build" content="2026-10-10-17">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1517,62 +1517,46 @@ button:active{filter:brightness(1.15)}
 .mnext.mlast + .mnext{margin-top:2px}
 .oquiz{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .oquiz[hidden]{display:none}
-.jgame{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow-y:auto}
-.jgame[hidden]{display:none}
-.jghud{display:flex;align-items:center;gap:12px;padding:10px 16px 0;font-size:15px}
-.jghearts{letter-spacing:2px}
-.jgcombo{color:var(--orange);font-weight:700}
-.jgcombo.pop2{animation:bqres .4s cubic-bezier(.2,1.6,.4,1)}
-.jgscore{margin-left:auto;color:var(--gold);font-weight:700;font-variant-numeric:tabular-nums}
-.jgtime{height:5px;margin:10px 16px 0;border-radius:3px;background:#1E1D24;overflow:hidden}
-.jgtime[hidden]{display:none}
-.jgtime i{display:block;height:100%;background:var(--sky);transition:width .1s linear}
-.jgtime i.low{background:var(--pink)}
-.jgriver{position:relative;margin:16px 16px 6px;height:64px;border-radius:16px;background:linear-gradient(180deg,#0E2233,#0C1A27);overflow:hidden}
-.jgriver::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(100deg,transparent 0 22px,rgba(110,203,244,.07) 22px 26px);animation:jgflow 3s linear infinite}
-@keyframes jgflow{to{background-position:52px 0}}
-.jgstones{position:absolute;left:10px;right:10px;bottom:12px;display:flex;justify-content:space-between;align-items:center}
-.jgstones i{flex:0 1 16px;min-width:4px;height:9px;margin:0 1px;border-radius:50%;background:#3A3F47;box-shadow:0 2px 0 #23272D}
-.jgstones i.on{background:color-mix(in srgb,var(--green) 80%,#3A3F47)}
-.jgstones i.now{background:var(--gold);animation:jgglow 1s ease-in-out infinite alternate}
-@keyframes jgglow{to{box-shadow:0 0 10px var(--gold)}}
-.jgme{position:absolute;left:0;bottom:22px;margin-left:-14px;font-size:26px;line-height:1;transition:transform .28s cubic-bezier(.3,1.4,.5,1)}
-.jgme.hop{animation:jghop .3s ease-out}
-@keyframes jghop{40%{margin-bottom:14px}}
-.jgme.splash{animation:jgshake .4s}
-@keyframes jgshake{20%,60%{margin-left:-20px}40%,80%{margin-left:-8px}}
-.jgme.fall{transition:none;animation:jgfall .7s forwards}
-@keyframes jgfall{to{bottom:-30px;opacity:.2}}
-.jgme.win{animation:jgwin .6s ease-in-out 2}
-@keyframes jgwin{50%{margin-bottom:16px}}
-.jgverse{padding:14px 18px 8px;font-size:20px;line-height:1.8;color:var(--ink);min-height:96px}
-.jgw.hid{color:var(--faint);letter-spacing:1px}
-.jgw.fresh{color:var(--mint);font-weight:700}
-.jgq{display:inline-block;min-width:44px;padding:0 10px;border-radius:10px;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);font-weight:700;text-align:center;animation:jgglow 1s ease-in-out infinite alternate}
-.jgpick{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 16px 18px}
-.jgpick[hidden]{display:none}
-.jgc{min-height:58px;padding:8px 10px;border:1px solid color-mix(in srgb,var(--sky) 35%,#2E2D33);border-radius:16px;background:#16161B;color:var(--ink);font-size:18px;font-weight:700;word-break:keep-all;animation:bwenter .35s cubic-bezier(.2,1.4,.4,1) both}
-.jgc:only-child,.jgc:nth-child(3):last-child{grid-column:1/-1}
-.jgc.right{border-color:var(--green);background:color-mix(in srgb,var(--green) 22%,#16161B);color:var(--green)}
-.jgc.wrong{animation:cellshake .35s;border-color:var(--pink);color:var(--pink);opacity:.45}
-.jgc.hint{border-color:var(--gold);box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 40%,transparent)}
-@media (hover:hover){.jgc:not(:disabled):hover{border-color:var(--sky)}}
-.jgres{text-align:center;padding:6px 20px 24px}
-.jgres[hidden]{display:none}
-.jgres.show{animation:bqres .5s cubic-bezier(.2,1.5,.4,1)}
-.jgr1{font-size:24px;font-weight:700;color:var(--ink)}
-.jgstars{margin:10px 0 6px;font-size:44px;letter-spacing:6px}
-.jgstars span{color:#2E2D33}
-.jgstars span.on{color:var(--gold);display:inline-block;animation:jgstar .5s cubic-bezier(.2,1.8,.4,1) both;text-shadow:0 0 14px color-mix(in srgb,var(--gold) 60%,transparent)}
-@keyframes jgstar{from{transform:scale(0) rotate(-90deg)}to{transform:scale(1)}}
-.jgr2{font-size:14.5px;color:var(--muted)}
-.jgr3{margin-top:6px;min-height:20px;font-size:14.5px;font-weight:700;color:var(--mint)}
-.jgbtns{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
-.jgbtn{height:46px;padding:0 20px;border:1px solid var(--rule);border-radius:23px;background:transparent;color:var(--muted);font-size:15px;font-weight:700}
-.jgbtn.main{border-color:color-mix(in srgb,var(--gold) 60%,#34333A);background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold)}
-.mprow2 .jgopen{color:var(--mint);border-color:color-mix(in srgb,var(--mint) 45%,var(--rule))}
-.jgst{font-size:12px;color:var(--gold)}
-@media (prefers-reduced-motion:reduce){.jgriver::before,.jgstones i.now,.jgq{animation:none}}
+.wtgame{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;align-items:stretch;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);overflow:hidden;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.wtgame[hidden]{display:none}
+.wthud{display:flex;align-items:center;gap:12px;padding:10px 16px 0;font-size:15px}
+.wtscore{color:var(--gold);font-weight:700;font-size:18px;font-variant-numeric:tabular-nums}
+.wtcombo{color:var(--orange);font-weight:700}
+.wtcombo.pop2{animation:bqres .4s cubic-bezier(.2,1.6,.4,1)}
+.wtlines{margin-left:auto;font-size:13px;color:var(--muted)}
+.wtline{margin:8px 16px 10px;min-height:30px;font-size:17px;line-height:1.7;color:var(--ink)}
+.wtw.fresh{color:var(--mint);font-weight:700}
+.wtq{display:inline-block;padding:0 10px;border-radius:10px;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);font-weight:700}
+.wtboard{position:relative;margin:0 auto;border-radius:12px;background:linear-gradient(180deg,#111117,#16151C);box-shadow:inset 0 0 0 1px #24232A;overflow:hidden;
+  background-image:linear-gradient(#1D1C23 1px,transparent 1px),linear-gradient(90deg,#1D1C23 1px,transparent 1px);background-size:25% 11.111%}
+.wtgrid{position:absolute;inset:0}
+.wtb{position:absolute;left:0;top:0;display:grid;place-items:center;padding:0 4px;border-radius:9px;font-size:15px;font-weight:700;line-height:1.15;text-align:center;word-break:keep-all;overflow:hidden;cursor:pointer;
+  color:#101014;background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 92%,#fff),var(--bc));box-shadow:inset 0 -4px 0 rgba(0,0,0,.25),inset 0 2px 0 rgba(255,255,255,.35)}
+.wtb.land{animation:wtland .18s ease-out}
+@keyframes wtland{50%{filter:brightness(1.3)}}
+.wtb.junk{background:#3A3940;color:#77757E;text-decoration:line-through;box-shadow:inset 0 -4px 0 rgba(0,0,0,.3);cursor:default}
+.wtb.nope{animation:cellshake .3s}
+.wtb.hint{animation:wthint .8s ease-in-out infinite alternate}
+@keyframes wthint{to{box-shadow:0 0 0 3px #fff,0 0 16px var(--bc)}}
+.wtb.pop2x{transition:opacity .2s,scale .2s;opacity:0;scale:1.4}
+.wtb.clear{transition:opacity .25s;opacity:0;filter:brightness(2)}
+.wtmsg{position:absolute;left:0;right:0;top:38%;text-align:center;font-size:24px;font-weight:700;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.8);opacity:0;pointer-events:none}
+.wtmsg.show{animation:wtmsg 1.3s ease-out}
+@keyframes wtmsg{0%{opacity:0;transform:scale(.6)}20%{opacity:1;transform:scale(1.1)}70%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-20px)}}
+.wtcover{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px;background:rgba(11,11,13,.86);text-align:center}
+.wtcover[hidden]{display:none}
+.wtc1{font-size:24px;font-weight:700;color:var(--ink)}
+.wtc2 p{margin:4px 0;font-size:14.5px;line-height:1.5;color:var(--muted)}
+.wtc2 b{color:var(--gold)}
+.wtc2 .wtbig{font-size:30px;font-weight:700;color:var(--gold)}
+.wtc2 .wtbest{margin-top:8px;color:var(--gold);font-weight:700}
+.wtstart{margin-top:14px;height:50px;padding:0 34px;border:0;border-radius:25px;background:var(--gold);color:#17120A;font-size:17px;font-weight:700}
+.mprow2 .wtopen{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 45%,var(--rule))}
+.wtico{display:grid;grid-template-columns:repeat(2,6px);gap:1.5px}
+.wtico i{width:6px;height:6px;border-radius:1.5px;background:var(--violet)}
+.wtico i:nth-child(2){background:var(--sky)}.wtico i:nth-child(3){background:var(--orange)}.wtico i:nth-child(4){background:var(--green)}
+.wtbs{font-size:12px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.wtb.hint,.wtmsg.show{animation:none}}
 .oqhint{margin:12px 18px 0;font-size:13px;color:var(--faint)}
 .oqbuilt{flex:1;overflow:auto;padding:20px 20px;font-size:22px;line-height:2;color:var(--hi);word-break:keep-all;align-content:flex-start}
 .oqbuilt[hidden]{display:none}
@@ -3157,7 +3141,7 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("mreveal")){memView.set(id,"");memStep.delete(id);memPeek.delete(id);buzz(8);render();return}
     if(b.classList.contains("morder")){openOrderQuiz(n);return}
-    if(b.classList.contains("jgopen")){openJg(n);return}
+    if(b.classList.contains("wtopen")){openWt(n);return}
     if(b.classList.contains("mladder")){openLadder(n,false);return}
     if(b.classList.contains("dfold")){drillOpen.add(id);render();return}
     if(b.classList.contains("dfoldup")){drillOpen.delete(id);render();return}
@@ -4737,7 +4721,7 @@ button:active{filter:brightness(1.15)}
     }
     var t=0, wi=0;
     tokens(bqState.text).forEach(function(tok){
-      if(/^\s+$/.test(tok)){v.appendChild(document.createTextNode(tok));return}
+      if(/^\s+$/.test(tok)){if(tok.indexOf("\n")>=0)v.appendChild(document.createElement("br"));else v.appendChild(document.createTextNode(tok));return}   // 말씀의 줄바꿈은 그대로
       var sp=document.createElement("span"); sp.className="bw"+(hide[wi]?"":" open shown"); sp.textContent=tok; sp.style.animationDelay=(wi*25)+"ms"; sp.classList.add("enter"); v.appendChild(sp);
       if(hide[wi])t++; wi++;
     });
@@ -4975,142 +4959,165 @@ button:active{filter:brightness(1.15)}
     var id=oqState&&oqState.id; oqState=null; if(id)render();
   }
 
-  /* ---------- 말씀 징검다리: 다음 낱말을 골라 돌을 건너는 암송 게임 ----------
-     1단계 고르기(3개 중) → 2단계 지나온 말 가리기(4개 중) → 3단계 시간 안에(4개 중, 6초)
-     목숨 3개, 연속으로 맞히면 콤보 점수, 실수 수로 별 1~3개. 기록은 이 기기에 저장 */
-  var jg=null, jgS=null, jgTimer=0;
-  var JGLV=[{n:"1단계 · 고르기",k:3,hide:false,sec:0},{n:"2단계 · 가리고 건너기",k:4,hide:true,sec:0},{n:"3단계 · 시간 안에",k:4,hide:true,sec:6}];
-  function jgRec(id){try{var o=JSON.parse(localStorage.getItem("bible-jg:"+id)||"null");if(o&&Array.isArray(o.st))return {st:[0,1,2].map(function(i){return Math.max(0,Math.min(3,+o.st[i]||0))}),best:+o.best||0}}catch(e){}return {st:[0,0,0],best:0}}
-  function jgSave(id,r){try{localStorage.setItem("bible-jg:"+id,JSON.stringify(r))}catch(e){}}
-  function jgBare(w){return String(w).replace(/[^가-힣A-Za-z0-9]/g,"")}
-  function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
-  function jgChoices(i){
-    var ws=jgS.words, right=ws[i], rb=jgBare(right), need=JGLV[jgS.lv].k-1, seen={}, out=[];
-    seen[rb]=1;
-    function take(list){shuffle(list).forEach(function(w){var b=jgBare(w);if(out.length<need&&b&&!seen[b]){seen[b]=1;out.push(w)}})}
-    // 같은 말씀의 다른 낱말(가까운 것 먼저) → 다른 말씀의 낱말
-    take(ws.filter(function(w,k){return k!==i&&Math.abs(k-i)<=6}));
-    take(ws.filter(function(w,k){return k!==i}));
-    if(out.length<need){var other=[];notes.forEach(function(n){if(n.id!==jgS.id)wordsOf(n.text||"").forEach(function(w){if(Math.abs(Array.from(jgBare(w)).length-Array.from(rb).length)<=1)other.push(w)})});take(other.slice(0,400))}
-    if(out.length<need)take(["주님","말씀","사랑","은혜","믿음","소망","평안","지혜","생명","빛"]);
-    return shuffle(out.concat([right]));
-  }
-  function openJg(n,lv){
+  /* ---------- 말씀 블록 (테트리스처럼): 낱말 블록이 떨어지면 말씀 순서대로 다음 낱말을 눌러 없앰 ----------
+     틀린 블록을 누르면 회색 돌이 되어 쌓임. 한 줄이 꽉 차면 줄이 지워짐. 블록이 맨 위까지 쌓이면 끝.
+     말씀을 한 번 다 완성할 때마다 단계가 오르고 빨라짐. 최고 점수는 이 기기에 저장 */
+  var wt=null, W=null, wtIv=0;
+  var WT_COLS=4, WT_ROWS=9;
+  function wtBest(id){try{return +localStorage.getItem("bible-wt:"+id)||0}catch(e){return 0}}
+  function wtBare(w){return String(w).replace(/[^가-힣A-Za-z0-9]/g,"")}
+  function openWt(n){
     var ws=wordsOf(n.text||""); if(ws.length<2){toast("말씀이 조금 더 길어야 게임을 할 수 있어요");return}
-    if(!jg){
-      jg=document.createElement("div"); jg.className="jgame"; jg.setAttribute("role","dialog"); jg.setAttribute("aria-modal","true"); jg.hidden=true;
-      jg.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="jgref"></b><span class="jglvn"></span></div><div class="qbarbtns"><button type="button" class="qvoice"></button><button type="button" class="jgclose">닫기</button></div></div>'+
-        '<div class="jghud"><span class="jghearts" aria-label="목숨"></span><span class="jgcombo"></span><span class="jgscore"></span></div>'+
-        '<div class="jgtime" hidden><i></i></div>'+
-        '<div class="jgriver" aria-hidden="true"><div class="jgstones"></div><span class="jgme"></span></div>'+
-        '<div class="jgverse" aria-live="polite"></div>'+
-        '<div class="jgpick" role="group" aria-label="다음 낱말 고르기"></div>'+
-        '<div class="jgres" hidden><div class="jgr1"></div><div class="jgstars"></div><div class="jgr2"></div><div class="jgr3"></div><div class="jgbtns"></div></div>';
-      document.body.appendChild(jg);
-      jg.querySelector(".jgclose").addEventListener("click",closeJg);
-      window.addEventListener("resize",jgPlace);
-      jg.querySelector(".jgpick").addEventListener("click",function(e){var b=e.target.closest(".jgc");if(b&&!b.disabled)jgAnswer(b)});
-      jg.querySelector(".jgbtns").addEventListener("click",function(e){var b=e.target.closest("button");if(!b||!jgS)return;var nn=notes.get(jgS.id);if(!nn)return;openJg(nn,+b.dataset.lv)});
-      document.addEventListener("keydown",function(e){
-        if(!jg||jg.hidden)return;
-        if(e.key==="Escape"){closeJg();return}
-        var k=+e.key; if(k>=1&&k<=4){var bs=jg.querySelectorAll(".jgc");if(bs[k-1]&&!bs[k-1].disabled)jgAnswer(bs[k-1])}
+    if(!wt){
+      wt=document.createElement("div"); wt.className="wtgame"; wt.setAttribute("role","dialog"); wt.setAttribute("aria-modal","true"); wt.hidden=true;
+      wt.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="wtref"></b><span class="wtlv"></span></div><div class="qbarbtns"><button type="button" class="qvoice"></button><button type="button" class="wtclose">닫기</button></div></div>'+
+        '<div class="wthud"><span class="wtscore">0</span><span class="wtcombo"></span><span class="wtlines"></span></div>'+
+        '<div class="wtline" aria-live="polite"></div>'+
+        '<div class="wtboard"><div class="wtgrid"></div><div class="wtmsg"></div>'+
+          '<div class="wtcover"><div class="wtc1">🧱 말씀 블록</div><div class="wtc2"></div><button type="button" class="wtstart">시작</button></div></div>';
+      document.body.appendChild(wt);
+      wt.querySelector(".wtclose").addEventListener("click",closeWt);
+      wt.querySelector(".wtstart").addEventListener("click",wtStart);
+      wt.querySelector(".wtboard").addEventListener("pointerdown",function(e){
+        var el=e.target.closest(".wtb"); if(!el||!W||!W.run)return; e.preventDefault();
+        var b=W.blocks.find(function(x){return x.el===el}); if(b)wtTap(b);
       });
+      window.addEventListener("resize",function(){if(W)wtSize()});
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&wt&&!wt.hidden)closeWt()});
+      document.addEventListener("visibilitychange",function(){if(document.visibilityState!=="visible"&&W&&W.run)wtPause()});
     }
-    var rec=jgRec(n.id);
-    if(lv==null){lv=0;while(lv<2&&rec.st[lv]===3)lv++}   // 별 3개를 다 받은 단계는 건너뜀
-    lv=Math.max(0,Math.min(2,lv)); if(lv>0&&!rec.st[lv-1])lv=0;            // 앞 단계를 깨야 열림
-    jgS={id:n.id,ref:n.ref,words:ws,i:0,lv:lv,hearts:3,miss:0,combo:0,maxCombo:0,score:0,t0:Date.now(),done:false};
-    jg.querySelector(".jgref").textContent=n.ref;
-    jg.querySelector(".jglvn").textContent=JGLV[lv].n;
-    jg.querySelector(".jgres").hidden=true; jg.querySelector(".jgpick").hidden=false; jg.querySelector(".jgverse").hidden=false; jg.querySelector(".jgriver").hidden=false;
-    var st=jg.querySelector(".jgstones"); st.textContent="";
-    ws.forEach(function(_,k){var d=document.createElement("i");d.style.setProperty("--k",k);st.appendChild(d)});
-    var me=jg.querySelector(".jgme"); me.textContent=typeof myEmoji==="function"?myEmoji():"🐑"; me.classList.remove("fall","win");
-    jg.hidden=false; jgDraw(); document.body.style.overflow="hidden"; $("fab").hidden=true; syncVoiceBtns();
+    W={id:n.id,ref:n.ref,words:ws,next:0,blocks:[],run:false,over:false,score:0,combo:0,lines:0,lv:1,speed:1.1,every:1900,last:0,t:0,since:0,miss:0,hintAt:0};
+    wt.querySelector(".wtref").textContent=n.ref;
+    wt.querySelector(".wtgrid").textContent=""; wt.querySelector(".wtmsg").textContent="";
+    var best=wtBest(n.id);
+    wt.querySelector(".wtc1").textContent="🧱 말씀 블록";
+    wt.querySelector(".wtc2").innerHTML='';
+    ["낱말 블록이 떨어져요.","말씀 <b>순서대로 다음 낱말</b>을 눌러 없애요.","틀린 블록을 누르면 회색 돌이 돼요.","한 줄이 꽉 차면 줄이 지워져요.","맨 위까지 쌓이면 끝!"].forEach(function(t){var p=document.createElement("p");p.innerHTML=t;wt.querySelector(".wtc2").appendChild(p)});
+    if(best){var bp=document.createElement("p");bp.className="wtbest";bp.textContent="🏆 최고 "+best+"점";wt.querySelector(".wtc2").appendChild(bp)}
+    wt.querySelector(".wtstart").textContent="시작";
+    wt.querySelector(".wtcover").hidden=false;
+    wt.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true; syncVoiceBtns();
+    wtSize(); wtHud(); wtLine();
   }
-  function jgDraw(){
-    var S=jgS, L=JGLV[S.lv];
-    jg.querySelector(".jghearts").textContent="❤️".repeat(S.hearts)+"🤍".repeat(3-S.hearts);
-    var cb=jg.querySelector(".jgcombo"); cb.textContent=S.combo>=2?"🔥 "+S.combo+" 콤보":""; cb.classList.remove("pop2"); if(S.combo>=2){void cb.offsetWidth;cb.classList.add("pop2")}
-    jg.querySelector(".jgscore").textContent=S.score+"점";
-    // 돌: 건넌 돌은 초록, 지금 돌은 반짝
-    var stones=jg.querySelectorAll(".jgstones i"); stones.forEach(function(d,k){d.className=k<S.i?"on":k===S.i?"now":""});
-    jgPlace();
-    var v=jg.querySelector(".jgverse"); v.textContent="";
-    S.words.forEach(function(w,k){
-      if(k>S.i)return;
-      var sp=document.createElement("span");
-      if(k===S.i){sp.className="jgq";sp.textContent="?";}
-      else{sp.className="jgw"+(L.hide&&k<S.i-1?" hid":"")+(k===S.i-1?" fresh":"");sp.textContent=L.hide&&k<S.i-1?circles(w):w}
-      v.appendChild(sp); v.appendChild(document.createTextNode(" "));
+  function wtSize(){
+    var bd=wt.querySelector(".wtboard"), top=bd.getBoundingClientRect().top, availH=window.innerHeight-top-16, availW=Math.min(wt.clientWidth-24,440);
+    var ch=Math.max(34,Math.min(58,Math.floor(availH/WT_ROWS))), cw=Math.floor(availW/WT_COLS);
+    W.cw=cw; W.ch=ch; bd.style.width=(cw*WT_COLS)+"px"; bd.style.height=(ch*WT_ROWS)+"px";
+    W.blocks.forEach(wtPlace);
+  }
+  function wtStart(){
+    if(!W)return;
+    if(W.over){var nn=notes.get(W.id); if(nn){openWt(nn);}}
+    wt.querySelector(".wtcover").hidden=true; W.run=true; W.t=performance.now(); W.last=W.t-W.every+300; W.since=W.t;
+    clearInterval(wtIv); wtIv=setInterval(function(){wtLoop(performance.now())},30);
+  }
+  function wtPause(){
+    if(!W||!W.run)return; W.run=false;
+    wt.querySelector(".wtc1").textContent="⏸ 잠깐 쉬는 중"; wt.querySelector(".wtc2").textContent=""; wt.querySelector(".wtstart").textContent="계속하기";
+    wt.querySelector(".wtcover").hidden=false;
+  }
+  function wtHud(){
+    wt.querySelector(".wtscore").textContent=W.score+"점";
+    var c=wt.querySelector(".wtcombo"); c.textContent=W.combo>=2?"🔥 "+W.combo+" 콤보":""; if(W.combo>=2){c.classList.remove("pop2");void c.offsetWidth;c.classList.add("pop2")}
+    wt.querySelector(".wtlines").textContent="말씀 "+(W.lv-1)+"번 완성";
+    wt.querySelector(".wtlv").textContent=W.lv+"단계";
+  }
+  function wtLine(){   // 위쪽 줄: 지금까지 맞힌 말씀 + 다음 자리 ?
+    var box=wt.querySelector(".wtline"); box.textContent="";
+    var from=Math.max(0,W.next-5);
+    if(from>0)box.appendChild(document.createTextNode("… "));
+    for(var k=from;k<W.next;k++){var sp=document.createElement("span");sp.className="wtw"+(k===W.next-1?" fresh":"");sp.textContent=W.words[k];box.appendChild(sp);box.appendChild(document.createTextNode(" "))}
+    var q=document.createElement("span"); q.className="wtq"; q.textContent=W.next===0?"첫 낱말은?":"?"; box.appendChild(q);
+  }
+  function wtHeight(col){return W.blocks.filter(function(b){return b.landed&&b.col===col}).length}
+  function wtPickWord(){
+    var need=W.words[W.next], nb=wtBare(need);
+    var onBoard=W.blocks.some(function(b){return !b.junk&&wtBare(b.word)===nb});
+    W.sinceNeed=(W.sinceNeed||0)+1;
+    if(!onBoard&&(Math.random()<.5||W.sinceNeed>=3)){W.sinceNeed=0;return need}
+    if(Math.random()<.75){var pool=W.words.filter(function(w){return wtBare(w)!==nb});if(pool.length)return pool[Math.floor(Math.random()*pool.length)]}
+    var other=[];notes.forEach(function(n){if(n.id!==W.id)wordsOf(n.text||"").forEach(function(w){if(wtBare(w)&&wtBare(w)!==nb)other.push(w)})});
+    if(other.length)return other[Math.floor(Math.random()*other.length)];
+    return W.words[Math.floor(Math.random()*W.words.length)];
+  }
+  function wtSpawn(){
+    var cols=[]; for(var c=0;c<WT_COLS;c++){if(wtHeight(c)<WT_ROWS&&!W.blocks.some(function(b){return !b.landed&&b.col===c&&b.y<1.2}))cols.push(c)}
+    if(!cols.length)return;
+    var col=cols[Math.floor(Math.random()*cols.length)], word=wtPickWord();
+    var el=document.createElement("div"); el.className="wtb"; el.textContent=word;
+    var hue=["--violet","--sky","--orange","--green","--pink","--gold","--mint"][Math.floor(Math.random()*7)]; el.style.setProperty("--bc","var("+hue+")");
+    wt.querySelector(".wtgrid").appendChild(el);
+    var b={el:el,col:col,y:-1,word:word,landed:false,junk:false}; W.blocks.push(b); wtPlace(b);
+  }
+  function wtPlace(b){b.el.style.width=(W.cw-4)+"px";b.el.style.height=(W.ch-4)+"px";b.el.style.transform="translate("+(b.col*W.cw+2)+"px,"+(b.y*W.ch+2)+"px)"}
+  function wtLoop(now){
+    if(!W||!W.run||wt.hidden){clearInterval(wtIv);return}
+    var dt=Math.min(.05,(now-W.t)/1000); W.t=now;
+    if(now-W.last>W.every){W.last=now;wtSpawn()}
+    var landedNow=false;
+    W.blocks.forEach(function(b){
+      if(b.landed)return;
+      var floor=WT_ROWS-1-wtHeight(b.col);
+      b.y+=W.speed*dt;
+      if(b.y>=floor){b.y=floor;b.landed=true;landedNow=true;b.el.classList.add("land")}
+      wtPlace(b);
     });
-    var pk=jg.querySelector(".jgpick"); pk.textContent="";
-    if(S.i>=S.words.length)return;
-    jgChoices(S.i).forEach(function(w,k){var b=document.createElement("button");b.type="button";b.className="jgc";b.dataset.w=w;b.style.animationDelay=(k*50)+"ms";b.textContent=w;pk.appendChild(b)});
-    clearInterval(jgTimer); var tb=jg.querySelector(".jgtime"); tb.hidden=!L.sec;
-    if(L.sec){var t0=Date.now(), bar=tb.firstChild; bar.style.width="100%";
-      jgTimer=setInterval(function(){if(!jgS||jgS.done){clearInterval(jgTimer);return}var left=1-(Date.now()-t0)/(L.sec*1000);bar.style.width=Math.max(0,left*100)+"%";bar.classList.toggle("low",left<.35);if(left<=0){clearInterval(jgTimer);jgWrong(null)}},100)}
+    if(landedNow){
+      if(W.blocks.some(function(b){return b.landed&&b.y<0.5})){wtOver();return}
+      wtRows();
+    }
+    // 오래 못 찾으면 정답 블록을 살짝 반짝
+    var nb=wtBare(W.words[W.next]);
+    W.blocks.forEach(function(b){b.el.classList.toggle("hint",!b.junk&&now-W.since>9000&&wtBare(b.word)===nb)});
   }
-  function jgPlace(){   // 내 이모티콘을 지금 밟을 돌 위로
-    if(!jgS||!jg||jg.hidden)return;
-    var stones=jg.querySelectorAll(".jgstones i"), me=jg.querySelector(".jgme"), cur=stones[Math.min(jgS.i,stones.length-1)];
-    if(cur){var rr=jg.querySelector(".jgriver").getBoundingClientRect(), cr=cur.getBoundingClientRect(); me.style.transform="translate("+(cr.left-rr.left+cr.width/2)+"px,0)"}
+  function wtRows(){
+    var cleared=0;
+    for(var r=WT_ROWS-1;r>=0;r--){
+      var row=W.blocks.filter(function(b){return b.landed&&Math.round(b.y)===r});
+      if(row.length===WT_COLS){
+        row.forEach(function(b){b.el.classList.add("clear");(function(el){setTimeout(function(){el.remove()},260)})(b.el)});
+        W.blocks=W.blocks.filter(function(b){return row.indexOf(b)<0});
+        W.blocks.forEach(function(b){if(b.landed&&Math.round(b.y)<r)b.landed=false});
+        cleared++;
+      }
+    }
+    if(cleared){W.lines+=cleared;W.score+=100*cleared*W.lv;wtMsg(cleared>1?cleared+"줄 지우기! ✨":"줄 지우기! ✨");buzz([10,30,10]);wtHud()}
   }
-  function jgAnswer(b){
-    var S=jgS; if(!S||S.done)return;
-    if(jgBare(b.dataset.w)===jgBare(S.words[S.i])){
-      clearInterval(jgTimer);
-      S.combo++; S.maxCombo=Math.max(S.maxCombo,S.combo); S.score+=10*Math.min(5,S.combo)+(JGLV[S.lv].sec?5:0);
-      b.classList.add("right"); sparkle(b); buzz(8); sayWord(S.words[S.i]);
-      S.i++;
-      var me=jg.querySelector(".jgme"); me.classList.remove("hop"); void me.offsetWidth; me.classList.add("hop");
-      if(S.i>=S.words.length){jgDraw();setTimeout(jgFinish,350);return}
-      setTimeout(function(){if(jgS===S&&!S.done)jgDraw()},180);
-    }else jgWrong(b);
+  function wtMsg(t){var m=wt.querySelector(".wtmsg");m.textContent=t;m.classList.remove("show");void m.offsetWidth;m.classList.add("show")}
+  function wtTap(b){
+    if(b.junk){b.el.classList.remove("nope");void b.el.offsetWidth;b.el.classList.add("nope");return}
+    if(wtBare(b.word)===wtBare(W.words[W.next])){
+      W.combo++; W.score+=10*Math.min(6,W.combo)*W.lv; W.since=performance.now();
+      sparkle(b.el); buzz(8); sayWord(W.words[W.next]);
+      b.el.classList.add("pop2x"); (function(el){setTimeout(function(){el.remove()},200)})(b.el);
+      var col=b.col, y=b.y; W.blocks=W.blocks.filter(function(x){return x!==b});
+      W.blocks.forEach(function(x){if(x.landed&&x.col===col&&x.y<y)x.landed=false});   // 위에 쌓인 블록이 내려옴
+      W.next++;
+      if(W.next>=W.words.length){
+        W.next=0; W.score+=200*W.lv; W.lv++; W.speed*=1.15; W.every=Math.max(700,W.every*.88);
+        wtMsg("말씀 완성! 🎉 "+W.lv+"단계"); confetti(wt.querySelector(".wtscore")); buzz([14,50,22]);
+        recordDrill(W.id,0,W.words.length,false);
+      }
+      wtHud(); wtLine();
+    }else{
+      W.combo=0; W.miss++; b.junk=true; b.el.classList.add("junk"); buzz([30,30,30]); wtHud();
+    }
   }
-  function jgWrong(b){
-    var S=jgS; if(!S||S.done)return;
-    S.hearts--; S.miss++; S.combo=0; buzz([30,30,30]);
-    if(b){b.disabled=true;b.classList.add("wrong")}
-    var me=jg.querySelector(".jgme"); me.classList.remove("splash"); void me.offsetWidth; me.classList.add("splash");
-    if(S.hearts<=0){jgFinish(true);return}
-    if(!b){jgDraw();return}   // 시간이 다 되면 새 보기로
-    jg.querySelector(".jghearts").textContent="❤️".repeat(S.hearts)+"🤍".repeat(3-S.hearts);
-    jg.querySelector(".jgcombo").textContent="";
-    // 남은 보기가 정답 하나면 바로 알려 줌
-    var left=Array.prototype.filter.call(jg.querySelectorAll(".jgc"),function(x){return !x.disabled});
-    if(left.length===1)left[0].classList.add("hint");
+  function wtOver(){
+    W.run=false; W.over=true;
+    var best=wtBest(W.id), nb=W.score>best; if(nb){try{localStorage.setItem("bible-wt:"+W.id,String(W.score))}catch(e){}}
+    wt.querySelector(".wtc1").textContent="블록이 꽉 찼어요!";
+    var c2=wt.querySelector(".wtc2"); c2.textContent="";
+    [W.score+"점"+(nb?"  🏆 최고 기록!":""),"말씀 "+(W.lv-1)+"번 완성 · 줄 "+W.lines+"개 지움",nb?"":"최고 "+best+"점"].forEach(function(t,i){if(!t)return;var p=document.createElement("p");p.className=i===0?"wtbig":"";p.textContent=t;c2.appendChild(p)});
+    wt.querySelector(".wtstart").textContent="다시 하기";
+    wt.querySelector(".wtcover").hidden=false; buzz([40,60,40]);
+    if(nb)confetti(wt.querySelector(".wtstart"));
   }
-  function jgFinish(fail){
-    var S=jgS; if(!S||S.done)return; S.done=true; clearInterval(jgTimer);
-    var rec=jgRec(S.id), stars=fail?0:S.miss===0?3:S.miss===1?2:1, ms=Date.now()-S.t0;
-    var firstClear=!fail&&!rec.st[S.lv], better=stars>rec.st[S.lv]; if(better)rec.st[S.lv]=stars;
-    var newBest=!fail&&S.score>rec.best; if(newBest)rec.best=S.score;
-    jgSave(S.id,rec);
-    var dr=null; if(!fail)dr=recordDrill(S.id,ms,S.words.length,newBest&&rec.best>0&&S.lv>0);
-    var me=jg.querySelector(".jgme");
-    if(fail){me.classList.add("fall")}else{me.classList.add("win");confetti(jg.querySelector(".jgscore"));buzz([14,50,22])}
-    setTimeout(function(){
-      if(jgS!==S)return;
-      jg.querySelector(".jgpick").hidden=true; jg.querySelector(".jgtime").hidden=true;
-      var r=jg.querySelector(".jgres"); r.hidden=false; r.classList.remove("show"); void r.offsetWidth; r.classList.add("show");
-      jg.querySelector(".jgr1").textContent=fail?"앗, 물에 빠졌어요 💦":stars===3?"완벽하게 건넜어요!":"다 건넜어요!";
-      var sw=jg.querySelector(".jgstars"); sw.textContent="";
-      for(var k=0;k<3;k++){var e=document.createElement("span");e.className=k<stars?"on":"";e.textContent="★";e.style.animationDelay=(k*180)+"ms";sw.appendChild(e)}
-      jg.querySelector(".jgr2").textContent=fail?S.i+" / "+S.words.length+" 낱말까지 건넜어요":S.score+"점 · 최대 "+S.maxCombo+" 콤보 · "+fmtTime(ms)+(newBest?"  🏆 최고 점수!":"");
-      var unlock=firstClear&&S.lv<2;
-      jg.querySelector(".jgr3").textContent=fail?"한 번 더 하면 더 멀리 갈 수 있어요":unlock?"🔓 "+JGLV[S.lv+1].n+"이 열렸어요!"+(stars<3?" (실수 없이 건너면 별 3개)":""):stars<3?"실수 없이 건너면 별 3개!":dr&&dr.medal?dr.medal[1]+" 연습 "+dr.medal[2]+" 달성!":"";
-      var bx=jg.querySelector(".jgbtns"); bx.textContent="";
-      function add(t,lv,main){var b=document.createElement("button");b.type="button";b.className="jgbtn"+(main?" main":"");b.dataset.lv=String(lv);b.textContent=t;bx.appendChild(b)}
-      if(!fail&&S.lv<2)add("다음 단계 ▶",S.lv+1,stars===3);
-      add(fail||stars<3?"다시 도전":"한 번 더",S.lv,fail||stars<3&&S.lv<2?true:S.lv===2);
-      if(S.lv>0)add("1단계",0,false);
-    },fail?700:900);
-  }
-  function closeJg(){
-    if(!jg||jg.hidden)return; clearInterval(jgTimer); jg.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode;
-    var id=jgS&&jgS.id; jgS=null; if(id){var c=cards.get(id);if(c){var p=c.querySelector(".mempanel");if(p)p.dataset.key=""}render()}
+  function closeWt(){
+    if(!wt||wt.hidden)return;
+    if(W&&W.run&&!W.over&&W.score>wtBest(W.id)){try{localStorage.setItem("bible-wt:"+W.id,String(W.score))}catch(e){}}
+    if(W)W.run=false; wt.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode;
+    var id=W&&W.id; W=null; if(id){var c=cards.get(id);if(c){var p=c.querySelector(".mempanel");if(p)p.dataset.key=""}render()}
   }
 
   /* ---------- 듣기 (읽어 주기) ---------- */
@@ -5763,10 +5770,10 @@ button:active{filter:brightness(1.15)}
     var lb=document.createElement("button"); lb.type="button"; lb.className="mladder"; lb.disabled=ladderBusy.has(n.id);
     lb.innerHTML=ladderBusy.has(n.id)?'<span>질문 만드는 중…</span>':'<svg class="mlicon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3h7A2.5 2.5 0 0 1 16 5.5v4A2.5 2.5 0 0 1 13.5 12H9l-3.5 3v-3A2.5 2.5 0 0 1 4 9.5z"/><path d="M19 9.2a2.3 2.3 0 0 1 1 1.9v3.7a2.3 2.3 0 0 1-2.3 2.3V20l-3.3-2.9H11a2.3 2.3 0 0 1-2-1.1"/></svg><span>질문으로</span>';
     prow2.appendChild(lb);
-    var jgb=document.createElement("button"); jgb.type="button"; jgb.className="jgopen"; var jr=jgRec(n.id), jst=jr.st[0]+jr.st[1]+jr.st[2];
-    jgb.innerHTML='<span aria-hidden="true">🪨</span><span>징검다리</span>'+(jst?'<span class="jgst"></span>':'');
-    if(jst)jgb.querySelector(".jgst").textContent="⭐"+jst;
-    jgb.setAttribute("aria-label","말씀 징검다리 게임"+(jst?" (별 "+jst+"개)":"")); prow2.appendChild(jgb);
+    var wtb=document.createElement("button"); wtb.type="button"; wtb.className="wtopen"; var wbest=wtBest(n.id);
+    wtb.innerHTML='<span class="wtico" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>블록</span>'+(wbest?'<span class="wtbs"></span>':'');
+    if(wbest)wtb.querySelector(".wtbs").textContent=wbest;
+    wtb.setAttribute("aria-label","말씀 블록 게임"+(wbest?" (최고 "+wbest+"점)":"")); prow2.appendChild(wtb);
     if(canSpeak){var sb=document.createElement("button");sb.type="button";sb.className="mspeak"+(speakingId===n.id?" on":"");sb.innerHTML=speakingId===n.id?'<span aria-hidden="true">■</span><span>멈추기</span>':'<span aria-hidden="true">🔊</span><span>듣기</span>';prow2.appendChild(sb)}
     panel.appendChild(prow2);
     var nxt=memNextStep(n);
