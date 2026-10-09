@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-21">
+<meta name="app-build" content="2026-10-10-22">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5369,7 +5369,7 @@ button:active{filter:brightness(1.15)}
     var gc=ghCfg(), gs=(typeof ghState==="object"&&ghState)||{};   // 앱이 처음 그려질 때는 아직 동기화 상태가 없을 수 있음
     var ss=sbSession(), sst=(typeof sbState==="object"&&sbState)||{};
     if(ss){var sago=sst.at?Math.round((Date.now()-sst.at)/60000):-1;
-      rows.push({icon:"☁️",info:1,label:"동기화",tag:sst.ok===false?"안 됐어요":(typeof sbBusy!=="undefined"&&sbBusy)||sago<0?"맞추는 중…":sago<1?"방금 맞춤":sago+"분 전 맞춤",bad:sst.ok===false,chips:[{id:"",t:"지금 맞추기",act:"sbsync"}],done:sst.ok===true})}
+      rows.push({icon:"☁️",info:1,label:"동기화",tag:sst.ok===false?"안 됐어요 · "+(sst.short||""):(typeof sbBusy!=="undefined"&&sbBusy)||sago<0?"맞추는 중…":sago<1?"방금 맞춤":sago+"분 전 맞춤",bad:sst.ok===false,chips:[{id:"",t:"지금 맞추기",act:"sbsync"}],done:sst.ok===true})}
     else if(gc){var ago=gs.at?Math.round((Date.now()-gs.at)/60000):-1;
       rows.push({icon:"☁️",info:1,label:"동기화",tag:gs.ok===false?"안 됐어요":ghBusy?"맞추는 중…":ago<0?"GitHub 켜짐":ago<1?"방금 맞춤":ago+"분 전 맞춤",bad:gs.ok===false,chips:[{id:"",t:"지금 맞추기",act:"sync"}],done:gs.ok===true})}
     else rows.push({icon:"☁️",info:1,label:"동기화",tag:"꺼짐",chips:[{id:"",t:"로그인",act:"sblogin"}]});
@@ -6799,7 +6799,8 @@ button:active{filter:brightness(1.15)}
     var x=sbSession(); if(!x)return null;
     if(Date.now()/1000<(x.expires_at||0)-60)return x.access_token;
     var r=await fetch(SB_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:sbH(),body:JSON.stringify({refresh_token:x.refresh_token})});
-    if(!r.ok){if(r.status===400||r.status===401){sbSetSession(null);toast("로그인이 끝났어요. 다시 로그인해 주세요");renderReviewBar()}return null}
+    if(!r.ok){sbTokErr="로그인 갱신 실패 ("+r.status+")"; if(r.status===400||r.status===401){sbSetSession(null);toast("로그인이 끝났어요. 다시 로그인해 주세요");renderReviewBar()}return null}
+    sbTokErr="";
     var j=await r.json(); sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
     return j.access_token;
   }
@@ -6807,6 +6808,13 @@ button:active{filter:brightness(1.15)}
     // 로그인 직후: 이 기기의 노트를 모두 올리고, 서버의 노트를 모두 받음
     var u=await fetch(SB_URL+"/auth/v1/user",{headers:sbH(tok)}); if(!u.ok)throw new Error("user");
     return u.json();
+  }
+  // 동기화가 안 될 때 이유를 사람이 읽을 수 있게 (서버가 보낸 설명 앞부분까지)
+  var sbTokErr="";
+  async function sbErr(r,what){
+    var detail=""; try{var t=await r.text(); try{var j=JSON.parse(t); detail=j.message||j.msg||j.error_description||j.error||t}catch(e){detail=t}}catch(e){}
+    detail=String(detail||"").replace(/\s+/g," ").trim().slice(0,140);
+    return {msg:what+" ("+r.status+(detail?": "+detail:"")+")",short:what+" "+r.status};
   }
   function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");try{localStorage.removeItem(SB_LAST)}catch(e){}}
   function sbMark(id){if(sbApplying||!sbSession())return; sbDirty.add(id); clearTimeout(sbTimer); sbTimer=setTimeout(function(){sbSync("auto")},1500)}
@@ -6818,7 +6826,7 @@ button:active{filter:brightness(1.15)}
     sbBusy=true; if(why==="manual")renderReviewBar();
     var ids=Array.from(sbDirty); sbDirty.clear();
     try{
-      var tok=await sbToken(); if(!tok)throw {msg:"다시 로그인해 주세요"};
+      var tok=await sbToken(); if(!tok)throw {msg:sbTokErr||"다시 로그인해 주세요",short:sbTokErr?"로그인 갱신 실패":"다시 로그인"};
       var uid=sbSession().user.id, now=Date.now(), rows=[], tb=tombs();
       ids.forEach(function(id){
         if(id==="__me"){
@@ -6842,12 +6850,12 @@ button:active{filter:brightness(1.15)}
       rows.forEach(function(r){if(!r.visibility)r.visibility="private"});
       for(var k=0;k<rows.length;k+=200){
         var pr=await fetch(SB_URL+"/rest/v1/notes?on_conflict=user_id,id",{method:"POST",headers:Object.assign(sbH(tok),{"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(rows.slice(k,k+200))});
-        if(!pr.ok){throw {msg:"올리지 못했어요 ("+pr.status+")"}}
+        if(!pr.ok){throw await sbErr(pr,"올리지 못했어요")}
       }
       // 다른 기기에서 바뀐 것 받기 (기기 시계 차이를 생각해 10분 겹쳐서)
       var last=+(localStorage.getItem(SB_LAST)||0), since=Math.max(0,last-600000), maxAt=last;
       var gr=await fetch(SB_URL+"/rest/v1/notes?select=id,data,updated_at,deleted&user_id=eq."+uid+"&updated_at=gt."+since+"&order=updated_at.asc&limit=2000",{headers:sbH(tok),cache:"no-store"});
-      if(!gr.ok)throw {msg:"받지 못했어요 ("+gr.status+")"};
+      if(!gr.ok)throw await sbErr(gr,"받지 못했어요");
       var arr=await gr.json(), res={added:0,updated:0,removed:0};
       sbApplying=true;
       try{
@@ -6872,7 +6880,9 @@ button:active{filter:brightness(1.15)}
       return true;
     }catch(e){
       ids.forEach(function(id){sbDirty.add(id)});
-      sbState={ok:false,at:sbState.at,msg:(e&&e.msg)||"맞추지 못했어요. 인터넷 연결을 확인해 주세요"};
+      var net=e&&!e.msg&&e.message;   // fetch 자체가 실패 (인터넷, 차단, 너무 큰 요청 등)
+      sbState={ok:false,at:sbState.at,msg:(e&&e.msg)||("서버에 닿지 못했어요"+(net?" ("+String(e.message).slice(0,80)+")":"")+". 인터넷 연결을 확인해 주세요"),short:(e&&e.short)||"연결 안 됨"};
+      try{console.warn("sync failed",e)}catch(err){}
       if(why==="manual"||why==="login")toast(sbState.msg);
       return false;
     }finally{
