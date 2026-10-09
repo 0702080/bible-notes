@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-11">
+<meta name="app-build" content="2026-10-10-12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -322,6 +322,12 @@ details.menu>summary::-webkit-details-marker{display:none}
 .frtoggle.on .frts{color:var(--mint)}
 .frerr{color:var(--pink)}
 .frtip{margin:8px 0 0;font-size:12.5px}
+.gcref{margin:2px 0 8px;font-size:17px;font-weight:700;color:var(--violet)}
+.gctime{height:44px;margin-bottom:10px}
+.gcdays,.gcst{display:flex;gap:6px;margin-bottom:12px}
+.gcdays button,.gcst button{flex:1;height:40px;border:1px solid var(--rule);border-radius:12px;background:transparent;color:var(--muted);font-size:14px;font-weight:700}
+.gcdays button.on,.gcst button.on{border-color:color-mix(in srgb,var(--sky) 55%,#34333A);background:color-mix(in srgb,var(--sky) 14%,transparent);color:var(--sky)}
+.gcnote{margin-top:10px;font-size:12.5px}
 .pdel{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--faint);white-space:nowrap}
 .mend{margin-top:8px;padding:10px 12px 12px;border-radius:12px;background:#121216;border:1px solid #232229;display:flex;flex-direction:column;gap:4px}
 .mendl{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-top:4px}
@@ -2366,6 +2372,7 @@ button:active{filter:brightness(1.15)}
           '<button type="button" class="medit">본문 고치기</button>'+
           '<button type="button" class="mcopy">말씀 복사</button>'+
           '<button type="button" class="mtopic">주제 정하기</button>'+
+          '<button type="button" class="mgcal">📅 구글 캘린더로 암송 알림</button>'+
           '<button type="button" class="mpin">맨 위에 고정</button>'+
           '<button type="button" class="mpriv" hidden></button>'+
           '<a class="mgae" target="_blank" rel="noopener" hidden>개역개정으로 보기 (성서공회)</a>'+
@@ -3036,6 +3043,7 @@ button:active{filter:brightness(1.15)}
     var id=card.dataset.id, n=notes.get(id); if(!n)return;
     if(b.classList.contains("tab")){tabOf.set(id,b.dataset.tab);render();return}
     if(b.classList.contains("mtopic")){b.closest("details").open=false;openPicker(id);return}
+    if(b.classList.contains("mgcal")){b.closest("details").open=false;openGcal(id);return}
     if(b.classList.contains("vtopic")){openPicker(id);return}
     if(b.classList.contains("vxref")){toggleXref(card,n);return}
     if(b.classList.contains("xldel")){
@@ -6698,6 +6706,79 @@ button:active{filter:brightness(1.15)}
     }
   }
   $("sbBtn").addEventListener("click",function(){$("topMenu").open=false;openSb()});
+
+  /* ---------- 구글 캘린더로 암송 알림 ----------
+     구글 캘린더 '일정 추가' 주소에 말씀을 담아 매일 반복 일정으로 넣음. 일정의 링크를 누르면 이 앱에서 그 말씀 암송이 열림 */
+  var gcBox=null, gcNote="", gcDays=21, GC_KEY="bible-gcal";
+  function gcPref(){try{var o=JSON.parse(localStorage.getItem(GC_KEY)||"{}");return {t:/^\d\d:\d\d$/.test(o.t)?o.t:"07:00",d:[7,21,40].indexOf(+o.d)>=0?+o.d:21,st:o.st==="today"?"today":"tomorrow"}}catch(e){return {t:"07:00",d:21,st:"tomorrow"}}}
+  function gcSave(o){try{localStorage.setItem(GC_KEY,JSON.stringify(o))}catch(e){}}
+  function pad2(x){return (x<10?"0":"")+x}
+  function gcStamp(d){return d.getFullYear()+pad2(d.getMonth()+1)+pad2(d.getDate())+"T"+pad2(d.getHours())+pad2(d.getMinutes())+"00"}
+  function gcUrl(n,o){
+    var hm=o.t.split(":"), st=new Date(); st.setHours(+hm[0],+hm[1],0,0);
+    if(o.st==="tomorrow"||st.getTime()<Date.now())st=new Date(st.getTime()+864e5);
+    var en=new Date(st.getTime()+10*60000);
+    var plain=String(n.text||"").replace(/\s+/g," ").trim(), head=plain.length>22?plain.slice(0,22)+"…":plain;
+    var link=SB_SITE+"?mem="+encodeURIComponent(n.id)+"&r="+encodeURIComponent(n.ref||"");
+    var details=(n.ref||"")+"\n"+String(n.text||"").trim()+"\n\n▶ 외우러 가기\n"+link;
+    var q="action=TEMPLATE&text="+encodeURIComponent("📖 "+(n.ref||"말씀")+" 암송 · "+head)+
+      "&dates="+gcStamp(st)+"/"+gcStamp(en)+"&ctz="+encodeURIComponent(Intl.DateTimeFormat().resolvedOptions().timeZone||"Asia/Seoul")+
+      "&details="+encodeURIComponent(details)+"&recur="+encodeURIComponent("RRULE:FREQ=DAILY;COUNT="+o.d);
+    return "https://calendar.google.com/calendar/render?"+q;
+  }
+  function openGcal(id){
+    var n=notes.get(id); if(!n)return; gcNote=id;
+    if(!gcBox){
+      gcBox=document.createElement("div"); gcBox.className="ghsheet gcsheet"; gcBox.hidden=true; gcBox.setAttribute("role","dialog"); gcBox.setAttribute("aria-modal","true");
+      gcBox.innerHTML='<div class="ghbox"><div class="ghhd"><b>📅 구글 캘린더로 암송 알림</b><button type="button" class="ghclose gcclose">닫기</button></div>'+
+        '<p class="gcref"></p><p class="ghtip">정한 시간마다 캘린더 알림으로 이 말씀이 떠요. 알림의 일정을 열고 <b>외우러 가기</b> 링크를 누르면 바로 가리기 연습이 열려요.</p>'+
+        '<label class="ghl">알림 시간</label><input class="field gctime" type="time" step="300">'+
+        '<label class="ghl">며칠 동안</label><div class="gcdays" role="group" aria-label="며칠 동안"><button type="button" data-d="7">7일</button><button type="button" data-d="21">21일</button><button type="button" data-d="40">40일</button></div>'+
+        '<label class="ghl">시작</label><div class="gcst" role="group" aria-label="시작"><button type="button" data-s="today">오늘부터</button><button type="button" data-s="tomorrow">내일부터</button></div>'+
+        '<button type="button" class="ghconnect gcgo">구글 캘린더에 넣기</button>'+
+        '<p class="ghtip gcnote">구글 캘린더가 열리면 <b>저장</b>을 눌러 주세요. 알림이 안 오면 일정의 알림을 "일정 시작 시"로 바꿔 주세요.</p></div>';
+      document.body.appendChild(gcBox);
+      gcBox.addEventListener("click",function(e){
+        if(e.target===gcBox){closeGcal();return}
+        var b=e.target.closest("button"); if(!b)return; var o=gcPref();
+        if(b.classList.contains("gcclose")){closeGcal();return}
+        if(b.dataset.d){o.d=+b.dataset.d;gcSave(o);drawGcal();return}
+        if(b.dataset.s){o.st=b.dataset.s;gcSave(o);drawGcal();return}
+        if(b.classList.contains("gcgo")){
+          var nn=notes.get(gcNote); if(!nn)return;
+          o.t=gcBox.querySelector(".gctime").value||o.t; gcSave(o);
+          window.open(gcUrl(nn,o),"_blank","noopener");
+          closeGcal(); toast("구글 캘린더에서 저장을 눌러 주세요");
+        }
+      });
+      gcBox.querySelector(".gctime").addEventListener("change",function(){var o=gcPref();if(/^\d\d:\d\d$/.test(this.value)){o.t=this.value;gcSave(o)}});
+    }
+    drawGcal(); gcBox.hidden=false; document.body.style.overflow="hidden";
+  }
+  function drawGcal(){
+    var n=notes.get(gcNote), o=gcPref(); if(!n||!gcBox)return;
+    gcBox.querySelector(".gcref").textContent=n.ref||"말씀";
+    var ti=gcBox.querySelector(".gctime"); if(document.activeElement!==ti)ti.value=o.t;
+    gcBox.querySelectorAll(".gcdays button").forEach(function(b){b.classList.toggle("on",+b.dataset.d===o.d)});
+    gcBox.querySelectorAll(".gcst button").forEach(function(b){b.classList.toggle("on",b.dataset.s===o.st)});
+  }
+  function closeGcal(){if(gcBox){gcBox.hidden=true;document.body.style.overflow=""}}
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&gcBox&&!gcBox.hidden)closeGcal()});
+  // 캘린더 일정의 링크(?mem=노트id&r=구절)로 들어오면 그 말씀의 암송 연습을 바로 엶
+  (function memLink(){
+    var q=new URLSearchParams(location.search), mid0=q.get("mem"); if(!mid0)return;
+    var ref0=q.get("r")||"";
+    (function wait(k){
+      if(typeof backend==="undefined"||!backend||!notes.size){if(k<60)setTimeout(function(){wait(k+1)},250);return}
+      try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
+      var n=notes.get(mid0)||Array.from(notes.values()).find(function(x){return ref0&&x.ref===ref0});
+      if(!n){toast("이 기기에서 그 말씀을 찾지 못했어요");return}
+      setTopics([]); memOpen.add(n.id); openIds.clear(); openIds.add(n.id); try{localStorage.setItem("bible-last-open",n.id)}catch(e){}
+      spotId=n.id; render();
+      var c=cards.get(n.id); if(c)setTimeout(function(){c.scrollIntoView({block:"start",behavior:"smooth"})},120);
+      toast("📖 "+n.ref+" 외울 시간이에요");
+    })(0);
+  })();
 
   /* ---------- 친구: 친구 코드로 맺고, 서로의 묵상·실천을 봄 ----------
      원본 노트는 언제나 나만 볼 수 있고, 친구에게는 따로 만든 사본(s:노트id)만 보임.
