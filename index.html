@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-17">
+<meta name="app-build" content="2026-10-10-18">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4986,7 +4986,7 @@ button:active{filter:brightness(1.15)}
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&wt&&!wt.hidden)closeWt()});
       document.addEventListener("visibilitychange",function(){if(document.visibilityState!=="visible"&&W&&W.run)wtPause()});
     }
-    W={id:n.id,ref:n.ref,words:ws,next:0,blocks:[],run:false,over:false,score:0,combo:0,lines:0,lv:1,speed:1.1,every:1900,last:0,t:0,since:0,miss:0,hintAt:0};
+    W={id:n.id,ref:n.ref,words:ws,next:0,blocks:[],run:false,over:false,score:0,combo:0,lines:0,lv:1,speed:0.6,every:2700,last:0,t:0,since:0,miss:0,hintAt:0};
     wt.querySelector(".wtref").textContent=n.ref;
     wt.querySelector(".wtgrid").textContent=""; wt.querySelector(".wtmsg").textContent="";
     var best=wtBest(n.id);
@@ -5094,7 +5094,7 @@ button:active{filter:brightness(1.15)}
       W.blocks.forEach(function(x){if(x.landed&&x.col===col&&x.y<y)x.landed=false});   // 위에 쌓인 블록이 내려옴
       W.next++;
       if(W.next>=W.words.length){
-        W.next=0; W.score+=200*W.lv; W.lv++; W.speed*=1.15; W.every=Math.max(700,W.every*.88);
+        W.next=0; W.score+=200*W.lv; W.lv++; W.speed*=1.1; W.every=Math.max(1300,W.every*.92);
         wtMsg("말씀 완성! 🎉 "+W.lv+"단계"); confetti(wt.querySelector(".wtscore")); buzz([14,50,22]);
         recordDrill(W.id,0,W.words.length,false);
       }
