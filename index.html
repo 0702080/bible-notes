@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-21">
+<meta name="app-build" content="2026-10-10-01">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -280,6 +280,15 @@ details.menu>summary::-webkit-details-marker{display:none}
 .mtoact{align-self:flex-end;margin-top:4px;height:30px;padding:0 12px;border:0;border-radius:15px;background:color-mix(in srgb,var(--sky) 20%,#1E1D24);color:var(--sky);font-size:12.5px;font-weight:700;white-space:nowrap}
 .mtoact[hidden]{display:none}
 .mtoact:disabled{background:#1E1D24;color:var(--faint)}
+.mprev{display:none;width:100%;align-items:center;gap:10px;padding:12px 14px;border:1px solid #26252B;border-radius:12px;background:#141418;text-align:left;font:inherit;min-width:0}
+.medi.folded .mprev{display:flex}
+.medi.folded .med,.medi.folded .mend,.medi.folded .mfoot .dl{display:none}
+.mpd{flex:0 0 auto;font-size:12px;color:var(--faint);white-space:nowrap}
+.mpt{flex:1;min-width:0;font-size:15px;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mfoot .mfold{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--muted)}
+.mtools{display:flex;justify-content:flex-end;margin:-4px 0 6px}
+.mtools[hidden]{display:none}
+.mfoldall{height:28px;padding:0 10px;border:0;border-radius:14px;background:#1E1D24;color:#D9D5E0;font-size:12.5px}
 .mfoot .delm{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--faint)}
 .mfoot .delm[data-sure]{color:var(--pink)}
 .qa{border-bottom-color:transparent;padding:6px 0 8px}
@@ -2292,6 +2301,7 @@ button:active{filter:brightness(1.15)}
         '</div>'+
         '<div class="pane" data-pane="m">'+
           '<div class="qbtns"><button type="button" class="newmed addm" aria-label="새 묵상 쓰기"><span class="nmplus" aria-hidden="true">+</span>새 묵상</button><button type="button" class="medprog" aria-label="묵상 진도표"></button></div>'+
+          '<div class="mtools" hidden><button type="button" class="mfoldall">모두 접기</button></div>'+
           '<div class="meds"></div>'+
         '</div>'+
         '<div class="pane" data-pane="p" hidden>'+
@@ -2306,9 +2316,9 @@ button:active{filter:brightness(1.15)}
           '<div class="sugg sugga"></div>'+
         '</div>'+
         '<div class="pane" data-pane="q" hidden>'+
+          '<div class="qbtns"><button type="button" class="addbtn v addq">+ 질문</button><button type="button" class="addbtn v sugq" hidden>추천받기</button></div>'+
           '<div class="qtools" hidden><button type="button" class="qfoldall">모두 접기</button></div>'+
           '<div class="qs"></div>'+
-          '<div class="qbtns"><button type="button" class="addbtn v addq">+ 질문</button><button type="button" class="addbtn v sugq" hidden>추천받기</button></div>'+
           '<div class="sugg"></div>'+
         '</div>'+
         '<div class="pane" data-pane="e" hidden>'+
@@ -2336,15 +2346,18 @@ button:active{filter:brightness(1.15)}
     el.querySelectorAll(".exportone").forEach(function(b){b.hidden=!downloadsNs});
     return el;
   }
+  // 묵상 접기 (이 기기에 기억)
+  var medFold=new Set(); try{JSON.parse(localStorage.getItem("bible-notes-mfold")||"[]").forEach(function(x){medFold.add(String(x))})}catch(e){}
+  function saveMFold(){try{localStorage.setItem("bible-notes-mfold",JSON.stringify(Array.from(medFold).slice(-800)))}catch(e){}}
   function makeMed(m){
     var d=document.createElement("div");
     d.className="medi"; d.dataset.mid=m.id;
     var wd=new Date(m.at).getDay();
-    d.innerHTML='<textarea class="med" rows="1" aria-label="묵상"></textarea>'+
+    d.innerHTML='<button type="button" class="mprev" aria-label="펼치기"><span class="mpd"></span><span class="mpt"></span></button><textarea class="med" rows="1" aria-label="묵상"></textarea>'+
       '<div class="mend"><label class="mendl thx"><span>🙏 감사</span><small></small></label><textarea class="mthx" rows="1" aria-label="감사"></textarea>'+
       '<label class="mendl todo"><span>✅ 결론 · 할 일</span><small></small></label><textarea class="mtodo" rows="1" aria-label="결론과 할 일"></textarea>'+
       '<button type="button" class="mtoact" hidden>실천으로 보내기</button></div>'+
-      '<div class="mfoot"><span class="dl"></span><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div>';
+      '<div class="mfoot"><span class="dl"></span><button type="button" class="mfold">접기</button><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div>';
     d.querySelector(".dl").textContent=dateLabel(m.at);
     d.querySelector(".med").placeholder="오늘의 관점: "+LENS[new Date(m.at).getDay()];
     d.querySelector(".mendl.thx small").textContent=THXQ[wd]; d.querySelector(".mthx").placeholder="예: 오늘도 말씀으로 마음을 붙들어 주셔서 감사합니다";
@@ -2486,11 +2499,15 @@ button:active{filter:brightness(1.15)}
     newestFirst(n.meds).forEach(function(m,i){
       var d=mhave.get(m.id); if(!d)d=makeMed(m); mhave.delete(m.id);
       if(mbox.children[i]!==d)mbox.insertBefore(d,mbox.children[i]||null);
+      var fo=medFold.has(m.id); d.classList.toggle("folded",fo);
+      if(fo){d.querySelector(".mpd").textContent=dateShort(m.at);d.querySelector(".mpt").textContent=(m.text||"").replace(/\s+/g," ").trim()||"(빈 묵상)"}
+      d.querySelector(".mfold").textContent=fo?"펼치기":"접기";
       setVal(d.querySelector(".med"),m.text); setVal(d.querySelector(".mthx"),m.thx||""); setVal(d.querySelector(".mtodo"),m.todo||"");
       var tb=d.querySelector(".mtoact"), ta=m.tact&&n.acts.some(function(a){return a.id===m.tact});
       tb.hidden=!(m.todo||"").trim(); tb.textContent=ta?"✓ 실천에 있어요":"실천으로 보내기"; tb.disabled=!!ta;
     });
     mhave.forEach(function(d){d.remove()});
+    var mt=el.querySelector(".mtools"); if(mt){var wm=n.meds.filter(function(m){return (m.text||"").trim()});mt.hidden=wm.length<2;mt.querySelector(".mfoldall").textContent=wm.length&&wm.every(function(m){return medFold.has(m.id)})?"모두 펼치기":"모두 접기"}
     renderPrays(el,n);
     setVal(el.querySelector(".eref"),n.ref);
     setVal(el.querySelector(".etext"),n.text);
@@ -3040,7 +3057,7 @@ button:active{filter:brightness(1.15)}
       n.meds=n.meds.filter(function(x){return x.id!==md.dataset.mid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("addq")){
-      var q={id:qid(),q:"",a:""}; n.qs.push(q); render(); scheduleSave(id);
+      var q={id:qid(),q:"",a:""}; n.qs.unshift(q); render(); scheduleSave(id);   // 새 질문은 맨 위에
       var ta=card.querySelector('.qa[data-qid="'+q.id+'"] .q'); if(ta)ta.focus();
       return;
     }
@@ -3228,6 +3245,17 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("sugq")){ suggest(card,n,b); return }
     if(b.classList.contains("suga")){ suggestActs(card,n,b); return }
+    if(b.classList.contains("mfold")||b.classList.contains("mprev")){
+      var fmid=b.closest(".medi").dataset.mid; if(medFold.has(fmid))medFold.delete(fmid);else medFold.add(fmid); saveMFold(); render();
+      if(!medFold.has(fmid)){var fc=cards.get(id),fe=fc&&fc.querySelector('.medi[data-mid="'+fmid+'"]');if(fe)fe.querySelectorAll("textarea").forEach(grow)}
+      return;
+    }
+    if(b.classList.contains("mfoldall")){
+      var wm2=n.meds.filter(function(m){return (m.text||"").trim()}), allF=wm2.every(function(m){return medFold.has(m.id)});
+      wm2.forEach(function(m){if(allF)medFold.delete(m.id);else medFold.add(m.id)}); saveMFold(); render();
+      if(allF){var fc2=cards.get(id);if(fc2)fc2.querySelectorAll(".medi textarea").forEach(grow)}
+      return;
+    }
     if(b.classList.contains("mtoact")){
       var mm=n.meds.find(function(x){return x.id===b.closest(".medi").dataset.mid}); if(!mm||!(mm.todo||"").trim())return;
       var nact={id:qid(),t:mm.todo.trim().slice(0,200),done:false}; n.acts.unshift(nact); mm.tact=nact.id;
