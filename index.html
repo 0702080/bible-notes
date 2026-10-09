@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-06">
+<meta name="app-build" content="2026-10-10-07">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -285,17 +285,27 @@ details.menu>summary::-webkit-details-marker{display:none}
 .medi.folded .med,.medi.folded .mend{display:none}
 .mpd{display:none}   /* 접은 묵상 앞에는 날짜를 붙이지 않음 (날짜는 아래 줄에) */
 .mpt{flex:1;min-width:0;font-size:15px;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mfoot .mgrip{margin-right:auto;width:30px;height:30px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--faint);display:grid;place-items:center;cursor:grab;touch-action:none}
-.mfoot .mgrip svg{width:18px;height:18px;fill:currentColor}
-@media (hover:hover){.mfoot .mgrip:hover{color:var(--ink);background:#1E1D24}}
+.medrow{display:flex;align-items:flex-start;gap:4px}
+.mbody{flex:1;min-width:0}
+.medi .mgrip{flex:0 0 26px;width:26px;height:36px;margin-top:6px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--faint);display:grid;place-items:center;cursor:grab;touch-action:none}
+.medi .mgrip svg{width:16px;height:16px;fill:currentColor}
+@media (hover:hover){.medi .mgrip:hover{color:var(--ink);background:#1E1D24}}
+.mdotsw{position:relative;flex:0 0 30px}
+.mdots{width:30px;height:36px;margin-top:6px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--faint);font-size:18px;line-height:1}
+.mdots[aria-expanded="true"],.mdots:hover{color:var(--ink);background:#1E1D24}
+.mmenu{position:absolute;right:0;top:44px;z-index:8;min-width:150px;padding:6px;border:1px solid #302F36;border-radius:12px;background:#1C1C21;box-shadow:0 12px 30px rgba(0,0,0,.55);display:flex;flex-direction:column}
+.mmenu[hidden]{display:none}
+.mmenu .dl{padding:6px 10px 8px;font-size:12px;color:var(--faint);white-space:nowrap}
+.mmenu button{height:38px;padding:0 10px;border:0;border-radius:8px;background:transparent;color:var(--ink);font-size:14px;text-align:left;white-space:nowrap}
+@media (hover:hover){.mmenu button:hover{background:#26252C}}
+.mmenu .delm{color:var(--pink)}
 .medi.mdragging{position:relative;z-index:5;opacity:.95;box-shadow:0 12px 30px rgba(0,0,0,.55);outline:2px solid color-mix(in srgb,var(--green) 60%,transparent);outline-offset:3px;border-radius:12px;background:#17161b}
 .medi.mdragging .mgrip{cursor:grabbing;color:var(--green)}
-.mfoot .mfold{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--muted)}
+
 .mtools{display:flex;justify-content:flex-end;margin:-4px 0 6px}
 .mtools[hidden]{display:none}
 .mfoldall{height:28px;padding:0 10px;border:0;border-radius:14px;background:#1E1D24;color:#D9D5E0;font-size:12.5px}
-.mfoot .delm{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--faint)}
-.mfoot .delm[data-sure]{color:var(--pink)}
+.mmenu .delm[data-sure]{font-weight:700}
 .qa{border-bottom-color:transparent;padding:6px 0 8px}
 .qa+.qa:not(.deep){border-top:1px solid var(--rule)}
 .chip{border-width:1px}
@@ -2365,11 +2375,13 @@ button:active{filter:brightness(1.15)}
     var d=document.createElement("div");
     d.className="medi"; d.dataset.mid=m.id;
     var wd=new Date(m.at).getDay();
-    d.innerHTML='<button type="button" class="mprev" aria-label="펼치기"><span class="mpd"></span><span class="mpt"></span></button><textarea class="med" rows="1" aria-label="묵상"></textarea>'+
+    d.innerHTML='<div class="medrow">'+'<button type="button" class="mgrip" aria-label="끌어서 순서 바꾸기" title="끌어서 순서 바꾸기"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button>'+
+      '<div class="mbody"><button type="button" class="mprev" aria-label="펼치기"><span class="mpd"></span><span class="mpt"></span></button><textarea class="med" rows="1" aria-label="묵상"></textarea>'+
       '<div class="mend"><label class="mendl thx"><span>🙏 감사</span><small></small></label><textarea class="mthx" rows="1" aria-label="감사"></textarea>'+
       '<label class="mendl todo"><span>✅ 결론 · 할 일</span><small></small></label><textarea class="mtodo" rows="1" aria-label="결론과 할 일"></textarea>'+
-      '<button type="button" class="mtoact" hidden>실천으로 보내기</button></div>'+
-      '<div class="mfoot"><button type="button" class="mgrip" aria-label="끌어서 순서 바꾸기" title="끌어서 순서 바꾸기"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><span class="dl"></span><button type="button" class="mfold">접기</button><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div>';
+      '<button type="button" class="mtoact" hidden>실천으로 보내기</button></div></div>'+
+      '<div class="mdotsw"><button type="button" class="mdots" aria-label="묵상 메뉴" aria-expanded="false">⋯</button>'+
+      '<div class="mmenu" hidden><span class="dl"></span><button type="button" class="mfold">접기</button><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div></div></div>';
     d.querySelector(".dl").textContent=dateLabel(m.at);
     d.querySelector(".med").placeholder="오늘의 관점: "+LENS[new Date(m.at).getDay()];
     d.querySelector(".mendl.thx small").textContent=THXQ[wd]; d.querySelector(".mthx").placeholder="";
@@ -2860,6 +2872,7 @@ button:active{filter:brightness(1.15)}
     var pri=e.target.closest&&e.target.closest(".pri"); if(!pri||!prEdit.has(pri.dataset.pid))return;
     setTimeout(function(){if(!pri.isConnected||pri.contains(document.activeElement))return;prEdit.delete(pri.dataset.pid);render()},150);
   });
+  document.addEventListener("click",function(e){if(e.target.closest&&e.target.closest(".mdotsw"))return;document.querySelectorAll(".mmenu:not([hidden])").forEach(function(x){x.hidden=true;var bb=x.parentNode.querySelector(".mdots");if(bb)bb.setAttribute("aria-expanded","false")})});
   // 묵상 끌어서 옮기기 (⋮⋮ 손잡이)
   var mdrag=null;
   list.addEventListener("pointerdown",function(e){
@@ -3287,7 +3300,13 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("sugq")){ suggest(card,n,b); return }
     if(b.classList.contains("suga")){ suggestActs(card,n,b); return }
+    if(b.classList.contains("mdots")){
+      var mw=b.closest(".mdotsw"), mn=mw.querySelector(".mmenu"), op=mn.hidden;
+      document.querySelectorAll(".mmenu").forEach(function(x){x.hidden=true;var bb=x.parentNode.querySelector(".mdots");if(bb)bb.setAttribute("aria-expanded","false")});
+      mn.hidden=!op; b.setAttribute("aria-expanded",String(op)); return;
+    }
     if(b.classList.contains("mfold")||b.classList.contains("mprev")){
+      var mn2=b.closest(".medi").querySelector(".mmenu"); if(mn2)mn2.hidden=true;
       var fmid=b.closest(".medi").dataset.mid; if(medFold.has(fmid))medFold.delete(fmid);else medFold.add(fmid); saveMFold(); render();
       if(!medFold.has(fmid)){var fc=cards.get(id),fe=fc&&fc.querySelector('.medi[data-mid="'+fmid+'"]');if(fe)fe.querySelectorAll("textarea").forEach(grow)}
       return;
