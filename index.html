@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-19">
+<meta name="app-build" content="2026-10-10-20">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -963,7 +963,7 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .focusrow{flex-wrap:wrap}
 /* ===== in-app chapter reader ===== */
 .chapread{background:transparent;cursor:pointer}
-.reader{position:fixed;inset:0;z-index:65;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.reader{position:fixed;inset:0;z-index:67;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .reader[hidden]{display:none}
 .rdbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #222126}
 .rdtitle{display:flex;align-items:baseline;gap:10px;min-width:0}
@@ -1884,6 +1884,9 @@ button:active{filter:brightness(1.15)}
 .dlrow.on .dlbox::after{content:"✓";color:#141416;font-size:14px;font-weight:700}
 .dlrow.on .dlt{color:var(--muted)}
 .dlt{flex:1;min-width:0;word-break:keep-all}
+.dlref{color:var(--sky);font-weight:700;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px;cursor:pointer;padding:2px 0}
+.dlref::after{content:" 📖";font-size:.85em;text-decoration:none}
+.dlrow.on .dlref{color:color-mix(in srgb,var(--sky) 70%,var(--muted))}
 .dlauto{flex:0 0 auto;font-size:10.5px;color:var(--sky);white-space:nowrap}
 .dldel{flex:0 0 auto;height:30px;min-width:30px;padding:0 8px;border:0;border-radius:15px;background:transparent;color:var(--faint);font-size:16px;white-space:nowrap}
 .dldel.sure{color:var(--pink);font-size:12px}
@@ -5270,6 +5273,8 @@ button:active{filter:brightness(1.15)}
         var o=dailyData(); o.items.push({id:"d"+Date.now().toString(36),g:dl.querySelector(".dlg").value,t:t.slice(0,40)}); saveDaily(o); inp.value=""; drawDaily(); inp.focus();
       });
       dl.querySelector(".dllist").addEventListener("click",function(e){
+        var rf=e.target.closest(".dlref");
+        if(rf&&!dlEdit){e.stopPropagation(); openReader({book:+rf.dataset.b,chapter:+rf.dataset.c,verse:+rf.dataset.v||0}); return}   // 시편 91편 → 장 읽기
         var b=e.target.closest("button"); if(!b)return; var o=dailyData(), id=b.dataset.id;
         if(b.classList.contains("dldel")){
           if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
@@ -5314,7 +5319,7 @@ button:active{filter:brightness(1.15)}
         var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc",g.c);
         var b=document.createElement("button"); b.type="button"; b.className="dlrow"+(on.indexOf(it.id)>=0?" on":""); b.dataset.id=it.id; b.setAttribute("aria-pressed",String(on.indexOf(it.id)>=0));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>'+(it.auto?'<span class="dlauto">한 줄 감사로 자동</span>':'');
-        b.querySelector(".dlt").textContent=it.t; row.appendChild(b);
+        dlRefInto(b.querySelector(".dlt"),it.t); row.appendChild(b);
         if(dlEdit){var x=document.createElement("button");x.type="button";x.className="dldel";x.dataset.id=it.id;x.textContent="×";x.setAttribute("aria-label","이 항목 지우기");row.appendChild(x)}
         list.appendChild(row);
       });
@@ -5323,6 +5328,20 @@ button:active{filter:brightness(1.15)}
     dl.querySelector(".dledit").textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기";
   }
 
+  // 체크 항목 글에 있는 성경 구절(예: 시편 91편, 요한복음 3장, 로마서 8:28)을 눌러서 읽을 수 있게
+  function dlRefInto(el,t){
+    el.textContent=""; var re=/([가-힣]{1,6})\s*(\d{1,3})\s*(편|장|:)\s*(\d{1,3})?(절)?/g, last=0, m;
+    while((m=re.exec(t))){
+      var bi=bookIndex(m[1]); if(bi<0)continue;
+      var ch=+m[2], vs=m[3]===":"?+(m[4]||0):+(m[4]||0); if(!ch)continue;
+      if(m[3]===":"&&!m[4])continue;
+      var txt=m[0].replace(/\s+$/,"");
+      if(m.index>last)el.appendChild(document.createTextNode(t.slice(last,m.index)));
+      var a=document.createElement("span"); a.className="dlref"; a.textContent=txt; a.dataset.b=bi; a.dataset.c=ch; a.dataset.v=vs; a.title=BOOKS[bi]+" "+ch+(bi===18?"편":"장")+" 읽기";
+      el.appendChild(a); last=m.index+txt.length;
+    }
+    if(last<t.length)el.appendChild(document.createTextNode(t.slice(last)));
+  }
   function renderReviewBar(){
     var bar=$("reviewBar"); if(!bar)return;
     bar.textContent="";
