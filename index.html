@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-05">
+<meta name="app-build" content="2026-10-10-06">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -288,7 +288,8 @@ details.menu>summary::-webkit-details-marker{display:none}
 .mfoot .mgrip{margin-right:auto;width:30px;height:30px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--faint);display:grid;place-items:center;cursor:grab;touch-action:none}
 .mfoot .mgrip svg{width:18px;height:18px;fill:currentColor}
 @media (hover:hover){.mfoot .mgrip:hover{color:var(--ink);background:#1E1D24}}
-.medi.mdragging{opacity:.85;outline:2px dashed color-mix(in srgb,var(--green) 60%,transparent);outline-offset:4px;border-radius:12px}
+.medi.mdragging{position:relative;z-index:5;opacity:.95;box-shadow:0 12px 30px rgba(0,0,0,.55);outline:2px solid color-mix(in srgb,var(--green) 60%,transparent);outline-offset:3px;border-radius:12px;background:#17161b}
+.medi.mdragging .mgrip{cursor:grabbing;color:var(--green)}
 .mfoot .mfold{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--muted)}
 .mtools{display:flex;justify-content:flex-end;margin:-4px 0 6px}
 .mtools[hidden]{display:none}
@@ -2864,7 +2865,7 @@ button:active{filter:brightness(1.15)}
   list.addEventListener("pointerdown",function(e){
     var g=e.target.closest&&e.target.closest(".mgrip"); if(!g)return;
     e.preventDefault(); e.stopPropagation();
-    var it=g.closest(".medi"); mdrag={it:it,box:it.parentNode,nid:it.closest(".note").dataset.id,moved:false};
+    var it=g.closest(".medi"), r0=it.getBoundingClientRect(); mdrag={it:it,box:it.parentNode,nid:it.closest(".note").dataset.id,moved:false,grab:e.clientY-r0.top,tx:0};
     it.classList.add("mdragging"); document.body.style.userSelect="none";
     try{g.setPointerCapture(e.pointerId)}catch(err){}
     if(navigator.vibrate)try{navigator.vibrate(12)}catch(err){}
@@ -2874,11 +2875,12 @@ button:active{filter:brightness(1.15)}
     var y=e.clientY, it=mdrag.it, prev=it.previousElementSibling, next=it.nextElementSibling;
     if(prev&&y<prev.getBoundingClientRect().top+prev.offsetHeight/2){mdrag.box.insertBefore(it,prev);mdrag.moved=true}
     else if(next&&y>next.getBoundingClientRect().top+next.offsetHeight/2){mdrag.box.insertBefore(next,it);mdrag.moved=true}
+    var natural=it.getBoundingClientRect().top-mdrag.tx; mdrag.tx=y-mdrag.grab-natural; it.style.transform="translateY("+mdrag.tx+"px)";   // 마우스를 따라 움직임
     if(y<60)window.scrollBy(0,-12); else if(y>window.innerHeight-60)window.scrollBy(0,12);
   },{passive:false});
   function endMDrag(){
     if(!mdrag)return; var d=mdrag; mdrag=null;
-    d.it.classList.remove("mdragging"); document.body.style.userSelect="";
+    d.it.classList.remove("mdragging"); d.it.style.transform=""; document.body.style.userSelect="";
     if(!d.moved)return;
     var n=notes.get(d.nid); if(!n)return;
     Array.prototype.forEach.call(d.box.children,function(c,i){var m=n.meds.find(function(x){return x.id===c.dataset.mid});if(m)m.o=i});
