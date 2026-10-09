@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-04">
+<meta name="app-build" content="2026-10-10-05">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1832,7 +1832,8 @@ button:active{filter:brightness(1.15)}
         <button type="button" id="exportPdf">모두 PDF로 저장</button>
         <button type="button" id="backupSave">백업 파일 저장</button>
         <button type="button" id="backupLoad">백업 불러오기</button>
-        <button type="button" id="ghSyncBtn">☁️ GitHub 동기화</button>
+        <button type="button" id="sbBtn">☁️ 로그인 · 동기화</button>
+        <button type="button" id="ghSyncBtn">GitHub 동기화 (예전 방식)</button>
       </div>
     </details>
   </div>
@@ -1988,6 +1989,7 @@ button:active{filter:brightness(1.15)}
   function scheduleSave(id,delay,keepTime){
     var n0=notes.get(id); if(n0&&!keepTime)n0.updatedAt=Date.now();
     if(!keepTime&&typeof ghQueue==="function")ghQueue();
+    if(!keepTime&&typeof sbMark==="function")sbMark(id);
     dirtyIds.add(id); markCard(id,"저장 중");
     clearTimeout(timers.get(id));
     timers.set(id,setTimeout(function(){timers.delete(id);flush(id)},delay==null?800:delay));
@@ -3738,6 +3740,8 @@ button:active{filter:brightness(1.15)}
     var b=e.target.closest(".rvchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
     if(b.dataset.act==="sync"){if(ghCfg())ghSync("manual");else openGh();return}
+    if(b.dataset.act==="sbsync"){sbSync("manual");return}
+    if(b.dataset.act==="sblogin"){openSb();return}
     if(b.dataset.act==="rvall"){openRecall();return}
     var id=b.dataset.id, act=b.dataset.act||"mem"; setTopics([]);
     if(act==="mem")memOpen.add(id);
@@ -4889,7 +4893,7 @@ button:active{filter:brightness(1.15)}
     }
     return o;
   }
-  function saveDaily(o){try{localStorage.setItem(DAILY_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")}}
+  function saveDaily(o){try{localStorage.setItem(DAILY_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__daily")}
   // 그날 '감사' 실천에 한 줄을 적었으면 "감사한 것을 적었는가"는 저절로 체크
   function thanksOn(day){var hit=false;notes.forEach(function(n){(n.acts||[]).forEach(function(a){if(!hit&&actWord(a.t)==="감사"&&(a.logs||[]).some(function(l){return dkey(l.at)===day}))hit=true})});return hit}
   function dailyChecked(o,day){
@@ -4998,9 +5002,12 @@ button:active{filter:brightness(1.15)}
     if(lo&&!openIds.has(lo.id)&&!rows.some(function(r){return r.chips.some(function(c){return c.id===lo.id})}))rows.push({icon:"↩️",label:"이어서",chips:[{id:lo.id,t:lo.ref,act:"open"}]});
     // ☁️ 동기화 상태: 이 기기가 GitHub에 올리고 있는지 한눈에
     var gc=ghCfg(), gs=(typeof ghState==="object"&&ghState)||{};   // 앱이 처음 그려질 때는 아직 동기화 상태가 없을 수 있음
-    if(gc){var ago=gs.at?Math.round((Date.now()-gs.at)/60000):-1;
+    var ss=sbSession(), sst=(typeof sbState==="object"&&sbState)||{};
+    if(ss){var sago=sst.at?Math.round((Date.now()-sst.at)/60000):-1;
+      rows.push({icon:"☁️",label:sst.ok===false?"동기화가 안 됐어요":(typeof sbBusy!=="undefined"&&sbBusy)?"맞추는 중…":sago<0?"로그인됨 · 맞추는 중":sago<1?"모든 기기와 맞춰졌어요 · 방금":"모든 기기와 맞춰졌어요 · "+sago+"분 전",chips:[{id:"",t:"지금 맞추기",act:"sbsync"}],done:sst.ok===true})}
+    else if(gc){var ago=gs.at?Math.round((Date.now()-gs.at)/60000):-1;
       rows.push({icon:"☁️",label:gs.ok===false?"동기화가 안 됐어요":ghBusy?"맞추는 중…":ago<0?"GitHub 동기화 켜짐":ago<1?"GitHub과 맞춰졌어요 · 방금":"GitHub과 맞춰졌어요 · "+ago+"분 전",chips:[{id:"",t:"지금 맞추기",act:"sync"}],done:gs.ok===true})}
-    else rows.push({icon:"☁️",label:"이 기기 메모는 GitHub에 안 올라가요",chips:[{id:"",t:"연결하기",act:"sync"}]});
+    else rows.push({icon:"☁️",label:"로그인하면 모든 기기에 바로 맞춰져요",chips:[{id:"",t:"로그인",act:"sblogin"}]});
     var dd=dailyData(), dc=dailyChecked(dd,dkey(Date.now())).length, dt=dd.items.length;
     rows.push({icon:"🌙",label:"하루 돌아보기",chips:[{id:"",t:dc+" / "+dt,act:"daily"}],done:dt>0&&dc===dt});
     bar.hidden=!rows.length;
@@ -5746,6 +5753,7 @@ button:active{filter:brightness(1.15)}
   var MYCH="bible-my-chapters";
   function myChapters(){try{var o=JSON.parse(localStorage.getItem(MYCH)||"{}");return o&&typeof o==="object"?o:{}}catch(e){return {}}}
   function saveMyChapter(key,verses){var o=myChapters();o[key]={v:verses,at:Date.now()};try{localStorage.setItem(MYCH,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")}}
+  var _saveMyChapter=saveMyChapter; saveMyChapter=function(k,v){_saveMyChapter(k,v);if(typeof sbMark==="function")sbMark("__chapters")};
   function parseChapterPaste(txt){
     var clean=function(t){return t.replace(/\d+\)/g,"").replace(/\s+/g," ").trim()}, out=[];
     // 한 줄에 한 절: "1 본문", "1. 본문", "1절 본문" (절 번호 없는 줄은 소제목으로 보고 건너뜀)
@@ -6270,7 +6278,7 @@ button:active{filter:brightness(1.15)}
   var TOMB_KEY="bible-notes-deleted", GH_KEY="bible-gh-sync";
   function tombs(){try{var o=JSON.parse(localStorage.getItem(TOMB_KEY)||"{}");return o&&typeof o==="object"?o:{}}catch(e){return {}}}
   function saveTombs(o){try{var ks=Object.keys(o);if(ks.length>800)ks.sort(function(a,b){return o[a]-o[b]}).slice(0,ks.length-800).forEach(function(k){delete o[k]});localStorage.setItem(TOMB_KEY,JSON.stringify(o))}catch(e){}}
-  function addTomb(id){var o=tombs();o[id]=Date.now();saveTombs(o);ghQueue()}
+  function addTomb(id){var o=tombs();o[id]=Date.now();saveTombs(o);ghQueue();sbMark(id)}
   function ghCfg(){try{var c=JSON.parse(localStorage.getItem(GH_KEY)||"null");return c&&c.repo&&c.token?c:null}catch(e){return null}}
   function ghSetCfg(c){try{if(c)localStorage.setItem(GH_KEY,JSON.stringify(c));else localStorage.removeItem(GH_KEY)}catch(e){}}
   function b64e(s){var b=new TextEncoder().encode(s),o="";for(var i=0;i<b.length;i+=0x8000)o+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(o)}
@@ -6398,11 +6406,178 @@ button:active{filter:brightness(1.15)}
   },60000);
   setInterval(function(){if(document.visibilityState==="visible")try{renderReviewBar()}catch(e){}},60000);   // "○분 전" 새로
 
+  /* ---------- Supabase 로그인·동기화: 이메일로 한 번 로그인하면 모든 기기가 같은 노트 (나만 볼 수 있음) ----------
+     공개 키(publishable)만 앱에 들어감. 누가 무엇을 읽고 쓸 수 있는지는 데이터베이스 규칙(RLS)이 막음 */
+  var SB_URL="https://fsctntwrqocjvkboqmzn.supabase.co", SB_KEY="sb_publishable_8ARyO5q9ODokIT0um2ShnQ_DgZarC_E";
+  var SB_SES="bible-sb-session", SB_LAST="bible-sb-last", SB_SITE="https://0702080.github.io/bible-notes/";
+  var sbDirty=new Set(), sbTimer=0, sbBusy=false, sbAgain=false, sbState={ok:null,at:0,msg:""}, sbApplying=false, sbLastJson={};
+  function sbSession(){try{var x=JSON.parse(localStorage.getItem(SB_SES)||"null");return x&&x.access_token&&x.user&&x.user.id?x:null}catch(e){return null}}
+  function sbSetSession(x){try{if(x)localStorage.setItem(SB_SES,JSON.stringify(x));else localStorage.removeItem(SB_SES)}catch(e){}}
+  function sbH(tok){var h={"apikey":SB_KEY,"Content-Type":"application/json"};if(tok)h.Authorization="Bearer "+tok;return h}
+  async function sbToken(){
+    var x=sbSession(); if(!x)return null;
+    if(Date.now()/1000<(x.expires_at||0)-60)return x.access_token;
+    var r=await fetch(SB_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:sbH(),body:JSON.stringify({refresh_token:x.refresh_token})});
+    if(!r.ok){if(r.status===400||r.status===401){sbSetSession(null);toast("로그인이 끝났어요. 다시 로그인해 주세요");renderReviewBar()}return null}
+    var j=await r.json(); sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
+    return j.access_token;
+  }
+  async function sbStart(tok){
+    // 로그인 직후: 이 기기의 노트를 모두 올리고, 서버의 노트를 모두 받음
+    var u=await fetch(SB_URL+"/auth/v1/user",{headers:sbH(tok)}); if(!u.ok)throw new Error("user");
+    return u.json();
+  }
+  function sbMarkAll(){notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");try{localStorage.removeItem(SB_LAST)}catch(e){}}
+  function sbMark(id){if(sbApplying||!sbSession())return; sbDirty.add(id); clearTimeout(sbTimer); sbTimer=setTimeout(function(){sbSync("auto")},1500)}
+  async function sbSync(why){
+    if(!sbSession())return false;
+    if(typeof backend==="undefined"||!backend){setTimeout(function(){sbSync(why)},500);return false}   // 노트를 다 불러온 뒤에
+    if(sbBusy){sbAgain=true;return false}
+    if(!navigator.onLine){sbState={ok:false,at:sbState.at,msg:"인터넷에 연결되면 다시 맞춰요"};return false}
+    sbBusy=true; if(why==="manual")renderReviewBar();
+    var ids=Array.from(sbDirty); sbDirty.clear();
+    try{
+      var tok=await sbToken(); if(!tok)throw {msg:"다시 로그인해 주세요"};
+      var uid=sbSession().user.id, now=Date.now(), rows=[], tb=tombs();
+      ids.forEach(function(id){
+        if(id==="__daily"||id==="__chapters"){
+          var d=id==="__daily"?dailyData():myChapters(), js=JSON.stringify(d);
+          if(sbLastJson[id]!==js){rows.push({user_id:uid,id:id,data:d,updated_at:now,deleted:false});sbLastJson[id]=js}
+          return;
+        }
+        var n=notes.get(id);
+        if(n)rows.push({user_id:uid,id:id,data:cleanNote(n),updated_at:now,deleted:false});
+        else if(tb[id])rows.push({user_id:uid,id:id,data:{at:tb[id]},updated_at:now,deleted:true});
+      });
+      for(var k=0;k<rows.length;k+=200){
+        var pr=await fetch(SB_URL+"/rest/v1/notes?on_conflict=user_id,id",{method:"POST",headers:Object.assign(sbH(tok),{"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify(rows.slice(k,k+200))});
+        if(!pr.ok){throw {msg:"올리지 못했어요 ("+pr.status+")"}}
+      }
+      // 다른 기기에서 바뀐 것 받기 (기기 시계 차이를 생각해 10분 겹쳐서)
+      var last=+(localStorage.getItem(SB_LAST)||0), since=Math.max(0,last-600000), maxAt=last;
+      var gr=await fetch(SB_URL+"/rest/v1/notes?select=id,data,updated_at,deleted&user_id=eq."+uid+"&updated_at=gt."+since+"&order=updated_at.asc&limit=2000",{headers:sbH(tok),cache:"no-store"});
+      if(!gr.ok)throw {msg:"받지 못했어요 ("+gr.status+")"};
+      var arr=await gr.json(), res={added:0,updated:0,removed:0};
+      sbApplying=true;
+      try{
+        var list=[], del={};
+        arr.forEach(function(r){
+          maxAt=Math.max(maxAt,+r.updated_at||0);
+          if(r.id==="__daily"){sbLastJson.__daily=JSON.stringify(r.data);mergeData({daily:r.data},true);return}
+          if(r.id==="__chapters"){var before=JSON.stringify(myChapters());mergeData({chapters:r.data},true);sbLastJson.__chapters=JSON.stringify(myChapters());return}
+          if(r.deleted)del[r.id]=(r.data&&+r.data.at)||+r.updated_at; else if(r.data&&r.data.id)list.push(r.data);
+        });
+        res=mergeData({notes:list,deleted:del},true);
+      }finally{sbApplying=false}
+      try{localStorage.setItem(SB_LAST,String(maxAt))}catch(e){}
+      if(res.added||res.updated||res.removed)render();
+      sbState={ok:true,at:Date.now(),msg:""};
+      if(why==="manual"||why==="login")toast(why==="login"?"로그인했어요. 이제 모든 기기가 같은 노트를 봐요":(res.added||res.updated||res.removed?"맞췄어요: 새로 "+res.added+", 고친 것 "+res.updated:"모든 기기와 맞춰져 있어요"));
+      else if(why==="start"&&(res.added||res.updated))toast("다른 기기에서 쓴 노트를 가져왔어요");
+      return true;
+    }catch(e){
+      ids.forEach(function(id){sbDirty.add(id)});
+      sbState={ok:false,at:sbState.at,msg:(e&&e.msg)||"맞추지 못했어요. 인터넷 연결을 확인해 주세요"};
+      if(why==="manual"||why==="login")toast(sbState.msg);
+      return false;
+    }finally{
+      sbBusy=false; try{renderReviewBar()}catch(e){} drawSb();
+      if(sbAgain){sbAgain=false;clearTimeout(sbTimer);sbTimer=setTimeout(function(){sbSync("auto")},1000)}
+    }
+  }
+  // 메일 링크로 돌아왔을 때 (#access_token=…)
+  async function sbFromHash(){
+    var h=location.hash||""; if(h.indexOf("access_token=")<0&&h.indexOf("error_description=")<0)return;
+    var q={}; h.replace(/^#/,"").split("&").forEach(function(kv){var a=kv.split("=");q[decodeURIComponent(a[0])]=decodeURIComponent((a[1]||"").replace(/\+/g," "))});
+    try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}
+    if(q.error_description){toast("로그인하지 못했어요: "+q.error_description);return}
+    try{
+      var u=await sbStart(q.access_token);
+      sbSetSession({access_token:q.access_token,refresh_token:q.refresh_token,expires_at:+q.expires_at||Math.floor(Date.now()/1000)+(+q.expires_in||3600),user:{id:u.id,email:u.email}});
+      sbMarkAll(); sbSync("login");
+    }catch(e){toast("로그인하지 못했어요. 다시 시도해 주세요")}
+  }
+  var sbBox=null, sbSentTo="";
+  function openSb(){
+    if(!sbBox){
+      sbBox=document.createElement("div"); sbBox.className="ghsheet"; sbBox.hidden=true; sbBox.setAttribute("role","dialog"); sbBox.setAttribute("aria-modal","true");
+      sbBox.innerHTML='<div class="ghbox"><div class="ghhd"><b>☁️ 로그인 · 동기화</b><button type="button" class="ghclose sbclose">닫기</button></div>'+
+        '<p class="ghtip">이메일로 한 번 로그인하면, 휴대폰이든 PC든 메모하는 즉시 저장되고 다른 기기에도 바로 나와요. 노트는 나만 볼 수 있어요.</p>'+
+        '<div class="sboff"><label class="ghl">이메일</label><input class="field sbmail" type="email" inputmode="email" autocomplete="email" placeholder="me@example.com">'+
+        '<button type="button" class="ghconnect sbsend">로그인 링크 받기</button>'+
+        '<div class="sbsent" hidden><p class="ghtip small sbsentmsg"></p><label class="ghl">메일에 6자리 숫자가 있으면 여기에 (없으면 메일의 링크를 누르세요)</label><input class="field sbcode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456"><button type="button" class="ghnow sbverify">코드로 로그인</button></div></div>'+
+        '<div class="sbon" hidden><div class="ghrepo sbwho"></div><div class="ghst sbst"></div><div class="ghbtns"><button type="button" class="ghnow sbnow">지금 맞추기</button><button type="button" class="ghout sbout">로그아웃</button></div></div></div>';
+      document.body.appendChild(sbBox);
+      sbBox.addEventListener("click",async function(e){
+        if(e.target===sbBox){closeSb();return}
+        var b=e.target.closest("button"); if(!b)return;
+        if(b.classList.contains("sbclose")){closeSb();return}
+        if(b.classList.contains("sbnow")){sbSync("manual");return}
+        if(b.classList.contains("sbout")){
+          if(!b.dataset.sure){b.dataset.sure="1";b.textContent="한 번 더 누르면 로그아웃";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="로그아웃"}},3000);return}
+          sbSetSession(null); try{localStorage.removeItem(SB_LAST)}catch(err){} toast("로그아웃했어요. 노트는 이 기기에 그대로 있어요"); drawSb(); renderReviewBar(); return;
+        }
+        if(b.classList.contains("sbsend")){
+          var em=sbBox.querySelector(".sbmail").value.trim(); if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){toast("이메일을 확인해 주세요");return}
+          b.disabled=true; b.textContent="보내는 중…";
+          try{
+            var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(SB_SITE),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
+            if(r.status===429){toast("잠시 뒤에 다시 보내 주세요 (메일은 짧은 시간에 여러 번 보낼 수 없어요)")}
+            else if(!r.ok){toast("메일을 보내지 못했어요 ("+r.status+")")}
+            else{sbSentTo=em; var sm=sbBox.querySelector(".sbsent"); sm.hidden=false; sbBox.querySelector(".sbsentmsg").textContent=em+" 로 로그인 메일을 보냈어요. 메일의 링크를 이 기기의 이 브라우저에서 열어 주세요.";}
+          }catch(err){toast("인터넷 연결을 확인해 주세요")}
+          finally{b.disabled=false; b.textContent="로그인 링크 다시 받기"}
+          return;
+        }
+        if(b.classList.contains("sbverify")){
+          var code=sbBox.querySelector(".sbcode").value.replace(/\D/g,""), em2=sbSentTo||sbBox.querySelector(".sbmail").value.trim();
+          if(code.length<6){toast("메일의 숫자를 넣어 주세요");return}
+          b.disabled=true;
+          try{
+            var vr=await fetch(SB_URL+"/auth/v1/verify",{method:"POST",headers:sbH(),body:JSON.stringify({type:"email",email:em2,token:code})});
+            if(!vr.ok){toast("코드가 맞지 않거나 시간이 지났어요");return}
+            var j=await vr.json();
+            sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
+            sbMarkAll(); closeSb(); sbSync("login");
+          }catch(err){toast("인터넷 연결을 확인해 주세요")}
+          finally{b.disabled=false}
+          return;
+        }
+      });
+    }
+    drawSb(); sbBox.hidden=false;
+    var x=sbSession(); if(!x)setTimeout(function(){var m=sbBox.querySelector(".sbmail");if(m&&!m.value)m.focus()},80);
+  }
+  function closeSb(){if(sbBox)sbBox.hidden=true}
+  function drawSb(){
+    if(!sbBox)return; var x=sbSession();
+    sbBox.querySelector(".sboff").hidden=!!x; sbBox.querySelector(".sbon").hidden=!x;
+    if(x){
+      sbBox.querySelector(".sbwho").textContent=x.user.email+" 로 로그인됨";
+      var st=sbBox.querySelector(".sbst"); st.classList.toggle("bad",sbState.ok===false);
+      st.textContent=sbBusy?"맞추는 중…":sbState.ok===false?sbState.msg:sbState.at?"맞춰졌어요 · "+new Date(sbState.at).toLocaleTimeString("ko-KR",{hour:"numeric",minute:"2-digit"}):"";
+    }
+  }
+  $("sbBtn").addEventListener("click",function(){$("topMenu").open=false;openSb()});
+  (function wait(){if(typeof backend!=="undefined"&&backend)setTimeout(sbFromHash,300);else setTimeout(wait,200)})();
+  setTimeout(function(){if(sbSession())sbSync("start")},1200);
+  setInterval(function(){
+    if(!sbSession()||document.visibilityState!=="visible"||!navigator.onLine)return;
+    var a=document.activeElement; if(a&&/^(INPUT|TEXTAREA)$/.test(a.tagName)&&sbDirty.size===0)return;
+    sbSync("tick");
+  },30000);
+  document.addEventListener("visibilitychange",function(){
+    if(!sbSession())return;
+    if(document.visibilityState==="visible")sbSync("start");
+    else{flushAll();if(sbDirty.size){clearTimeout(sbTimer);sbSync("auto")}}
+  });
+  window.addEventListener("online",function(){if(sbSession())sbSync("auto")});
+
   /* ---------- 공개 노트 파일 받기: 토큰 없는 브라우저도 GitHub의 notes.json을 받아서 보여 줌 ----------
      (공개 저장소라 주소를 아는 사람은 누구나 볼 수 있음. 올리기는 토큰을 넣은 브라우저에서 ☁️ GitHub 동기화로) */
   var PUB_NOTES="https://raw.githubusercontent.com/0702080/bible-notes-data/main/notes.json", pubBusy=false;
   async function pubPull(why){
-    if(ghCfg()||pubBusy||!navigator.onLine||!backend)return;
+    if(ghCfg()||sbSession()||pubBusy||!navigator.onLine||!backend)return;
     pubBusy=true;
     try{
       // GitHub API는 올린 즉시 최신 파일을 줌 (시간당 60번 제한) → 막히면 raw 주소로 (몇 분 늦을 수 있음)
