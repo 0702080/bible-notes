@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-17">
+<meta name="app-build" content="2026-10-09-18">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1642,6 +1642,25 @@ button:active{filter:brightness(1.15)}
 .daily[hidden]{display:none}
 .rvq{position:fixed;inset:0;z-index:66;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .rvq[hidden]{display:none}
+.prdbody{flex:1;overflow:auto;padding:14px max(18px,calc((100% - 660px) / 2)) 40px;scrollbar-width:none}
+.prdbody::-webkit-scrollbar{display:none}
+.prdfil{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.prdfil button{height:32px;padding:0 14px;border:0;border-radius:16px;background:#1E1D24;color:#D9D5E0;font-size:13px;font-weight:600;white-space:nowrap}
+.prdfil button[aria-pressed="true"]{background:color-mix(in srgb,var(--orange) 26%,#1E1D24);color:var(--orange)}
+.prdsec{margin:0 0 26px}
+.prdhd{display:flex;align-items:center;gap:10px}
+.prdref{font-size:16px;color:var(--violet)}
+.prdgo{margin-left:auto;height:28px;padding:0 12px;border:0;border-radius:14px;background:#1E1D24;color:#D9D5E0;font-size:12.5px;white-space:nowrap}
+.prdverse{margin:6px 0 12px;font-size:14px;line-height:1.7;color:var(--muted);white-space:pre-line;word-break:keep-all}
+.prdit{margin:0 0 12px;padding:16px 18px;border-radius:16px;background:#141418;border:1px solid #26252B}
+.prdmeta{font-size:12px;color:var(--faint)}
+.prdtext{margin:8px 0 0;font-size:19px;line-height:1.85;color:color-mix(in srgb,var(--orange) 85%,var(--ink));white-space:pre-line;word-break:keep-all}
+.prdit.answered .prdtext{color:#C9C4D2}
+.prdans{margin-top:12px;padding:10px 0 0 12px;border-left:2px solid var(--gold)}
+.prdans b{font-size:13px;color:var(--gold)}
+.prdans b span{font-weight:500;color:var(--faint);margin-left:4px}
+.prdans p{margin:4px 0 0;font-size:16.5px;line-height:1.8;color:var(--gold);white-space:pre-line;word-break:keep-all}
+.prdempty{text-align:center;margin-top:40px}
 .rqcnt{margin-left:auto;margin-right:10px;font-size:14px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
 .rqbody{flex:1;overflow:auto;display:flex;flex-direction:column;justify-content:center;gap:20px;padding:20px max(18px,calc((100% - 620px) / 2)) 28px}
 .rqcard{border-radius:18px;background:#141418;border:1px solid #26252B;padding:22px 20px;min-height:220px}
@@ -1768,6 +1787,7 @@ button:active{filter:brightness(1.15)}
         <button type="button" id="openMedBtn">묵상 진도표</button>
         <button type="button" id="openMemBtn">암송 도장판</button>
         <button type="button" id="openProgBtn">실천 진도표</button>
+        <button type="button" id="prayReadBtn">기도 모아 읽기</button>
         <button type="button" id="reorderBtn">카드 순서 바꾸기</button>
         <button type="button" id="foldAll">모두 펼치기</button>
         <button type="button" id="exportTxt" hidden>txt로 저장</button>
@@ -2137,6 +2157,52 @@ button:active{filter:brightness(1.15)}
     });
     have.forEach(function(d){d.remove()});
   }
+  /* ---------- 기도 읽기 모드: 적은 기도를 큰 글씨로 차분히 읽기 (한 말씀 또는 모든 말씀) ---------- */
+  var prd=null, prdNote=null, prdFilter="all";
+  function openPrayRead(nid){
+    prdNote=nid; prdFilter="all";
+    if(!prd){
+      prd=document.createElement("div"); prd.className="rvq prd"; prd.setAttribute("role","dialog"); prd.setAttribute("aria-modal","true"); prd.hidden=true;
+      prd.innerHTML='<div class="dlbar"><b class="dltitle">🙏 기도 읽기</b><span class="rqcnt prdcnt"></span><button type="button" class="dlclose prdclose">닫기</button></div>'+
+        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button></div><div class="prdlist"></div></div>';
+      document.body.appendChild(prd);
+      prd.querySelector(".prdclose").addEventListener("click",closePrayRead);
+      prd.querySelector(".prdfil").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;prdFilter=b.dataset.f;drawPrayRead()});
+      prd.querySelector(".prdlist").addEventListener("click",function(e){var b=e.target.closest(".prdgo");if(!b)return;var id=b.dataset.id;closePrayRead();tabOf.set(id,"p");openOne(id);render();var c=cards.get(id);if(c)setTimeout(function(){c.scrollIntoView({block:"start",behavior:"smooth"})},80)});
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&prd&&!prd.hidden)closePrayRead()});
+    }
+    drawPrayRead();
+    prd.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+    prd.querySelector(".prdbody").scrollTop=0;
+  }
+  function closePrayRead(){if(!prd)return; prd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
+  function drawPrayRead(){
+    var list=prd.querySelector(".prdlist"); list.textContent="";
+    prd.querySelectorAll(".prdfil button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.f===prdFilter))});
+    var src=prdNote?[notes.get(prdNote)].filter(Boolean):sorted(), total=0, ansN=0;
+    src.forEach(function(n){
+      var ps=(n.prays||[]).filter(function(x){return x.t.trim()});
+      ps.forEach(function(x){total++;if(x.ans)ansN++});
+      ps=ps.filter(function(x){return prdFilter==="all"||(prdFilter==="ans"?!!x.ans:!x.ans)}).sort(function(a,b){return b.at-a.at});
+      if(!ps.length)return;
+      var sec=document.createElement("section"); sec.className="prdsec";
+      sec.innerHTML='<div class="prdhd"><b class="prdref"></b><button type="button" class="prdgo">카드로 가기</button></div><p class="prdverse"></p>';
+      sec.querySelector(".prdref").textContent=n.ref; sec.querySelector(".prdverse").textContent=n.text; sec.querySelector(".prdgo").dataset.id=n.id;
+      if(prdNote)sec.querySelector(".prdgo").remove();
+      ps.forEach(function(x){
+        var a=document.createElement("article"); a.className="prdit"+(x.ans?" answered":"");
+        a.innerHTML='<div class="prdmeta"></div><p class="prdtext"></p>'+(x.ans?'<div class="prdans"><b>🙌 응답 <span></span></b><p></p></div>':'');
+        a.querySelector(".prdmeta").textContent=dateLabel(x.at)+(x.ans?"":"  ·  기다리는 기도");
+        a.querySelector(".prdtext").textContent=x.t;
+        if(x.ans){a.querySelector(".prdans span").textContent=dlabel(dkey(x.ans));var ap=a.querySelector(".prdans p");if((x.an||"").trim())ap.textContent=x.an;else ap.remove()}
+        sec.appendChild(a);
+      });
+      list.appendChild(sec);
+    });
+    prd.querySelector(".prdcnt").textContent=total?("응답 "+ansN+" / "+total):"";
+    if(!list.children.length)list.innerHTML='<p class="pempty prdempty">'+(total?"이 보기에 해당하는 기도가 없어요.":"아직 적은 기도가 없어요. 말씀 카드의 기도 탭에서 + 기도로 적어 보세요.")+'</p>';
+  }
+
   function syncCounts(el,n){
     var open=openIds.has(n.id), mc=medCount(n), qc=n.qs.length, ad=n.acts.filter(function(a){return a.done}).length, ac=n.acts.length;
     var tg=el.querySelector(".toggle");
@@ -2187,7 +2253,7 @@ button:active{filter:brightness(1.15)}
           '<div class="meds"></div>'+
         '</div>'+
         '<div class="pane" data-pane="p" hidden>'+
-          '<div class="qbtns"><button type="button" class="addbtn s addp">+ 기도</button></div>'+
+          '<div class="qbtns"><button type="button" class="addbtn s addp">+ 기도</button><button type="button" class="addbtn s pread">읽기 모드</button></div>'+
           '<div class="prays"></div>'+
         '</div>'+
         '<div class="pane" data-pane="a" hidden>'+
@@ -2882,6 +2948,7 @@ button:active{filter:brightness(1.15)}
       render();return;
     }
     if(b.classList.contains("addm")||b.classList.contains("addq")||b.classList.contains("adda")){tabOf.set(id,b.classList.contains("addm")?"m":b.classList.contains("addq")?"q":"a")}
+    if(b.classList.contains("pread")){openPrayRead(id);return}
     if(b.classList.contains("addp")){
       tabOf.set(id,"p"); if(!n.prays)n.prays=[]; var np={id:qid(),t:"",at:Date.now(),ans:0,an:""}; n.prays.push(np); render(); scheduleSave(id);
       var pc=cards.get(id), pe=pc&&pc.querySelector('.pri[data-pid="'+np.id+'"] .pt'); if(pe)setTimeout(function(){pe.focus()},40);
@@ -6609,6 +6676,7 @@ button:active{filter:brightness(1.15)}
   });
   $("topMenu").addEventListener("click",function(e){if(e.target.closest(".pop button"))this.open=false});
   $("openProgBtn").addEventListener("click",openProg);
+  $("prayReadBtn").addEventListener("click",function(){$("topMenu").open=false;openPrayRead(null)});
   $("foldAll").addEventListener("click",function(){
     if(notes.size&&openIds.size>=notes.size)openIds.clear();
     else notes.forEach(function(_,id){openIds.add(id)});
