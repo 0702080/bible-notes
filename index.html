@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-08">
+<meta name="app-build" content="2026-10-10-09">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -767,10 +767,19 @@ body.reorder .note .topics{display:none}
 .pgday.lots .pgdot{background:var(--sky)}
 .pgn{font-size:10.5px;color:var(--faint)}
 .pgday.on .pgn{color:var(--sky);font-weight:700}
-.pgrow{display:grid;grid-template-columns:minmax(0,1.2fr) 2fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule)}
+.pgrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr) 62px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule)}
 .pgrow:last-of-type{border-bottom:0}
 .pgref{font-size:13.5px;color:var(--violet);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pgcnt{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.pggo{min-width:0;height:32px;padding:0 8px;margin-left:-8px;border:0;border-radius:8px;background:transparent;text-align:left;cursor:pointer}
+@media (hover:hover){.pggo:hover{background:#1E1D24;text-decoration:underline;text-underline-offset:3px}}
+.pgbs{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.pgb{width:20px;height:20px;border-radius:50%;border:1.5px dashed #3A3940;display:grid;place-items:center;font-size:11px;line-height:1;color:#2A1C05}
+.pgb.got{border:0;background:radial-gradient(circle at 35% 30%,#FFE8A3,var(--gold) 55%,var(--orange));box-shadow:0 0 8px color-mix(in srgb,var(--gold) 45%,transparent);animation:pgbIn .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i)*60ms)}
+.pgrow.full .pgb.got{background:radial-gradient(circle at 35% 30%,#D9FFF4,var(--mint) 55%,var(--green));box-shadow:0 0 8px color-mix(in srgb,var(--mint) 50%,transparent)}
+.pgrow.full .pgcnt{color:var(--mint);font-weight:700}
+@keyframes pgbIn{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.pgb.got{animation:none}}
+.pgcnt{text-align:right;white-space:nowrap;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion:reduce){.aprog.bump{animation:none}.apbar i{transition:none}}
 .tk{font-weight:700;color:var(--hi);-webkit-text-stroke:.35px var(--hi)}
 .tsres .txt .tk{color:var(--hi)}
@@ -3909,6 +3918,13 @@ button:active{filter:brightness(1.15)}
       return;
     }
     var b=e.target.closest("button"); if(!b)return;
+    if(b.classList.contains("pggo")){   // 실천 진도표의 말씀 → 그 말씀의 실천 탭으로
+      var gid=b.dataset.id; if(!notes.has(gid))return;
+      closeTS(); setTopics([]); tabOf.set(gid,"a"); openIds.clear(); openIds.add(gid); try{localStorage.setItem("bible-last-open",gid)}catch(err){}
+      spotId=gid; render();
+      var gc=cards.get(gid); if(gc){gc.scrollIntoView({block:"start",behavior:"smooth"});gc.classList.remove("spotin");void gc.offsetWidth;gc.classList.add("spotin")}
+      return;
+    }
     if(b.classList.contains("mcprev")||b.classList.contains("mcnext")){
       var dm=b.classList.contains("mcprev")?-1:1; var nd=new Date(medCal.y,medCal.m+dm,1); medCal={y:nd.getFullYear(),m:nd.getMonth()}; drawMedProgress(); return;
     }
@@ -4233,10 +4249,14 @@ button:active{filter:brightness(1.15)}
     var h2=document.createElement("div"); h2.className="pgh"; h2.textContent="말씀별 진도"; body.appendChild(h2);
     arr.forEach(function(x){
       var r=document.createElement("div"); r.className="pgrow";
-      r.innerHTML='<div class="pgref"></div><div class="apbar"><i></i></div><div class="pgcnt"></div>';
-      r.querySelector(".pgref").textContent=x.n.ref;
-      r.querySelector("i").style.width=x.st.pct+"%"; if(x.st.pct>=100)r.querySelector(".apbar").classList.add("full");
-      r.querySelector(".pgcnt").textContent=x.st.done+"/"+x.st.total;
+      r.innerHTML='<button type="button" class="pgref pggo"></button><div class="pgbs"></div><div class="pgcnt"></div>';
+      var rb=r.querySelector(".pgref"); rb.textContent=x.n.ref; rb.dataset.id=x.n.id; rb.title=x.n.ref+" 실천으로 가기";
+      // 실천 하나 끝낼 때마다 배지 하나씩 모으기 (빈 자리는 점선 동그라미)
+      var bs=r.querySelector(".pgbs");
+      for(var k=0;k<x.st.total;k++){var g=document.createElement("span");g.className="pgb"+(k<x.st.done?" got":"");g.textContent=k<x.st.done?"★":"";g.style.setProperty("--i",k);bs.appendChild(g)}
+      bs.setAttribute("aria-label","배지 "+x.st.done+"개 모음, 전체 "+x.st.total+"개");
+      if(x.st.pct>=100)r.classList.add("full");
+      r.querySelector(".pgcnt").textContent=(x.st.pct>=100?"🏆 ":"")+x.st.done+"/"+x.st.total;
       body.appendChild(r);
     });
     var rec=[]; notes.forEach(function(n){n.acts.forEach(function(a){if(a.done&&a.t.trim())rec.push({ref:n.ref,t:a.t.trim(),at:a.doneAt||0})})});
