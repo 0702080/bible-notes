@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-07">
+<meta name="app-build" content="2026-10-10-08">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3760,6 +3760,7 @@ button:active{filter:brightness(1.15)}
   $("reviewBar").addEventListener("click",function(e){
     var b=e.target.closest(".rvchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
+    if(b.dataset.act==="prog"){openProg();return}
     if(b.dataset.act==="sync"){if(ghCfg())ghSync("manual");else openGh();return}
     if(b.dataset.act==="sbsync"){sbSync("manual");return}
     if(b.dataset.act==="sblogin"){openSb();return}
@@ -5031,6 +5032,7 @@ button:active{filter:brightness(1.15)}
     else rows.push({icon:"☁️",label:"로그인하면 모든 기기에 바로 맞춰져요",chips:[{id:"",t:"로그인",act:"sblogin"}]});
     var dd=dailyData(), dc=dailyChecked(dd,dkey(Date.now())).length, dt=dd.items.length;
     rows.push({icon:"🌙",label:"하루 돌아보기",chips:[{id:"",t:dc+" / "+dt,act:"daily"}],done:dt>0&&dc===dt});
+    if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))rows.push({icon:"📊",label:"실천 진도표",chips:[{id:"",t:"전체 보기",act:"prog"}]});
     bar.hidden=!rows.length;
     if(!rows.length)return;
     var h=document.createElement("div"); h.className="tdh"; h.textContent="오늘"; bar.appendChild(h);
