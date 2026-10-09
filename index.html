@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-28">
+<meta name="app-build" content="2026-10-10-29">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1920,9 +1920,13 @@ button:active{filter:brightness(1.15)}
 .ghbtns .ghnow{flex:1}
 .ghout{flex:0 0 auto;height:44px;padding:0 14px;border:1px solid var(--rule);border-radius:12px;background:transparent;color:var(--faint);font-size:13px}
 /* 하나님 경외 주제 카드: 은은한 짙은 보라 */
-.note.fear{background:linear-gradient(180deg,#231B30 0%,#1C1626 100%);border-color:#3A2F4C}
-.note.fear.open .chead{background:linear-gradient(180deg,#231B30 0%,#231B30 82%,rgba(35,27,48,0) 100%)}
-.note.fear.open .chead.stuck{background:#231B30}
+/* 말씀 카드: 주제 색을 아주 옅게 섞은 파스텔 톤 (카드마다 은은하게 다르지만 한 가족처럼) */
+.note{--cbg:color-mix(in srgb,var(--tc,var(--violet)) 12%,#19181F);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--tc,var(--violet)) 15%,#1B1A21) 0%,color-mix(in srgb,var(--tc,var(--violet)) 7%,#16151B) 55%,color-mix(in srgb,var(--tc,var(--violet)) 4%,#141418) 100%);
+  border-color:color-mix(in srgb,var(--tc,var(--violet)) 24%,#26252B)}
+.note.open{border-color:color-mix(in srgb,var(--tc,var(--violet)) 40%,#2A2930);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--tc,var(--violet)) 18%,transparent),0 14px 36px rgba(0,0,0,.5)}
+.note.open .chead{background:linear-gradient(180deg,color-mix(in srgb,var(--tc,var(--violet)) 15%,#1B1A21) 0%,color-mix(in srgb,var(--tc,var(--violet)) 15%,#1B1A21) 82%,transparent 100%)}
+.note.open .chead.stuck{background:color-mix(in srgb,var(--tc,var(--violet)) 15%,#1B1A21)}
 /* 말씀 속 진한 글씨: 짙은 노란색 */
 :root{--boldy:#FFC21A}
 .verse .tk,.verse .vmark,.verse.focus .w.on,.verse b,.verse strong{color:var(--boldy)!important;-webkit-text-stroke:0!important}
