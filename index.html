@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-27">
+<meta name="app-build" content="2026-10-10-28">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1552,6 +1552,8 @@ button:active{filter:brightness(1.15)}
 .mcoach b{font-size:14.5px}
 .mcoach small{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
 @media (max-width:400px){.mcoach small{display:none}}
+.mtop{display:flex;flex-direction:column;align-items:flex-start}
+@media (min-width:600px){.mtop{flex-direction:row;align-items:center;gap:22px}.mtop .mcoach{margin:0 0 14px}}
 .mmoretg{display:flex;align-items:center;gap:8px;width:100%;height:42px;margin-top:6px;padding:0 4px;border:0;border-top:1px solid var(--rule);background:transparent;color:var(--muted);font-size:14px;font-weight:700;text-align:left}
 .mmoretg .mmorehint{flex:1;min-width:0;font-size:12px;font-weight:400;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mmoretg .mhkchev{border-color:var(--muted)}
@@ -5819,13 +5821,14 @@ button:active{filter:brightness(1.15)}
     head.innerHTML='<b>말씀 암송</b><span class="mcnt"></span>';
     head.querySelector(".mcnt").textContent=memDone(n)?"🏅 암송 완료!":"도장 "+c+" / "+MEMSTEPS.length;
     panel.appendChild(head);
-    panel.appendChild(stampRow(n,true));
+    var mtop=document.createElement("div"); mtop.className="mtop"; panel.appendChild(mtop);
+    mtop.appendChild(stampRow(n,true));   // PC에서는 도장 옆에 암송 버튼
     // 가장 먼저 보이는 것: 오늘 할 일 하나
     var ri0=reviewInfo(n), nx0=memNextStep(n), cb=document.createElement("button"); cb.type="button"; cb.className="mcoach";
     var ct=memDone(n)?(ri0&&ri0.due?"🔁 오늘 복습하기":"🔁 한 번 더 떠올리기"):nx0===3?"🌤️ 오늘 다시 외우기 (마지막 도장)":nx0===-1&&n.mem.s[2]?"내일 다시 외워요 · 지금 한 번 더":"▶ 암송 시작";
     var cs=memDone(n)||nx0===3||(nx0===-1&&n.mem.s[2])?"1분":"읽기 → 첫 글자 → 가리기 → 떠올리기";
     cb.innerHTML='<b></b><small></small>'; cb.querySelector("b").textContent=ct; cb.querySelector("small").textContent=cs;
-    panel.appendChild(cb);
+    mtop.appendChild(cb);
     if(ri0){var nr=document.createElement("p");nr.className="mnext"+(ri0.due?" due":"");var dr=new Date(ri0.next);nr.textContent=ri0.due?"🔁 오늘 복습할 차례예요":"🔁 다음 복습 "+(dr.getMonth()+1)+"/"+dr.getDate()+" ("+ri0.gap+"일 간격)";panel.appendChild(nr)}
     var view0=memView.get(n.id)||"", mOpen=memMore.has(n.id)||!!view0||memStep.has(n.id);
     var mt=document.createElement("button"); mt.type="button"; mt.className="mmoretg"; mt.setAttribute("aria-expanded",String(mOpen));
