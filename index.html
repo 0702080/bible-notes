@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-18">
+<meta name="app-build" content="2026-10-10-19">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1783,10 +1783,18 @@ button:active{filter:brightness(1.15)}
 .pane[data-pane="m"] .qbtns .medprog:active{transform:scale(.98)}
 /* ===== simpler + smarter ===== */
 .reviewbar{flex-direction:column;align-items:stretch;gap:6px;padding:10px 12px 12px}
-.tdh{font-size:12px;font-weight:700;color:var(--gold);letter-spacing:.04em}
-.tdrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-.tdl{font-size:13px;color:var(--ink);margin-right:2px}
-.tdrow.done .tdl{color:var(--green)}
+.tdh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
+.tddate{font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0}
+.tdrow{display:grid;grid-template-columns:22px 6.6em minmax(0,1fr);align-items:start;column-gap:6px;min-height:30px}
+.tdi{font-size:14px;line-height:28px;text-align:center}
+.tdl{font-size:13px;line-height:28px;color:var(--ink);white-space:nowrap}
+.tdc{display:flex;flex-wrap:wrap;align-items:center;gap:5px;min-width:0}
+.tdtag{font-size:12.5px;line-height:28px;color:var(--muted);white-space:nowrap;margin-right:2px}
+.tdrow.done .tdl,.tdrow.done .tdtag{color:var(--green)}
+.tdrow.bad .tdtag{color:var(--pink)}
+.tdsep{height:1px;margin:4px 0 2px;background:color-mix(in srgb,var(--gold) 20%,var(--rule))}
+.rvchip.main{background:var(--gold);color:#141416}
+@media (max-width:480px){.tdrow{grid-template-columns:22px 6.2em minmax(0,1fr)}.tdrow.many .tdc{grid-column:2/-1;margin-bottom:4px}}
 .mmore{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed #2E2D33}
 .mmore > *{margin:0!important}
 .dfold,.aftoggle{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border:1px solid #2A2930;border-radius:12px;background:#141317;color:var(--ink);text-align:left}
@@ -5328,38 +5336,47 @@ button:active{filter:brightness(1.15)}
     var lastMedNote=null, lastAt=0;
     all.forEach(function(n){(n.meds||[]).forEach(function(m){if(String(m.text||"").trim()&&(+m.at||0)>lastAt){lastAt=+m.at;lastMedNote=n}})});
     var target=notes.get(lastOpenId())||lastMedNote||all[0];
-    if(didToday)rows.push({icon:"✨",label:st.streak>=2?"오늘 묵상 완료,  🔥 "+st.streak+"일 연속":"오늘 묵상 완료",chips:[],done:true});
-    else if(target)rows.push({icon:"✍️",label:st.streak>=1?"오늘 묵상하면 "+(st.streak+1)+"일 연속":"오늘 묵상 쓰기",chips:[{id:target.id,t:target.ref,act:"med"}]});
+    if(didToday)rows.push({icon:"✨",label:"오늘 묵상",tag:"완료 ✓"+(st.streak>=2?"  ·  🔥 "+st.streak+"일 연속":""),chips:[],done:true});
+    else if(target)rows.push({icon:"✍️",label:"오늘 묵상",tag:st.streak>=1?"쓰면 🔥 "+(st.streak+1)+"일 연속":"",chips:[{id:target.id,t:target.ref,act:"med"}]});
     // 3) 오늘 실천 (체크표가 있는 실천 중 오늘 아직 안 찍은 것)
     var acts=[];
     all.forEach(function(n){(n.acts||[]).forEach(function(a){if(a.t&&a.t.trim()&&!a.done&&(a.stamps||[]).length&&(a.stamps||[]).indexOf(today)<0)acts.push(n)})});
     var actNotes=acts.filter(function(n,i){return acts.indexOf(n)===i});
-    if(actNotes.length)rows.push({icon:"✅",label:"오늘 실천 체크",chips:actNotes.slice(0,4).map(function(n){return {id:n.id,t:n.ref,act:"act"}})});
+    if(actNotes.length)rows.push({icon:"✅",label:"오늘 실천",chips:actNotes.slice(0,4).map(function(n){return {id:n.id,t:n.ref,act:"act"}})});
     // 4) 이어서 보기
     var lo=notes.get(lastOpenId());
-    if(lo&&!openIds.has(lo.id)&&!rows.some(function(r){return r.chips.some(function(c){return c.id===lo.id})}))rows.push({icon:"↩️",label:"이어서",chips:[{id:lo.id,t:lo.ref,act:"open"}]});
+    if(lo&&!openIds.has(lo.id)&&!rows.some(function(r){return r.chips.some(function(c){return c.id===lo.id})}))rows.push({icon:"↩️",label:"이어서 보기",chips:[{id:lo.id,t:lo.ref,act:"open"}]});
     // ☁️ 동기화 상태: 이 기기가 GitHub에 올리고 있는지 한눈에
     var gc=ghCfg(), gs=(typeof ghState==="object"&&ghState)||{};   // 앱이 처음 그려질 때는 아직 동기화 상태가 없을 수 있음
     var ss=sbSession(), sst=(typeof sbState==="object"&&sbState)||{};
     if(ss){var sago=sst.at?Math.round((Date.now()-sst.at)/60000):-1;
-      rows.push({icon:"☁️",label:sst.ok===false?"동기화가 안 됐어요":(typeof sbBusy!=="undefined"&&sbBusy)?"맞추는 중…":sago<0?"로그인됨 · 맞추는 중":sago<1?"모든 기기와 맞춰졌어요 · 방금":"모든 기기와 맞춰졌어요 · "+sago+"분 전",chips:[{id:"",t:"지금 맞추기",act:"sbsync"}],done:sst.ok===true})}
+      rows.push({icon:"☁️",info:1,label:"동기화",tag:sst.ok===false?"안 됐어요":(typeof sbBusy!=="undefined"&&sbBusy)||sago<0?"맞추는 중…":sago<1?"방금 맞춤":sago+"분 전 맞춤",bad:sst.ok===false,chips:[{id:"",t:"지금 맞추기",act:"sbsync"}],done:sst.ok===true})}
     else if(gc){var ago=gs.at?Math.round((Date.now()-gs.at)/60000):-1;
-      rows.push({icon:"☁️",label:gs.ok===false?"동기화가 안 됐어요":ghBusy?"맞추는 중…":ago<0?"GitHub 동기화 켜짐":ago<1?"GitHub과 맞춰졌어요 · 방금":"GitHub과 맞춰졌어요 · "+ago+"분 전",chips:[{id:"",t:"지금 맞추기",act:"sync"}],done:gs.ok===true})}
-    else rows.push({icon:"☁️",label:"로그인하면 모든 기기에 바로 맞춰져요",chips:[{id:"",t:"로그인",act:"sblogin"}]});
+      rows.push({icon:"☁️",info:1,label:"동기화",tag:gs.ok===false?"안 됐어요":ghBusy?"맞추는 중…":ago<0?"GitHub 켜짐":ago<1?"방금 맞춤":ago+"분 전 맞춤",bad:gs.ok===false,chips:[{id:"",t:"지금 맞추기",act:"sync"}],done:gs.ok===true})}
+    else rows.push({icon:"☁️",info:1,label:"동기화",tag:"꺼짐",chips:[{id:"",t:"로그인",act:"sblogin"}]});
     if(ss){var fin=(frData&&frData.incoming||[]).length, fct=(frData&&frData.friends||[]).length;
-      rows.push({icon:"👥",label:fin?"친구 신청이 "+fin+"개 왔어요":fct?"친구 "+fct+"명":"친구와 묵상 나누기",chips:[{id:"",t:fin?"확인하기":fct?"친구 보기":"친구 맺기",act:"friends"}]})}
+      rows.push({icon:"👥",info:1,label:"친구",tag:fin?"신청 "+fin+"개 💌":fct?fct+"명":"",chips:[{id:"",t:fin?"확인하기":fct?"친구 보기":"친구 맺기",act:"friends"}]})}
     var dd=dailyData(), dc=dailyChecked(dd,dkey(Date.now())).length, dt=dd.items.length;
     rows.push({icon:"🌙",label:"하루 돌아보기",chips:[{id:"",t:dc+" / "+dt,act:"daily"}],done:dt>0&&dc===dt});
-    if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))rows.push({icon:"📊",label:"실천 진도표",chips:[{id:"",t:"전체 보기",act:"prog"}]});
+    if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))rows.push({icon:"📊",info:1,label:"실천 진도표",chips:[{id:"",t:"전체 보기",act:"prog"}]});
     bar.hidden=!rows.length;
     if(!rows.length)return;
-    var h=document.createElement("div"); h.className="tdh"; h.textContent="오늘"; bar.appendChild(h);
-    rows.forEach(function(r){
-      var row=document.createElement("div"); row.className="tdrow"+(r.done?" done":"");
-      var lb=document.createElement("span"); lb.className="tdl"; lb.textContent=r.icon+"  "+r.label; row.appendChild(lb);
-      r.chips.forEach(function(c){var b=document.createElement("button");b.type="button";b.className="rvchip"+(spotId===c.id&&openIds.has(c.id)?" on":"");b.dataset.id=c.id;b.dataset.act=c.act;b.textContent=c.t;row.appendChild(b)});
-      bar.appendChild(row);
-    });
+    var h=document.createElement("div"); h.className="tdh"; h.innerHTML='<span>오늘</span><span class="tddate"></span>';
+    var nd=new Date(); h.querySelector(".tddate").textContent=(nd.getMonth()+1)+"월 "+nd.getDate()+"일 ("+WD[nd.getDay()]+")"; bar.appendChild(h);
+    // 할 일(위)과 상태 보기(아래)로 나눠 한 줄씩: [아이콘] [이름] [상태 · 버튼들]
+    var todo=rows.filter(function(r){return !r.info}), info=rows.filter(function(r){return r.info});
+    function drawRow(r){
+      var row=document.createElement("div"); row.className="tdrow"+(r.done?" done":"")+(r.bad?" bad":"")+(r.chips.length>=2||(r.chips.length&&r.tag&&r.tag.length>6)?" many":"");
+      var ic=document.createElement("span"); ic.className="tdi"; ic.textContent=r.icon; ic.setAttribute("aria-hidden","true"); row.appendChild(ic);
+      var lb=document.createElement("span"); lb.className="tdl"; lb.textContent=r.label; row.appendChild(lb);
+      var cs=document.createElement("div"); cs.className="tdc";
+      if(r.tag){var tg=document.createElement("span");tg.className="tdtag";tg.textContent=r.tag;cs.appendChild(tg)}
+      r.chips.forEach(function(c){var b=document.createElement("button");b.type="button";b.className="rvchip"+(spotId===c.id&&openIds.has(c.id)?" on":"")+(c.act==="rvall"?" main":"");b.dataset.id=c.id;b.dataset.act=c.act;b.textContent=c.t;cs.appendChild(b)});
+      row.appendChild(cs); bar.appendChild(row);
+    }
+    todo.forEach(drawRow);
+    if(todo.length&&info.length){var hr=document.createElement("div");hr.className="tdsep";bar.appendChild(hr)}
+    info.forEach(drawRow);
   }
 
 
