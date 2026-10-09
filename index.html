@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-29">
+<meta name="app-build" content="2026-10-10-30">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2725,6 +2725,48 @@ button:active{filter:brightness(1.15)}
     atl.querySelector(".afoldall").textContent=named.length&&named.every(function(a){return aFold.has(a.id)})?"모두 펼치기":"모두 접기";
     if(!n.qs.length&&!box.children.length){box.innerHTML=""}
   }
+  // 카드 펼치기/접기 애니메이션: 높이가 부드럽게 늘고 줄며, 펼칠 때는 안의 내용이 차례로 떠오름
+  var cardAnim=new Map();
+  function toggleCard(id,open){
+    var el=cards.get(id), still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function apply(){if(open)openOne(id);else openIds.delete(id);render()}
+    if(!el||!el.animate||still){apply();return}
+    if(cardAnim.has(id)){try{cardAnim.get(id).cancel()}catch(e){}cardAnim.delete(id)}
+    if(!open){
+      // 접을 때: 안의 내용이 위로 스르르 사라진 뒤 높이가 줄어듦
+      var kids=Array.prototype.filter.call(el.children,function(c){return !c.classList.contains("chead")&&!c.classList.contains("verse")&&c.offsetParent});
+      kids.forEach(function(c){c.animate([{opacity:1,transform:"none"},{opacity:0,transform:"translateY(-10px)"}],{duration:150,easing:"ease-in",fill:"forwards"})});
+      el.classList.add("closing");
+      setTimeout(function(){
+        kids.forEach(function(c){c.getAnimations().forEach(function(a){a.cancel()})});
+        el.classList.remove("closing");
+        flip(el,apply,false);
+      },140);
+      return;
+    }
+    flip(el,apply,true);
+  }
+  function flip(el,apply,opening){
+    var id=el.dataset.id, h0=el.getBoundingClientRect().height;
+    apply();
+    el=cards.get(id); if(!el)return;
+    var h1=el.getBoundingClientRect().height;
+    if(Math.abs(h1-h0)<4)return;
+    el.style.overflow="clip";
+    var all=[], a=el.animate([{height:h0+"px"},{height:h1+"px"}],{duration:opening?460:300,easing:opening?"cubic-bezier(.22,1.18,.36,1)":"cubic-bezier(.4,0,.2,1)"});
+    all.push(a); cardAnim.set(id,a);
+    setTimeout(function(){all.forEach(function(x){try{if(x.playState!=="finished")x.finish()}catch(e){}});el.style.overflow="";if(cardAnim.get(id)===a)cardAnim.delete(id)},900);   // 화면이 멈춰 있어도 꼭 끝나게
+    a.onfinish=a.oncancel=function(){el.style.overflow="";if(cardAnim.get(id)===a)cardAnim.delete(id)};
+    if(opening){
+      Array.prototype.forEach.call(el.children,function(c,i){
+        if(c.classList.contains("chead")||!c.offsetParent)return;
+        all.push(c.animate([{opacity:0,transform:"translateY(-12px) scale(.98)"},{opacity:1,transform:"none"}],{duration:340,delay:40+Math.min(i,8)*45,easing:"cubic-bezier(.2,.9,.3,1.2)",fill:"backwards"}));
+      });
+      all.push(el.animate([{boxShadow:"0 0 0 0 color-mix(in srgb,var(--tc,var(--violet)) 0%,transparent)"},{boxShadow:"0 0 0 6px color-mix(in srgb,var(--tc,var(--violet)) 22%,transparent)"},{boxShadow:"0 0 0 0 transparent"}],{duration:600,easing:"ease-out"}));
+    }else{
+      all.push(el.animate([{transform:"scale(.985)"},{transform:"scale(1.006)"},{transform:"none"}],{duration:320,easing:"ease-out"}));
+    }
+  }
   function openOne(id){
     openIds.clear(); openIds.add(id); try{localStorage.setItem("bible-last-open",id)}catch(e){}
     setTimeout(function(){var el=cards.get(id); if(!el)return; var r=el.getBoundingClientRect(); if(r.top<0||r.top>window.innerHeight*0.45)el.scrollIntoView({block:"start",behavior:"smooth"})},60);
@@ -3154,15 +3196,14 @@ button:active{filter:brightness(1.15)}
         clearTimeout(vTap.timer); vTap={id:tid,t:tnow,timer:0};
         if(isOpen&&!e.target.closest(".body")){   // 펼친 카드는 두 번째 누름을 잠깐 기다렸다가 접음
           var vsel=window.getSelection&&String(window.getSelection()||""); if(vsel&&vsel.trim())return;
-          vTap.timer=setTimeout(function(){if(vTap.id!==tid)return;vTap={id:"",t:0,timer:0};openIds.delete(tid);render()},380);
+          vTap.timer=setTimeout(function(){if(vTap.id!==tid)return;vTap={id:"",t:0,timer:0};toggleCard(tid,false)},380);
           return;
         }
       }
       if(!isOpen||!e.target.closest(".body")){
         var sel=window.getSelection&&String(window.getSelection()||"");
         if(sel&&sel.trim())return;
-        if(isOpen)openIds.delete(tid);else openOne(tid);
-        render(); return;
+        toggleCard(tid,!isOpen); return;
       }
     }
     var b=e.target.closest("button"); if(!b)return;
@@ -3291,14 +3332,7 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("apall")){openProg();return}
     if(b.classList.contains("ctopicadd")){openPicker(id);return}
     if(b.classList.contains("ctopic")){toggleTopic(b.dataset.topic);render();return}
-    if(b.classList.contains("hchev")){
-      if(openIds.has(id))openIds.delete(id);else openOne(id);
-      render(); return;
-    }
-    if(b.classList.contains("toggle")){
-      if(openIds.has(id))openIds.delete(id);else openOne(id);
-      render();return;
-    }
+    if(b.classList.contains("hchev")||b.classList.contains("toggle")){toggleCard(id,!openIds.has(id));return}
     if(b.classList.contains("addm")||b.classList.contains("addq")||b.classList.contains("adda")){tabOf.set(id,b.classList.contains("addm")?"m":b.classList.contains("addq")?"q":"a")}
     if(b.classList.contains("pread")){openPrayRead(id);return}
     if(b.classList.contains("addp")){
@@ -7707,10 +7741,7 @@ button:active{filter:brightness(1.15)}
       drag.moved=wasMoved; endDrag(false);
       if(quick&&tapTarget&&tapEl){
         var tid=tapEl.dataset.id, isOpen=openIds.has(tid);
-        if(!isOpen||!tapTarget.closest(".body")){
-          if(isOpen)openIds.delete(tid);else openOne(tid);
-          render();
-        }
+        if(!isOpen||!tapTarget.closest(".body"))toggleCard(tid,!isOpen);
       }
       suppressClick=true; setTimeout(function(){suppressClick=false},wasMoved?400:250);
     }
