@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-02">
+<meta name="app-build" content="2026-10-10-03">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -285,6 +285,10 @@ details.menu>summary::-webkit-details-marker{display:none}
 .medi.folded .med,.medi.folded .mend{display:none}
 .mpd{display:none}   /* 접은 묵상 앞에는 날짜를 붙이지 않음 (날짜는 아래 줄에) */
 .mpt{flex:1;min-width:0;font-size:15px;color:var(--green);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mfoot .mgrip{margin-right:auto;width:30px;height:30px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--faint);display:grid;place-items:center;cursor:grab;touch-action:none}
+.mfoot .mgrip svg{width:18px;height:18px;fill:currentColor}
+@media (hover:hover){.mfoot .mgrip:hover{color:var(--ink);background:#1E1D24}}
+.medi.mdragging{opacity:.85;outline:2px dashed color-mix(in srgb,var(--green) 60%,transparent);outline-offset:4px;border-radius:12px}
 .mfoot .mfold{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--muted)}
 .mtools{display:flex;justify-content:flex-end;margin:-4px 0 6px}
 .mtools[hidden]{display:none}
@@ -1824,8 +1828,8 @@ button:active{filter:brightness(1.15)}
         <button type="button" id="prayReadBtn">기도 모아 읽기</button>
         <button type="button" id="reorderBtn">카드 순서 바꾸기</button>
         <button type="button" id="foldAll">모두 펼치기</button>
-        <button type="button" id="exportTxt" hidden>txt로 저장</button>
-        <button type="button" id="exportPdf" hidden>PDF로 저장</button>
+        <button type="button" id="exportTxt">모두 txt로 저장</button>
+        <button type="button" id="exportPdf">모두 PDF로 저장</button>
         <button type="button" id="backupSave">백업 파일 저장</button>
         <button type="button" id="backupLoad">백업 불러오기</button>
         <button type="button" id="ghSyncBtn">☁️ GitHub 동기화</button>
@@ -1927,7 +1931,7 @@ button:active{filter:brightness(1.15)}
   }
   function mid(){return "m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
   function normMeds(n){
-    if(Array.isArray(n.meds))return n.meds.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),text:String(x.text||""),at:+x.at||+n.createdAt||Date.now(),thx:String(x.thx||"").slice(0,1000),todo:String(x.todo||"").slice(0,1000),tact:x.tact?String(x.tact):""}});
+    if(Array.isArray(n.meds))return n.meds.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),text:String(x.text||""),at:+x.at||+n.createdAt||Date.now(),thx:String(x.thx||"").slice(0,1000),todo:String(x.todo||"").slice(0,1000),tact:x.tact?String(x.tact):"",o:(typeof x.o==="number"&&isFinite(x.o))?x.o:null}});
     if(n.med&&String(n.med).trim())return [{id:"m0",text:String(n.med),at:+n.createdAt||Date.now()}];
     return [];
   }
@@ -1940,6 +1944,11 @@ button:active{filter:brightness(1.15)}
   function dateLabel(t){var d=new Date(t);return (d.getMonth()+1)+"월 "+d.getDate()+"일 ("+WD[d.getDay()]+")"}
   function lastMedAt(n){var t=n.createdAt||0;n.meds.forEach(function(m){if(m.at>t)t=m.at});return t}
   function newestFirst(meds){return meds.slice().sort(function(a,b){return b.at-a.at})}
+  // 묵상 보이는 순서: 끌어서 바꾼 적이 있으면 그 순서(o), 아니면 최근 것부터
+  function medOrder(meds){
+    if(!meds.some(function(m){return typeof m.o==="number"}))return newestFirst(meds);
+    return meds.slice().sort(function(a,b){var ao=typeof a.o==="number"?a.o:-1e15-a.at, bo=typeof b.o==="number"?b.o:-1e15-b.at;return ao-bo});
+  }
   function medsText(n){return n.meds.map(function(m){return m.text}).join(" ")}
   function medCount(n){return n.meds.filter(function(m){return m.text.trim()}).length}
   function cleanNote(n){
@@ -2343,7 +2352,7 @@ button:active{filter:brightness(1.15)}
     el.querySelector(".sugq").hidden=!sampleFn;
     el.querySelector(".suga").hidden=!sampleFn;
     el.querySelector(".sugh").hidden=!sampleFn;
-    el.querySelectorAll(".exportone").forEach(function(b){b.hidden=!downloadsNs});
+    el.querySelectorAll(".exportone").forEach(function(b){b.hidden=false});
     return el;
   }
   // 묵상 접기 (이 기기에 기억)
@@ -2357,11 +2366,11 @@ button:active{filter:brightness(1.15)}
       '<div class="mend"><label class="mendl thx"><span>🙏 감사</span><small></small></label><textarea class="mthx" rows="1" aria-label="감사"></textarea>'+
       '<label class="mendl todo"><span>✅ 결론 · 할 일</span><small></small></label><textarea class="mtodo" rows="1" aria-label="결론과 할 일"></textarea>'+
       '<button type="button" class="mtoact" hidden>실천으로 보내기</button></div>'+
-      '<div class="mfoot"><span class="dl"></span><button type="button" class="mfold">접기</button><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div>';
+      '<div class="mfoot"><button type="button" class="mgrip" aria-label="끌어서 순서 바꾸기" title="끌어서 순서 바꾸기"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><span class="dl"></span><button type="button" class="mfold">접기</button><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div>';
     d.querySelector(".dl").textContent=dateLabel(m.at);
     d.querySelector(".med").placeholder="오늘의 관점: "+LENS[new Date(m.at).getDay()];
-    d.querySelector(".mendl.thx small").textContent=THXQ[wd]; d.querySelector(".mthx").placeholder="예: 오늘도 말씀으로 마음을 붙들어 주셔서 감사합니다";
-    d.querySelector(".mendl.todo small").textContent=TODOQ[wd]; d.querySelector(".mtodo").placeholder="예: 저녁에 가족에게 먼저 고맙다고 말하기";
+    d.querySelector(".mendl.thx small").textContent=THXQ[wd]; d.querySelector(".mthx").placeholder="";
+    d.querySelector(".mendl.todo small").textContent=TODOQ[wd]; d.querySelector(".mtodo").placeholder="";
     return d;
   }
   function makeAct(a){
@@ -2496,7 +2505,7 @@ button:active{filter:brightness(1.15)}
     var mbox=el.querySelector(".meds"), mhave=new Map();
     Array.prototype.forEach.call(mbox.children,function(c){mhave.set(c.dataset.mid,c)});
     var chrono=n.meds.slice().sort(function(a,b){return a.at-b.at});
-    newestFirst(n.meds).forEach(function(m,i){
+    medOrder(n.meds).forEach(function(m,i){
       var d=mhave.get(m.id); if(!d)d=makeMed(m); mhave.delete(m.id);
       if(mbox.children[i]!==d)mbox.insertBefore(d,mbox.children[i]||null);
       var fo=medFold.has(m.id); d.classList.toggle("folded",fo);
@@ -2848,6 +2857,33 @@ button:active{filter:brightness(1.15)}
     var pri=e.target.closest&&e.target.closest(".pri"); if(!pri||!prEdit.has(pri.dataset.pid))return;
     setTimeout(function(){if(!pri.isConnected||pri.contains(document.activeElement))return;prEdit.delete(pri.dataset.pid);render()},150);
   });
+  // 묵상 끌어서 옮기기 (⋮⋮ 손잡이)
+  var mdrag=null;
+  list.addEventListener("pointerdown",function(e){
+    var g=e.target.closest&&e.target.closest(".mgrip"); if(!g)return;
+    e.preventDefault(); e.stopPropagation();
+    var it=g.closest(".medi"); mdrag={it:it,box:it.parentNode,nid:it.closest(".note").dataset.id,moved:false};
+    it.classList.add("mdragging"); document.body.style.userSelect="none";
+    try{g.setPointerCapture(e.pointerId)}catch(err){}
+    if(navigator.vibrate)try{navigator.vibrate(12)}catch(err){}
+  },true);
+  document.addEventListener("pointermove",function(e){
+    if(!mdrag)return; e.preventDefault();
+    var y=e.clientY, it=mdrag.it, prev=it.previousElementSibling, next=it.nextElementSibling;
+    if(prev&&y<prev.getBoundingClientRect().top+prev.offsetHeight/2){mdrag.box.insertBefore(it,prev);mdrag.moved=true}
+    else if(next&&y>next.getBoundingClientRect().top+next.offsetHeight/2){mdrag.box.insertBefore(next,it);mdrag.moved=true}
+    if(y<60)window.scrollBy(0,-12); else if(y>window.innerHeight-60)window.scrollBy(0,12);
+  },{passive:false});
+  function endMDrag(){
+    if(!mdrag)return; var d=mdrag; mdrag=null;
+    d.it.classList.remove("mdragging"); document.body.style.userSelect="";
+    if(!d.moved)return;
+    var n=notes.get(d.nid); if(!n)return;
+    Array.prototype.forEach.call(d.box.children,function(c,i){var m=n.meds.find(function(x){return x.id===c.dataset.mid});if(m)m.o=i});
+    scheduleSave(n.id); render(); toast("묵상 순서를 바꿨어요");
+  }
+  document.addEventListener("pointerup",endMDrag);
+  document.addEventListener("pointercancel",endMDrag);
   list.addEventListener("submit",function(e){
     var xf=e.target.closest&&e.target.closest(".xlform");
     if(xf){e.preventDefault(); var xc=xf.closest(".note"), xn=xc&&notes.get(xc.dataset.id); if(xn)addMyLink(xc,xn,xf); return}
@@ -3047,7 +3083,9 @@ button:active{filter:brightness(1.15)}
       n.prays=n.prays.filter(function(x){return x.id!==pid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("addm")){
-      var nm={id:mid(),text:"",at:Date.now()}; n.meds.push(nm); render(); scheduleSave(id);
+      var nm={id:mid(),text:"",at:Date.now()};
+      var mins=n.meds.filter(function(m){return typeof m.o==="number"}).map(function(m){return m.o}); if(mins.length)nm.o=Math.min.apply(null,mins)-1;   // 순서를 바꿔 둔 경우에도 새 묵상은 맨 위
+      n.meds.push(nm); render(); scheduleSave(id);
       var mt=card.querySelector('.medi[data-mid="'+nm.id+'"] .med'); if(mt){mt.focus({preventScroll:true});mt.scrollIntoView({block:"center",behavior:"smooth"})}
       return;
     }
@@ -6092,13 +6130,15 @@ button:active{filter:brightness(1.15)}
     if(memCount(n))out.push("암송: "+(memDone(n)?"완료":memCount(n)+"/"+MEMSTEPS.length+" 단계"));
     if(n.uses&&n.uses.length){out.push("");out.push("[이 말씀, 언제 쓸까]");n.uses.forEach(function(u){out.push("· "+u.when+": "+u.how)})}
     out.push(n.text);
-    var meds=newestFirst(n.meds.filter(function(m){return m.text.trim()}));
+    var meds=medOrder(n.meds.filter(function(m){return m.text.trim()}));
     if(meds.length){
       out.push("");
       out.push("[묵상]");
       meds.forEach(function(m,i){
         if(i)out.push("");
         out.push(m.text.trim()+"  ("+dateShort(m.at)+")");
+        if((m.thx||"").trim())out.push("  🙏 감사: "+m.thx.trim());
+        if((m.todo||"").trim())out.push("  ✅ 결론 · 할 일: "+m.todo.trim());
       });
     }
     var qs=n.qs.filter(function(q){return q.q.trim()||q.a.trim()});
@@ -6139,7 +6179,16 @@ button:active{filter:brightness(1.15)}
     return saveFile(filename,"\uFEFF"+body,btn,"txt");
   }
   async function saveFile(filename,data,btn,kind){
-    if(!downloadsNs)return;
+    if(!downloadsNs){   // GitHub 주소 등: 브라우저 다운로드로 저장
+      flushAll();
+      try{
+        var blob=data instanceof Blob?data:new Blob([data],{type:kind==="pdf"?"application/pdf":kind==="json"?"application/json":"text/plain;charset=utf-8"});
+        var url=URL.createObjectURL(blob), a=document.createElement("a");
+        a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(url)},4000);
+        toast(kind==="pdf"?"PDF 파일로 저장했어요":kind==="json"?"백업 파일을 저장했어요":"txt 파일로 저장했어요");
+      }catch(e){toast("파일로 저장하지 못했어요")}
+      return;
+    }
     flushAll();
     if(btn)btn.disabled=true;
     try{
@@ -6154,8 +6203,7 @@ button:active{filter:brightness(1.15)}
     }finally{if(btn)btn.disabled=false}
   }
   function hideDownloads(){
-    downloadsNs=null; $("exportTxt").hidden=true; $("exportPdf").hidden=true;
-    document.querySelectorAll(".exportone").forEach(function(b){b.hidden=true});
+    downloadsNs=null;   // 버튼은 그대로 두고 브라우저 다운로드로 저장
   }
 
   /* ---------- 백업 저장 / 불러오기 (claude.ai ↔ 내 GitHub 노트 옮기기) ---------- */
@@ -6430,7 +6478,7 @@ button:active{filter:brightness(1.15)}
       text(n.ref||"구절 미입력",PM,refF,PC.ref,38,25); y+=38;
       if(n.topics.length){text(n.topics.map(function(t){return "#"+t}).join("  "),PM,"500 20px "+PSANS,PC.muted,32,20); y+=32}
       para(n.text,verseF,PC.verse,30,52,PM);
-      var meds=newestFirst(n.meds.filter(function(m){return m.text.trim()}));
+      var meds=medOrder(n.meds.filter(function(m){return m.text.trim()}));
       if(meds.length){
         y+=14; need(34+44);
         text("묵상",PM,lblF,PC.muted,34,20); y+=34;
@@ -6440,6 +6488,8 @@ button:active{filter:brightness(1.15)}
           var ds="("+dateShort(m.at)+")"; mc.font=dateF; var dw=mc.measureText(ds).width;
           if(last&&last.x+last.w+16+dw<=PM+PCW){last.page.push({t:"x",s:ds,x:last.x+last.w+16,y:last.b,f:dateF,c:PC.muted})}
           else{need(34);page().push({t:"x",s:ds,x:PM+PCW-dw,y:base(34,20),f:dateF,c:PC.muted});y+=34}
+          if((m.thx||"").trim()){y+=6;para("감사: "+m.thx.trim(),medF,PC.essay,26,44,PM)}
+          if((m.todo||"").trim()){y+=6;para("결론 · 할 일: "+m.todo.trim(),medF,PC.act,26,44,PM)}
         });
       }
       var qs=n.qs.filter(function(q){return q.q.trim()||q.a.trim()});
@@ -6558,7 +6608,7 @@ button:active{filter:brightness(1.15)}
   }
   var pdfBusy=false;
   async function savePdf(filename,list,btn){
-    if(!downloadsNs||pdfBusy)return;
+    if(pdfBusy)return;
     pdfBusy=true; if(btn)btn.disabled=true;
     setStatus("PDF를 만드는 중이에요.");
     var blob;
