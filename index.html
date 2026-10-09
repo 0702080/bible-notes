@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-09">
+<meta name="app-build" content="2026-10-10-10">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -773,7 +773,9 @@ body.reorder .note .topics{display:none}
 .pggo{min-width:0;height:32px;padding:0 8px;margin-left:-8px;border:0;border-radius:8px;background:transparent;text-align:left;cursor:pointer}
 @media (hover:hover){.pggo:hover{background:#1E1D24;text-decoration:underline;text-underline-offset:3px}}
 .pgbs{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
-.pgb{width:20px;height:20px;border-radius:50%;border:1.5px dashed #3A3940;display:grid;place-items:center;font-size:11px;line-height:1;color:#2A1C05}
+.pgb{width:20px;height:20px;border-radius:50%;border:1.5px dashed #3A3940;display:grid;place-items:center;color:#2A1C05}
+.pgb svg{width:13px;height:13px;fill:currentColor;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.pgrow.full .pgb{color:#063A2E}
 .pgb.got{border:0;background:radial-gradient(circle at 35% 30%,#FFE8A3,var(--gold) 55%,var(--orange));box-shadow:0 0 8px color-mix(in srgb,var(--gold) 45%,transparent);animation:pgbIn .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i)*60ms)}
 .pgrow.full .pgb.got{background:radial-gradient(circle at 35% 30%,#D9FFF4,var(--mint) 55%,var(--green));box-shadow:0 0 8px color-mix(in srgb,var(--mint) 50%,transparent)}
 .pgrow.full .pgcnt{color:var(--mint);font-weight:700}
@@ -4216,6 +4218,8 @@ button:active{filter:brightness(1.15)}
     var all=document.createElement("button"); all.type="button"; all.className="apall"; all.textContent="전체 실천 진도표 보기";
     box.appendChild(head); box.appendChild(bar); box.appendChild(ol); box.appendChild(all);
   }
+  // 실천 배지: 작은 새싹 (실천 하나 = 싹 하나)
+  var PGLEAF='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 13C12 8.5 8.6 6 4.5 6.2 4.3 10.4 7.3 13 12 13Z"/><path d="M12 11c0-4.2 3-7 7.5-7 .2 4.6-3 7-7.5 7Z"/></svg>';
   function openProg(){
     ts.mode="prog"; openTS("실천 진도표");
     var body=$("tsBody"); body.textContent="";
@@ -4253,7 +4257,7 @@ button:active{filter:brightness(1.15)}
       var rb=r.querySelector(".pgref"); rb.textContent=x.n.ref; rb.dataset.id=x.n.id; rb.title=x.n.ref+" 실천으로 가기";
       // 실천 하나 끝낼 때마다 배지 하나씩 모으기 (빈 자리는 점선 동그라미)
       var bs=r.querySelector(".pgbs");
-      for(var k=0;k<x.st.total;k++){var g=document.createElement("span");g.className="pgb"+(k<x.st.done?" got":"");g.textContent=k<x.st.done?"★":"";g.style.setProperty("--i",k);bs.appendChild(g)}
+      for(var k=0;k<x.st.total;k++){var g=document.createElement("span");g.className="pgb"+(k<x.st.done?" got":"");if(k<x.st.done)g.innerHTML=PGLEAF;g.style.setProperty("--i",k);bs.appendChild(g)}
       bs.setAttribute("aria-label","배지 "+x.st.done+"개 모음, 전체 "+x.st.total+"개");
       if(x.st.pct>=100)r.classList.add("full");
       r.querySelector(".pgcnt").textContent=(x.st.pct>=100?"🏆 ":"")+x.st.done+"/"+x.st.total;
