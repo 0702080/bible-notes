@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-09-20">
+<meta name="app-build" content="2026-10-09-21">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -268,6 +268,18 @@ details.menu>summary::-webkit-details-marker{display:none}
 .pansbtn{height:30px;padding:0 12px;border:1px solid color-mix(in srgb,var(--gold) 50%,#34333A);border-radius:15px;background:transparent;color:var(--gold);font-size:12.5px;font-weight:700;white-space:nowrap}
 .pri.answered .pansbtn{color:var(--faint);border-color:#34333A;font-weight:500}
 .pdel{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--faint);white-space:nowrap}
+.mend{margin-top:8px;padding:10px 12px 12px;border-radius:12px;background:#121216;border:1px solid #232229;display:flex;flex-direction:column;gap:4px}
+.mendl{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;margin-top:4px}
+.mendl span{font-size:13px;font-weight:800}
+.mendl.thx span{color:var(--gold)}
+.mendl.todo span{color:var(--sky)}
+.mendl small{font-size:12.5px;color:var(--muted)}
+.mthx,.mtodo{display:block;width:100%;box-sizing:border-box;min-height:44px;padding:8px 10px;border:1px solid #2A2930;border-radius:9px;background:#0E0E11;font:inherit;font-size:15px;line-height:1.65;resize:none;overflow:hidden}
+.mthx{color:var(--gold)}
+.mtodo{color:var(--sky)}
+.mtoact{align-self:flex-end;margin-top:4px;height:30px;padding:0 12px;border:0;border-radius:15px;background:color-mix(in srgb,var(--sky) 20%,#1E1D24);color:var(--sky);font-size:12.5px;font-weight:700;white-space:nowrap}
+.mtoact[hidden]{display:none}
+.mtoact:disabled{background:#1E1D24;color:var(--faint)}
 .mfoot .delm{height:28px;padding:0 6px;border:0;background:transparent;font-size:12.5px;color:var(--faint)}
 .mfoot .delm[data-sure]{color:var(--pink)}
 .qa{border-bottom-color:transparent;padding:6px 0 8px}
@@ -1906,12 +1918,15 @@ button:active{filter:brightness(1.15)}
   }
   function mid(){return "m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
   function normMeds(n){
-    if(Array.isArray(n.meds))return n.meds.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),text:String(x.text||""),at:+x.at||+n.createdAt||Date.now()}});
+    if(Array.isArray(n.meds))return n.meds.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),text:String(x.text||""),at:+x.at||+n.createdAt||Date.now(),thx:String(x.thx||"").slice(0,1000),todo:String(x.todo||"").slice(0,1000),tact:x.tact?String(x.tact):""}});
     if(n.med&&String(n.med).trim())return [{id:"m0",text:String(n.med),at:+n.createdAt||Date.now()}];
     return [];
   }
   var LENS=["한 주 정리: 한 문장 요약, 적용 결단","전체 흐름, 처음 마음에 남은 한 절","예수님은 무엇을 말씀하셨나?","제자(대화 상대)는 어떻게 반응했나? 나라면?","다른 사람들은 예수님을 어떻게 봤나?","반복되는 단어는 무엇이고, 왜 반복될까?","작은 표현(장소, 시간, 동작)에 머물기"];
   var WD=["일","월","화","수","목","금","토"];
+  // 묵상 끝 질문: 감사와 결론(할 일). 요일마다 질문을 바꿔 매일 새롭게 생각하게
+  var THXQ=["이 말씀으로 한 주를 돌아보며 감사한 것은?","이 말씀을 통해 하나님께 감사한 것은?","오늘 이 말씀이 내게 준 선물은?","이 말씀에서 발견한 하나님의 은혜는?","이 말씀 덕분에 오늘 감사하게 된 일은?","이 말씀으로 새롭게 보인 감사는?","이 말씀을 주신 하나님께 무엇을 감사하나요?"];
+  var TODOQ=["그래서 다음 한 주, 무엇을 붙들고 살까?","그래서 오늘 나는 무엇을 하겠는가?","오늘 한 가지 행동으로 옮긴다면?","오늘 누구에게, 어떻게 이 말씀을 살아낼까?","오늘 멈추거나 버려야 할 것은?","오늘 이 말씀을 언제, 어디서 떠올릴까?","내일까지 꼭 할 한 가지는?"];
   function dateShort(t){var d=new Date(t);return (d.getMonth()+1)+"월 "+d.getDate()+"일 "+WD[d.getDay()]}
   function dateLabel(t){var d=new Date(t);return (d.getMonth()+1)+"월 "+d.getDate()+"일 ("+WD[d.getDay()]+")"}
   function lastMedAt(n){var t=n.createdAt||0;n.meds.forEach(function(m){if(m.at>t)t=m.at});return t}
@@ -2324,9 +2339,16 @@ button:active{filter:brightness(1.15)}
   function makeMed(m){
     var d=document.createElement("div");
     d.className="medi"; d.dataset.mid=m.id;
-    d.innerHTML='<textarea class="med" rows="1" aria-label="묵상"></textarea><div class="mfoot"><span class="dl"></span><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div>';
+    var wd=new Date(m.at).getDay();
+    d.innerHTML='<textarea class="med" rows="1" aria-label="묵상"></textarea>'+
+      '<div class="mend"><label class="mendl thx"><span>🙏 감사</span><small></small></label><textarea class="mthx" rows="1" aria-label="감사"></textarea>'+
+      '<label class="mendl todo"><span>✅ 결론 · 할 일</span><small></small></label><textarea class="mtodo" rows="1" aria-label="결론과 할 일"></textarea>'+
+      '<button type="button" class="mtoact" hidden>실천으로 보내기</button></div>'+
+      '<div class="mfoot"><span class="dl"></span><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div>';
     d.querySelector(".dl").textContent=dateLabel(m.at);
     d.querySelector(".med").placeholder="오늘의 관점: "+LENS[new Date(m.at).getDay()];
+    d.querySelector(".mendl.thx small").textContent=THXQ[wd]; d.querySelector(".mthx").placeholder="예: 오늘도 말씀으로 마음을 붙들어 주셔서 감사합니다";
+    d.querySelector(".mendl.todo small").textContent=TODOQ[wd]; d.querySelector(".mtodo").placeholder="예: 저녁에 가족에게 먼저 고맙다고 말하기";
     return d;
   }
   function makeAct(a){
@@ -2464,7 +2486,9 @@ button:active{filter:brightness(1.15)}
     newestFirst(n.meds).forEach(function(m,i){
       var d=mhave.get(m.id); if(!d)d=makeMed(m); mhave.delete(m.id);
       if(mbox.children[i]!==d)mbox.insertBefore(d,mbox.children[i]||null);
-      setVal(d.querySelector(".med"),m.text);
+      setVal(d.querySelector(".med"),m.text); setVal(d.querySelector(".mthx"),m.thx||""); setVal(d.querySelector(".mtodo"),m.todo||"");
+      var tb=d.querySelector(".mtoact"), ta=m.tact&&n.acts.some(function(a){return a.id===m.tact});
+      tb.hidden=!(m.todo||"").trim(); tb.textContent=ta?"✓ 실천에 있어요":"실천으로 보내기"; tb.disabled=!!ta;
     });
     mhave.forEach(function(d){d.remove()});
     renderPrays(el,n);
@@ -2694,6 +2718,10 @@ button:active{filter:brightness(1.15)}
     if(t.classList.contains("pt")||t.classList.contains("pan")){
       var pp=(n.prays||[]).find(function(x){return x.id===t.closest(".pri").dataset.pid}); if(!pp)return;
       if(t.classList.contains("pt"))pp.t=t.value; else pp.an=t.value;
+    }
+    else if(t.classList.contains("mthx")||t.classList.contains("mtodo")){
+      var me=n.meds.find(function(x){return x.id===t.closest(".medi").dataset.mid}); if(!me)return;
+      if(t.classList.contains("mthx"))me.thx=t.value; else{me.todo=t.value; var tb2=t.closest(".medi").querySelector(".mtoact"); if(tb2)tb2.hidden=!t.value.trim()}
     }
     else if(t.classList.contains("med")){
       var m=n.meds.find(function(x){return x.id===t.closest(".medi").dataset.mid}); if(!m)return; m.text=t.value; scheduleMedBadges();
@@ -3200,6 +3228,11 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("sugq")){ suggest(card,n,b); return }
     if(b.classList.contains("suga")){ suggestActs(card,n,b); return }
+    if(b.classList.contains("mtoact")){
+      var mm=n.meds.find(function(x){return x.id===b.closest(".medi").dataset.mid}); if(!mm||!(mm.todo||"").trim())return;
+      var nact={id:qid(),t:mm.todo.trim().slice(0,200),done:false}; n.acts.unshift(nact); mm.tact=nact.id;
+      render(); scheduleSave(id); toast("실천 탭에 넣었어요. 오늘 해 보고 체크해요"); buzz([12,40,18]); return;
+    }
     if(b.classList.contains("adda")){
       var na={id:qid(),t:"",done:false}; n.acts.unshift(na); aOpen.add(na.id); saveAFold(); render(); scheduleSave(id);
       var at=card.querySelector('.act[data-aid="'+na.id+'"] .at'); if(at)at.focus();
