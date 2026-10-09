@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-22">
+<meta name="app-build" content="2026-10-10-23">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -215,6 +215,12 @@ details.menu>summary::-webkit-details-marker{display:none}
 .note .verse{margin:4px 0 8px}
 .editbox{margin:4px 0 10px}
 .editbox .field{font-size:15px}
+.note.vediting .verse{display:none}
+.note.vediting .editbox{margin:2px 0 10px}
+.note.vediting .editbox .eref{height:34px;margin-bottom:6px;font-size:13.5px;color:var(--violet);font-weight:700}
+.note.vediting .editbox .etext{font-family:var(--serif);font-size:18px;line-height:1.75;color:var(--orange);word-break:keep-all;padding:6px 10px;background:#141418;border:1px dashed color-mix(in srgb,var(--orange) 50%,#34333A);border-radius:12px;caret-color:var(--hi)}
+.note.vediting .editbox .etext:focus{outline:none;border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 18%,transparent)}
+.note.vediting .editbox .donedit{margin-top:6px}
 .focusrow{gap:6px;margin:0 0 8px}
 .focusrow .fl{font-size:12.5px}
 .fbtn{height:28px;padding:0 11px;font-size:13px;border-width:1px;border-radius:14px}
@@ -3059,6 +3065,46 @@ button:active{filter:brightness(1.15)}
     var n=notes.get(nid), h=n&&n.hymns.find(function(x){return x.id===hid}), card=cards.get(nid);
     if(f&&n&&h&&card)uploadHymnImg(card,n,h,f);
   });
+  // 말씀 고치기: 말씀 글자 자리에 바로 편집 칸이 열림 (누른 곳에 커서)
+  var vTap={id:"",t:0,timer:0}, vEditFrom={};
+  function verseOffset(v,x,y,text){
+    try{
+      var node=null, off=0;
+      if(document.caretRangeFromPoint){var r=document.caretRangeFromPoint(x,y);if(r){node=r.startContainer;off=r.startOffset}}
+      else if(document.caretPositionFromPoint){var cp=document.caretPositionFromPoint(x,y);if(cp){node=cp.offsetNode;off=cp.offset}}
+      if(!node||!v.contains(node))return -1;
+      var tw=document.createTreeWalker(v,NodeFilter.SHOW_TEXT), sum=0, t;
+      while((t=tw.nextNode())){if(t===node)break;sum+=t.nodeValue.length}
+      if(node.nodeType!==3)off=0;
+      var at=sum+off, vl=v.textContent.length;
+      if(vl&&vl!==text.length)at=Math.round(at*text.length/vl);
+      return Math.max(0,Math.min(text.length,at));
+    }catch(e){return -1}
+  }
+  function enterVerseEdit(id,x,y){
+    var card=cards.get(id), n=notes.get(id); if(!card||!n)return;
+    if(!openIds.has(id)){openOne(id);render()}
+    var v=card.querySelector(".verse"), at=x!=null?verseOffset(v,x,y,n.text||""):-1;
+    try{window.getSelection().removeAllRanges()}catch(e){}
+    card.classList.add("vediting");
+    var ve=card.querySelector(".vedit"), eb=card.querySelector(".editbox");
+    if(ve){ve.setAttribute("aria-expanded","true");ve.textContent="고치기 끝"}
+    eb.hidden=false; setVal(eb.querySelector(".eref"),n.ref); var et=eb.querySelector(".etext"); setVal(et,n.text);
+    vEditFrom[id]=n.text+"|"+n.ref;
+    setTimeout(function(){
+      grow(et); et.focus({preventScroll:true});
+      var k=at>=0?at:et.value.length; try{et.setSelectionRange(k,k)}catch(e){}
+      var r=et.getBoundingClientRect(); if(r.top<70||r.bottom>window.innerHeight-40)et.scrollIntoView({block:"center",behavior:"smooth"});
+    },30);
+    buzz(10);
+  }
+  function exitVerseEdit(id){
+    var card=cards.get(id); if(!card)return;
+    card.classList.remove("vediting"); card.querySelector(".editbox").hidden=true;
+    var ve=card.querySelector(".vedit"); if(ve){ve.setAttribute("aria-expanded","false");ve.textContent="말씀 고치기"}
+    flushNow(id); render();
+    var n=notes.get(id); if(n&&vEditFrom[id]!==n.text+"|"+n.ref)toast("말씀을 고쳤어요"); delete vEditFrom[id];
+  }
   list.addEventListener("click",async function(e){
     var rvv=e.target.closest(".verse.memv");
     var rww=e.target.closest(".verse.memv .rw.masked")||(rvv&&!e.target.closest(".mw")&&rvv.querySelector(".rw")?nearestWord(rvv,e.clientX,e.clientY,".rw.masked"):null);
@@ -3088,6 +3134,17 @@ button:active{filter:brightness(1.15)}
     var tapCard=e.target.closest(".note");
     if(tapCard&&!e.target.closest("button,textarea,input,select,a,details,summary,.pop,.editbox,.xpanel,.focusrow,.chip,.sugg,.himgs,.pastezone,.sform,.hsheets,.essays,.topics,.verse.picking,.verse.picking .w,.verse.memv,.mempanel,.usepanel")){
       var tid=tapCard.dataset.id, isOpen=openIds.has(tid);
+      var vtap=e.target.closest(".verse");
+      if(vtap&&!tapCard.classList.contains("vediting")){
+        var tnow=Date.now();
+        if(vTap.id===tid&&tnow-vTap.t<380){clearTimeout(vTap.timer);vTap={id:"",t:0,timer:0};enterVerseEdit(tid,e.clientX,e.clientY);return}
+        clearTimeout(vTap.timer); vTap={id:tid,t:tnow,timer:0};
+        if(isOpen&&!e.target.closest(".body")){   // 펼친 카드는 두 번째 누름을 잠깐 기다렸다가 접음
+          var vsel=window.getSelection&&String(window.getSelection()||""); if(vsel&&vsel.trim())return;
+          vTap.timer=setTimeout(function(){if(vTap.id!==tid)return;vTap={id:"",t:0,timer:0};openIds.delete(tid);render()},380);
+          return;
+        }
+      }
       if(!isOpen||!e.target.closest(".body")){
         var sel=window.getSelection&&String(window.getSelection()||"");
         if(sel&&sel.trim())return;
@@ -3118,14 +3175,13 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("xopen")){var xo=b.dataset.id;openOne(xo);render();var xe=cards.get(xo);if(xe)setTimeout(function(){xe.scrollIntoView({block:"start",behavior:"smooth"})},80);return}
     if(b.classList.contains("medit")||b.classList.contains("vedit")){
-      var ve=card.querySelector(".vedit"), eb=card.querySelector(".editbox");
-      if(b.classList.contains("vedit")&&!eb.hidden){eb.hidden=true;ve.setAttribute("aria-expanded","false");ve.textContent="말씀 고치기";flushNow(id);toast("말씀을 고쳤어요");return}
+      var eb=card.querySelector(".editbox");
+      if(b.classList.contains("vedit")&&!eb.hidden){exitVerseEdit(id);return}
       if(b.classList.contains("medit"))b.closest("details").open=false;
-      if(ve){ve.setAttribute("aria-expanded","true");ve.textContent="고치기 끝"} eb.hidden=false; var er=eb.querySelector(".eref"); setVal(er,n.ref); setVal(eb.querySelector(".etext"),n.text);
-      requestAnimationFrame(function(){grow(eb.querySelector(".etext"));er.focus()});
+      enterVerseEdit(id);
       return;
     }
-    if(b.classList.contains("donedit")){card.querySelector(".editbox").hidden=true;var ve2=card.querySelector(".vedit");if(ve2){ve2.setAttribute("aria-expanded","false");ve2.textContent="말씀 고치기"}flushNow(id);toast("말씀을 고쳤어요");return}
+    if(b.classList.contains("donedit")){exitVerseEdit(id);return}
     if(b.classList.contains("grip")){return}
     if(b.classList.contains("copyv")){copyVerse(n,b);return}
     if(b.classList.contains("medprog")){openMedProgress();return}
