@@ -117,27 +117,41 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   color:#FFD36B;text-shadow:0 0 4px rgba(0,0,0,.4);pointer-events:none;
 }
 
-/* 다섯 장째마다 피는 꽃. 그림 없이 둥근 꽃잎 다섯 장으로 그린다. */
-.fl{
-  --pt:#FFE08A; --pc:#FF9BC4;
-  display:none;position:absolute;top:-7px;left:50%;margin-left:-9px;
-  width:18px;height:18px;pointer-events:none;
-  filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));
+/* 다섯 장째 뱃지. 튀어나오는 장식 대신 숫자 뒤에 은은한 꽃무늬를 깔고
+   금빛 테두리를 둘러 조용히 특별해 보이게 한다. */
+.chip[data-s="me"][data-five]{
   background:
-    radial-gradient(circle at 50% 20%, var(--pt) 0 30%, transparent 31%),
-    radial-gradient(circle at 79% 43%, var(--pt) 0 30%, transparent 31%),
-    radial-gradient(circle at 68% 81%, var(--pt) 0 30%, transparent 31%),
-    radial-gradient(circle at 32% 81%, var(--pt) 0 30%, transparent 31%),
-    radial-gradient(circle at 21% 43%, var(--pt) 0 30%, transparent 31%),
-    radial-gradient(circle at 50% 52%, var(--pc) 0 19%, transparent 20%);
+    radial-gradient(circle at 50% 27%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 71% 46%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 63% 72%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 37% 72%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 29% 46%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 50% 52%, rgba(255,222,150,.55) 0 11%, transparent 12%),
+    linear-gradient(150deg,color-mix(in srgb,var(--violet) 80%,#fff),var(--violet) 52%,color-mix(in srgb,var(--violet) 55%,#000));
+  box-shadow:0 2px 9px color-mix(in srgb,var(--violet) 46%,transparent),
+             inset 0 0 0 1.5px rgba(255,211,107,.9),
+             inset 0 -2px 4px rgba(0,0,0,.18);
 }
-.chip[data-s="me"] .fl{display:block}
-.chip[data-s="both"] .fl{display:block;--pt:#CFF3A8;--pc:#FFD36B}
-.fl.bloom{animation:bloom .6s cubic-bezier(.26,1.5,.4,1)}
-@keyframes bloom{
-  0%{transform:scale(0) rotate(-120deg);opacity:0}
-  60%{transform:scale(1.25) rotate(12deg);opacity:1}
-  100%{transform:scale(1) rotate(0);opacity:1}
+.chip[data-s="both"][data-five]{
+  background:
+    radial-gradient(circle at 50% 27%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 71% 46%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 63% 72%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 37% 72%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 29% 46%, rgba(255,255,255,.26) 0 15%, transparent 16%),
+    radial-gradient(circle at 50% 52%, rgba(255,222,150,.55) 0 11%, transparent 12%),
+    linear-gradient(150deg,color-mix(in srgb,var(--green) 80%,#fff),var(--green) 52%,color-mix(in srgb,var(--green) 55%,#000));
+  box-shadow:0 2px 9px color-mix(in srgb,var(--green) 46%,transparent),
+             inset 0 0 0 1.5px rgba(255,211,107,.9),
+             inset 0 -2px 4px rgba(0,0,0,.18);
+}
+/* 아직 안 읽은 다섯 장째는 테두리만 살짝 금빛으로 귀띔 */
+.chip:not([data-s])[data-five]{border-color:color-mix(in srgb,#FFD36B 45%,var(--rule))}
+/* 다섯 장째를 막 얻은 순간, 금빛 테두리가 한 번 번진다 */
+.chip.got5{animation:pop .42s cubic-bezier(.26,1.4,.4,1),glow .9s ease-out .1s}
+@keyframes glow{
+  0%{box-shadow:0 0 0 0 rgba(255,211,107,.85),inset 0 0 0 1.5px rgba(255,211,107,.9)}
+  100%{box-shadow:0 0 0 12px rgba(255,211,107,0),inset 0 0 0 1.5px rgba(255,211,107,.9)}
 }
 
 /* 5장마다 뜨는 작은 격려 띠 */
@@ -210,7 +224,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .cel .bless{margin:10px 0 0;font-family:var(--sans);font-size:15.5px;color:var(--ink);line-height:1.75}
 .cel .ref{margin:7px 0 0;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){
-  .chip.got,.medal,.cel .seal,.fl.bloom,.toast{animation:none}
+  .chip.got,.chip.got5,.medal,.cel .seal,.toast{animation:none}
   .ring,.spark{display:none}
   .chip:active{transform:none}
 }
@@ -448,9 +462,8 @@ function chipsHTML(bi){
   for(var c=1;c<=total;c++){
     var idx=base+c-1, st=chipState(idx);
     s+='<button class="chip" type="button" data-act="chip" data-i="'+idx+'"'
-      +(st?' data-s="'+st+'"':'')
-      +' aria-pressed="'+(!!me[idx])+'" aria-label="'+BOOKS[bi][0]+' '+c+'장">'
-      +(c%5===0?'<i class="fl" aria-hidden="true"></i>':'')+c+'</button>';
+      +(st?' data-s="'+st+'"':'')+(c%5===0?' data-five':'')
+      +' aria-pressed="'+(!!me[idx])+'" aria-label="'+BOOKS[bi][0]+' '+c+'장">'+c+'</button>';
   }
   s+='</div><button class="bk-all" type="button" data-act="all" data-b="'+bi+'">'
     +(bookDone(bi)===total?"이 책 전체 지우기":"이 책 전체 읽음으로")+'</button>';
@@ -650,8 +663,10 @@ document.addEventListener("click",function(ev){
     if(me[idx]){
       var spot=document.querySelector('.chip[data-i="'+idx+'"]');
       sparkle(spot);
-      var fl=spot&&spot.querySelector(".fl");      // 다섯 장째면 꽃이 핀다
-      if(fl){fl.classList.remove("bloom");void fl.offsetWidth;fl.classList.add("bloom")}
+      // 다섯 장째면 금빛 테두리가 한 번 번진다
+      if(spot&&spot.hasAttribute("data-five")){
+        spot.classList.remove("got5");void spot.offsetWidth;spot.classList.add("got5");
+      }
       var nowFull=bookDone(bi2)===BOOKS[bi2][1];
       checkMilestones(before,after,(!wasFull&&nowFull)?[bi2]:[]);
       // 축복 카드가 떴으면 띠까지 겹치지 않게 한다
