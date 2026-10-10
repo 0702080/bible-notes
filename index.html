@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-31">
+<meta name="app-build" content="2026-10-10-32">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1918,6 +1918,12 @@ button:active{filter:brightness(1.15)}
 .ghst.bad{color:var(--pink)}
 .ghbtns{display:flex;gap:8px}
 .ghbtns .ghnow{flex:1}
+.sbor{margin:14px 0 8px;font-size:12.5px}
+.sbpwform .ghconnect{margin-top:10px}
+.sbsetpw{margin-top:16px;padding-top:12px;border-top:1px solid var(--rule)}
+.sbpwrow{display:flex;gap:8px}
+.sbpwrow .field{flex:1;min-width:0}
+.sbpwrow .ghnow{width:auto;padding:0 18px}
 .ghout{flex:0 0 auto;height:44px;padding:0 14px;border:1px solid var(--rule);border-radius:12px;background:transparent;color:var(--faint);font-size:13px}
 /* 하나님 경외 주제 카드: 은은한 짙은 보라 */
 /* 말씀 카드: 주제 색을 아주 옅게 섞은 파스텔 톤 (카드마다 은은하게 다르지만 한 가족처럼) */
@@ -6906,13 +6912,19 @@ button:active{filter:brightness(1.15)}
   function sbSession(){try{var x=JSON.parse(localStorage.getItem(SB_SES)||"null");return x&&x.access_token&&x.user&&x.user.id?x:null}catch(e){return null}}
   function sbSetSession(x){try{if(x)localStorage.setItem(SB_SES,JSON.stringify(x));else localStorage.removeItem(SB_SES)}catch(e){}}
   function sbH(tok){var h={"apikey":SB_KEY,"Content-Type":"application/json"};if(tok)h.Authorization="Bearer "+tok;return h}
+  var sbRefreshing=null;
   async function sbToken(){
     var x=sbSession(); if(!x)return null;
     if(Date.now()/1000<(x.expires_at||0)-60)return x.access_token;
+    if(sbRefreshing)return sbRefreshing;
+    sbRefreshing=sbRefresh(x); try{return await sbRefreshing}finally{sbRefreshing=null}
+  }
+  async function sbRefresh(x){
     var r=await fetch(SB_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:sbH(),body:JSON.stringify({refresh_token:x.refresh_token})});
     if(!r.ok){sbTokErr="로그인 갱신 실패 ("+r.status+")"; if(r.status===400||r.status===401){sbSetSession(null);toast("로그인이 끝났어요. 다시 로그인해 주세요");renderReviewBar()}return null}
     sbTokErr="";
     var j=await r.json(); sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
+    if(j.user&&j.user.email)sbRemember(j.user.email);
     return j.access_token;
   }
   async function sbStart(tok){
@@ -7023,11 +7035,44 @@ button:active{filter:brightness(1.15)}
       sbBox=document.createElement("div"); sbBox.className="ghsheet"; sbBox.hidden=true; sbBox.setAttribute("role","dialog"); sbBox.setAttribute("aria-modal","true");
       sbBox.innerHTML='<div class="ghbox"><div class="ghhd"><b>☁️ 로그인 · 동기화</b><button type="button" class="ghclose sbclose">닫기</button></div>'+
         '<p class="ghtip">이메일로 한 번 로그인하면, 휴대폰이든 PC든 메모하는 즉시 저장되고 다른 기기에도 바로 나와요. 노트는 나만 볼 수 있어요.</p>'+
-        '<div class="sboff"><label class="ghl">이메일</label><input class="field sbmail" type="email" inputmode="email" autocomplete="email" placeholder="me@example.com">'+
-        '<button type="button" class="ghconnect sbsend">로그인 링크 받기</button>'+
+        '<div class="sboff"><form class="sbpwform" autocomplete="on"><label class="ghl">이메일</label><input class="field sbmail" name="email" type="email" inputmode="email" autocomplete="username email" placeholder="me@example.com">'+
+        '<label class="ghl">비밀번호</label><input class="field sbpw" name="password" type="password" autocomplete="current-password" placeholder="비밀번호">'+
+        '<button type="submit" class="ghconnect sbpwlogin">로그인</button></form>'+
+        '<p class="ghtip sbor">비밀번호가 아직 없으면 ↓ 메일 링크로 한 번만 로그인한 뒤, 비밀번호를 만들어 두세요.</p>'+
+        '<button type="button" class="ghnow sbsend">로그인 링크 받기</button>'+
         '<div class="sbsent" hidden><p class="ghtip small sbsentmsg"></p><label class="ghl">메일에 6자리 숫자가 있으면 여기에 (없으면 메일의 링크를 누르세요)</label><input class="field sbcode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456"><button type="button" class="ghnow sbverify">코드로 로그인</button></div></div>'+
-        '<div class="sbon" hidden><div class="ghrepo sbwho"></div><div class="ghst sbst"></div><div class="ghbtns"><button type="button" class="ghnow sbnow">지금 맞추기</button><button type="button" class="ghout sbout">로그아웃</button></div></div></div>';
+        '<div class="sbon" hidden><div class="ghrepo sbwho"></div><div class="ghst sbst"></div><div class="ghbtns"><button type="button" class="ghnow sbnow">지금 맞추기</button><button type="button" class="ghout sbout">로그아웃</button></div>'+
+        '<form class="sbsetpw" autocomplete="on"><input type="email" name="email" class="sbpwuser" autocomplete="username" hidden><label class="ghl">🔑 비밀번호 만들기 · 바꾸기 (다른 기기에서 이메일+비밀번호로 바로 로그인)</label>'+
+        '<div class="sbpwrow"><input class="field sbnewpw" name="new-password" type="password" autocomplete="new-password" minlength="6" placeholder="6자 이상"><button type="submit" class="ghnow sbpwsave">저장</button></div></form></div></div>';
       document.body.appendChild(sbBox);
+      sbBox.querySelector(".sbpwform").addEventListener("submit",async function(e){
+        e.preventDefault();
+        var em=sbBox.querySelector(".sbmail").value.trim(), pw=sbBox.querySelector(".sbpw").value, b=sbBox.querySelector(".sbpwlogin");
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){toast("이메일을 확인해 주세요");return}
+        if(!pw){sbBox.querySelector(".sbpw").focus();return}
+        b.disabled=true; b.textContent="로그인 중…";
+        try{
+          var r=await fetch(SB_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:sbH(),body:JSON.stringify({email:em,password:pw})});
+          if(!r.ok){toast(r.status===400?"이메일이나 비밀번호가 맞지 않아요. 비밀번호가 없으면 아래 '로그인 링크 받기'로 먼저 로그인해 주세요":"로그인하지 못했어요 ("+r.status+")");return}
+          var j=await r.json(); sbRemember(em);
+          sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
+          sbMarkAll(); closeSb(); sbSync("login"); if(typeof frLoad==="function")setTimeout(frLoad,1500);
+        }catch(err){toast("인터넷 연결을 확인해 주세요")}
+        finally{b.disabled=false; b.textContent="로그인"}
+      });
+      sbBox.querySelector(".sbsetpw").addEventListener("submit",async function(e){
+        e.preventDefault();
+        var pw=sbBox.querySelector(".sbnewpw").value, b=sbBox.querySelector(".sbpwsave");
+        if(pw.length<6){toast("비밀번호는 6자 이상으로 해 주세요");return}
+        b.disabled=true;
+        try{
+          var tok=await sbToken(); if(!tok){toast("다시 로그인해 주세요");return}
+          var r=await fetch(SB_URL+"/auth/v1/user",{method:"PUT",headers:sbH(tok),body:JSON.stringify({password:pw})});
+          if(!r.ok){var er=await sbErr(r,"비밀번호를 저장하지 못했어요");toast(er.msg);return}
+          sbBox.querySelector(".sbnewpw").value=""; toast("🔑 비밀번호를 만들었어요. 다른 기기에서는 이메일과 비밀번호로 바로 로그인해요");
+        }catch(err){toast("인터넷 연결을 확인해 주세요")}
+        finally{b.disabled=false}
+      });
       sbBox.addEventListener("click",async function(e){
         if(e.target===sbBox){closeSb();return}
         var b=e.target.closest("button"); if(!b)return;
@@ -7044,7 +7089,7 @@ button:active{filter:brightness(1.15)}
             var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(SB_SITE),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
             if(r.status===429){toast("잠시 뒤에 다시 보내 주세요 (메일은 짧은 시간에 여러 번 보낼 수 없어요)")}
             else if(!r.ok){toast("메일을 보내지 못했어요 ("+r.status+")")}
-            else{sbSentTo=em; var sm=sbBox.querySelector(".sbsent"); sm.hidden=false; sbBox.querySelector(".sbsentmsg").textContent=em+" 로 로그인 메일을 보냈어요. 메일의 링크를 이 기기의 이 브라우저에서 열어 주세요.";}
+            else{sbSentTo=em; sbRemember(em); var sm=sbBox.querySelector(".sbsent"); sm.hidden=false; sbBox.querySelector(".sbsentmsg").textContent=em+" 로 로그인 메일을 보냈어요. 메일의 링크를 이 기기의 이 브라우저에서 열어 주세요.";}
           }catch(err){toast("인터넷 연결을 확인해 주세요")}
           finally{b.disabled=false; b.textContent="로그인 링크 다시 받기"}
           return;
@@ -7065,15 +7110,19 @@ button:active{filter:brightness(1.15)}
         }
       });
     }
+    var rem=sbRemembered(), mi=sbBox.querySelector(".sbmail"); if(rem&&!mi.value)mi.value=rem;
     drawSb(); sbBox.hidden=false;
-    var x=sbSession(); if(!x)setTimeout(function(){var m=sbBox.querySelector(".sbmail");if(m&&!m.value)m.focus()},80);
+    var x=sbSession(); if(!x)setTimeout(function(){var m=sbBox.querySelector(".sbmail");if(m&&!m.value)m.focus();else{var pw=sbBox.querySelector(".sbpw");if(pw)pw.focus()}},80);
   }
   function closeSb(){if(sbBox)sbBox.hidden=true}
+  function sbRemember(em){try{localStorage.setItem("bible-sb-email",em)}catch(e){}}
+  function sbRemembered(){try{var x=sbSession();return localStorage.getItem("bible-sb-email")||(x&&x.user&&x.user.email)||""}catch(e){return ""}}
   function drawSb(){
     if(!sbBox)return; var x=sbSession();
     sbBox.querySelector(".sboff").hidden=!!x; sbBox.querySelector(".sbon").hidden=!x;
     if(x){
       sbBox.querySelector(".sbwho").textContent=x.user.email+" 로 로그인됨";
+      sbBox.querySelector(".sbpwuser").value=x.user.email||"";
       var st=sbBox.querySelector(".sbst"); st.classList.toggle("bad",sbState.ok===false);
       st.textContent=sbBusy?"맞추는 중…":sbState.ok===false?sbState.msg:sbState.at?"맞춰졌어요 · "+new Date(sbState.at).toLocaleTimeString("ko-KR",{hour:"numeric",minute:"2-digit"}):"";
     }
