@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-11-63">
+<meta name="app-build" content="2026-10-11-64">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1447,18 +1447,10 @@ body.boardon #list,body.boardon #reviewBar{display:none!important}
 .bcard.landed{animation:kbland .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes kbland{0%{transform:scale(.9);box-shadow:0 0 0 0 var(--tc)}60%{transform:scale(1.03);box-shadow:0 0 0 6px color-mix(in srgb,var(--tc) 30%,transparent)}100%{transform:none;box-shadow:none}}
 @media (hover:none){.bcgo{opacity:1}}
-/* 새로 담음은 보관함이라 금방 수십 개가 된다. 큰 카드 대신 한 줄로 줄여
-   한눈에 훑게 한다. .bcard 클래스는 그대로 둬야 끌어 옮기기가 동작한다. */
-.bcard.brow{display:flex;align-items:baseline;gap:8px;padding:7px 10px 7px 13px;border-radius:9px;animation-duration:.25s}
-.bcard.brow::before{top:6px;bottom:6px}
-.bcard.brow .bcref{flex:0 0 auto;font-size:13px}
-.bcard.brow .bctext{margin:0;flex:1 1 auto;min-width:0;font-size:12.5px;line-height:1.5;color:var(--faint);
-  display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bcard.brow .bcpin{margin-left:4px}
-@media (hover:hover){.bcard.brow:hover{transform:translateX(2px)}}
-/* 접지 않고 두 줄(세로 두 칸)로 흘려 담는다. 위에서 아래로 채운 뒤 옆 칸으로 넘어간다. */
+/* 새로 담음은 금방 수십 개가 된다. 접지 않고 다른 칸과 같은 카드로 펼치되,
+   칸을 두 배로 넓혀 세로 두 줄로 나눈다. 위에서 아래로 채운 뒤 옆 줄로 넘어간다. */
 .bcol.bnew .bclist{display:block;column-count:2;column-gap:8px}
-.bcol.bnew .bcard.brow{break-inside:avoid;margin-bottom:6px}
+.bcol.bnew .bcard{break-inside:avoid;margin-bottom:8px}
 .act textarea.at{font-size:14px}   /* 실천 제목 조금 작게 */
 .act>.agrip,.act>.chk,.act>.afold,.act>textarea.at{align-self:center}   /* 제목이 두 줄이어도 네모·손잡이·화살표가 제목 가운데에 */
 .uform{border:0;padding:0}   /* 점선 테두리 없애기 */
@@ -2379,26 +2371,22 @@ button:active{filter:brightness(1.15)}
       var lst=document.createElement("div"); lst.className="bclist";
       var items=groups[col.k];
       if(!items.length){var em=document.createElement("p");em.className="bcempty";em.textContent=col.k==="due"?"오늘 복습할 말씀이 없어요 🙂":"비어 있어요";lst.appendChild(em)}
-      // 새로 담음은 아직 시작 안 한 보관함이라 수십 개가 쌓인다.
-      // 한 줄로 줄이고 두 줄로 나눠 모두 펼친다. 나머지 칸은 지금 하는 일이라 그대로 카드로.
-      var compact=(col.k==="new");
-      if(compact)cl.classList.add("bnew");
+      // 새로 담음은 수십 개가 쌓이므로 칸을 넓혀 세로 두 줄로 나눠 펼친다.
+      if(col.k==="new")cl.classList.add("bnew");
       items.forEach(function(n,i){
-        var cd=document.createElement("article"); cd.className="bcard"+(compact?" brow":"");
+        var cd=document.createElement("article"); cd.className="bcard";
         cd.dataset.id=n.id; cd.tabIndex=0; cd.draggable=true;
         var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)");
-        cd.style.animationDelay=(Math.min(i,12)*(compact?12:30))+"ms";
+        cd.style.animationDelay=(Math.min(i,12)*30)+"ms";
         var mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
         cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
-          (compact?'':'<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div>'+
-          '<button type="button" class="bcgo"></button>');
+          '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div>'+
+          '<button type="button" class="bcgo"></button>';
         cd.querySelector(".bcref b").textContent=n.ref||"구절 미입력";
         cd.querySelector(".bctext").textContent=String(n.text||"").replace(/\s+/g," ").trim();
-        if(!compact){
-          cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
-          if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
-          cd.querySelector(".bcgo").textContent=col.k==="due"?"🔁 복습하기":col.k==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
-        }
+        cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
+        if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
+        cd.querySelector(".bcgo").textContent=col.k==="due"?"🔁 복습하기":col.k==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
         lst.appendChild(cd);
       });
       cl.appendChild(lst); box.appendChild(cl);
