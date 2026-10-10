@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-35">
+<meta name="app-build" content="2026-10-10-36">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1920,6 +1920,7 @@ button:active{filter:brightness(1.15)}
 .ghbtns .ghnow{flex:1}
 .sbor{margin:14px 0 8px;font-size:12.5px}
 .sbpwform .ghconnect{margin-top:10px}
+.sbpwform .sbsignup{margin-top:8px}
 .sbsetpw{margin-top:16px;padding-top:12px;border-top:1px solid var(--rule)}
 .sbsetpw.hl{padding:12px;border:1px solid color-mix(in srgb,var(--gold) 60%,#34333A);border-radius:12px;background:color-mix(in srgb,var(--gold) 9%,transparent)}
 .sbsetpw.hl .ghl::before{content:"👉 로그인됐어요! 이제 ";color:var(--gold);font-weight:700}
@@ -7029,7 +7030,7 @@ button:active{filter:brightness(1.15)}
       sbSetSession({access_token:q.access_token,refresh_token:q.refresh_token,expires_at:+q.expires_at||Math.floor(Date.now()/1000)+(+q.expires_in||3600),user:{id:u.id,email:u.email}});
       if(u&&u.email)sbRemember(u.email);
       sbMarkAll(); sbSync("login");
-      setTimeout(function(){openSb(true)},700);   // 메일 링크로 들어온 김에 비밀번호를 만들게 바로 안내
+      setTimeout(sbAfterLogin,700);   // 메일 링크로 들어온 김에 비밀번호 저장(또는 만들기 안내)
     }catch(e){toast("로그인하지 못했어요. 다시 시도해 주세요")}
   }
   var sbBox=null, sbSentTo="";
@@ -7040,9 +7041,10 @@ button:active{filter:brightness(1.15)}
         '<p class="ghtip">이메일로 한 번 로그인하면, 휴대폰이든 PC든 메모하는 즉시 저장되고 다른 기기에도 바로 나와요. 노트는 나만 볼 수 있어요.</p>'+
         '<div class="sboff"><form class="sbpwform" autocomplete="on"><label class="ghl">이메일</label><input class="field sbmail" name="email" type="email" inputmode="email" autocomplete="username email" placeholder="me@example.com">'+
         '<label class="ghl">비밀번호</label><input class="field sbpw" name="password" type="password" autocomplete="current-password" placeholder="비밀번호">'+
-        '<button type="submit" class="ghconnect sbpwlogin">로그인</button></form>'+
-        '<p class="ghtip sbor">비밀번호가 아직 없으면 ↓ 메일 링크로 한 번만 로그인한 뒤, 비밀번호를 만들어 두세요.</p>'+
-        '<button type="button" class="ghnow sbsend">로그인 링크 받기</button>'+
+        '<button type="submit" class="ghconnect sbpwlogin">로그인</button>'+
+        '<button type="button" class="ghnow sbsignup">처음이에요 · 이 비밀번호로 정하기</button></form>'+
+        '<p class="ghtip sbor">처음이면 이메일과 쓸 비밀번호를 넣고 ‘처음이에요’를 누르세요. 메일로 온 링크로 한 번만 확인하면 비밀번호가 저장돼요.</p>'+
+        '<button type="button" class="ghnow sbsend">로그인 링크만 받기</button>'+
         '<div class="sbsent" hidden><p class="ghtip frtip sbsentmsg"></p><label class="ghl">메일의 링크가 다른 앱(네이버 등)에서 열리면: 메일의 <b>로그인 링크를 길게 눌러 복사</b>해서 여기에 붙여 넣으세요</label><input class="field sbcode" inputmode="url" autocomplete="one-time-code" placeholder="링크 붙여넣기 (또는 6자리 숫자)"><button type="button" class="ghnow sbverify">이 링크로 로그인</button></div></div>'+
         '<div class="sbon" hidden><div class="ghrepo sbwho"></div><div class="ghst sbst"></div><div class="ghbtns"><button type="button" class="ghnow sbnow">지금 맞추기</button><button type="button" class="ghout sbout">로그아웃</button></div>'+
         '<form class="sbsetpw" autocomplete="on"><input type="email" name="email" class="sbpwuser" autocomplete="username" hidden><label class="ghl">🔑 비밀번호 만들기 · 바꾸기 (다른 기기에서 이메일+비밀번호로 바로 로그인)</label>'+
@@ -7062,6 +7064,22 @@ button:active{filter:brightness(1.15)}
           sbMarkAll(); closeSb(); sbSync("login"); if(typeof frLoad==="function")setTimeout(frLoad,1500);
         }catch(err){toast("인터넷 연결을 확인해 주세요")}
         finally{b.disabled=false; b.textContent="로그인"}
+      });
+      sbBox.querySelector(".sbsignup").addEventListener("click",async function(){
+        var em=sbBox.querySelector(".sbmail").value.trim(), pw=sbBox.querySelector(".sbpw").value, b=this;
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){toast("이메일을 확인해 주세요");return}
+        if(pw.length<6){toast("쓸 비밀번호를 6자 이상으로 넣어 주세요");sbBox.querySelector(".sbpw").focus();return}
+        b.disabled=true; b.textContent="메일 보내는 중…";
+        try{
+          var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(SB_SITE),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
+          if(r.status===429){toast("잠시 뒤에 다시 눌러 주세요 (메일은 짧은 시간에 여러 번 보낼 수 없어요)");return}
+          if(!r.ok){toast("메일을 보내지 못했어요 ("+r.status+")");return}
+          sbPendSet(em,pw); sbSentTo=em; sbRemember(em);
+          var sm=sbBox.querySelector(".sbsent"); sm.hidden=false;
+          sbBox.querySelector(".sbsentmsg").textContent="📧 "+em+" 로 확인 메일을 보냈어요. 메일의 링크를 길게 눌러 복사해서 아래 칸에 붙여 넣으면, 로그인과 비밀번호 저장이 한 번에 끝나요.";
+          setTimeout(function(){var c=sbBox.querySelector(".sbcode");if(c){c.scrollIntoView({block:"center"})}},100);
+        }catch(err){toast("인터넷 연결을 확인해 주세요")}
+        finally{b.disabled=false; b.textContent="처음이에요 · 이 비밀번호로 정하기"}
       });
       sbBox.querySelector(".sbsetpw").addEventListener("submit",async function(e){
         e.preventDefault();
@@ -7109,7 +7127,7 @@ button:active{filter:brightness(1.15)}
             var j=await vr.json();
             sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
             if(j.user&&j.user.email)sbRemember(j.user.email);
-            sbMarkAll(); sbSync("login"); drawSb(); openSb(true);
+            sbMarkAll(); sbSync("login"); drawSb(); sbAfterLogin();
           }catch(err){toast("인터넷 연결을 확인해 주세요")}
           finally{b.disabled=false}
           return;
@@ -7123,6 +7141,21 @@ button:active{filter:brightness(1.15)}
     if(x&&pwFirst)setTimeout(function(){var np=sbBox.querySelector(".sbnewpw");if(np){np.scrollIntoView({block:"center"});np.focus()}},120);
   }
   function closeSb(){if(sbBox)sbBox.hidden=true}
+  // '처음이에요'로 정한 비밀번호: 메일 확인이 끝나는 순간 서버에 저장 (이 기기에 30분만, 쓰면 바로 지움)
+  var SB_PEND="bible-sb-pendpw";
+  function sbPendSet(em,pw){try{localStorage.setItem(SB_PEND,JSON.stringify({em:em,pw:pw,at:Date.now()}))}catch(e){}}
+  function sbPendTake(){try{var o=JSON.parse(localStorage.getItem(SB_PEND)||"null");localStorage.removeItem(SB_PEND);return o&&o.pw&&Date.now()-o.at<1800000?o:null}catch(e){return null}}
+  try{var pd0=JSON.parse(localStorage.getItem(SB_PEND)||"null");if(pd0&&Date.now()-pd0.at>=1800000)localStorage.removeItem(SB_PEND)}catch(e){}   // 30분 지나면 지움
+  async function sbAfterLogin(){
+    var pd=sbPendTake(), x=sbSession();
+    if(pd&&x&&(!pd.em||!x.user.email||pd.em.toLowerCase()===String(x.user.email).toLowerCase())){
+      try{
+        var tok=await sbToken(), r=await fetch(SB_URL+"/auth/v1/user",{method:"PUT",headers:sbH(tok),body:JSON.stringify({password:pd.pw})});
+        if(r.ok){closeSb();toast("✅ 로그인했고 비밀번호도 저장했어요. 다음부터는 이메일과 비밀번호로 바로 로그인해요");return}
+      }catch(e){}
+    }
+    openSb(true);   // 정해 둔 비밀번호가 없으면 비밀번호 만들기 칸을 띄움
+  }
   function sbRemember(em){try{localStorage.setItem("bible-sb-email",em)}catch(e){}}
   function sbRemembered(){try{var x=sbSession();return localStorage.getItem("bible-sb-email")||(x&&x.user&&x.user.email)||""}catch(e){return ""}}
   function drawSb(){
