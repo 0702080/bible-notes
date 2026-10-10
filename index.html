@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-37">
+<meta name="app-build" content="2026-10-10-38">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -934,6 +934,18 @@ body.reorder .note .topics{display:none}
 .blmore{margin-top:4px;height:26px;padding:0 10px;border:0;border-radius:13px;background:transparent;color:var(--muted);font-size:12.5px}
 .blmore[hidden]{display:none}
 .lbadges{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:10px;padding-top:10px;border-top:1px dashed #2A2930}
+/* 한 줄 기록이 있는 실천: 적는 칸 → 적은 줄 → 체크표 → 배지 순서 */
+.board{display:flex;flex-direction:column}
+.board .blog{display:contents}
+.board .blog[hidden]{display:none}
+.board .blform{order:1}
+.board .bllist{order:2}
+.board .blmore{order:3;align-self:flex-start}
+.board .bhead{order:4;margin-top:12px;padding-top:10px;border-top:1px dashed #2A2930}
+.board .bbody{order:5}
+.board .lbadges{order:6}
+.board .bfoot{order:7}
+.board .blform:first-child{margin-top:0}
 .lbhead{font-size:12px;color:var(--gold);font-weight:700;margin-right:2px;white-space:nowrap}
 .lb{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 9px 0 6px;border-radius:13px;background:#17161b;border:1px solid #26252B;white-space:nowrap}
 .lb i{font-style:normal;font-size:14px;filter:grayscale(1);opacity:.35}
@@ -4399,7 +4411,9 @@ button:active{filter:brightness(1.15)}
     var today=dkey(Date.now()), nc=card.querySelector('.act[data-aid="'+a.id+'"] .cell.next');
     if(a.stamps.indexOf(today)<0&&a.stamps.length<a.goal&&nc){stampCell(card,n,a,nc)}   // 오늘 칸 자동 체크 (저장·그리기 포함)
     else{toast("한 줄을 적었어요");render();scheduleSave(n.id)}
-    setTimeout(function(){var c2=cards.get(n.id),i2=c2&&c2.querySelector('.act[data-aid="'+a.id+'"] .blin');if(i2)i2.focus()},60);
+    // 적은 뒤에는 휴대폰 키보드를 내림 (다시 적으려면 칸을 누르면 됨)
+    try{if(document.activeElement&&document.activeElement.blur)document.activeElement.blur()}catch(e){}
+    setTimeout(function(){var c2=cards.get(n.id),i2=c2&&c2.querySelector('.act[data-aid="'+a.id+'"] .blin');if(i2&&document.activeElement===i2)i2.blur()},60);
     var fresh=logBadges(a).filter(function(k){return before.indexOf(k)<0});
     if(fresh.length){
       var bd=LBADGE.filter(function(x){return x.k===fresh[fresh.length-1]})[0];
