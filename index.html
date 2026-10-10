@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-61">
+<meta name="app-build" content="2026-10-10-62">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1439,6 +1439,13 @@ body.boardon #list,body.boardon #reviewBar{display:none!important}
 .bcnx{margin-left:auto}
 .bcgo{margin-top:8px;width:100%;height:32px;border:1px solid color-mix(in srgb,var(--gold) 45%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--gold) 10%,transparent);color:var(--gold);font-size:13px;opacity:0;transition:opacity .15s}
 .bcard:hover .bcgo,.bcard:focus-within .bcgo{opacity:1}
+.bcard{cursor:grab}
+.bcard.dragging{opacity:.4;transform:rotate(-2deg) scale(.98)}
+.board4.dragon .bcol{transition:background .15s,border-color .15s,box-shadow .15s}
+.board4.dragon .bcol:not(.over){border-style:dashed}
+.bcol.over{background:color-mix(in srgb,var(--bc) 10%,#141417);border-color:var(--bc);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--bc) 50%,transparent)}
+.bcard.landed{animation:kbland .5s cubic-bezier(.2,1.6,.4,1)}
+@keyframes kbland{0%{transform:scale(.9);box-shadow:0 0 0 0 var(--tc)}60%{transform:scale(1.03);box-shadow:0 0 0 6px color-mix(in srgb,var(--tc) 30%,transparent)}100%{transform:none;box-shadow:none}}
 @media (hover:none){.bcgo{opacity:1}}
 .act textarea.at{font-size:14px}   /* 실천 제목 조금 작게 */
 .act>.agrip,.act>.chk,.act>.afold,.act>textarea.at{align-self:center}   /* 제목이 두 줄이어도 네모·손잡이·화살표가 제목 가운데에 */
@@ -2209,12 +2216,12 @@ button:active{filter:brightness(1.15)}
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
       prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),sh:x.sh?1:0}}):[],
-      rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0}:null,
+      rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0,d:/^\d{4}-\d{2}-\d{2}$/.test(n.rv.d||"")?n.rv.d:""}:null,
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
       uses:Array.isArray(n.uses)?n.uses.filter(function(u){return u&&u.when}).slice(0,30).map(function(u){return {when:String(u.when),why:String(u.why||""),how:String(u.how||""),mine:!!u.mine}}):[],
       drill:Array.isArray(n.drill)?n.drill.filter(function(d){return d&&+d.at>0}).slice(-300).map(function(d){return {at:+d.at,ms:+d.ms||0,b:["best","fast","fire","done"].indexOf(d.b)>=0?d.b:"done"}}):[],
-      mem:(n.mem&&Array.isArray(n.mem.s))?{s:(function(a){if(a.length>=5)a=[a[0],a[1],a[2],a[4]||a[3]];return [0,1,2,3].map(function(i){return +a[i]||0})})(n.mem.s)}:{s:[0,0,0,0]},   // 예전 5단계(다음 날, 내일)는 4단계(내일) 하나로
+      mem:(n.mem&&Array.isArray(n.mem.s))?{s:(function(a){if(a.length>=5)a=[a[0],a[1],a[2],a[4]||a[3]];return [0,1,2,3].map(function(i){return +a[i]||0})})(n.mem.s),bak:Array.isArray(n.mem.bak)?[0,1,2,3].map(function(i){return +n.mem.bak[i]||0}):null}:{s:[0,0,0,0],bak:null},   // 예전 5단계(다음 날, 내일)는 4단계(내일) 하나로
       pinned:!!n.pinned, pinnedAt:n.pinned?(+n.pinnedAt||0):0, priv:!!n.priv,
       tw:(function(o){var r={};if(o&&typeof o==="object"&&!Array.isArray(o)){Object.keys(o).slice(0,20).forEach(function(k){if(Array.isArray(o[k]))r[String(k).slice(0,20)]=o[k].map(String).map(function(w){return w.trim()}).filter(Boolean).slice(0,8)})}return r})(n.tw),
       links:Array.isArray(n.links)?n.links.filter(function(l){return l&&String(l.ref||"").trim()}).slice(0,60).map(function(l){return {id:String(l.id||("k"+Math.random().toString(36).slice(2,8))),ref:String(l.ref).trim().slice(0,40),memo:String(l.memo||"").trim().slice(0,120)}}):[],
@@ -2352,7 +2359,7 @@ button:active{filter:brightness(1.15)}
     var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
     sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
     BCOLS.forEach(function(col){
-      var cl=document.createElement("section"); cl.className="bcol"; cl.style.setProperty("--bc",col.c);
+      var cl=document.createElement("section"); cl.className="bcol"; cl.dataset.k=col.k; cl.style.setProperty("--bc",col.c);
       var h=document.createElement("div"); h.className="bch"; h.title=col.tip;
       h.innerHTML='<span class="bce"></span><b></b><span class="bcn"></span>';
       h.querySelector(".bce").textContent=col.e; h.querySelector("b").textContent=col.t; h.querySelector(".bcn").textContent=groups[col.k].length;
@@ -2360,7 +2367,7 @@ button:active{filter:brightness(1.15)}
       var lst=document.createElement("div"); lst.className="bclist";
       if(!groups[col.k].length){var em=document.createElement("p");em.className="bcempty";em.textContent=col.k==="due"?"오늘 복습할 말씀이 없어요 🙂":"비어 있어요";lst.appendChild(em)}
       groups[col.k].forEach(function(n,i){
-        var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0;
+        var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0; cd.draggable=true;
         var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)"); cd.style.animationDelay=(i*30)+"ms";
         var mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
         cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
@@ -2376,6 +2383,27 @@ button:active{filter:brightness(1.15)}
       cl.appendChild(lst); box.appendChild(cl);
     });
   }
+  // 칸을 옮기면 도장·복습 상태를 그 칸에 맞게 바꿈. 지운 도장은 보관해 두었다가 다시 옮기면 되살림
+  function kanbanMove(n,to){
+    if(!n.mem)n.mem={s:[0,0,0,0],bak:null};
+    var s0=n.mem.s, cnt=s0.filter(Boolean).length, now=Date.now(), from=boardCol(n);
+    if(from===to)return false;
+    if(to==="new"){
+      if(cnt)n.mem.bak=s0.slice(); n.mem.s=[0,0,0,0]; n.rv=null;
+    }else if(to==="doing"){
+      if(!cnt){var b=n.mem.bak; n.mem.s=b&&b.some(Boolean)?b.slice():[now,0,0,0]; n.mem.bak=null}
+      if(n.mem.s.filter(Boolean).length>=4){n.mem.bak=n.mem.s.slice(); n.mem.s[3]=0}
+      n.rv={at:now,gap:1,ok:(n.rv&&n.rv.ok)||0,miss:(n.rv&&n.rv.miss)||0,d:""};
+    }else if(to==="due"){
+      if(!cnt){var b2=n.mem.bak; n.mem.s=b2&&b2.some(Boolean)?b2.slice():[now,0,0,0]; n.mem.bak=null}
+      n.rv={at:now,gap:(n.rv&&n.rv.gap)||1,ok:(n.rv&&n.rv.ok)||0,miss:(n.rv&&n.rv.miss)||0,d:dkey(now)};
+    }else if(to==="done"){
+      var b3=n.mem.bak; n.mem.s=n.mem.s.map(function(t,i){return t||(b3&&b3[i])||now}); n.mem.bak=null;
+      var cur=(n.rv&&n.rv.gap)||1; n.rv={at:now,gap:nextGap(cur),ok:(n.rv&&n.rv.ok)||0,miss:(n.rv&&n.rv.miss)||0,d:""};
+    }
+    scheduleSave(n.id); return true;
+  }
+  var kbDrag=null;
   function boardOpen(id){   // 보드에서 카드를 누르면: 목록으로 돌아가 그 카드를 펼침
     setBoard(false); setTopics([]); openIds.clear(); openIds.add(id); try{localStorage.setItem("bible-last-open",id)}catch(e){}
     spotId=id; render();
@@ -5394,6 +5422,7 @@ button:active{filter:brightness(1.15)}
     if(n.rv&&n.rv.at&&n.rv.at>=m.last){gap=n.rv.gap;base=n.rv.at}   // 떠올려 보고 고른 결과로 정한 간격
     var d=new Date(base); d.setHours(0,0,0,0); var next=d.getTime()+gap*864e5;
     var today=new Date(); today.setHours(0,0,0,0);
+    if(n.rv&&n.rv.d&&n.rv.d<=dkey(Date.now()))return {next:today.getTime(),due:true,gap:gap};
     return {next:next,due:today.getTime()>=next,gap:gap};
   }
   /* ---------- 한 번에 복습: 먼저 떠올리고 → 확인하고 → 기억난 만큼 다음 복습 날을 늘림 ---------- */
@@ -7350,6 +7379,33 @@ button:active{filter:brightness(1.15)}
     var cd=e.target.closest(".bcard"); if(!cd)return; var n=notes.get(cd.dataset.id); if(!n)return;
     if(e.target.closest(".bcgo")){openCoach(n);return}
     boardOpen(n.id);
+  });
+  $("board").addEventListener("dragstart",function(e){
+    var cd=e.target.closest&&e.target.closest(".bcard"); if(!cd)return;
+    kbDrag=cd.dataset.id; cd.classList.add("dragging");
+    try{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",kbDrag)}catch(err){}
+    $("board").classList.add("dragon");
+  });
+  $("board").addEventListener("dragend",function(e){
+    kbDrag=null; $("board").classList.remove("dragon");
+    document.querySelectorAll(".bcard.dragging").forEach(function(x){x.classList.remove("dragging")});
+    document.querySelectorAll(".bcol.over").forEach(function(x){x.classList.remove("over")});
+  });
+  $("board").addEventListener("dragover",function(e){
+    if(!kbDrag)return; var cl=e.target.closest(".bcol"); if(!cl)return;
+    e.preventDefault(); try{e.dataTransfer.dropEffect="move"}catch(err){}
+    document.querySelectorAll(".bcol.over").forEach(function(x){if(x!==cl)x.classList.remove("over")}); cl.classList.add("over");
+  });
+  $("board").addEventListener("drop",function(e){
+    var cl=e.target.closest(".bcol"); if(!cl||!kbDrag)return; e.preventDefault();
+    var n=notes.get(kbDrag), to=cl.dataset.k; kbDrag=null; cl.classList.remove("over");
+    if(!n)return;
+    if(kanbanMove(n,to)){
+      buzz(10); render();
+      var col=BCOLS.filter(function(c){return c.k===to})[0];
+      toast(col.e+" "+n.ref+" → "+col.t);
+      var nc=$("board").querySelector('.bcard[data-id="'+n.id+'"]'); if(nc){nc.classList.add("landed");if(to==="done")confetti(nc)}
+    }
   });
   $("board").addEventListener("keydown",function(e){if(e.key==="Enter"){var cd=e.target.closest(".bcard");if(cd)boardOpen(cd.dataset.id)}});
   window.addEventListener("resize",function(){var was=document.body.classList.contains("boardon");applyBoard();if(was!==document.body.classList.contains("boardon"))render()});
