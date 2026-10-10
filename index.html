@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-48">
+<meta name="app-build" content="2026-10-10-49">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -31,8 +31,8 @@
   --paper:#ECECE8; --sheet:#F7F7F4; --rule:#D6D4CD; --ink:#2C2833; --muted:#6D6776; --faint:#9C97A3;
   --violet:#6A45B0; --orange:#D86E0C; --hi:#F07800; --green:#1F7A45; --blue:#2447B8; --sky:#1C93CF; --pink:#D94A90; --mint:#4FD1B5;
   --btn:#2C2833; --btn-ink:#F7F7F4; --focus:#2447B8;
-  --serif:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
-  --sans:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --serif:"Binggrae","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --sans:"Binggrae","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
@@ -666,7 +666,10 @@ a.addbtn{display:inline-flex;align-items:center;text-decoration:none}
 .edbody:focus{outline:none}
 .edbody::placeholder{color:var(--faint)}
 .edfoot{display:flex;justify-content:flex-end;padding:8px 18px;border-top:1px solid #222126;font-size:12.5px;color:var(--faint)}
-html,body,button,input,textarea,select{font-family:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
+/* 글꼴: 빙그레체 (빙그레가 무료로 공개한 글꼴, 눈누 CDN). 받기 전에는 Noto Sans KR로 보임 */
+@font-face{font-family:"Binggrae";src:url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Binggrae.woff") format("woff");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"Binggrae";src:url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Binggrae-Bold.woff") format("woff");font-weight:700;font-style:normal;font-display:swap}
+html,body,button,input,textarea,select{font-family:"Binggrae","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif}
 .mark,.qa .mark{font-family:inherit}
 /* ===== simpler, easier ===== */
 .wrap{padding-bottom:120px}
@@ -1572,7 +1575,7 @@ button:active{filter:brightness(1.15)}
 .ccfoot{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid #1E1D23;max-width:720px;width:100%;margin:0 auto}
 .ccbtn{height:48px;padding:0 18px;border:1px solid var(--rule);border-radius:24px;background:transparent;color:var(--muted);font-size:15px;font-weight:700;white-space:nowrap}
 .ccbtn.main{flex:1;min-width:150px;border:0;background:var(--gold);color:#17120A;font-size:16px}
-.ccres{text-align:center;padding:10px 0;font-family:"Noto Sans KR",sans-serif}
+.ccres{text-align:center;padding:10px 0;font-family:var(--sans)}
 .ccr1{font-size:26px;font-weight:700;color:var(--ink);margin-bottom:12px}
 .ccstamps{justify-content:center;width:max-content;max-width:100%;margin:8px auto}
 .ccr2{font-size:15px;color:var(--green);font-weight:700;margin-top:6px}
