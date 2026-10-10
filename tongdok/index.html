@@ -116,6 +116,54 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   content:"★";position:absolute;top:-3px;right:-2px;font-size:9px;
   color:#FFD36B;text-shadow:0 0 4px rgba(0,0,0,.4);pointer-events:none;
 }
+
+/* 다섯 장째마다 피는 꽃. 그림 없이 둥근 꽃잎 다섯 장으로 그린다. */
+.fl{
+  --pt:#FFE08A; --pc:#FF9BC4;
+  display:none;position:absolute;top:-7px;left:50%;margin-left:-9px;
+  width:18px;height:18px;pointer-events:none;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));
+  background:
+    radial-gradient(circle at 50% 20%, var(--pt) 0 30%, transparent 31%),
+    radial-gradient(circle at 79% 43%, var(--pt) 0 30%, transparent 31%),
+    radial-gradient(circle at 68% 81%, var(--pt) 0 30%, transparent 31%),
+    radial-gradient(circle at 32% 81%, var(--pt) 0 30%, transparent 31%),
+    radial-gradient(circle at 21% 43%, var(--pt) 0 30%, transparent 31%),
+    radial-gradient(circle at 50% 52%, var(--pc) 0 19%, transparent 20%);
+}
+.chip[data-s="me"] .fl{display:block}
+.chip[data-s="both"] .fl{display:block;--pt:#CFF3A8;--pc:#FFD36B}
+.fl.bloom{animation:bloom .6s cubic-bezier(.26,1.5,.4,1)}
+@keyframes bloom{
+  0%{transform:scale(0) rotate(-120deg);opacity:0}
+  60%{transform:scale(1.25) rotate(12deg);opacity:1}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+
+/* 5장마다 뜨는 작은 격려 띠 */
+.toast{
+  position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0));
+  z-index:60;margin:0 auto;max-width:420px;
+  background:var(--sheet);border:1px solid var(--rule);border-radius:14px;
+  box-shadow:0 8px 26px rgba(0,0,0,.35);
+  padding:12px 14px;display:grid;grid-template-columns:28px 1fr;gap:11px;align-items:center;
+  animation:tin .32s cubic-bezier(.26,1.4,.4,1);
+}
+.toast[hidden]{display:none}
+.toast.out{opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s}
+.toast .ic{
+  width:26px;height:26px;
+  background:
+    radial-gradient(circle at 50% 20%, #FFE08A 0 30%, transparent 31%),
+    radial-gradient(circle at 79% 43%, #FFE08A 0 30%, transparent 31%),
+    radial-gradient(circle at 68% 81%, #FFE08A 0 30%, transparent 31%),
+    radial-gradient(circle at 32% 81%, #FFE08A 0 30%, transparent 31%),
+    radial-gradient(circle at 21% 43%, #FFE08A 0 30%, transparent 31%),
+    radial-gradient(circle at 50% 52%, #FF9BC4 0 19%, transparent 20%);
+}
+.toast b{display:block;font-size:14px;line-height:1.5;font-weight:500}
+.toast small{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
+@keyframes tin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .chip[data-s="friend"]{border-color:var(--orange);color:var(--orange);font-weight:700;border-style:dashed}
 
 /* 뱃지를 얻는 순간 */
@@ -162,7 +210,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .cel .bless{margin:10px 0 0;font-family:var(--sans);font-size:15.5px;color:var(--ink);line-height:1.75}
 .cel .ref{margin:7px 0 0;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){
-  .chip.got,.medal,.cel .seal{animation:none}
+  .chip.got,.medal,.cel .seal,.fl.bloom,.toast{animation:none}
   .ring,.spark{display:none}
   .chip:active{transform:none}
 }
@@ -247,6 +295,11 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   </div>
 </div>
 
+<div class="toast" id="toast" hidden>
+  <span class="ic" aria-hidden="true"></span>
+  <span><b id="toastMsg"></b><small id="toastRef"></small></span>
+</div>
+
 <div class="sheet cel" id="cel" hidden>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="celTitle">
     <div class="seal" id="celSeal" aria-hidden="true">✦</div>
@@ -295,9 +348,12 @@ var open={};
 var $=function(id){return document.getElementById(id)};
 
 /* 모든 버튼에서 짧게 진동 (프로젝트 공통 규칙) */
-function buzz(){try{if(navigator.vibrate)navigator.vibrate(8)}catch(e){}}
+/* 기존 앱(index.html)과 세기를 맞춘다. 8ms 는 폰에서 거의 안 느껴진다. */
+function buzz(ms){try{if(navigator.vibrate)navigator.vibrate(Math.max(22,+ms||22))}catch(e){}}
 document.addEventListener("click",function(ev){
-  if(ev.target.closest("button"))buzz();
+  var b=ev.target.closest("button");
+  if(!b)return;
+  buzz(b.classList.contains("chip")?28:22);   // 장을 누를 때 조금 더 또렷하게
 },true);
 
 /* ── 저장 ─────────────────────────────── */
@@ -393,7 +449,8 @@ function chipsHTML(bi){
     var idx=base+c-1, st=chipState(idx);
     s+='<button class="chip" type="button" data-act="chip" data-i="'+idx+'"'
       +(st?' data-s="'+st+'"':'')
-      +' aria-pressed="'+(!!me[idx])+'" aria-label="'+BOOKS[bi][0]+' '+c+'장">'+c+'</button>';
+      +' aria-pressed="'+(!!me[idx])+'" aria-label="'+BOOKS[bi][0]+' '+c+'장">'
+      +(c%5===0?'<i class="fl" aria-hidden="true"></i>':'')+c+'</button>';
   }
   s+='</div><button class="bk-all" type="button" data-act="all" data-b="'+bi+'">'
     +(bookDone(bi)===total?"이 책 전체 지우기":"이 책 전체 읽음으로")+'</button>';
@@ -495,6 +552,41 @@ function sparkle(el){
   },700);
 }
 
+/* 다섯 장마다 뜨는 짧은 격려. 본문 대신 직접 쓴 문장과 장절만 둔다. */
+var CHEERS=[
+ ["다섯 장을 더 걸었어요. 오늘의 걸음을 기억해 주실 거예요.","시편 37:23"],
+ ["말씀이 마음에 차곡차곡 쌓이고 있어요.","골로새서 3:16"],
+ ["꾸준한 걸음이 가장 멀리 갑니다.","갈라디아서 6:9"],
+ ["오늘 읽은 자리에 평안이 머물기를.","요한복음 14:27"],
+ ["작은 성실이 큰 길을 냅니다.","누가복음 16:10"],
+ ["읽는 마음에 기쁨이 더해지기를.","느헤미야 8:10"],
+ ["지치지 않도록 새 힘 주시기를.","이사야 40:31"],
+ ["오늘 받은 말씀이 발걸음을 비추기를.","시편 119:105"],
+ ["마음 밭에 좋은 씨가 심기고 있어요.","마태복음 13:23"],
+ ["조용히 쌓이는 시간이 가장 단단합니다.","이사야 30:15"],
+ ["여기까지 온 걸음을 축복합니다.","민수기 6:24"],
+ ["말씀 곁에 머무는 하루가 복됩니다.","시편 1:2"],
+ ["오늘도 한 걸음, 참 잘하셨어요.","빌립보서 3:14"],
+ ["읽고 지키는 사람에게 복이 있어요.","요한계시록 1:3"]
+];
+var toastTimer=null;
+function cheer(total){
+  var c=CHEERS[Math.floor(total/5)%CHEERS.length];
+  var el=$("toast");
+  $("toastMsg").textContent=c[0];
+  $("toastRef").textContent=total+"장째 · "+c[1]+" 말씀을 찾아 읽어 보세요";
+  el.hidden=false;el.classList.remove("out");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){
+    el.classList.add("out");
+    setTimeout(function(){el.hidden=true},320);
+  },3200);
+}
+$("toast").addEventListener("click",function(){
+  clearTimeout(toastTimer);this.classList.add("out");
+  var el=this;setTimeout(function(){el.hidden=true},320);
+});
+
 /* 달라진 만큼만 축하한다 */
 function checkMilestones(before,after,finishedBooks){
   for(var i=0;i<finishedBooks.length;i++){
@@ -556,9 +648,14 @@ document.addEventListener("click",function(ev){
     renderSummary();renderShelf();
     var after=countRange(me,0,TOTAL);
     if(me[idx]){
-      sparkle(document.querySelector('.chip[data-i="'+idx+'"]'));
+      var spot=document.querySelector('.chip[data-i="'+idx+'"]');
+      sparkle(spot);
+      var fl=spot&&spot.querySelector(".fl");      // 다섯 장째면 꽃이 핀다
+      if(fl){fl.classList.remove("bloom");void fl.offsetWidth;fl.classList.add("bloom")}
       var nowFull=bookDone(bi2)===BOOKS[bi2][1];
       checkMilestones(before,after,(!wasFull&&nowFull)?[bi2]:[]);
+      // 축복 카드가 떴으면 띠까지 겹치지 않게 한다
+      if(after%5===0&&!celOpen)cheer(after);
     }else{
       lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
     }
