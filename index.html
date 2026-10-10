@@ -1447,6 +1447,18 @@ body.boardon #list,body.boardon #reviewBar{display:none!important}
 .bcard.landed{animation:kbland .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes kbland{0%{transform:scale(.9);box-shadow:0 0 0 0 var(--tc)}60%{transform:scale(1.03);box-shadow:0 0 0 6px color-mix(in srgb,var(--tc) 30%,transparent)}100%{transform:none;box-shadow:none}}
 @media (hover:none){.bcgo{opacity:1}}
+/* 새로 담음은 보관함이라 금방 수십 개가 된다. 큰 카드 대신 한 줄로 줄여
+   한눈에 훑게 한다. .bcard 클래스는 그대로 둬야 끌어 옮기기가 동작한다. */
+.bcard.brow{display:flex;align-items:baseline;gap:8px;padding:7px 10px 7px 13px;border-radius:9px;animation-duration:.25s}
+.bcard.brow::before{top:6px;bottom:6px}
+.bcard.brow .bcref{flex:0 0 auto;font-size:13px}
+.bcard.brow .bctext{margin:0;flex:1 1 auto;min-width:0;font-size:12.5px;line-height:1.5;color:var(--faint);
+  display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bcard.brow .bcpin{margin-left:4px}
+@media (hover:hover){.bcard.brow:hover{transform:translateX(2px)}}
+.bmore{margin-top:8px;width:100%;height:30px;border:1px dashed #34333A;border-radius:15px;
+  background:transparent;color:var(--muted);font-size:12.5px;cursor:pointer;transition:color .15s,border-color .15s}
+@media (hover:hover){.bmore:hover{color:var(--ink);border-color:var(--violet)}}
 .act textarea.at{font-size:14px}   /* 실천 제목 조금 작게 */
 .act>.agrip,.act>.chk,.act>.afold,.act>textarea.at{align-self:center}   /* 제목이 두 줄이어도 네모·손잡이·화살표가 제목 가운데에 */
 .uform{border:0;padding:0}   /* 점선 테두리 없애기 */
@@ -2335,6 +2347,7 @@ button:active{filter:brightness(1.15)}
   /* ---------- rendering ---------- */
   /* ---------- PC 칸반 보드: 암송 단계별로 한눈에 (새로 담음 → 외우는 중 → 복습할 차례 → 다 외움) ---------- */
   var boardOn=false; try{boardOn=localStorage.getItem("bible-view")==="board"}catch(e){}
+  var newShown=12;   // '새로 담음'에서 한 번에 펼쳐 둘 개수. '더 보기'로 늘어난다
   var BCOLS=[{k:"new",t:"새로 담음",e:"🌱",c:"var(--muted)",tip:"아직 암송을 시작하지 않은 말씀"},{k:"doing",t:"외우는 중",e:"✏️",c:"var(--sky)",tip:"도장을 모으는 중"},{k:"due",t:"복습할 차례",e:"🔁",c:"var(--gold)",tip:"오늘 다시 떠올릴 말씀"},{k:"done",t:"다 외움",e:"🏅",c:"var(--green)",tip:"도장 4개를 다 받은 말씀"}];
   function boardCol(n){
     var c=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
@@ -2365,21 +2378,37 @@ button:active{filter:brightness(1.15)}
       h.querySelector(".bce").textContent=col.e; h.querySelector("b").textContent=col.t; h.querySelector(".bcn").textContent=groups[col.k].length;
       cl.appendChild(h);
       var lst=document.createElement("div"); lst.className="bclist";
-      if(!groups[col.k].length){var em=document.createElement("p");em.className="bcempty";em.textContent=col.k==="due"?"오늘 복습할 말씀이 없어요 🙂":"비어 있어요";lst.appendChild(em)}
-      groups[col.k].forEach(function(n,i){
-        var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0; cd.draggable=true;
-        var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)"); cd.style.animationDelay=(i*30)+"ms";
+      var items=groups[col.k];
+      if(!items.length){var em=document.createElement("p");em.className="bcempty";em.textContent=col.k==="due"?"오늘 복습할 말씀이 없어요 🙂":"비어 있어요";lst.appendChild(em)}
+      // 새로 담음은 아직 시작 안 한 보관함이라 수십 개가 쌓인다.
+      // 한 줄로 줄이고 일부만 펼쳐 둔다. 나머지 칸은 지금 하는 일이라 그대로 카드로.
+      var compact=(col.k==="new");
+      var show=compact?Math.min(items.length,newShown):items.length;
+      items.slice(0,show).forEach(function(n,i){
+        var cd=document.createElement("article"); cd.className="bcard"+(compact?" brow":"");
+        cd.dataset.id=n.id; cd.tabIndex=0; cd.draggable=true;
+        var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)");
+        cd.style.animationDelay=(Math.min(i,12)*(compact?12:30))+"ms";
         var mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
         cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
-          '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div>'+
-          '<button type="button" class="bcgo"></button>';
+          (compact?'':'<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div>'+
+          '<button type="button" class="bcgo"></button>');
         cd.querySelector(".bcref b").textContent=n.ref||"구절 미입력";
         cd.querySelector(".bctext").textContent=String(n.text||"").replace(/\s+/g," ").trim();
-        cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
-        if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
-        cd.querySelector(".bcgo").textContent=col.k==="due"?"🔁 복습하기":col.k==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
+        if(!compact){
+          cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
+          if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
+          cd.querySelector(".bcgo").textContent=col.k==="due"?"🔁 복습하기":col.k==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
+        }
         lst.appendChild(cd);
       });
+      if(compact&&items.length>show){
+        var more=document.createElement("button");
+        more.type="button"; more.className="bmore";
+        more.textContent=items.length+"개 중 "+show+"개 · 더 보기";
+        more.addEventListener("click",function(){newShown+=20;renderKanban()});
+        lst.appendChild(more);
+      }
       cl.appendChild(lst); box.appendChild(cl);
     });
   }
