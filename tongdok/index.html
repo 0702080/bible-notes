@@ -94,14 +94,13 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .chip[data-s]{color:var(--ink);font-weight:700}
 /* 휴대폰에서는 칸이 좁아 동그라미를 조금 작게 */
 @media (max-width:520px){.chip{--d:76%;font-size:12.5px}.ring{transform-origin:center;width:34px!important;height:34px!important;margin:-17px 0 0 -17px!important}}
-/* 읽은 장: 반짝이 없이 납작하게 채운 동그라미. 바탕과 살짝 떨어진
-   가는 바깥 고리를 둘러 단정한 메달처럼 보이게 한다 */
+/* 읽은 장: 반짝이 없이 납작하게 채운 동그라미 (바깥 고리 없음) */
 .chip[data-s="me"]{--c:#F2C94C;color:#3A2A00}
 .chip[data-s="me"][data-five]{--c:#F2994A;color:#3A1C00}
 .chip[data-s="both"]{--c:#5CC08A;color:#0E2E1C}
 .chip[data-s="me"]::before,.chip[data-s="both"]::before{
   border:0;background:var(--c);
-  box-shadow:0 0 0 2px var(--sheet),0 0 0 3.5px color-mix(in srgb,var(--c) 45%,transparent),0 3px 10px color-mix(in srgb,var(--c) 22%,transparent);
+  box-shadow:none;
 }
 .chip[data-s="friend"]::before{border:2px dashed var(--sky)}
 .chip[data-s="friend"]{color:var(--sky)}
