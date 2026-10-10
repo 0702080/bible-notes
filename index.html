@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-11-64">
+<meta name="app-build" content="2026-10-11-65">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1418,7 +1418,9 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 }
 body.boardon .wrap{max-width:1280px}
 body.boardon #list,body.boardon #reviewBar{display:none!important}
-.board4{display:grid;grid-template-columns:minmax(0,2fr) repeat(3,minmax(0,1fr));gap:14px;align-items:start;margin-top:8px}
+.board4{display:flex;gap:14px;align-items:flex-start;margin-top:8px}
+.board4>.bcol{flex:1 1 0;min-width:0}
+.board4>.bcol.bnew{flex-grow:2}   /* 새로 담음은 두 줄이라 두 배 폭. 어디로 옮겨도 따라간다 */
 .board4[hidden]{display:none}
 .bcol{background:#141417;border:1px solid #24232A;border-radius:16px;padding:10px;min-height:200px}
 .bch{display:flex;align-items:center;gap:8px;padding:4px 6px 10px;color:var(--bc);font-size:14.5px}
@@ -1443,6 +1445,10 @@ body.boardon #list,body.boardon #reviewBar{display:none!important}
 .bcard.dragging{opacity:.4;transform:rotate(-2deg) scale(.98)}
 .board4.dragon .bcol{transition:background .15s,border-color .15s,box-shadow .15s}
 .board4.dragon .bcol:not(.over){border-style:dashed}
+/* 칸 머리를 좌우로 끌어 칸 순서를 바꾼다 */
+.bch{cursor:grab;border-radius:10px}
+@media (hover:hover){.bch:hover{background:#1C1B20}}
+.bcol.cdrag{opacity:.45;border-style:dashed;border-color:var(--bc)}
 .bcol.over{background:color-mix(in srgb,var(--bc) 10%,#141417);border-color:var(--bc);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--bc) 50%,transparent)}
 .bcard.landed{animation:kbland .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes kbland{0%{transform:scale(.9);box-shadow:0 0 0 0 var(--tc)}60%{transform:scale(1.03);box-shadow:0 0 0 6px color-mix(in srgb,var(--tc) 30%,transparent)}100%{transform:none;box-shadow:none}}
@@ -2357,14 +2363,22 @@ button:active{filter:brightness(1.15)}
     $("board").hidden=!on;
     $("viewSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String((b.dataset.v==="board")===on))});
   }
+  // 칸 순서(칸 머리를 끌어 바꿈). 이 기기에만 저장
+  var BORDER_KEY="bible-board-order";
+  function boardOrder(){
+    var o=[]; try{o=JSON.parse(localStorage.getItem(BORDER_KEY)||"[]")}catch(e){}
+    var ks=BCOLS.map(function(c){return c.k}); o=(Array.isArray(o)?o:[]).filter(function(k,i,a){return ks.indexOf(k)>=0&&a.indexOf(k)===i});
+    ks.forEach(function(k){if(o.indexOf(k)<0)o.push(k)});
+    return o.map(function(k){return BCOLS.filter(function(c){return c.k===k})[0]});
+  }
   function renderKanban(){
     var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
     box.textContent="";
     var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
     sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
-    BCOLS.forEach(function(col){
+    boardOrder().forEach(function(col){
       var cl=document.createElement("section"); cl.className="bcol"; cl.dataset.k=col.k; cl.style.setProperty("--bc",col.c);
-      var h=document.createElement("div"); h.className="bch"; h.title=col.tip;
+      var h=document.createElement("div"); h.className="bch"; h.title=col.tip+" · 좌우로 끌면 칸 순서가 바뀌어요"; h.draggable=true;
       h.innerHTML='<span class="bce"></span><b></b><span class="bcn"></span>';
       h.querySelector(".bce").textContent=col.e; h.querySelector("b").textContent=col.t; h.querySelector(".bcn").textContent=groups[col.k].length;
       cl.appendChild(h);
@@ -7389,23 +7403,51 @@ button:active{filter:brightness(1.15)}
     if(e.target.closest(".bcgo")){openCoach(n);return}
     boardOpen(n.id);
   });
+  var colDrag=null;   // 칸 머리를 끌어 칸 순서 바꾸기
   $("board").addEventListener("dragstart",function(e){
+    var hd=e.target.closest&&e.target.closest(".bch");
+    if(hd){
+      colDrag=hd.closest(".bcol"); colDrag.classList.add("cdrag"); buzz(8);
+      try{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain","col:"+colDrag.dataset.k);e.dataTransfer.setDragImage(colDrag,40,20)}catch(err){}
+      return;
+    }
     var cd=e.target.closest&&e.target.closest(".bcard"); if(!cd)return;
     kbDrag=cd.dataset.id; cd.classList.add("dragging");
     try{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",kbDrag)}catch(err){}
     $("board").classList.add("dragon");
   });
   $("board").addEventListener("dragend",function(e){
+    if(colDrag){
+      colDrag.classList.remove("cdrag"); colDrag=null;
+      var o=Array.from($("board").querySelectorAll(".bcol")).map(function(x){return x.dataset.k});
+      try{localStorage.setItem(BORDER_KEY,JSON.stringify(o))}catch(err){}
+      return;
+    }
     kbDrag=null; $("board").classList.remove("dragon");
     document.querySelectorAll(".bcard.dragging").forEach(function(x){x.classList.remove("dragging")});
     document.querySelectorAll(".bcol.over").forEach(function(x){x.classList.remove("over")});
   });
   $("board").addEventListener("dragover",function(e){
+    if(colDrag){
+      e.preventDefault(); try{e.dataTransfer.dropEffect="move"}catch(err){}
+      var t=e.target.closest(".bcol"); if(!t||t===colDrag)return;
+      var r=t.getBoundingClientRect(), after=e.clientX>r.left+r.width/2;
+      var ref=after?t.nextSibling:t; if(ref===colDrag)return;
+      if(colDrag.nextSibling===ref)return;
+      // 칸이 미끄러지듯 자리를 바꾸게 (FLIP)
+      var cols=Array.from($("board").querySelectorAll(".bcol")), before=cols.map(function(x){return x.getBoundingClientRect().left});
+      $("board").insertBefore(colDrag,ref);
+      cols.forEach(function(x,i){var d=before[i]-x.getBoundingClientRect().left;if(!d||x===colDrag)return;
+        x.style.transition="none";x.style.transform="translateX("+d+"px)";x.offsetWidth;x.style.transition="transform .2s ease";x.style.transform="";});
+      buzz(6);
+      return;
+    }
     if(!kbDrag)return; var cl=e.target.closest(".bcol"); if(!cl)return;
     e.preventDefault(); try{e.dataTransfer.dropEffect="move"}catch(err){}
     document.querySelectorAll(".bcol.over").forEach(function(x){if(x!==cl)x.classList.remove("over")}); cl.classList.add("over");
   });
   $("board").addEventListener("drop",function(e){
+    if(colDrag){e.preventDefault();return}
     var cl=e.target.closest(".bcol"); if(!cl||!kbDrag)return; e.preventDefault();
     var n=notes.get(kbDrag), to=cl.dataset.k; kbDrag=null; cl.classList.remove("over");
     if(!n)return;
