@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --paper:#ECECE8; --sheet:#F6F6F3; --rule:#D5D3CC; --ink:#2E2A36; --muted:#6E6878;
+  --paper:#F0EEF5; --sheet:#FCFBFE; --rule:#E1DDE9; --ink:#2E2A36; --muted:#6E6878;
   --violet:#6A45B0; --orange:#E97A12; --green:#1F7A45; --blue:#2447B8; --sky:#1C93CF; --pink:#D94A90;
   --five:#C0376F; --five2:#15727E;   /* 다섯 장째 뱃지 (장미 / 청록) */
   --focus:#2A63B8;
@@ -33,7 +33,16 @@
 *,*::before,*::after{box-sizing:inherit}
 html{-webkit-text-size-adjust:100%}
 body{
-  margin:0;background:var(--paper);color:var(--ink);
+  margin:0;color:var(--ink);
+  /* 흰 바탕만 있으면 밋밋해서, 위쪽에 보랏빛 아래쪽에 하늘빛을 아주 옅게
+     깔아 결을 준다. 스크롤해도 배경은 그대로 있게 고정한다. */
+  background:
+    radial-gradient(1100px 520px at 50% -8%,
+      color-mix(in srgb,var(--violet) 11%,transparent), transparent 70%),
+    radial-gradient(760px 420px at 105% 102%,
+      color-mix(in srgb,var(--sky) 9%,transparent), transparent 68%),
+    var(--paper);
+  background-attachment:fixed;
   font-family:var(--sans);font-size:15px;line-height:1.55;
   padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
   touch-action:manipulation;
@@ -46,7 +55,7 @@ h2{font-family:var(--sans);font-weight:700;font-size:18px;margin:26px 0 10px}
 button{font-family:inherit;font-size:inherit;color:inherit}
 
 /* 요약 */
-.sum{margin-top:16px;padding:14px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px}
+.sum{margin-top:16px;padding:14px;border-radius:12px;background:linear-gradient(180deg,var(--sheet),color-mix(in srgb,var(--sheet) 93%,var(--violet)));border:1px solid var(--rule);box-shadow:0 1px 2px color-mix(in srgb,var(--ink) 7%,transparent),0 8px 20px color-mix(in srgb,var(--ink) 5%,transparent);}
 .sum-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 .sum-now{font-family:var(--sans);font-size:17px;font-weight:700}
 .sum-cnt{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
@@ -77,7 +86,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 
 /* 책 목록 */
 .books{margin-top:6px}
-.bk{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;margin-top:7px;overflow:hidden}
+.bk{border-radius:10px;margin-top:7px;overflow:hidden;background:linear-gradient(180deg,var(--sheet),color-mix(in srgb,var(--sheet) 93%,var(--violet)));border:1px solid var(--rule);box-shadow:0 1px 2px color-mix(in srgb,var(--ink) 7%,transparent),0 8px 20px color-mix(in srgb,var(--ink) 5%,transparent);}
 .bk-h{
   display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
   width:100%;padding:11px 13px;background:none;border:0;text-align:left;cursor:pointer;
@@ -206,7 +215,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 }
 
 /* 모은 책 선반 */
-.shelf{margin-top:14px;padding:12px 13px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px}
+.shelf{margin-top:14px;padding:12px 13px;border-radius:12px;background:linear-gradient(180deg,var(--sheet),color-mix(in srgb,var(--sheet) 93%,var(--violet)));border:1px solid var(--rule);box-shadow:0 1px 2px color-mix(in srgb,var(--ink) 7%,transparent),0 8px 20px color-mix(in srgb,var(--ink) 5%,transparent);}
 .shelf h3{margin:0 0 9px;font-family:var(--sans);font-size:15px;font-weight:700}
 .shelf h3 span{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400;margin-left:6px}
 .medals{display:flex;flex-wrap:wrap;gap:6px}
