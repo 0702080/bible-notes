@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-11-65">
+<meta name="app-build" content="2026-10-11-66">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1420,7 +1420,6 @@ body.boardon .wrap{max-width:1280px}
 body.boardon #list,body.boardon #reviewBar{display:none!important}
 .board4{display:flex;gap:14px;align-items:flex-start;margin-top:8px}
 .board4>.bcol{flex:1 1 0;min-width:0}
-.board4>.bcol.bnew{flex-grow:2}   /* 새로 담음은 두 줄이라 두 배 폭. 어디로 옮겨도 따라간다 */
 .board4[hidden]{display:none}
 .bcol{background:#141417;border:1px solid #24232A;border-radius:16px;padding:10px;min-height:200px}
 .bch{display:flex;align-items:center;gap:8px;padding:4px 6px 10px;color:var(--bc);font-size:14.5px}
@@ -1453,10 +1452,6 @@ body.boardon #list,body.boardon #reviewBar{display:none!important}
 .bcard.landed{animation:kbland .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes kbland{0%{transform:scale(.9);box-shadow:0 0 0 0 var(--tc)}60%{transform:scale(1.03);box-shadow:0 0 0 6px color-mix(in srgb,var(--tc) 30%,transparent)}100%{transform:none;box-shadow:none}}
 @media (hover:none){.bcgo{opacity:1}}
-/* 새로 담음은 금방 수십 개가 된다. 접지 않고 다른 칸과 같은 카드로 펼치되,
-   칸을 두 배로 넓혀 세로 두 줄로 나눈다. 위에서 아래로 채운 뒤 옆 줄로 넘어간다. */
-.bcol.bnew .bclist{display:block;column-count:2;column-gap:8px}
-.bcol.bnew .bcard{break-inside:avoid;margin-bottom:8px}
 .act textarea.at{font-size:14px}   /* 실천 제목 조금 작게 */
 .act>.agrip,.act>.chk,.act>.afold,.act>textarea.at{align-self:center}   /* 제목이 두 줄이어도 네모·손잡이·화살표가 제목 가운데에 */
 .uform{border:0;padding:0}   /* 점선 테두리 없애기 */
@@ -2364,18 +2359,24 @@ button:active{filter:brightness(1.15)}
     $("viewSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String((b.dataset.v==="board")===on))});
   }
   // 칸 순서(칸 머리를 끌어 바꿈). 이 기기에만 저장
+  // 새로 담음은 수십 개가 쌓이므로 보드에서는 두 칸(new, new2)으로 나눠 펼친다.
+  // new2는 보드에만 있는 칸이고 암송 상태는 똑같이 "new"다.
+  var BLANES=BCOLS.slice(0,1).concat([{k:"new2",t:"새로 담음 2",e:"🌱",c:"var(--muted)",tip:"새로 담음이 많아 둘로 나눈 칸"}],BCOLS.slice(1));
+  function laneState(k){return k==="new2"?"new":k}
   var BORDER_KEY="bible-board-order";
   function boardOrder(){
     var o=[]; try{o=JSON.parse(localStorage.getItem(BORDER_KEY)||"[]")}catch(e){}
-    var ks=BCOLS.map(function(c){return c.k}); o=(Array.isArray(o)?o:[]).filter(function(k,i,a){return ks.indexOf(k)>=0&&a.indexOf(k)===i});
+    var ks=BLANES.map(function(c){return c.k}); o=(Array.isArray(o)?o:[]).filter(function(k,i,a){return ks.indexOf(k)>=0&&a.indexOf(k)===i});
+    if(o.indexOf("new2")<0&&o.indexOf("new")>=0)o.splice(o.indexOf("new")+1,0,"new2");   // 예전 순서에는 new2가 없음: new 바로 옆에
     ks.forEach(function(k){if(o.indexOf(k)<0)o.push(k)});
-    return o.map(function(k){return BCOLS.filter(function(c){return c.k===k})[0]});
+    return o.map(function(k){return BLANES.filter(function(c){return c.k===k})[0]});
   }
   function renderKanban(){
     var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
     box.textContent="";
     var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
     sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
+    var half=Math.ceil(groups["new"].length/2); groups.new2=groups["new"].slice(half); groups["new"]=groups["new"].slice(0,half);
     boardOrder().forEach(function(col){
       var cl=document.createElement("section"); cl.className="bcol"; cl.dataset.k=col.k; cl.style.setProperty("--bc",col.c);
       var h=document.createElement("div"); h.className="bch"; h.title=col.tip+" · 좌우로 끌면 칸 순서가 바뀌어요"; h.draggable=true;
@@ -2385,8 +2386,6 @@ button:active{filter:brightness(1.15)}
       var lst=document.createElement("div"); lst.className="bclist";
       var items=groups[col.k];
       if(!items.length){var em=document.createElement("p");em.className="bcempty";em.textContent=col.k==="due"?"오늘 복습할 말씀이 없어요 🙂":"비어 있어요";lst.appendChild(em)}
-      // 새로 담음은 수십 개가 쌓이므로 칸을 넓혀 세로 두 줄로 나눠 펼친다.
-      if(col.k==="new")cl.classList.add("bnew");
       items.forEach(function(n,i){
         var cd=document.createElement("article"); cd.className="bcard";
         cd.dataset.id=n.id; cd.tabIndex=0; cd.draggable=true;
@@ -7449,7 +7448,7 @@ button:active{filter:brightness(1.15)}
   $("board").addEventListener("drop",function(e){
     if(colDrag){e.preventDefault();return}
     var cl=e.target.closest(".bcol"); if(!cl||!kbDrag)return; e.preventDefault();
-    var n=notes.get(kbDrag), to=cl.dataset.k; kbDrag=null; cl.classList.remove("over");
+    var n=notes.get(kbDrag), to=laneState(cl.dataset.k); kbDrag=null; cl.classList.remove("over");
     if(!n)return;
     if(kanbanMove(n,to)){
       buzz(10); render();
