@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-38">
+<meta name="app-build" content="2026-10-10-39">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7101,10 +7101,10 @@ button:active{filter:brightness(1.15)}
         if(pw.length<6){toast("비밀번호는 6자 이상으로 해 주세요");return}
         b.disabled=true;
         try{
-          var tok=await sbToken(); if(!tok){toast("다시 로그인해 주세요");return}
-          var r=await fetch(SB_URL+"/auth/v1/user",{method:"PUT",headers:sbH(tok),body:JSON.stringify({password:pw})});
-          if(!r.ok){var er=await sbErr(r,"비밀번호를 저장하지 못했어요");toast(er.msg);return}
-          sbBox.querySelector(".sbnewpw").value=""; toast("🔑 비밀번호를 만들었어요. 다른 기기에서는 이메일과 비밀번호로 바로 로그인해요");
+          var res=await sbSavePw(pw);
+          if(!res.ok){toast(res.msg);return}
+          sbBox.querySelector(".sbnewpw").value=""; sbBox.querySelector(".sbsetpw").classList.remove("hl");
+          toast("🔑 비밀번호를 저장했고, 그 비밀번호로 로그인되는 것까지 확인했어요");
         }catch(err){toast("인터넷 연결을 확인해 주세요")}
         finally{b.disabled=false}
       });
@@ -7160,13 +7160,24 @@ button:active{filter:brightness(1.15)}
   function sbPendSet(em,pw){try{localStorage.setItem(SB_PEND,JSON.stringify({em:em,pw:pw,at:Date.now()}))}catch(e){}}
   function sbPendTake(){try{var o=JSON.parse(localStorage.getItem(SB_PEND)||"null");localStorage.removeItem(SB_PEND);return o&&o.pw&&Date.now()-o.at<1800000?o:null}catch(e){return null}}
   try{var pd0=JSON.parse(localStorage.getItem(SB_PEND)||"null");if(pd0&&Date.now()-pd0.at>=1800000)localStorage.removeItem(SB_PEND)}catch(e){}   // 30분 지나면 지움
+  async function sbSavePw(pw){
+    var x=sbSession(), tok=await sbToken(); if(!tok||!x)return {ok:false,msg:"다시 로그인해 주세요"};
+    var r=await fetch(SB_URL+"/auth/v1/user",{method:"PUT",headers:sbH(tok),body:JSON.stringify({password:pw})});
+    if(!r.ok){var er=await sbErr(r,"비밀번호를 저장하지 못했어요");return {ok:false,msg:er.msg}}
+    // 정말 저장됐는지: 그 비밀번호로 로그인해 봄
+    var t=await fetch(SB_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:sbH(),body:JSON.stringify({email:x.user.email,password:pw})});
+    if(!t.ok){var e2=await sbErr(t,"저장은 됐는데 비밀번호 로그인이 안 돼요");return {ok:false,msg:e2.msg}}
+    var j=await t.json(); sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
+    return {ok:true};
+  }
   async function sbAfterLogin(){
     var pd=sbPendTake(), x=sbSession();
     if(pd&&x&&(!pd.em||!x.user.email||pd.em.toLowerCase()===String(x.user.email).toLowerCase())){
       try{
-        var tok=await sbToken(), r=await fetch(SB_URL+"/auth/v1/user",{method:"PUT",headers:sbH(tok),body:JSON.stringify({password:pd.pw})});
-        if(r.ok){closeSb();toast("✅ 로그인했고 비밀번호도 저장했어요. 다음부터는 이메일과 비밀번호로 바로 로그인해요");return}
-      }catch(e){}
+        var res=await sbSavePw(pd.pw);
+        if(res.ok){closeSb();toast("✅ 로그인했고 비밀번호도 저장했어요 (확인 완료). 다음부터는 이메일과 비밀번호로 바로 로그인해요");return}
+        openSb(true); toast(res.msg); return;
+      }catch(e){toast("인터넷 연결을 확인해 주세요")}
     }
     openSb(true);   // 정해 둔 비밀번호가 없으면 비밀번호 만들기 칸을 띄움
   }
