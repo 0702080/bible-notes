@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>성경 통독표</title>
+<meta name="theme-color" content="#1B1A1E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ECECE8; --sheet:#F6F6F3; --rule:#D5D3CC; --ink:#2E2A36; --muted:#6E6878;
+  --violet:#6A45B0; --orange:#E97A12; --green:#1F7A45; --blue:#2447B8; --sky:#1C93CF; --pink:#D94A90;
+  --focus:#2A63B8;
+  --serif:"Gowun Batang","Noto Serif KR","AppleMyungjo","Batang",serif;
+  --sans:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  box-sizing:border-box;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#1B1A1E; --sheet:#242228; --rule:#3A3740; --ink:#ECE8F2; --muted:#A39CAD;
+    --violet:#AE90E0; --orange:#F4974A; --green:#52B87A; --blue:#7C98EE; --sky:#5CC0EE; --pink:#F08AC0;
+    --focus:#6B9BE6;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#1B1A1E; --sheet:#242228; --rule:#3A3740; --ink:#ECE8F2; --muted:#A39CAD;
+  --violet:#AE90E0; --orange:#F4974A; --green:#52B87A; --blue:#7C98EE; --sky:#5CC0EE; --pink:#F08AC0;
+  --focus:#6B9BE6;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:var(--sans);font-size:15px;line-height:1.55;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+  touch-action:manipulation;
+}
+.wrap{max-width:680px;margin:0 auto;padding:20px 14px 40px}
+h1{font-family:var(--serif);font-weight:700;font-size:26px;margin:0;color:var(--violet);letter-spacing:-.01em}
+.lead{margin:5px 0 0;color:var(--muted);font-size:14px}
+h2{font-family:var(--serif);font-weight:700;font-size:18px;margin:26px 0 10px}
+
+button{font-family:inherit;font-size:inherit;color:inherit}
+
+/* 요약 */
+.sum{margin-top:16px;padding:14px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px}
+.sum-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sum-now{font-family:var(--serif);font-size:17px;font-weight:700}
+.sum-cnt{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+.meter{height:10px;border-radius:5px;background:var(--rule);overflow:hidden;margin-top:10px;display:flex}
+.meter i{display:block;height:100%}
+.meter .me{background:var(--violet)}
+.meter .both{background:var(--green)}
+.halves{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.half{background:var(--paper);border:1px solid var(--rule);border-radius:9px;padding:8px 10px}
+.half b{display:block;font-size:12.5px;color:var(--muted);font-weight:500}
+.half span{font-family:var(--serif);font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* 도구 줄 */
+.tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.btn{
+  padding:9px 13px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--sheet);font-size:13.5px;font-weight:500;cursor:pointer;
+}
+.btn:active{background:var(--rule)}
+.btn.on{background:var(--violet);border-color:var(--violet);color:#fff;font-weight:700}
+.btn.wide{flex:1 1 100%;text-align:center;padding:12px}
+.btn:disabled{opacity:.45}
+
+/* 범례 */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin:12px 2px 0;font-size:12.5px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:12px;height:12px;border-radius:4px;display:block}
+
+/* 책 목록 */
+.books{margin-top:6px}
+.bk{background:var(--sheet);border:1px solid var(--rule);border-radius:10px;margin-top:7px;overflow:hidden}
+.bk-h{
+  display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+  width:100%;padding:11px 13px;background:none;border:0;text-align:left;cursor:pointer;
+}
+.bk-h:active{background:var(--rule)}
+.bk-name{font-family:var(--serif);font-size:16px;font-weight:700}
+.bk-sub{display:block;font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:400;margin-top:1px}
+.bk-cnt{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.bk.full .bk-name{color:var(--green)}
+.bk-body{padding:0 11px 11px;display:none}
+.bk.open .bk-body{display:block}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:5px}
+.chip{
+  height:38px;border:1.5px solid var(--rule);border-radius:9px;background:transparent;
+  font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer;padding:0;
+  display:grid;place-items:center;
+}
+.chip:active{transform:scale(.94)}
+.chip[data-s="me"]{background:var(--violet);border-color:var(--violet);color:#fff;font-weight:700}
+.chip[data-s="both"]{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
+.chip[data-s="friend"]{border-color:var(--orange);color:var(--orange);font-weight:700}
+.chip:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.bk-all{margin-top:8px;font-size:12.5px;color:var(--muted);background:none;border:0;padding:4px 2px;cursor:pointer;text-decoration:underline}
+
+/* 대화상자 */
+.sheet{
+  position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);
+  display:flex;align-items:flex-end;justify-content:center;padding:0;
+}
+.sheet[hidden]{display:none}
+.card{
+  width:100%;max-width:680px;background:var(--paper);
+  border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0));
+  max-height:86vh;overflow:auto;
+}
+.card h3{font-family:var(--serif);font-size:18px;margin:0 0 4px}
+.card p{margin:6px 0 0;font-size:13.5px;color:var(--muted);line-height:1.65}
+.card textarea,.card input[type=text]{
+  width:100%;margin-top:10px;padding:11px;font-family:var(--sans);font-size:14px;
+  color:var(--ink);background:var(--sheet);border:1px solid var(--rule);border-radius:10px;
+}
+.card textarea{height:96px;resize:vertical;word-break:break-all}
+.card .tools{margin-top:12px}
+.msg{margin-top:10px;font-size:13px;color:var(--green);min-height:1.2em}
+.msg.bad{color:var(--orange)}
+.note{margin:16px 2px 0;font-size:12.5px;color:var(--muted);line-height:1.7}
+@media (prefers-reduced-motion:reduce){.chip:active{transform:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>성경 통독표</h1>
+  <p class="lead">읽은 장을 눌러 표시하고, 친구와 진도를 맞춰 보세요</p>
+
+  <section class="sum" aria-live="polite">
+    <div class="sum-top">
+      <span class="sum-now" id="who">내 진도</span>
+      <span class="sum-cnt" id="cnt"></span>
+    </div>
+    <div class="meter"><i class="both" id="mBoth"></i><i class="me" id="mMe"></i></div>
+    <div class="halves">
+      <div class="half"><b>구약 39권</b><span id="otCnt"></span></div>
+      <div class="half"><b>신약 27권</b><span id="ntCnt"></span></div>
+    </div>
+    <div class="tools">
+      <button class="btn" id="btnShare" type="button">내 진도 보내기</button>
+      <button class="btn" id="btnFriend" type="button">친구 진도 불러오기</button>
+      <button class="btn" id="btnCmp" type="button" hidden>비교 끄기</button>
+    </div>
+    <div class="legend" id="legend" hidden>
+      <span><i style="background:var(--violet)"></i>나만</span>
+      <span><i style="background:var(--green)"></i>둘 다</span>
+      <span><i style="border:1.5px solid var(--orange)"></i>친구만</span>
+    </div>
+  </section>
+
+  <h2>구약</h2>
+  <div class="books" id="ot"></div>
+  <h2>신약</h2>
+  <div class="books" id="nt"></div>
+
+  <p class="note">
+    체크는 이 기기에만 저장돼요. 다른 기기에서 이어 보려면 <b>내 진도 보내기</b>로 만든 링크를 자기에게 보내 두세요.<br>
+    친구 진도를 불러오면 두 사람 진도가 한 화면에 겹쳐 보여요. 친구 것은 보기만 하고 바뀌지 않아요.
+  </p>
+</main>
+
+<div class="sheet" id="dlg" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <h3 id="dlgTitle"></h3>
+    <p id="dlgDesc"></p>
+    <div id="dlgBody"></div>
+    <div class="msg" id="dlgMsg"></div>
+    <div class="tools" id="dlgTools"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* 책 이름과 장 수. 성경 본문은 담지 않고, 권별 장 수만 쓴다. */
+var OT=[["창세기",50],["출애굽기",40],["레위기",27],["민수기",36],["신명기",34],
+["여호수아",24],["사사기",21],["룻기",4],["사무엘상",31],["사무엘하",24],
+["열왕기상",22],["열왕기하",25],["역대상",29],["역대하",36],["에스라",10],
+["느헤미야",13],["에스더",10],["욥기",42],["시편",150],["잠언",31],
+["전도서",12],["아가",8],["이사야",66],["예레미야",52],["예레미야애가",5],
+["에스겔",48],["다니엘",12],["호세아",14],["요엘",3],["아모스",9],
+["오바댜",1],["요나",4],["미가",7],["나훔",3],["하박국",3],
+["스바냐",3],["학개",2],["스가랴",14],["말라기",4]];
+var NT=[["마태복음",28],["마가복음",16],["누가복음",24],["요한복음",21],["사도행전",28],
+["로마서",16],["고린도전서",16],["고린도후서",13],["갈라디아서",6],["에베소서",6],
+["빌립보서",4],["골로새서",4],["데살로니가전서",5],["데살로니가후서",3],["디모데전서",6],
+["디모데후서",4],["디도서",3],["빌레몬서",1],["히브리서",13],["야고보서",5],
+["베드로전서",5],["베드로후서",3],["요한일서",5],["요한이서",1],["요한삼서",1],
+["유다서",1],["요한계시록",22]];
+
+var BOOKS=OT.concat(NT);
+var OT_N=OT.length;
+var OFF=[],TOTAL=0;
+for(var i=0;i<BOOKS.length;i++){OFF.push(TOTAL);TOTAL+=BOOKS[i][1];}   // 1189
+var OT_TOTAL=OFF[OT_N], NT_TOTAL=TOTAL-OT_TOTAL;
+
+var LS="bible-tongdok-v1";       // 기존 앱들과 겹치지 않는 저장 키
+var me=new Uint8Array(TOTAL);    // 내 진도
+var friend=null;                 // 친구 진도 (불러왔을 때만)
+var friendName="";
+var myName="";
+var compare=false;
+var open={};
+
+var $=function(id){return document.getElementById(id)};
+
+/* 모든 버튼에서 짧게 진동 (프로젝트 공통 규칙) */
+function buzz(){try{if(navigator.vibrate)navigator.vibrate(8)}catch(e){}}
+document.addEventListener("click",function(ev){
+  if(ev.target.closest("button"))buzz();
+},true);
+
+/* ── 저장 ─────────────────────────────── */
+function save(){
+  try{localStorage.setItem(LS,JSON.stringify({n:myName,b:toB64(me)}))}catch(e){}
+}
+function load(){
+  try{
+    var raw=localStorage.getItem(LS); if(!raw)return;
+    var o=JSON.parse(raw);
+    if(o&&typeof o.b==="string"){var a=fromB64(o.b); if(a)me=a;}
+    if(o&&typeof o.n==="string")myName=o.n;
+  }catch(e){}
+}
+
+/* ── 코드 변환 (1189장을 비트로 눌러 담는다) ── */
+function toB64(bits){
+  var bytes=new Uint8Array(Math.ceil(TOTAL/8));
+  for(var i=0;i<TOTAL;i++)if(bits[i])bytes[i>>3]|=1<<(i&7);
+  var s="";for(var j=0;j<bytes.length;j++)s+=String.fromCharCode(bytes[j]);
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function fromB64(str){
+  try{
+    var s=String(str).replace(/-/g,"+").replace(/_/g,"/");
+    while(s.length%4)s+="=";
+    var bin=atob(s), bits=new Uint8Array(TOTAL);
+    for(var i=0;i<TOTAL;i++){
+      var b=bin.charCodeAt(i>>3)||0;
+      bits[i]=(b>>(i&7))&1;
+    }
+    return bits;
+  }catch(e){return null}
+}
+function encName(n){
+  try{return btoa(unescape(encodeURIComponent(n||""))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+  catch(e){return ""}
+}
+function decName(s){
+  try{
+    var t=String(s||"").replace(/-/g,"+").replace(/_/g,"/");
+    while(t.length%4)t+="=";
+    return decodeURIComponent(escape(atob(t)));
+  }catch(e){return ""}
+}
+function makeCode(){return "T1~"+encName(myName)+"~"+toB64(me)}
+function parseCode(txt){
+  var s=String(txt||"").trim();
+  var m=s.match(/[#?&]f=([^&\s]+)/);          // 링크를 통째로 붙여넣어도 받는다
+  if(m)s=decodeURIComponent(m[1]);
+  var p=s.split("~");
+  if(p.length<3||p[0]!=="T1")return null;
+  var bits=fromB64(p[2]);
+  if(!bits)return null;
+  return {name:decName(p[1]),bits:bits};
+}
+function makeLink(){
+  var base=location.href.split("#")[0].split("?")[0];
+  return base+"#f="+encodeURIComponent(makeCode());
+}
+
+/* ── 세기 ─────────────────────────────── */
+function countRange(bits,from,to){var n=0;for(var i=from;i<to;i++)if(bits[i])n++;return n}
+function bookDone(bi){return countRange(me,OFF[bi],OFF[bi]+BOOKS[bi][1])}
+
+/* ── 그리기 ───────────────────────────── */
+function chipState(idx){
+  var a=!!me[idx], b=friend&&compare?!!friend[idx]:false;
+  if(a&&b)return "both";
+  if(a)return "me";
+  if(b)return "friend";
+  return "";
+}
+function renderBooks(){
+  var html=["",""];
+  for(var bi=0;bi<BOOKS.length;bi++){
+    var name=BOOKS[bi][0], total=BOOKS[bi][1], done=bookDone(bi);
+    var isOpen=!!open[bi];
+    var cls="bk"+(done===total?" full":"")+(isOpen?" open":"");
+    var h='<section class="'+cls+'" data-b="'+bi+'">'
+      +'<button class="bk-h" type="button" data-act="toggle" data-b="'+bi+'" aria-expanded="'+isOpen+'">'
+      +'<span class="bk-name">'+name+'<span class="bk-sub">'+total+'장</span></span>'
+      +'<span class="bk-cnt">'+done+' / '+total+'</span></button>'
+      +'<div class="bk-body">'+(isOpen?chipsHTML(bi):"")+'</div></section>';
+    html[bi<OT_N?0:1]+=h;
+  }
+  $("ot").innerHTML=html[0];
+  $("nt").innerHTML=html[1];
+}
+function chipsHTML(bi){
+  var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips">';
+  for(var c=1;c<=total;c++){
+    var idx=base+c-1, st=chipState(idx);
+    s+='<button class="chip" type="button" data-act="chip" data-i="'+idx+'"'
+      +(st?' data-s="'+st+'"':'')
+      +' aria-pressed="'+(!!me[idx])+'" aria-label="'+BOOKS[bi][0]+' '+c+'장">'+c+'</button>';
+  }
+  s+='</div><button class="bk-all" type="button" data-act="all" data-b="'+bi+'">'
+    +(bookDone(bi)===total?"이 책 전체 지우기":"이 책 전체 읽음으로")+'</button>';
+  return s;
+}
+function repaintBook(bi){
+  var sec=document.querySelector('.bk[data-b="'+bi+'"]');
+  if(!sec)return;
+  var total=BOOKS[bi][1], done=bookDone(bi);
+  sec.classList.toggle("full",done===total);
+  sec.querySelector(".bk-cnt").textContent=done+" / "+total;
+  if(open[bi])sec.querySelector(".bk-body").innerHTML=chipsHTML(bi);
+}
+function renderSummary(){
+  var mine=countRange(me,0,TOTAL);
+  var pctMe=mine/TOTAL*100;
+  if(friend&&compare){
+    var both=0,fo=0;
+    for(var i=0;i<TOTAL;i++){if(me[i]&&friend[i])both++;else if(friend[i])fo++;}
+    $("who").textContent="나와 "+(friendName||"친구");
+    $("cnt").textContent="나 "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
+    $("mBoth").style.width=(both/TOTAL*100)+"%";
+    $("mMe").style.width=((mine-both)/TOTAL*100)+"%";
+  }else{
+    $("who").textContent=myName?myName+"의 진도":"내 진도";
+    $("cnt").textContent=mine+" / "+TOTAL+"장 ("+Math.round(mine/TOTAL*100)+"%)";
+    $("mBoth").style.width="0%";
+    $("mMe").style.width=pctMe+"%";
+  }
+  $("otCnt").textContent=countRange(me,0,OT_TOTAL)+" / "+OT_TOTAL+"장";
+  $("ntCnt").textContent=countRange(me,OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
+  $("legend").hidden=!(friend&&compare);
+  $("btnCmp").hidden=!friend;
+  $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
+}
+function renderAll(){renderBooks();renderSummary()}
+
+/* ── 조작 ─────────────────────────────── */
+document.addEventListener("click",function(ev){
+  var el=ev.target.closest("[data-act]"); if(!el)return;
+  var act=el.dataset.act;
+
+  if(act==="toggle"){
+    var bi=+el.dataset.b; open[bi]=!open[bi];
+    var sec=document.querySelector('.bk[data-b="'+bi+'"]');
+    sec.classList.toggle("open",open[bi]);
+    el.setAttribute("aria-expanded",open[bi]);
+    sec.querySelector(".bk-body").innerHTML=open[bi]?chipsHTML(bi):"";
+    return;
+  }
+  if(act==="chip"){
+    var idx=+el.dataset.i;
+    me[idx]=me[idx]?0:1;
+    save();
+    var bi2=bookOf(idx);
+    repaintBook(bi2);
+    renderSummary();
+    return;
+  }
+  if(act==="all"){
+    var b3=+el.dataset.b, t=BOOKS[b3][1], base=OFF[b3];
+    var fill=bookDone(b3)!==t?1:0;
+    for(var c=0;c<t;c++)me[base+c]=fill;
+    save();repaintBook(b3);renderSummary();
+    return;
+  }
+});
+function bookOf(idx){
+  for(var i=BOOKS.length-1;i>=0;i--)if(idx>=OFF[i])return i;
+  return 0;
+}
+
+/* ── 대화상자 ─────────────────────────── */
+function closeDlg(){$("dlg").hidden=true;$("dlgBody").innerHTML="";$("dlgTools").innerHTML="";$("dlgMsg").textContent=""}
+$("dlg").addEventListener("click",function(ev){if(ev.target===$("dlg"))closeDlg()});
+function setMsg(t,bad){var m=$("dlgMsg");m.textContent=t||"";m.className="msg"+(bad?" bad":"")}
+
+function openShare(){
+  $("dlgTitle").textContent="내 진도 보내기";
+  $("dlgDesc").textContent="아래 링크를 카톡으로 보내면, 친구가 열어서 내 진도를 볼 수 있어요. 내 이름을 적으면 친구 화면에 그 이름이 보여요.";
+  $("dlgBody").innerHTML='<input type="text" id="nm" placeholder="내 이름 (예: 은혜)" value="'+esc(myName)+'">'
+    +'<textarea id="lk" readonly></textarea>';
+  $("dlgTools").innerHTML='<button class="btn on wide" type="button" id="cp">링크 복사하기</button>'
+    +'<button class="btn wide" type="button" id="cl">닫기</button>';
+  $("dlg").hidden=false;
+  var nm=$("nm"), lk=$("lk");
+  function refresh(){lk.value=makeLink()}
+  refresh();
+  nm.addEventListener("input",function(){myName=nm.value.slice(0,20);save();refresh();renderSummary()});
+  $("cp").addEventListener("click",function(){
+    copy(lk.value).then(function(){setMsg("복사했어요. 카톡에 붙여 넣어 보내세요.")},
+                        function(){lk.select();setMsg("길게 눌러 복사해 주세요.",true)});
+  });
+  $("cl").addEventListener("click",closeDlg);
+}
+function openFriend(){
+  $("dlgTitle").textContent="친구 진도 불러오기";
+  $("dlgDesc").textContent="친구가 보낸 링크나 코드를 그대로 붙여 넣으세요. 친구 진도는 보기만 하고, 내 체크는 그대로 있어요.";
+  $("dlgBody").innerHTML='<textarea id="pf" placeholder="여기에 붙여 넣기"></textarea>';
+  $("dlgTools").innerHTML='<button class="btn on wide" type="button" id="ok">불러오기</button>'
+    +(friend?'<button class="btn wide" type="button" id="rm">친구 진도 지우기</button>':"")
+    +'<button class="btn wide" type="button" id="cl2">닫기</button>';
+  $("dlg").hidden=false;
+  $("ok").addEventListener("click",function(){
+    var r=parseCode($("pf").value);
+    if(!r){setMsg("코드를 알아볼 수 없어요. 링크 전체를 다시 붙여 넣어 주세요.",true);return}
+    friend=r.bits;friendName=r.name;compare=true;
+    renderAll();
+    setMsg((friendName||"친구")+" 진도를 불러왔어요.");
+    setTimeout(closeDlg,900);
+  });
+  if(friend)$("rm").addEventListener("click",function(){
+    friend=null;friendName="";compare=false;renderAll();closeDlg();
+  });
+  $("cl2").addEventListener("click",closeDlg);
+}
+function copy(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);
+  return new Promise(function(res,rej){
+    try{
+      var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);
+      ta.select();var ok=document.execCommand("copy");document.body.removeChild(ta);
+      ok?res():rej();
+    }catch(e){rej()}
+  });
+}
+function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]})}
+
+$("btnShare").addEventListener("click",openShare);
+$("btnFriend").addEventListener("click",openFriend);
+$("btnCmp").addEventListener("click",function(){compare=!compare;renderAll()});
+
+/* ── 시작 ─────────────────────────────── */
+load();
+/* 링크로 열렸으면 그 진도를 친구 것으로 본다 (내 체크는 건드리지 않는다) */
+var fromLink=parseCode(location.hash);
+if(fromLink){
+  friend=fromLink.bits;friendName=fromLink.name;compare=true;
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+}
+renderAll();
+})();
+</script>
+</body></html>
