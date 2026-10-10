@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-47">
+<meta name="app-build" content="2026-10-10-48">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -428,7 +428,7 @@ details.menu>summary::-webkit-details-marker{display:none}
 .tabs::before{content:"";position:absolute;top:4px;bottom:4px;left:4px;width:calc((100% - 8px) / 6);border-radius:10px;
   background:color-mix(in srgb,var(--tabc) 13%,var(--sheet));
   box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tabc) 40%,transparent),0 1px 2px rgba(0,0,0,.06);
-  transition:transform .28s cubic-bezier(.3,.8,.25,1),background-color .28s,box-shadow .28s}
+  transition:transform .48s cubic-bezier(.34,1.56,.64,1),background-color .3s,box-shadow .3s}
 .tabs[data-active="p"]::before{transform:translateX(100%)}
 .tabs[data-active="a"]::before{transform:translateX(200%)}
 .tabs[data-active="q"]::before{transform:translateX(300%)}
@@ -3249,7 +3249,18 @@ button:active{filter:brightness(1.15)}
     var b=e.target.closest("button"); if(!b)return;
     var card=b.closest(".note"); if(!card)return;
     var id=card.dataset.id, n=notes.get(id); if(!n)return;
-    if(b.classList.contains("tab")){tabOf.set(id,b.dataset.tab);render();return}
+    if(b.classList.contains("tab")){
+      var prevTab=card.querySelector(".tabs").dataset.active, nt=b.dataset.tab;
+      tabOf.set(id,nt); render();
+      if(prevTab!==nt&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){   // 고른 탭 아이콘이 톡 튀고, 내용이 미끄러지듯 나타남
+        var tc=cards.get(id), tb=tc&&tc.querySelector('.tab[data-tab="'+nt+'"]'), ic=tb&&tb.querySelector(".ic"), pn=tc&&tc.querySelector('.pane[data-pane="'+nt+'"]');
+        var order="mpaqer", dir=order.indexOf(nt)>order.indexOf(prevTab)?1:-1;
+        if(ic&&ic.animate)ic.animate([{transform:"scale(1)"},{transform:"scale(1.35) rotate("+(dir*-8)+"deg)"},{transform:"scale(.92)"},{transform:"scale(1)"}],{duration:420,easing:"ease-out"});
+        if(pn&&pn.animate){var pa=pn.animate([{opacity:0,transform:"translateX("+(dir*24)+"px)"},{opacity:1,transform:"none"}],{duration:320,easing:"cubic-bezier(.2,.9,.3,1)"});setTimeout(function(){try{if(pa.playState!=="finished")pa.finish()}catch(e){}},600)}
+        if(tb&&tb.animate)tb.animate([{boxShadow:"0 0 0 0 color-mix(in srgb,var(--c,var(--green)) 45%,transparent)"},{boxShadow:"0 0 0 10px transparent"}],{duration:500,easing:"ease-out"});
+      }
+      return;
+    }
     if(b.classList.contains("mtopic")){b.closest("details").open=false;openPicker(id);return}
     if(b.classList.contains("hcal")){openGcal(id);return}
     if(b.classList.contains("vtopic")){openPicker(id);return}
