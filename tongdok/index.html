@@ -150,8 +150,8 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 /* 얻는 순간은 같은 보라빛으로 한 번 번진다 */
 .chip.got5{animation:pop .42s cubic-bezier(.26,1.4,.4,1),glow .85s ease-out .1s}
 @keyframes glow{
-  from{box-shadow:0 0 0 0 color-mix(in srgb,var(--violet) 65%,transparent)}
-  to{box-shadow:0 0 0 13px transparent}
+  from{box-shadow:0 0 0 0 color-mix(in srgb,var(--violet) 55%,transparent)}
+  to{box-shadow:0 0 0 7px transparent}
 }
 
 /* 5장마다 뜨는 작은 격려 띠 */
@@ -183,14 +183,17 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 /* 뱃지를 얻는 순간 */
 .chip.got{animation:pop .42s cubic-bezier(.26,1.4,.4,1)}
 @keyframes pop{0%{transform:scale(.55)}55%{transform:scale(1.22)}100%{transform:scale(1)}}
+/* 칸 밖으로 크게 번지면 옆 칸까지 넘어가 부자연스럽다. 테두리 바로
+   바깥까지만 아주 짧게 퍼지게 한다. */
 .ring{
-  position:absolute;inset:-6px;border-radius:16px;pointer-events:none;
-  border:2px solid var(--violet);animation:ring .55s ease-out forwards;
+  position:absolute;inset:-2px;border-radius:13px;pointer-events:none;
+  border:1.5px solid color-mix(in srgb,var(--violet) 70%,transparent);
+  animation:ring .36s ease-out forwards;
 }
-@keyframes ring{from{opacity:.75;transform:scale(.6)}to{opacity:0;transform:scale(1.7)}}
+@keyframes ring{from{opacity:.6;transform:scale(.9)}to{opacity:0;transform:scale(1.14)}}
 .spark{
-  position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;
-  background:#FFD36B;pointer-events:none;animation:spark .6s ease-out forwards;
+  position:absolute;left:50%;top:50%;width:4px;height:4px;border-radius:50%;
+  background:#FFD36B;pointer-events:none;animation:spark .5s ease-out forwards;
 }
 @keyframes spark{
   from{opacity:1;transform:translate(-50%,-50%) scale(1)}
@@ -553,7 +556,7 @@ function sparkle(el){
   var ring=document.createElement("span");ring.className="ring";el.appendChild(ring);
   for(var i=0;i<6;i++){
     var s=document.createElement("span");s.className="spark";
-    var a=(Math.PI*2/6)*i-Math.PI/2, d=20+Math.random()*10;
+    var a=(Math.PI*2/6)*i-Math.PI/2, d=12+Math.random()*5;
     s.style.setProperty("--dx",(Math.cos(a)*d).toFixed(1)+"px");
     s.style.setProperty("--dy",(Math.sin(a)*d).toFixed(1)+"px");
     s.style.animationDelay=(i*12)+"ms";
