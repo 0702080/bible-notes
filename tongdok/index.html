@@ -95,19 +95,22 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .chips>span{background:var(--sheet)}   /* 마지막 줄 빈칸 */
 .chip{
   position:relative;isolation:isolate;aspect-ratio:1/1;min-height:32px;border:0;border-radius:0;
-  background:var(--sheet);font-size:12.5px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums;
+  background:var(--sheet);font-size:13.5px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums;
   cursor:pointer;padding:0;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;
 }
 /* 동그라미 */
 .chip::before{
-  content:"";position:absolute;left:50%;top:50%;width:min(30px,80%);aspect-ratio:1/1;transform:translate(-50%,-50%);
+  content:"";position:absolute;left:50%;top:50%;width:min(36px,86%);aspect-ratio:1/1;transform:translate(-50%,-50%);
   border-radius:50%;border:2px solid var(--blank);z-index:-1;transition:border-color .15s;
 }
 .chip:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
 .chip[data-s]{color:var(--ink);font-weight:700}
-.chip[data-s="me"]::before{border:3px solid var(--ring)}
-.chip[data-s="me"][data-five]::before{border-color:var(--ring5)}
-.chip[data-s="both"]::before{border:3px solid var(--green)}
+/* 읽은 장은 동그라미를 색으로 채운다 */
+.chip[data-s="me"]::before{border:3px solid var(--ring);background:var(--ring)}
+.chip[data-s="me"]{color:#2A2622}
+.chip[data-s="me"][data-five]::before{border-color:var(--ring5);background:var(--ring5)}
+.chip[data-s="me"][data-five],.chip[data-s="both"]{color:#fff}
+.chip[data-s="both"]::before{border:3px solid var(--green);background:var(--green)}
 .chip[data-s="friend"]::before{border:2px dashed var(--sky)}
 .chip[data-s="friend"]{color:var(--sky)}
 /* 얻는 순간 동그라미가 톡 튀어 오른다 */
@@ -143,7 +146,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 
 /* 칸 밖으로 번지지 않게 동그라미 바로 바깥까지만 퍼진다 */
 .ring{
-  position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;pointer-events:none;
+  position:absolute;left:50%;top:50%;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;pointer-events:none;
   border:1.5px solid color-mix(in srgb,var(--ring) 80%,transparent);
   animation:ring .36s ease-out forwards;
 }
