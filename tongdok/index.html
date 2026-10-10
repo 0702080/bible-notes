@@ -114,9 +114,9 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 /* 5, 10, 15… 장째를 읽으면 번호 뒤에 꽃이 은은하게 핀다 (안 읽은 칸에는 없음) */
 .chip[data-s="me"][data-five]::after,.chip[data-s="both"][data-five]::after{
   content:"🌸";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-12deg);
-  font-size:28px;line-height:1;opacity:.38;z-index:-1;pointer-events:none;filter:saturate(.7) brightness(1.15);
+  font-size:22px;line-height:1;opacity:.38;z-index:-1;pointer-events:none;filter:saturate(.7) brightness(1.15);
 }
-@media (max-width:520px){.chip[data-five]::after{font-size:19px}}
+@media (max-width:520px){.chip[data-five]::after{font-size:13px}}   /* 원 안에 쏙 들어가게 */
 .chip[data-s="friend"]::before{border:2px dashed var(--sky)}
 .chip[data-s="friend"]{color:var(--sky)}
 /* 얻는 순간 동그라미가 톡 튀어 오른다 */
