@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-41">
+<meta name="app-build" content="2026-10-10-42">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -361,6 +361,14 @@ details.menu>summary::-webkit-details-marker{display:none}
 @media (hover:hover){.medi .mgrip:hover{color:var(--ink);background:#1E1D24}}
 .mdotsw{position:relative;flex:0 0 30px}
 .mdots{width:30px;height:36px;margin-top:6px;padding:0;border:0;border-radius:8px;background:transparent;color:var(--faint);font-size:18px;line-height:1}
+/* ⋯ 메뉴를 묵상 칸 오른쪽 위 모서리 안으로 (오른쪽 여백 없애기) */
+.medrow{position:relative}
+.medrow .mdotsw{position:absolute;top:1px;right:1px;z-index:3;flex:none;width:30px}
+.medrow .mdots{margin-top:0;height:30px;opacity:.55}
+.medrow .mdots:hover,.medrow .mdots[aria-expanded="true"]{opacity:1}
+.medrow .mmenu{top:34px}
+.medrow .med{padding-right:34px}
+.medrow .mprev{padding-right:38px}
 .mdots[aria-expanded="true"],.mdots:hover{color:var(--ink);background:#1E1D24}
 .mmenu{position:absolute;right:0;top:44px;z-index:8;min-width:150px;padding:6px;border:1px solid #302F36;border-radius:12px;background:#1C1C21;box-shadow:0 12px 30px rgba(0,0,0,.55);display:flex;flex-direction:column}
 .mmenu[hidden]{display:none}
