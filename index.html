@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-43">
+<meta name="app-build" content="2026-10-10-44">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -979,6 +979,8 @@ body.reorder .note .topics{display:none}
 .toast.show{opacity:1;transform:translate(-50%,0)}
 /* closed card: show the whole verse, no "..." */
 .note:not(.open) .verse{display:block;-webkit-line-clamp:unset;-webkit-box-orient:initial;overflow:visible;white-space:pre-wrap}
+.note:not(.open) .verse{line-height:1.8}   /* 줄 사이를 살짝 더 */
+.note.open .verse{line-height:1.9}
 body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
 /* topic colors on cards */
 .note::before{background:var(--tc,var(--violet))}
