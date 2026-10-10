@@ -6,13 +6,12 @@
 <meta name="theme-color" content="#1B1A1E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --paper:#ECECE8; --sheet:#F6F6F3; --rule:#D5D3CC; --ink:#2E2A36; --muted:#6E6878;
   --violet:#6A45B0; --orange:#E97A12; --green:#1F7A45; --blue:#2447B8; --sky:#1C93CF; --pink:#D94A90;
   --focus:#2A63B8;
-  --serif:"Gowun Batang","Noto Serif KR","AppleMyungjo","Batang",serif;
   --sans:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   box-sizing:border-box;
 }
@@ -37,16 +36,16 @@ body{
   touch-action:manipulation;
 }
 .wrap{max-width:680px;margin:0 auto;padding:20px 14px 40px}
-h1{font-family:var(--serif);font-weight:700;font-size:26px;margin:0;color:var(--violet);letter-spacing:-.01em}
+h1{font-family:var(--sans);font-weight:700;font-size:26px;margin:0;color:var(--violet);letter-spacing:-.01em}
 .lead{margin:5px 0 0;color:var(--muted);font-size:14px}
-h2{font-family:var(--serif);font-weight:700;font-size:18px;margin:26px 0 10px}
+h2{font-family:var(--sans);font-weight:700;font-size:18px;margin:26px 0 10px}
 
 button{font-family:inherit;font-size:inherit;color:inherit}
 
 /* 요약 */
 .sum{margin-top:16px;padding:14px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px}
 .sum-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
-.sum-now{font-family:var(--serif);font-size:17px;font-weight:700}
+.sum-now{font-family:var(--sans);font-size:17px;font-weight:700}
 .sum-cnt{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
 .meter{height:10px;border-radius:5px;background:var(--rule);overflow:hidden;margin-top:10px;display:flex}
 .meter i{display:block;height:100%}
@@ -55,7 +54,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .halves{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .half{background:var(--paper);border:1px solid var(--rule);border-radius:9px;padding:8px 10px}
 .half b{display:block;font-size:12.5px;color:var(--muted);font-weight:500}
-.half span{font-family:var(--serif);font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.half span{font-family:var(--sans);font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
 
 /* 도구 줄 */
 .tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
@@ -81,23 +80,92 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   width:100%;padding:11px 13px;background:none;border:0;text-align:left;cursor:pointer;
 }
 .bk-h:active{background:var(--rule)}
-.bk-name{font-family:var(--serif);font-size:16px;font-weight:700}
+.bk-name{font-family:var(--sans);font-size:16px;font-weight:700}
 .bk-sub{display:block;font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:400;margin-top:1px}
 .bk-cnt{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .bk.full .bk-name{color:var(--green)}
 .bk-body{padding:0 11px 11px;display:none}
 .bk.open .bk-body{display:block}
-.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(38px,1fr));gap:5px}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:6px}
 .chip{
-  height:38px;border:1.5px solid var(--rule);border-radius:9px;background:transparent;
-  font-size:13px;font-variant-numeric:tabular-nums;cursor:pointer;padding:0;
-  display:grid;place-items:center;
+  position:relative;height:40px;border:1.5px solid var(--rule);border-radius:12px;
+  background:transparent;font-size:13px;font-variant-numeric:tabular-nums;
+  cursor:pointer;padding:0;display:grid;place-items:center;
+  transition:transform .12s ease-out, box-shadow .2s ease-out;
 }
-.chip:active{transform:scale(.94)}
-.chip[data-s="me"]{background:var(--violet);border-color:var(--violet);color:#fff;font-weight:700}
-.chip[data-s="both"]{background:var(--green);border-color:var(--green);color:#fff;font-weight:700}
-.chip[data-s="friend"]{border-color:var(--orange);color:var(--orange);font-weight:700}
+.chip:active{transform:scale(.92)}
 .chip:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* 모은 뱃지 — 가운데가 볼록한 보석처럼 */
+.chip[data-s]{color:#fff;font-weight:700;border-color:transparent}
+.chip[data-s]::before{
+  content:"";position:absolute;left:3px;right:3px;top:2px;height:42%;
+  border-radius:10px 10px 60% 60%/10px 10px 100% 100%;
+  background:linear-gradient(rgba(255,255,255,.38),rgba(255,255,255,0));
+  pointer-events:none;
+}
+.chip[data-s="me"]{
+  background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 88%,#fff),var(--violet) 55%,color-mix(in srgb,var(--violet) 62%,#000));
+  box-shadow:0 2px 7px color-mix(in srgb,var(--violet) 42%,transparent),inset 0 -2px 4px rgba(0,0,0,.18);
+}
+.chip[data-s="both"]{
+  background:linear-gradient(150deg,color-mix(in srgb,var(--green) 88%,#fff),var(--green) 55%,color-mix(in srgb,var(--green) 62%,#000));
+  box-shadow:0 2px 7px color-mix(in srgb,var(--green) 42%,transparent),inset 0 -2px 4px rgba(0,0,0,.18);
+}
+.chip[data-s="both"]::after{
+  content:"★";position:absolute;top:-3px;right:-2px;font-size:9px;
+  color:#FFD36B;text-shadow:0 0 4px rgba(0,0,0,.4);pointer-events:none;
+}
+.chip[data-s="friend"]{border-color:var(--orange);color:var(--orange);font-weight:700;border-style:dashed}
+
+/* 뱃지를 얻는 순간 */
+.chip.got{animation:pop .42s cubic-bezier(.26,1.4,.4,1)}
+@keyframes pop{0%{transform:scale(.55)}55%{transform:scale(1.22)}100%{transform:scale(1)}}
+.ring{
+  position:absolute;inset:-6px;border-radius:16px;pointer-events:none;
+  border:2px solid var(--violet);animation:ring .55s ease-out forwards;
+}
+@keyframes ring{from{opacity:.75;transform:scale(.6)}to{opacity:0;transform:scale(1.7)}}
+.spark{
+  position:absolute;left:50%;top:50%;width:5px;height:5px;border-radius:50%;
+  background:#FFD36B;pointer-events:none;animation:spark .6s ease-out forwards;
+}
+@keyframes spark{
+  from{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  to{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.25)}
+}
+
+/* 모은 책 선반 */
+.shelf{margin-top:14px;padding:12px 13px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px}
+.shelf h3{margin:0 0 9px;font-family:var(--sans);font-size:15px;font-weight:700}
+.shelf h3 span{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400;margin-left:6px}
+.medals{display:flex;flex-wrap:wrap;gap:6px}
+.medal{
+  padding:6px 11px;border-radius:999px;font-size:12.5px;font-weight:700;color:#fff;
+  background:linear-gradient(150deg,color-mix(in srgb,var(--green) 88%,#fff),var(--green) 60%,color-mix(in srgb,var(--green) 62%,#000));
+  box-shadow:0 2px 6px color-mix(in srgb,var(--green) 35%,transparent);
+  animation:pop .4s cubic-bezier(.26,1.4,.4,1);
+}
+.shelf .none{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* 축복 카드 */
+.cel .card{text-align:center;border-radius:18px 18px 0 0}
+.cel .seal{
+  width:84px;height:84px;margin:4px auto 10px;border-radius:50%;
+  display:grid;place-items:center;font-size:34px;color:#fff;
+  background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 85%,#fff),var(--violet) 55%,color-mix(in srgb,var(--violet) 55%,#000));
+  box-shadow:0 6px 20px color-mix(in srgb,var(--violet) 45%,transparent),inset 0 -3px 8px rgba(0,0,0,.2);
+  animation:seal .6s cubic-bezier(.26,1.4,.4,1);
+}
+@keyframes seal{0%{transform:scale(.3) rotate(-18deg);opacity:0}60%{transform:scale(1.14) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.cel h3{font-size:20px;color:var(--violet);margin-bottom:2px}
+.cel .bless{margin:10px 0 0;font-family:var(--sans);font-size:15.5px;color:var(--ink);line-height:1.75}
+.cel .ref{margin:7px 0 0;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){
+  .chip.got,.medal,.cel .seal{animation:none}
+  .ring,.spark{display:none}
+  .chip:active{transform:none}
+}
 .bk-all{margin-top:8px;font-size:12.5px;color:var(--muted);background:none;border:0;padding:4px 2px;cursor:pointer;text-decoration:underline}
 
 /* 대화상자 */
@@ -111,7 +179,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0));
   max-height:86vh;overflow:auto;
 }
-.card h3{font-family:var(--serif);font-size:18px;margin:0 0 4px}
+.card h3{font-family:var(--sans);font-size:18px;margin:0 0 4px}
 .card p{margin:6px 0 0;font-size:13.5px;color:var(--muted);line-height:1.65}
 .card textarea,.card input[type=text]{
   width:100%;margin-top:10px;padding:11px;font-family:var(--sans);font-size:14px;
@@ -152,6 +220,12 @@ button{font-family:inherit;font-size:inherit;color:inherit}
     </div>
   </section>
 
+  <section class="shelf">
+    <h3>모은 책 뱃지<span id="shelfCnt"></span></h3>
+    <div class="medals" id="medals"></div>
+    <p class="none" id="shelfNone">한 책을 끝까지 읽으면 여기에 뱃지가 쌓여요.</p>
+  </section>
+
   <h2>구약</h2>
   <div class="books" id="ot"></div>
   <h2>신약</h2>
@@ -170,6 +244,17 @@ button{font-family:inherit;font-size:inherit;color:inherit}
     <div id="dlgBody"></div>
     <div class="msg" id="dlgMsg"></div>
     <div class="tools" id="dlgTools"></div>
+  </div>
+</div>
+
+<div class="sheet cel" id="cel" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="celTitle">
+    <div class="seal" id="celSeal" aria-hidden="true">✦</div>
+    <h3 id="celTitle"></h3>
+    <p id="celSub"></p>
+    <p class="bless" id="celBless"></p>
+    <p class="ref" id="celRef"></p>
+    <div class="tools"><button class="btn on wide" type="button" id="celOk">고마워요</button></div>
   </div>
 </div>
 
@@ -344,7 +429,110 @@ function renderSummary(){
   $("btnCmp").hidden=!friend;
   $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
 }
-function renderAll(){renderBooks();renderSummary()}
+function renderAll(){renderBooks();renderSummary();renderShelf()}
+
+/* ── 축복 카드 ─────────────────────────
+   성경 본문은 담지 않는다(프로젝트 규칙). 축복 문구는 직접 쓰고
+   말씀은 찾아보시도록 장절만 적는다. */
+var MILES=[
+ {n:1,    t:"첫 장을 열었어요",   b:"오늘 펼친 한 장이 앞길을 비추는 등불이 되기를 바라요.", r:"시편 119:105"},
+ {n:10,   t:"열 장",             b:"꾸준함이 쌓이면 마음에 길이 납니다. 그 길에 평안이 함께하기를.", r:"시편 1:2"},
+ {n:30,   t:"서른 장",           b:"말씀을 가까이 두는 사람에게 깊은 뿌리가 자라납니다.", r:"예레미야 17:8"},
+ {n:50,   t:"쉰 장",             b:"지치는 날에도 새 힘으로 걸어가시기를 바라요.", r:"이사야 40:31"},
+ {n:100,  t:"백 장",             b:"지나온 백 장이 마음에 심겨 좋은 열매를 맺기를.", r:"골로새서 3:16"},
+ {n:200,  t:"이백 장",           b:"읽는 기쁨이 날마다 마음의 양식이 되기를 바라요.", r:"예레미야 15:16"},
+ {n:300,  t:"삼백 장",           b:"한 걸음씩 걸어온 날들을 하나님이 기억하십니다.", r:"히브리서 6:10"},
+ {n:400,  t:"사백 장",           b:"오늘 들은 말씀이 마음을 든든히 지켜 주기를.", r:"빌립보서 4:7"},
+ {n:500,  t:"오백 장, 절반 가까이", b:"여기까지 걸어온 걸음에 축복이 가득하기를.", r:"민수기 6:24-26"},
+ {n:600,  t:"육백 장",           b:"말씀이 마음에 새겨져 흔들리지 않기를 바라요.", r:"시편 119:11"},
+ {n:700,  t:"칠백 장",           b:"지혜와 분별이 날마다 더해지기를.", r:"잠언 2:6"},
+ {n:800,  t:"팔백 장",           b:"끝까지 함께 걸어 주실 분을 신뢰하며 나아가요.", r:"신명기 31:8"},
+ {n:900,  t:"구백 장",           b:"선한 일에 지치지 않는 마음을 주시기를.", r:"갈라디아서 6:9"},
+ {n:1000, t:"천 장을 넘었어요",   b:"큰 일을 해내셨어요. 그 기쁨이 오래 머물기를.", r:"시편 126:3"},
+ {n:1100, t:"천백 장",           b:"마지막 고개를 넘는 걸음에 힘이 더해지기를.", r:"이사야 41:10"},
+ {n:1189, t:"성경 전체 통독 완료", b:"끝까지 걸어오셨어요. 이 여정이 평생의 선물로 남기를.", r:"디모데후서 4:7"}
+];
+var BOOK_BLESS=[
+ {b:"한 권을 끝까지 읽어 냈어요. 그 성실함이 참 귀합니다.", r:"골로새서 3:23"},
+ {b:"오늘 쌓은 한 권이 마음의 보물이 되기를 바라요.", r:"마태복음 6:21"},
+ {b:"읽는 사람에게 복이 있다고 했어요. 그 복이 함께하기를.", r:"요한계시록 1:3"},
+ {b:"한 권만큼 더 가까워졌어요. 그 길에 기쁨이 있기를.", r:"시편 16:11"}
+];
+var queue=[], celOpen=false;
+
+function pushCel(c){queue.push(c);if(!celOpen)nextCel()}
+function nextCel(){
+  if(!queue.length){celOpen=false;$("cel").hidden=true;return}
+  celOpen=true;
+  var c=queue.shift();
+  $("celSeal").textContent=c.icon||"✦";
+  $("celTitle").textContent=c.t;
+  $("celSub").textContent=c.s||"";
+  $("celBless").textContent=c.b;
+  $("celRef").textContent=c.r?"— "+c.r+" 말씀을 찾아 읽어 보세요":"";
+  $("cel").hidden=false;
+}
+$("celOk").addEventListener("click",nextCel);
+$("cel").addEventListener("click",function(ev){if(ev.target===$("cel"))nextCel()});
+
+/* 체크한 칸에서 반짝이 터뜨리기 */
+function sparkle(el){
+  if(!el)return;
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  el.classList.remove("got");void el.offsetWidth;el.classList.add("got");
+  var ring=document.createElement("span");ring.className="ring";el.appendChild(ring);
+  for(var i=0;i<6;i++){
+    var s=document.createElement("span");s.className="spark";
+    var a=(Math.PI*2/6)*i-Math.PI/2, d=20+Math.random()*10;
+    s.style.setProperty("--dx",(Math.cos(a)*d).toFixed(1)+"px");
+    s.style.setProperty("--dy",(Math.sin(a)*d).toFixed(1)+"px");
+    s.style.animationDelay=(i*12)+"ms";
+    el.appendChild(s);
+  }
+  setTimeout(function(){
+    var junk=el.querySelectorAll(".ring,.spark");
+    for(var j=0;j<junk.length;j++)junk[j].remove();
+  },700);
+}
+
+/* 달라진 만큼만 축하한다 */
+function checkMilestones(before,after,finishedBooks){
+  for(var i=0;i<finishedBooks.length;i++){
+    var bi=finishedBooks[i];
+    var pick=BOOK_BLESS[bi%BOOK_BLESS.length];
+    pushCel({icon:"✺",t:BOOKS[bi][0]+" 완독",
+      s:BOOKS[bi][1]+"장을 모두 읽었어요. 뱃지를 하나 모았어요.",
+      b:pick.b,r:pick.r});
+  }
+  for(var m=0;m<MILES.length;m++){
+    var x=MILES[m];
+    if(before<x.n&&after>=x.n){
+      pushCel({icon:x.n===TOTAL?"♕":"✦",t:x.t,
+        s:after+" / "+TOTAL+"장을 읽었어요.",b:x.b,r:x.r});
+    }
+  }
+  var obT=countRange(me,0,OT_TOTAL);
+  if(obT===OT_TOTAL&&before<after&&lastOT!==OT_TOTAL)
+    pushCel({icon:"✵",t:"구약 39권 완독",s:OT_TOTAL+"장을 모두 읽었어요.",
+      b:"긴 길을 끝까지 걸어오셨어요. 그 수고를 하나님이 아십니다.",r:"시편 126:5"});
+  var nbT=countRange(me,OT_TOTAL,TOTAL);
+  if(nbT===NT_TOTAL&&before<after&&lastNT!==NT_TOTAL)
+    pushCel({icon:"✵",t:"신약 27권 완독",s:NT_TOTAL+"장을 모두 읽었어요.",
+      b:"끝까지 읽어 내신 그 마음에 기쁨이 가득하기를.",r:"요한복음 20:31"});
+  lastOT=obT;lastNT=nbT;
+}
+var lastOT=0,lastNT=0;
+
+/* 모은 책 뱃지 선반 */
+function renderShelf(){
+  var got=[];
+  for(var bi=0;bi<BOOKS.length;bi++)if(bookDone(bi)===BOOKS[bi][1])got.push(bi);
+  $("shelfCnt").textContent=got.length?"  "+got.length+" / 66권":"";
+  $("shelfNone").hidden=got.length>0;
+  $("medals").innerHTML=got.map(function(bi){
+    return '<span class="medal">'+BOOKS[bi][0]+'</span>';
+  }).join("");
+}
 
 /* ── 조작 ─────────────────────────────── */
 document.addEventListener("click",function(ev){
@@ -360,19 +548,34 @@ document.addEventListener("click",function(ev){
     return;
   }
   if(act==="chip"){
-    var idx=+el.dataset.i;
+    var idx=+el.dataset.i, bi2=bookOf(idx);
+    var before=countRange(me,0,TOTAL), wasFull=bookDone(bi2)===BOOKS[bi2][1];
     me[idx]=me[idx]?0:1;
     save();
-    var bi2=bookOf(idx);
     repaintBook(bi2);
-    renderSummary();
+    renderSummary();renderShelf();
+    var after=countRange(me,0,TOTAL);
+    if(me[idx]){
+      sparkle(document.querySelector('.chip[data-i="'+idx+'"]'));
+      var nowFull=bookDone(bi2)===BOOKS[bi2][1];
+      checkMilestones(before,after,(!wasFull&&nowFull)?[bi2]:[]);
+    }else{
+      lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
+    }
     return;
   }
   if(act==="all"){
     var b3=+el.dataset.b, t=BOOKS[b3][1], base=OFF[b3];
-    var fill=bookDone(b3)!==t?1:0;
+    var before2=countRange(me,0,TOTAL), wasFull2=bookDone(b3)===t;
+    var fill=wasFull2?0:1;
     for(var c=0;c<t;c++)me[base+c]=fill;
-    save();repaintBook(b3);renderSummary();
+    save();repaintBook(b3);renderSummary();renderShelf();
+    var after2=countRange(me,0,TOTAL);
+    if(fill){
+      checkMilestones(before2,after2,wasFull2?[]:[b3]);
+    }else{
+      lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
+    }
     return;
   }
 });
@@ -444,6 +647,9 @@ $("btnCmp").addEventListener("click",function(){compare=!compare;renderAll()});
 
 /* ── 시작 ─────────────────────────────── */
 load();
+/* 이미 읽어 둔 만큼은 축하가 다시 뜨지 않게 기준을 맞춰 둔다 */
+lastOT=countRange(me,0,OT_TOTAL);
+lastNT=countRange(me,OT_TOTAL,TOTAL);
 /* 링크로 열렸으면 그 진도를 친구 것으로 본다 (내 체크는 건드리지 않는다) */
 var fromLink=parseCode(location.hash);
 if(fromLink){
