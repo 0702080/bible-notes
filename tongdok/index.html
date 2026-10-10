@@ -88,35 +88,21 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 /* 동그라미 */
 .chip::before{
   content:"";position:absolute;left:50%;top:50%;width:var(--d);aspect-ratio:1/1;transform:translate(-50%,-50%);
-  border-radius:50%;border:2px solid var(--blank);z-index:-1;transition:border-color .15s;
+  border-radius:50%;border:1px solid color-mix(in srgb,var(--blank) 70%,var(--rule));background:color-mix(in srgb,var(--blank) 55%,transparent);z-index:-1;transition:background .15s,box-shadow .2s;
 }
 .chip:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
 .chip[data-s]{color:var(--ink);font-weight:700}
-/* 읽은 장은 동그라미를 색으로 채운다 */
 /* 휴대폰에서는 칸이 좁아 동그라미를 조금 작게 */
 @media (max-width:520px){.chip{--d:76%;font-size:12.5px}.ring{transform-origin:center;width:34px!important;height:34px!important;margin:-17px 0 0 -17px!important}}
-/* 읽은 장: 아쿠아 스타일 젤 구슬. 위는 밝고 아래로 진해지며,
-   아래쪽에 빛이 고이고 위에는 유리 같은 반사광(::after)이 얹힌다 */
-.chip[data-s="me"]{--c1:#FFF0B0;--c2:#F5CD45;--c3:#DCA623;color:#4A3500}
-.chip[data-s="me"][data-five]{--c1:#FFD3A6;--c2:#F39A4A;--c3:#D27428;color:#fff}
-.chip[data-s="both"]{--c1:#B5EEC7;--c2:#4DB574;--c3:#2E8752;color:#fff}
+/* 읽은 장: 반짝이 없이 납작하게 채운 동그라미. 바탕과 살짝 떨어진
+   가는 바깥 고리를 둘러 단정한 메달처럼 보이게 한다 */
+.chip[data-s="me"]{--c:#F2C94C;color:#3A2A00}
+.chip[data-s="me"][data-five]{--c:#F2994A;color:#3A1C00}
+.chip[data-s="both"]{--c:#5CC08A;color:#0E2E1C}
 .chip[data-s="me"]::before,.chip[data-s="both"]::before{
-  border:1px solid color-mix(in srgb,var(--c3) 60%,transparent);
-  background:
-    radial-gradient(ellipse 70% 45% at 50% 100%,color-mix(in srgb,var(--c1) 85%,#fff),transparent 70%),
-    linear-gradient(180deg,var(--c1),var(--c2) 60%,var(--c3));
-  box-shadow:0 1px 4px color-mix(in srgb,var(--c3) 28%,transparent),inset 0 -1px 2px rgba(255,255,255,.45);
+  border:0;background:var(--c);
+  box-shadow:0 0 0 2px var(--sheet),0 0 0 3.5px color-mix(in srgb,var(--c) 45%,transparent),0 3px 10px color-mix(in srgb,var(--c) 22%,transparent);
 }
-.chip[data-s="me"][data-five],.chip[data-s="both"]{text-shadow:0 1px 1px color-mix(in srgb,var(--c3) 70%,transparent)}
-.chip[data-s="me"]{text-shadow:0 1px 0 rgba(255,255,255,.55)}
-.chip[data-s="me"]::after,.chip[data-s="both"]::after{
-  content:"";position:absolute;left:50%;top:50%;z-index:-1;pointer-events:none;
-  width:calc(var(--d)*.66);height:calc(var(--d)*.4);
-  transform:translate(-50%,-102%);border-radius:50% 50% 45% 45%/60% 60% 40% 40%;
-  background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0));
-}
-.chip.got::after,.chip.got5::after{animation:gloss .42s ease-out}
-@keyframes gloss{from{opacity:0}to{opacity:1}}
 .chip[data-s="friend"]::before{border:2px dashed var(--sky)}
 .chip[data-s="friend"]{color:var(--sky)}
 /* 얻는 순간 동그라미가 톡 튀어 오른다 */
