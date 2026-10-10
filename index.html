@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-59">
+<meta name="app-build" content="2026-10-10-60">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1404,6 +1404,33 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 /* 언제 쓸까 panel: the button already says it */
 .usepanel .uhd{display:none}
 .usepanel .uform{margin-top:0}
+/* PC 칸반 보드 */
+#boardBtn{display:none}
+@media (min-width:900px){#boardBtn{display:inline-flex}}
+body.boardon .wrap{max-width:1280px}
+body.boardon #list,body.boardon #reviewBar{display:none!important}
+.board4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start;margin-top:8px}
+.board4[hidden]{display:none}
+.bcol{background:#141417;border:1px solid #24232A;border-radius:16px;padding:10px;min-height:200px}
+.bch{display:flex;align-items:center;gap:8px;padding:4px 6px 10px;color:var(--bc);font-size:14.5px}
+.bch b{font-weight:400;-webkit-text-stroke:.35px currentColor}
+.bcn{margin-left:auto;min-width:24px;height:22px;padding:0 7px;border-radius:11px;background:color-mix(in srgb,var(--bc) 18%,transparent);color:var(--bc);font-size:12.5px;line-height:22px;text-align:center}
+.bclist{display:flex;flex-direction:column;gap:8px}
+.bcempty{margin:10px 6px;font-size:13px;color:var(--faint)}
+.bcard{position:relative;padding:11px 12px 10px 14px;border:1px solid color-mix(in srgb,var(--tc) 22%,#2A2930);border-radius:12px;cursor:pointer;
+  background:linear-gradient(165deg,color-mix(in srgb,var(--tc) 8%,#1E1C1F),#18171B);transition:transform .15s,border-color .15s,box-shadow .15s;animation:bwenter .35s cubic-bezier(.2,1.2,.4,1) both}
+.bcard::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--tc)}
+@media (hover:hover){.bcard:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--tc) 50%,#2A2930);box-shadow:0 10px 24px rgba(0,0,0,.45)}}
+.bcref{display:flex;align-items:center;gap:6px;color:var(--violet);font-size:13.5px}
+.bcref b{font-weight:400;-webkit-text-stroke:.3px currentColor}
+.bcpin{margin-left:auto;font-size:11px}
+.bctext{margin:6px 0 8px;font-size:14px;line-height:1.6;color:#E8C3A0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+.bcfoot{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint)}
+.bcst{letter-spacing:1px}
+.bcnx{margin-left:auto}
+.bcgo{margin-top:8px;width:100%;height:32px;border:1px solid color-mix(in srgb,var(--gold) 45%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--gold) 10%,transparent);color:var(--gold);font-size:13px;opacity:0;transition:opacity .15s}
+.bcard:hover .bcgo,.bcard:focus-within .bcgo{opacity:1}
+@media (hover:none){.bcgo{opacity:1}}
 .act textarea.at{font-size:14px}   /* 실천 제목 조금 작게 */
 .act>.agrip,.act>.chk,.act>.afold,.act>textarea.at{align-self:center}   /* 제목이 두 줄이어도 네모·손잡이·화살표가 제목 가운데에 */
 .uform{border:0;padding:0}   /* 점선 테두리 없애기 */
@@ -2019,6 +2046,7 @@ button:active{filter:brightness(1.15)}
 
   <div class="toolbar">
     <h2>담은 말씀 <span id="count" style="color:var(--muted);font-size:15px;font-family:var(--sans);font-weight:400"></span></h2>
+    <button class="tbtn" id="boardBtn" type="button" aria-pressed="false" title="칸반 보드로 보기 (PC)">📋 보드</button>
     <button class="tbtn" id="sortBtn" type="button" aria-label="정렬 바꾸기">최근순</button>
     
     <button class="tbtn" id="filterBtn" type="button" aria-label="노트에서 찾기" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
@@ -2044,6 +2072,7 @@ button:active{filter:brightness(1.15)}
   <div class="reviewbar" id="reviewBar" hidden></div>
   <input class="filter" id="filter" type="search" placeholder="노트에서 찾기 (초성도 돼요: ㅅㅁ)" aria-label="노트에서 찾기" hidden>
   <div id="list"></div>
+  <div id="board" class="board4" hidden></div>
   <input type="file" id="hymnFile" accept="image/*" hidden>
   <div class="empty" id="empty" hidden><p id="emptyMsg"></p><button type="button" class="primary" id="emptyAdd">첫 말씀 담기</button></div>
 </main>
@@ -2287,6 +2316,60 @@ button:active{filter:brightness(1.15)}
   }
 
   /* ---------- rendering ---------- */
+  /* ---------- PC 칸반 보드: 암송 단계별로 한눈에 (새로 담음 → 외우는 중 → 복습할 차례 → 다 외움) ---------- */
+  var boardOn=false; try{boardOn=localStorage.getItem("bible-view")==="board"}catch(e){}
+  var BCOLS=[{k:"new",t:"새로 담음",e:"🌱",c:"var(--muted)",tip:"아직 암송을 시작하지 않은 말씀"},{k:"doing",t:"외우는 중",e:"✏️",c:"var(--sky)",tip:"도장을 모으는 중"},{k:"due",t:"복습할 차례",e:"🔁",c:"var(--gold)",tip:"오늘 다시 떠올릴 말씀"},{k:"done",t:"다 외움",e:"🏅",c:"var(--green)",tip:"도장 4개를 다 받은 말씀"}];
+  function boardCol(n){
+    var c=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
+    if(ri&&ri.due&&c>0)return "due";
+    if(c>=4)return "done";
+    return c>0?"doing":"new";
+  }
+  function boardWide(){return window.matchMedia&&matchMedia("(min-width:900px)").matches}
+  function setBoard(on){
+    boardOn=!!on; try{localStorage.setItem("bible-view",boardOn?"board":"list")}catch(e){}
+    applyBoard(); render(); window.scrollTo(0,0);
+  }
+  function applyBoard(){
+    var on=boardOn&&boardWide();
+    document.body.classList.toggle("boardon",on);
+    $("board").hidden=!on; var bb=$("boardBtn"); bb.setAttribute("aria-pressed",String(on)); bb.textContent=on?"☰ 목록":"📋 보드";
+  }
+  function renderKanban(){
+    var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
+    box.textContent="";
+    var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
+    sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
+    BCOLS.forEach(function(col){
+      var cl=document.createElement("section"); cl.className="bcol"; cl.style.setProperty("--bc",col.c);
+      var h=document.createElement("div"); h.className="bch"; h.title=col.tip;
+      h.innerHTML='<span class="bce"></span><b></b><span class="bcn"></span>';
+      h.querySelector(".bce").textContent=col.e; h.querySelector("b").textContent=col.t; h.querySelector(".bcn").textContent=groups[col.k].length;
+      cl.appendChild(h);
+      var lst=document.createElement("div"); lst.className="bclist";
+      if(!groups[col.k].length){var em=document.createElement("p");em.className="bcempty";em.textContent=col.k==="due"?"오늘 복습할 말씀이 없어요 🙂":"비어 있어요";lst.appendChild(em)}
+      groups[col.k].forEach(function(n,i){
+        var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0;
+        var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)"); cd.style.animationDelay=(i*30)+"ms";
+        var mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
+        cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
+          '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div>'+
+          '<button type="button" class="bcgo"></button>';
+        cd.querySelector(".bcref b").textContent=n.ref||"구절 미입력";
+        cd.querySelector(".bctext").textContent=String(n.text||"").replace(/\s+/g," ").trim();
+        cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
+        if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
+        cd.querySelector(".bcgo").textContent=col.k==="due"?"🔁 복습하기":col.k==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
+        lst.appendChild(cd);
+      });
+      cl.appendChild(lst); box.appendChild(cl);
+    });
+  }
+  function boardOpen(id){   // 보드에서 카드를 누르면: 목록으로 돌아가 그 카드를 펼침
+    setBoard(false); setTopics([]); openIds.clear(); openIds.add(id); try{localStorage.setItem("bible-last-open",id)}catch(e){}
+    spotId=id; render();
+    var c=cards.get(id); if(c)setTimeout(function(){c.scrollIntoView({block:"start",behavior:"smooth"})},80);
+  }
   function sorted(){
     var all=Array.from(notes.values());
     var pins=all.filter(function(n){return n.pinned});
@@ -2843,6 +2926,7 @@ button:active{filter:brightness(1.15)}
       var vis=visibleNote(n); el.hidden=!vis; if(vis)shown++;
       if(list.children[i]!==el)list.insertBefore(el,list.children[i]||null);
     });
+    if(boardOn)renderKanban();
     $("count").textContent=!notes.size?"":((filterText||topicSel.length)?shown+" / "+notes.size+"개":notes.size+"개");
     $("empty").hidden=notes.size>0;
     if(notes.size&&!shown){$("empty").hidden=false;$("emptyMsg").textContent="\u201C"+filterText+"\u201D이(가) 들어 있는 노트가 없어요.";$("emptyAdd").hidden=true}
@@ -7249,6 +7333,15 @@ button:active{filter:brightness(1.15)}
     }
   }
   $("sbBtn").addEventListener("click",function(){$("topMenu").open=false;openSb()});
+  $("boardBtn").addEventListener("click",function(){setBoard(!(boardOn&&boardWide()))});
+  $("board").addEventListener("click",function(e){
+    var cd=e.target.closest(".bcard"); if(!cd)return; var n=notes.get(cd.dataset.id); if(!n)return;
+    if(e.target.closest(".bcgo")){openCoach(n);return}
+    boardOpen(n.id);
+  });
+  $("board").addEventListener("keydown",function(e){if(e.key==="Enter"){var cd=e.target.closest(".bcard");if(cd)boardOpen(cd.dataset.id)}});
+  window.addEventListener("resize",function(){var was=document.body.classList.contains("boardon");applyBoard();if(was!==document.body.classList.contains("boardon"))render()});
+  applyBoard();
 
   /* ---------- 구글 캘린더로 암송 알림 ----------
      구글 캘린더 '일정 추가' 주소에 말씀을 담아 매일 반복 일정으로 넣음. 일정의 링크를 누르면 이 앱에서 그 말씀 암송이 열림 */
