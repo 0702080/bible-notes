@@ -75,8 +75,17 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .bk-h{display:flex;align-items:baseline;gap:8px;padding:0 2px 7px}
 .bk-name{font-size:16px;font-weight:700}
 .bk-cnt{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-.bk.full .bk-name{color:var(--green)}
-.bk.full .bk-name::after{content:" ✓"}
+/* 책 이름은 갈래마다 다른 색 (율법서, 역사서, 시가서, 선지서, 복음서, 서신서…) */
+.bk[data-g="law"] .bk-name{color:#F5B971}
+.bk[data-g="hist"] .bk-name{color:#7EC8E3}
+.bk[data-g="poem"] .bk-name{color:#B9A2F0}
+.bk[data-g="major"] .bk-name{color:#F28CA6}
+.bk[data-g="minor"] .bk-name{color:#8FD6B4}
+.bk[data-g="gospel"] .bk-name{color:#FFD27A}
+.bk[data-g="paul"] .bk-name{color:#A7B8F5}
+.bk[data-g="general"] .bk-name{color:#F7A98B}
+.bk[data-g="rev"] .bk-name{color:#E99BD0}
+.bk.full .bk-name::after{content:" ✓";color:var(--green)}
 .bk-all{margin-left:auto;font-size:12px;color:var(--muted);background:none;border:0;padding:2px;cursor:pointer;text-decoration:underline}
 .chips{display:grid;grid-template-columns:repeat(10,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
 .chips>span{background:var(--sheet)}   /* 마지막 줄 빈칸 */
@@ -389,11 +398,16 @@ function chipState(idx){
   if(b)return "friend";
   return "";
 }
+/* 책 갈래: 색으로 구분하려고 쓴다 */
+function bookGroup(bi){
+  if(bi<5)return "law"; if(bi<17)return "hist"; if(bi<22)return "poem"; if(bi<27)return "major"; if(bi<39)return "minor";
+  if(bi<43)return "gospel"; if(bi===43)return "hist"; if(bi<57)return "paul"; if(bi<65)return "general"; return "rev";
+}
 function renderBooks(){
   var html=["",""];
   for(var bi=0;bi<BOOKS.length;bi++){
     var name=BOOKS[bi][0], total=BOOKS[bi][1], done=bookDone(bi);
-    var h='<section class="bk'+(done===total?" full":"")+'" data-b="'+bi+'">'
+    var h='<section class="bk'+(done===total?" full":"")+'" data-b="'+bi+'" data-g="'+bookGroup(bi)+'">'
       +'<div class="bk-h"><span class="bk-name">'+name+'</span>'
       +'<span class="bk-cnt">'+done+' / '+total+'</span>'
       +'<button class="bk-all" type="button" data-act="all" data-b="'+bi+'">'+(done===total?"전체 지우기":"전체 읽음")+'</button></div>'
