@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-60">
+<meta name="app-build" content="2026-10-10-61">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1405,8 +1405,17 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 .usepanel .uhd{display:none}
 .usepanel .uform{margin-top:0}
 /* PC 칸반 보드 */
-#boardBtn{display:none}
-@media (min-width:900px){#boardBtn{display:inline-flex}}
+/* PC: 목록 / 칸반 보드 바꾸기 (두 칸 스위치), 상단 말씀 담기 */
+.viewseg,.tadd{display:none}
+@media (min-width:900px){
+  .viewseg{display:inline-flex;padding:3px;gap:2px;border:1px solid var(--rule);border-radius:19px;background:rgba(255,255,255,.03)}
+  .viewseg button{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 13px;border:0;border-radius:15px;background:transparent;color:var(--muted);font-size:13.5px;transition:background .2s,color .2s}
+  .viewseg button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+  .viewseg button[aria-pressed="true"]{background:var(--violet);color:#141416;-webkit-text-stroke:.3px currentColor}
+  @media (hover:hover){.viewseg button[aria-pressed="false"]:hover{color:var(--ink);background:#22212A}}
+  .tadd{display:inline-flex;align-items:center;border-color:color-mix(in srgb,var(--gold) 55%,var(--rule));background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);-webkit-text-stroke:.3px currentColor}
+  .fab{display:none!important}
+}
 body.boardon .wrap{max-width:1280px}
 body.boardon #list,body.boardon #reviewBar{display:none!important}
 .board4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:start;margin-top:8px}
@@ -2046,7 +2055,8 @@ button:active{filter:brightness(1.15)}
 
   <div class="toolbar">
     <h2>담은 말씀 <span id="count" style="color:var(--muted);font-size:15px;font-family:var(--sans);font-weight:400"></span></h2>
-    <button class="tbtn" id="boardBtn" type="button" aria-pressed="false" title="칸반 보드로 보기 (PC)">📋 보드</button>
+    <button class="tbtn tadd" id="topAdd" type="button">＋ 말씀 담기</button>
+    <div class="viewseg" id="viewSeg" role="group" aria-label="보기 방식"><button type="button" data-v="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>목록</button><button type="button" data-v="board" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="4.5" height="16" rx="1.2"/><rect x="9.75" y="4" width="4.5" height="11" rx="1.2"/><rect x="16" y="4" width="4.5" height="13.5" rx="1.2"/></svg>칸반 보드</button></div>
     <button class="tbtn" id="sortBtn" type="button" aria-label="정렬 바꾸기">최근순</button>
     
     <button class="tbtn" id="filterBtn" type="button" aria-label="노트에서 찾기" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
@@ -2333,7 +2343,8 @@ button:active{filter:brightness(1.15)}
   function applyBoard(){
     var on=boardOn&&boardWide();
     document.body.classList.toggle("boardon",on);
-    $("board").hidden=!on; var bb=$("boardBtn"); bb.setAttribute("aria-pressed",String(on)); bb.textContent=on?"☰ 목록":"📋 보드";
+    $("board").hidden=!on;
+    $("viewSeg").querySelectorAll("button").forEach(function(b){b.setAttribute("aria-pressed",String((b.dataset.v==="board")===on))});
   }
   function renderKanban(){
     var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
@@ -7333,7 +7344,8 @@ button:active{filter:brightness(1.15)}
     }
   }
   $("sbBtn").addEventListener("click",function(){$("topMenu").open=false;openSb()});
-  $("boardBtn").addEventListener("click",function(){setBoard(!(boardOn&&boardWide()))});
+  $("viewSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var want=b.dataset.v==="board";if(want!==(boardOn&&boardWide()))setBoard(want)});
+  $("topAdd").addEventListener("click",function(){$("fab").click()});
   $("board").addEventListener("click",function(e){
     var cd=e.target.closest(".bcard"); if(!cd)return; var n=notes.get(cd.dataset.id); if(!n)return;
     if(e.target.closest(".bcgo")){openCoach(n);return}
