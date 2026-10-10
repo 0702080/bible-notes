@@ -106,11 +106,28 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .chip:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
 .chip[data-s]{color:var(--ink);font-weight:700}
 /* 읽은 장은 동그라미를 색으로 채운다 */
-.chip[data-s="me"]::before{border:3px solid var(--ring);background:var(--ring)}
-.chip[data-s="me"]{color:#2A2622}
-.chip[data-s="me"][data-five]::before{border-color:var(--ring5);background:var(--ring5)}
-.chip[data-s="me"][data-five],.chip[data-s="both"]{color:#fff}
-.chip[data-s="both"]::before{border:3px solid var(--green);background:var(--green)}
+/* 읽은 장: 아쿠아 스타일 젤 구슬. 위는 밝고 아래로 진해지며,
+   아래쪽에 빛이 고이고 위에는 유리 같은 반사광(::after)이 얹힌다 */
+.chip[data-s="me"]{--c1:#FFE98F;--c2:#F2C21B;--c3:#C98C00;color:#4A3500}
+.chip[data-s="me"][data-five]{--c1:#FFC88A;--c2:#F08A24;--c3:#B95500;color:#fff}
+.chip[data-s="both"]{--c1:#9EEAB6;--c2:#2FA25A;--c3:#17663A;color:#fff}
+.chip[data-s="me"]::before,.chip[data-s="both"]::before{
+  border:1px solid var(--c3);
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 100%,color-mix(in srgb,var(--c1) 85%,#fff),transparent 70%),
+    linear-gradient(180deg,var(--c1),var(--c2) 55%,var(--c3));
+  box-shadow:0 2px 4px color-mix(in srgb,var(--c3) 45%,transparent),inset 0 -1px 2px rgba(255,255,255,.5),inset 0 1px 1px color-mix(in srgb,var(--c3) 40%,transparent);
+}
+.chip[data-s="me"][data-five],.chip[data-s="both"]{text-shadow:0 1px 1px color-mix(in srgb,var(--c3) 80%,#000)}
+.chip[data-s="me"]{text-shadow:0 1px 0 rgba(255,255,255,.55)}
+.chip[data-s="me"]::after,.chip[data-s="both"]::after{
+  content:"";position:absolute;left:50%;top:50%;z-index:-1;pointer-events:none;
+  width:calc(min(44px,90%)*.66);height:calc(min(44px,90%)*.4);
+  transform:translate(-50%,-102%);border-radius:50% 50% 45% 45%/60% 60% 40% 40%;
+  background:linear-gradient(180deg,rgba(255,255,255,.92),rgba(255,255,255,.12));
+}
+.chip.got::after,.chip.got5::after{animation:gloss .42s ease-out}
+@keyframes gloss{from{opacity:0}to{opacity:1}}
 .chip[data-s="friend"]::before{border:2px dashed var(--sky)}
 .chip[data-s="friend"]{color:var(--sky)}
 /* 얻는 순간 동그라미가 톡 튀어 오른다 */
