@@ -119,39 +119,39 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 
 /* 다섯 장째 뱃지. 튀어나오는 장식 대신 숫자 뒤에 은은한 꽃무늬를 깔고
    금빛 테두리를 둘러 조용히 특별해 보이게 한다. */
+/* 같은 보라 계열인데 분홍빛이 살짝 섞여 톤이 다르다. 꽃무늬는 아주 옅게
+   깔아 무늬가 아니라 윤기처럼만 보이게 한다. */
 .chip[data-s="me"][data-five]{
+  --five:color-mix(in srgb,var(--violet) 74%,var(--pink));
   background:
-    radial-gradient(circle at 50% 27%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 71% 46%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 63% 72%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 37% 72%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 29% 46%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 50% 52%, rgba(255,222,150,.55) 0 11%, transparent 12%),
-    linear-gradient(150deg,color-mix(in srgb,var(--violet) 80%,#fff),var(--violet) 52%,color-mix(in srgb,var(--violet) 55%,#000));
-  box-shadow:0 2px 9px color-mix(in srgb,var(--violet) 46%,transparent),
-             inset 0 0 0 1.5px rgba(255,211,107,.9),
+    radial-gradient(circle at 50% 28%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    radial-gradient(circle at 71% 47%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    radial-gradient(circle at 63% 73%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    radial-gradient(circle at 37% 73%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    radial-gradient(circle at 29% 47%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    linear-gradient(150deg,color-mix(in srgb,var(--five) 86%,#fff),var(--five) 54%,color-mix(in srgb,var(--five) 58%,#000));
+  box-shadow:0 2px 8px color-mix(in srgb,var(--five) 45%,transparent),
              inset 0 -2px 4px rgba(0,0,0,.18);
 }
 .chip[data-s="both"][data-five]{
+  --five:color-mix(in srgb,var(--green) 78%,var(--sky));
   background:
-    radial-gradient(circle at 50% 27%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 71% 46%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 63% 72%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 37% 72%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 29% 46%, rgba(255,255,255,.26) 0 15%, transparent 16%),
-    radial-gradient(circle at 50% 52%, rgba(255,222,150,.55) 0 11%, transparent 12%),
-    linear-gradient(150deg,color-mix(in srgb,var(--green) 80%,#fff),var(--green) 52%,color-mix(in srgb,var(--green) 55%,#000));
-  box-shadow:0 2px 9px color-mix(in srgb,var(--green) 46%,transparent),
-             inset 0 0 0 1.5px rgba(255,211,107,.9),
+    radial-gradient(circle at 50% 28%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    radial-gradient(circle at 71% 47%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    radial-gradient(circle at 63% 73%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    radial-gradient(circle at 37% 73%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    radial-gradient(circle at 29% 47%, rgba(255,255,255,.11) 0 15%, transparent 16%),
+    linear-gradient(150deg,color-mix(in srgb,var(--five) 86%,#fff),var(--five) 54%,color-mix(in srgb,var(--five) 58%,#000));
+  box-shadow:0 2px 8px color-mix(in srgb,var(--five) 45%,transparent),
              inset 0 -2px 4px rgba(0,0,0,.18);
 }
-/* 아직 안 읽은 다섯 장째는 테두리만 살짝 금빛으로 귀띔 */
-.chip:not([data-s])[data-five]{border-color:color-mix(in srgb,#FFD36B 45%,var(--rule))}
-/* 다섯 장째를 막 얻은 순간, 금빛 테두리가 한 번 번진다 */
-.chip.got5{animation:pop .42s cubic-bezier(.26,1.4,.4,1),glow .9s ease-out .1s}
+/* 아직 안 읽은 다섯 장째는 테두리만 아주 살짝 보랏빛 */
+.chip:not([data-s])[data-five]{border-color:color-mix(in srgb,var(--violet) 32%,var(--rule))}
+/* 얻는 순간은 같은 보라빛으로 한 번 번진다 */
+.chip.got5{animation:pop .42s cubic-bezier(.26,1.4,.4,1),glow .85s ease-out .1s}
 @keyframes glow{
-  0%{box-shadow:0 0 0 0 rgba(255,211,107,.85),inset 0 0 0 1.5px rgba(255,211,107,.9)}
-  100%{box-shadow:0 0 0 12px rgba(255,211,107,0),inset 0 0 0 1.5px rgba(255,211,107,.9)}
+  from{box-shadow:0 0 0 0 color-mix(in srgb,var(--violet) 65%,transparent)}
+  to{box-shadow:0 0 0 13px transparent}
 }
 
 /* 5장마다 뜨는 작은 격려 띠 */
