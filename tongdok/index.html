@@ -111,6 +111,13 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   border:0;background:var(--c);
   box-shadow:none;
 }
+/* 5, 10, 15… 장째: 번호 뒤에 꽃을 은은하게 깔아 둔다 */
+.chip[data-five]::after{
+  content:"🌸";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-12deg);
+  font-size:28px;line-height:1;opacity:.28;z-index:-1;pointer-events:none;filter:saturate(.8);
+}
+.chip[data-s][data-five]::after{opacity:.38;filter:saturate(.7) brightness(1.15)}
+@media (max-width:520px){.chip[data-five]::after{font-size:19px}}
 .chip[data-s="friend"]::before{border:2px dashed var(--sky)}
 .chip[data-s="friend"]{color:var(--sky)}
 /* 얻는 순간 동그라미가 톡 튀어 오른다 */
