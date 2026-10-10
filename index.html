@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-30">
+<meta name="app-build" content="2026-10-10-31">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6723,17 +6723,49 @@ button:active{filter:brightness(1.15)}
           Object.keys(obj.daily.days||{}).forEach(function(k){var a=od.days[k]||[];(obj.daily.days[k]||[]).forEach(function(id){if(a.indexOf(id)<0)a.push(id)});od.days[k]=a});
           saveDaily(od); renderReviewBar()}
         if(obj&&obj.chapters&&typeof obj.chapters==="object"){var mc=myChapters();Object.keys(obj.chapters).forEach(function(k){var c=obj.chapters[k];if(c&&Array.isArray(c.v)&&(!mc[k]||(+c.at||0)>(+mc[k].at||0)))mc[k]=c});try{localStorage.setItem(MYCH,JSON.stringify(mc))}catch(e){}}
-        var added=0, updated=0;
+        var added=0, updated=0, repush=[];
         arr.forEach(function(x){
           if(!x||!x.id||!x.text)return;
           var n=cleanNote(x), cur=notes.get(n.id);
           if(tomb[n.id]&&(n.updatedAt||0)<=tomb[n.id])return;
-          if(!cur){notes.set(n.id,n);added++;scheduleSave(n.id,0,true)}
-          else if((n.updatedAt||0)>(cur.updatedAt||0)){notes.set(n.id,n);updated++;scheduleSave(n.id,0,true)}
+          if(!cur){notes.set(n.id,n);added++;scheduleSave(n.id,0,true);return}
+          var curC=cleanNote(cur), incNewer=(n.updatedAt||0)>(curC.updatedAt||0);
+          var m=mergeNote(incNewer?curC:n, incNewer?n:curC), mj=JSON.stringify(m);
+          if(mj!==JSON.stringify(curC)){notes.set(n.id,m);updated++;scheduleSave(n.id,0,true)}
+          if(mj!==JSON.stringify(n))repush.push(n.id);   // 받은 것보다 합친 것이 더 많으면 다시 올림
         });
+        if(repush.length&&typeof sbSession==="function"&&sbSession()){setTimeout(function(){repush.forEach(function(id){sbDirty.add(id)});sbSaveDirty();clearTimeout(sbTimer);sbTimer=setTimeout(function(){sbSync("auto")},1500)},0)}
         return {added:added,updated:updated,removed:removed};
   }
 
+  // 두 기기의 같은 말씀 합치기: 글자·설정은 더 최근 것, 목록(묵상·기도·실천·질문·경험·연결)은 id로 모두 모음
+  function unionBy(older,newer,key,mergeItem){
+    var out=[], at={};
+    (newer||[]).forEach(function(x){var k=key(x);at[k]=out.length;out.push(x)});
+    (older||[]).forEach(function(x){var k=key(x);if(!(k in at)){at[k]=out.length;out.push(x)}else if(mergeItem)out[at[k]]=mergeItem(x,out[at[k]])});
+    return out;
+  }
+  function mergeNote(older,newer){
+    var m=JSON.parse(JSON.stringify(newer)), id=function(x){return x&&x.id};
+    m.meds=unionBy(older.meds,newer.meds,id,function(o,nw){return {id:nw.id,text:nw.text||o.text,at:nw.at||o.at,thx:nw.thx||o.thx||"",todo:nw.todo||o.todo||"",tact:nw.tact||o.tact||"",o:nw.o!=null?nw.o:o.o}});
+    m.prays=unionBy(older.prays,newer.prays,id);
+    m.qs=unionBy(older.qs,newer.qs,id);
+    m.essays=unionBy(older.essays,newer.essays,id);
+    m.links=unionBy(older.links,newer.links,id);
+    m.vids=unionBy(older.vids,newer.vids,id);
+    m.acts=unionBy(older.acts,newer.acts,id,function(o,nw){
+      var a=JSON.parse(JSON.stringify(nw));
+      a.logs=unionBy(o.logs,nw.logs,function(l){return l.id}).sort(function(x,y){return (x.at||0)-(y.at||0)});
+      a.stamps=(nw.stamps||[]).concat((o.stamps||[]).filter(function(d){return (nw.stamps||[]).indexOf(d)<0})).sort();
+      if(o.done&&!a.done){a.done=true;a.doneAt=o.doneAt}
+      return a;
+    });
+    if(older.mem&&newer.mem&&Array.isArray(older.mem.s)){m.mem={s:(newer.mem.s||[0,0,0,0]).map(function(t,i){return t||older.mem.s[i]||0})}}
+    if((older.drill||[]).length){var seen={};m.drill=(newer.drill||[]).concat(older.drill).filter(function(d){var k=d.at+"|"+d.b;if(seen[k])return false;seen[k]=1;return true}).sort(function(a,b){return a.at-b.at}).slice(-300)}
+    m.topics=(newer.topics||[]).concat((older.topics||[]).filter(function(t){return (newer.topics||[]).indexOf(t)<0}));
+    m.updatedAt=Math.max(older.updatedAt||0,newer.updatedAt||0);
+    return cleanNote(m);
+  }
   /* ---------- GitHub 동기화: 내 (비공개) 저장소의 JSON 파일 하나로 여러 브라우저·기기를 맞춤 ---------- */
   var TOMB_KEY="bible-notes-deleted", GH_KEY="bible-gh-sync";
   function tombs(){try{var o=JSON.parse(localStorage.getItem(TOMB_KEY)||"{}");return o&&typeof o==="object"?o:{}}catch(e){return {}}}
@@ -6896,14 +6928,17 @@ button:active{filter:brightness(1.15)}
     return {msg:what+" ("+r.status+(detail?": "+detail:"")+")",short:what+" "+r.status};
   }
   function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");try{localStorage.removeItem(SB_LAST)}catch(e){}}
-  function sbMark(id){if(sbApplying||!sbSession())return; sbDirty.add(id); clearTimeout(sbTimer); sbTimer=setTimeout(function(){sbSync("auto")},1500)}
+  var SB_DIRTY="bible-sb-dirty";
+  try{(JSON.parse(localStorage.getItem(SB_DIRTY)||"[]")||[]).forEach(function(id){sbDirty.add(String(id))})}catch(e){}
+  function sbSaveDirty(){try{if(sbDirty.size)localStorage.setItem(SB_DIRTY,JSON.stringify(Array.from(sbDirty)));else localStorage.removeItem(SB_DIRTY)}catch(e){}}
+  function sbMark(id){if(sbApplying||!sbSession())return; sbDirty.add(id); sbSaveDirty(); clearTimeout(sbTimer); sbTimer=setTimeout(function(){sbSync("auto")},1500)}
   async function sbSync(why){
     if(!sbSession())return false;
     if(typeof backend==="undefined"||!backend){setTimeout(function(){sbSync(why)},500);return false}   // 노트를 다 불러온 뒤에
     if(sbBusy){sbAgain=true;return false}
     if(!navigator.onLine){sbState={ok:false,at:sbState.at,msg:"인터넷에 연결되면 다시 맞춰요"};return false}
     sbBusy=true; if(why==="manual")renderReviewBar();
-    var ids=Array.from(sbDirty); sbDirty.clear();
+    var ids=Array.from(sbDirty); sbDirty.clear();   // 저장된 목록은 성공한 뒤에 지움
     try{
       var tok=await sbToken(); if(!tok)throw {msg:sbTokErr||"다시 로그인해 주세요",short:sbTokErr?"로그인 갱신 실패":"다시 로그인"};
       var uid=sbSession().user.id, now=Date.now(), rows=[], tb=tombs();
@@ -6952,13 +6987,14 @@ button:active{filter:brightness(1.15)}
         res=mergeData({notes:list,deleted:del},true);
       }finally{sbApplying=false}
       try{localStorage.setItem(SB_LAST,String(maxAt))}catch(e){}
+      sbSaveDirty();   // 올리기 성공: 남은 것만 저장
       if(res.added||res.updated||res.removed)render();
       sbState={ok:true,at:Date.now(),msg:""};
       if(why==="manual"||why==="login")toast(why==="login"?"로그인했어요. 이제 모든 기기가 같은 노트를 봐요":(res.added||res.updated||res.removed?"맞췄어요: 새로 "+res.added+", 고친 것 "+res.updated:"모든 기기와 맞춰져 있어요"));
       else if(why==="start"&&(res.added||res.updated))toast("다른 기기에서 쓴 노트를 가져왔어요");
       return true;
     }catch(e){
-      ids.forEach(function(id){sbDirty.add(id)});
+      ids.forEach(function(id){sbDirty.add(id)}); sbSaveDirty();
       var net=e&&!e.msg&&e.message;   // fetch 자체가 실패 (인터넷, 차단, 너무 큰 요청 등)
       sbState={ok:false,at:sbState.at,msg:(e&&e.msg)||("서버에 닿지 못했어요"+(net?" ("+String(e.message).slice(0,80)+")":"")+". 인터넷 연결을 확인해 주세요"),short:(e&&e.short)||"연결 안 됨"};
       try{console.warn("sync failed",e)}catch(err){}
