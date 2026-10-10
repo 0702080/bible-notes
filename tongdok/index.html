@@ -534,11 +534,16 @@ var BOOK_BLESS=[
  {b:"읽는 사람에게 복이 있다고 했어요. 그 복이 함께하기를.", r:"요한계시록 1:3"},
  {b:"한 권만큼 더 가까워졌어요. 그 길에 기쁨이 있기를.", r:"시편 16:11"}
 ];
-var queue=[], celOpen=false;
+var queue=[], celOpen=false, pendingCheer=0;
 
 function pushCel(c){queue.push(c);if(!celOpen)nextCel()}
 function nextCel(){
-  if(!queue.length){celOpen=false;$("cel").hidden=true;return}
+  if(!queue.length){
+    celOpen=false;$("cel").hidden=true;
+    // 카드에 가려 못 띄운 격려가 있으면 이제 보여 준다
+    if(pendingCheer){var n=pendingCheer;pendingCheer=0;cheer(n)}
+    return;
+  }
   celOpen=true;
   var c=queue.shift();
   $("celSeal").textContent=c.icon||"✦";
@@ -605,6 +610,16 @@ $("toast").addEventListener("click",function(){
   clearTimeout(toastTimer);this.classList.add("out");
   var el=this;setTimeout(function(){el.hidden=true},320);
 });
+
+/* 다섯 장 고비를 넘었으면 격려한다. 한 번에 여러 구간을 건너뛰어도
+   (책 전체 읽음 등) 마지막 고비 기준으로 한 번 띄운다.
+   축복 카드가 떠 있으면 미뤄 두었다가 카드를 닫은 뒤에 보여 준다. */
+function dueCheer(before,after){
+  if(Math.floor(after/5)<=Math.floor(before/5))return;
+  var at=Math.floor(after/5)*5;
+  if(celOpen){pendingCheer=at;return}
+  cheer(at);
+}
 
 /* 달라진 만큼만 축하한다 */
 function checkMilestones(before,after,finishedBooks){
@@ -676,7 +691,7 @@ document.addEventListener("click",function(ev){
       var nowFull=bookDone(bi2)===BOOKS[bi2][1];
       checkMilestones(before,after,(!wasFull&&nowFull)?[bi2]:[]);
       // 축복 카드가 떴으면 띠까지 겹치지 않게 한다
-      if(after%5===0&&!celOpen)cheer(after);
+      dueCheer(before,after);
     }else{
       lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
     }
@@ -691,6 +706,7 @@ document.addEventListener("click",function(ev){
     var after2=countRange(me,0,TOTAL);
     if(fill){
       checkMilestones(before2,after2,wasFull2?[]:[b3]);
+      dueCheer(before2,after2);
     }else{
       lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
     }
