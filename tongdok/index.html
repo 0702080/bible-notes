@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ko"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
 <meta name="theme-color" content="#2A211C">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -111,12 +111,11 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   border:0;background:var(--c);
   box-shadow:none;
 }
-/* 5, 10, 15… 장째: 번호 뒤에 꽃을 은은하게 깔아 둔다 */
-.chip[data-five]::after{
+/* 5, 10, 15… 장째를 읽으면 번호 뒤에 꽃이 은은하게 핀다 (안 읽은 칸에는 없음) */
+.chip[data-s="me"][data-five]::after,.chip[data-s="both"][data-five]::after{
   content:"🌸";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-12deg);
-  font-size:28px;line-height:1;opacity:.28;z-index:-1;pointer-events:none;filter:saturate(.8);
+  font-size:28px;line-height:1;opacity:.38;z-index:-1;pointer-events:none;filter:saturate(.7) brightness(1.15);
 }
-.chip[data-s][data-five]::after{opacity:.38;filter:saturate(.7) brightness(1.15)}
 @media (max-width:520px){.chip[data-five]::after{font-size:19px}}
 .chip[data-s="friend"]::before{border:2px dashed var(--sky)}
 .chip[data-s="friend"]{color:var(--sky)}
@@ -219,9 +218,20 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .msg{margin-top:10px;font-size:13px;color:var(--green);min-height:1.2em}
 .msg.bad{color:var(--orange)}
 .note{margin:16px 2px 0;font-size:12.5px;color:var(--muted);line-height:1.7}
+/* 휴대폰을 가로로 돌리면 표가 깨지므로 세로로 돌려 달라고 안내한다.
+   (웹 페이지는 회전을 직접 막을 수 없어, 홈 화면 앱일 때만 세로로 고정된다) */
+.turn{display:none}
+@media (orientation:landscape) and (max-height:500px) and (pointer:coarse){
+  .turn{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    background:var(--paper);color:var(--ink);font-size:15px;text-align:center;padding:20px}
+  .turn b{font-size:40px;display:block;animation:turn 1.6s ease-in-out infinite}
+  body{overflow:hidden}
+}
+@keyframes turn{0%,30%{transform:rotate(90deg)}60%,100%{transform:rotate(0)}}
 </style>
 </head>
 <body>
+<div class="turn" aria-live="polite"><b aria-hidden="true">📱</b>휴대폰을 세로로 돌려 주세요</div>
 <header class="bar"><h1>성경 통독표</h1><span class="bar-cnt" id="barCnt"></span></header>
 <main class="wrap">
 
@@ -324,6 +334,12 @@ var myName="";
 var compare=false;
 
 var $=function(id){return document.getElementById(id)};
+
+/* 페이지 확대 막기 */
+["gesturestart","gesturechange"].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});
+document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
+/* 홈 화면 앱·전체 화면일 때는 세로로 고정 (일반 브라우저 탭에서는 조용히 실패) */
+try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock("portrait").catch(function(){})}catch(e){}
 
 /* 모든 버튼에서 짧게 진동 (프로젝트 공통 규칙) */
 /* 기존 앱(index.html)과 세기를 맞춘다. 8ms 는 폰에서 거의 안 느껴진다. */
