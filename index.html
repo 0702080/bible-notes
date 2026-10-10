@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-52">
+<meta name="app-build" content="2026-10-10-53">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1360,6 +1360,8 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 body.typing .fab{opacity:0;pointer-events:none;transform:translateY(20px)}
 .fab{transition:opacity .15s,transform .15s}
 .fab,.fab *{font-weight:400!important}   /* 말씀 담기 버튼 글자는 가늘게 */
+/* 빙그레체 '살짝 굵게': 굵은 글꼴 대신 보통 글꼴 + 아주 얇은 테두리 (제목, 주제 칩, 오늘 카드 버튼, 카드 버튼 줄) */
+h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!important;-webkit-text-stroke:.35px currentColor;paint-order:stroke fill}
 @media (prefers-reduced-motion:reduce){.uitem.fresh{animation:none}}
 /* ===== solid-box hiding ===== */
 .rw.masked.box{color:transparent;background:color-mix(in srgb,var(--orange) 30%,#2a2420);border-radius:6px;letter-spacing:normal;padding:2px 2px;margin:-2px -2px}
