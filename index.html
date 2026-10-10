@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-50">
+<meta name="app-build" content="2026-10-10-51">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1359,6 +1359,7 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 @keyframes ufresh{0%{box-shadow:0 0 0 2px var(--gold);background:color-mix(in srgb,var(--gold) 16%,var(--sheet))}100%{box-shadow:0 0 0 0 transparent}}
 body.typing .fab{opacity:0;pointer-events:none;transform:translateY(20px)}
 .fab{transition:opacity .15s,transform .15s}
+.fab,.fab *{font-weight:400!important}   /* 말씀 담기 버튼 글자는 가늘게 */
 @media (prefers-reduced-motion:reduce){.uitem.fresh{animation:none}}
 /* ===== solid-box hiding ===== */
 .rw.masked.box{color:transparent;background:color-mix(in srgb,var(--orange) 30%,#2a2420);border-radius:6px;letter-spacing:normal;padding:2px 2px;margin:-2px -2px}
