@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-42">
+<meta name="app-build" content="2026-10-10-43">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -369,6 +369,9 @@ details.menu>summary::-webkit-details-marker{display:none}
 .medrow .mmenu{top:34px}
 .medrow .med{padding-right:34px}
 .medrow .mprev{padding-right:38px}
+.medi.pinned .med,.medi.pinned .mprev{border-color:color-mix(in srgb,var(--gold) 45%,#2E2D33);box-shadow:inset 3px 0 0 color-mix(in srgb,var(--gold) 70%,transparent)}
+.medi.pinned .mdotsw::before{content:"📌";position:absolute;right:30px;top:7px;font-size:12px;pointer-events:none}
+.medi.pinned .med,.medi.pinned .mprev{padding-right:56px}
 .mdots[aria-expanded="true"],.mdots:hover{color:var(--ink);background:#1E1D24}
 .mmenu{position:absolute;right:0;top:44px;z-index:8;min-width:150px;padding:6px;border:1px solid #302F36;border-radius:12px;background:#1C1C21;box-shadow:0 12px 30px rgba(0,0,0,.55);display:flex;flex-direction:column}
 .mmenu[hidden]{display:none}
@@ -2113,7 +2116,7 @@ button:active{filter:brightness(1.15)}
   }
   function mid(){return "m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
   function normMeds(n){
-    if(Array.isArray(n.meds))return n.meds.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),text:String(x.text||""),at:+x.at||+n.createdAt||Date.now(),thx:String(x.thx||"").slice(0,1000),todo:String(x.todo||"").slice(0,1000),tact:x.tact?String(x.tact):"",o:(typeof x.o==="number"&&isFinite(x.o))?x.o:null}});
+    if(Array.isArray(n.meds))return n.meds.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),text:String(x.text||""),at:+x.at||+n.createdAt||Date.now(),thx:String(x.thx||"").slice(0,1000),todo:String(x.todo||"").slice(0,1000),tact:x.tact?String(x.tact):"",o:(typeof x.o==="number"&&isFinite(x.o))?x.o:null,pin:+x.pin||0}});
     if(n.med&&String(n.med).trim())return [{id:"m0",text:String(n.med),at:+n.createdAt||Date.now()}];
     return [];
   }
@@ -2128,8 +2131,9 @@ button:active{filter:brightness(1.15)}
   function newestFirst(meds){return meds.slice().sort(function(a,b){return b.at-a.at})}
   // 묵상 보이는 순서: 끌어서 바꾼 적이 있으면 그 순서(o), 아니면 최근 것부터
   function medOrder(meds){
-    if(!meds.some(function(m){return typeof m.o==="number"}))return newestFirst(meds);
-    return meds.slice().sort(function(a,b){var ao=typeof a.o==="number"?a.o:-1e15-a.at, bo=typeof b.o==="number"?b.o:-1e15-b.at;return ao-bo});
+    var rest=meds.filter(function(m){return !m.pin}), pins=meds.filter(function(m){return m.pin}).sort(function(a,b){return b.pin-a.pin});
+    if(!rest.some(function(m){return typeof m.o==="number"}))return pins.concat(newestFirst(rest));
+    return pins.concat(rest.slice().sort(function(a,b){var ao=typeof a.o==="number"?a.o:-1e15-a.at, bo=typeof b.o==="number"?b.o:-1e15-b.at;return ao-bo}));
   }
   function medsText(n){return n.meds.map(function(m){return m.text}).join(" ")}
   function medCount(n){return n.meds.filter(function(m){return m.text.trim()}).length}
@@ -2554,7 +2558,7 @@ button:active{filter:brightness(1.15)}
       '<label class="mendl todo"><span>✅ 결론 · 할 일</span><small></small></label><textarea class="mtodo" rows="1" aria-label="결론과 할 일"></textarea>'+
       '<button type="button" class="mtoact" hidden>실천으로 보내기</button></div></div>'+
       '<div class="mdotsw"><button type="button" class="mdots" aria-label="묵상 메뉴" aria-expanded="false">⋯</button>'+
-      '<div class="mmenu" hidden><span class="dl"></span><button type="button" class="mfold">접기</button><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div></div></div>';
+      '<div class="mmenu" hidden><span class="dl"></span><button type="button" class="mpinm">📌 맨 위에 고정</button><button type="button" class="mfold">접기</button><button type="button" class="delm" aria-label="이 묵상 지우기">지우기</button></div></div></div>';
     d.querySelector(".dl").textContent=dateLabel(m.at);
     d.querySelector(".med").placeholder="오늘의 관점: "+LENS[new Date(m.at).getDay()];
     d.querySelector(".mendl.thx small").textContent=THXQ[wd]; d.querySelector(".mthx").placeholder="";
@@ -2699,6 +2703,7 @@ button:active{filter:brightness(1.15)}
       var fo=medFold.has(m.id); d.classList.toggle("folded",fo);
       if(fo){d.querySelector(".mpd").textContent=dateShort(m.at);d.querySelector(".mpt").textContent=(m.text||"").replace(/\s+/g," ").trim()||"(빈 묵상)"}
       d.querySelector(".mfold").textContent=fo?"펼치기":"접기";
+      d.classList.toggle("pinned",!!m.pin); d.querySelector(".mpinm").textContent=m.pin?"📌 고정 풀기":"📌 맨 위에 고정";
       setVal(d.querySelector(".med"),m.text); setVal(d.querySelector(".mthx"),m.thx||""); setVal(d.querySelector(".mtodo"),m.todo||"");
       var tb=d.querySelector(".mtoact"), ta=m.tact&&n.acts.some(function(a){return a.id===m.tact});
       tb.hidden=!(m.todo||"").trim(); tb.textContent=ta?"✓ 실천에 있어요":"실천으로 보내기"; tb.disabled=!!ta;
@@ -3592,6 +3597,14 @@ button:active{filter:brightness(1.15)}
       var mw=b.closest(".mdotsw"), mn=mw.querySelector(".mmenu"), op=mn.hidden;
       document.querySelectorAll(".mmenu").forEach(function(x){x.hidden=true;var bb=x.parentNode.querySelector(".mdots");if(bb)bb.setAttribute("aria-expanded","false")});
       mn.hidden=!op; b.setAttribute("aria-expanded",String(op)); return;
+    }
+    if(b.classList.contains("mpinm")){
+      var pm=n.meds.find(function(x){return x.id===b.closest(".medi").dataset.mid}); if(!pm)return;
+      var pmn=b.closest(".mmenu"); if(pmn)pmn.hidden=true;
+      pm.pin=pm.pin?0:Date.now(); render(); scheduleSave(id); buzz(10);
+      toast(pm.pin?"📌 이 묵상을 맨 위에 고정했어요":"고정을 풀었어요");
+      if(pm.pin){var pc=cards.get(id),pe=pc&&pc.querySelector('.medi[data-mid="'+pm.id+'"]');if(pe)pe.scrollIntoView({block:"center",behavior:"smooth"})}
+      return;
     }
     if(b.classList.contains("mfold")||b.classList.contains("mprev")){
       var mn2=b.closest(".medi").querySelector(".mmenu"); if(mn2)mn2.hidden=true;
@@ -6781,7 +6794,7 @@ button:active{filter:brightness(1.15)}
   }
   function mergeNote(older,newer){
     var m=JSON.parse(JSON.stringify(newer)), id=function(x){return x&&x.id};
-    m.meds=unionBy(older.meds,newer.meds,id,function(o,nw){return {id:nw.id,text:nw.text||o.text,at:nw.at||o.at,thx:nw.thx||o.thx||"",todo:nw.todo||o.todo||"",tact:nw.tact||o.tact||"",o:nw.o!=null?nw.o:o.o}});
+    m.meds=unionBy(older.meds,newer.meds,id,function(o,nw){return {id:nw.id,text:nw.text||o.text,at:nw.at||o.at,thx:nw.thx||o.thx||"",todo:nw.todo||o.todo||"",tact:nw.tact||o.tact||"",o:nw.o!=null?nw.o:o.o,pin:+nw.pin||0}});
     m.prays=unionBy(older.prays,newer.prays,id);
     m.qs=unionBy(older.qs,newer.qs,id);
     m.essays=unionBy(older.essays,newer.essays,id);
