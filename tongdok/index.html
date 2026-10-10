@@ -100,7 +100,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 }
 /* 동그라미 */
 .chip::before{
-  content:"";position:absolute;left:50%;top:50%;width:min(36px,86%);aspect-ratio:1/1;transform:translate(-50%,-50%);
+  content:"";position:absolute;left:50%;top:50%;width:min(44px,90%);aspect-ratio:1/1;transform:translate(-50%,-50%);
   border-radius:50%;border:2px solid var(--blank);z-index:-1;transition:border-color .15s;
 }
 .chip:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
@@ -146,7 +146,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 
 /* 칸 밖으로 번지지 않게 동그라미 바로 바깥까지만 퍼진다 */
 .ring{
-  position:absolute;left:50%;top:50%;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;pointer-events:none;
+  position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;pointer-events:none;
   border:1.5px solid color-mix(in srgb,var(--ring) 80%,transparent);
   animation:ring .36s ease-out forwards;
 }
