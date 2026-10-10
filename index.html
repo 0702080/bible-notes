@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-34">
+<meta name="app-build" content="2026-10-10-35">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1921,6 +1921,8 @@ button:active{filter:brightness(1.15)}
 .sbor{margin:14px 0 8px;font-size:12.5px}
 .sbpwform .ghconnect{margin-top:10px}
 .sbsetpw{margin-top:16px;padding-top:12px;border-top:1px solid var(--rule)}
+.sbsetpw.hl{padding:12px;border:1px solid color-mix(in srgb,var(--gold) 60%,#34333A);border-radius:12px;background:color-mix(in srgb,var(--gold) 9%,transparent)}
+.sbsetpw.hl .ghl::before{content:"👉 로그인됐어요! 이제 ";color:var(--gold);font-weight:700}
 .sbpwrow{display:flex;gap:8px}
 .sbpwrow .field{flex:1;min-width:0}
 .sbpwrow .ghnow{width:auto;padding:0 18px}
@@ -7025,11 +7027,13 @@ button:active{filter:brightness(1.15)}
     try{
       var u=await sbStart(q.access_token);
       sbSetSession({access_token:q.access_token,refresh_token:q.refresh_token,expires_at:+q.expires_at||Math.floor(Date.now()/1000)+(+q.expires_in||3600),user:{id:u.id,email:u.email}});
+      if(u&&u.email)sbRemember(u.email);
       sbMarkAll(); sbSync("login");
+      setTimeout(function(){openSb(true)},700);   // 메일 링크로 들어온 김에 비밀번호를 만들게 바로 안내
     }catch(e){toast("로그인하지 못했어요. 다시 시도해 주세요")}
   }
   var sbBox=null, sbSentTo="";
-  function openSb(){
+  function openSb(pwFirst){
     if(!sbBox){
       sbBox=document.createElement("div"); sbBox.className="ghsheet"; sbBox.hidden=true; sbBox.setAttribute("role","dialog"); sbBox.setAttribute("aria-modal","true");
       sbBox.innerHTML='<div class="ghbox"><div class="ghhd"><b>☁️ 로그인 · 동기화</b><button type="button" class="ghclose sbclose">닫기</button></div>'+
@@ -7052,7 +7056,7 @@ button:active{filter:brightness(1.15)}
         b.disabled=true; b.textContent="로그인 중…";
         try{
           var r=await fetch(SB_URL+"/auth/v1/token?grant_type=password",{method:"POST",headers:sbH(),body:JSON.stringify({email:em,password:pw})});
-          if(!r.ok){toast(r.status===400?"이메일이나 비밀번호가 맞지 않아요. 비밀번호가 없으면 아래 '로그인 링크 받기'로 먼저 로그인해 주세요":"로그인하지 못했어요 ("+r.status+")");return}
+          if(!r.ok){toast(r.status===400?"비밀번호가 아직 없거나 달라요. '로그인 링크 받기'로 들어간 뒤 뜨는 🔑 비밀번호 만들기에서 먼저 정해 주세요":"로그인하지 못했어요 ("+r.status+")");return}
           var j=await r.json(); sbRemember(em);
           sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
           sbMarkAll(); closeSb(); sbSync("login"); if(typeof frLoad==="function")setTimeout(frLoad,1500);
@@ -7105,7 +7109,7 @@ button:active{filter:brightness(1.15)}
             var j=await vr.json();
             sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
             if(j.user&&j.user.email)sbRemember(j.user.email);
-            sbMarkAll(); closeSb(); sbSync("login"); toast("로그인했어요! 이제 🔑 비밀번호를 만들어 두면 다음엔 더 쉬워요");
+            sbMarkAll(); sbSync("login"); drawSb(); openSb(true);
           }catch(err){toast("인터넷 연결을 확인해 주세요")}
           finally{b.disabled=false}
           return;
@@ -7115,6 +7119,8 @@ button:active{filter:brightness(1.15)}
     var rem=sbRemembered(), mi=sbBox.querySelector(".sbmail"); if(rem&&!mi.value)mi.value=rem;
     drawSb(); sbBox.hidden=false;
     var x=sbSession(); if(!x)setTimeout(function(){var m=sbBox.querySelector(".sbmail");if(m&&!m.value)m.focus();else{var pw=sbBox.querySelector(".sbpw");if(pw)pw.focus()}},80);
+    var sp=sbBox.querySelector(".sbsetpw"); sp.classList.toggle("hl",!!(x&&pwFirst));
+    if(x&&pwFirst)setTimeout(function(){var np=sbBox.querySelector(".sbnewpw");if(np){np.scrollIntoView({block:"center"});np.focus()}},120);
   }
   function closeSb(){if(sbBox)sbBox.hidden=true}
   function sbRemember(em){try{localStorage.setItem("bible-sb-email",em)}catch(e){}}
