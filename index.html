@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-10-33">
+<meta name="app-build" content="2026-10-10-34">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6861,7 +6861,7 @@ button:active{filter:brightness(1.15)}
         '<p class="ghtip">내 GitHub 저장소의 파일 하나에 노트를 저장해서, 어느 브라우저·기기에서 열어도 같은 노트가 나오게 해요. 고칠 때마다 몇 초 뒤 자동으로 올라가고, 앱을 열 때 자동으로 받아와요.</p>'+
         '<div class="ghoff"><label class="ghl">저장소 (아이디/이름)</label><input class="field ghrepoin" placeholder="0702080/bible-notes-data" autocapitalize="off" autocomplete="off" spellcheck="false">'+
         '<label class="ghl">토큰</label><input class="field ghtok" type="password" placeholder="github_pat_로 시작하는 토큰" autocapitalize="off" autocomplete="off" spellcheck="false">'+
-        '<p class="ghtip small">이 저장소는 <b>공개</b>라서 토큰 없는 다른 브라우저에서도 노트를 받아 볼 수 있어요(주소를 아는 사람도 볼 수 있어요). 토큰은 이 기기 브라우저에만 저장되고, 토큰을 넣은 브라우저에서만 고친 내용이 올라가요.</p>'+
+        '<p class="ghtip frtip">이 저장소는 <b>공개</b>라서 토큰 없는 다른 브라우저에서도 노트를 받아 볼 수 있어요(주소를 아는 사람도 볼 수 있어요). 토큰은 이 기기 브라우저에만 저장되고, 토큰을 넣은 브라우저에서만 고친 내용이 올라가요.</p>'+
         '<button type="button" class="ghconnect">연결하고 맞추기</button></div>'+
         '<div class="ghon" hidden><div class="ghrepo"></div><div class="ghst"></div><div class="ghbtns"><button type="button" class="ghnow">지금 맞추기</button><button type="button" class="ghout">연결 끊기</button></div></div></div>';
       document.body.appendChild(gh);
@@ -7039,7 +7039,7 @@ button:active{filter:brightness(1.15)}
         '<button type="submit" class="ghconnect sbpwlogin">로그인</button></form>'+
         '<p class="ghtip sbor">비밀번호가 아직 없으면 ↓ 메일 링크로 한 번만 로그인한 뒤, 비밀번호를 만들어 두세요.</p>'+
         '<button type="button" class="ghnow sbsend">로그인 링크 받기</button>'+
-        '<div class="sbsent" hidden><p class="ghtip small sbsentmsg"></p><label class="ghl">메일에 6자리 숫자가 있으면 여기에 (없으면 메일의 링크를 누르세요)</label><input class="field sbcode" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="123456"><button type="button" class="ghnow sbverify">코드로 로그인</button></div></div>'+
+        '<div class="sbsent" hidden><p class="ghtip frtip sbsentmsg"></p><label class="ghl">메일의 링크가 다른 앱(네이버 등)에서 열리면: 메일의 <b>로그인 링크를 길게 눌러 복사</b>해서 여기에 붙여 넣으세요</label><input class="field sbcode" inputmode="url" autocomplete="one-time-code" placeholder="링크 붙여넣기 (또는 6자리 숫자)"><button type="button" class="ghnow sbverify">이 링크로 로그인</button></div></div>'+
         '<div class="sbon" hidden><div class="ghrepo sbwho"></div><div class="ghst sbst"></div><div class="ghbtns"><button type="button" class="ghnow sbnow">지금 맞추기</button><button type="button" class="ghout sbout">로그아웃</button></div>'+
         '<form class="sbsetpw" autocomplete="on"><input type="email" name="email" class="sbpwuser" autocomplete="username" hidden><label class="ghl">🔑 비밀번호 만들기 · 바꾸기 (다른 기기에서 이메일+비밀번호로 바로 로그인)</label>'+
         '<div class="sbpwrow"><input class="field sbnewpw" name="new-password" type="password" autocomplete="new-password" minlength="6" placeholder="6자 이상"><button type="submit" class="ghnow sbpwsave">저장</button></div></form></div></div>';
@@ -7088,21 +7088,24 @@ button:active{filter:brightness(1.15)}
             var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(SB_SITE),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
             if(r.status===429){toast("잠시 뒤에 다시 보내 주세요 (메일은 짧은 시간에 여러 번 보낼 수 없어요)")}
             else if(!r.ok){toast("메일을 보내지 못했어요 ("+r.status+")")}
-            else{sbSentTo=em; sbRemember(em); var sm=sbBox.querySelector(".sbsent"); sm.hidden=false; sbBox.querySelector(".sbsentmsg").textContent=em+" 로 로그인 메일을 보냈어요. 메일의 링크를 이 기기의 이 브라우저에서 열어 주세요.";}
+            else{sbSentTo=em; sbRemember(em); var sm=sbBox.querySelector(".sbsent"); sm.hidden=false; sbBox.querySelector(".sbsentmsg").textContent=em+" 로 로그인 메일을 보냈어요. 메일의 링크를 누르거나, 링크를 복사해 아래에 붙여 넣으세요.";}
           }catch(err){toast("인터넷 연결을 확인해 주세요")}
           finally{b.disabled=false; b.textContent="로그인 링크 다시 받기"}
           return;
         }
         if(b.classList.contains("sbverify")){
-          var code=sbBox.querySelector(".sbcode").value.replace(/\D/g,""), em2=sbSentTo||sbBox.querySelector(".sbmail").value.trim();
-          if(code.length<6){toast("메일의 숫자를 넣어 주세요");return}
+          var raw=sbBox.querySelector(".sbcode").value.trim(), em2=sbSentTo||sbBox.querySelector(".sbmail").value.trim(), body=null;
+          var lm=raw.match(/[?&#]token=([^&#\s]+)/), tm=raw.match(/[?&#]type=([a-z_]+)/);
+          if(lm)body={type:tm?tm[1]:"magiclink",token_hash:decodeURIComponent(lm[1])};   // 메일 링크를 통째로 붙여 넣은 경우
+          else{var code=raw.replace(/\D/g,""); if(code.length<6){toast("메일의 로그인 링크를 복사해 붙여 넣어 주세요");return} body={type:"email",email:em2,token:code}}
           b.disabled=true;
           try{
-            var vr=await fetch(SB_URL+"/auth/v1/verify",{method:"POST",headers:sbH(),body:JSON.stringify({type:"email",email:em2,token:code})});
-            if(!vr.ok){toast("코드가 맞지 않거나 시간이 지났어요");return}
+            var vr=await fetch(SB_URL+"/auth/v1/verify",{method:"POST",headers:sbH(),body:JSON.stringify(body)});
+            if(!vr.ok){toast(lm?"링크가 이미 쓰였거나 시간이 지났어요. '로그인 링크 다시 받기'를 눌러 새 링크로 해 주세요":"코드가 맞지 않거나 시간이 지났어요");return}
             var j=await vr.json();
             sbSetSession({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}});
-            sbMarkAll(); closeSb(); sbSync("login");
+            if(j.user&&j.user.email)sbRemember(j.user.email);
+            sbMarkAll(); closeSb(); sbSync("login"); toast("로그인했어요! 이제 🔑 비밀번호를 만들어 두면 다음엔 더 쉬워요");
           }catch(err){toast("인터넷 연결을 확인해 주세요")}
           finally{b.disabled=false}
           return;
