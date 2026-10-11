@@ -435,6 +435,7 @@ function parseCode(txt){
   var s=String(txt||"").trim();
   var m=s.match(/[#?&]f=([^&\s]+)/);          // 링크를 통째로 붙여넣어도 받는다
   if(m)s=decodeURIComponent(m[1]);
+  else{var h=s.indexOf("#");if(h>=0)s=s.slice(h+1)}   // 짧은 주소: …/t#코드
   var bits,name="";
   if(/^T1~/.test(s)){   // 예전 긴 코드
     var p=s.split("~"); if(p.length<3)return null;
@@ -447,8 +448,9 @@ function parseCode(txt){
   return {name:name,bits:bits};
 }
 function makeLink(){
-  var base=location.href.split("#")[0].split("?")[0];
-  return base+"#f="+makeCode();   // 코드는 URL에 그대로 쓸 수 있는 글자만 씀
+  // 가장 짧은 주소: …/bible-notes/t#코드 (t 폴더가 통독표로 넘겨 줌). "https://"도 빼서 카톡에 그대로 붙여도 링크가 됨
+  var u=new URL("../t",location.href.split("#")[0].split("?")[0]);
+  return u.host+u.pathname+"#"+makeCode();
 }
 
 /* ── 세기 ─────────────────────────────── */
