@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-70">
+<meta name="app-build" content="2026-10-11-71">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5366,8 +5366,7 @@ button:active{filter:brightness(1.15)}
     ccBox.querySelector(".ccref").textContent=n.ref;
     ccBox.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     try{history.pushState({cc:1},"");ccHist=true}catch(e){ccHist=false}
-    // 브라우저에서는 전체 화면으로 주소창을 숨김 (처음 몇 초 브라우저 안내가 뜸). 홈 화면 앱으로 열면 이미 전체 화면이라 요청하지 않음
-    if(!(window.matchMedia&&matchMedia("(display-mode: fullscreen), (display-mode: standalone)").matches))ccFull(true);
+    // 브라우저 전체 화면은 쓰지 않음 (브라우저 안내 문구가 떠서, 사용자 요청). 주소창 없이 쓰려면 홈 화면 앱으로 염
     ccDraw();
   }
   var ccHist=false, CC_COL=5, ccFs=false;
