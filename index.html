@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-72">
+<meta name="app-build" content="2026-10-11-73">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3520,8 +3520,9 @@ button:active{filter:brightness(1.15)}
     }
     if(b.classList.contains("mcopy")){b.closest("details").open=false;copyVerse(n,null);return}
     if(b.classList.contains("memopen")){
-      if(memOpen.has(id)){memOpen.delete(id);memView.delete(id);memPeek.delete(id);memStep.delete(id)}else{memOpen.add(id);focusMode.delete(id);focusOpen.delete(id)}
-      render(); return;
+      // 머리의 암송 아이콘: 아래 "암송 시작 / 한 번 더 떠올리기" 버튼과 똑같이 암송 코치를 엶 (닫으면 암송 칸이 펼쳐져 있음)
+      if(!memOpen.has(id)){memOpen.add(id);focusMode.delete(id);focusOpen.delete(id)}
+      openCoach(n); return;
     }
     if(b.classList.contains("mreveal")){memView.set(id,"");memStep.delete(id);memPeek.delete(id);buzz(8);render();return}
     if(b.classList.contains("morder")){openOrderQuiz(n);return}
