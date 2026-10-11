@@ -447,6 +447,24 @@ function parseCode(txt){
   if(!bits)return null;
   return {name:name,bits:bits};
 }
+/* is.gd로 아주 짧게 (예: is.gd/AbC123). 같은 코드는 한 번만 줄이고 기억해 둠.
+   is.gd가 #뒤를 놓칠 수 있어 ?c=코드 모양의 주소를 줄인다 (t 폴더가 통독표로 넘겨 줌) */
+var SHORT_KEY="bible-tongdok-short";
+function shortCache(){try{return JSON.parse(localStorage.getItem(SHORT_KEY)||"{}")||{}}catch(e){return {}}}
+function shorten(code,done){
+  var c=shortCache(); if(c[code]){done(c[code]);return}
+  var cb="isgd_"+Date.now().toString(36)+Math.floor(Math.random()*1e4), sc=document.createElement("script"), fin=false;
+  function end(v){if(fin)return;fin=true;try{delete window[cb]}catch(e){window[cb]=undefined}sc.remove();done(v)}
+  window[cb]=function(r){
+    var u=r&&r.shorturl?String(r.shorturl).replace(/^https?:\/\//,""):null;
+    if(u){var m=shortCache();m[code]=u;var ks=Object.keys(m);if(ks.length>30)delete m[ks[0]];try{localStorage.setItem(SHORT_KEY,JSON.stringify(m))}catch(e){}}
+    end(u);
+  };
+  var long=new URL("../t/",location.href.split("#")[0].split("?")[0]).href+"?c="+encodeURIComponent(code);
+  sc.src="https://is.gd/create.php?format=json&callback="+cb+"&url="+encodeURIComponent(long);
+  sc.onerror=function(){end(null)}; setTimeout(function(){end(null)},6000);
+  document.head.appendChild(sc);
+}
 function makeLink(){
   // 가장 짧은 주소: …/bible-notes/t#코드 (t 폴더가 통독표로 넘겨 줌). "https://"도 빼서 카톡에 그대로 붙여도 링크가 됨
   var u=new URL("../t",location.href.split("#")[0].split("?")[0]);
@@ -746,9 +764,13 @@ function openShare(){
     +'<button class="btn wide" type="button" id="cl">닫기</button>';
   $("dlg").hidden=false;
   var nm=$("nm"), lk=$("lk");
-  function refresh(){lk.value=makeLink()}
+  var tmr=0;
+  function refresh(){
+    lk.value=makeLink(); var code=makeCode(), now=code;
+    shorten(code,function(u){if(u&&now===makeCode()&&!$("dlg").hidden){lk.value=u}});
+  }
   refresh();
-  nm.addEventListener("input",function(){myName=nm.value.slice(0,20);save();refresh();renderSummary()});
+  nm.addEventListener("input",function(){myName=nm.value.slice(0,20);save();lk.value=makeLink();renderSummary();clearTimeout(tmr);tmr=setTimeout(refresh,900)});
   $("cp").addEventListener("click",function(){
     copy(lk.value).then(function(){setMsg("복사했어요. 카톡에 붙여 넣어 보내세요.")},
                         function(){lk.select();setMsg("길게 눌러 복사해 주세요.",true)});

@@ -4,7 +4,9 @@
 <title>성경 통독표</title>
 <style>body{margin:0;background:#121214}</style>
 <script>
-// 짧은 진도 링크(…/bible-notes/t#코드)를 통독표로 넘겨 줌
-location.replace("../tongdok/"+(location.hash&&location.hash.length>1?"#f="+location.hash.slice(1):""));
+// 짧은 진도 링크를 통독표로 넘겨 줌: …/t#코드 또는 …/t/?c=코드 (is.gd로 줄인 링크가 여기로 옴)
+var c=(location.search.match(/[?&]c=([^&]+)/)||[])[1];
+if(c)c=decodeURIComponent(c); else if(location.hash.length>1)c=location.hash.slice(1);
+location.replace("../tongdok/"+(c?"#f="+c:""));
 </script>
 <noscript><a href="../tongdok/">성경 통독표 열기</a></noscript>
