@@ -405,20 +405,50 @@ function decName(s){
     return decodeURIComponent(escape(atob(t)));
   }catch(e){return ""}
 }
-function makeCode(){return "T1~"+encName(myName)+"~"+toB64(me)}
+/* 짧은 코드 (2026-10-11): 읽은 장은 대개 이어져 있으니 "안 읽음 n장, 읽음 m장…" 길이만 적는다.
+   숫자 하나는 base64url 글자 1~3개 (5비트씩, 32를 더하면 다음 글자가 이어짐).
+   모양: "2" + 길이들 [+ "." + 이름]   예) 아무것도 안 읽음 → "2"
+   이게 비트 그대로보다 길면 "1" + 비트(base64) [+ "." + 이름]. 예전 "T1~이름~비트"도 그대로 읽는다 */
+var B64C="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+function putNum(n){var out="";do{var v=n&31;n>>=5;out+=B64C[v|(n?32:0)]}while(n);return out}
+function toRuns(bits){
+  var runs=[],cur=0,len=0;
+  for(var i=0;i<TOTAL;i++){var b=bits[i]?1:0;if(b===cur)len++;else{runs.push(len);cur=b;len=1}}
+  if(cur===1)runs.push(len);   // 끝에 남은 '안 읽음'은 적지 않음
+  return runs.map(putNum).join("");
+}
+function fromRuns(str){
+  var bits=new Uint8Array(TOTAL),pos=0,cur=0,i=0;
+  while(i<str.length){
+    var n=0,sh=0,c;
+    do{c=B64C.indexOf(str[i++]);if(c<0)return null;n|=(c&31)<<sh;sh+=5}while(c&32&&i<=str.length);
+    if(cur)for(var k=0;k<n&&pos<TOTAL;k++)bits[pos++]=1;else pos+=n;
+    if(pos>TOTAL)return null; cur^=1;
+  }
+  return bits;
+}
+function makeCode(){
+  var r="2"+toRuns(me), raw="1"+toB64(me), body=r.length<=raw.length?r:raw;
+  return body+(myName?"."+encName(myName):"");
+}
 function parseCode(txt){
   var s=String(txt||"").trim();
   var m=s.match(/[#?&]f=([^&\s]+)/);          // 링크를 통째로 붙여넣어도 받는다
   if(m)s=decodeURIComponent(m[1]);
-  var p=s.split("~");
-  if(p.length<3||p[0]!=="T1")return null;
-  var bits=fromB64(p[2]);
+  var bits,name="";
+  if(/^T1~/.test(s)){   // 예전 긴 코드
+    var p=s.split("~"); if(p.length<3)return null;
+    bits=fromB64(p[2]); name=decName(p[1]);
+  }else if(/^[12]/.test(s)){
+    var q=s.split("."), body=q[0].slice(1);
+    bits=s[0]==="2"?fromRuns(body):fromB64(body); name=q[1]?decName(q[1]):"";
+  }else return null;
   if(!bits)return null;
-  return {name:decName(p[1]),bits:bits};
+  return {name:name,bits:bits};
 }
 function makeLink(){
   var base=location.href.split("#")[0].split("?")[0];
-  return base+"#f="+encodeURIComponent(makeCode());
+  return base+"#f="+makeCode();   // 코드는 URL에 그대로 쓸 수 있는 글자만 씀
 }
 
 /* ── 세기 ─────────────────────────────── */
