@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-85">
+<meta name="app-build" content="2026-10-11-86">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1686,6 +1686,8 @@ button:active{filter:brightness(1.15)}
 /* 결과 화면: 밀어서 다음 말씀 */
 .ccnext{display:inline-flex;align-items:center;gap:8px;margin-top:28px;padding:10px 18px;border:1px dashed color-mix(in srgb,var(--violet) 55%,#34333A);border-radius:22px;background:color-mix(in srgb,var(--violet) 10%,transparent);color:var(--muted);font-size:14.5px}
 .ccnext b{color:var(--violet);font-weight:700}
+.ccnext{min-height:60px;padding:14px 34px;border-radius:30px;border-width:1.5px;margin-top:32px}
+.ccnext b{font-size:20px}
 .ccnarw{display:inline-block;color:var(--violet);font-size:18px;animation:ccnudge 1.4s ease-in-out infinite}
 @keyframes ccnudge{0%,100%{transform:none}50%{transform:translateX(-6px)}}
 .ccbody.ccout{animation:ccout .22s ease-in forwards}
@@ -5591,9 +5593,6 @@ button:active{filter:brightness(1.15)}
     var t1=document.createElement("div"); t1.className="ccr1"; t1.textContent=C.grade==="g2"?"잘했어요! 🎉":C.grade==="g1"?"거의 다 왔어요! 💪":"괜찮아요, 내일 다시 해요 🌱"; box.appendChild(t1);
     if(C.got&&C.got.length){var sr=stampRow(n,true);sr.classList.add("ccstamps");box.appendChild(sr);var t2=document.createElement("div");t2.className="ccr2";t2.textContent="도장 "+C.got.length+"개를 받았어요"+(memDone(n)?" · 🏅 암송 완료!":"");box.appendChild(t2)}
     var ri=reviewInfo(n), d=ri?new Date(ri.next):null;
-    var t3=document.createElement("div"); t3.className="ccr3";
-    t3.textContent=d?"🔁 다음 복습: "+(d.getMonth()+1)+"월 "+d.getDate()+"일 ("+(n.rv.gap===1?"내일":n.rv.gap+"일 뒤")+")":"";
-    box.appendChild(t3);
     v.appendChild(box); tip.textContent="";
     ft.textContent="";
     [["처음부터 다시","restart",false],["끝내기","close",true]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(x[2]?" main":"");b.dataset.a=x[1];b.textContent=x[0];ft.appendChild(b)});
