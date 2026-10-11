@@ -299,6 +299,12 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
 .toast{background:#5A4130;border-color:#5A4130;color:#FFF8EA;pointer-events:none;box-shadow:0 8px 22px rgba(60,40,20,.3)}
 .toast small{color:#EAD9C2}
 .fchips .chip{cursor:not-allowed}
+/* 마지막 줄 빈칸은 장이 아니므로 칸처럼 보이지 않게 (2026-10-11: 오바댜처럼 짧은 책에서 빈칸을 누르던 문제) */
+.chips{background:transparent;border:0;gap:0;border-radius:0;overflow:visible}
+.chips .chip{box-shadow:0 0 0 .5px var(--rule)}
+.chips>span{background:transparent;box-shadow:none}
+.fchips{background:transparent}
+.fchips .chip{box-shadow:0 0 0 .5px color-mix(in srgb,var(--sky) 35%,var(--rule))}
 /* ===== 읽는 중인 책 고정 (📌) ===== */
 .bk-pin{align-self:center;flex:0 0 auto;width:34px;height:34px;margin-left:auto;border:1px solid var(--rule);border-radius:50%;background:var(--sheet);display:grid;place-items:center;font-size:15px;cursor:pointer;filter:grayscale(1);opacity:.55;padding:0}
 .bk-pin[aria-pressed="true"]{filter:none;opacity:1;border-color:color-mix(in srgb,var(--pink) 50%,var(--rule));background:color-mix(in srgb,var(--pink) 10%,var(--sheet))}
