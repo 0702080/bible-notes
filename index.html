@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-71">
+<meta name="app-build" content="2026-10-11-72">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1667,6 +1667,16 @@ button:active{filter:brightness(1.15)}
 .ccw.got{color:var(--bc);font-weight:600}
 .ccw.flip{animation:bwflip .42s cubic-bezier(.2,1.5,.4,1)}
 .ccres{animation:bqres .5s cubic-bezier(.2,1.5,.4,1)}
+/* 결과 화면: 밀어서 다음 말씀 */
+.ccnext{display:inline-flex;align-items:center;gap:8px;margin-top:28px;padding:10px 18px;border:1px dashed color-mix(in srgb,var(--violet) 55%,#34333A);border-radius:22px;background:color-mix(in srgb,var(--violet) 10%,transparent);color:var(--muted);font-size:14.5px}
+.ccnext b{color:var(--violet);font-weight:700}
+.ccnarw{display:inline-block;color:var(--violet);font-size:18px;animation:ccnudge 1.4s ease-in-out infinite}
+@keyframes ccnudge{0%,100%{transform:none}50%{transform:translateX(-6px)}}
+.ccbody.ccout{animation:ccout .22s ease-in forwards}
+.ccbody.ccin{animation:ccin .32s cubic-bezier(.2,1.2,.4,1)}
+@keyframes ccout{to{transform:translateX(-40%);opacity:0}}
+@keyframes ccin{from{transform:translateX(40%);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.ccnarw,.ccbody.ccout,.ccbody.ccin{animation:none}}
 /* 말씀은 화면 가운데, 버튼은 엄지가 닿기 쉬운 아래쪽에 크게 */
 .ccbody{display:flex;flex-direction:column}
 .cctip{text-align:center}
@@ -5342,7 +5352,8 @@ button:active{filter:brightness(1.15)}
      끝나면 단계 도장(읽기·첫 글자·가리기, 다음 날이면 '내일')을 찍고, 떠올린 결과로 다음 복습 날을 정함 */
   var ccBox=null, C=null;
   var CC_STEPS=["읽기","첫 글자","가리기","떠올리기"];
-  function openCoach(n){
+  function openCoach(n,opt){
+    opt=opt||{};
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
       ccBox=document.createElement("div"); ccBox.className="cch"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
@@ -5351,6 +5362,13 @@ button:active{filter:brightness(1.15)}
         '<div class="ccbody"><div class="cctip"></div><div class="ccverse"></div></div>'+
         '<div class="ccfoot"></div>';
       document.body.appendChild(ccBox);
+      // 결과 화면에서 오른쪽 → 왼쪽으로 밀면 다음 암송 말씀
+      var sx=0,sy=0,sw=false;
+      ccBox.addEventListener("touchstart",function(e){var t=e.touches[0];sx=t.clientX;sy=t.clientY;sw=!!(C&&C.stage===5&&e.touches.length===1)},{passive:true});
+      ccBox.addEventListener("touchend",function(e){
+        if(!sw||!C||C.stage!==5)return; sw=false; var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+        if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.5)ccGoNext();
+      },{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 가린 낱말을 누르면 톡 뒤집혀 잠깐 보기
         var w=e.target.closest(".ccw.hid"); if(!w||!C||C.revealing||w.classList.contains("peek"))return;
@@ -5362,10 +5380,11 @@ button:active{filter:brightness(1.15)}
       window.addEventListener("popstate",function(){if(ccBox&&!ccBox.hidden){ccHist=false;closeCoach()}});
     }
     var done3=n.mem&&n.mem.s&&n.mem.s[0]&&n.mem.s[1]&&n.mem.s[2];
-    C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",anim:true};
+    C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",anim:true,seen:opt.seen||{}};
     ccBox.querySelector(".ccref").textContent=n.ref;
+    var wasOpen=!ccBox.hidden;
     ccBox.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
-    try{history.pushState({cc:1},"");ccHist=true}catch(e){ccHist=false}
+    if(!wasOpen){try{history.pushState({cc:1},"");ccHist=true}catch(e){ccHist=false}}
     // 브라우저 전체 화면은 쓰지 않음 (브라우저 안내 문구가 떠서, 사용자 요청). 주소창 없이 쓰려면 홈 화면 앱으로 염
     ccDraw();
   }
@@ -5469,6 +5488,25 @@ button:active{filter:brightness(1.15)}
     if(a==="restart"){C.stage=0;C.shown=0;C.reads=0;C.round=0;C.grade="";C.anim=true;ccDraw();return}
     if(a==="close"){closeCoach();return}
   }
+  function ccNextNote(){   // 다음 암송 말씀: 오늘 복습할 것 → 아직 외우는 중인 것 → 나머지 (목록 순서)
+    if(!C)return null;
+    var seen=Object.assign({},C.seen); seen[C.id]=1;
+    var list=sorted().filter(function(x){return !seen[x.id]&&wordsOf(x.text||"").length});
+    var due=list.filter(function(x){var r=reviewInfo(x);return r&&r.due});
+    var doing=list.filter(function(x){return !memDone(x)});
+    return due[0]||doing[0]||list[0]||null;
+  }
+  function ccGoNext(){
+    var nx=ccNextNote(); if(!nx){toast("이번에 외울 말씀을 다 했어요 🎉");return}
+    var seen=Object.assign({},C.seen); seen[C.id]=1; buzz(8);
+    var body=ccBox.querySelector(".ccbody"), still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    body.classList.remove("ccin"); body.classList.add("ccout");
+    setTimeout(function(){
+      if(ccBox.hidden)return; body.classList.remove("ccout");
+      openCoach(nx,{seen:seen}); body.classList.add("ccin");
+      setTimeout(function(){body.classList.remove("ccin")},400);
+    },still?0:220);
+  }
   function ccReveal(){   // 확인하기: 가린 구슬이 앞에서부터 한 낱말씩 뒤집히며 말씀이 드러남
     if(C.revealing)return; C.revealing=true; buzz(8);
     ccBox.querySelectorAll(".ccfoot button").forEach(function(b){b.disabled=true});
@@ -5515,6 +5553,8 @@ button:active{filter:brightness(1.15)}
     v.appendChild(box); tip.textContent="";
     ft.textContent="";
     [["처음부터 다시","restart",false],["끝내기","close",true]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(x[2]?" main":"");b.dataset.a=x[1];b.textContent=x[0];ft.appendChild(b)});
+    var nx=ccNextNote();
+    if(nx){var nb=document.createElement("button");nb.type="button";nb.className="ccnext";nb.innerHTML='<span class="ccnarw" aria-hidden="true">←</span><span>밀어서 다음 말씀</span><b></b>';nb.querySelector("b").textContent=nx.ref;nb.addEventListener("click",ccGoNext);box.appendChild(nb)}
     if(C.grade==="g2"){buzz([14,50,22]);confetti(t1)}
   }
   function closeCoach(){
