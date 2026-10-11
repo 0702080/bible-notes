@@ -228,6 +228,18 @@ button{font-family:inherit;font-size:inherit;color:inherit}
   body{overflow:hidden}
 }
 @keyframes turn{0%,30%{transform:rotate(90deg)}60%,100%{transform:rotate(0)}}
+/* 진도 카드·뱃지 칸에 살짝 색감 (2026-10-11 사용자 요청) */
+.sum{background:linear-gradient(160deg,color-mix(in srgb,var(--ring) 9%,var(--sheet)) 0%,var(--sheet) 55%,color-mix(in srgb,var(--violet) 8%,var(--sheet)) 100%);border-color:color-mix(in srgb,var(--ring) 22%,var(--rule))}
+.sum-now{color:color-mix(in srgb,var(--ring) 70%,var(--ink))}
+.meter{background:color-mix(in srgb,var(--ring) 12%,#2A2A30)}
+.half{background:color-mix(in srgb,var(--orange) 9%,var(--paper));border-color:color-mix(in srgb,var(--orange) 26%,var(--rule))}
+.half b{color:color-mix(in srgb,var(--orange) 55%,var(--muted))}
+.half+.half{background:color-mix(in srgb,var(--sky) 9%,var(--paper));border-color:color-mix(in srgb,var(--sky) 26%,var(--rule))}
+.half+.half b{color:color-mix(in srgb,var(--sky) 55%,var(--muted))}
+#btnShare{background:color-mix(in srgb,var(--green) 12%,transparent);border-color:color-mix(in srgb,var(--green) 40%,var(--rule))}
+#btnFriend{background:color-mix(in srgb,var(--sky) 12%,transparent);border-color:color-mix(in srgb,var(--sky) 40%,var(--rule))}
+.shelf{background:linear-gradient(160deg,color-mix(in srgb,var(--violet) 11%,var(--sheet)),var(--sheet) 70%);border-color:color-mix(in srgb,var(--violet) 28%,var(--rule))}
+.shelf h3{color:color-mix(in srgb,var(--violet) 65%,var(--ink))}
 </style>
 </head>
 <body>
