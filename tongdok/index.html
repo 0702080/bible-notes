@@ -93,6 +93,8 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .bk.shut .bk-body{display:none}
 .bk.shut .bk-h{padding-bottom:0}
 .bk.shut{margin-top:12px}
+.foldbar{display:flex;justify-content:flex-end;margin-top:18px}
+.tg-all.tg-every{font-size:13.5px;padding:7px 16px;border-radius:18px;color:var(--ink);background:color-mix(in srgb,var(--ring) 12%,#232328);border-color:color-mix(in srgb,var(--ring) 35%,var(--rule))}
 h2.tg{display:flex;align-items:center;justify-content:space-between}
 .tg-all{font-size:12.5px;font-weight:500;color:var(--muted);background:#232328;border:1px solid var(--rule);border-radius:14px;padding:4px 12px;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.bk-chev{transition:none}}
@@ -285,6 +287,7 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
     <p class="none" id="shelfNone">한 책을 끝까지 읽으면 여기에 뱃지가 쌓여요.</p>
   </section>
 
+  <div class="foldbar"><button class="tg-all tg-every" type="button" data-act="foldall" data-t="all">66권 모두 접기</button></div>
   <h2 class="tg">구약<button class="tg-all" type="button" data-act="foldall" data-t="ot">모두 접기</button></h2>
   <div class="books" id="ot"></div>
   <h2 class="tg">신약<button class="tg-all" type="button" data-act="foldall" data-t="nt">모두 접기</button></h2>
@@ -524,9 +527,9 @@ function setFold(bi,shut){
   sec.classList.toggle("shut",shut); sec.querySelector(".bk-tg").setAttribute("aria-expanded",String(!shut));
 }
 function syncFoldAll(){
-  [["ot",0,OT_N],["nt",OT_N,BOOKS.length]].forEach(function(t){
+  [["ot",0,OT_N],["nt",OT_N,BOOKS.length],["all",0,BOOKS.length]].forEach(function(t){
     var all=true; for(var b=t[1];b<t[2];b++)if(!folded[b]){all=false;break}
-    var btn=document.querySelector('.tg-all[data-t="'+t[0]+'"]'); if(btn)btn.textContent=all?"모두 펴기":"모두 접기";
+    var btn=document.querySelector('.tg-all[data-t="'+t[0]+'"]'); if(btn)btn.textContent=(t[0]==="all"?"66권 ":"")+(all?"모두 펴기":"모두 접기");
   });
 }
 function chipsHTML(bi){
@@ -734,7 +737,7 @@ document.addEventListener("click",function(ev){
   var act=el.dataset.act;
   if(act==="fold"){var fb=+el.dataset.b;setFold(fb,!folded[fb]);saveFold();syncFoldAll();return}
   if(act==="foldall"){
-    var ot=el.dataset.t==="ot", a=ot?0:OT_N, z=ot?OT_N:BOOKS.length, shutAll=el.textContent==="모두 접기";
+    var t=el.dataset.t, a=t==="nt"?OT_N:0, z=t==="ot"?OT_N:BOOKS.length, shutAll=/접기$/.test(el.textContent);
     for(var fb2=a;fb2<z;fb2++)setFold(fb2,shutAll); saveFold(); syncFoldAll(); return;
   }
 
