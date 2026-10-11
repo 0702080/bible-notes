@@ -321,6 +321,9 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
 .cloud a{color:var(--violet);font-weight:700}
 .cloud small{color:var(--muted)}
 .cloud select,.cloud .cl-re{font:inherit;font-size:12.5px;padding:2px 6px;border:1px solid var(--rule);border-radius:8px;background:var(--sheet);color:var(--ink)}
+.chips .chip{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.painting{-webkit-user-select:none;user-select:none}
+body.painting .chips .chip[data-act]{cursor:crosshair}
 /* ===== 읽는 중인 책 고정 (📌) ===== */
 .bk-pin{align-self:center;flex:0 0 auto;width:34px;height:34px;margin-left:auto;border:1px solid var(--rule);border-radius:50%;background:var(--sheet);display:grid;place-items:center;font-size:15px;cursor:pointer;filter:grayscale(1);opacity:.55;padding:0}
 .bk-pin[aria-pressed="true"]{filter:none;opacity:1;border-color:color-mix(in srgb,var(--pink) 50%,var(--rule));background:color-mix(in srgb,var(--pink) 10%,var(--sheet))}
@@ -883,6 +886,48 @@ document.addEventListener("click",function(ev){
     return;
   }
 });
+/* 꾹 눌렀다가(0.3초) 그대로 끌면 지나가는 장을 한꺼번에 체크 (처음 누른 장이 체크돼 있었으면 한꺼번에 해제) */
+(function(){
+  var P=null, D=null, eat=false;
+  function chipAt(x,y){var t=document.elementFromPoint(x,y);t=t&&t.closest?t.closest('.chip[data-act="chip"]'):null;return t}
+  function paint(c){
+    var i=+c.dataset.i; if(D.done[i])return; D.done[i]=1;
+    if(!!me[i]===!!D.fill)return;
+    me[i]=D.fill; D.books[bookOf(i)]=1; D.n=(D.n||0)+1;
+    if(D.fill){c.setAttribute("data-s","me");c.classList.remove("got5");void c.offsetWidth;c.classList.add("got5")}else c.removeAttribute("data-s");
+    c.setAttribute("aria-pressed",String(!!D.fill)); try{navigator.vibrate&&navigator.vibrate(6)}catch(e){}
+  }
+  document.addEventListener("pointerdown",function(e){
+    var c=e.target.closest&&e.target.closest('.chip[data-act="chip"]'); if(!c||D||(e.pointerType==="mouse"&&e.button!==0))return;
+    P={c:c,x:e.clientX,y:e.clientY,id:e.pointerId,t:setTimeout(function(){
+      if(!P)return; var c0=P.c, i0=+c0.dataset.i; P=null;
+      D={id:e.pointerId,fill:me[i0]?0:1,done:{},books:{},before:countRange(me,0,TOTAL),full:{}};
+      BOOKS.forEach(function(b,bi){D.full[bi]=bookDone(bi)===b[1]});
+      document.body.classList.add("painting"); paint(c0); try{navigator.vibrate&&navigator.vibrate(20)}catch(err){}
+    },300)};
+  });
+  document.addEventListener("touchmove",function(e){if(D)e.preventDefault()},{passive:false});
+  document.addEventListener("pointermove",function(e){
+    if(P&&e.pointerId===P.id&&(Math.abs(e.clientX-P.x)>8||Math.abs(e.clientY-P.y)>8)){clearTimeout(P.t);P=null}
+    if(!D||e.pointerId!==D.id)return; e.preventDefault();
+    var c=chipAt(e.clientX,e.clientY); if(c)paint(c);
+    if(e.clientY<70)window.scrollBy(0,-14); else if(e.clientY>innerHeight-50)window.scrollBy(0,14);   // 화면 끝에서는 저절로 스크롤
+  });
+  function end(e){
+    if(P&&(!e||e.pointerId===P.id)){clearTimeout(P.t);P=null}
+    if(!D||(e&&e.pointerId!==D.id))return;
+    var d=D; D=null; document.body.classList.remove("painting"); eat=true; setTimeout(function(){eat=false},400);
+    var n=d.n||0; if(!n)return;
+    save(); Object.keys(d.books).forEach(function(bi){repaintBook(+bi)}); renderSummary(); renderShelf();
+    var after=countRange(me,0,TOTAL);
+    if(d.fill){var fin=Object.keys(d.books).map(Number).filter(function(bi){return !d.full[bi]&&bookDone(bi)===BOOKS[bi][1]});checkMilestones(d.before,after,fin)}
+    else{lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
+    hint(d.fill?"✓ "+n+"장을 한꺼번에 체크했어요":n+"장 체크를 풀었어요","꾹 눌러 끌면 여러 장을 한 번에 바꿀 수 있어요");
+  }
+  document.addEventListener("pointerup",end); document.addEventListener("pointercancel",end);
+  document.addEventListener("contextmenu",function(e){if(D||P)e.preventDefault()});
+  document.addEventListener("click",function(e){if(eat&&e.target.closest&&e.target.closest(".chip")){e.stopPropagation();e.preventDefault();eat=false}},true);
+})();
 function bookOf(idx){
   for(var i=BOOKS.length-1;i>=0;i--)if(idx>=OFF[i])return i;
   return 0;
