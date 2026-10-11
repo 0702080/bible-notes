@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-74">
+<meta name="app-build" content="2026-10-11-75">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5474,7 +5474,6 @@ button:active{filter:brightness(1.15)}
       ccWords(n.text,"none",0,C.seed);
       btn("확인하기 👀","show",true);
     }else if(C.stage===4){
-      tip.innerHTML="<b>얼마나 기억났나요?</b><br>솔직하게 고르면 다음 복습 날을 알맞게 정해 줘요.";
       ccWords(n.text,"got",0,C.seed);
       btn("😅 잘 모르겠어요","g0"); btn("🤔 조금 틀렸어요","g1"); btn("😊 다 기억났어요","g2",true);
     }else{
