@@ -3,7 +3,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-11-68">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B0B0D">
+<link rel="icon" href="icon-192.png">
+<meta name="app-build" content="2026-10-11-69">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1668,7 +1671,7 @@ button:active{filter:brightness(1.15)}
 .ccbody{display:flex;flex-direction:column}
 .cctip{text-align:center}
 .ccmeter{justify-content:center}
-.ccverse{margin:auto 0;padding:14px 0;text-align:center}
+.ccverse{margin:auto 0;padding:14px 0;text-align:left}
 .ccverse.recall{padding-top:14px}
 .ccfoot{justify-content:center;gap:10px;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px));border-top:0}
 .ccbtn{flex:1;height:54px;border-radius:27px;font-size:15.5px}
@@ -5363,7 +5366,7 @@ button:active{filter:brightness(1.15)}
     ccBox.querySelector(".ccref").textContent=n.ref;
     ccBox.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     try{history.pushState({cc:1},"");ccHist=true}catch(e){ccHist=false}
-    ccFull(true);
+    // 브라우저 전체 화면은 "종료하려면…" 안내가 떠서 쓰지 않음. 홈 화면 앱(manifest: fullscreen)으로 열면 주소창 없이 전체 화면
     ccDraw();
   }
   var ccHist=false, CC_COL=5, ccFs=false;
