@@ -137,6 +137,15 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
 @media (max-width:520px){.chip[data-s][data-five]::after{font-size:13px}}   /* 원 안에 쏙 들어가게 */
 .chip[data-s="friend"]::before{border:2px dashed var(--sky)}
 .chip[data-s="friend"]{color:var(--sky)}
+/* 친구 표 (보기 전용) */
+.who{display:flex;align-items:baseline;gap:6px;margin:8px 2px 5px;font-size:12.5px;font-weight:700}
+.who span{font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.me-who{color:#F2C94C;margin-top:0}
+.fr-who{color:var(--sky);margin-top:10px}
+.fchips{border-color:color-mix(in srgb,var(--sky) 30%,var(--rule));background:color-mix(in srgb,var(--sky) 18%,var(--rule))}
+.fchips .chip{cursor:default}
+.chip[data-s="fr"]{--c:var(--sky);color:#06222E;font-weight:700}
+.chip[data-s="fr"]::before{border:0;background:var(--c)}
 /* 얻는 순간 동그라미가 톡 튀어 오른다 */
 .chip.got::before,.chip.got5::before{animation:pop .42s cubic-bezier(.26,1.4,.4,1)}
 @keyframes pop{0%{transform:translate(-50%,-50%) scale(.55)}55%{transform:translate(-50%,-50%) scale(1.22)}100%{transform:translate(-50%,-50%) scale(1)}}
@@ -281,9 +290,8 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
       <button class="btn" id="btnCmp" type="button" hidden>비교 끄기</button>
     </div>
     <div class="legend" id="legend" hidden>
-      <span><i style="background:var(--ring)"></i>나만</span>
-      <span><i style="background:var(--green)"></i>둘 다</span>
-      <span><i style="border:1.5px dashed var(--sky)"></i>친구만</span>
+      <span><i style="background:#F2C94C"></i>나</span>
+      <span><i style="background:var(--sky)"></i>친구</span>
     </div>
   </section>
 
@@ -495,12 +503,20 @@ function countRange(bits,from,to){var n=0;for(var i=from;i<to;i++)if(bits[i])n++
 function bookDone(bi){return countRange(me,OFF[bi],OFF[bi]+BOOKS[bi][1])}
 
 /* ── 그리기 ───────────────────────────── */
-function chipState(idx){
-  var a=!!me[idx], b=friend&&compare?!!friend[idx]:false;
-  if(a&&b)return "both";
-  if(a)return "me";
-  if(b)return "friend";
-  return "";
+function chipState(idx){return me[idx]?"me":""}   // 내 표에는 내 것만 (친구 것은 바로 아래 따로 그림)
+/* 친구와 비교할 때: 책마다 내 표 아래에 친구 표를 나란히 (보기 전용) */
+function cmpOn(){return !!(friend&&compare)}
+function friendChipsHTML(bi){
+  var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips fchips" aria-label="'+esc(friendName||"친구")+'의 '+BOOKS[bi][0]+'">';
+  for(var c=1;c<=total;c++){var idx=base+c-1;s+='<span class="chip"'+(friend[idx]?' data-s="fr"':'')+(c%5===0?' data-five':'')+'>'+c+'</span>'}
+  for(var e=total%10?10-total%10:0;e>0;e--)s+='<span></span>';
+  return s+'</div>';
+}
+function bodyHTML(bi){
+  if(!cmpOn())return chipsHTML(bi);
+  var total=BOOKS[bi][1], fd=countRange(friend,OFF[bi],OFF[bi]+total);
+  return '<div class="who me-who">🙋 나 <span>'+bookDone(bi)+' / '+total+'</span></div>'+chipsHTML(bi)
+    +'<div class="who fr-who">👤 '+esc(friendName||"친구")+' <span>'+fd+' / '+total+'</span></div>'+friendChipsHTML(bi);
 }
 /* 책 갈래: 색으로 구분하려고 쓴다 */
 function bookGroup(bi){
@@ -516,7 +532,7 @@ function renderBooks(){
       +'<div class="bk-h"><button class="bk-tg" type="button" data-act="fold" data-b="'+bi+'" aria-expanded="'+(!shut)+'"><span class="bk-chev" aria-hidden="true"></span><span class="bk-name">'+name+'</span>'
       +'<span class="bk-cnt">'+done+' / '+total+'</span></button>'
       +progBadge(done,total)+'</div>'
-      +'<div class="bk-body">'+chipsHTML(bi)+'</div></section>';
+      +'<div class="bk-body">'+bodyHTML(bi)+'</div></section>';
     html[bi<OT_N?0:1]+=h;
   }
   $("ot").innerHTML=html[0];
@@ -562,7 +578,7 @@ function repaintBook(bi){
   sec.classList.toggle("full",done===total);
   sec.querySelector(".bk-cnt").textContent=done+" / "+total;
   sec.querySelector(".bk-prog").outerHTML=progBadge(done,total);
-  sec.querySelector(".bk-body").innerHTML=chipsHTML(bi);
+  sec.querySelector(".bk-body").innerHTML=bodyHTML(bi);
 }
 function renderSummary(){
   var mine=countRange(me,0,TOTAL);
