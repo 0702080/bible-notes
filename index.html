@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-90">
+<meta name="app-build" content="2026-10-11-91">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7536,6 +7536,8 @@ button:active{filter:brightness(1.15)}
       var u=await sbStart(q.access_token);
       sbSetSession({access_token:q.access_token,refresh_token:q.refresh_token,expires_at:+q.expires_at||Math.floor(Date.now()/1000)+(+q.expires_in||3600),user:{id:u.id,email:u.email}});
       if(u&&u.email)sbRemember(u.email);
+      // 통독표에서 로그인 메일을 보냈으면 로그인 뒤 통독표로 돌아감 (30분 안)
+      try{var nx=JSON.parse(localStorage.getItem("bible-login-next")||"null");if(nx&&nx.u&&Date.now()-nx.at<1800000){localStorage.removeItem("bible-login-next");location.replace(SB_SITE+nx.u);return}}catch(e){}
       sbMarkAll(); sbSync("login");
       setTimeout(sbAfterLogin,700);   // 메일 링크로 들어온 김에 비밀번호 저장(또는 만들기 안내)
     }catch(e){toast("로그인하지 못했어요. 다시 시도해 주세요")}

@@ -305,6 +305,16 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
 .chips>span{background:transparent;box-shadow:none}
 .fchips{background:transparent}
 .fchips .chip{box-shadow:0 0 0 .5px color-mix(in srgb,var(--sky) 35%,var(--rule))}
+.cl-login{margin-top:2px;background:color-mix(in srgb,var(--sky) 12%,var(--sheet));border-color:color-mix(in srgb,var(--sky) 45%,var(--rule));color:var(--ink);font-weight:700}
+.lg-tip{font-size:13px;line-height:1.6;color:var(--muted);margin:10px 0 6px}
+.fr-box{font-size:14px;line-height:1.6}
+.fr-me{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fr-code{font-size:20px;letter-spacing:2px;color:var(--violet)}
+.fr-name,.fr-add{display:flex;align-items:center;gap:6px;margin-top:10px}
+.fr-name input,.fr-add input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--rule);border-radius:9px;background:var(--paper);color:var(--ink);font:inherit}
+.fr-h{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.fr-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--rule)}
+.fr-none{color:var(--muted);font-size:13px}
 .cloud{margin-top:10px;font-size:12.5px;line-height:1.6;color:var(--muted)}
 .cloud.on{color:#2E7D52}
 .cloud.bad{color:var(--pink)}
@@ -1012,17 +1022,116 @@ function applyCloudFriend(){
 function ago(t){var m=Math.round((Date.now()-t)/60000);return m<1?"방금":m<60?m+"분 전":m<1440?Math.round(m/60)+"시간 전":Math.round(m/1440)+"일 전"}
 function drawCloud(){
   var el=$("cloud"); if(!el)return;
-  if(!sbSession()){el.innerHTML='☁️ <a href="../">묵상 노트</a>에서 로그인하고 친구를 맺으면, 친구 진도가 <b>저절로</b> 같이 보여요.';el.className="cloud off";return}
+  if(!sbSession()){el.innerHTML='<button type="button" class="btn cl-login" data-act="login">☁️ 로그인하고 친구와 자동으로 같이 보기</button>';el.className="cloud off";return}
   if(cloudState.ok===false){el.innerHTML='☁️ 자동 맞춤이 안 됐어요 · '+esc(cloudState.msg)+' <button type="button" class="cl-re" data-act="cloud">다시</button>';el.className="cloud bad";return}
   var h='☁️ 자동 맞춤 켜짐'+(cloudState.at?' · '+ago(cloudState.at):'');
   if(cloudFriends.length>1){h+=' · <select class="cl-pick" aria-label="같이 볼 친구">'+cloudFriends.map(function(f){return '<option value="'+f.id+'"'+(f.id===friendCloud?' selected':'')+'>'+esc(f.name)+'</option>'}).join("")+'</select>'}
   else if(cloudFriends.length===1)h+=' · 👤 '+esc(cloudFriends[0].name)+' ('+ago(cloudFriends[0].at)+' 체크)';
-  else if(cloudState.nFriends===0)h+=' · 묵상 노트 👥 친구에서 친구를 맺어 주세요';
+  else if(cloudState.nFriends===0)h+=' · 아래 👥 친구에서 친구 코드로 친구를 맺어 주세요';
   if(cloudState.noRows&&cloudState.noRows.length)h+='<br><small>'+esc(cloudState.noRows.join(", "))+'님은 아직 통독표를 안 열었어요 (한 번 열면 보여요)</small>';
+  h+=' <button type="button" class="cl-re" data-act="friends">👥 친구</button>';
   el.innerHTML=h; el.className="cloud on";
 }
 document.addEventListener("change",function(ev){if(ev.target.classList&&ev.target.classList.contains("cl-pick")){cloudPick=ev.target.value;try{localStorage.setItem("bible-tongdok-cloudpick",cloudPick)}catch(e){}compare=true;applyCloudFriend();renderAll()}});
-document.addEventListener("click",function(ev){if(ev.target.closest('[data-act="cloud"]'))cloudSync(false)});
+document.addEventListener("click",function(ev){
+  if(ev.target.closest('[data-act="cloud"]'))cloudSync(false);
+  if(ev.target.closest('[data-act="login"]'))openLogin();
+  if(ev.target.closest('[data-act="friends"]'))openFriends();
+});
+/* 로그인: 이메일로 로그인 링크를 받아 한 번만 하면 이 휴대폰에서 계속 로그인된 상태 (묵상 노트와 같은 계정·같은 저장) */
+var SB_SITE="https://0702080.github.io/bible-notes/";
+function setSes(j){try{localStorage.setItem(SB_SES,JSON.stringify({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}}))}catch(e){}}
+function openLogin(){
+  $("dlgTitle").textContent="☁️ 로그인";
+  $("dlgDesc").textContent="이메일로 한 번만 로그인하면, 친구 코드로 맺은 친구의 진도가 내 표 아래에 저절로 보여요. 내 진도는 친구로 맺은 사람에게만 보여요.";
+  var rem=""; try{rem=localStorage.getItem("bible-sb-email")||""}catch(e){}
+  $("dlgBody").innerHTML='<input type="text" id="lgMail" inputmode="email" autocomplete="email" placeholder="이메일 (예: name@naver.com)" value="'+esc(rem)+'">'
+    +'<div id="lgStep2" hidden><p class="lg-tip">📧 메일함에서 <b>로그인 링크</b>를 눌러 주세요. 링크가 다른 앱에서 열리면, 링크를 <b>길게 눌러 복사</b>해서 아래에 붙여 넣고 [확인]을 누르세요.</p><textarea id="lgLink" placeholder="로그인 링크 붙여 넣기"></textarea></div>';
+  $("dlgTools").innerHTML='<button class="btn on wide" type="button" id="lgSend">로그인 메일 받기</button><button class="btn wide" type="button" id="lgOk" hidden>확인</button><button class="btn wide" type="button" id="lgCl">닫기</button>';
+  $("dlg").hidden=false;
+  $("lgCl").addEventListener("click",closeDlg);
+  $("lgSend").addEventListener("click",async function(){
+    var em=$("lgMail").value.trim(), b=this; if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){setMsg("이메일을 확인해 주세요",true);return}
+    b.disabled=true; b.textContent="보내는 중…";
+    try{
+      try{localStorage.setItem("bible-sb-email",em);localStorage.setItem("bible-login-next",JSON.stringify({u:"tongdok/",at:Date.now()}))}catch(e){}   // 메일 링크로 들어오면 통독표로 돌아오게
+      var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(SB_SITE),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
+      if(r.status===429){setMsg("잠시 뒤에 다시 눌러 주세요 (메일은 짧은 시간에 여러 번 보낼 수 없어요)",true);return}
+      if(!r.ok){setMsg("메일을 보내지 못했어요 ("+r.status+")",true);return}
+      $("lgStep2").hidden=false; $("lgOk").hidden=false; b.textContent="메일 다시 받기"; setMsg(em+" 로 로그인 메일을 보냈어요.");
+    }catch(e){setMsg("인터넷 연결을 확인해 주세요",true)}
+    finally{b.disabled=false; if(b.textContent==="보내는 중…")b.textContent="로그인 메일 받기"}
+  });
+  $("lgOk").addEventListener("click",async function(){
+    var raw=$("lgLink").value.trim(), em=$("lgMail").value.trim(), body=null;
+    var lm=raw.match(/[?&#]token=([^&#\s]+)/), tm=raw.match(/[?&#]type=([a-z_]+)/), am=raw.match(/access_token=([^&#\s]+)/);
+    if(am){var rt=(raw.match(/refresh_token=([^&#\s]+)/)||[])[1];if(rt){await finishLogin({access_token:decodeURIComponent(am[1]),refresh_token:decodeURIComponent(rt),expires_in:3600});return}}
+    if(lm)body={type:tm?tm[1]:"magiclink",token_hash:decodeURIComponent(lm[1])};
+    else{var code=raw.replace(/\D/g,"");if(code.length<6){setMsg("메일의 로그인 링크를 복사해 붙여 넣어 주세요",true);return}body={type:"email",email:em,token:code}}
+    try{
+      var vr=await fetch(SB_URL+"/auth/v1/verify",{method:"POST",headers:sbH(),body:JSON.stringify(body)});
+      if(!vr.ok){setMsg("링크가 이미 쓰였거나 시간이 지났어요. '메일 다시 받기'로 새 링크를 받아 주세요",true);return}
+      var j=await vr.json(); setSes(j); loginDone();
+    }catch(e){setMsg("인터넷 연결을 확인해 주세요",true)}
+  });
+}
+async function finishLogin(q){
+  try{var u=await (await fetch(SB_URL+"/auth/v1/user",{headers:sbH(q.access_token)})).json();setSes({access_token:q.access_token,refresh_token:q.refresh_token,expires_in:+q.expires_in||3600,expires_at:+q.expires_at||0,user:u});loginDone()}
+  catch(e){setMsg("로그인하지 못했어요. 다시 해 주세요",true)}
+}
+function loginDone(){
+  try{localStorage.removeItem("bible-login-next")}catch(e){}
+  closeDlg(); hint("로그인했어요 ☁️","이제 친구 코드로 친구를 맺으면 진도가 저절로 같이 보여요");
+  cloudSync(false).then(function(){if(!cloudFriends.length)openFriends()});
+  if(myName)setProfileName(myName);
+}
+async function setProfileName(n){try{var tok=await sbToken();if(!tok)return;await fetch(SB_URL+"/rest/v1/profiles?id=eq."+sbSession().user.id,{method:"PATCH",headers:Object.assign(sbH(tok),{"Prefer":"return=minimal"}),body:JSON.stringify({name:String(n).slice(0,20)})})}catch(e){}}
+/* 👥 친구: 내 친구 코드를 알려 주고, 친구 코드를 넣어 신청·수락 (묵상 노트의 친구와 같은 것) */
+async function openFriends(){
+  if(!sbSession()){openLogin();return}
+  $("dlgTitle").textContent="👥 친구";
+  $("dlgDesc").textContent="서로 친구 코드를 주고받아 한 사람이 넣으면 신청, 다른 사람이 수락하면 친구가 돼요. 친구가 되면 진도가 저절로 같이 보여요.";
+  $("dlgBody").innerHTML='<div class="fr-box">불러오는 중…</div>';
+  $("dlgTools").innerHTML='<button class="btn wide" type="button" id="frOut">로그아웃</button><button class="btn wide" type="button" id="frCl">닫기</button>';
+  $("dlg").hidden=false;
+  $("frCl").addEventListener("click",function(){closeDlg();cloudSync(false)});
+  $("frOut").addEventListener("click",function(){
+    if(!this.dataset.sure){this.dataset.sure="1";this.textContent="한 번 더 누르면 로그아웃";return}
+    try{localStorage.removeItem(SB_SES)}catch(e){} cloudFriends=[]; closeDlg(); drawCloud(); hint("로그아웃했어요","체크는 이 휴대폰에 그대로 있어요");
+  });
+  drawFriends();
+}
+async function drawFriends(){
+  var box=$("dlgBody").querySelector(".fr-box"); if(!box)return;
+  try{
+    var tok=await sbToken(); if(!tok){box.textContent="다시 로그인해 주세요";return}
+    var uid=sbSession().user.id;
+    var fr=await sbGet(tok,"/rest/v1/friendships?select=requester,addressee,status");
+    var ids=fr.map(function(f){return f.requester===uid?f.addressee:f.requester});
+    var pf=await sbGet(tok,"/rest/v1/profiles?select=id,name,friend_code&id=in.("+[uid].concat(ids).join(",")+")"), pm={}; pf.forEach(function(p){pm[p.id]=p});
+    var meP=pm[uid]||{}, nm=function(id){return esc((pm[id]&&pm[id].name)||"이름 없음")};
+    var acc=fr.filter(function(f){return f.status==="accepted"}), inc=fr.filter(function(f){return f.status==="pending"&&f.addressee===uid}), out=fr.filter(function(f){return f.status==="pending"&&f.requester===uid});
+    var h='<div class="fr-me">내 친구 코드 <b class="fr-code">'+esc(meP.friend_code||"……")+'</b> <button type="button" class="cl-re" id="frCopy">복사</button></div>'
+      +'<div class="fr-name">내 이름 <input type="text" id="frNm" maxlength="20" value="'+esc(meP.name||myName||"")+'" placeholder="친구에게 보일 이름"><button type="button" class="cl-re" id="frNmSave">저장</button></div>'
+      +'<div class="fr-add"><input type="text" id="frCode" maxlength="8" placeholder="친구 코드 6자리" autocapitalize="characters"><button type="button" class="btn on" id="frReq">친구 신청</button></div>';
+    if(inc.length)h+='<div class="fr-h">받은 신청</div>'+inc.map(function(f){return '<div class="fr-row">'+nm(f.requester)+' <button type="button" class="btn on fr-acc" data-u="'+f.requester+'">수락</button></div>'}).join("");
+    if(out.length)h+='<div class="fr-h">보낸 신청 (상대가 수락하면 친구)</div>'+out.map(function(f){return '<div class="fr-row">'+nm(f.addressee)+' · 기다리는 중</div>'}).join("");
+    h+='<div class="fr-h">친구 '+acc.length+'명</div>'+(acc.length?acc.map(function(f){var o=f.requester===uid?f.addressee:f.requester;return '<div class="fr-row">👤 '+nm(o)+'</div>'}).join(""):'<div class="fr-row fr-none">아직 없어요. 친구 코드를 주고받아 보세요.</div>');
+    box.innerHTML=h;
+    $("frCopy").addEventListener("click",function(){copy(meP.friend_code||"").then(function(){setMsg("친구 코드를 복사했어요. 카톡으로 보내 주세요.")})});
+    $("frNmSave").addEventListener("click",async function(){var v=$("frNm").value.trim();if(!v)return;myName=v;save();await setProfileName(v);setMsg("이름을 저장했어요.")});
+    $("frReq").addEventListener("click",async function(){
+      var c=$("frCode").value.trim().toUpperCase(); if(c.length<4){setMsg("친구 코드를 넣어 주세요",true);return}
+      try{var r=await fetch(SB_URL+"/rest/v1/rpc/request_friend",{method:"POST",headers:sbH(await sbToken()),body:JSON.stringify({code:c})});var t=await r.json();
+        setMsg({requested:"친구 신청을 보냈어요. 친구가 수락하면 진도가 보여요.",accepted:"친구가 됐어요! 🎉",already:"이미 친구예요.",self:"내 코드예요. 친구의 코드를 넣어 주세요.",notfound:"그 코드를 찾지 못했어요.",login:"다시 로그인해 주세요."}[t]||("결과: "+t),t==="notfound"||t==="self");
+        drawFriends(); if(t==="accepted")cloudSync(false);
+      }catch(e){setMsg("인터넷 연결을 확인해 주세요",true)}
+    });
+    box.querySelectorAll(".fr-acc").forEach(function(b){b.addEventListener("click",async function(){
+      try{var tk=await sbToken();await fetch(SB_URL+"/rest/v1/friendships?requester=eq."+b.dataset.u+"&addressee=eq."+uid,{method:"PATCH",headers:Object.assign(sbH(tk),{"Prefer":"return=minimal"}),body:JSON.stringify({status:"accepted"})});setMsg("친구가 됐어요! 🎉");drawFriends();cloudSync(false)}catch(e){setMsg("인터넷 연결을 확인해 주세요",true)}
+    })});
+  }catch(e){box.textContent="친구 정보를 받지 못했어요. 인터넷 연결을 확인해 주세요."}
+}
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&sbSession())cloudSync(false)});
 setInterval(function(){if(!document.hidden&&sbSession())cloudSync(false)},60000);
 
@@ -1032,6 +1141,11 @@ load();
 lastOT=countRange(me,0,OT_TOTAL);
 lastNT=countRange(me,OT_TOTAL,TOTAL);
 /* 링크로 열렸으면 그 진도를 친구 것으로 본다 (내 체크는 건드리지 않는다) */
+if(/access_token=/.test(location.hash)){   // 메일 링크가 통독표로 바로 돌아온 경우
+  var lq={}; location.hash.replace(/^#/,"").split("&").forEach(function(kv){var a=kv.split("=");lq[decodeURIComponent(a[0])]=decodeURIComponent(a[1]||"")});
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+  if(lq.access_token&&lq.refresh_token)finishLogin(lq);
+}
 var fromLink=parseCode(location.hash);
 if(fromLink){
   friend=fromLink.bits;friendName=fromLink.name;compare=true;saveFriend();
