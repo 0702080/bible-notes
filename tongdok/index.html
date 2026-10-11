@@ -98,8 +98,13 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 h2.tg{display:flex;align-items:center;justify-content:space-between}
 .tg-all{font-size:12.5px;font-weight:500;color:var(--muted);background:#232328;border:1px solid var(--rule);border-radius:14px;padding:4px 12px;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.bk-chev{transition:none}}
-.bk-all{margin-left:auto;align-self:center;width:36px;height:30px;display:grid;place-items:center;font-size:17px;line-height:1;color:var(--muted);background:#232328;border:1px solid var(--rule);border-radius:15px;padding:0;cursor:pointer}
-.bk-all.clr{opacity:.75}
+.bk-prog{--c:var(--ring);margin-left:auto;align-self:center;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+  background:conic-gradient(var(--c) calc(var(--p)*1%),#34343B 0)}
+.bk-prog b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--paper);font-size:11px;font-weight:700;color:var(--c);font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.bk-prog[data-st="none"]{--c:var(--muted)}
+.bk-prog[data-st="none"] b{color:#7A7782}
+.bk-prog[data-st="full"]{--c:var(--green);box-shadow:0 0 10px color-mix(in srgb,var(--green) 40%,transparent)}
+.bk-prog[data-st="full"] b{background:var(--green);color:#0E1A12;font-size:15px}
 .chips{display:grid;grid-template-columns:repeat(10,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
 .chips>span{background:var(--sheet)}   /* 마지막 줄 빈칸 */
 .chip{
@@ -510,7 +515,7 @@ function renderBooks(){
     var h='<section class="bk'+(done===total?" full":"")+(shut?" shut":"")+'" data-b="'+bi+'" data-g="'+bookGroup(bi)+'">'
       +'<div class="bk-h"><button class="bk-tg" type="button" data-act="fold" data-b="'+bi+'" aria-expanded="'+(!shut)+'"><span class="bk-chev" aria-hidden="true"></span><span class="bk-name">'+name+'</span>'
       +'<span class="bk-cnt">'+done+' / '+total+'</span></button>'
-      +allBtn(bi,done===total)+'</div>'
+      +progBadge(done,total)+'</div>'
       +'<div class="bk-body">'+chipsHTML(bi)+'</div></section>';
     html[bi<OT_N?0:1]+=h;
   }
@@ -533,10 +538,11 @@ function syncFoldAll(){
     var btn=document.querySelector('.tg-all[data-t="'+t[0]+'"]'); if(btn)btn.textContent=(t[0]==="all"?"66권 ":"")+(all?"모두 펴기":"모두 접기");
   });
 }
-/* 전체 읽음 / 전체 지우기를 작은 그림 버튼으로 (글자는 화면 읽기용으로만) */
-function allBtn(bi,full){
-  var t=full?BOOKS[bi][0]+" 전체 지우기":BOOKS[bi][0]+" 전체 읽음";
-  return '<button class="bk-all'+(full?" clr":"")+'" type="button" data-act="all" data-b="'+bi+'" aria-label="'+t+'" title="'+t+'">'+(full?"↩️":"✅")+'</button>';
+/* 책 오른쪽 끝: 진행 상황을 링(색)과 숫자로 — 안 읽음 회색, 읽는 중 금빛 %, 다 읽음 초록 ✓ (2026-10-11 사용자 요청) */
+function progBadge(done,total){
+  var p=Math.round(done/total*100), st=done===0?"none":done===total?"full":"part";
+  var txt=done===total?"✓":done===0?"0":p+"%";
+  return '<span class="bk-prog" data-st="'+st+'" style="--p:'+(done/total*100).toFixed(1)+'" role="img" aria-label="'+(done===total?"다 읽음":p+"% 읽음")+'"><b>'+txt+'</b></span>';
 }
 function chipsHTML(bi){
   var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips">';
@@ -555,7 +561,7 @@ function repaintBook(bi){
   var total=BOOKS[bi][1], done=bookDone(bi);
   sec.classList.toggle("full",done===total);
   sec.querySelector(".bk-cnt").textContent=done+" / "+total;
-  sec.querySelector(".bk-all").outerHTML=allBtn(bi,done===total);
+  sec.querySelector(".bk-prog").outerHTML=progBadge(done,total);
   sec.querySelector(".bk-body").innerHTML=chipsHTML(bi);
 }
 function renderSummary(){
@@ -766,20 +772,6 @@ document.addEventListener("click",function(ev){
       checkMilestones(before,after,(!wasFull&&nowFull)?[bi2]:[]);
       // 축복 카드가 떴으면 띠까지 겹치지 않게 한다
       maybeCheer(bi2, idx-OFF[bi2]+1);
-    }else{
-      lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
-    }
-    return;
-  }
-  if(act==="all"){
-    var b3=+el.dataset.b, t=BOOKS[b3][1], base=OFF[b3];
-    var before2=countRange(me,0,TOTAL), wasFull2=bookDone(b3)===t;
-    var fill=wasFull2?0:1;
-    for(var c=0;c<t;c++)me[base+c]=fill;
-    save();repaintBook(b3);renderSummary();renderShelf();
-    var after2=countRange(me,0,TOTAL);
-    if(fill){
-      checkMilestones(before2,after2,wasFull2?[]:[b3]);
     }else{
       lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
     }
