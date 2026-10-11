@@ -886,13 +886,13 @@ function openFriend(){
   $("ok").addEventListener("click",function(){
     var r=parseCode($("pf").value);
     if(!r){setMsg("코드를 알아볼 수 없어요. 링크 전체를 다시 붙여 넣어 주세요.",true);return}
-    friend=r.bits;friendName=r.name;compare=true;
+    friend=r.bits;friendName=r.name;compare=true;saveFriend();
     renderAll();
     setMsg((friendName||"친구")+" 진도를 불러왔어요.");
     setTimeout(closeDlg,900);
   });
   if(friend)$("rm").addEventListener("click",function(){
-    friend=null;friendName="";compare=false;renderAll();closeDlg();
+    friend=null;friendName="";compare=false;saveFriend();renderAll();closeDlg();
   });
   $("cl2").addEventListener("click",closeDlg);
 }
@@ -911,7 +911,11 @@ function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){
 
 $("btnShare").addEventListener("click",openShare);
 $("btnFriend").addEventListener("click",openFriend);
-$("btnCmp").addEventListener("click",function(){compare=!compare;renderAll()});
+$("btnCmp").addEventListener("click",function(){compare=!compare;saveFriend();renderAll()});
+/* 불러온 친구 진도는 이 기기에 기억해 두고, 다음에 열어도 내 표와 같이 보여 줌 */
+var FRIEND_KEY="bible-tongdok-friend";
+function saveFriend(){try{if(friend)localStorage.setItem(FRIEND_KEY,JSON.stringify({c:"2"+toRuns(friend),n:friendName,cmp:compare}));else localStorage.removeItem(FRIEND_KEY)}catch(e){}}
+function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"null");if(!o||!o.c)return;var bits=fromRuns(String(o.c).slice(1));if(!bits)return;friend=bits;friendName=o.n||"";compare=o.cmp!==false}catch(e){}}
 
 /* ── 시작 ─────────────────────────────── */
 load();
@@ -921,9 +925,9 @@ lastNT=countRange(me,OT_TOTAL,TOTAL);
 /* 링크로 열렸으면 그 진도를 친구 것으로 본다 (내 체크는 건드리지 않는다) */
 var fromLink=parseCode(location.hash);
 if(fromLink){
-  friend=fromLink.bits;friendName=fromLink.name;compare=true;
+  friend=fromLink.bits;friendName=fromLink.name;compare=true;saveFriend();
   try{history.replaceState(null,"",location.pathname)}catch(e){}
-}
+}else loadFriend();
 renderAll();
 })();
 </script>
