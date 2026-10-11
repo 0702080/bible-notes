@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-73">
+<meta name="app-build" content="2026-10-11-74">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1667,6 +1667,10 @@ button:active{filter:brightness(1.15)}
 .ccw.got{color:var(--bc);font-weight:600}
 .ccw.flip{animation:bwflip .42s cubic-bezier(.2,1.5,.4,1)}
 .ccres{animation:bqres .5s cubic-bezier(.2,1.5,.4,1)}
+.ccnum{align-self:center;padding:1px 8px;border-radius:9px;background:color-mix(in srgb,var(--violet) 18%,transparent);color:var(--violet);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.ccnum[hidden]{display:none}
+.ccnum.bump{animation:ccpop .55s cubic-bezier(.2,1.6,.4,1)}
+@media (prefers-reduced-motion:reduce){.ccnum.bump{animation:none}}
 /* 결과 화면: 밀어서 다음 말씀 */
 .ccnext{display:inline-flex;align-items:center;gap:8px;margin-top:28px;padding:10px 18px;border:1px dashed color-mix(in srgb,var(--violet) 55%,#34333A);border-radius:22px;background:color-mix(in srgb,var(--violet) 10%,transparent);color:var(--muted);font-size:14.5px}
 .ccnext b{color:var(--violet);font-weight:700}
@@ -5358,7 +5362,7 @@ button:active{filter:brightness(1.15)}
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
       ccBox=document.createElement("div"); ccBox.className="cch"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
-      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b></div></div>'+
+      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b><small class="ccnum" hidden></small></div></div>'+
         '<div class="ccsteps" aria-hidden="true"></div>'+
         '<div class="ccbody"><div class="cctip"></div><div class="ccverse"></div></div>'+
         '<div class="ccfoot"></div>';
@@ -5381,8 +5385,10 @@ button:active{filter:brightness(1.15)}
       window.addEventListener("popstate",function(){if(ccBox&&!ccBox.hidden){ccHist=false;closeCoach()}});
     }
     var done3=n.mem&&n.mem.s&&n.mem.s[0]&&n.mem.s[1]&&n.mem.s[2];
-    C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",anim:true,seen:opt.seen||{}};
+    C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",anim:true,seen:opt.seen||{},order:opt.order||1};
     ccBox.querySelector(".ccref").textContent=n.ref;
+    var cn=ccBox.querySelector(".ccnum"); cn.hidden=C.order<2; cn.textContent=C.order+"번째";   // 밀어서 이어 외울 때 몇 번째 말씀인지
+    if(C.order>=2){cn.classList.remove("bump");void cn.offsetWidth;cn.classList.add("bump")}
     var wasOpen=!ccBox.hidden;
     ccBox.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     if(!wasOpen){try{history.pushState({cc:1},"");ccHist=true}catch(e){ccHist=false}}
@@ -5504,7 +5510,7 @@ button:active{filter:brightness(1.15)}
     body.classList.remove("ccin"); body.classList.add("ccout");
     setTimeout(function(){
       if(ccBox.hidden)return; body.classList.remove("ccout");
-      openCoach(nx,{seen:seen}); body.classList.add("ccin");
+      openCoach(nx,{seen:seen,order:(C?C.order:1)+1}); body.classList.add("ccin");
       setTimeout(function(){body.classList.remove("ccin")},400);
     },still?0:220);
   }
