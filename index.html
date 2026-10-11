@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
-<meta name="app-build" content="2026-10-11-67">
+<meta name="app-build" content="2026-10-11-68">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1664,6 +1664,17 @@ button:active{filter:brightness(1.15)}
 .ccw.got{color:var(--bc);font-weight:600}
 .ccw.flip{animation:bwflip .42s cubic-bezier(.2,1.5,.4,1)}
 .ccres{animation:bqres .5s cubic-bezier(.2,1.5,.4,1)}
+/* 말씀은 화면 가운데, 버튼은 엄지가 닿기 쉬운 아래쪽에 크게 */
+.ccbody{display:flex;flex-direction:column}
+.cctip{text-align:center}
+.ccmeter{justify-content:center}
+.ccverse{margin:auto 0;padding:14px 0;text-align:center}
+.ccverse.recall{padding-top:14px}
+.ccfoot{justify-content:center;gap:10px;padding:14px 16px calc(24px + env(safe-area-inset-bottom,0px));border-top:0}
+.ccbtn{flex:1;height:54px;border-radius:27px;font-size:15.5px}
+.ccbtn.main{flex:1 1 100%;order:9;height:66px;border-radius:33px;font-size:18px;box-shadow:0 6px 18px color-mix(in srgb,var(--gold) 22%,transparent)}
+.ccbtn:active{transform:scale(.97)}
+.ccbtn:disabled{opacity:.55}
 @media (prefers-reduced-motion:reduce){.ccst.done.just i,.ccst.now i,.ccmeter i.on.just,.ccw.hid.peek,.ccw.enter,.ccverse.recall .ccw.hid,.ccw.flip,.ccres{animation:none}}
 .mcoach{display:inline-flex;align-items:baseline;gap:8px;max-width:100%;height:38px;margin:10px 0 4px;padding:0 16px;border:1px solid color-mix(in srgb,var(--gold) 60%,#34333A);border-radius:19px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);line-height:36px;white-space:nowrap;overflow:hidden}
 .mcoach b{font-size:14.5px}
@@ -5352,9 +5363,25 @@ button:active{filter:brightness(1.15)}
     ccBox.querySelector(".ccref").textContent=n.ref;
     ccBox.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     try{history.pushState({cc:1},"");ccHist=true}catch(e){ccHist=false}
+    ccFull(true);
     ccDraw();
   }
-  var ccHist=false, CC_COL=5;
+  var ccHist=false, CC_COL=5, ccFs=false;
+  function ccFull(on){   // 암송할 때는 주소창까지 가리는 전체 화면
+    var d=document, el=d.documentElement;
+    try{
+      if(on){
+        var req=el.requestFullscreen||el.webkitRequestFullscreen; if(!req||d.fullscreenElement||d.webkitFullscreenElement)return;
+        var p=req.call(el,{navigationUI:"hide"}); ccFs=true; if(p&&p.catch)p.catch(function(){ccFs=false});
+      }else if(ccFs){
+        ccFs=false; if(d.fullscreenElement||d.webkitFullscreenElement)(d.exitFullscreen||d.webkitExitFullscreen).call(d);
+      }
+    }catch(e){ccFs=false}
+  }
+  // 뒤로 가기로 전체 화면이 풀리면 암송 창도 함께 닫음 (뒤로 가기를 두 번 누르지 않도록)
+  ["fullscreenchange","webkitfullscreenchange"].forEach(function(ev){document.addEventListener(ev,function(){
+    if(!document.fullscreenElement&&!document.webkitFullscreenElement&&ccFs){ccFs=false;if(ccBox&&!ccBox.hidden)closeCoach()}
+  })});
   function ccMask(sp){   // 가린 낱말 다시 그리기 (첫 글자 단계는 첫 글자를 밝게)
     sp.textContent="";
     if(sp.dataset.f){var b=document.createElement("b");b.textContent=sp.dataset.f;sp.appendChild(b);sp.appendChild(document.createTextNode(sp.dataset.m))}
@@ -5489,6 +5516,7 @@ button:active{filter:brightness(1.15)}
   }
   function closeCoach(){
     if(!ccBox||ccBox.hidden)return; ccBox.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode;
+    ccFull(false);
     if(ccHist){ccHist=false;try{history.back()}catch(e){}}
     try{window.speechSynthesis.cancel()}catch(e){}
     var id=C&&C.id; C=null; if(id){var c=cards.get(id);if(c){var p=c.querySelector(".mempanel");if(p)p.dataset.key=""}render();renderReviewBar()}
