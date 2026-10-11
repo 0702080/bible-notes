@@ -305,6 +305,12 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
 .chips>span{background:transparent;box-shadow:none}
 .fchips{background:transparent}
 .fchips .chip{box-shadow:0 0 0 .5px color-mix(in srgb,var(--sky) 35%,var(--rule))}
+.cloud{margin-top:10px;font-size:12.5px;line-height:1.6;color:var(--muted)}
+.cloud.on{color:#2E7D52}
+.cloud.bad{color:var(--pink)}
+.cloud a{color:var(--violet);font-weight:700}
+.cloud small{color:var(--muted)}
+.cloud select,.cloud .cl-re{font:inherit;font-size:12.5px;padding:2px 6px;border:1px solid var(--rule);border-radius:8px;background:var(--sheet);color:var(--ink)}
 /* ===== 읽는 중인 책 고정 (📌) ===== */
 .bk-pin{align-self:center;flex:0 0 auto;width:34px;height:34px;margin-left:auto;border:1px solid var(--rule);border-radius:50%;background:var(--sheet);display:grid;place-items:center;font-size:15px;cursor:pointer;filter:grayscale(1);opacity:.55;padding:0}
 .bk-pin[aria-pressed="true"]{filter:none;opacity:1;border-color:color-mix(in srgb,var(--pink) 50%,var(--rule));background:color-mix(in srgb,var(--pink) 10%,var(--sheet))}
@@ -336,6 +342,7 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
       <button class="btn" id="btnFriend" type="button">친구 진도 불러오기</button>
       <button class="btn" id="btnCmp" type="button" hidden>비교 끄기</button>
     </div>
+    <div class="cloud" id="cloud"></div>
     <div class="legend" id="legend" hidden>
       <span><i style="background:#F2C94C"></i>나</span>
       <span><i style="background:var(--sky)"></i>친구</span>
@@ -437,8 +444,12 @@ document.addEventListener("click",function(ev){
 },true);
 
 /* ── 저장 ─────────────────────────────── */
+var meAt=0;   // 내 체크를 마지막으로 바꾼 시각 (여러 기기에서 맞출 때 더 최근 것을 씀)
 function save(){
-  try{localStorage.setItem(LS,JSON.stringify({n:myName,b:toB64(me)}))}catch(e){}
+  var b=toB64(me), old=null; try{old=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){}
+  if(!old||old.b!==b)meAt=Date.now();
+  try{localStorage.setItem(LS,JSON.stringify({n:myName,b:b,t:meAt}))}catch(e){}
+  if(typeof cloudPush==="function")cloudPush();
 }
 function load(){
   try{
@@ -446,6 +457,7 @@ function load(){
     var o=JSON.parse(raw);
     if(o&&typeof o.b==="string"){var a=fromB64(o.b); if(a)me=a;}
     if(o&&typeof o.n==="string")myName=o.n;
+    if(o&&+o.t)meAt=+o.t;
   }catch(e){}
 }
 
@@ -931,9 +943,88 @@ $("btnShare").addEventListener("click",openShare);
 $("btnFriend").addEventListener("click",openFriend);
 $("btnCmp").addEventListener("click",function(){compare=!compare;saveFriend();renderAll()});
 /* 불러온 친구 진도는 이 기기에 기억해 두고, 다음에 열어도 내 표와 같이 보여 줌 */
-var FRIEND_KEY="bible-tongdok-friend";
-function saveFriend(){try{if(friend)localStorage.setItem(FRIEND_KEY,JSON.stringify({c:"2"+toRuns(friend),n:friendName,cmp:compare}));else localStorage.removeItem(FRIEND_KEY)}catch(e){}}
-function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"null");if(!o||!o.c)return;var bits=fromRuns(String(o.c).slice(1));if(!bits)return;friend=bits;friendName=o.n||"";compare=o.cmp!==false}catch(e){}}
+var FRIEND_KEY="bible-tongdok-friend", friendCloud="";
+function saveFriend(){try{if(friend)localStorage.setItem(FRIEND_KEY,JSON.stringify({c:"2"+toRuns(friend),n:friendName,cmp:compare,fc:friendCloud}));else localStorage.removeItem(FRIEND_KEY)}catch(e){}}
+function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"null");if(!o||!o.c)return;var bits=fromRuns(String(o.c).slice(1));if(!bits)return;friend=bits;friendName=o.n||"";compare=o.cmp!==false;friendCloud=o.fc||""}catch(e){}}
+
+
+/* ── ☁️ 자동 맞춤 (묵상 노트의 Supabase 로그인을 그대로 씀) ──────────────
+   같은 주소(0702080.github.io)라 묵상 노트에서 로그인해 두면 여기서도 로그인된 상태.
+   내 진도는 notes 표에 id "s:tongdok" 한 줄로 '친구 공개'로 올리고(묵상 노트는 s: 줄을 노트로 보지 않음),
+   묵상 노트에서 친구를 맺은 사람의 "s:tongdok" 줄을 받아 친구 표로 보여 준다. 1분마다, 화면으로 돌아올 때마다 다시 받음 */
+var SB_URL="https://fsctntwrqocjvkboqmzn.supabase.co", SB_KEY="sb_publishable_8ARyO5q9ODokIT0um2ShnQ_DgZarC_E", SB_SES="bible-sb-session";
+var CLOUD_ID="s:tongdok", cloudFriends=[], cloudPick="", cloudState={ok:null,at:0,msg:""}, cloudTimer=0, cloudBusy=false;
+try{cloudPick=localStorage.getItem("bible-tongdok-cloudpick")||""}catch(e){}
+function sbSession(){try{var x=JSON.parse(localStorage.getItem(SB_SES)||"null");return x&&x.access_token&&x.user&&x.user.id?x:null}catch(e){return null}}
+function sbH(tok){var h={"apikey":SB_KEY,"Content-Type":"application/json"};if(tok)h.Authorization="Bearer "+tok;return h}
+async function sbToken(){
+  var x=sbSession(); if(!x)return null;
+  if(Date.now()/1000<(x.expires_at||0)-60)return x.access_token;
+  var r=await fetch(SB_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:sbH(),body:JSON.stringify({refresh_token:x.refresh_token})});
+  if(!r.ok){if(r.status===400||r.status===401){try{localStorage.removeItem(SB_SES)}catch(e){}}return null}
+  var j=await r.json(), nx={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}};
+  try{localStorage.setItem(SB_SES,JSON.stringify(nx))}catch(e){}
+  return nx.access_token;
+}
+async function sbGet(tok,path){var r=await fetch(SB_URL+path,{headers:sbH(tok),cache:"no-store"});if(!r.ok)throw new Error(String(r.status));return r.json()}
+function cloudPush(){if(!sbSession())return;clearTimeout(cloudTimer);cloudTimer=setTimeout(function(){cloudSync(true)},1500)}
+async function cloudSync(pushOnly){
+  if(cloudBusy){clearTimeout(cloudTimer);cloudTimer=setTimeout(function(){cloudSync(pushOnly)},1500);return}
+  var x=sbSession(); if(!x){drawCloud();return}
+  cloudBusy=true;
+  try{
+    var tok=await sbToken(); if(!tok)throw new Error("login");
+    var uid=sbSession().user.id;
+    if(!pushOnly){
+      // 1) 다른 기기에서 더 최근에 바꾼 내 진도가 있으면 받기
+      var mine=await sbGet(tok,"/rest/v1/notes?select=data&user_id=eq."+uid+"&id=eq."+encodeURIComponent(CLOUD_ID));
+      var md=mine&&mine[0]&&mine[0].data;
+      if(md&&md.c&&(+md.at||0)>meAt){var bits=fromRuns(String(md.c).slice(1));if(bits){me=bits;meAt=+md.at;if(typeof md.n==="string"&&md.n&&!myName)myName=md.n;try{localStorage.setItem(LS,JSON.stringify({n:myName,b:toB64(me),t:meAt}))}catch(e){}lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}}
+    }
+    // 2) 내 진도 올리기 (친구 공개)
+    var row={user_id:uid,id:CLOUD_ID,data:{c:"2"+toRuns(me),at:meAt||Date.now(),n:myName},updated_at:Date.now(),deleted:false,visibility:"friends"};
+    var pr=await fetch(SB_URL+"/rest/v1/notes?on_conflict=user_id,id",{method:"POST",headers:Object.assign(sbH(tok),{"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify([row])});
+    if(!pr.ok)throw new Error("up "+pr.status);
+    if(!pushOnly){
+      // 3) 친구들 진도 받기
+      var fr=await sbGet(tok,"/rest/v1/friendships?select=requester,addressee,status&status=eq.accepted");
+      var ids=fr.map(function(f){return f.requester===uid?f.addressee:f.requester}).filter(function(v,i,a){return a.indexOf(v)===i});
+      var list=[];
+      if(ids.length){
+        var pf=await sbGet(tok,"/rest/v1/profiles?select=id,name&id=in.("+ids.join(",")+")"), nm={}; pf.forEach(function(p){nm[p.id]=p.name});
+        var rows=await sbGet(tok,"/rest/v1/notes?select=user_id,data,updated_at&id=eq."+encodeURIComponent(CLOUD_ID)+"&user_id=in.("+ids.join(",")+")&deleted=is.false");
+        rows.forEach(function(r){if(!r.data||!r.data.c)return;var bits=fromRuns(String(r.data.c).slice(1));if(bits)list.push({id:r.user_id,name:nm[r.user_id]||r.data.n||"친구",bits:bits,at:+r.data.at||+r.updated_at})});
+        cloudFriends=list; cloudState.noRows=ids.length>list.length?ids.filter(function(u){return !list.some(function(l){return l.id===u})}).map(function(u){return nm[u]||"친구"}):[];
+      }else{cloudFriends=[];cloudState.noRows=[]}
+      cloudState.nFriends=ids.length;
+      applyCloudFriend();
+    }
+    cloudState.ok=true; cloudState.at=Date.now(); cloudState.msg="";
+  }catch(e){cloudState.ok=false;cloudState.msg=e&&e.message==="login"?"다시 로그인해 주세요":"서버에 닿지 못했어요"}
+  finally{cloudBusy=false;renderAll();drawCloud()}
+}
+function applyCloudFriend(){
+  if(!cloudFriends.length)return;
+  var f=cloudFriends.filter(function(x){return x.id===cloudPick})[0]||cloudFriends[0];
+  var wasOff=!!friend&&!compare;   // 비교를 꺼 두었으면 그대로
+  friend=f.bits; friendName=f.name; friendCloud=f.id; if(!wasOff)compare=true; saveFriend();
+}
+function ago(t){var m=Math.round((Date.now()-t)/60000);return m<1?"방금":m<60?m+"분 전":m<1440?Math.round(m/60)+"시간 전":Math.round(m/1440)+"일 전"}
+function drawCloud(){
+  var el=$("cloud"); if(!el)return;
+  if(!sbSession()){el.innerHTML='☁️ <a href="../">묵상 노트</a>에서 로그인하고 친구를 맺으면, 친구 진도가 <b>저절로</b> 같이 보여요.';el.className="cloud off";return}
+  if(cloudState.ok===false){el.innerHTML='☁️ 자동 맞춤이 안 됐어요 · '+esc(cloudState.msg)+' <button type="button" class="cl-re" data-act="cloud">다시</button>';el.className="cloud bad";return}
+  var h='☁️ 자동 맞춤 켜짐'+(cloudState.at?' · '+ago(cloudState.at):'');
+  if(cloudFriends.length>1){h+=' · <select class="cl-pick" aria-label="같이 볼 친구">'+cloudFriends.map(function(f){return '<option value="'+f.id+'"'+(f.id===friendCloud?' selected':'')+'>'+esc(f.name)+'</option>'}).join("")+'</select>'}
+  else if(cloudFriends.length===1)h+=' · 👤 '+esc(cloudFriends[0].name)+' ('+ago(cloudFriends[0].at)+' 체크)';
+  else if(cloudState.nFriends===0)h+=' · 묵상 노트 👥 친구에서 친구를 맺어 주세요';
+  if(cloudState.noRows&&cloudState.noRows.length)h+='<br><small>'+esc(cloudState.noRows.join(", "))+'님은 아직 통독표를 안 열었어요 (한 번 열면 보여요)</small>';
+  el.innerHTML=h; el.className="cloud on";
+}
+document.addEventListener("change",function(ev){if(ev.target.classList&&ev.target.classList.contains("cl-pick")){cloudPick=ev.target.value;try{localStorage.setItem("bible-tongdok-cloudpick",cloudPick)}catch(e){}compare=true;applyCloudFriend();renderAll()}});
+document.addEventListener("click",function(ev){if(ev.target.closest('[data-act="cloud"]'))cloudSync(false)});
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&sbSession())cloudSync(false)});
+setInterval(function(){if(!document.hidden&&sbSession())cloudSync(false)},60000);
 
 /* ── 시작 ─────────────────────────────── */
 load();
@@ -947,6 +1038,7 @@ if(fromLink){
   try{history.replaceState(null,"",location.pathname)}catch(e){}
 }else loadFriend();
 renderAll();
+drawCloud(); if(sbSession())cloudSync(false);
 })();
 </script>
 </body></html>
