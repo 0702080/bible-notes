@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-79">
+<meta name="app-build" content="2026-10-11-80">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5569,12 +5569,11 @@ button:active{filter:brightness(1.15)}
     var t3=document.createElement("div"); t3.className="ccr3";
     t3.textContent=d?"🔁 다음 복습: "+(d.getMonth()+1)+"월 "+d.getDate()+"일 ("+(n.rv.gap===1?"내일":n.rv.gap+"일 뒤")+")":"";
     box.appendChild(t3);
-    if(!memDone(n)&&n.mem.s[2]&&!n.mem.s[3]){var t4=document.createElement("div");t4.className="ccr4";t4.textContent="내일 한 번 더 하면 마지막 🌤️ 도장을 받아요";box.appendChild(t4)}
     v.appendChild(box); tip.textContent="";
     ft.textContent="";
     [["처음부터 다시","restart",false],["끝내기","close",true]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(x[2]?" main":"");b.dataset.a=x[1];b.textContent=x[0];ft.appendChild(b)});
     var nx=ccNextNote();
-    if(nx){var nb=document.createElement("button");nb.type="button";nb.className="ccnext";nb.innerHTML='<span class="ccnarw" aria-hidden="true">←</span><span>밀어서 다음 말씀</span><b></b>';nb.querySelector("b").textContent=nx.ref;nb.addEventListener("click",ccGoNext);box.appendChild(nb)}
+    if(nx){var nb=document.createElement("button");nb.type="button";nb.className="ccnext";nb.innerHTML='<b></b>';nb.querySelector("b").textContent=nx.ref;nb.setAttribute("aria-label","다음 말씀: "+nx.ref+" (왼쪽으로 밀어도 넘어가요)");nb.addEventListener("click",ccGoNext);box.appendChild(nb)}
     if(C.grade==="g2"){buzz([14,50,22]);confetti(t1)}
   }
   function closeCoach(){
