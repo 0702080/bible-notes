@@ -86,6 +86,16 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .bk[data-g="general"] .bk-name{color:#F7A98B}
 .bk[data-g="rev"] .bk-name{color:#E99BD0}
 .bk.full .bk-name::after{content:" ✓";color:var(--green)}
+/* 책 접기·펴기 */
+.bk-tg{display:flex;align-items:baseline;gap:8px;min-width:0;padding:4px 2px;margin:-4px -2px;background:none;border:0;color:inherit;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bk-chev{align-self:center;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-2px);transition:transform .2s;flex:0 0 auto;margin-right:2px}
+.bk.shut .bk-chev{transform:rotate(-45deg)}
+.bk.shut .bk-body{display:none}
+.bk.shut .bk-h{padding-bottom:0}
+.bk.shut{margin-top:12px}
+h2.tg{display:flex;align-items:center;justify-content:space-between}
+.tg-all{font-size:12.5px;font-weight:500;color:var(--muted);background:#232328;border:1px solid var(--rule);border-radius:14px;padding:4px 12px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.bk-chev{transition:none}}
 .bk-all{margin-left:auto;font-size:12px;color:var(--muted);background:none;border:0;padding:2px;cursor:pointer;text-decoration:underline}
 .chips{display:grid;grid-template-columns:repeat(10,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
 .chips>span{background:var(--sheet)}   /* 마지막 줄 빈칸 */
@@ -275,9 +285,9 @@ button{font-family:inherit;font-size:inherit;color:inherit}
     <p class="none" id="shelfNone">한 책을 끝까지 읽으면 여기에 뱃지가 쌓여요.</p>
   </section>
 
-  <h2>구약</h2>
+  <h2 class="tg">구약<button class="tg-all" type="button" data-act="foldall" data-t="ot">모두 접기</button></h2>
   <div class="books" id="ot"></div>
-  <h2>신약</h2>
+  <h2 class="tg">신약<button class="tg-all" type="button" data-act="foldall" data-t="nt">모두 접기</button></h2>
   <div class="books" id="nt"></div>
 
   <p class="note">
@@ -492,15 +502,32 @@ function renderBooks(){
   var html=["",""];
   for(var bi=0;bi<BOOKS.length;bi++){
     var name=BOOKS[bi][0], total=BOOKS[bi][1], done=bookDone(bi);
-    var h='<section class="bk'+(done===total?" full":"")+'" data-b="'+bi+'" data-g="'+bookGroup(bi)+'">'
-      +'<div class="bk-h"><span class="bk-name">'+name+'</span>'
-      +'<span class="bk-cnt">'+done+' / '+total+'</span>'
+    var shut=!!folded[bi];
+    var h='<section class="bk'+(done===total?" full":"")+(shut?" shut":"")+'" data-b="'+bi+'" data-g="'+bookGroup(bi)+'">'
+      +'<div class="bk-h"><button class="bk-tg" type="button" data-act="fold" data-b="'+bi+'" aria-expanded="'+(!shut)+'"><span class="bk-chev" aria-hidden="true"></span><span class="bk-name">'+name+'</span>'
+      +'<span class="bk-cnt">'+done+' / '+total+'</span></button>'
       +'<button class="bk-all" type="button" data-act="all" data-b="'+bi+'">'+(done===total?"전체 지우기":"전체 읽음")+'</button></div>'
       +'<div class="bk-body">'+chipsHTML(bi)+'</div></section>';
     html[bi<OT_N?0:1]+=h;
   }
   $("ot").innerHTML=html[0];
   $("nt").innerHTML=html[1];
+  syncFoldAll();
+}
+/* 책 접기·펴기 (이 기기에 기억) */
+var FOLD_KEY="bible-tongdok-fold", folded={};
+try{(JSON.parse(localStorage.getItem(FOLD_KEY)||"[]")||[]).forEach(function(b){folded[b]=1})}catch(e){}
+function saveFold(){try{localStorage.setItem(FOLD_KEY,JSON.stringify(Object.keys(folded).map(Number)))}catch(e){}}
+function setFold(bi,shut){
+  if(shut)folded[bi]=1;else delete folded[bi];
+  var sec=document.querySelector('.bk[data-b="'+bi+'"]'); if(!sec)return;
+  sec.classList.toggle("shut",shut); sec.querySelector(".bk-tg").setAttribute("aria-expanded",String(!shut));
+}
+function syncFoldAll(){
+  [["ot",0,OT_N],["nt",OT_N,BOOKS.length]].forEach(function(t){
+    var all=true; for(var b=t[1];b<t[2];b++)if(!folded[b]){all=false;break}
+    var btn=document.querySelector('.tg-all[data-t="'+t[0]+'"]'); if(btn)btn.textContent=all?"모두 펴기":"모두 접기";
+  });
 }
 function chipsHTML(bi){
   var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips">';
@@ -705,6 +732,11 @@ function renderShelf(){
 document.addEventListener("click",function(ev){
   var el=ev.target.closest("[data-act]"); if(!el)return;
   var act=el.dataset.act;
+  if(act==="fold"){var fb=+el.dataset.b;setFold(fb,!folded[fb]);saveFold();syncFoldAll();return}
+  if(act==="foldall"){
+    var ot=el.dataset.t==="ot", a=ot?0:OT_N, z=ot?OT_N:BOOKS.length, shutAll=el.textContent==="모두 접기";
+    for(var fb2=a;fb2<z;fb2++)setFold(fb2,shutAll); saveFold(); syncFoldAll(); return;
+  }
 
   if(act==="chip"){
     var idx=+el.dataset.i, bi2=bookOf(idx);
