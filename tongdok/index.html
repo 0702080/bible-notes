@@ -886,45 +886,65 @@ document.addEventListener("click",function(ev){
     return;
   }
 });
-/* 꾹 눌렀다가(0.3초) 그대로 끌면 지나가는 장을 한꺼번에 체크 (처음 누른 장이 체크돼 있었으면 한꺼번에 해제) */
+/* 장 번호를 누른 채 옆으로 밀거나, 꾹 눌렀다가(0.3초) 끌면 지나가는 장을 한꺼번에 체크 (처음 누른 장이 체크돼 있었으면 한꺼번에 해제)
+   휴대폰(카톡 안 브라우저 포함)에서는 포인터 이벤트가 중간에 끊길 수 있어 터치 이벤트로 직접 처리하고, 마우스만 포인터 이벤트로 처리 */
 (function(){
   var P=null, D=null, eat=false;
-  function chipAt(x,y){var t=document.elementFromPoint(x,y);t=t&&t.closest?t.closest('.chip[data-act="chip"]'):null;return t}
+  function chipAt(x,y){var t=document.elementFromPoint(x,y);return t&&t.closest?t.closest('.chip[data-act="chip"]'):null}
+  function buzzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
   function paint(c){
     var i=+c.dataset.i; if(D.done[i])return; D.done[i]=1;
     if(!!me[i]===!!D.fill)return;
-    me[i]=D.fill; D.books[bookOf(i)]=1; D.n=(D.n||0)+1;
+    me[i]=D.fill; D.books[bookOf(i)]=1; D.n++;
     if(D.fill){c.setAttribute("data-s","me");c.classList.remove("got5");void c.offsetWidth;c.classList.add("got5")}else c.removeAttribute("data-s");
-    c.setAttribute("aria-pressed",String(!!D.fill)); try{navigator.vibrate&&navigator.vibrate(6)}catch(e){}
+    c.setAttribute("aria-pressed",String(!!D.fill)); buzzz(6);
   }
-  document.addEventListener("pointerdown",function(e){
-    var c=e.target.closest&&e.target.closest('.chip[data-act="chip"]'); if(!c||D||(e.pointerType==="mouse"&&e.button!==0))return;
-    P={c:c,x:e.clientX,y:e.clientY,id:e.pointerId,t:setTimeout(function(){
-      if(!P)return; var c0=P.c, i0=+c0.dataset.i; P=null;
-      D={id:e.pointerId,fill:me[i0]?0:1,done:{},books:{},before:countRange(me,0,TOTAL),full:{}};
-      BOOKS.forEach(function(b,bi){D.full[bi]=bookDone(bi)===b[1]});
-      document.body.classList.add("painting"); paint(c0); try{navigator.vibrate&&navigator.vibrate(20)}catch(err){}
-    },300)};
-  });
-  document.addEventListener("touchmove",function(e){if(D)e.preventDefault()},{passive:false});
-  document.addEventListener("pointermove",function(e){
-    if(P&&e.pointerId===P.id&&(Math.abs(e.clientX-P.x)>8||Math.abs(e.clientY-P.y)>8)){clearTimeout(P.t);P=null}
-    if(!D||e.pointerId!==D.id)return; e.preventDefault();
-    var c=chipAt(e.clientX,e.clientY); if(c)paint(c);
-    if(e.clientY<70)window.scrollBy(0,-14); else if(e.clientY>innerHeight-50)window.scrollBy(0,14);   // 화면 끝에서는 저절로 스크롤
-  });
-  function end(e){
-    if(P&&(!e||e.pointerId===P.id)){clearTimeout(P.t);P=null}
-    if(!D||(e&&e.pointerId!==D.id))return;
-    var d=D; D=null; document.body.classList.remove("painting"); eat=true; setTimeout(function(){eat=false},400);
-    var n=d.n||0; if(!n)return;
+  function begin(c){
+    var i0=+c.dataset.i;
+    D={fill:me[i0]?0:1,done:{},books:{},n:0,before:countRange(me,0,TOTAL),full:{}};
+    BOOKS.forEach(function(b,bi){D.full[bi]=bookDone(bi)===b[1]});
+    document.body.classList.add("painting"); paint(c); buzzz(25);
+  }
+  function arm(c,x,y){cancelArm(); P={c:c,x:x,y:y,t:setTimeout(function(){if(!P)return;var c0=P.c;P=null;begin(c0)},300)}}
+  function cancelArm(){if(P){clearTimeout(P.t);P=null}}
+  function move(x,y){
+    if(P){var dx=Math.abs(x-P.x),dy=Math.abs(y-P.y);
+      if(dx>8&&dx>dy*1.2){var c1=P.c;cancelArm();begin(c1)}   // 기다리지 않고 바로 옆으로 밀어도 칠하기 시작 (위아래로 밀면 스크롤)
+      else if(dx>10||dy>10)cancelArm();
+    }
+    if(!D)return false;
+    var c=chipAt(x,y); if(c)paint(c);
+    if(y<70)window.scrollBy(0,-14); else if(y>innerHeight-50)window.scrollBy(0,14);   // 화면 끝에서는 저절로 스크롤
+    return true;
+  }
+  function end(){
+    cancelArm(); if(!D)return;
+    var d=D; D=null; document.body.classList.remove("painting"); eat=true; setTimeout(function(){eat=false},450);
+    if(!d.n)return;
     save(); Object.keys(d.books).forEach(function(bi){repaintBook(+bi)}); renderSummary(); renderShelf();
     var after=countRange(me,0,TOTAL);
     if(d.fill){var fin=Object.keys(d.books).map(Number).filter(function(bi){return !d.full[bi]&&bookDone(bi)===BOOKS[bi][1]});checkMilestones(d.before,after,fin)}
     else{lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
-    hint(d.fill?"✓ "+n+"장을 한꺼번에 체크했어요":n+"장 체크를 풀었어요","꾹 눌러 끌면 여러 장을 한 번에 바꿀 수 있어요");
+    hint(d.fill?"✓ "+d.n+"장을 한꺼번에 체크했어요":d.n+"장 체크를 풀었어요","꾹 눌러 끌면 여러 장을 한 번에 바꿀 수 있어요");
   }
-  document.addEventListener("pointerup",end); document.addEventListener("pointercancel",end);
+  // 터치
+  document.addEventListener("touchstart",function(e){
+    if(e.touches.length!==1){cancelArm();return}
+    var t=e.touches[0], c=e.target.closest&&e.target.closest('.chip[data-act="chip"]'); if(c)arm(c,t.clientX,t.clientY);
+  },{passive:true});
+  document.addEventListener("touchmove",function(e){
+    var t=e.touches[0]; if(!t)return;
+    if(move(t.clientX,t.clientY)&&e.cancelable)e.preventDefault();   // 끄는 동안 화면이 스크롤되지 않게
+  },{passive:false});
+  document.addEventListener("touchend",end,{passive:true});
+  document.addEventListener("touchcancel",end,{passive:true});
+  // 마우스 (PC)
+  document.addEventListener("pointerdown",function(e){
+    if(e.pointerType!=="mouse"||e.button!==0)return;
+    var c=e.target.closest&&e.target.closest('.chip[data-act="chip"]'); if(c)arm(c,e.clientX,e.clientY);
+  });
+  document.addEventListener("pointermove",function(e){if(e.pointerType==="mouse")move(e.clientX,e.clientY)});
+  document.addEventListener("pointerup",function(e){if(e.pointerType==="mouse")end()});
   document.addEventListener("contextmenu",function(e){if(D||P)e.preventDefault()});
   document.addEventListener("click",function(e){if(eat&&e.target.closest&&e.target.closest(".chip")){e.stopPropagation();e.preventDefault();eat=false}},true);
 })();
