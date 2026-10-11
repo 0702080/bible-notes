@@ -9,8 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  /* 늘 어두운 바탕 (2026-10-11 사용자 요청). 밝은 모드는 두지 않는다 */
-  color-scheme:dark;
+  /* 아이보리 밝은 바탕 (2026-10-11 사용자 요청으로 검정에서 바꿈). 색은 아래 '아이보리 테마' 블록에서 덮어씀 */
+  color-scheme:light;
   --paper:#121214; --sheet:#1A1A1D; --rule:#2E2E33; --ink:#ECEAF0; --muted:#9C98A4;
   --bar:#2A211C; --ring:#E8B92E; --ring5:#F4974A; --blank:#2C2C31;
   --violet:#AE90E0; --orange:#F4974A; --green:#52B87A; --blue:#7C98EE; --sky:#5CC0EE; --pink:#F08AC0;
@@ -267,12 +267,49 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
 #btnFriend{background:color-mix(in srgb,var(--sky) 12%,transparent);border-color:color-mix(in srgb,var(--sky) 40%,var(--rule))}
 .shelf{background:linear-gradient(160deg,color-mix(in srgb,var(--violet) 11%,var(--sheet)),var(--sheet) 70%);border-color:color-mix(in srgb,var(--violet) 28%,var(--rule))}
 .shelf h3{color:color-mix(in srgb,var(--violet) 65%,var(--ink))}
+/* ===== 아이보리 테마 (2026-10-11 사용자 요청) ===== */
+:root{
+  --paper:#F7F1E3; --sheet:#FFFBF2; --rule:#E2D8C2; --ink:#2E2820; --muted:#857B6A; --blank:#EDE4D0;
+  --bar:#6E5038; --ring:#D9A514; --violet:#8A68C9; --orange:#E07F2E; --green:#3E9E64; --sky:#2E9BCB; --pink:#D2558F;
+}
+.bk[data-g="law"] .bk-name{color:#C27A1F}
+.bk[data-g="hist"] .bk-name{color:#2F86A8}
+.bk[data-g="poem"] .bk-name{color:#7A5CC4}
+.bk[data-g="major"] .bk-name{color:#C24D6E}
+.bk[data-g="minor"] .bk-name{color:#2E9A6A}
+.bk[data-g="gospel"] .bk-name{color:#B07D08}
+.bk[data-g="paul"] .bk-name{color:#4F67C2}
+.bk[data-g="general"] .bk-name{color:#C26444}
+.bk[data-g="rev"] .bk-name{color:#B2508F}
+.chip::before{background:#EFE7D5;border-color:#DFD4BD}
+.chip{color:#8C8270}
+.chip[data-s="me"]{--c:#F2C94C;color:#3A2A00}
+.meter{background:#ECE2CE}
+.tg-all{background:#F1E9D8;color:var(--muted)}
+.tg-all.tg-every{background:color-mix(in srgb,var(--ring) 16%,#FFFBF2);color:var(--ink)}
+.bk-prog{background:conic-gradient(var(--c) calc(var(--p)*1%),#E6DCC8 0)}
+.bk-prog b{background:var(--paper)}
+.bk-prog[data-st="none"] b{color:#A39886}
+.bk-prog[data-st="full"] b{color:#fff}
+.me-who{color:#B8900F}
+.chip[data-s="fr"]{color:#fff}
+.sum,.shelf{box-shadow:0 1px 3px rgba(80,60,30,.08)}
+.half span{color:var(--ink)}
+/* ===== 읽는 중인 책 고정 (📌) ===== */
+.bk-pin{align-self:center;flex:0 0 auto;width:34px;height:34px;margin-left:auto;border:1px solid var(--rule);border-radius:50%;background:var(--sheet);display:grid;place-items:center;font-size:15px;cursor:pointer;filter:grayscale(1);opacity:.55;padding:0}
+.bk-pin[aria-pressed="true"]{filter:none;opacity:1;border-color:color-mix(in srgb,var(--pink) 50%,var(--rule));background:color-mix(in srgb,var(--pink) 10%,var(--sheet))}
+.bk-pin+.bk-prog{margin-left:8px}
+.pinned{margin-top:16px;padding:12px 12px 4px;border-radius:12px;background:color-mix(in srgb,var(--pink) 6%,var(--sheet));border:1px solid color-mix(in srgb,var(--pink) 28%,var(--rule))}
+.pinned[hidden]{display:none}
+.pinned>h3{margin:0;font-size:14px;font-weight:700;color:var(--pink)}
+.pinned .bk:first-of-type{margin-top:10px}
 </style>
 </head>
 <body>
 <div class="turn" aria-live="polite"><b aria-hidden="true">📱</b>휴대폰을 세로로 돌려 주세요</div>
 <header class="bar"><h1>성경 통독표</h1><span class="bar-cnt" id="barCnt"></span></header>
 <main class="wrap">
+  <section class="pinned" id="pinned" hidden><h3>📌 읽는 중</h3><div class="books" id="pin"></div></section>
 
   <section class="sum" aria-live="polite">
     <div class="sum-top">
@@ -523,20 +560,26 @@ function bookGroup(bi){
   if(bi<5)return "law"; if(bi<17)return "hist"; if(bi<22)return "poem"; if(bi<27)return "major"; if(bi<39)return "minor";
   if(bi<43)return "gospel"; if(bi===43)return "hist"; if(bi<57)return "paul"; if(bi<65)return "general"; return "rev";
 }
+/* 📌 고정한 책: {책번호: 고정한 시각} — 맨 위 '읽는 중' 칸에 따로 보여 줌 (이 기기에 기억) */
+var PIN_KEY="bible-tongdok-pin", pins={};
+try{var pj=JSON.parse(localStorage.getItem(PIN_KEY)||"{}");if(pj&&typeof pj==="object")pins=pj}catch(e){}
 function renderBooks(){
-  var html=["",""];
+  var html=["",""], pinHtml={};
   for(var bi=0;bi<BOOKS.length;bi++){
     var name=BOOKS[bi][0], total=BOOKS[bi][1], done=bookDone(bi);
     var shut=!!folded[bi];
     var h='<section class="bk'+(done===total?" full":"")+(shut?" shut":"")+'" data-b="'+bi+'" data-g="'+bookGroup(bi)+'">'
       +'<div class="bk-h"><button class="bk-tg" type="button" data-act="fold" data-b="'+bi+'" aria-expanded="'+(!shut)+'"><span class="bk-chev" aria-hidden="true"></span><span class="bk-name">'+name+'</span>'
       +'<span class="bk-cnt">'+done+' / '+total+'</span></button>'
+      +'<button class="bk-pin" type="button" data-act="pin" data-b="'+bi+'" aria-pressed="'+(!!pins[bi])+'" aria-label="'+name+(pins[bi]?" 고정 풀기":" 위에 고정")+'">📌</button>'
       +progBadge(done,total)+'</div>'
       +'<div class="bk-body">'+bodyHTML(bi)+'</div></section>';
-    html[bi<OT_N?0:1]+=h;
+    if(pins[bi])pinHtml[pins[bi]]=h; else html[bi<OT_N?0:1]+=h;
   }
   $("ot").innerHTML=html[0];
   $("nt").innerHTML=html[1];
+  var pk=Object.keys(pinHtml).sort(function(a,b){return b-a});   // 최근에 고정한 책이 맨 위
+  $("pin").innerHTML=pk.map(function(k){return pinHtml[k]}).join(""); $("pinned").hidden=!pk.length;
   syncFoldAll();
 }
 /* 책 접기·펴기 (이 기기에 기억) */
@@ -763,6 +806,12 @@ function renderShelf(){
 document.addEventListener("click",function(ev){
   var el=ev.target.closest("[data-act]"); if(!el)return;
   var act=el.dataset.act;
+  if(act==="pin"){
+    var pb=+el.dataset.b; if(pins[pb])delete pins[pb]; else{pins[pb]=Date.now();delete folded[pb];saveFold()}
+    try{localStorage.setItem(PIN_KEY,JSON.stringify(pins))}catch(e){}
+    renderBooks(); if(pins[pb])window.scrollTo({top:0,behavior:"smooth"});
+    return;
+  }
   if(act==="fold"){var fb=+el.dataset.b;setFold(fb,!folded[fb]);saveFold();syncFoldAll();return}
   if(act==="foldall"){
     var t=el.dataset.t, a=t==="nt"?OT_N:0, z=t==="ot"?OT_N:BOOKS.length, shutAll=/접기$/.test(el.textContent);
