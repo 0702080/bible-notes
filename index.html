@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-82">
+<meta name="app-build" content="2026-10-11-83">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1656,6 +1656,7 @@ button:active{filter:brightness(1.15)}
 .ccmeter i.on{border:0;background:radial-gradient(circle at 35% 30%,#FFE7A8,var(--gold) 60%,#B8862F);color:#17120A;box-shadow:0 0 14px color-mix(in srgb,var(--gold) 45%,transparent)}
 .ccmeter i.on.just{animation:ccpop .55s cubic-bezier(.2,1.6,.4,1)}
 .ccw{display:inline-block;--bc:#6ECBF4}
+.ccw.r-act{--bc:#6FD09A}.ccw.r-div{--bc:#B79CF2}.ccw.r-obj{--bc:#6ECBF4}.ccw.r-sub{--bc:#F4A45E}.ccw.r-etc{--bc:#E6DFD2}
 .ccw.c0{--bc:#6ECBF4}.ccw.c1{--bc:#F48FB6}.ccw.c2{--bc:#6FD09A}.ccw.c3{--bc:#F4A45E}.ccw.c4{--bc:#B79CF2}
 .ccverse.recall{padding-top:18px}
 .ccw.hid{color:color-mix(in srgb,var(--bc) 85%,#fff);background:color-mix(in srgb,var(--bc) 15%,transparent);padding:0 4px;line-height:1.55;border-radius:8px;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--bc) 32%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--bc) 30%,transparent)}
@@ -5423,6 +5424,28 @@ button:active{filter:brightness(1.15)}
   ["fullscreenchange","webkitfullscreenchange"].forEach(function(ev){document.addEventListener(ev,function(){
     if(!document.fullscreenElement&&!document.webkitFullscreenElement&&ccFs){ccFs=false;if(ccBox&&!ccBox.hidden)closeCoach()}
   })});
+  /* 낱말 색은 문장 속 역할로: 하나님·예수님·성령님·선지자 = 보라, 행동(서술어) = 초록, 목적어 = 하늘색, 사람 주어 = 주황, 나머지 = 은은한 흰색
+     문장 분석(n.parse)이 있으면 그걸 쓰고, 없으면 끝말(조사·어미)로 짐작함 */
+  var CC_DIV=/^(하나님|여호와|예수|그리스도|성령|선지자|주께서|주님|주의\s|주를|아버지께서|성부|성자)/;
+  function ccRoleOf(w){
+    var t=w.replace(/[^가-힣A-Za-z0-9]/g,""); if(!t)return "etc";
+    if(CC_DIV.test(t))return "div";
+    if(/(을|를)$/.test(t))return "obj";
+    if(/(이면|이라|이니|이요|이니라|이시라|이시니|이로다)$/.test(t)&&t.length>2)return "etc";   // 이름씨 + 이다
+    if(/(다|라|니|고|며|면|서|지|여|사|매|되|소서|나니|도다|리라|니라|거니와|려니와|으며|으니|으나|는데|느니라|시니|시며|시고|하라|하자|할지니|할지어다)$/.test(t))return "act";
+    if(t.length>=2&&/(하는|되는|시는|하신|하실|하던|있는|없는|않는|아니하는|하나니|할|될|한|된|간|온|준|본|받은|믿는|가는|오는|사는|아는|설|볼|갈|올)$/.test(t))return "act";
+    if(/(이|가|께서|은|는|도)$/.test(t))return "sub";
+    return "etc";
+  }
+  function ccRoles(n){
+    var ws=wordsOf(n.text||""), lab=parseOk(n)?n.parse.labels:null;
+    return ws.map(function(w,i){
+      var t=w.replace(/[^가-힣A-Za-z0-9]/g,"");
+      if(CC_DIV.test(t))return "div";
+      if(lab){var r=lab[i];return r==="V"?"act":r==="O"?"obj":r==="S"?"sub":ccRoleOf(w)==="act"?"act":"etc"}
+      return ccRoleOf(w);
+    });
+  }
   function ccMask(sp){   // 가린 낱말 다시 그리기 (첫 글자 단계는 첫 글자를 밝게)
     sp.textContent="";
     if(sp.dataset.f){var b=document.createElement("b");b.textContent=sp.dataset.f;sp.appendChild(b);sp.appendChild(document.createTextNode(sp.dataset.m))}
@@ -5438,7 +5461,7 @@ button:active{filter:brightness(1.15)}
     var wi=0, step=Math.min(.05,.9/Math.max(1,ws.length));
     tokens(text).forEach(function(tok){
       if(/^\s+$/.test(tok)){if(tok.indexOf("\n")>=0)box.appendChild(document.createElement("br"));else box.appendChild(document.createTextNode(" "));return}
-      var sp=document.createElement("span"), ch=Array.from(tok), col=" c"+(wi%CC_COL);
+      var sp=document.createElement("span"), ch=Array.from(tok), col=" r-"+((C&&C.roles&&C.roles[wi])||"etc");
       var isHid=mode==="none"||mode==="first"||!!hide[wi];
       if(isHid){
         sp.className="ccw hid"+col; sp.dataset.w=tok;
@@ -5458,6 +5481,7 @@ button:active{filter:brightness(1.15)}
   }
   function ccDraw(){
     var n=notes.get(C.id); if(!n){closeCoach();return}
+    if(!C.roles||C.rolesSrc!==n.text){C.roles=ccRoles(n);C.rolesSrc=n.text}
     var st=ccBox.querySelector(".ccsteps"); st.textContent="";
     var prev=C.shown; C.shown=C.stage;
     CC_STEPS.forEach(function(t,i){var dn=i<Math.min(C.stage,4);var d=document.createElement("span");d.className="ccst"+(dn?" done":i===C.stage?" now":"")+(dn&&i>=prev?" just":"");d.innerHTML='<i></i><span></span>';d.querySelector("i").textContent=dn?"✓":String(i+1);d.querySelector("span").textContent=t;st.appendChild(d)});
