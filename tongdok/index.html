@@ -295,6 +295,10 @@ h2.tg{display:flex;align-items:center;justify-content:space-between}
 .chip[data-s="fr"]{color:#fff}
 .sum,.shelf{box-shadow:0 1px 3px rgba(80,60,30,.08)}
 .half span{color:var(--ink)}
+/* 격려 알림: 바탕과 구분되게 진한 갈색, 그리고 아래 칸을 가리지 않게 손가락이 통과함 (2026-10-11: 알림이 떠 있는 동안 체크가 안 눌리던 문제) */
+.toast{background:#5A4130;border-color:#5A4130;color:#FFF8EA;pointer-events:none;box-shadow:0 8px 22px rgba(60,40,20,.3)}
+.toast small{color:#EAD9C2}
+.fchips .chip{cursor:not-allowed}
 /* ===== 읽는 중인 책 고정 (📌) ===== */
 .bk-pin{align-self:center;flex:0 0 auto;width:34px;height:34px;margin-left:auto;border:1px solid var(--rule);border-radius:50%;background:var(--sheet);display:grid;place-items:center;font-size:15px;cursor:pointer;filter:grayscale(1);opacity:.55;padding:0}
 .bk-pin[aria-pressed="true"]{filter:none;opacity:1;border-color:color-mix(in srgb,var(--pink) 50%,var(--rule));background:color-mix(in srgb,var(--pink) 10%,var(--sheet))}
@@ -736,6 +740,14 @@ var CHEERS=[
 ];
 var toastTimer=null, cheerTurn=0;
 /* bi = 책 번호, c = 그 책 안의 장 번호 */
+function hint(msg,sub){
+  var el=$("toast"); $("toastMsg").textContent=msg; $("toastRef").textContent=sub||"";
+  el.hidden=false; el.classList.remove("out"); clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){el.classList.add("out");setTimeout(function(){el.hidden=true},320)},2200);
+}
+document.addEventListener("click",function(ev){
+  if(ev.target.closest(".fchips"))hint("친구 표는 보기만 할 수 있어요","내 체크는 바로 위 🙋 나 표에서 눌러 주세요");
+});
 function cheer(bi,c){
   var t=(c===1)
     ? ["«"+BOOKS[bi][0]+"»을 펼쳤어요. 첫 장에 좋은 만남이 있기를.","시편 119:18"]
