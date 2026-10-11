@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-86">
+<meta name="app-build" content="2026-10-11-87">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2050,6 +2050,11 @@ button:active{filter:brightness(1.15)}
 .dlref::after{content:" 📖";font-size:.85em;text-decoration:none}
 .dlrow.on .dlref{color:color-mix(in srgb,var(--sky) 70%,var(--muted))}
 .dlauto{flex:0 0 auto;font-size:10.5px;color:var(--sky);white-space:nowrap}
+.dlgrip{flex:0 0 auto;width:30px;height:44px;display:grid;place-items:center;cursor:grab;touch-action:none;color:var(--faint);-webkit-user-select:none;user-select:none}
+.dlgrip::before{content:"⠿";font-size:20px;line-height:1}
+.dlitem.dldrag{position:relative;z-index:5;transition:none}
+.dlitem.dldrag .dlrow{box-shadow:0 8px 22px rgba(0,0,0,.55);border-color:color-mix(in srgb,var(--gc,var(--gold)) 60%,#232229);transform:scale(1.02)}
+.dlitem.dldrag .dlgrip{cursor:grabbing;color:var(--gc,var(--gold))}
 .dldel{flex:0 0 auto;height:30px;min-width:30px;padding:0 8px;border:0;border-radius:15px;background:transparent;color:var(--faint);font-size:16px;white-space:nowrap}
 .dldel.sure{color:var(--pink);font-size:12px}
 .dladd{display:flex;gap:6px;margin-top:14px}
@@ -5769,9 +5774,48 @@ button:active{filter:brightness(1.15)}
         }
       });
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dl&&!dl.hidden)closeDaily()});
+      dlDragInit(dl.querySelector(".dllist"));
     }
     dlDay=dkey(Date.now()); dlEdit=false; drawDaily();
     dl.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+  }
+  /* 항목 고치기에서 ⠿ 손잡이를 끌어 같은 묶음 안에서 순서 바꾸기 */
+  function dlDragInit(list){
+    var D=null;
+    list.addEventListener("pointerdown",function(e){
+      var gp=e.target.closest(".dlgrip"); if(!gp||!dlEdit)return;
+      e.preventDefault(); var row=gp.closest(".dlitem");
+      D={row:row,g:row.dataset.g,y0:e.clientY,pid:e.pointerId,moved:false};
+      try{gp.setPointerCapture(e.pointerId)}catch(err){}
+      row.classList.add("dldrag"); buzz(8);
+    });
+    list.addEventListener("pointermove",function(e){
+      if(!D||e.pointerId!==D.pid)return; e.preventDefault();
+      var dy=e.clientY-D.y0; D.row.style.transform="translateY("+dy+"px)";
+      var sibs=Array.from(list.querySelectorAll('.dlitem[data-g="'+D.g+'"]')), i=sibs.indexOf(D.row);
+      var r=D.row.getBoundingClientRect(), mid=r.top+r.height/2, prev=sibs[i-1], next=sibs[i+1], tgt=null, before=null;
+      if(next){var nr=next.getBoundingClientRect(); if(mid>nr.top+nr.height/2){tgt=next;before=true}}
+      if(!tgt&&prev){var pr=prev.getBoundingClientRect(); if(mid<pr.top+pr.height/2){tgt=prev;before=false}}
+      if(tgt){
+        D.row.style.transform=""; var t0=D.row.getBoundingClientRect().top;
+        if(before)list.insertBefore(tgt,D.row); else list.insertBefore(D.row,tgt);
+        D.y0+=D.row.getBoundingClientRect().top-t0; D.row.style.transform="translateY("+(e.clientY-D.y0)+"px)"; D.moved=true; buzz(4);
+      }
+      // 화면 끝 가까이 끌면 저절로 스크롤
+      var body=dl.querySelector(".dlbody"), br=body.getBoundingClientRect();
+      if(e.clientY<br.top+60)body.scrollTop-=12; else if(e.clientY>br.bottom-60)body.scrollTop+=12;
+    });
+    function end(e){
+      if(!D||(e&&e.pointerId!==D.pid))return;
+      var d=D; D=null; d.row.classList.remove("dldrag"); d.row.style.transform="";
+      if(!d.moved)return;
+      var ids=Array.from(list.querySelectorAll('.dlitem[data-g="'+d.g+'"]')).map(function(x){return x.dataset.id});
+      var o=dailyData(), k=0, byId={};
+      o.items.forEach(function(it){byId[it.id]=it});
+      o.items=o.items.map(function(it){return it.g===d.g&&byId[ids[k]]?byId[ids[k++]]:it});
+      saveDaily(o); drawDaily();
+    }
+    list.addEventListener("pointerup",end); list.addEventListener("pointercancel",end);
   }
   function closeDaily(){if(!dl)return; dl.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
   function drawDaily(){
@@ -5794,7 +5838,8 @@ button:active{filter:brightness(1.15)}
       var its=o.items.filter(function(it){return it.g===g.g}); if(!its.length)return;
       var h=document.createElement("div"); h.className="dlgh"; h.style.setProperty("--gc",g.c); h.textContent=g.e+" "+g.t+"  "+its.filter(function(it){return on.indexOf(it.id)>=0}).length+"/"+its.length; list.appendChild(h);
       its.forEach(function(it){
-        var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc",g.c);
+        var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc",g.c); row.dataset.id=it.id; row.dataset.g=g.g;
+        if(dlEdit){var gp=document.createElement("span");gp.className="dlgrip";gp.setAttribute("aria-hidden","true");gp.title="끌어서 순서 바꾸기";row.appendChild(gp)}
         var b=document.createElement("button"); b.type="button"; b.className="dlrow"+(on.indexOf(it.id)>=0?" on":""); b.dataset.id=it.id; b.setAttribute("aria-pressed",String(on.indexOf(it.id)>=0));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>'+(it.auto?'<span class="dlauto">한 줄 감사로 자동</span>':'');
         dlRefInto(b.querySelector(".dlt"),it.t); row.appendChild(b);
