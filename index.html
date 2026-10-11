@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-88">
+<meta name="app-build" content="2026-10-11-89">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1046,6 +1046,10 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .rdpbar button{height:38px;padding:0 14px;border:1px solid #34333A;border-radius:19px;background:transparent;color:var(--ink);font-size:13.5px;white-space:nowrap}
 .rdpbar .rdcard{border-color:color-mix(in srgb,var(--violet) 55%,#34333A);color:var(--violet);font-weight:700}
 .rdpbar .rdcard[hidden]{display:none}
+.rdpbar .rdedit{border-color:color-mix(in srgb,var(--gold) 55%,#34333A);color:var(--gold);font-weight:700}
+.rdpbar .rdedit[hidden]{display:none}
+.rdpform.editing .rdphint{display:none}
+.rdpform.editing .rdptext{min-height:55vh}
 .rdpbar .rdpaste{border-color:color-mix(in srgb,var(--mint) 55%,#34333A);color:var(--mint);font-weight:700}
 .rdpform{position:absolute;left:0;right:0;bottom:0;max-width:720px;margin:0 auto;padding:16px;background:#141418;border:1px solid #2E2D33;border-radius:16px 16px 0 0;box-shadow:0 -12px 40px rgba(0,0,0,.6);display:flex;flex-direction:column;gap:10px}
 .rdpform[hidden]{display:none}
@@ -6505,19 +6509,28 @@ button:active{filter:brightness(1.15)}
         '<a class="rdhb" target="_blank" rel="noopener">개역개정으로 보기 (대한성서공회) ↗</a>'+
         '<p class="rdalt">안 열리면 <a class="rdhb2" target="_blank" rel="noopener">홀리바이블로 보기</a>를 길게 눌러 크롬에서 열어 주세요.</p>'+
         '<div class="rdscroll"><ol class="rdlist"></ol><div class="rdmsg" aria-live="polite"></div>'+'</div>'+
-        '<div class="rdpbar"><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button><button type="button" class="rdcard" hidden>📌 이 장을 말씀 카드로 담기</button></div>'+
+        '<div class="rdpbar"><button type="button" class="rdedit" hidden>✏️ 본문 고치기</button><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button><button type="button" class="rdcard" hidden>📌 이 장을 말씀 카드로 담기</button></div>'+
         '<div class="rdpform" hidden><p class="rdphint">성서공회나 홀리바이블에서 장 본문을 복사해 붙여 넣으세요. 절 번호(1, 2, 3 …)가 있으면 그대로 나누고, 없으면 한 줄을 한 절로 보고 번호를 붙여요. 이 기기에만 저장돼요.</p>'+
         '<textarea class="field rdptext" placeholder="1 그는 허물과 죄로 죽었던 너희를 살리셨도다&#10;2 그 때에 너희는 …&#10;(절 번호가 없으면 한 줄을 한 절로 봐요)" aria-label="장 본문 붙여넣기"></textarea>'+
         '<div class="rdpbtns"><button type="button" class="rdpcancel">취소</button><button type="button" class="primary rdpsave">저장</button></div></div>';
       document.body.appendChild(rd);
       rd.querySelector(".rdclose").addEventListener("click",closeReader);
-      rd.querySelector(".rdpaste").addEventListener("click",function(){var f=rd.querySelector(".rdpform");f.hidden=false;var t=f.querySelector(".rdptext");t.value="";t.focus()});
+      rd.querySelector(".rdpaste").addEventListener("click",function(){var f=rd.querySelector(".rdpform");f.hidden=false;f.classList.remove("editing");var t=f.querySelector(".rdptext");t.value="";t.focus()});
+      // 저장해 둔 본문 고치기: 지금 본문을 "절번호 본문" 줄로 채워 두고 고친 뒤 저장
+      rd.querySelector(".rdedit").addEventListener("click",function(){
+        var sv=myChapters()[rd.dataset.key]; if(!sv)return;
+        var f=rd.querySelector(".rdpform"), t=f.querySelector(".rdptext");
+        f.hidden=false; f.classList.add("editing"); t.value=sv.v.map(function(x){return x.v+" "+x.t}).join("\n");
+        var hl=+rd.dataset.hl||0, line=hl>1?sv.v.findIndex(function(x){return x.v===hl}):-1;
+        setTimeout(function(){t.focus();var pos=line>0?t.value.split("\n").slice(0,line).join("\n").length+1:0;try{t.setSelectionRange(pos,pos)}catch(e){}},80);
+      });
       rd.querySelector(".rdpcancel").addEventListener("click",function(){rd.querySelector(".rdpform").hidden=true});
       rd.querySelector(".rdpsave").addEventListener("click",function(){
         var vs=parseChapterPaste(rd.querySelector(".rdptext").value);
         if(vs.length<2){toast("절 번호를 찾지 못했어요. 절 번호까지 함께 복사해 주세요.");return}
-        saveMyChapter(rd.dataset.key,vs); rd.querySelector(".rdpform").hidden=true;
-        showMine(true); toast(vs.length+"절을 저장했어요");
+        var wasEdit=rd.querySelector(".rdpform").classList.contains("editing");
+        saveMyChapter(rd.dataset.key,vs); rd.querySelector(".rdpform").hidden=true; rd.querySelector(".rdpform").classList.remove("editing");
+        showMine(true); toast(wasEdit?"본문을 고쳤어요 ("+vs.length+"절)":vs.length+"절을 저장했어요");
       });
       rd.querySelector(".rdcard").addEventListener("click",function(){
         var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1], sv=myChapters()[rd.dataset.key]; if(!sv||bk<0)return;
@@ -6710,6 +6723,7 @@ button:active{filter:brightness(1.15)}
   function showMine(){
     var saved=myChapters()[rd.dataset.key], msg=rd.querySelector(".rdmsg");
     rd.querySelector(".rdpaste").textContent=saved?"📋 다시 붙여넣기":"📋 복사한 본문 붙여넣기";
+    rd.querySelector(".rdedit").hidden=!saved;
     var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1], cardBtn=rd.querySelector(".rdcard");
     cardBtn.hidden=!saved||!!myNoteAt(bk,ch,0);
     if(saved){msg.textContent="";drawReader(saved.v,+rd.dataset.hl);return}
