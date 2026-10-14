@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-100">
+<meta name="app-build" content="2026-10-14-101">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2063,8 +2063,10 @@ button:active{filter:brightness(1.15)}
 .dlref{color:var(--sky);font-weight:700;text-decoration:none;cursor:pointer;padding:2px 0}
 .dlref::after{content:" 📖";font-size:.85em;text-decoration:none}
 .dlrow.on .dlref{color:color-mix(in srgb,var(--sky) 70%,var(--muted))}
-.dlauto{position:absolute;top:50%;right:50px;transform:translateY(-50%);padding:4px 9px;border:1px solid color-mix(in srgb,var(--sky) 38%,transparent);border-radius:11px;background:color-mix(in srgb,var(--sky) 13%,transparent);color:var(--sky);font-size:10.5px;font-weight:700;white-space:nowrap;text-decoration:none}
+.dlauto{position:absolute;top:50%;right:14px;transform:translateY(-50%);padding:4px 9px;border:1px solid color-mix(in srgb,var(--sky) 38%,transparent);border-radius:11px;background:color-mix(in srgb,var(--sky) 13%,transparent);color:var(--sky);font-size:10.5px;font-weight:700;white-space:nowrap;text-decoration:none}
+.dlauto.off{border-color:#34333A;background:transparent;color:var(--faint)}
 .dlitem.hasauto .dlrow{padding-right:104px}
+.dlitem.haspill .dlrow{padding-right:82px}
 .dlgrip{flex:0 0 auto;width:30px;height:44px;display:grid;place-items:center;cursor:grab;touch-action:none;color:var(--faint);-webkit-user-select:none;user-select:none}
 .dlgrip::before{content:"⠿";font-size:20px;line-height:1}
 .dlitem.dldrag{position:relative;z-index:5;transition:none}
@@ -2106,8 +2108,6 @@ button:active{filter:brightness(1.15)}
 .dlgn2,.dlted{flex:1;min-width:0}
 .dlfsave{flex:0 0 auto;height:40px;padding:0 14px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:13.5px;font-weight:700}
 .dlfcancel{flex:0 0 auto;height:40px;padding:0 12px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
-.dlmemo{flex:0 0 auto;width:34px;height:34px;padding:0;border:1px solid #2A2930;border-radius:17px;background:transparent;color:var(--faint);font-size:14px;line-height:1}
-.dlmemo.on{color:var(--sky);border-color:color-mix(in srgb,var(--sky) 45%,#2A2930);background:color-mix(in srgb,var(--sky) 12%,transparent)}
 .dlmemop{display:block;width:100%;height:auto;margin:0 0 4px;padding:6px 10px;border:0;border-left:2px solid color-mix(in srgb,var(--sky) 45%,transparent);background:transparent;color:var(--faint);font-size:12.5px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dlmemobox{margin:2px 0 10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--sky) 35%,#232229);border-radius:12px;background:color-mix(in srgb,var(--sky) 7%,#121216)}
 .dlmemoh{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:700;color:var(--sky)}
@@ -5909,7 +5909,7 @@ button:active{filter:brightness(1.15)}
           if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
           o.items=o.items.filter(function(it){return it.id!==id}); saveDaily(o); drawDaily(); return;
         }
-        if(b.classList.contains("dlauto")){dlGotoThanks();return}   // 한 줄 감사 쓰는 고으로
+        if(b.classList.contains("dlauto")&&!b.classList.contains("dlmemo")){dlGotoThanks();return}   // 한 줄 감사 쓰는 고으로
         if(b.classList.contains("dlmemo")){
           dlMemoId=(dlMemoId===id?"":id); drawDaily();
           if(dlMemoId)setTimeout(function(){
@@ -5954,8 +5954,9 @@ button:active{filter:brightness(1.15)}
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dl&&!dl.hidden)closeDaily()});
       dlDragInit(dl.querySelector(".dllist"));
     }
-    dlDay=dkey(Date.now()); dlEdit=false; dlEditId=""; dlGEditId=""; dlMemoId=""; drawDaily();
+    dlDay=dkey(Date.now()); dlEdit=false; dlEditId=""; dlGEditId=""; dlMemoId="";
     dl.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+    drawDaily();   // 창이 보인 뒤에 그려야 알약 단추 너비를 재서 글자 자리를 비울 수 있다
   }
   /* 순서 바꾸기: 항목을 꾹 눌렀다가(0.4초) 끌기. 항목 고치기에서는 ⠿ 손잡이를 바로 끌어도 됨. 같은 묶음 안에서만 움직임 */
   function dlDragInit(list){
@@ -6075,22 +6076,25 @@ button:active{filter:brightness(1.15)}
           setTimeout(function(){ei2.focus();ei2.setSelectionRange(ei2.value.length,ei2.value.length)},0);
           return;
         }
-        var row=document.createElement("div"); row.className="dlitem"+(it.auto==="thanks"&&!dlEdit?" hasauto":""); row.style.setProperty("--gc",g.c); row.dataset.id=it.id; row.dataset.g=g.g;
+        var memo=dlMemoGet(o,dlDay,it.id), isThx=it.auto==="thanks";
+        var row=document.createElement("div"); row.className="dlitem"+(dlEdit?"":(isThx?" hasauto":" haspill")); row.style.setProperty("--gc",g.c); row.dataset.id=it.id; row.dataset.g=g.g;
         if(dlEdit){var gp=document.createElement("span");gp.className="dlgrip";gp.setAttribute("aria-hidden","true");gp.title="끌어서 순서 바꾸기";row.appendChild(gp)}
         var b=document.createElement("button"); b.type="button"; b.className="dlrow"+(on.indexOf(it.id)>=0?" on":""); b.dataset.id=it.id; b.setAttribute("aria-pressed",String(on.indexOf(it.id)>=0));
         if(dlEdit)b.title="눌러서 글 고치기";
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
         dlRefInto(b.querySelector(".dlt"),it.t); row.appendChild(b);
-        if(it.auto==="thanks"&&!dlEdit){   // 누르면 한 줄 감사 쓰는 곣으로 감
-          var au=document.createElement("button"); au.type="button"; au.className="dlauto"; au.textContent="한 줄 감사 쓰기 ›";
-          au.setAttribute("aria-label","한 줄 감사 쓰는 고으로 가기"); row.appendChild(au);
-        }
-        var memo=dlMemoGet(o,dlDay,it.id);
         if(!dlEdit){
-          var mb=document.createElement("button"); mb.type="button"; mb.className="dlmemo"+(memo?" on":""); mb.dataset.id=it.id;
-          mb.textContent=memo?"📝":"✎"; mb.title="구체적으로 적어 두기";
-          mb.setAttribute("aria-label",it.t+" 기록 "+(memo?"보기":"적기"));
-          mb.setAttribute("aria-expanded",String(dlMemoId===it.id)); row.appendChild(mb);
+          var pill=document.createElement("button"); pill.type="button";
+          if(isThx){   // 감사 항목은 '한 줄 감사'가 그 기록 코너
+            pill.className="dlauto"; pill.textContent="한 줄 감사 쓰기 ›";
+            pill.setAttribute("aria-label","한 줄 감사 쓰는 곳으로 가기");
+          }else{       // 나머지 항목은 그날 기록 칸을 연다
+            pill.className="dlauto dlmemo"+(memo?"":" off"); pill.dataset.id=it.id;
+            pill.textContent="기록 ›"; pill.title=(memo?"적어 둔 기록 보기":"구체적으로 적어 두기");
+            pill.setAttribute("aria-label",it.t+" 기록 "+(memo?"보기":"적기"));
+            pill.setAttribute("aria-expanded",String(dlMemoId===it.id));
+          }
+          row.appendChild(pill);
         }
         if(dlEdit){var x=document.createElement("button");x.type="button";x.className="dldel";x.dataset.id=it.id;x.textContent="×";x.setAttribute("aria-label","이 항목 지우기");row.appendChild(x)}
         list.appendChild(row);
@@ -6107,6 +6111,10 @@ button:active{filter:brightness(1.15)}
           mp.textContent=memo.replace(/\s+/g," ").slice(0,80); list.appendChild(mp);
         }
       });
+    });
+    // 알약 단추 너비만큼 글자 자리를 비워 둠 (여러 줄로 접히는 항목도 단추 밑으로 들어가지 않게)
+    Array.prototype.forEach.call(list.querySelectorAll(".dlitem .dlauto"),function(pl){
+      var rw=pl.parentNode.querySelector(".dlrow"); if(rw&&pl.offsetWidth)rw.style.paddingRight=(pl.offsetWidth+20)+"px";
     });
     dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit;
     dl.querySelector(".dledit").textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기";
