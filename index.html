@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-97">
+<meta name="app-build" content="2026-10-14-99">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1633,7 +1633,11 @@ button:active{filter:brightness(1.15)}
 .cctip b{color:var(--ink);font-size:16px}
 .ccverse{font-family:var(--serif);font-size:21px;line-height:2;color:var(--orange);word-break:keep-all}
 .ccverse.big{font-size:22px}
-.ccw.hid{color:var(--faint);letter-spacing:1px;cursor:pointer;border-radius:6px}
+.ccw.hid{position:relative;color:var(--faint);cursor:pointer;border-radius:6px}
+.ccw.hid .ccg{visibility:hidden}
+.ccw.hid .ccm{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;letter-spacing:1px;white-space:nowrap;pointer-events:none}
+.ccw.hid.peek .ccg{visibility:visible}
+.ccw.hid.peek .ccm{display:none}
 .ccw.hid.peek{color:var(--hi);background:color-mix(in srgb,var(--gold) 15%,transparent);letter-spacing:0}
 .ccfoot{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid #1E1D23;max-width:720px;width:100%;margin:0 auto}
 .ccbtn{height:48px;padding:0 18px;border:1px solid var(--rule);border-radius:24px;background:transparent;color:var(--muted);font-size:15px;font-weight:700;white-space:nowrap}
@@ -2047,7 +2051,7 @@ button:active{filter:brightness(1.15)}
 .dlw.cur b{color:var(--gold);font-weight:700}
 .dlw.cur i{box-shadow:0 0 0 2px var(--gold)}
 .dlgh{margin:18px 0 6px;padding-left:2px;font-size:13.5px;font-weight:700;color:var(--gc,var(--muted))}
-.dlitem{display:flex;align-items:center;gap:6px}
+.dlitem{position:relative;display:flex;align-items:center;gap:6px}
 .dlrow{flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:10px 10px;margin:2px 0;border:1px solid #232229;border-radius:12px;background:#121216;color:var(--ink);font-size:15px;text-align:left}
 .dlbox{flex:0 0 22px;height:22px;border:2px solid color-mix(in srgb,var(--gc,var(--gold)) 70%,var(--rule));border-radius:6px;display:grid;place-items:center}
 .dlrow{background:color-mix(in srgb,var(--gc,var(--gold)) 7%,#121216);border-color:color-mix(in srgb,var(--gc,var(--gold)) 18%,#232229)}   /* 묶음 색으로 칸 배경 */
@@ -2059,7 +2063,8 @@ button:active{filter:brightness(1.15)}
 .dlref{color:var(--sky);font-weight:700;text-decoration:none;cursor:pointer;padding:2px 0}
 .dlref::after{content:" 📖";font-size:.85em;text-decoration:none}
 .dlrow.on .dlref{color:color-mix(in srgb,var(--sky) 70%,var(--muted))}
-.dlauto{flex:0 0 auto;padding:0 2px;border:0;background:transparent;font-size:10.5px;color:var(--sky);white-space:nowrap;text-decoration:underline;text-underline-offset:2px}
+.dlauto{position:absolute;top:50%;right:50px;transform:translateY(-50%);padding:4px 9px;border:1px solid color-mix(in srgb,var(--sky) 38%,transparent);border-radius:11px;background:color-mix(in srgb,var(--sky) 13%,transparent);color:var(--sky);font-size:10.5px;font-weight:700;white-space:nowrap;text-decoration:none}
+.dlitem.hasauto .dlrow{padding-right:104px}
 .dlgrip{flex:0 0 auto;width:30px;height:44px;display:grid;place-items:center;cursor:grab;touch-action:none;color:var(--faint);-webkit-user-select:none;user-select:none}
 .dlgrip::before{content:"⠿";font-size:20px;line-height:1}
 .dlitem.dldrag{position:relative;z-index:5;transition:none}
@@ -2090,9 +2095,10 @@ button:active{filter:brightness(1.15)}
 .sermempty{margin:0 0 8px;padding:10px 12px;border:1px dashed #2E2D34;border-radius:12px;font-size:12.5px;color:var(--faint);line-height:1.6}
 .dlgempty{margin:0 0 4px;padding:10px 12px;border:1px dashed #2E2D34;border-radius:12px;font-size:12.5px;color:var(--faint)}
 /* 묶음 이름 바꾸기 · 항목 고치기 · 그날 기록 */
-.dlgbtns{margin-left:auto;flex:0 0 auto;display:flex;gap:6px}
-.dlgdel{margin-left:0}
-.dlgname{height:26px;padding:0 10px;border:1px solid #34333A;border-radius:13px;background:transparent;color:var(--faint);font-size:11.5px;font-weight:500}
+.dlgname{padding:2px 8px 2px 2px;border:0;border-radius:10px;background:transparent;color:var(--gc,var(--muted));font-size:13.5px;font-weight:700;font-family:inherit;letter-spacing:.04em;text-align:left}
+.dlgname .dlgpen{margin-left:6px;font-size:10.5px;opacity:.5}
+.dlgdel{margin-left:auto}
+.dlmemoedit{height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:transparent;color:var(--muted);font-size:12.5px}
 .dlgform{display:flex;gap:6px;align-items:center;margin:18px 0 6px}
 .dlitform{display:flex;gap:6px;align-items:center;margin:2px 0}
 .dlgform .field,.dlitform .field{height:40px;margin:0}
@@ -5492,8 +5498,8 @@ button:active{filter:brightness(1.15)}
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 가린 낱말을 누르면 톡 뒤집혀 잠깐 보기
         var w=e.target.closest(".ccw.hid"); if(!w||!C||C.revealing||w.classList.contains("peek"))return;
-        w.classList.add("peek"); w.textContent=w.dataset.w; C.peek++; buzz(5);
-        setTimeout(function(){if(w.isConnected&&C&&C.stage<4&&!C.revealing){w.classList.remove("peek");ccMask(w)}},1600);
+        w.classList.add("peek"); C.peek++; buzz(5);
+        setTimeout(function(){if(w.isConnected&&C&&C.stage<4&&!C.revealing)w.classList.remove("peek")},1600);
       });
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ccBox&&!ccBox.hidden)closeCoach()});
       // 닫기 버튼 대신 휴대폰 뒤로 가기로 닫음
@@ -5548,10 +5554,13 @@ button:active{filter:brightness(1.15)}
       return ccRoleOf(w);
     });
   }
-  function ccMask(sp){   // 가린 낱말 다시 그리기 (첫 글자 단계는 첫 글자를 밝게)
+  function ccMask(sp){   // 가린 낱말: 진짜 글자가 칸 너비를 잡고(안 보임), ○는 그 위에 겹쳐 보여 준다
     sp.textContent="";
-    if(sp.dataset.f){var b=document.createElement("b");b.textContent=sp.dataset.f;sp.appendChild(b);sp.appendChild(document.createTextNode(sp.dataset.m))}
-    else sp.textContent=sp.dataset.m;
+    var g=document.createElement("span"); g.className="ccg"; g.textContent=sp.dataset.w||sp.dataset.m||"";
+    var m=document.createElement("span"); m.className="ccm";
+    if(sp.dataset.f){var b=document.createElement("b");b.textContent=sp.dataset.f;m.appendChild(b);m.appendChild(document.createTextNode(sp.dataset.m))}
+    else m.textContent=sp.dataset.m;
+    sp.appendChild(g); sp.appendChild(m);
   }
   function ccWords(text,mode,frac,seed,opt){   // mode: all | first | hide(frac) | none | got(색 입혀 다 보기)
     opt=opt||{};
@@ -5910,6 +5919,7 @@ button:active{filter:brightness(1.15)}
           return;
         }
         if(b.classList.contains("dlmemoclose")){dlMemoId="";drawDaily();return}
+        if(b.classList.contains("dlmemoedit")){dlEditId=b.closest(".dlmemobox").dataset.id;dlGEditId="";drawDaily();return}
         if(b.classList.contains("dlgname")){dlGEditId=b.dataset.g;dlEditId="";drawDaily();return}
         if(b.classList.contains("dlgcancel2")){dlGEditId="";drawDaily();return}
         if(b.classList.contains("dlgsave2")){
@@ -5994,15 +6004,21 @@ button:active{filter:brightness(1.15)}
   }
   // '한 줄 감사로 자동' 줄을 누르면 실제로 한 줄을 적는 고(감사 실천)으로 데려간다
   function dlGotoThanks(){
-    var tn=null, ta=null;
-    sorted().forEach(function(n){(n.acts||[]).forEach(function(a){if(!ta&&a.t&&a.t.trim()&&actWord(a.t)==="감사"){tn=n;ta=a}})});
+    var tn=null, ta=null, bn=null, ba=null;
+    sorted().forEach(function(n){(n.acts||[]).forEach(function(a){
+      if(!a.t||!a.t.trim()||actWord(a.t)!=="감사")return;
+      if(!ta){tn=n;ta=a}                                   // 처음 만나는 감사 실천
+      if(!ba&&(a.logs||[]).length){bn=n;ba=a}              // 이미 한 줄을 적어 온 곳이 있으면 그쪽으로
+    })});
+    if(ba){tn=bn;ta=ba}
     if(!ta){toast("아직 '감사' 실천이 없어요. 말씀 카드의 실천에 '감사'를 넣어 보세요");return}
     if(aFold.has(ta.id)){aFold.delete(ta.id); saveAFold()}   // 접혀 있으면 펼쳐서 바로 적을 수 있게
     closeDaily(); setBoard(false); setTopics([]); tabOf.set(tn.id,"a"); openOne(tn.id); render();
     setTimeout(function(){
       var c=cards.get(tn.id), el=c&&c.querySelector('.act[data-aid="'+ta.id+'"]'); if(!el)return;
-      el.scrollIntoView({block:"center",behavior:"smooth"});
-      var i=el.querySelector(".blin"); if(i)setTimeout(function(){try{i.focus()}catch(e){}},320);
+      var blog=el.querySelector(".blog")||el;              // 한 줄 적는 칸이 화면 가운데 오게
+      blog.scrollIntoView({block:"center",behavior:"smooth"});
+      var i=el.querySelector(".blin"); if(i)setTimeout(function(){try{i.focus({preventScroll:true})}catch(e){}},320);
     },140);
   }
   function closeDaily(){if(!dl)return; dl.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
@@ -6026,7 +6042,7 @@ button:active{filter:brightness(1.15)}
     sel.innerHTML=gs.map(function(g){return '<option value="'+g.g+'">'+g.e+' '+g.t.replace(/[<&"]/g,"")+'</option>'}).join(""); if(keep&&gs.some(function(g){return g.g===keep}))sel.value=keep; dlPickG="";
     gs.forEach(function(g){
       var its=o.items.filter(function(it){return it.g===g.g}), mine=/^u/.test(g.g); if(!its.length&&!(dlEdit&&mine))return;
-      if(dlEdit&&dlGEditId===g.g){   // 묶음 이름 바꾸기
+      if(dlGEditId===g.g){   // 묶음 이름 바꾸기
         var gf=document.createElement("div"); gf.className="dlgform"; gf.dataset.g=g.g;
         var ge=document.createElement("input"); ge.className="field dlge2"; ge.maxLength=4; ge.value=g.e; ge.setAttribute("aria-label","묶음 이모지");
         var gn=document.createElement("input"); gn.className="field dlgn2"; gn.maxLength=14; gn.value=g.t; gn.setAttribute("aria-label","묶음 이름");
@@ -6035,18 +6051,18 @@ button:active{filter:brightness(1.15)}
         gf.appendChild(ge); gf.appendChild(gn); gf.appendChild(gsv); gf.appendChild(gcl); list.appendChild(gf);
         setTimeout(function(){gn.focus();gn.setSelectionRange(gn.value.length,gn.value.length)},0);
       }else{
-        var h=document.createElement("div"); h.className="dlgh"; h.style.setProperty("--gc",g.c); h.textContent=g.e+" "+g.t+"  "+its.filter(function(it){return on.indexOf(it.id)>=0}).length+"/"+its.length;
-        if(dlEdit){
-          var gb=document.createElement("span"); gb.className="dlgbtns";
-          var gr=document.createElement("button"); gr.type="button"; gr.className="dlgname"; gr.dataset.g=g.g; gr.textContent="✏️ 이름 바꾸기"; gb.appendChild(gr);
-          if(mine){var gd=document.createElement("button");gd.type="button";gd.className="dlgdel";gd.dataset.g=g.g;gd.textContent="묶음 지우기";gb.appendChild(gd)}
-          h.appendChild(gb);
-        }
+        var h=document.createElement("div"); h.className="dlgh"; h.style.setProperty("--gc",g.c);
+        var gr=document.createElement("button"); gr.type="button"; gr.className="dlgname"; gr.dataset.g=g.g;
+        gr.setAttribute("aria-label","'"+g.t+"' 묶음 이름 바꾸기"); gr.title="눌러서 묶음 이름 바꾸기";
+        gr.textContent=g.e+" "+g.t+"  "+its.filter(function(it){return on.indexOf(it.id)>=0}).length+"/"+its.length;
+        var pen=document.createElement("span"); pen.className="dlgpen"; pen.textContent="✏️"; pen.setAttribute("aria-hidden","true"); gr.appendChild(pen);
+        h.appendChild(gr);
+        if(dlEdit&&mine){var gd=document.createElement("button");gd.type="button";gd.className="dlgdel";gd.dataset.g=g.g;gd.textContent="묶음 지우기";h.appendChild(gd)}
         list.appendChild(h);
       }
       if(!its.length){var em=document.createElement("p");em.className="dlgempty";em.textContent="아래 '새 항목' 칸에서 이 묶음을 골라 항목을 넣어 주세요.";list.appendChild(em)}
       its.forEach(function(it){
-        if(dlEdit&&dlEditId===it.id){   // 항목 글 고치기
+        if(dlEditId===it.id){   // 항목 글 고치기
           var ef=document.createElement("div"); ef.className="dlitform"; ef.dataset.id=it.id;
           var ei2=document.createElement("input"); ei2.className="field dlted"; ei2.maxLength=40; ei2.value=it.t; ei2.setAttribute("aria-label","항목 글 고치기");
           var esv=document.createElement("button"); esv.type="button"; esv.className="dlfsave dlitsave"; esv.dataset.id=it.id; esv.textContent="저장";
@@ -6055,14 +6071,14 @@ button:active{filter:brightness(1.15)}
           setTimeout(function(){ei2.focus();ei2.setSelectionRange(ei2.value.length,ei2.value.length)},0);
           return;
         }
-        var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc",g.c); row.dataset.id=it.id; row.dataset.g=g.g;
+        var row=document.createElement("div"); row.className="dlitem"+(it.auto==="thanks"&&!dlEdit?" hasauto":""); row.style.setProperty("--gc",g.c); row.dataset.id=it.id; row.dataset.g=g.g;
         if(dlEdit){var gp=document.createElement("span");gp.className="dlgrip";gp.setAttribute("aria-hidden","true");gp.title="끌어서 순서 바꾸기";row.appendChild(gp)}
         var b=document.createElement("button"); b.type="button"; b.className="dlrow"+(on.indexOf(it.id)>=0?" on":""); b.dataset.id=it.id; b.setAttribute("aria-pressed",String(on.indexOf(it.id)>=0));
         if(dlEdit)b.title="눌러서 글 고치기";
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
         dlRefInto(b.querySelector(".dlt"),it.t); row.appendChild(b);
         if(it.auto==="thanks"&&!dlEdit){   // 누르면 한 줄 감사 쓰는 곣으로 감
-          var au=document.createElement("button"); au.type="button"; au.className="dlauto"; au.textContent="한 줄 감사 쓰러 가기 ›";
+          var au=document.createElement("button"); au.type="button"; au.className="dlauto"; au.textContent="한 줄 감사 쓰기 ›";
           au.setAttribute("aria-label","한 줄 감사 쓰는 고으로 가기"); row.appendChild(au);
         }
         var memo=dlMemoGet(o,dlDay,it.id);
@@ -6078,7 +6094,7 @@ button:active{filter:brightness(1.15)}
           var mx=document.createElement("div"); mx.className="dlmemobox"; mx.dataset.id=it.id; mx.dataset.day=dlDay;
           mx.innerHTML='<div class="dlmemoh"><span></span><span class="dlmemosave"></span></div>'+
             '<textarea maxlength="2000" placeholder="구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)"></textarea>'+
-            '<div class="dlmemofoot"><button type="button" class="dlmemoclose">닫기</button></div>';
+            '<div class="dlmemofoot"><button type="button" class="dlmemoedit">✏️ 항목 글 고치기</button><button type="button" class="dlmemoclose">닫기</button></div>';
           mx.querySelector(".dlmemoh span").textContent="📝 "+dayName(dlDay)+" 기록";
           var ta=mx.querySelector("textarea"); ta.value=memo; ta.setAttribute("aria-label",it.t+" 기록");
           list.appendChild(mx);
