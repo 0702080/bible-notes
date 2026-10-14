@@ -93,7 +93,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .bk.shut .bk-body{display:none}
 .bk.shut .bk-h{padding-bottom:0}
 .bk.shut{margin-top:12px}
-.findbar{position:relative;margin-top:20px}
+.findbar{position:relative;margin:0 0 2px}
 .findin{width:100%;box-sizing:border-box;height:44px;padding:0 40px 0 14px;border:1.5px solid var(--rule);border-radius:12px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:15px}
 .findin:focus{border-color:var(--violet);outline:none}
 .findin::placeholder{color:var(--faint)}
@@ -104,7 +104,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .foldbar{display:flex;justify-content:flex-end;margin-top:18px}
 .tg-all.tg-every{font-size:13.5px;padding:7px 16px;border-radius:18px;color:var(--ink);background:color-mix(in srgb,var(--ring) 12%,#232328);border-color:color-mix(in srgb,var(--ring) 35%,var(--rule))}
 h2.tg{display:flex;align-items:center;justify-content:space-between}
-h2.tg[hidden],.foldbar[hidden],.bk[hidden]{display:none}
+h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:none}
 .tg-all{font-size:12.5px;font-weight:500;color:var(--muted);background:#232328;border:1px solid var(--rule);border-radius:14px;padding:4px 12px;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.bk-chev{transition:none}}
 .bk-prog{--c:var(--ring);margin-left:auto;align-self:center;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
@@ -347,6 +347,11 @@ body.painting .chips .chip[data-act]{cursor:crosshair}
 <div class="turn" aria-live="polite"><b aria-hidden="true">📱</b>휴대폰을 세로로 돌려 주세요</div>
 <header class="bar"><h1>성경 통독표</h1><span class="bar-cnt" id="barCnt"></span></header>
 <main class="wrap">
+  <div class="findbar">
+    <input class="findin" id="bkFind" type="search" inputmode="search" placeholder="성경 책 찾기 (초성도 돼요: ㅇㄱㅂㅅ)" aria-label="성경 책 찾기" autocomplete="off">
+    <button class="findx" id="bkFindX" type="button" aria-label="찾기 지우기" hidden>×</button>
+  </div>
+  <p class="findmsg" id="findMsg" hidden></p>
   <section class="pinned" id="pinned" hidden><h3>📌 읽는 중</h3><div class="books" id="pin"></div></section>
 
   <section class="sum" aria-live="polite">
@@ -377,11 +382,6 @@ body.painting .chips .chip[data-act]{cursor:crosshair}
     <p class="none" id="shelfNone">한 책을 끝까지 읽으면 여기에 뱃지가 쌓여요.</p>
   </section>
 
-  <div class="findbar">
-    <input class="findin" id="bkFind" type="search" inputmode="search" placeholder="성경 책 찾기 (초성도 돼요: ㅇㄱㅂㅅ)" aria-label="성경 책 찾기" autocomplete="off">
-    <button class="findx" id="bkFindX" type="button" aria-label="찾기 지우기" hidden>×</button>
-  </div>
-  <p class="findmsg" id="findMsg" hidden></p>
   <div class="foldbar"><button class="tg-all tg-every" type="button" data-act="foldall" data-t="all">66권 모두 접기</button></div>
   <h2 class="tg">구약<button class="tg-all" type="button" data-act="foldall" data-t="ot">모두 접기</button></h2>
   <div class="books" id="ot"></div>
@@ -721,7 +721,7 @@ function applyFind(){
     if(hit&&!seen[bi]){seen[bi]=1;shown++}
   });
   // 비어 버린 구약·신약 제목과 접기 단추는 찾는 동안 숨긴다
-  document.querySelectorAll("h2.tg,.foldbar").forEach(function(h){h.hidden=!!q});
+  document.querySelectorAll("h2.tg,.foldbar,.sum,.shelf").forEach(function(h){h.hidden=!!q});
   var pn=document.getElementById("pinned");
   if(pn&&q)pn.hidden=!Array.prototype.some.call(pn.querySelectorAll(".bk[data-b]"),function(s2){return !s2.hidden});
   if(msg){msg.hidden=!q; msg.textContent=q?(shown?shown+"권 찾았어요":"'"+q+"' 로 찾은 책이 없어요"):""}
