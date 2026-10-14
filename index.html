@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-124">
+<meta name="app-build" content="2026-10-15-125">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5888,10 +5888,20 @@ button:active{filter:brightness(1.15)}
   ];
   // 내가 만든 묶음 (o.groups) 까지 합친 묶음 목록
   var DAILY_GCOL=["var(--pink)","var(--mint)","var(--sky)","var(--gold)","var(--violet)","var(--orange)","var(--green)"];
+  // 내가 만든 묶음에 아직 이모지를 안 골랐으면 서로 다른 것으로 하나씩 붙여 준다
+  var DAILY_GEMO=["🌿","🕊️","🔥","💧","🌱","⭐","🎯","🧭","🏠","🤝","🔔","🪴","🌾","🎁","🛡️","✨","🧩","🗝️","🍀","🎵"];
   function dlGroups(o){
-    var all=DAILY_GROUPS.concat((o&&Array.isArray(o.groups)?o.groups:[]).filter(function(g){return g&&g.g&&g.t}));
-    var ov=(o&&o.gname&&typeof o.gname==="object")?o.gname:null; if(!ov)return all;
-    return all.map(function(g){var v=ov[g.g]; return (v&&v.t)?{g:g.g,e:v.e||g.e,t:v.t,c:g.c}:g});   // 내가 바꾼 이름이 있으면 그걸로
+    var base=DAILY_GROUPS.concat((o&&Array.isArray(o.groups)?o.groups:[]).filter(function(g){return g&&g.g&&g.t}));
+    var ov=(o&&o.gname&&typeof o.gname==="object")?o.gname:null;
+    var all=base.map(function(g){var v=ov&&ov[g.g]; return (v&&v.t)?{g:g.g,e:v.e||g.e,t:v.t,c:g.c}:{g:g.g,e:g.e,t:g.t,c:g.c}});
+    var used={}, k=0;
+    all.forEach(function(g){if(g.e&&g.e!=="📌")used[g.e]=1});
+    all.forEach(function(g){
+      if(g.e&&g.e!=="📌")return;
+      while(k<DAILY_GEMO.length&&used[DAILY_GEMO[k]])k++;
+      g.e=DAILY_GEMO[k%DAILY_GEMO.length]; used[g.e]=1; k++;
+    });
+    return all;
   }
   // 그날 그 항목에 적어 둔 글 (예: 어떻게 기도했는지)
   function dlMemoGet(o,day,id){var m=o&&o.memo&&o.memo[day]; return (m&&typeof m[id]==="string")?m[id]:""}
