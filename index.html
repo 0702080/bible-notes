@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-105">
+<meta name="app-build" content="2026-10-14-106">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2109,7 +2109,7 @@ button:active{filter:brightness(1.15)}
 .dlgn2,.dlted{flex:1;min-width:0}
 .dlfsave{flex:0 0 auto;height:40px;padding:0 14px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:13.5px;font-weight:700}
 .dlfcancel{flex:0 0 auto;height:40px;padding:0 12px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
-.dlmemop{display:block;width:100%;height:auto;margin:0 0 4px;padding:6px 10px;border:0;border-left:2px solid color-mix(in srgb,var(--sky) 45%,transparent);background:transparent;color:var(--faint);font-size:12.5px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dlmemop{display:block;width:100%;height:auto;margin:0 0 6px;padding:7px 10px;border:0;border-left:2px solid color-mix(in srgb,var(--sky) 45%,transparent);background:transparent;color:var(--faint);font-size:12.5px;line-height:1.65;text-align:left;white-space:pre-wrap;word-break:break-word;font-family:inherit}
 .dlmemobox{margin:2px 0 10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--sky) 35%,#232229);border-radius:12px;background:color-mix(in srgb,var(--sky) 7%,#121216)}
 .dlmemoh{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:700;color:var(--sky)}
 .dlmemosave{margin-left:auto;font-size:11px;font-weight:400;color:var(--faint)}
@@ -2121,7 +2121,10 @@ button:active{filter:brightness(1.15)}
 .dlg{flex:0 0 auto;width:auto;height:40px;font-size:13px;padding:0 6px}
 .dlin{flex:1;min-width:0;height:40px;font-size:14px}
 .dladd button{flex:0 0 auto;height:40px;padding:0 14px;border-radius:20px;white-space:nowrap}
-.dledit{display:block;margin:16px auto 0;height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--muted);font-size:13.5px}
+.dlbar .dltitle{flex:1;min-width:0}
+.dledit{flex:0 0 auto;height:36px;padding:0 14px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--muted);font-size:13px;white-space:nowrap}
+.dledit.on{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,#34333A);background:color-mix(in srgb,var(--gold) 12%,transparent)}
+@media (max-width:420px){.dlbar{gap:6px;padding:12px 12px}.dltitle{font-size:16px}.dledit{padding:0 10px;font-size:12px}.dlclose{padding:0 12px;font-size:13.5px}}
 @media (max-width:400px){.dlg{max-width:96px}}
 .note.spotin{animation:spotin .45s cubic-bezier(.2,1.3,.4,1)}
 @keyframes spotin{0%{transform:translateY(-10px);opacity:.4}100%{transform:none;opacity:1}}
@@ -5859,13 +5862,13 @@ button:active{filter:brightness(1.15)}
   function openDaily(){
     if(!dl){
       dl=document.createElement("div"); dl.className="daily"; dl.setAttribute("role","dialog"); dl.setAttribute("aria-modal","true"); dl.hidden=true;
-      dl.innerHTML='<div class="dlbar"><b class="dltitle">🌙 하루 돌아보기</b><button type="button" class="dlclose">닫기</button></div>'+
+      dl.innerHTML='<div class="dlbar"><b class="dltitle">🌙 하루 돌아보기</b><button type="button" class="dledit">✏️ 항목 고치기</button><button type="button" class="dlclose">닫기</button></div>'+
         '<div class="dlbody"><div class="dlday"><button type="button" class="dlprev" aria-label="전날">◀</button><b class="dldate"></b><button type="button" class="dlnext" aria-label="다음 날">▶</button></div>'+
         '<div class="dlprog"><span class="dlcnt"></span><span class="dlbarw"><i></i></span></div><div class="dlweek" aria-label="최근 7일"></div>'+
         '<div class="dllist"></div>'+
         '<form class="dladd" autocomplete="off" hidden><select class="field dlg" aria-label="묶음"></select><input class="field dlin" maxlength="40" placeholder="새 항목 (예: 먼저 인사했는가)" aria-label="새 항목"><button type="submit" class="primary">추가</button></form>'+
         '<form class="dlnewg" autocomplete="off" hidden><input class="field dlge" maxlength="4" placeholder="🙂" aria-label="묶음 이모지"><input class="field dlgn" maxlength="14" placeholder="새 묶음 이름 (예: 가정, 일터)" aria-label="새 묶음 이름"><button type="submit">+ 묶음</button></form>'+
-        '<button type="button" class="dledit">✏️ 항목 고치기</button></div>';
+        '</div>';
       document.body.appendChild(dl);
       dl.querySelector(".dlnewg").addEventListener("submit",function(e){
         e.preventDefault(); var ni=dl.querySelector(".dlgn"), ei=dl.querySelector(".dlge"), t=ni.value.trim(); if(!t){ni.focus();return}
@@ -6134,7 +6137,7 @@ button:active{filter:brightness(1.15)}
           list.appendChild(mx);
         }else if(!dlEdit&&memo){   // 미리보기는 평소 화면에서만 (고치기 중에는 줄을 짧게)
           var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo"; mp.dataset.id=it.id;
-          mp.textContent=memo.replace(/\s+/g," ").slice(0,80); list.appendChild(mp);
+          mp.textContent=memo.length>400?memo.slice(0,400)+"…":memo; list.appendChild(mp);
         }
       });
     });
@@ -6145,7 +6148,7 @@ button:active{filter:brightness(1.15)}
       rw.style.paddingRight=Math.max(10,Math.round(rr.right-pr.left)+10)+"px";
     });
     dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit;
-    dl.querySelector(".dledit").textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기";
+    var eb=dl.querySelector(".dledit"); eb.textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기"; eb.classList.toggle("on",dlEdit);
   }
 
   // 체크 항목 글에 있는 성경 구절(예: 시편 91편, 요한복음 3장, 로마서 8:28)을 눌러서 읽을 수 있게
