@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-125">
+<meta name="app-build" content="2026-10-15-127">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -91,6 +91,9 @@ textarea.field{resize:vertical;min-height:80px;font-family:var(--serif);line-hei
 /* toolbar */
 .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:30px 0 8px;padding-bottom:10px;border-bottom:2px solid var(--ink)}
 .toolbar h2{font-family:var(--serif);font-size:20px;margin:0;flex:1 1 auto}
+.homebtn{padding:2px 6px;margin-left:-6px;border:0;border-radius:9px;background:transparent;color:inherit;font-family:inherit;font-size:inherit;font-weight:inherit;letter-spacing:inherit}
+.homebtn:active{transform:scale(.97)}
+@media (hover:hover){.homebtn:hover{background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet)}}
 .seg{display:inline-flex;border:1.5px solid var(--rule);border-radius:8px;overflow:hidden}
 .seg button{border:0;background:transparent;height:32px;padding:0 10px;font-size:13px;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
@@ -2245,7 +2248,7 @@ button:active{filter:brightness(1.15)}
 
 
   <div class="toolbar">
-    <h2>담은 말씀 <span id="count" style="color:var(--muted);font-size:15px;font-family:var(--sans);font-weight:400"></span></h2>
+    <h2><button type="button" class="homebtn" id="homeBtn" aria-label="처음 화면으로">담은 말씀</button> <span id="count" style="color:var(--muted);font-size:15px;font-family:var(--sans);font-weight:400"></span></h2>
     <button class="tbtn tadd" id="topAdd" type="button">＋ 말씀 담기</button>
     <div class="viewseg" id="viewSeg" role="group" aria-label="보기 방식"><button type="button" data-v="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>목록</button><button type="button" data-v="board" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="4.5" height="16" rx="1.2"/><rect x="9.75" y="4" width="4.5" height="11" rx="1.2"/><rect x="16" y="4" width="4.5" height="13.5" rx="1.2"/></svg>칸반 보드</button></div>
     <button class="tbtn" id="sortBtn" type="button" aria-label="정렬 바꾸기">최근순</button>
@@ -2895,8 +2898,10 @@ button:active{filter:brightness(1.15)}
     return el;
   }
   // 묵상 접기 (이 기기에 기억)
-  var medFold=new Set(); try{JSON.parse(localStorage.getItem("bible-notes-mfold")||"[]").forEach(function(x){medFold.add(String(x))})}catch(e){}
-  function saveMFold(){try{localStorage.setItem("bible-notes-mfold",JSON.stringify(Array.from(medFold).slice(-800)))}catch(e){}}
+  // 묵상 칸은 기본으로 접혀 있고, 펼친 것만 기억한다
+  var medOpen2=new Set(); try{JSON.parse(localStorage.getItem("bible-notes-mopen")||"[]").forEach(function(x){medOpen2.add(String(x))})}catch(e){}
+  var medFold={has:function(id){return !medOpen2.has(id)},add:function(id){medOpen2.delete(id)},delete:function(id){medOpen2.add(id)}};
+  function saveMFold(){try{localStorage.setItem("bible-notes-mopen",JSON.stringify(Array.from(medOpen2).slice(-800)))}catch(e){}}
   function makeMed(m){
     var d=document.createElement("div");
     d.className="medi"; d.dataset.mid=m.id;
@@ -3286,6 +3291,15 @@ button:active{filter:brightness(1.15)}
     $("addSheet").hidden=true; $("fab").hidden=reorderMode; document.body.style.overflow="";
     if(lastAdded){var el=cards.get(lastAdded); lastAdded=null; if(el)setTimeout(function(){el.scrollIntoView({block:"start",behavior:"smooth"})},60)}
   }
+  $("homeBtn").addEventListener("click",function(){   // 처음 화면으로: 찾기·주제·펼친 카드를 모두 되돌림
+    if(typeof reorderMode!=="undefined"&&reorderMode)setReorder(false);
+    setBoard(false); setTopics([]); openIds.clear(); spotId=null;
+    var f=$("filter"); if(f){f.value="";f.hidden=true}
+    var fb=$("filterBtn"); if(fb)fb.setAttribute("aria-pressed","false");
+    filterText="";
+    render();
+    try{window.scrollTo({top:0,behavior:"smooth"})}catch(e){window.scrollTo(0,0)}
+  });
   $("fab").addEventListener("click",openSheet);
   (function(){
     var lastY=window.scrollY, ticking=false;
@@ -3791,7 +3805,7 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("addm")){
       var nm={id:mid(),text:"",at:Date.now()};
       var mins=n.meds.filter(function(m){return typeof m.o==="number"}).map(function(m){return m.o}); if(mins.length)nm.o=Math.min.apply(null,mins)-1;   // 순서를 바꿔 둔 경우에도 새 묵상은 맨 위
-      n.meds.push(nm); render(); scheduleSave(id);
+      n.meds.push(nm); medFold.delete(nm.id); saveMFold(); render(); scheduleSave(id);
       var mt=card.querySelector('.medi[data-mid="'+nm.id+'"] .med'); if(mt){mt.focus({preventScroll:true});mt.scrollIntoView({block:"center",behavior:"smooth"})}
       return;
     }
