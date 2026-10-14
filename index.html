@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-99">
+<meta name="app-build" content="2026-10-14-100">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5853,7 +5853,7 @@ button:active{filter:brightness(1.15)}
     o.items.forEach(function(it){if(it.auto==="thanks"&&on.indexOf(it.id)<0){if(th===null)th=thanksOn(day);if(th)on.push(it.id)}});
     return on.filter(function(id){return o.items.some(function(it){return it.id===id})});
   }
-  var dl=null, dlDay="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="";
+  var dl=null, dlDay="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0};
   function dayName(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"}
   function openDaily(){
     if(!dl){
@@ -5920,7 +5920,11 @@ button:active{filter:brightness(1.15)}
         }
         if(b.classList.contains("dlmemoclose")){dlMemoId="";drawDaily();return}
         if(b.classList.contains("dlmemoedit")){dlEditId=b.closest(".dlmemobox").dataset.id;dlGEditId="";drawDaily();return}
-        if(b.classList.contains("dlgname")){dlGEditId=b.dataset.g;dlEditId="";drawDaily();return}
+        if(b.classList.contains("dlgname")){   // 두 번 눌러야 제목이 열림 (한 번에 실수로 바뀌지 않게)
+          var gg=b.dataset.g, nowT=Date.now();
+          if(dlgTap.g===gg&&nowT-dlgTap.t<450){dlgTap={g:"",t:0};dlGEditId=gg;dlEditId="";drawDaily();return}
+          dlgTap={g:gg,t:nowT}; toast("한 번 더 누르면 이름을 고쳐요"); return;
+        }
         if(b.classList.contains("dlgcancel2")){dlGEditId="";drawDaily();return}
         if(b.classList.contains("dlgsave2")){
           var gfm=b.closest(".dlgform"), gnm=gfm.querySelector(".dlgn2").value.trim(), gem=gfm.querySelector(".dlge2").value.trim();
@@ -6053,7 +6057,7 @@ button:active{filter:brightness(1.15)}
       }else{
         var h=document.createElement("div"); h.className="dlgh"; h.style.setProperty("--gc",g.c);
         var gr=document.createElement("button"); gr.type="button"; gr.className="dlgname"; gr.dataset.g=g.g;
-        gr.setAttribute("aria-label","'"+g.t+"' 묶음 이름 바꾸기"); gr.title="눌러서 묶음 이름 바꾸기";
+        gr.setAttribute("aria-label","'"+g.t+"' 묶음 이름 바꾸기 (두 번 누르기)"); gr.title="두 번 누르면 묶음 이름을 고쳐요";
         gr.textContent=g.e+" "+g.t+"  "+its.filter(function(it){return on.indexOf(it.id)>=0}).length+"/"+its.length;
         var pen=document.createElement("span"); pen.className="dlgpen"; pen.textContent="✏️"; pen.setAttribute("aria-hidden","true"); gr.appendChild(pen);
         h.appendChild(gr);
