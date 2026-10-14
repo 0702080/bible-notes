@@ -93,9 +93,18 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .bk.shut .bk-body{display:none}
 .bk.shut .bk-h{padding-bottom:0}
 .bk.shut{margin-top:12px}
+.findbar{position:relative;margin-top:20px}
+.findin{width:100%;box-sizing:border-box;height:44px;padding:0 40px 0 14px;border:1.5px solid var(--rule);border-radius:12px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:15px}
+.findin:focus{border-color:var(--violet);outline:none}
+.findin::placeholder{color:var(--faint)}
+.findx{position:absolute;top:50%;right:6px;transform:translateY(-50%);width:32px;height:32px;padding:0;border:0;border-radius:16px;background:transparent;color:var(--muted);font-size:20px;line-height:1}
+.findx[hidden]{display:none}
+.findmsg{margin:8px 2px 0;font-size:12.5px;color:var(--muted)}
+.findmsg[hidden]{display:none}
 .foldbar{display:flex;justify-content:flex-end;margin-top:18px}
 .tg-all.tg-every{font-size:13.5px;padding:7px 16px;border-radius:18px;color:var(--ink);background:color-mix(in srgb,var(--ring) 12%,#232328);border-color:color-mix(in srgb,var(--ring) 35%,var(--rule))}
 h2.tg{display:flex;align-items:center;justify-content:space-between}
+h2.tg[hidden],.foldbar[hidden],.bk[hidden]{display:none}
 .tg-all{font-size:12.5px;font-weight:500;color:var(--muted);background:#232328;border:1px solid var(--rule);border-radius:14px;padding:4px 12px;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.bk-chev{transition:none}}
 .bk-prog{--c:var(--ring);margin-left:auto;align-self:center;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
@@ -368,6 +377,11 @@ body.painting .chips .chip[data-act]{cursor:crosshair}
     <p class="none" id="shelfNone">한 책을 끝까지 읽으면 여기에 뱃지가 쌓여요.</p>
   </section>
 
+  <div class="findbar">
+    <input class="findin" id="bkFind" type="search" inputmode="search" placeholder="성경 책 찾기 (초성도 돼요: ㅇㄱㅂㅅ)" aria-label="성경 책 찾기" autocomplete="off">
+    <button class="findx" id="bkFindX" type="button" aria-label="찾기 지우기" hidden>×</button>
+  </div>
+  <p class="findmsg" id="findMsg" hidden></p>
   <div class="foldbar"><button class="tg-all tg-every" type="button" data-act="foldall" data-t="all">66권 모두 접기</button></div>
   <h2 class="tg">구약<button class="tg-all" type="button" data-act="foldall" data-t="ot">모두 접기</button></h2>
   <div class="books" id="ot"></div>
@@ -681,7 +695,43 @@ function renderSummary(){
   $("btnCmp").hidden=!friend;
   $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
 }
-function renderAll(){renderBooks();renderSummary();renderShelf()}
+function renderAll(){renderBooks();renderSummary();renderShelf();applyFind()}
+
+/* ── 성경 책 찾기 (초성도 됨) ───────────────────── */
+var CHO="ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+function chosung(t){return Array.prototype.map.call(String(t),function(ch){
+  var c=ch.charCodeAt(0);
+  return (c>=0xAC00&&c<=0xD7A3)?CHO.charAt(Math.floor((c-0xAC00)/588)):ch;
+}).join("")}
+function bkHit(name,q){
+  var n=String(name).replace(/\s/g,""), w=String(q).replace(/\s/g,"");
+  if(!w)return true;
+  if(n.indexOf(w)>=0)return true;
+  if(/^[ㄱ-ㅎ]+$/.test(w))return chosung(n).indexOf(w)>=0;
+  return false;
+}
+function applyFind(){
+  var el=document.getElementById("bkFind"); if(!el)return;
+  var q=el.value.trim(), x=document.getElementById("bkFindX"), msg=document.getElementById("findMsg");
+  if(x)x.hidden=!q;
+  var secs=document.querySelectorAll(".bk[data-b]"), shown=0, seen={};
+  Array.prototype.forEach.call(secs,function(sec){
+    var bi=+sec.dataset.b, hit=bkHit(BOOKS[bi][0],q);
+    sec.hidden=!hit;
+    if(hit&&!seen[bi]){seen[bi]=1;shown++}
+  });
+  // 비어 버린 구약·신약 제목과 접기 단추는 찾는 동안 숨긴다
+  document.querySelectorAll("h2.tg,.foldbar").forEach(function(h){h.hidden=!!q});
+  var pn=document.getElementById("pinned");
+  if(pn&&q)pn.hidden=!Array.prototype.some.call(pn.querySelectorAll(".bk[data-b]"),function(s2){return !s2.hidden});
+  if(msg){msg.hidden=!q; msg.textContent=q?(shown?shown+"권 찾았어요":"'"+q+"' 로 찾은 책이 없어요"):""}
+}
+(function(){
+  var el=document.getElementById("bkFind"), x=document.getElementById("bkFindX");
+  if(!el)return;
+  ["input","compositionupdate","search"].forEach(function(ev){el.addEventListener(ev,applyFind)});
+  if(x)x.addEventListener("click",function(){el.value="";applyFind();el.focus()});
+})();
 
 /* ── 축복 카드 ─────────────────────────
    성경 본문은 담지 않는다(프로젝트 규칙). 축복 문구는 직접 쓰고
