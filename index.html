@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-121">
+<meta name="app-build" content="2026-10-15-122">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2142,7 +2142,11 @@ button:active{filter:brightness(1.15)}
 .dlgn2,.dlted{flex:1;min-width:0}
 .dlfsave{flex:0 0 auto;height:40px;padding:0 14px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:13.5px;font-weight:700}
 .dlfcancel{flex:0 0 auto;height:40px;padding:0 12px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
-.dlmemomore{display:block;margin:-2px 0 8px 12px;padding:2px 8px;border:0;border-radius:9px;background:transparent;color:var(--sky);font-size:11.5px;font-weight:700}
+.dlmemomore{display:grid;place-items:center;width:28px;height:22px;margin:-1px 0 8px 14px;padding:0;border:0;border-radius:11px;background:color-mix(in srgb,var(--sky) 13%,transparent);color:var(--sky)}
+.dlmemomore svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s}
+.dlmemomore[aria-expanded="true"]{background:color-mix(in srgb,var(--sky) 22%,transparent)}
+.dlmemomore[aria-expanded="true"] svg{transform:rotate(180deg)}
+@media (prefers-reduced-motion:reduce){.dlmemomore svg{transition:none}}
 .dlmemop{display:block;width:100%;height:auto;margin:0 0 6px;padding:7px 10px;border:0;border-left:2px solid color-mix(in srgb,var(--sky) 45%,transparent);background:transparent;color:var(--faint);font-size:12.5px;line-height:1.65;text-align:left;white-space:pre-wrap;word-break:break-word;font-family:inherit}
 .dlmemobox{margin:2px 0 10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--sky) 35%,#232229);border-radius:12px;background:color-mix(in srgb,var(--sky) 7%,#121216)}
 .dlmemoh{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:700;color:var(--sky)}
@@ -6208,7 +6212,11 @@ button:active{filter:brightness(1.15)}
           }
           if(long){
             var mm=document.createElement("button"); mm.type="button"; mm.className="dlmemomore"; mm.dataset.id=it.id;
-            mm.textContent=show?"⌃ 접기":"⌄ 기록 보기"; mm.setAttribute("aria-expanded",String(show)); list.appendChild(mm);
+            mm.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg>';
+            mm.setAttribute("aria-expanded",String(show));
+            mm.setAttribute("aria-label",show?"적어 둔 기록 접기":"적어 둔 기록 보기");
+            mm.title=mm.getAttribute("aria-label");
+            list.appendChild(mm);
           }
         }
       });
