@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-104">
+<meta name="app-build" content="2026-10-14-105">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5888,11 +5888,29 @@ button:active{filter:brightness(1.15)}
         var o=dailyData(); dlMemoSet(o,box.dataset.day,box.dataset.id,ta.value); saveDaily(o);
         var tip=box.querySelector(".dlmemosave"); if(tip){tip.textContent="저장됨"; clearTimeout(tip._t); tip._t=setTimeout(function(){tip.textContent=""},1400)}
       });
+      // 입력칸을 벗어나면 저장 (저장·취소 단추 없이)
+      dl.querySelector(".dllist").addEventListener("focusout",function(e){
+        var t=e.target; if(!t.classList)return;
+        if(t.classList.contains("dlted")){
+          var ef=t.closest(".dlitform"); if(!ef)return;
+          var iid=ef.dataset.id, val=t.value.trim();
+          setTimeout(function(){ if(dlEditId!==iid)return; dlSaveItem(iid,val) },0);
+          return;
+        }
+        if(t.classList.contains("dlgn2")||t.classList.contains("dlge2")){
+          var gf=t.closest(".dlgform"); if(!gf)return;
+          var gid=gf.dataset.g;
+          setTimeout(function(){
+            if(dlGEditId!==gid||!gf.isConnected)return;
+            if(gf.contains(document.activeElement))return;   // 같은 칸 안에서 옮겨 간 것은 그대로
+            dlSaveGroup(gid,gf.querySelector(".dlge2").value.trim(),gf.querySelector(".dlgn2").value.trim());
+          },0);
+        }
+      });
       // 이름과 항목은 엔터로도 저장
       dl.querySelector(".dllist").addEventListener("keydown",function(e){
         if(e.key!=="Enter")return; var t=e.target, f;
-        if(t.classList.contains("dlted")&&(f=t.closest(".dlitform"))){e.preventDefault();f.querySelector(".dlitsave").click()}
-        else if((t.classList.contains("dlgn2")||t.classList.contains("dlge2"))&&(f=t.closest(".dlgform"))){e.preventDefault();f.querySelector(".dlgsave2").click()}
+        if(t.classList.contains("dlted")||t.classList.contains("dlgn2")||t.classList.contains("dlge2")){e.preventDefault();t.blur()}   // 빠져나가면 저장됨
       });
       dl.querySelector(".dladd").addEventListener("submit",function(e){
         e.preventDefault(); var inp=dl.querySelector(".dlin"), t=inp.value.trim(); if(!t){inp.focus();return}
@@ -5925,21 +5943,6 @@ button:active{filter:brightness(1.15)}
           var gg=b.dataset.g, nowT=Date.now();
           if(dlgTap.g===gg&&nowT-dlgTap.t<450){dlgTap={g:"",t:0};dlGEditId=gg;dlEditId="";drawDaily();return}
           dlgTap={g:gg,t:nowT}; toast("한 번 더 누르면 이름을 고쳐요"); return;
-        }
-        if(b.classList.contains("dlgcancel2")){dlGEditId="";drawDaily();return}
-        if(b.classList.contains("dlgsave2")){
-          var gfm=b.closest(".dlgform"), gnm=gfm.querySelector(".dlgn2").value.trim(), gem=gfm.querySelector(".dlge2").value.trim();
-          if(!gnm){gfm.querySelector(".dlgn2").focus();return}
-          if(!o.gname||typeof o.gname!=="object")o.gname={};
-          o.gname[b.dataset.g]={e:(Array.from(gem)[0]||"📌"),t:gnm.slice(0,14)};
-          saveDaily(o); dlGEditId=""; drawDaily(); renderReviewBar(); toast("묶음 이름을 '"+gnm+"'으로 바꿨어요"); return;
-        }
-        if(b.classList.contains("dlitcancel")){dlEditId="";drawDaily();return}
-        if(b.classList.contains("dlitsave")){
-          var efm=b.closest(".dlitform"), etx=efm.querySelector(".dlted").value.trim();
-          if(!etx){efm.querySelector(".dlted").focus();return}
-          o.items.forEach(function(x){if(x.id===id)x.t=etx.slice(0,40)});
-          saveDaily(o); dlEditId=""; drawDaily(); renderReviewBar(); toast("고쳤어요"); return;
         }
         if(b.classList.contains("dlrow")&&dlEdit){dlEditId=id;dlGEditId="";drawDaily();return}   // 고치기 중에는 눌러서 글 수정
         if(b.classList.contains("dlrow")&&!dlEdit){
@@ -6019,6 +6022,22 @@ button:active{filter:brightness(1.15)}
     list.addEventListener("click",function(e){if(eatClick){e.stopPropagation();e.preventDefault();eatClick=false}},true);
   }
   // '한 줄 감사로 자동' 줄을 누르면 실제로 한 줄을 적는 고(감사 실천)으로 데려간다
+  function dlSaveItem(id,v){   // 항목 글: 비었거나 그대로면 그냥 닫기
+    var o=dailyData(), it=o.items.filter(function(x){return x.id===id})[0];
+    dlEditId="";
+    if(it&&v&&v!==it.t){it.t=v.slice(0,40); saveDaily(o); drawDaily(); renderReviewBar(); toast("고쳤어요"); return}
+    drawDaily();
+  }
+  function dlSaveGroup(g,em,nm){   // 묶음 이름: 비었거나 그대로면 그냥 닫기
+    var o=dailyData(), cur=dlGroups(o).filter(function(x){return x.g===g})[0], e1=(Array.from(em)[0]||"");
+    dlGEditId="";
+    if(nm&&cur&&(nm!==cur.t||(e1&&e1!==cur.e))){
+      if(!o.gname||typeof o.gname!=="object")o.gname={};
+      o.gname[g]={e:e1||cur.e||"📌",t:nm.slice(0,14)};
+      saveDaily(o); drawDaily(); renderReviewBar(); toast("묶음 이름을 '"+nm+"'으로 바꿨어요"); return;
+    }
+    drawDaily();
+  }
   function dlGotoThanks(){
     var tn=null, ta=null, bn=null, ba=null;
     sorted().forEach(function(n){(n.acts||[]).forEach(function(a){
@@ -6062,9 +6081,7 @@ button:active{filter:brightness(1.15)}
         var gf=document.createElement("div"); gf.className="dlgform"; gf.dataset.g=g.g;
         var ge=document.createElement("input"); ge.className="field dlge2"; ge.maxLength=4; ge.value=g.e; ge.setAttribute("aria-label","묶음 이모지");
         var gn=document.createElement("input"); gn.className="field dlgn2"; gn.maxLength=14; gn.value=g.t; gn.setAttribute("aria-label","묶음 이름");
-        var gsv=document.createElement("button"); gsv.type="button"; gsv.className="dlfsave dlgsave2"; gsv.dataset.g=g.g; gsv.textContent="저장";
-        var gcl=document.createElement("button"); gcl.type="button"; gcl.className="dlfcancel dlgcancel2"; gcl.textContent="취소";
-        gf.appendChild(ge); gf.appendChild(gn); gf.appendChild(gsv); gf.appendChild(gcl); list.appendChild(gf);
+        gf.appendChild(ge); gf.appendChild(gn); list.appendChild(gf);
         setTimeout(function(){gn.focus();gn.setSelectionRange(gn.value.length,gn.value.length)},0);
       }else{
         var h=document.createElement("div"); h.className="dlgh"; h.style.setProperty("--gc",g.c);
@@ -6081,9 +6098,7 @@ button:active{filter:brightness(1.15)}
         if(dlEditId===it.id){   // 항목 글 고치기
           var ef=document.createElement("div"); ef.className="dlitform"; ef.dataset.id=it.id;
           var ei2=document.createElement("input"); ei2.className="field dlted"; ei2.maxLength=40; ei2.value=it.t; ei2.setAttribute("aria-label","항목 글 고치기");
-          var esv=document.createElement("button"); esv.type="button"; esv.className="dlfsave dlitsave"; esv.dataset.id=it.id; esv.textContent="저장";
-          var ecl=document.createElement("button"); ecl.type="button"; ecl.className="dlfcancel dlitcancel"; ecl.textContent="취소";
-          ef.appendChild(ei2); ef.appendChild(esv); ef.appendChild(ecl); list.appendChild(ef);
+          ef.appendChild(ei2); list.appendChild(ef);
           setTimeout(function(){ei2.focus();ei2.setSelectionRange(ei2.value.length,ei2.value.length)},0);
           return;
         }
