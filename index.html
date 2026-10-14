@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-113">
+<meta name="app-build" content="2026-10-15-114">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2139,7 +2139,6 @@ button:active{filter:brightness(1.15)}
 .dlgn2,.dlted{flex:1;min-width:0}
 .dlfsave{flex:0 0 auto;height:40px;padding:0 14px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:13.5px;font-weight:700}
 .dlfcancel{flex:0 0 auto;height:40px;padding:0 12px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
-.dlmemop.clip{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .dlmemomore{display:block;margin:-2px 0 8px 12px;padding:2px 8px;border:0;border-radius:9px;background:transparent;color:var(--sky);font-size:11.5px;font-weight:700}
 .dlmemop{display:block;width:100%;height:auto;margin:0 0 6px;padding:7px 10px;border:0;border-left:2px solid color-mix(in srgb,var(--sky) 45%,transparent);background:transparent;color:var(--faint);font-size:12.5px;line-height:1.65;text-align:left;white-space:pre-wrap;word-break:break-word;font-family:inherit}
 .dlmemobox{margin:2px 0 10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--sky) 35%,#232229);border-radius:12px;background:color-mix(in srgb,var(--sky) 7%,#121216)}
@@ -6194,9 +6193,14 @@ button:active{filter:brightness(1.15)}
           var ta=mx.querySelector("textarea"); ta.value=memo; ta.setAttribute("aria-label",it.t+" 기록");
           list.appendChild(mx);
         }else if(!dlEdit&&memo){   // 미리보기는 평소 화면에서만 (고치기 중에는 줄을 짧게)
-          var long=memo.split(String.fromCharCode(10)).length>3||memo.length>110, show=dlMemoMore.has(it.id);
-          var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo"+(long&&!show?" clip":""); mp.dataset.id=it.id;
-          mp.textContent=memo.length>2000?memo.slice(0,2000)+"…":memo; list.appendChild(mp);
+          var NL=String.fromCharCode(10);
+          var rows=memo.split(NL).filter(function(x,i,arr){return x.trim()||i===0});   // 빈 줄은 접힌 모습에서 빼고 센다
+          var show=dlMemoMore.has(it.id), head=rows.slice(0,3).join(NL);
+          if(head.length>150)head=head.slice(0,150);
+          var long=rows.length>3||head.length<memo.replace(/\s+$/,"").length;
+          var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo"; mp.dataset.id=it.id;
+          mp.textContent=show?(memo.length>2000?memo.slice(0,2000)+"…":memo):(long?head+" …":memo);
+          list.appendChild(mp);
           if(long){
             var mm=document.createElement("button"); mm.type="button"; mm.className="dlmemomore"; mm.dataset.id=it.id;
             mm.textContent=show?"⌃ 접기":"⌄ 더 보기"; mm.setAttribute("aria-expanded",String(show)); list.appendChild(mm);
