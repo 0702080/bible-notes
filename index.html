@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="ko"><head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>말씀 묵상 노트</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-129">
+<meta name="app-build" content="2026-10-15-130">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -495,6 +495,7 @@ details.menu>summary::-webkit-details-marker{display:none}
 .note:not(.open){cursor:pointer}
 .note.open .chead,.note.open .verse:not(.picking),.note.open .trow{cursor:pointer}
 .note{-webkit-tap-highlight-color:transparent}
+body{touch-action:manipulation}
 .hits{margin:-2px 0 8px}
 .hits:empty{display:none}
 .hit{display:flex;gap:8px;align-items:baseline;font-size:13.5px;line-height:1.5;padding:3px 0;color:var(--muted)}
