@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-92">
+<meta name="app-build" content="2026-10-14-93">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3459,6 +3459,15 @@ button:active{filter:brightness(1.15)}
       var eb=card.querySelector(".editbox"); if(eb&&!eb.contains(e.target))exitVerseEdit(card.dataset.id);
     });
   },true);
+  // 지금 고른 글자가 바로 이 카드 안에 있는지 (검색란처럼 다른 곳에서 고른 글자는 카드 여는 걸 막지 않는다)
+  function selInCard(card){
+    var sel=window.getSelection&&window.getSelection();
+    if(!sel||sel.isCollapsed||!String(sel||"").trim())return false;
+    var node=sel.anchorNode, el=node&&(node.nodeType===1?node:node.parentElement);
+    if(!el||!el.closest)return false;
+    if(el.closest("input,textarea,[contenteditable]"))return false;
+    return card.contains(el);
+  }
   list.addEventListener("click",async function(e){
     var rvv=e.target.closest(".verse.memv");
     var rww=e.target.closest(".verse.memv .rw.masked")||(rvv&&!e.target.closest(".mw")&&rvv.querySelector(".rw")?nearestWord(rvv,e.clientX,e.clientY,".rw.masked"):null);
@@ -3494,14 +3503,13 @@ button:active{filter:brightness(1.15)}
         if(vTap.id===tid&&tnow-vTap.t<380){clearTimeout(vTap.timer);vTap={id:"",t:0,timer:0};enterVerseEdit(tid,e.clientX,e.clientY);return}
         clearTimeout(vTap.timer); vTap={id:tid,t:tnow,timer:0};
         if(isOpen&&!e.target.closest(".body")){   // 펼친 카드는 두 번째 누름을 잠깐 기다렸다가 접음
-          var vsel=window.getSelection&&String(window.getSelection()||""); if(vsel&&vsel.trim())return;
+          if(selInCard(tapCard))return;
           vTap.timer=setTimeout(function(){if(vTap.id!==tid)return;vTap={id:"",t:0,timer:0};toggleCard(tid,false)},380);
           return;
         }
       }
       if(!isOpen||!e.target.closest(".body")){
-        var sel=window.getSelection&&String(window.getSelection()||"");
-        if(sel&&sel.trim())return;
+        if(selInCard(tapCard))return;
         toggleCard(tid,!isOpen); return;
       }
     }
