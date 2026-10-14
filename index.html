@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-101">
+<meta name="app-build" content="2026-10-14-102">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2067,6 +2067,7 @@ button:active{filter:brightness(1.15)}
 .dlauto.off{border-color:#34333A;background:transparent;color:var(--faint)}
 .dlitem.hasauto .dlrow{padding-right:104px}
 .dlitem.haspill .dlrow{padding-right:82px}
+.dlitem.editing .dlauto{right:50px}
 .dlgrip{flex:0 0 auto;width:30px;height:44px;display:grid;place-items:center;cursor:grab;touch-action:none;color:var(--faint);-webkit-user-select:none;user-select:none}
 .dlgrip::before{content:"⠿";font-size:20px;line-height:1}
 .dlitem.dldrag{position:relative;z-index:5;transition:none}
@@ -6077,13 +6078,13 @@ button:active{filter:brightness(1.15)}
           return;
         }
         var memo=dlMemoGet(o,dlDay,it.id), isThx=it.auto==="thanks";
-        var row=document.createElement("div"); row.className="dlitem"+(dlEdit?"":(isThx?" hasauto":" haspill")); row.style.setProperty("--gc",g.c); row.dataset.id=it.id; row.dataset.g=g.g;
+        var row=document.createElement("div"); row.className="dlitem"+(isThx?" hasauto":" haspill")+(dlEdit?" editing":""); row.style.setProperty("--gc",g.c); row.dataset.id=it.id; row.dataset.g=g.g;
         if(dlEdit){var gp=document.createElement("span");gp.className="dlgrip";gp.setAttribute("aria-hidden","true");gp.title="끌어서 순서 바꾸기";row.appendChild(gp)}
         var b=document.createElement("button"); b.type="button"; b.className="dlrow"+(on.indexOf(it.id)>=0?" on":""); b.dataset.id=it.id; b.setAttribute("aria-pressed",String(on.indexOf(it.id)>=0));
         if(dlEdit)b.title="눌러서 글 고치기";
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
         dlRefInto(b.querySelector(".dlt"),it.t); row.appendChild(b);
-        if(!dlEdit){
+        {   // 기록(한 줄로 적어 두기) 단추는 고치기 중에도 그대로 보인다
           var pill=document.createElement("button"); pill.type="button";
           if(isThx){   // 감사 항목은 '한 줄 감사'가 그 기록 코너
             pill.className="dlauto"; pill.textContent="한 줄 감사 쓰기 ›";
@@ -6098,7 +6099,7 @@ button:active{filter:brightness(1.15)}
         }
         if(dlEdit){var x=document.createElement("button");x.type="button";x.className="dldel";x.dataset.id=it.id;x.textContent="×";x.setAttribute("aria-label","이 항목 지우기");row.appendChild(x)}
         list.appendChild(row);
-        if(!dlEdit&&dlMemoId===it.id){
+        if(dlMemoId===it.id){
           var mx=document.createElement("div"); mx.className="dlmemobox"; mx.dataset.id=it.id; mx.dataset.day=dlDay;
           mx.innerHTML='<div class="dlmemoh"><span></span><span class="dlmemosave"></span></div>'+
             '<textarea maxlength="2000" placeholder="구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)"></textarea>'+
@@ -6106,7 +6107,7 @@ button:active{filter:brightness(1.15)}
           mx.querySelector(".dlmemoh span").textContent="📝 "+dayName(dlDay)+" 기록";
           var ta=mx.querySelector("textarea"); ta.value=memo; ta.setAttribute("aria-label",it.t+" 기록");
           list.appendChild(mx);
-        }else if(!dlEdit&&memo){
+        }else if(!dlEdit&&memo){   // 미리보기는 평소 화면에서만 (고치기 중에는 줄을 짧게)
           var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo"; mp.dataset.id=it.id;
           mp.textContent=memo.replace(/\s+/g," ").slice(0,80); list.appendChild(mp);
         }
@@ -6114,7 +6115,9 @@ button:active{filter:brightness(1.15)}
     });
     // 알약 단추 너비만큼 글자 자리를 비워 둠 (여러 줄로 접히는 항목도 단추 밑으로 들어가지 않게)
     Array.prototype.forEach.call(list.querySelectorAll(".dlitem .dlauto"),function(pl){
-      var rw=pl.parentNode.querySelector(".dlrow"); if(rw&&pl.offsetWidth)rw.style.paddingRight=(pl.offsetWidth+20)+"px";
+      var rw=pl.parentNode.querySelector(".dlrow"); if(!rw||!pl.offsetWidth)return;
+      var rr=rw.getBoundingClientRect(), pr=pl.getBoundingClientRect();
+      rw.style.paddingRight=Math.max(10,Math.round(rr.right-pr.left)+10)+"px";
     });
     dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit;
     dl.querySelector(".dledit").textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기";
