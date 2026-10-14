@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-103">
+<meta name="app-build" content="2026-10-14-104">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5854,7 +5854,7 @@ button:active{filter:brightness(1.15)}
     o.items.forEach(function(it){if(it.auto==="thanks"&&on.indexOf(it.id)<0){if(th===null)th=thanksOn(day);if(th)on.push(it.id)}});
     return on.filter(function(id){return o.items.some(function(it){return it.id===id})});
   }
-  var dl=null, dlDay="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0};
+  var dl=null, dlDay="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false};
   function dayName(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"}
   function openDaily(){
     if(!dl){
@@ -5944,9 +5944,19 @@ button:active{filter:brightness(1.15)}
         if(b.classList.contains("dlrow")&&dlEdit){dlEditId=id;dlGEditId="";drawDaily();return}   // 고치기 중에는 눌러서 글 수정
         if(b.classList.contains("dlrow")&&!dlEdit){
           var it=o.items.filter(function(x){return x.id===id})[0]; if(!it)return;
+          var nowR=Date.now();
+          if(dlrTap.id===id&&nowR-dlrTap.t<450){   // 두 번 누르면 항목 글 고치기
+            if(dlrTap.flip){                        // 한 번째 누름으로 바뀐 체크는 되돌림
+              var d2=o.days[dlDay]||[], k2=d2.indexOf(id);
+              if(k2>=0)d2.splice(k2,1);else d2.push(id);
+              o.days[dlDay]=d2; saveDaily(o); renderReviewBar();
+            }
+            dlrTap={id:"",t:0,flip:false}; dlEditId=id; dlGEditId=""; drawDaily(); return;
+          }
           var day=o.days[dlDay]||[], k=day.indexOf(id), wasAll=dailyChecked(o,dlDay).length===o.items.length;
-          if(it.auto==="thanks"&&k<0&&thanksOn(dlDay)){toast("한 줄 감사를 적어서 저절로 체크됐어요");return}
+          if(it.auto==="thanks"&&k<0&&thanksOn(dlDay)){dlrTap={id:id,t:nowR,flip:false};toast("한 줄 감사를 적어서 저절로 체크됐어요");return}
           if(k>=0)day.splice(k,1);else day.push(id);
+          dlrTap={id:id,t:nowR,flip:true};
           o.days[dlDay]=day; saveDaily(o); drawDaily(); renderReviewBar();
           var nowAll=dailyChecked(o,dlDay).length===o.items.length;
           if(nowAll&&!wasAll){toast("오늘 하루를 다 돌아봤어요 🙌");buzz([12,40,18,40,24]);confetti(dl.querySelector(".dlcnt"))}
