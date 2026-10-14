@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-118">
+<meta name="app-build" content="2026-10-15-119">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6200,16 +6200,15 @@ button:active{filter:brightness(1.15)}
           list.appendChild(mx);
         }else if(!dlEdit&&memo){   // 미리보기는 평소 화면에서만 (고치기 중에는 줄을 짧게)
           var NL=String.fromCharCode(10);
-          var rows=memo.split(NL).filter(function(x,i,arr){return x.trim()||i===0});   // 빈 줄은 접힌 모습에서 빼고 센다
-          var show=dlMemoMore.has(it.id), head=rows.slice(0,3).join(NL);
-          if(head.length>150)head=head.slice(0,150);
-          var long=rows.length>3||head.length<memo.replace(/\s+$/,"").length;
-          var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo"; mp.dataset.id=it.id;
-          mp.textContent=show?(memo.length>2000?memo.slice(0,2000)+"…":memo):(long?head+" …":memo);
-          list.appendChild(mp);
+          var rows=memo.split(NL).filter(function(x,i){return x.trim()||i===0});
+          var show=dlMemoMore.has(it.id), long=rows.length>3||memo.length>110;
+          if(!long||show){   // 접으면 글이 아예 숨는다
+            var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo"; mp.dataset.id=it.id;
+            mp.textContent=memo.length>2000?memo.slice(0,2000)+"…":memo; list.appendChild(mp);
+          }
           if(long){
             var mm=document.createElement("button"); mm.type="button"; mm.className="dlmemomore"; mm.dataset.id=it.id;
-            mm.textContent=show?"⌃ 접기":"⌄ 더 보기"; mm.setAttribute("aria-expanded",String(show)); list.appendChild(mm);
+            mm.textContent=show?"⌃ 접기":"⌄ 기록 보기"; mm.setAttribute("aria-expanded",String(show)); list.appendChild(mm);
           }
         }
       });
