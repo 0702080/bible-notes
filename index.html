@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-95">
+<meta name="app-build" content="2026-10-14-96">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2079,6 +2079,16 @@ button:active{filter:brightness(1.15)}
 .dlgh{display:flex;align-items:center;gap:8px}
 .dlgdel{margin-left:auto;height:26px;padding:0 10px;border:1px solid #34333A;border-radius:13px;background:transparent;color:var(--faint);font-size:11.5px;font-weight:500}
 .dlgdel.sure{color:var(--pink);border-color:color-mix(in srgb,var(--pink) 50%,#34333A)}
+/* 설교 요약 */
+.sermi{margin:0 0 8px;padding:10px 12px;border:1px solid #2A2930;border-radius:12px;background:color-mix(in srgb,var(--pink) 5%,transparent)}
+.sermh{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11.5px;color:var(--faint)}
+.sermd{font-weight:700;color:var(--pink)}
+.dels{margin-left:auto;flex:0 0 auto;min-width:26px;height:26px;padding:0 8px;border:0;border-radius:13px;background:transparent;color:var(--faint);font-size:15px}
+.dels.sure{font-size:11.5px;color:var(--pink)}
+.sermt{display:block;width:100%;box-sizing:border-box;min-height:92px;padding:9px 11px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:15.5px;line-height:1.7;resize:none;overflow:hidden}
+.sermt:focus{outline:none;border-color:var(--pink)}
+.sermt::placeholder{color:var(--faint)}
+.sermempty{margin:0 0 8px;padding:10px 12px;border:1px dashed #2E2D34;border-radius:12px;font-size:12.5px;color:var(--faint);line-height:1.6}
 .dlgempty{margin:0 0 4px;padding:10px 12px;border:1px dashed #2E2D34;border-radius:12px;font-size:12.5px;color:var(--faint)}
 /* 묶음 이름 바꾸기 · 항목 고치기 · 그날 기록 */
 .dlgbtns{margin-left:auto;flex:0 0 auto;display:flex;gap:6px}
@@ -2336,6 +2346,7 @@ button:active{filter:brightness(1.15)}
       art:(n.art&&typeof n.art.svg==="string"&&n.art.svg.length<40000)?{svg:n.art.svg,title:String(n.art.title||"").slice(0,30),src:String(n.art.src||"")}:null,
       hymns:Array.isArray(n.hymns)?n.hymns.filter(function(x){return x&&x.id}).map(function(x){var no=parseInt(x.no,10);return {id:String(x.id),no:no>0&&no<1000?no:null,title:String(x.title||""),why:String(x.why||""),sure:x.sure!==false,sheets:Array.isArray(x.sheets)?x.sheets.map(String).filter(function(u){return /^https?:\/\//i.test(u)}).slice(0,6):[],imgs:Array.isArray(x.imgs)?x.imgs.map(String).filter(function(v){return /^[A-Za-z0-9_-]{8,64}$/.test(v)}).slice(0,6):[]}}):[],
       essays:Array.isArray(n.essays)?n.essays.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),title:String(x.title||""),body:String(x.body||""),at:+x.at||Date.now()}}):[],
+      serms:Array.isArray(n.serms)?n.serms.filter(function(x){return x&&x.id}).slice(0,100).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,4000),at:+x.at||Date.now()}}):[],
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
       prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),sh:x.sh?1:0}}):[],
@@ -2590,7 +2601,7 @@ button:active{filter:brightness(1.15)}
   function visibleNote(n){return (!topicSel.length||noteSelTopics(n).length>0)&&matches(n)}
   function matches(n){
     if(!filterText)return true;
-    return has(n.ref)||has(n.text)||n.topics.some(function(t){return has(t)})||n.meds.some(function(m){return has(m.text)})||n.qs.some(function(q){return has(q.q)||has(q.a)})||n.acts.some(function(a){return has(a.t)})||n.hymns.some(function(h){return has(h.title)||has((h.no||"")+"장")})||n.vids.some(function(v){return has(v.title)})||n.essays.some(function(x){return has(x.title)||has(x.body)});
+    return has(n.ref)||has(n.text)||n.topics.some(function(t){return has(t)})||n.meds.some(function(m){return has(m.text)})||n.qs.some(function(q){return has(q.q)||has(q.a)})||n.acts.some(function(a){return has(a.t)})||n.hymns.some(function(h){return has(h.title)||has((h.no||"")+"장")})||n.vids.some(function(v){return has(v.title)})||n.serms.some(function(x){return has(x.t)})||n.essays.some(function(x){return has(x.title)||has(x.body)});
   }
   function findRange(text,q){
     var mr=matchAll(text,q,true); if(mr.length)return mr[0];
@@ -2737,13 +2748,13 @@ button:active{filter:brightness(1.15)}
   function syncCounts(el,n){
     var open=openIds.has(n.id), mc=medCount(n), qc=n.qs.length, ad=n.acts.filter(function(a){return a.done}).length, ac=n.acts.length;
     var tg=el.querySelector(".toggle");
-    var bits=[]; if(mc)bits.push("묵상 "+mc); if(qc)bits.push("질문 "+qc); if(ac)bits.push("실천 "+ad+"/"+ac); if(n.hymns.length){var nos=n.hymns.filter(function(h){return h.no}).map(function(h){return h.no+"장"});bits.push("찬송 "+(nos.length?nos.slice(0,3).join(", ")+(nos.length>3?" 외":""):n.hymns.length))} if(n.vids.length)bits.push("영상 "+n.vids.length); var ecn=n.essays.filter(function(x){return x.body.trim()}).length; if(ecn)bits.push("경험 "+ecn);
+    var bits=[]; if(mc)bits.push("묵상 "+mc); if(qc)bits.push("질문 "+qc); if(ac)bits.push("실천 "+ad+"/"+ac); if(n.hymns.length){var nos=n.hymns.filter(function(h){return h.no}).map(function(h){return h.no+"장"});bits.push("찬송 "+(nos.length?nos.slice(0,3).join(", ")+(nos.length>3?" 외":""):n.hymns.length))} var smc=n.serms.filter(function(x){return x.t.trim()}).length; if(smc)bits.push("설교 요약 "+smc); if(n.vids.length)bits.push("영상 "+n.vids.length); var ecn=n.essays.filter(function(x){return x.body.trim()}).length; if(ecn)bits.push("경험 "+ecn);
     tg.querySelector(".tl").textContent=open?"접기":(bits.length?"":"묵상 쓰기");
     tg.querySelector(".meta").textContent=open?"":bits.join("   ");
     function tc(k,v){var t=el.querySelector('.tab[data-tab="'+k+'"] .tc');if(t)t.textContent=v}
     tc("m",mc?String(mc):""); tc("q",qc?String(qc):""); tc("a",ac?ad+"/"+ac:"");
     var ec=n.essays.filter(function(x){return x.title.trim()||x.body.trim()}).length; tc("e",ec?String(ec):"");
-    var rc=n.hymns.length+n.vids.length; tc("r",rc?String(rc):"");
+    var rc=n.hymns.length+n.vids.length+n.serms.filter(function(x){return x.t.trim()}).length; tc("r",rc?String(rc):"");
     var pr=(n.prays||[]).filter(function(x){return x.t.trim()}), pa=pr.filter(function(x){return x.ans}).length; tc("p",pr.length?(pa?pa+"/"+pr.length:String(pr.length)):"");
   }
   function makeCard(n){
@@ -2812,6 +2823,10 @@ button:active{filter:brightness(1.15)}
             '<div class="hymns"></div>'+
             '<div class="qbtns"><button type="button" class="addbtn p addh">+ 찬송</button><button type="button" class="addbtn p sugh" hidden>추천받기</button></div>'+
             '<div class="hsugg"></div>'+
+          '</div>'+
+          '<div class="rsec"><div class="rtitle">설교 요약</div>'+
+            '<div class="serms"></div>'+
+            '<div class="qbtns"><button type="button" class="addbtn p adds">+ 요약 적기</button></div>'+
           '</div>'+
           '<div class="rsec"><div class="rtitle">설교 영상</div>'+
             '<div class="vids"></div>'+
@@ -3268,6 +3283,9 @@ button:active{filter:brightness(1.15)}
     else if(t.classList.contains("mthx")||t.classList.contains("mtodo")){
       var me=n.meds.find(function(x){return x.id===t.closest(".medi").dataset.mid}); if(!me)return;
       if(t.classList.contains("mthx"))me.thx=t.value; else{me.todo=t.value; var tb2=t.closest(".medi").querySelector(".mtoact"); if(tb2)tb2.hidden=!t.value.trim()}
+    }
+    else if(t.classList.contains("sermt")){
+      var sm2=n.serms.find(function(x){return x.id===t.closest(".sermi").dataset.sid}); if(!sm2)return; sm2.t=t.value;
     }
     else if(t.classList.contains("med")){
       var m=n.meds.find(function(x){return x.id===t.closest(".medi").dataset.mid}); if(!m)return; m.text=t.value; scheduleMedBadges();
@@ -3818,6 +3836,15 @@ button:active{filter:brightness(1.15)}
       if(hx&&(hx.no||hx.title.trim())&&!b.dataset.sure){b.dataset.sure="1";b.textContent="정말 삭제?";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="삭제"}},3000);return}
       n.hymns=n.hymns.filter(function(x){return x.id!==hid}); hyOpen.delete(hid); hyEdit.delete(hid); render(); scheduleSave(id); return;
     }
+    if(b.classList.contains("adds")){
+      n.serms.unshift({id:qid(),t:"",at:Date.now()}); render(); scheduleSave(id);
+      setTimeout(function(){var c2=cards.get(id),ta=c2&&c2.querySelector(".sermi .sermt");if(ta){ta.focus();ta.scrollIntoView({block:"center",behavior:"smooth"})}},60); return;
+    }
+    if(b.classList.contains("dels")){
+      var sid=b.closest(".sermi").dataset.sid, sx=n.serms.filter(function(x){return x.id===sid})[0];
+      if(sx&&sx.t.trim()&&!b.dataset.sure){b.dataset.sure="1";b.textContent="정말 지울까?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
+      n.serms=n.serms.filter(function(x){return x.id!==sid}); render(); scheduleSave(id); return;
+    }
     if(b.classList.contains("addv")){
       var vf=card.querySelector(".vform"); vf.hidden=false; vf.querySelector(".vmsg").textContent="";
       var vu=vf.querySelector(".vurl"); vu.value=""; vf.querySelector(".vtitle").value=""; vu.focus(); return;
@@ -4221,7 +4248,24 @@ button:active{filter:brightness(1.15)}
     d.querySelector(".listen").hidden=!ok;
     var dl=d.querySelector(".hyplay"); if(dl)dl.style.visibility=ok?"":"hidden";
   }
+  function makeSerm(sm){
+    var d=document.createElement("div"); d.className="sermi"; d.dataset.sid=sm.id;
+    d.innerHTML='<div class="sermh"><span class="sermd"></span><button type="button" class="dels" aria-label="이 요약 지우기">×</button></div>'+
+      '<textarea class="sermt" rows="1" aria-label="설교 요약" placeholder="설교 중에 마음에 남은 말씀을 적어 보세요 (본문, 제목, 기억할 한 줄)"></textarea>';
+    return d;
+  }
   function renderRes(el,n){
+    var sb=el.querySelector(".serms"), sh2=new Map();
+    Array.prototype.forEach.call(sb.children,function(c){if(c.dataset.sid)sh2.set(c.dataset.sid,c)});
+    var sempty=sb.querySelector(".sermempty"); if(sempty)sempty.remove();
+    n.serms.forEach(function(sm,i){
+      var d=sh2.get(sm.id); if(!d)d=makeSerm(sm); sh2.delete(sm.id);
+      if(sb.children[i]!==d)sb.insertBefore(d,sb.children[i]||null);
+      d.querySelector(".sermd").textContent=dateLabel(sm.at);
+      setVal(d.querySelector(".sermt"),sm.t);
+    });
+    sh2.forEach(function(d){d.remove()});
+    if(!n.serms.length){var ep=document.createElement("p");ep.className="sermempty";ep.textContent="설교를 들으면서 마음에 남은 말씀을 여기에 적어 두세요. 날짜별로 쌓입니다.";sb.appendChild(ep)}
     var hb=el.querySelector(".hymns"), hh=new Map();
     Array.prototype.forEach.call(hb.children,function(c){hh.set(c.dataset.hid,c)});
     n.hymns.forEach(function(h,i){
@@ -7314,6 +7358,11 @@ button:active{filter:brightness(1.15)}
       out.push(""); out.push("[말씀 경험]");
       ess.forEach(function(x,i){if(i)out.push("");out.push("《"+(x.title.trim()||"제목 없음")+"》  "+essayDate(x.at));out.push(x.body.trim())});
     }
+    var sms=(n.serms||[]).filter(function(x){return x.t.trim()}).sort(function(a,b){return a.at-b.at});
+    if(sms.length){
+      out.push(""); out.push("[설교 요약]");
+      sms.forEach(function(x,i){if(i)out.push("");out.push("· "+dateLabel(x.at));out.push(x.t.trim())});
+    }
     if(n.vids.length){
       out.push(""); out.push("[설교 영상]");
       n.vids.forEach(function(v){out.push("▶ "+(v.title?v.title+"  ":"")+v.url)});
@@ -7425,6 +7474,7 @@ button:active{filter:brightness(1.15)}
     m.essays=unionBy(older.essays,newer.essays,id);
     m.links=unionBy(older.links,newer.links,id);
     m.vids=unionBy(older.vids,newer.vids,id);
+    m.serms=unionBy(older.serms,newer.serms,id);
     m.acts=unionBy(older.acts,newer.acts,id,function(o,nw){
       var a=JSON.parse(JSON.stringify(nw));
       a.logs=unionBy(o.logs,nw.logs,function(l){return l.id}).sort(function(x,y){return (x.at||0)-(y.at||0)});
