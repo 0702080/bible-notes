@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-11-91">
+<meta name="app-build" content="2026-10-14-92">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1949,8 +1949,15 @@ button:active{filter:brightness(1.15)}
 .pane[data-pane="m"] .qbtns .medprog:active{transform:scale(.98)}
 /* ===== simpler + smarter ===== */
 .reviewbar{flex-direction:column;align-items:stretch;gap:6px;padding:10px 12px 12px}
-.tdh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em}
-.tddate{font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0}
+.tdh{display:flex;align-items:baseline;gap:6px;width:100%;margin-bottom:2px;padding:0;border:0;background:transparent;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em;text-align:left;font-family:inherit}
+.tddate{margin-left:auto;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0}
+.tdn{font-size:11.5px;font-weight:700;color:var(--ink);letter-spacing:0}
+.tdn:empty{display:none}
+.tdchev{align-self:center;flex:0 0 auto;width:7px;height:7px;margin-left:1px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(-135deg) translate(-1px,-1px);transition:transform .2s}
+.reviewbar.fold .tdchev{transform:rotate(45deg) translate(-1px,-1px)}
+.reviewbar.fold .tdrow,.reviewbar.fold .tdsep{display:none}
+.reviewbar.fold{padding-bottom:10px}
+@media (prefers-reduced-motion:reduce){.tdchev{transition:none}}
 .tdrow{display:grid;grid-template-columns:22px 6.6em minmax(0,1fr);align-items:start;column-gap:6px;min-height:30px}
 .tdi{font-size:14px;line-height:28px;text-align:center}
 .tdl{font-size:13px;line-height:28px;color:var(--ink);white-space:nowrap}
@@ -2181,8 +2188,8 @@ button:active{filter:brightness(1.15)}
     </details>
   </div>
   <div class="topicbar" id="topicBar" role="toolbar" aria-label="주제"></div>
-  <div class="reviewbar" id="reviewBar" hidden></div>
   <input class="filter" id="filter" type="search" placeholder="노트에서 찾기 (초성도 돼요: ㅅㅁ)" aria-label="노트에서 찾기" hidden>
+  <div class="reviewbar" id="reviewBar" hidden></div>
   <div id="list"></div>
   <div id="board" class="board4" hidden></div>
   <input type="file" id="hymnFile" accept="image/*" hidden>
@@ -2430,6 +2437,7 @@ button:active{filter:brightness(1.15)}
   /* ---------- rendering ---------- */
   /* ---------- PC 칸반 보드: 암송 단계별로 한눈에 (새로 담음 → 외우는 중 → 복습할 차례 → 다 외움) ---------- */
   var boardOn=false; try{boardOn=localStorage.getItem("bible-view")==="board"}catch(e){}
+  var tdFold=false; try{tdFold=localStorage.getItem("bible-today-fold")==="1"}catch(e){}   // '오늘' 카드 접어 두기
   var BCOLS=[{k:"new",t:"새로 담음",e:"🌱",c:"var(--muted)",tip:"아직 암송을 시작하지 않은 말씀"},{k:"doing",t:"외우는 중",e:"✏️",c:"var(--sky)",tip:"도장을 모으는 중"},{k:"due",t:"복습할 차례",e:"🔁",c:"var(--gold)",tip:"오늘 다시 떠올릴 말씀"},{k:"done",t:"다 외움",e:"🏅",c:"var(--green)",tip:"도장 4개를 다 받은 말씀"}];
   function boardCol(n){
     var c=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
@@ -5950,10 +5958,16 @@ button:active{filter:brightness(1.15)}
     if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))rows.push({icon:"📊",info:1,label:"실천 진도표",chips:[{id:"",t:"전체 보기",act:"prog"}]});
     bar.hidden=!rows.length;
     if(!rows.length)return;
-    var h=document.createElement("div"); h.className="tdh"; h.innerHTML='<span>오늘</span><span class="tddate"></span>';
-    var nd=new Date(); h.querySelector(".tddate").textContent=(nd.getMonth()+1)+"월 "+nd.getDate()+"일 ("+WD[nd.getDay()]+")"; bar.appendChild(h);
     // 할 일(위)과 상태 보기(아래)로 나눠 한 줄씩: [아이콘] [이름] [상태 · 버튼들]
     var todo=rows.filter(function(r){return !r.info}), info=rows.filter(function(r){return r.info});
+    bar.classList.toggle("fold",tdFold);
+    var h=document.createElement("button"); h.type="button"; h.className="tdh";
+    h.setAttribute("aria-expanded",tdFold?"false":"true"); h.setAttribute("aria-label","오늘 카드 "+(tdFold?"펼치기":"접기"));
+    h.innerHTML='<span>오늘</span><span class="tdn"></span><span class="tddate"></span><span class="tdchev" aria-hidden="true"></span>';
+    if(tdFold&&todo.length)h.querySelector(".tdn").textContent="할 일 "+todo.length;
+    var nd=new Date(); h.querySelector(".tddate").textContent=(nd.getMonth()+1)+"월 "+nd.getDate()+"일 ("+WD[nd.getDay()]+")";
+    h.addEventListener("click",function(){tdFold=!tdFold; try{localStorage.setItem("bible-today-fold",tdFold?"1":"0")}catch(err){} renderReviewBar()});
+    bar.appendChild(h);
     function drawRow(r){
       var row=document.createElement("div"); row.className="tdrow"+(r.done?" done":"")+(r.bad?" bad":"")+(r.chips.length>=2||(r.chips.length&&r.tag&&r.tag.length>6)?" many":"");
       var ic=document.createElement("span"); ic.className="tdi"; ic.textContent=r.icon; ic.setAttribute("aria-hidden","true"); row.appendChild(ic);
