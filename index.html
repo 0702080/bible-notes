@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-108">
+<meta name="app-build" content="2026-10-14-109">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1127,9 +1127,14 @@ body.reorder .note .pinbtn{display:none!important}
 .mempanel{margin:2px 0 14px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 35%,var(--rule));border-radius:14px;background:color-mix(in srgb,var(--gold) 6%,#101013)}
 .mempanel[hidden]{display:none}
 .note:not(.open) .mempanel{display:none}
-.mhd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.mhd{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;margin-bottom:8px;padding:0;border:0;background:transparent;font-family:inherit;text-align:left}
+.mhd .mfchev{flex:0 0 auto;width:8px;height:8px;margin-left:2px;border-right:2px solid var(--gold);border-bottom:2px solid var(--gold);transform:rotate(-135deg) translate(-2px,-2px);transition:transform .2s}
+.mempanel.mfold .mhd{margin-bottom:0}
+.mempanel.mfold .mhd .mfchev{transform:rotate(45deg) translate(-2px,-2px)}
+.mempanel.mfold > *:not(.mhd){display:none}
+@media (prefers-reduced-motion:reduce){.mhd .mfchev{transition:none}}
 .mhd b{color:var(--gold);font-size:14.5px}
-.mcnt{font-size:12.5px;color:var(--muted)}
+.mcnt{margin-left:auto;font-size:12.5px;color:var(--muted)}
 .mbar i{background:var(--gold)}
 .mbar.full i{background:linear-gradient(90deg,var(--gold),var(--green))}
 .mviews{display:flex;gap:6px;margin:12px 0 4px}
@@ -3596,6 +3601,14 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("hcal")){openGcal(id);return}
     if(b.classList.contains("vtopic")){openPicker(id);return}
     if(b.classList.contains("vxref")){toggleXref(card,n);return}
+    if(b.classList.contains("mhd")){   // '말씀 암송' 칸 접고 펼치기
+      if(memFolded.has(id))memFolded.delete(id); else memFolded.add(id);
+      saveMemFold();
+      var mp=card.querySelector(".mempanel"); if(mp)mp.classList.toggle("mfold",memFolded.has(id));
+      b.setAttribute("aria-expanded",String(!memFolded.has(id)));
+      b.setAttribute("aria-label","말씀 암송 "+(memFolded.has(id)?"펼치기":"접기"));
+      return;
+    }
     if(b.classList.contains("vctr")){
       if(ctrOn.has(id))ctrOn.delete(id); else{ctrOn.add(id); focusMode.delete(id)}
       saveCtr(); renderVerse(card,n); buzz(6); return;
@@ -6625,6 +6638,9 @@ button:active{filter:brightness(1.15)}
     if(i===3&&s[2]&&!s[3]){var d=new Date(s[2]+864e5);return (d.getMonth()+1)+"/"+d.getDate()+"부터"}
     return "";
   }
+  var memFolded=new Set();   // 접어 둔 '말씀 암송' 칸
+  try{JSON.parse(localStorage.getItem("bible-notes-memfold")||"[]").forEach(function(x){memFolded.add(String(x))})}catch(e){}
+  function saveMemFold(){try{localStorage.setItem("bible-notes-memfold",JSON.stringify(Array.from(memFolded).slice(-300)))}catch(e){}}
   function renderMem(el,n){
     if(!n.mem)n.mem={s:[0,0,0,0]};
     var btn=el.querySelector(".memopen"), panel=el.querySelector(".mempanel"), open=memOpen.has(n.id);
@@ -6633,13 +6649,16 @@ button:active{filter:brightness(1.15)}
     btn.dataset.c=memDone(n)?"✓":(c?String(c):"");
     btn.setAttribute("aria-label",memDone(n)?"말씀 암송 (완료)":(c?"말씀 암송 ("+c+"/"+MEMSTEPS.length+"단계)":"말씀 암송")); btn.title=btn.getAttribute("aria-label");
     panel.hidden=!open;
+    panel.classList.toggle("mfold",memFolded.has(n.id));
     if(!open){panel.textContent="";panel.dataset.key="";return}
     var view=memView.get(n.id)||"";
     var key=n.mem.s.join(",")+"/"+view+"/"+(memSeed.get(n.id)||0)+"/"+(memStep.has(n.id)?memStep.get(n.id):-1)+"/"+(lastStamp?lastStamp.id+lastStamp.i:"")+"/"+(n.drill?n.drill.length:0)+"/"+lastDrill+"/"+(artFor(n)?artFor(n).svg.length+artFor(n).title:"")+"/"+artBusy.has(n.id)+"/"+artHide.has(n.id)+"/"+artEdit.has(n.id)+"/"+(speakingId===n.id)+"/"+JSON.stringify(n.hooks)+"/"+hookForm.has(n.id)+"/"+hookBusy.has(n.id)+"/"+ladderBusy.has(n.id)+"/"+hookOpen.has(n.id)+"/"+drillOpen.has(n.id)+"/"+afterOpen.has(n.id)+"/"+dkey(Date.now());
     key+="/"+memMore.has(n.id);
     if(panel.dataset.key===key)return; panel.dataset.key=key; panel.textContent="";
-    var head=document.createElement("div"); head.className="mhd";
-    head.innerHTML='<b>말씀 암송</b><span class="mcnt"></span>';
+    var head=document.createElement("button"); head.type="button"; head.className="mhd";
+    head.setAttribute("aria-expanded",String(!memFolded.has(n.id)));
+    head.setAttribute("aria-label","말씀 암송 "+(memFolded.has(n.id)?"펼치기":"접기"));
+    head.innerHTML='<b>말씀 암송</b><span class="mcnt"></span><span class="mfchev" aria-hidden="true"></span>';
     head.querySelector(".mcnt").textContent=memDone(n)?"🏅 암송 완료!":"도장 "+c+" / "+MEMSTEPS.length;
     panel.appendChild(head);
     var mtop=document.createElement("div"); mtop.className="mtop"; panel.appendChild(mtop);
