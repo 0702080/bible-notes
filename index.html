@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-106">
+<meta name="app-build" content="2026-10-14-108">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1093,6 +1093,21 @@ body.reorder .note .pinbtn{display:none!important}
 .verse.picking .w:active{background:color-mix(in srgb,var(--orange) 18%,transparent)}
 .verse.picking .w.on{opacity:1}
 .verse .vmark{font-weight:700;color:var(--hi)}
+/* 대조·비교 보기: 서로 짝이 되는 말에 색을 입힌다 */
+.ct{font-weight:700;border-radius:4px;padding:0 2px;margin:0 -2px}
+.ct.c0{color:#FF9EC4;background:color-mix(in srgb,#FF9EC4 16%,transparent)}
+.ct.c1{color:#7FD1F5;background:color-mix(in srgb,#7FD1F5 16%,transparent)}
+.ct.c2{color:#8DE0A8;background:color-mix(in srgb,#8DE0A8 16%,transparent)}
+.ct.c3{color:#F7C66B;background:color-mix(in srgb,#F7C66B 16%,transparent)}
+.ct.c4{color:#C4A9F5;background:color-mix(in srgb,#C4A9F5 16%,transparent)}
+.ctcue{font-weight:700;color:var(--orange);border-bottom:2px solid color-mix(in srgb,var(--orange) 60%,transparent)}
+.ctrep{border-bottom:1.5px dotted color-mix(in srgb,var(--ink) 55%,transparent)}
+.ctlegend{display:flex;flex-wrap:wrap;gap:6px 10px;margin:-4px 0 10px;font-size:11.5px;color:var(--faint);line-height:1.6}
+.ctlegend[hidden]{display:none}
+.ctlegend b{font-weight:700}
+.ctlegend .ctpair{padding:1px 7px;border-radius:9px;background:color-mix(in srgb,var(--ink) 8%,transparent)}
+.ctlegend .ctnone{color:var(--muted)}
+.vctr[aria-pressed="true"]{color:var(--hi);border-color:var(--hi)}
 .verse.picking{cursor:text}
 .verse.picking .w.on .wdim{opacity:.42}
 .fselbold{height:28px;padding:0 11px;border:1px dashed color-mix(in srgb,var(--hi) 50%,#34333A);border-radius:14px;background:transparent;color:var(--hi);font-size:12.5px;white-space:nowrap}
@@ -2783,9 +2798,10 @@ button:active{filter:brightness(1.15)}
           '<div class="delwrap"><button type="button" class="danger-t delnote">노트 삭제</button></div>'+
         '</div></details></div>'+
       '<div class="verse"></div>'+
+      '<div class="ctlegend" hidden></div>'+
       '<div class="hits"></div>'+
       '<div class="editbox" hidden><input class="field eref" aria-label="성경 구절"><textarea class="field etext" aria-label="말씀"></textarea><button type="button" class="small donedit">완료</button></div>'+
-      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">언제 쓸까</button><button type="button" class="vtopic">주제 정하기</button><button type="button" class="vxref" aria-expanded="false">연결 말씀</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
+      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">언제 쓸까</button><button type="button" class="vtopic">주제 정하기</button><button type="button" class="vxref" aria-expanded="false">연결 말씀</button><button type="button" class="vctr" aria-pressed="false">⚖️ 대조</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
       '<div class="xpanel" hidden></div>'+
       '<div class="usepanel" hidden></div>'+
       '<div class="mempanel" hidden></div>'+
@@ -3580,6 +3596,10 @@ button:active{filter:brightness(1.15)}
     if(b.classList.contains("hcal")){openGcal(id);return}
     if(b.classList.contains("vtopic")){openPicker(id);return}
     if(b.classList.contains("vxref")){toggleXref(card,n);return}
+    if(b.classList.contains("vctr")){
+      if(ctrOn.has(id))ctrOn.delete(id); else{ctrOn.add(id); focusMode.delete(id)}
+      saveCtr(); renderVerse(card,n); buzz(6); return;
+    }
     if(b.classList.contains("xldel")){
       if(!b.dataset.sure){b.dataset.sure="1";b.classList.add("sure");b.textContent="한 번 더";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.classList.remove("sure");b.textContent="지우기"}},3000);return}
       var lid=b.closest("li").dataset.lid; n.links=(n.links||[]).filter(function(l){return l.id!==lid}); scheduleSave(id); renderMyLinks(card.querySelector(".xpanel"),n); return;
@@ -7177,6 +7197,97 @@ button:active{filter:brightness(1.15)}
   function tokens(text){return String(text).split(/(\s+)/).filter(function(x){return x!==""})}
   function wordsOf(text){return tokens(text).filter(function(x){return !/^\s+$/.test(x)})}
   function parseOk(n){return n.parse&&n.parse.src===n.text&&n.parse.labels.length===wordsOf(n.text).length}
+  /* ---------- 대조·비교 보기 ----------
+     AI 없이 규칙으로 찾는다: ① 반대말 쌍 ② 같은 꼴 다른 말(사흘 동안 ↔ 하루 동안)
+     ③ 대조를 알리는 이음말(그러나, 오직…) ④ 되풀이되는 말 */
+  var ctrOn=new Set();
+  try{JSON.parse(localStorage.getItem("bible-notes-ctr")||"[]").forEach(function(x){ctrOn.add(String(x))})}catch(e){}
+  function saveCtr(){try{localStorage.setItem("bible-notes-ctr",JSON.stringify(Array.from(ctrOn).slice(-300)))}catch(e){}}
+  var CT_OPP=[
+    ["높","낮"],["큰","작"],["빛","어둠"],["생명","죽음"],["살리","죽이"],["의인","악인"],
+    ["지혜","어리석"],["사랑","미워"],["처음","나중"],["하늘","땅"],["옛","새"],["많","적"],
+    ["강한","약한"],["기쁨","슬픔"],["웃","울"],["세우","무너"],["심","거두"],["복","저주"],
+    ["진리","거짓"],["믿음","의심"],["평안","두려움"],["감사","원망"],["순종","거역"],
+    ["부자","가난"],["첫","마지막"],["넓","좁"],["밝","어둡"],["영원","잠시"],
+    ["아침","저녁"],["앞","뒤"],["무거","가벼"],["멀","가까"]
+  ];
+  var CT_TAIL=["동안","만에","후에","전에","같이","처럼","째","번","날","해","년","달","시간","가지","만큼","쯤"];
+  var CT_CUE=["그러나","오직","도리어","하지만","반면","대신","아니라","그런즉"];
+  var CT_STOP=/^(그|이|저|것|수|때|바|더|또|다|곧|함|있|없|하|되|말|자|아니|너희|우리|나의|모든|사람)$/;
+  function ctToks(text){var re=/\S+/g,out=[],m;while((m=re.exec(text)))out.push({t:m[0],s:m.index,e:m.index+m[0].length});return out}
+  function ctBare(w){return String(w).replace(/[^가-힣A-Za-z0-9]/g,"")}
+  function ctStem(w){return ctBare(w).replace(/(은|는|이|가|을|를|의|에서|에게|으로|로|와|과|도|만|까지|부터|에)$/,"")}
+  function contrastFind(text){
+    var toks=ctToks(text), marks=[], used={}, color=0, pairs=[], reps=[], cues=[];
+    // ① 반대말 쌍
+    CT_OPP.forEach(function(pr){
+      var A=[],B=[];
+      toks.forEach(function(tk,i){var w=ctBare(tk.t);if(!w)return;
+        if(w.indexOf(pr[0])===0)A.push(i); else if(w.indexOf(pr[1])===0)B.push(i)});
+      if(!A.length||!B.length)return;
+      var c="ct c"+(color%5), got=false;
+      A.concat(B).forEach(function(i){if(used[i])return;used[i]=1;marks.push({s:toks[i].s,e:toks[i].e,c:c});got=true});
+      if(got){pairs.push({c:c,t:toks[A[0]].t+" ↔ "+toks[B[0]].t,k:"반대"});color++}
+    });
+    // ② 같은 꼴, 다른 말
+    var byTail={};
+    toks.forEach(function(tk,i){var w=ctBare(tk.t);if(i===0||CT_TAIL.indexOf(w)<0)return;(byTail[w]=byTail[w]||[]).push(i)});
+    Object.keys(byTail).forEach(function(tail){
+      var idx=byTail[tail]; if(idx.length<2)return;
+      var heads=idx.map(function(i){return ctStem(toks[i-1].t)});
+      if(heads.filter(function(h,k){return heads.indexOf(h)===k}).length<2)return;   // 다 같은 말이면 대조가 아님
+      var c="ct c"+(color%5), got=false;
+      idx.forEach(function(i){if(used[i-1]||used[i])return;used[i-1]=1;used[i]=1;marks.push({s:toks[i-1].s,e:toks[i].e,c:c});got=true});
+      if(got){pairs.push({c:c,t:heads.join(" ↔ ")+" "+tail,k:"같은 꼴"});color++}
+    });
+    // ③ 대조 이음말
+    toks.forEach(function(tk,i){if(used[i])return;var w=ctBare(tk.t);
+      if(CT_CUE.indexOf(w)>=0){used[i]=1;marks.push({s:tk.s,e:tk.e,c:"ctcue"});if(cues.indexOf(w)<0)cues.push(w)}});
+    // ④ 되풀이되는 말
+    var cnt={}, where={};
+    toks.forEach(function(tk,i){var st=ctStem(tk.t);
+      if(st.length<2||CT_STOP.test(st))return; cnt[st]=(cnt[st]||0)+1; (where[st]=where[st]||[]).push(i)});
+    Object.keys(cnt).forEach(function(st){
+      if(cnt[st]<2)return; var got=false;
+      where[st].forEach(function(i){if(used[i])return;used[i]=1;marks.push({s:toks[i].s,e:toks[i].e,c:"ctrep"});got=true});
+      if(got)reps.push(st+" "+cnt[st]+"번");
+    });
+    marks.sort(function(a,b){return a.s-b.s});
+    return {marks:marks,pairs:pairs,reps:reps,cues:cues};
+  }
+  function renderContrast(v,text,res){
+    v.textContent=""; var pos=0;
+    res.marks.forEach(function(m){
+      if(m.s<pos)return;
+      if(m.s>pos)v.appendChild(document.createTextNode(text.slice(pos,m.s)));
+      var sp=document.createElement("span"); sp.className=m.c; sp.textContent=text.slice(m.s,m.e);
+      v.appendChild(sp); pos=m.e;
+    });
+    if(pos<text.length)v.appendChild(document.createTextNode(text.slice(pos)));
+  }
+  function ctLegend(el,res){
+    el.textContent="";
+    if(!res.pairs.length&&!res.reps.length&&!(res.cues||[]).length){
+      var no=document.createElement("span"); no.className="ctnone";
+      no.textContent="짝이 되는 말을 찾지 못했어요. 집중 → 직접 고르기로 직접 진하게 표시할 수 있어요.";
+      el.appendChild(no); return;
+    }
+    res.pairs.forEach(function(p){
+      var sp=document.createElement("span"); sp.className="ctpair";
+      var b=document.createElement("b"); b.className=p.c; b.textContent=p.t; sp.appendChild(b);
+      sp.appendChild(document.createTextNode(" "+p.k)); el.appendChild(sp);
+    });
+    (res.cues||[]).forEach(function(w){
+      var cs=document.createElement("span"); cs.className="ctpair";
+      var cb2=document.createElement("b"); cb2.className="ctcue"; cb2.textContent=w;
+      cs.appendChild(cb2); cs.appendChild(document.createTextNode(" 앞뒤가 뒤집히는 자리")); el.appendChild(cs);
+    });
+    if(res.reps.length){
+      var r=document.createElement("span"); r.className="ctpair";
+      var rb=document.createElement("b"); rb.className="ctrep"; rb.textContent=res.reps.slice(0,5).join(", ");
+      r.appendChild(rb); r.appendChild(document.createTextNode(" 되풀이")); el.appendChild(r);
+    }
+  }
   function renderVerse(el,n){
     var v=el.querySelector(".verse"), mode=focusMode.get(n.id);
     v.classList.remove("memv");
@@ -7193,7 +7304,16 @@ button:active{filter:brightness(1.15)}
     var clr=el.querySelector(".fclear"), anyMk=hasMarks(n);
     if(clr)clr.hidden=!(mode==="P"&&anyMk);
     var fsel=el.querySelector(".fselbold"); if(fsel)fsel.hidden=mode!=="P";
+    var lgEl=el.querySelector(".ctlegend"), ctb=el.querySelector(".vctr"), ctOn=ctrOn.has(n.id);
+    if(ctb)ctb.setAttribute("aria-pressed",String(ctOn));
+    if(lgEl)lgEl.hidden=!ctOn;
     v.classList.remove("picking","has");
+    if(ctOn&&!mode){   // 대조·비교 보기
+      v.classList.remove("focus","kwon");
+      var cres=contrastFind(n.text); renderContrast(v,n.text,cres);
+      if(lgEl)ctLegend(lgEl,cres);
+      return;
+    }
     if(mode==="P"){
       v.classList.add("focus","picking"); if(anyMk)v.classList.add("has");
       renderMarked(v,n,true);
