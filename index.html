@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-14-109">
+<meta name="app-build" content="2026-10-14-110">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2056,15 +2056,17 @@ button:active{filter:brightness(1.15)}
 .dlclose{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:14.5px}
 .dlbody{flex:1;overflow:auto;padding:12px max(16px,calc((100% - 608px) / 2)) 28px;width:100%;box-sizing:border-box;scrollbar-width:none}
 .dlbody::-webkit-scrollbar{display:none}
-.dlday{display:flex;align-items:center;justify-content:center;gap:14px}
-.dlday button{width:36px;height:36px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:13px}
+.dlfix{display:flex;align-items:center;gap:14px;padding:8px max(16px,calc((100% - 608px) / 2));width:100%;box-sizing:border-box;border-bottom:1px solid #222126;background:#0B0B0D}
+.dlday{display:flex;align-items:center;justify-content:center;gap:10px;flex:0 0 auto}
+.dlday button{flex:0 0 auto;width:32px;height:32px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:13px}
 .dlday button:disabled{opacity:.3}
-.dldate{font-size:16px;color:var(--ink);min-width:120px;text-align:center}
-.dlprog{display:flex;align-items:center;gap:10px;margin:12px 0 4px}
+.dldate{font-size:15px;color:var(--ink);min-width:112px;text-align:center;white-space:nowrap}
+.dlprog{display:flex;align-items:center;gap:8px;flex:1;min-width:0;margin:0}
 .dlcnt{font-size:15px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
 .dlbarw{flex:1;height:8px;border-radius:4px;background:#222126;overflow:hidden}
 .dlbarw i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .35s}
-.dlweek{display:flex;justify-content:space-between;gap:6px;margin:10px 0 6px}
+.dlweek{display:flex;justify-content:space-between;gap:6px;margin:4px 0 6px}
+@media (max-width:420px){.dlfix{gap:8px;padding:8px 12px}.dlday{gap:6px}.dldate{font-size:14px;min-width:96px}.dlday button{width:28px;height:28px;font-size:12px}.dlcnt{font-size:13.5px}}
 .dlw{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 0;border:0;background:transparent;font:inherit;cursor:pointer}
 .dlw i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;color:#141416;background:color-mix(in srgb,var(--gold) calc(var(--f) * 100%),#1c1b21)}
 .dlw b{font-size:11px;color:var(--faint);font-weight:500}
@@ -5896,8 +5898,9 @@ button:active{filter:brightness(1.15)}
     if(!dl){
       dl=document.createElement("div"); dl.className="daily"; dl.setAttribute("role","dialog"); dl.setAttribute("aria-modal","true"); dl.hidden=true;
       dl.innerHTML='<div class="dlbar"><b class="dltitle">🌙 하루 돌아보기</b><button type="button" class="dledit">✏️ 항목 고치기</button><button type="button" class="dlclose">닫기</button></div>'+
-        '<div class="dlbody"><div class="dlday"><button type="button" class="dlprev" aria-label="전날">◀</button><b class="dldate"></b><button type="button" class="dlnext" aria-label="다음 날">▶</button></div>'+
-        '<div class="dlprog"><span class="dlcnt"></span><span class="dlbarw"><i></i></span></div><div class="dlweek" aria-label="최근 7일"></div>'+
+        '<div class="dlfix"><div class="dlday"><button type="button" class="dlprev" aria-label="전날">◀</button><b class="dldate"></b><button type="button" class="dlnext" aria-label="다음 날">▶</button></div>'+
+        '<div class="dlprog"><span class="dlcnt"></span><span class="dlbarw"><i></i></span></div></div>'+
+        '<div class="dlbody"><div class="dlweek" aria-label="최근 7일"></div>'+
         '<div class="dllist"></div>'+
         '<form class="dladd" autocomplete="off" hidden><select class="field dlg" aria-label="묶음"></select><input class="field dlin" maxlength="40" placeholder="새 항목 (예: 먼저 인사했는가)" aria-label="새 항목"><button type="submit" class="primary">추가</button></form>'+
         '<form class="dlnewg" autocomplete="off" hidden><input class="field dlge" maxlength="4" placeholder="🙂" aria-label="묶음 이모지"><input class="field dlgn" maxlength="14" placeholder="새 묶음 이름 (예: 가정, 일터)" aria-label="새 묶음 이름"><button type="submit">+ 묶음</button></form>'+
