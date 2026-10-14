@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-122">
+<meta name="app-build" content="2026-10-15-123">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2083,7 +2083,11 @@ button:active{filter:brightness(1.15)}
 .dlw b{font-size:11px;color:var(--faint);font-weight:500}
 .dlw.cur b{color:var(--gold);font-weight:700}
 .dlw.cur i{box-shadow:0 0 0 2px var(--gold)}
-.dlgh{margin:18px 0 6px;padding-left:2px;font-size:13.5px;font-weight:700;color:var(--gc,var(--muted))}
+.dlgh{margin:30px 0 8px;padding-left:2px;font-size:13.5px;font-weight:700;color:var(--gc,var(--muted))}
+.dlgh:first-child{margin-top:8px}
+.dlgchev{display:inline-block;width:7px;height:7px;margin-left:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .18s;opacity:.7}
+.dlgname[aria-expanded="true"] .dlgchev{transform:rotate(-135deg) translate(-2px,-2px)}
+@media (prefers-reduced-motion:reduce){.dlgchev{transition:none}}
 .dlitem{position:relative;display:flex;align-items:center;gap:6px}
 .dlrow{flex:1;min-width:0;display:flex;align-items:center;gap:10px;padding:10px 10px;margin:2px 0;border:1px solid #232229;border-radius:12px;background:#121216;color:var(--ink);font-size:15px;text-align:left}
 .dlbox{flex:0 0 22px;height:22px;border:2px solid color-mix(in srgb,var(--gc,var(--gold)) 70%,var(--rule));border-radius:6px;display:grid;place-items:center}
@@ -5919,7 +5923,9 @@ button:active{filter:brightness(1.15)}
     o.items.forEach(function(it){if(it.auto==="thanks"&&on.indexOf(it.id)<0){if(th===null)th=thanksOn(day);if(th)on.push(it.id)}});
     return on.filter(function(id){return o.items.some(function(it){return it.id===id})});
   }
-  var dl=null, dlDay="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set();
+  var dl=null, dlDay="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set();
+  try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
+  function saveGFold(){try{localStorage.setItem("bible-daily-gfold",JSON.stringify(Array.from(dlGFold)))}catch(e){}}
   function dayName(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"}
   function openDaily(){
     if(!dl){
@@ -6009,10 +6015,15 @@ button:active{filter:brightness(1.15)}
         }
         if(b.classList.contains("dlmemoclose")){dlMemoId="";drawDaily();return}
         if(b.classList.contains("dlmemoedit")){dlEditId=b.closest(".dlmemobox").dataset.id;dlGEditId="";drawDaily();return}
-        if(b.classList.contains("dlgname")){   // 두 번 눌러야 제목이 열림 (한 번에 실수로 바뀌지 않게)
+        if(b.classList.contains("dlgname")){   // 한 번 누르면 접고 펼치기, 빠르게 두 번이면 이름 바꾸기
           var gg=b.dataset.g, nowT=Date.now();
-          if(dlgTap.g===gg&&nowT-dlgTap.t<450){dlgTap={g:"",t:0};dlGEditId=gg;dlEditId="";drawDaily();return}
-          dlgTap={g:gg,t:nowT}; toast("한 번 더 누르면 이름을 고쳐요"); return;
+          if(dlgTap.g===gg&&nowT-dlgTap.t<450){
+            if(dlGFold.has(gg))dlGFold.delete(gg); else dlGFold.add(gg);   // 첫 번째 누름으로 바뀐 접힘을 되돌림
+            saveGFold(); dlgTap={g:"",t:0}; dlGEditId=gg; dlEditId=""; drawDaily(); return;
+          }
+          dlgTap={g:gg,t:nowT};
+          if(dlGFold.has(gg))dlGFold.delete(gg); else dlGFold.add(gg);
+          saveGFold(); drawDaily(); return;
         }
         if(b.classList.contains("dlrow")&&dlEdit){dlEditId=id;dlGEditId="";drawDaily();return}   // 고치기 중에는 눌러서 글 수정
         if(b.classList.contains("dlrow")&&!dlEdit){
@@ -6156,13 +6167,18 @@ button:active{filter:brightness(1.15)}
       }else{
         var h=document.createElement("div"); h.className="dlgh"; h.style.setProperty("--gc",g.c);
         var gr=document.createElement("button"); gr.type="button"; gr.className="dlgname"; gr.dataset.g=g.g;
-        gr.setAttribute("aria-label","'"+g.t+"' 묶음 이름 바꾸기 (두 번 누르기)"); gr.title="두 번 누르면 묶음 이름을 고쳐요";
+        var gOpen=!dlGFold.has(g.g);
+        gr.setAttribute("aria-expanded",String(gOpen));
+        gr.setAttribute("aria-label","'"+g.t+"' 묶음 "+(gOpen?"접기":"펼치기")+" (두 번 누르면 이름 바꾸기)");
+        gr.title="누르면 접고 펼쳐요 · 두 번 누르면 이름을 고쳐요";
         gr.textContent=g.e+" "+g.t+"  "+its.filter(function(it){return on.indexOf(it.id)>=0}).length+"/"+its.length;
         var pen=document.createElement("span"); pen.className="dlgpen"; pen.textContent="✏️"; pen.setAttribute("aria-hidden","true"); gr.appendChild(pen);
+        var gch=document.createElement("span"); gch.className="dlgchev"; gch.setAttribute("aria-hidden","true"); gr.appendChild(gch);
         h.appendChild(gr);
         if(dlEdit&&mine){var gd=document.createElement("button");gd.type="button";gd.className="dlgdel";gd.dataset.g=g.g;gd.textContent="묶음 지우기";h.appendChild(gd)}
         list.appendChild(h);
       }
+      if(dlGFold.has(g.g))return;   // 접힌 묶음은 항목을 그리지 않는다
       if(!its.length){var em=document.createElement("p");em.className="dlgempty";em.textContent="아래 '새 항목' 칸에서 이 묶음을 골라 항목을 넣어 주세요.";list.appendChild(em)}
       its.forEach(function(it){
         if(dlEditId===it.id){   // 항목 글 고치기
