@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-139">
+<meta name="app-build" content="2026-10-15-140">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2028,6 +2028,15 @@ button:active{filter:brightness(1.15)}
 .reviewbar.fold .tdbig{display:none}
 .tdsep{height:1px;margin:4px 0 2px;background:color-mix(in srgb,var(--gold) 20%,var(--rule))}
 .rvchip.main{background:var(--gold);color:#141416}
+/* 오늘 카드 줄의 버튼을 손가락으로 누르기 쉽게 크게 (2026-10-15 사용자 요청) */
+.tdrow{min-height:44px;margin:2px 0}
+.tdrow .tdi,.tdrow .tdl,.tdrow .tdtag{line-height:40px}
+.tdrow .tdi{font-size:16px}
+.tdrow .tdl{font-size:14.5px}
+.tdrow .tdtag{font-size:13.5px}
+.tdrow .tdc{gap:8px}
+.tdrow .rvchip{height:40px;padding:0 18px;border-radius:20px;font-size:15px}
+.tdrow .rvchip:active{transform:scale(.96)}
 @media (max-width:480px){.tdrow{grid-template-columns:22px 6.2em minmax(0,1fr)}.tdrow.many .tdc{grid-column:2/-1;margin-bottom:4px}}
 .mmore{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed #2E2D33}
 .mmore > *{margin:0!important}
