@@ -343,6 +343,17 @@ body.painting .chips .chip[data-act]{cursor:crosshair}
 .pinned[hidden]{display:none}
 .pinned>h3{margin:0;font-size:14px;font-weight:700;color:var(--pink)}
 .pinned .bk:first-of-type{margin-top:10px}
+/* ✍️ 통독/필사 바꾸기 (2026-10-15) */
+.modeseg{display:flex;gap:6px;margin:12px 0 0;padding:4px;background:var(--sheet);border:1px solid var(--rule);border-radius:999px}
+.modeseg button{flex:1;border:0;border-radius:999px;padding:8px 0;background:transparent;font-size:14.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
+.modeseg button[aria-pressed="true"]{background:var(--ring);color:#fff}
+body.pm .modeseg button[aria-pressed="true"]{background:var(--violet)}
+.modetip{margin:6px 4px 0;font-size:12px;color:var(--muted);text-align:center}
+.om{position:absolute;top:9%;right:9%;width:7px;height:7px;border-radius:50%;background:var(--violet);box-shadow:0 0 0 1.5px var(--sheet);pointer-events:none}
+body.pm .om{background:var(--ring)}
+.om.om-k{position:static;display:inline-block;vertical-align:middle;margin:0 2px 0 4px}
+body.pm .chip[data-s="me"],body.pm .chip[data-s="me"][data-five]{--c:var(--violet);color:#fff}
+body.pm #btnShare,body.pm #btnFriend{display:none}
 </style>
 </head>
 <body>
@@ -354,6 +365,8 @@ body.painting .chips .chip[data-act]{cursor:crosshair}
     <button class="findx" id="bkFindX" type="button" aria-label="찾기 지우기" hidden>×</button>
   </div>
   <p class="findmsg" id="findMsg" hidden></p>
+  <div class="modeseg" role="group" aria-label="표시할 것"><button type="button" data-act="mode" data-m="read" aria-pressed="true">📖 통독</button><button type="button" data-act="mode" data-m="pilsa" aria-pressed="false">✍️ 필사</button></div>
+  <p class="modetip" id="modeTip"></p>
   <section class="pinned" id="pinned" hidden><h3>📌 읽는 중</h3><div class="books" id="pin"></div></section>
 
   <section class="sum" aria-live="polite">
@@ -463,6 +476,10 @@ var OT_TOTAL=OFF[OT_N], NT_TOTAL=TOTAL-OT_TOTAL;
 var LS="bible-tongdok-v1";       // 기존 앱들과 겹치지 않는 저장 키
 var me=new Uint8Array(TOTAL);    // 내 진도
 var friend=null;                 // 친구 진도 (불러왔을 때만)
+/* ✍️ 필사 (2026-10-15): 같은 표에 필사한 장도 따로 표시. RB=통독, PB=필사, me는 지금 고른 쪽을 가리킴 */
+var RB=me, PB=new Uint8Array(TOTAL), pMode=false, pilAt=0, friendPil=null;
+var PIL_KEY="bible-tongdok-pilsa", MODE_KEY="bible-tongdok-mode";
+function fb(){return pMode?friendPil:friend}   // 지금 모드의 친구 표
 var friendName="";
 var myName="";
 var compare=false;
@@ -486,7 +503,9 @@ document.addEventListener("click",function(ev){
 
 /* ── 저장 ─────────────────────────────── */
 var meAt=0;   // 내 체크를 마지막으로 바꾼 시각 (여러 기기에서 맞출 때 더 최근 것을 씀)
+function storePil(){try{localStorage.setItem(PIL_KEY,JSON.stringify({b:toB64(PB),t:pilAt}))}catch(e){}}
 function save(){
+  if(pMode){pilAt=Date.now();storePil();if(typeof cloudPush==="function")cloudPush();return}
   var b=toB64(me), old=null; try{old=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){}
   if(!old||old.b!==b)meAt=Date.now();
   try{localStorage.setItem(LS,JSON.stringify({n:myName,b:b,t:meAt}))}catch(e){}
@@ -496,7 +515,7 @@ function load(){
   try{
     var raw=localStorage.getItem(LS); if(!raw)return;
     var o=JSON.parse(raw);
-    if(o&&typeof o.b==="string"){var a=fromB64(o.b); if(a)me=a;}
+    if(o&&typeof o.b==="string"){var a=fromB64(o.b); if(a)me=RB=a;}
     if(o&&typeof o.n==="string")myName=o.n;
     if(o&&+o.t)meAt=+o.t;
   }catch(e){}
@@ -555,7 +574,7 @@ function fromRuns(str){
   return bits;
 }
 function makeCode(){
-  var r="2"+toRuns(me), raw="1"+toB64(me), body=r.length<=raw.length?r:raw;
+  var r="2"+toRuns(RB), raw="1"+toB64(RB), body=r.length<=raw.length?r:raw;
   return body+(myName?"."+encName(myName):"");
 }
 function parseCode(txt){
@@ -605,16 +624,16 @@ function bookDone(bi){return countRange(me,OFF[bi],OFF[bi]+BOOKS[bi][1])}
 /* ── 그리기 ───────────────────────────── */
 function chipState(idx){return me[idx]?"me":""}   // 내 표에는 내 것만 (친구 것은 바로 아래 따로 그림)
 /* 친구와 비교할 때: 책마다 내 표 아래에 친구 표를 나란히 (보기 전용) */
-function cmpOn(){return !!(friend&&compare)}
+function cmpOn(){return !!(fb()&&compare)}
 function friendChipsHTML(bi){
   var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips fchips" aria-label="'+esc(friendName||"친구")+'의 '+BOOKS[bi][0]+'">';
-  for(var c=1;c<=total;c++){var idx=base+c-1;s+='<span class="chip"'+(friend[idx]?' data-s="fr"':'')+(c%5===0?' data-five':'')+'>'+c+'</span>'}
+  for(var c=1;c<=total;c++){var idx=base+c-1;s+='<span class="chip"'+(fb()[idx]?' data-s="fr"':'')+(c%5===0?' data-five':'')+'>'+c+'</span>'}
   for(var e=total%10?10-total%10:0;e>0;e--)s+='<span></span>';
   return s+'</div>';
 }
 function bodyHTML(bi){
   if(!cmpOn())return chipsHTML(bi);
-  var total=BOOKS[bi][1], fd=countRange(friend,OFF[bi],OFF[bi]+total);
+  var total=BOOKS[bi][1], fd=countRange(fb(),OFF[bi],OFF[bi]+total);
   return '<div class="who me-who">🙋 나 <span>'+bookDone(bi)+' / '+total+'</span></div>'+chipsHTML(bi)
     +'<div class="who fr-who">👤 '+esc(friendName||"친구")+' <span>'+fd+' / '+total+'</span></div>'+friendChipsHTML(bi);
 }
@@ -669,10 +688,10 @@ function progBadge(done,total){
 function chipsHTML(bi){
   var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips">';
   for(var c=1;c<=total;c++){
-    var idx=base+c-1, st=chipState(idx);
+    var idx=base+c-1, st=chipState(idx), o=(pMode?RB:PB)[idx];   // o: 다른 쪽(통독↔필사)도 했으면 작은 점
     s+='<button class="chip" type="button" data-act="chip" data-i="'+idx+'"'
       +(st?' data-s="'+st+'"':'')+(c%5===0?' data-five':'')
-      +' aria-pressed="'+(!!me[idx])+'" aria-label="'+BOOKS[bi][0]+' '+c+'장">'+c+'</button>';
+      +' aria-pressed="'+(!!me[idx])+'" aria-label="'+BOOKS[bi][0]+' '+c+'장'+(o?(pMode?' (읽음)':' (필사함)'):'')+'">'+c+(o?'<i class="om" aria-hidden="true"></i>':'')+'</button>';
   }
   for(var e=total%10?10-total%10:0;e>0;e--)s+='<span></span>';   // 마지막 줄을 빈칸으로 채워 표 모양 유지
   return s+'</div>';
@@ -689,15 +708,16 @@ function repaintBook(bi){
 function renderSummary(){
   var mine=countRange(me,0,TOTAL);
   var pctMe=mine/TOTAL*100;
-  if(friend&&compare){
+  var F=fb();
+  if(F&&compare){
     var both=0,fo=0;
-    for(var i=0;i<TOTAL;i++){if(me[i]&&friend[i])both++;else if(friend[i])fo++;}
+    for(var i=0;i<TOTAL;i++){if(me[i]&&F[i])both++;else if(F[i])fo++;}
     $("who").textContent="나와 "+(friendName||"친구");
     $("cnt").textContent="나 "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
     $("mBoth").style.width=(both/TOTAL*100)+"%";
     $("mMe").style.width=((mine-both)/TOTAL*100)+"%";
   }else{
-    $("who").textContent=myName?myName+"의 진도":"내 진도";
+    $("who").textContent=(myName?myName+"의 ":"내 ")+(pMode?"필사":"진도");
     $("cnt").textContent=mine+" / "+TOTAL+"장 ("+Math.round(mine/TOTAL*100)+"%)";
     $("mBoth").style.width="0%";
     $("mMe").style.width=pctMe+"%";
@@ -705,7 +725,7 @@ function renderSummary(){
   $("barCnt").textContent=mine.toLocaleString()+" / "+TOTAL.toLocaleString();
   $("otCnt").textContent=countRange(me,0,OT_TOTAL)+" / "+OT_TOTAL+"장";
   $("ntCnt").textContent=countRange(me,OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
-  $("legend").hidden=!(friend&&compare);
+  $("legend").hidden=!(F&&compare);
   $("btnCmp").hidden=!friend;
   $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
 }
@@ -925,6 +945,7 @@ document.addEventListener("click",function(ev){
     for(var fb2=a;fb2<z;fb2++)setFold(fb2,shutAll); saveFold(); syncFoldAll(); return;
   }
 
+  if(act==="mode"){setMode(el.dataset.m,true);window.scrollTo({top:0,behavior:"smooth"});return}
   if(act==="chip"){
     var idx=+el.dataset.i, bi2=bookOf(idx);
     var before=countRange(me,0,TOTAL), wasFull=bookDone(bi2)===BOOKS[bi2][1];
@@ -941,10 +962,10 @@ document.addEventListener("click",function(ev){
         spot.classList.remove("got5");void spot.offsetWidth;spot.classList.add("got5");
       }
       var nowFull=bookDone(bi2)===BOOKS[bi2][1];
-      checkMilestones(before,after,(!wasFull&&nowFull)?[bi2]:[]);
+      if(!pMode)checkMilestones(before,after,(!wasFull&&nowFull)?[bi2]:[]);
       // 축복 카드가 떴으면 띠까지 겹치지 않게 한다
       maybeCheer(bi2, idx-OFF[bi2]+1);
-    }else{
+    }else if(!pMode){
       lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
     }
     return;
@@ -987,7 +1008,8 @@ document.addEventListener("click",function(ev){
     if(!d.n)return;
     save(); Object.keys(d.books).forEach(function(bi){repaintBook(+bi)}); renderSummary(); renderShelf();
     var after=countRange(me,0,TOTAL);
-    if(d.fill){var fin=Object.keys(d.books).map(Number).filter(function(bi){return !d.full[bi]&&bookDone(bi)===BOOKS[bi][1]});checkMilestones(d.before,after,fin)}
+    if(pMode){}
+    else if(d.fill){var fin=Object.keys(d.books).map(Number).filter(function(bi){return !d.full[bi]&&bookDone(bi)===BOOKS[bi][1]});checkMilestones(d.before,after,fin)}
     else{lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
     hint(d.fill?"✓ "+d.n+"장을 한꺼번에 체크했어요":d.n+"장 체크를 풀었어요","꾹 눌러 끌면 여러 장을 한 번에 바꿀 수 있어요");
   }
@@ -1055,13 +1077,13 @@ function openFriend(){
   $("ok").addEventListener("click",function(){
     var r=parseCode($("pf").value);
     if(!r){setMsg("코드를 알아볼 수 없어요. 링크 전체를 다시 붙여 넣어 주세요.",true);return}
-    friend=r.bits;friendName=r.name;compare=true;saveFriend();
+    friend=r.bits;friendPil=null;friendName=r.name;compare=true;saveFriend();
     renderAll();
     setMsg((friendName||"친구")+" 진도를 불러왔어요.");
     setTimeout(closeDlg,900);
   });
   if(friend)$("rm").addEventListener("click",function(){
-    friend=null;friendName="";compare=false;saveFriend();renderAll();closeDlg();
+    friend=null;friendPil=null;friendName="";compare=false;saveFriend();renderAll();closeDlg();
   });
   $("cl2").addEventListener("click",closeDlg);
 }
@@ -1083,8 +1105,8 @@ $("btnFriend").addEventListener("click",openFriend);
 $("btnCmp").addEventListener("click",function(){compare=!compare;saveFriend();renderAll()});
 /* 불러온 친구 진도는 이 기기에 기억해 두고, 다음에 열어도 내 표와 같이 보여 줌 */
 var FRIEND_KEY="bible-tongdok-friend", friendCloud="";
-function saveFriend(){try{if(friend)localStorage.setItem(FRIEND_KEY,JSON.stringify({c:"2"+toRuns(friend),n:friendName,cmp:compare,fc:friendCloud}));else localStorage.removeItem(FRIEND_KEY)}catch(e){}}
-function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"null");if(!o||!o.c)return;var bits=fromRuns(String(o.c).slice(1));if(!bits)return;friend=bits;friendName=o.n||"";compare=o.cmp!==false;friendCloud=o.fc||""}catch(e){}}
+function saveFriend(){try{if(friend)localStorage.setItem(FRIEND_KEY,JSON.stringify({c:"2"+toRuns(friend),p:friendPil?"2"+toRuns(friendPil):"",n:friendName,cmp:compare,fc:friendCloud}));else localStorage.removeItem(FRIEND_KEY)}catch(e){}}
+function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"null");if(!o||!o.c)return;var bits=fromRuns(String(o.c).slice(1));if(!bits)return;friend=bits;friendPil=o.p?fromRuns(String(o.p).slice(1)):null;friendName=o.n||"";compare=o.cmp!==false;friendCloud=o.fc||""}catch(e){}}
 
 
 /* ── ☁️ 자동 맞춤 (묵상 노트의 Supabase 로그인을 그대로 씀) ──────────────
@@ -1118,10 +1140,11 @@ async function cloudSync(pushOnly){
       // 1) 다른 기기에서 더 최근에 바꾼 내 진도가 있으면 받기
       var mine=await sbGet(tok,"/rest/v1/notes?select=data&user_id=eq."+uid+"&id=eq."+encodeURIComponent(CLOUD_ID));
       var md=mine&&mine[0]&&mine[0].data;
-      if(md&&md.c&&(+md.at||0)>meAt){var bits=fromRuns(String(md.c).slice(1));if(bits){me=bits;meAt=+md.at;if(typeof md.n==="string"&&md.n&&!myName)myName=md.n;try{localStorage.setItem(LS,JSON.stringify({n:myName,b:toB64(me),t:meAt}))}catch(e){}lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}}
+      if(md&&md.c&&(+md.at||0)>meAt){var bits=fromRuns(String(md.c).slice(1));if(bits){RB=bits;if(!pMode)me=RB;meAt=+md.at;if(typeof md.n==="string"&&md.n&&!myName)myName=md.n;try{localStorage.setItem(LS,JSON.stringify({n:myName,b:toB64(RB),t:meAt}))}catch(e){}lastOT=countRange(RB,0,OT_TOTAL);lastNT=countRange(RB,OT_TOTAL,TOTAL)}}
+      if(md&&md.p&&(+md.pat||0)>pilAt){var pb=fromRuns(String(md.p).slice(1));if(pb){PB=pb;if(pMode)me=PB;pilAt=+md.pat;storePil()}}
     }
     // 2) 내 진도 올리기 (친구 공개)
-    var row={user_id:uid,id:CLOUD_ID,data:{c:"2"+toRuns(me),at:meAt||Date.now(),n:myName},updated_at:Date.now(),deleted:false,visibility:"friends"};
+    var row={user_id:uid,id:CLOUD_ID,data:{c:"2"+toRuns(RB),at:meAt||Date.now(),n:myName,p:"2"+toRuns(PB),pat:pilAt},updated_at:Date.now(),deleted:false,visibility:"friends"};
     var pr=await fetch(SB_URL+"/rest/v1/notes?on_conflict=user_id,id",{method:"POST",headers:Object.assign(sbH(tok),{"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify([row])});
     if(!pr.ok)throw new Error("up "+pr.status);
     if(!pushOnly){
@@ -1132,7 +1155,7 @@ async function cloudSync(pushOnly){
       if(ids.length){
         var pf=await sbGet(tok,"/rest/v1/profiles?select=id,name&id=in.("+ids.join(",")+")"), nm={}; pf.forEach(function(p){nm[p.id]=p.name});
         var rows=await sbGet(tok,"/rest/v1/notes?select=user_id,data,updated_at&id=eq."+encodeURIComponent(CLOUD_ID)+"&user_id=in.("+ids.join(",")+")&deleted=is.false");
-        rows.forEach(function(r){if(!r.data||!r.data.c)return;var bits=fromRuns(String(r.data.c).slice(1));if(bits)list.push({id:r.user_id,name:nm[r.user_id]||r.data.n||"친구",bits:bits,at:+r.data.at||+r.updated_at})});
+        rows.forEach(function(r){if(!r.data||!r.data.c)return;var bits=fromRuns(String(r.data.c).slice(1));if(bits)list.push({id:r.user_id,name:nm[r.user_id]||r.data.n||"친구",bits:bits,pbits:r.data.p?fromRuns(String(r.data.p).slice(1)):null,at:+r.data.at||+r.updated_at})});
         cloudFriends=list; cloudState.noRows=ids.length>list.length?ids.filter(function(u){return !list.some(function(l){return l.id===u})}).map(function(u){return nm[u]||"친구"}):[];
       }else{cloudFriends=[];cloudState.noRows=[]}
       cloudState.nFriends=ids.length;
@@ -1146,7 +1169,7 @@ function applyCloudFriend(){
   if(!cloudFriends.length)return;
   var f=cloudFriends.filter(function(x){return x.id===cloudPick})[0]||cloudFriends[0];
   var wasOff=!!friend&&!compare;   // 비교를 꺼 두었으면 그대로
-  friend=f.bits; friendName=f.name; friendCloud=f.id; if(!wasOff)compare=true; saveFriend();
+  friend=f.bits; friendPil=f.pbits||null; friendName=f.name; friendCloud=f.id; if(!wasOff)compare=true; saveFriend();
 }
 function ago(t){var m=Math.round((Date.now()-t)/60000);return m<1?"방금":m<60?m+"분 전":m<1440?Math.round(m/60)+"시간 전":Math.round(m/1440)+"일 전"}
 function drawCloud(){
@@ -1264,8 +1287,20 @@ async function drawFriends(){
 document.addEventListener("visibilitychange",function(){if(!document.hidden&&sbSession())cloudSync(false)});
 setInterval(function(){if(!document.hidden&&sbSession())cloudSync(false)},60000);
 
+/* ── 통독 / 필사 바꾸기 ── */
+function setMode(m,draw){
+  pMode=m==="pilsa"; me=pMode?PB:RB;
+  document.body.classList.toggle("pm",pMode);
+  document.querySelector(".bar h1").textContent=pMode?"성경 필사표":"성경 통독표";
+  document.querySelectorAll('.modeseg button').forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===(pMode?"pilsa":"read")))});
+  $("modeTip").innerHTML=pMode?'보라 칸 = 필사한 장 · <i class="om om-k"></i> 노란 점 = 읽은 장':'노란 칸 = 읽은 장 · <i class="om om-k"></i> 보라 점 = 필사한 장';
+  try{localStorage.setItem(MODE_KEY,pMode?"pilsa":"read")}catch(e){}
+  lastOT=countRange(RB,0,OT_TOTAL);lastNT=countRange(RB,OT_TOTAL,TOTAL);
+  if(draw)renderAll();
+}
 /* ── 시작 ─────────────────────────────── */
 load();
+try{var pj2=JSON.parse(localStorage.getItem(PIL_KEY)||"null");if(pj2&&typeof pj2.b==="string"){var pa=fromB64(pj2.b);if(pa)PB=pa;pilAt=+pj2.t||0}}catch(e){}
 /* 이미 읽어 둔 만큼은 축하가 다시 뜨지 않게 기준을 맞춰 둔다 */
 lastOT=countRange(me,0,OT_TOTAL);
 lastNT=countRange(me,OT_TOTAL,TOTAL);
@@ -1277,9 +1312,11 @@ if(/access_token=/.test(location.hash)){   // 메일 링크가 통독표로 바�
 }
 var fromLink=parseCode(location.hash);
 if(fromLink){
-  friend=fromLink.bits;friendName=fromLink.name;compare=true;saveFriend();
+  friend=fromLink.bits;friendPil=null;friendName=fromLink.name;compare=true;saveFriend();
   try{history.replaceState(null,"",location.pathname)}catch(e){}
 }else loadFriend();
+var sm="read";try{sm=localStorage.getItem(MODE_KEY)||"read"}catch(e){}
+setMode(sm,false);
 renderAll();
 drawCloud(); if(sbSession())cloudSync(false);
 })();
