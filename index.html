@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-memomulti">
+<meta name="app-build" content="2026-10-15-memocolor">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2201,7 +2201,9 @@ button:active{filter:brightness(1.15)}
 .dlmemobox textarea{width:100%;box-sizing:border-box;min-height:96px;resize:vertical;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.6}
 .dlmemobox textarea:focus{border-color:var(--sky);outline:none}
 .dlmemofoot{display:flex;gap:8px;margin-top:8px}
-.dlmemop+.dlmemop{margin-top:12px}
+.dlmemop+.dlmemop{margin-top:10px}
+.dlmemop.mc0{--mc:var(--sky)} .dlmemop.mc1{--mc:var(--violet)} .dlmemop.mc2{--mc:var(--green)} .dlmemop.mc3{--mc:var(--gold)}
+.dlmemop[class*="mc"]{border-left:3px solid color-mix(in srgb,var(--mc) 70%,transparent);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--mc) 7%,transparent);color:color-mix(in srgb,var(--mc) 45%,var(--muted))}
 .dlmemoadd{display:block;height:32px;margin:0 0 10px 12px;padding:0 14px;border:1px dashed color-mix(in srgb,var(--sky) 50%,#34333A);border-radius:16px;background:transparent;color:var(--sky);font-size:13px;font-weight:700;white-space:nowrap}
 .dlmemoclose{margin-left:auto;height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:transparent;color:var(--muted);font-size:12.5px}
 .dladd[hidden]{display:none}
@@ -6358,16 +6360,16 @@ button:active{filter:brightness(1.15)}
           var ta=mx.querySelector("textarea"); ta.value=val; ta.setAttribute("aria-label",it.t+" 기록"+(no>1?" "+no:""));
           list.appendChild(mx);
         }
-        function memoPrev(key,val){
-          var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo"; mp.dataset.id=key;
+        function memoPrev(key,val,no){   // 기록마다 색을 살짝 달리해 한눈에 나뉘어 보이게 (2026-10-15 사용자 요청)
+          var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo mc"+((no-1)%4); mp.dataset.id=key;
           mp.textContent=val; list.appendChild(mp);
         }
         var extras=isThx?[]:dlMemoExtras(o,dlDay,it.id), openNew=dlMemoId.indexOf(it.id+"~")===0&&extras.indexOf(dlMemoId)<0;
         if(dlMemoId===it.id)memoBox(it.id,memo,1);
-        else if(!dlEdit&&memo&&dlMemoMore.has(it.id))memoPrev(it.id,memo);   // 미리보기는 평소 화면에서, 제목을 눌러야 펼쳐진다
+        else if(!dlEdit&&memo&&dlMemoMore.has(it.id))memoPrev(it.id,memo,1);   // 미리보기는 평소 화면에서, 제목을 눌러야 펼쳐진다
         if(!dlEdit&&(dlMemoMore.has(it.id)||dlMemoId.indexOf(it.id+"~")===0)){
           extras.forEach(function(k,i){
-            if(dlMemoId===k)memoBox(k,dlMemoGet(o,dlDay,k),i+2); else memoPrev(k,dlMemoGet(o,dlDay,k));
+            if(dlMemoId===k)memoBox(k,dlMemoGet(o,dlDay,k),i+2); else memoPrev(k,dlMemoGet(o,dlDay,k),i+2);
           });
           if(openNew)memoBox(dlMemoId,"",extras.length+2);
           else if(!isThx&&(memo||extras.length)&&!dlMemoId){
