@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-145">
+<meta name="app-build" content="2026-10-15-blankline">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7527,7 +7527,8 @@ button:active{filter:brightness(1.15)}
     v.classList.add("vnum");
     // 절 번호로 시작하지 않는 줄(같은 절이 이어지는 줄)은 본문 자리에 맞춘다
     Array.prototype.forEach.call(v.querySelectorAll(".vl"),function(ln){
-      if(!/^[ 	]*\d{1,3}[ 	]/.test(ln.textContent||"")){ln.className="vl cont";return}
+      // 빈 줄 표시(vb)는 남겨 둬야 다음 절에 여백이 또 붙지 않는다 (편집기와 같은 한 줄 공백, 2026-10-15)
+      if(!/^[ 	]*\d{1,3}[ 	]/.test(ln.textContent||"")){ln.classList.add("cont");return}
       var f=ln.firstChild;   // 절 번호를 고정폭 칸에 넣어 본문 시작 자리를 똑같이 맞춘다
       if(f&&f.nodeType===3){
         var mm=String(f.data).match(/^[ 	]*(\d{1,3})[ 	]+/);
