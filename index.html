@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-142">
+<meta name="app-build" content="2026-10-15-143">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2855,8 +2855,7 @@ button:active{filter:brightness(1.15)}
     var list=prd.querySelector(".prdlist"); list.textContent="";
     prd.querySelectorAll(".prdfil button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.f===prdFilter))});
     var src=prdNote?[notes.get(prdNote)].filter(Boolean):sorted(), total=0, ansN=0;
-    prd.querySelector(".p1add").hidden=!!prdNote;
-    if(!prdNote){
+    {   // 한 줄 기도는 메뉴로 열든, 말씀 카드의 "읽기 모드"로 열든 늘 맨 위에 (2026-10-15)
       var ones=p1Data().items.filter(function(x){return x.t.trim()});
       ones.forEach(function(x){total++;if(x.ans)ansN++});
       ones=ones.filter(function(x){return prdFilter==="all"||(prdFilter==="ans"?!!x.ans:!x.ans)}).sort(function(a,b){return (a.ans?1:0)-(b.ans?1:0)||b.at-a.at});
