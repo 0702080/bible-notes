@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-137">
+<meta name="app-build" content="2026-10-15-138">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1122,7 +1122,7 @@ body.reorder .note .pinbtn{display:none!important}
 .verse.vnum .vl:not(.cont):first-child{margin-top:0}
 .verse.vlines{white-space:normal}
 .verse.vlines .vl{display:block;white-space:pre-wrap}
-.verse.vlines .vl+.vl{margin-top:.45em}
+.verse.vlines .vl+.vl{margin-top:0}   /* 줄 사이를 글이 넘어간 줄과 똑같이 (2026-10-15 사용자 요청) */
 .verse.vlines .vl:empty{height:.45em}
 .note.open .verse{margin:10px 0 20px}
 .note.open .focusrow{margin-bottom:18px;row-gap:8px}
