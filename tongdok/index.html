@@ -354,6 +354,9 @@ body.pm .om{background:var(--ring)}
 .om.om-k{position:static;display:inline-block;vertical-align:middle;margin:0 2px 0 4px}
 body.pm .chip[data-s="me"],body.pm .chip[data-s="me"][data-five]{--c:var(--violet);color:#fff}
 body.pm #btnShare,body.pm #btnFriend{display:none}
+/* 친구 여러 명: 사람마다 색 (2026-10-15) */
+.fr-who{color:var(--fc,var(--sky))}
+.fchips .chip[data-s="fr"]{--c:var(--fc,var(--sky))}
 </style>
 </head>
 <body>
@@ -624,18 +627,25 @@ function bookDone(bi){return countRange(me,OFF[bi],OFF[bi]+BOOKS[bi][1])}
 /* ── 그리기 ───────────────────────────── */
 function chipState(idx){return me[idx]?"me":""}   // 내 표에는 내 것만 (친구 것은 바로 아래 따로 그림)
 /* 친구와 비교할 때: 책마다 내 표 아래에 친구 표를 나란히 (보기 전용) */
-function cmpOn(){return !!(fb()&&compare)}
-function friendChipsHTML(bi){
-  var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips fchips" aria-label="'+esc(friendName||"친구")+'의 '+BOOKS[bi][0]+'">';
-  for(var c=1;c<=total;c++){var idx=base+c-1;s+='<span class="chip"'+(fb()[idx]?' data-s="fr"':'')+(c%5===0?' data-five':'')+'>'+c+'</span>'}
+/* 같이 보는 친구들 (2026-10-15): 로그인해서 맺은 친구는 모두 한꺼번에, 아니면 링크로 불러온 친구 한 명 */
+var FCOL=["var(--sky)","var(--pink)","var(--green)","var(--orange)","var(--blue)"];
+function viewFriends(){
+  var L=cloudFriends.length?cloudFriends.map(function(f){return {name:f.name,bits:pMode?(f.pbits||new Uint8Array(TOTAL)):f.bits}})
+    :friend?[{name:friendName||"친구",bits:fb()}]:[];
+  return L.filter(function(f){return !!f.bits}).map(function(f,k){f.col=FCOL[k%FCOL.length];return f});
+}
+function cmpOn(){return !!(compare&&viewFriends().length)}
+function friendChipsHTML(bi,F){
+  var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips fchips" style="--fc:'+F.col+'" aria-label="'+esc(F.name)+'의 '+BOOKS[bi][0]+'">';
+  for(var c=1;c<=total;c++){var idx=base+c-1;s+='<span class="chip"'+(F.bits[idx]?' data-s="fr"':'')+(c%5===0?' data-five':'')+'>'+c+'</span>'}
   for(var e=total%10?10-total%10:0;e>0;e--)s+='<span></span>';
   return s+'</div>';
 }
 function bodyHTML(bi){
   if(!cmpOn())return chipsHTML(bi);
-  var total=BOOKS[bi][1], fd=countRange(fb(),OFF[bi],OFF[bi]+total);
+  var total=BOOKS[bi][1];
   return '<div class="who me-who">🙋 나 <span>'+bookDone(bi)+' / '+total+'</span></div>'+chipsHTML(bi)
-    +'<div class="who fr-who">👤 '+esc(friendName||"친구")+' <span>'+fd+' / '+total+'</span></div>'+friendChipsHTML(bi);
+    +viewFriends().map(function(F){return '<div class="who fr-who" style="--fc:'+F.col+'">👤 '+esc(F.name)+' <span>'+countRange(F.bits,OFF[bi],OFF[bi]+total)+' / '+total+'</span></div>'+friendChipsHTML(bi,F)}).join("");
 }
 /* 책 갈래: 색으로 구분하려고 쓴다 */
 function bookGroup(bi){
@@ -708,9 +718,14 @@ function repaintBook(bi){
 function renderSummary(){
   var mine=countRange(me,0,TOTAL);
   var pctMe=mine/TOTAL*100;
-  var F=fb();
-  if(F&&compare){
-    var both=0,fo=0;
+  var VF=compare?viewFriends():[], F=VF.length===1?VF[0].bits:null;
+  if(VF.length>1){
+    $("who").textContent="함께 보기 "+(VF.length+1)+"명";
+    $("cnt").textContent="나 "+mine+" · "+VF.map(function(f){return f.name+" "+countRange(f.bits,0,TOTAL)}).join(" · ")+"장";
+    $("mBoth").style.width="0%";
+    $("mMe").style.width=pctMe+"%";
+  }else if(F){
+    var friendName=VF[0].name, both=0,fo=0;
     for(var i=0;i<TOTAL;i++){if(me[i]&&F[i])both++;else if(F[i])fo++;}
     $("who").textContent="나와 "+(friendName||"친구");
     $("cnt").textContent="나 "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
@@ -725,8 +740,9 @@ function renderSummary(){
   $("barCnt").textContent=mine.toLocaleString()+" / "+TOTAL.toLocaleString();
   $("otCnt").textContent=countRange(me,0,OT_TOTAL)+" / "+OT_TOTAL+"장";
   $("ntCnt").textContent=countRange(me,OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
-  $("legend").hidden=!(F&&compare);
-  $("btnCmp").hidden=!friend;
+  $("legend").hidden=!VF.length;
+  $("legend").innerHTML='<span><i style="background:'+(pMode?'var(--violet)':'#F2C94C')+'"></i>나</span>'+VF.map(function(f){return '<span><i style="background:'+f.col+'"></i>'+esc(f.name)+'</span>'}).join("");
+  $("btnCmp").hidden=!viewFriends().length;
   $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
 }
 function renderAll(){renderBooks();renderSummary();renderShelf();applyFind()}
@@ -1116,6 +1132,10 @@ function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"nu
 var SB_URL="https://fsctntwrqocjvkboqmzn.supabase.co", SB_KEY="sb_publishable_8ARyO5q9ODokIT0um2ShnQ_DgZarC_E", SB_SES="bible-sb-session";
 var CLOUD_ID="s:tongdok", cloudFriends=[], cloudPick="", cloudState={ok:null,at:0,msg:""}, cloudTimer=0, cloudBusy=false;
 try{cloudPick=localStorage.getItem("bible-tongdok-cloudpick")||""}catch(e){}
+/* 친구들 진도를 이 기기에도 기억해 두어, 켤 때 인터넷을 기다리지 않고 바로 보이게 */
+var CF_KEY="bible-tongdok-cloudfriends";
+function saveCF(){try{localStorage.setItem(CF_KEY,JSON.stringify(cloudFriends.map(function(f){return {id:f.id,n:f.name,at:f.at,c:"2"+toRuns(f.bits),p:f.pbits?"2"+toRuns(f.pbits):""}})))}catch(e){}}
+function loadCF(){try{var a=JSON.parse(localStorage.getItem(CF_KEY)||"[]");cloudFriends=a.map(function(o){return {id:o.id,name:o.n||"친구",at:+o.at||0,bits:fromRuns(String(o.c||"").slice(1)),pbits:o.p?fromRuns(String(o.p).slice(1)):null}}).filter(function(f){return !!f.bits})}catch(e){cloudFriends=[]}}
 function sbSession(){try{var x=JSON.parse(localStorage.getItem(SB_SES)||"null");return x&&x.access_token&&x.user&&x.user.id?x:null}catch(e){return null}}
 function sbH(tok){var h={"apikey":SB_KEY,"Content-Type":"application/json"};if(tok)h.Authorization="Bearer "+tok;return h}
 async function sbToken(){
@@ -1156,8 +1176,8 @@ async function cloudSync(pushOnly){
         var pf=await sbGet(tok,"/rest/v1/profiles?select=id,name&id=in.("+ids.join(",")+")"), nm={}; pf.forEach(function(p){nm[p.id]=p.name});
         var rows=await sbGet(tok,"/rest/v1/notes?select=user_id,data,updated_at&id=eq."+encodeURIComponent(CLOUD_ID)+"&user_id=in.("+ids.join(",")+")&deleted=is.false");
         rows.forEach(function(r){if(!r.data||!r.data.c)return;var bits=fromRuns(String(r.data.c).slice(1));if(bits)list.push({id:r.user_id,name:nm[r.user_id]||r.data.n||"친구",bits:bits,pbits:r.data.p?fromRuns(String(r.data.p).slice(1)):null,at:+r.data.at||+r.updated_at})});
-        cloudFriends=list; cloudState.noRows=ids.length>list.length?ids.filter(function(u){return !list.some(function(l){return l.id===u})}).map(function(u){return nm[u]||"친구"}):[];
-      }else{cloudFriends=[];cloudState.noRows=[]}
+        cloudFriends=list; saveCF(); cloudState.noRows=ids.length>list.length?ids.filter(function(u){return !list.some(function(l){return l.id===u})}).map(function(u){return nm[u]||"친구"}):[];
+      }else{cloudFriends=[];saveCF();cloudState.noRows=[]}
       cloudState.nFriends=ids.length;
       applyCloudFriend();
     }
@@ -1177,8 +1197,7 @@ function drawCloud(){
   if(!sbSession()){el.innerHTML='<button type="button" class="btn cl-login" data-act="login">☁️ 로그인하고 친구와 자동으로 같이 보기</button>';el.className="cloud off";return}
   if(cloudState.ok===false){el.innerHTML='☁️ 자동 맞춤이 안 됐어요 · '+esc(cloudState.msg)+' <button type="button" class="cl-re" data-act="cloud">다시</button>';el.className="cloud bad";return}
   var h='☁️ 자동 맞춤 켜짐'+(cloudState.at?' · '+ago(cloudState.at):'');
-  if(cloudFriends.length>1){h+=' · <select class="cl-pick" aria-label="같이 볼 친구">'+cloudFriends.map(function(f){return '<option value="'+f.id+'"'+(f.id===friendCloud?' selected':'')+'>'+esc(f.name)+'</option>'}).join("")+'</select>'}
-  else if(cloudFriends.length===1)h+=' · 👤 '+esc(cloudFriends[0].name)+' ('+ago(cloudFriends[0].at)+' 체크)';
+  if(cloudFriends.length)h+=' · '+cloudFriends.map(function(f){return '👤 '+esc(f.name)+' ('+ago(f.at)+' 체크)'}).join(" · ");
   else if(cloudState.nFriends===0)h+=' · 아래 👥 친구에서 친구 코드로 친구를 맺어 주세요';
   if(cloudState.noRows&&cloudState.noRows.length)h+='<br><small>'+esc(cloudState.noRows.join(", "))+'님은 아직 통독표를 안 열었어요 (한 번 열면 보여요)</small>';
   h+=' <button type="button" class="cl-re" data-act="friends">👥 친구</button>';
@@ -1249,7 +1268,7 @@ async function openFriends(){
   $("frCl").addEventListener("click",function(){closeDlg();cloudSync(false)});
   $("frOut").addEventListener("click",function(){
     if(!this.dataset.sure){this.dataset.sure="1";this.textContent="한 번 더 누르면 로그아웃";return}
-    try{localStorage.removeItem(SB_SES)}catch(e){} cloudFriends=[]; closeDlg(); drawCloud(); hint("로그아웃했어요","체크는 이 휴대폰에 그대로 있어요");
+    try{localStorage.removeItem(SB_SES)}catch(e){} cloudFriends=[]; saveCF(); closeDlg(); drawCloud(); hint("로그아웃했어요","체크는 이 휴대폰에 그대로 있어요");
   });
   drawFriends();
 }
@@ -1317,6 +1336,7 @@ if(fromLink){
 }else loadFriend();
 var sm="read";try{sm=localStorage.getItem(MODE_KEY)||"read"}catch(e){}
 setMode(sm,false);
+if(sbSession()){loadCF();applyCloudFriend()}
 renderAll();
 drawCloud(); if(sbSession())cloudSync(false);
 })();
