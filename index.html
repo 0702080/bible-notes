@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-verbfix">
+<meta name="app-build" content="2026-10-15-memoadd">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2201,6 +2201,7 @@ button:active{filter:brightness(1.15)}
 .dlmemobox textarea{width:100%;box-sizing:border-box;min-height:96px;resize:vertical;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.6}
 .dlmemobox textarea:focus{border-color:var(--sky);outline:none}
 .dlmemofoot{display:flex;gap:8px;margin-top:8px}
+.dlmemoadd{display:block;height:32px;margin:0 0 10px 12px;padding:0 14px;border:1px dashed color-mix(in srgb,var(--sky) 50%,#34333A);border-radius:16px;background:transparent;color:var(--sky);font-size:13px;font-weight:700;white-space:nowrap}
 .dlmemoclose{margin-left:auto;height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:transparent;color:var(--muted);font-size:12.5px}
 .dladd[hidden]{display:none}
 .dlg{flex:0 0 auto;width:auto;height:40px;font-size:13px;padding:0 6px}
@@ -6021,7 +6022,7 @@ button:active{filter:brightness(1.15)}
   function dlMemoSet(o,day,id,t){
     if(!o.memo||typeof o.memo!=="object")o.memo={};
     if(!o.memo[day]||typeof o.memo[day]!=="object")o.memo[day]={};
-    t=String(t||"").slice(0,2000);
+    t=String(t||"").slice(0,8000);   // 이어 쓰기로 길어질 수 있어 넉넉히
     if(t.trim())o.memo[day][id]=t; else delete o.memo[day][id];
     if(!Object.keys(o.memo[day]).length)delete o.memo[day];
   }
@@ -6046,7 +6047,7 @@ button:active{filter:brightness(1.15)}
     o.items.forEach(function(it){if(it.auto==="thanks"&&on.indexOf(it.id)<0){if(th===null)th=thanksOn(day);if(th)on.push(it.id)}});
     return on.filter(function(id){return o.items.some(function(it){return it.id===id})});
   }
-  var dl=null, dlDay="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set(), dlmTap={id:"",t:0};
+  var dl=null, dlDay="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlAddId="", dlAddBase="", dlAddDay="", dlGFold=new Set(), dlmTap={id:"",t:0};
   try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
   function saveGFold(){try{localStorage.setItem("bible-daily-gfold",JSON.stringify(Array.from(dlGFold)))}catch(e){}}
   function dayName(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"}
@@ -6080,7 +6081,11 @@ button:active{filter:brightness(1.15)}
       dl.querySelector(".dllist").addEventListener("input",function(e){
         var ta=e.target; if(ta.tagName!=="TEXTAREA")return;
         var box=ta.closest(".dlmemobox"); if(!box)return;
-        var o=dailyData(); dlMemoSet(o,box.dataset.day,box.dataset.id,ta.value); saveDaily(o);
+        var o=dailyData();
+        if(box.classList.contains("dladdbox")){   // 이어 쓰기: 앞 글은 그대로 두고 빈 줄 하나 띄운 뒤 붙인다
+          var add=ta.value; dlMemoSet(o,box.dataset.day,box.dataset.id,dlAddBase+(add.trim()?(dlAddBase.trim()?"\n\n":"")+add:""));
+        }else dlMemoSet(o,box.dataset.day,box.dataset.id,ta.value);
+        saveDaily(o);
         var tip=box.querySelector(".dlmemosave"); if(tip){tip.textContent="저장됨"; clearTimeout(tip._t); tip._t=setTimeout(function(){tip.textContent=""},1400)}
       });
       // 입력칸을 벗어나면 저장 (저장·취소 단추 없이)
@@ -6125,7 +6130,7 @@ button:active{filter:brightness(1.15)}
         }
         if(b.classList.contains("dlauto")&&!b.classList.contains("dlmemo")){dlGotoThanks();return}   // 한 줄 감사 쓰는 고으로
         function dlOpenMemo(mid){   // 적는 칸 열기
-          dlMemoId=(dlMemoId===mid?"":mid); drawDaily();
+          dlMemoId=(dlMemoId===mid?"":mid); dlAddId=""; drawDaily();
           if(dlMemoId)setTimeout(function(){
             var ta=dl.querySelector('.dlmemobox[data-id="'+mid+'"] textarea');
             if(ta){ta.focus();try{ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}ta.scrollIntoView({block:"center",behavior:"smooth"})}
@@ -6137,7 +6142,12 @@ button:active{filter:brightness(1.15)}
           dlmTap={id:id,t:nowM}; return;
         }
         if(b.classList.contains("dlmemo")){dlOpenMemo(id); return}   // '기록' 단추는 적는 칸
-        if(b.classList.contains("dlmemoclose")){dlMemoId="";drawDaily();return}
+        if(b.classList.contains("dlmemoclose")){dlMemoId="";dlAddId="";drawDaily();return}
+        if(b.classList.contains("dlmemoadd")){   // ＋ 이어서 쓰기: 써 둔 글 아래에 새 칸 (2026-10-15 사용자 요청)
+          var o2=dailyData(); dlAddId=id; dlAddDay=dlDay; dlAddBase=dlMemoGet(o2,dlDay,id); dlMemoId=""; dlMemoMore.add(id); drawDaily();
+          setTimeout(function(){var t2=dl.querySelector('.dladdbox[data-id="'+id+'"] textarea'); if(t2){t2.focus(); t2.scrollIntoView({block:"center",behavior:"smooth"})}},30);
+          return;
+        }
         if(b.classList.contains("dlmemoedit")){dlEditId=b.closest(".dlmemobox").dataset.id;dlGEditId="";drawDaily();return}
         if(b.classList.contains("dlgname")){   // 한 번 누르면 접고 펼치기, 빠르게 두 번이면 이름 바꾸기
           var gg=b.dataset.g, nowT=Date.now();
@@ -6339,7 +6349,7 @@ button:active{filter:brightness(1.15)}
         if(dlMemoId===it.id){
           var mx=document.createElement("div"); mx.className="dlmemobox"; mx.dataset.id=it.id; mx.dataset.day=dlDay;
           mx.innerHTML='<div class="dlmemoh"><span></span><span class="dlmemosave"></span></div>'+
-            '<textarea maxlength="2000" placeholder="구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)"></textarea>'+
+            '<textarea maxlength="8000" placeholder="구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)"></textarea>'+
             '<div class="dlmemofoot"><button type="button" class="dlmemoedit">✏️ 항목 글 고치기</button><button type="button" class="dlmemoclose">닫기</button></div>';
           mx.querySelector(".dlmemoh span").textContent="📝 "+dayName(dlDay)+" 기록";
           var ta=mx.querySelector("textarea"); ta.value=memo; ta.setAttribute("aria-label",it.t+" 기록");
@@ -6347,7 +6357,19 @@ button:active{filter:brightness(1.15)}
         }else if(!dlEdit&&memo){   // 미리보기는 평소 화면에서만 (고치기 중에는 줄을 짧게)
           if(dlMemoMore.has(it.id)){   // 제목을 눌러야 펼쳐진다
             var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo"; mp.dataset.id=it.id;
-            mp.textContent=memo.length>2000?memo.slice(0,2000)+"…":memo; list.appendChild(mp);
+            var adding=dlAddId===it.id&&dlAddDay===dlDay;
+            mp.textContent=(adding?dlAddBase:memo); list.appendChild(mp);
+            if(adding){   // 이어 쓰는 칸
+              var ax=document.createElement("div"); ax.className="dlmemobox dladdbox"; ax.dataset.id=it.id; ax.dataset.day=dlDay;
+              ax.innerHTML='<div class="dlmemoh"><span>＋ 이어서 쓰기</span><span class="dlmemosave"></span></div>'+
+                '<textarea maxlength="6000" placeholder="위 글 아래에 새로 이어서 적어요"></textarea>'+
+                '<div class="dlmemofoot"><button type="button" class="dlmemoclose">다 썼어요</button></div>';
+              ax.querySelector("textarea").setAttribute("aria-label",it.t+" 이어서 쓰기");
+              list.appendChild(ax);
+            }else{
+              var ab=document.createElement("button"); ab.type="button"; ab.className="dlmemoadd"; ab.dataset.id=it.id; ab.textContent="＋ 이어서 쓰기";
+              list.appendChild(ab);
+            }
           }
         }
       });
