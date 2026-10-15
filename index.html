@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-138">
+<meta name="app-build" content="2026-10-15-139">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7484,9 +7484,7 @@ button:active{filter:brightness(1.15)}
       });
     }
     if(!res.pairs.length&&!(res.cues||[]).length&&!rres.items.length&&!roleDone){
-      var no=document.createElement("span"); no.className="ctnone";
-      no.textContent="짝이 되거나 되풀이되는 말을 찾지 못했어요. 집중 → 직접 고르기로 직접 진하게 표시할 수 있어요.";
-      el.appendChild(no); return;
+      el.hidden=true; return;   // 찾은 게 없으면 안내 문구 없이 숨김 (2026-10-15 사용자 요청)
     }
     res.pairs.forEach(function(p){
       var sp=document.createElement("span"); sp.className="ctpair";
