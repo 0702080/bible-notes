@@ -358,12 +358,13 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
 .fr-who{color:var(--fc,var(--sky))}
 .fchips .chip[data-s="fr"]{--c:var(--fc,var(--sky))}
 /* 🔁 반복 읽기: 회차마다 내 칸 색이 바뀜 (1회째 노랑 → 2회째 산호 → 3회째 초록 → 4회째 파랑 → 다시 노랑) */
-.bk[data-rc="1"] .chips:not(.fchips) .chip[data-s="me"]{--c:#EE8467;color:#fff}
-.bk[data-rc="2"] .chips:not(.fchips) .chip[data-s="me"]{--c:#4FAE78;color:#fff}
-.bk[data-rc="3"] .chips:not(.fchips) .chip[data-s="me"]{--c:#6F8FE8;color:#fff}
-body.pm .bk[data-rc="1"] .chips:not(.fchips) .chip[data-s="me"]{--c:#D2558F}
-body.pm .bk[data-rc="2"] .chips:not(.fchips) .chip[data-s="me"]{--c:#3E9E64}
-body.pm .bk[data-rc="3"] .chips:not(.fchips) .chip[data-s="me"]{--c:#2E9BCB}
+.bk[data-rc] .chips:not(.fchips) .chip[data-s="me"],.bk[data-rc] .chips:not(.fchips) .chip[data-s="me"][data-five]{--c:var(--rc);color:#fff}
+.bk[data-rc] .bk-prog[data-st="part"]{--c:var(--rc)}
+.bk[data-rc] .bk-prog[data-st="full"]{--c:var(--rc);box-shadow:0 0 10px color-mix(in srgb,var(--rc) 40%,transparent)}
+.bk[data-rc] .bk-prog[data-st="full"] b{background:var(--rc)}
+.rcl{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:3px 7px;margin-top:4px}
+.rcl b{display:inline-flex;align-items:center;gap:3px;font-weight:500}
+.rcl i{width:10px;height:10px;border-radius:50%;display:inline-block}
 .rnd-go,.rnd-undo{display:block;width:100%;margin:8px 0 2px;padding:10px 12px;border-radius:12px;font-size:14.5px;font-weight:700;cursor:pointer;white-space:nowrap}
 .rnd-go{border:1px solid color-mix(in srgb,var(--green) 45%,var(--rule));background:color-mix(in srgb,var(--green) 12%,var(--sheet));color:var(--ink)}
 .rnd-go small{font-weight:500;color:var(--muted)}
@@ -502,6 +503,12 @@ function rounds(){return pMode?RND.p:RND.r}
 function rndOf(bi){return +rounds()[bi]||0}
 function storeRnd(){try{localStorage.setItem(RND_KEY,JSON.stringify({r:RND.r,p:RND.p,t:rndAt}))}catch(e){}}
 function saveRnd(){rndAt=Date.now();storeRnd();if(typeof cloudPush==="function")cloudPush()}
+/* 회차 색 (2026-10-15 사용자 요청: 처음과 반복이 확실히 다르게, 여러 색으로)
+   1회째는 기본색(통독 노랑 / 필사 보라), 2회째부터 10회째까지 모두 다른 색, 그 뒤로는 2회째 색부터 다시 */
+var RCOL_R=["#EE8467","#4FAE78","#6F8FE8","#A57BD8","#E46FA6","#2FB3A6","#4C5FB8","#8DBF3A","#D9534F"];
+var RCOL_P=["#D2558F","#3E9E64","#2E9BCB","#E07F2E","#1F9C8F","#4C5FB8","#C9443F","#6E9E2A","#A86F45"];
+function rcol(r){if(!r)return "";var A=pMode?RCOL_P:RCOL_R;return A[(r-1)%A.length]}
+function rcAttr(bi){var r=rndOf(bi);return r?' data-rc="'+r+'" style="--rc:'+rcol(r)+'"':''}
 function cntText(bi,done,total){var r=rndOf(bi);return done+' / '+total+(r?' · '+(r+1)+'회째':'')}
 /* 한 번이라도 다 읽은 책은 다 읽은 것으로 센다 (다시 읽느라 칸을 비워도 축하가 또 뜨지 않게) */
 function everCount(){var n=0,R0=rounds();for(var bi=0;bi<BOOKS.length;bi++)n+=R0[bi]?BOOKS[bi][1]:bookDone(bi);return n}
@@ -688,7 +695,7 @@ function renderBooks(){
   for(var bi=0;bi<BOOKS.length;bi++){
     var name=BOOKS[bi][0], total=BOOKS[bi][1], done=bookDone(bi);
     var shut=!!folded[bi];
-    var h='<section class="bk'+(done===total?" full":"")+(shut?" shut":"")+'" data-b="'+bi+'" data-g="'+bookGroup(bi)+'" data-rc="'+(rndOf(bi)%4)+'">'
+    var h='<section class="bk'+(done===total?" full":"")+(shut?" shut":"")+'" data-b="'+bi+'" data-g="'+bookGroup(bi)+'"'+rcAttr(bi)+'>'
       +'<div class="bk-h"><button class="bk-tg" type="button" data-act="fold" data-b="'+bi+'" aria-expanded="'+(!shut)+'"><span class="bk-chev" aria-hidden="true"></span><span class="bk-name">'+name+'</span>'
       +'<span class="bk-cnt">'+cntText(bi,done,total)+'</span></button>'
       +'<button class="bk-pin" type="button" data-act="pin" data-b="'+bi+'" aria-pressed="'+(!!pins[bi])+'" aria-label="'+name+(pins[bi]?" 고정 풀기":" 위에 고정")+'">📌</button>'
@@ -739,7 +746,7 @@ function repaintBook(bi){
   if(!sec)return;
   var total=BOOKS[bi][1], done=bookDone(bi);
   sec.classList.toggle("full",done===total);
-  sec.dataset.rc=rndOf(bi)%4;
+  var r0=rndOf(bi); if(r0){sec.dataset.rc=r0;sec.style.setProperty("--rc",rcol(r0))}else{delete sec.dataset.rc;sec.style.removeProperty("--rc")}
   sec.querySelector(".bk-cnt").textContent=cntText(bi,done,total);
   sec.querySelector(".bk-prog").outerHTML=progBadge(done,total,rndOf(bi));
   sec.querySelector(".bk-body").innerHTML=bodyHTML(bi);
@@ -1354,6 +1361,8 @@ function setMode(m,draw){
   document.querySelector(".bar h1").textContent=pMode?"성경 필사표":"성경 통독표";
   document.querySelectorAll('.modeseg button').forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===(pMode?"pilsa":"read")))});
   $("modeTip").innerHTML=pMode?'보라 칸 = 필사한 장 · <i class="om om-k"></i> 노란 점 = 읽은 장':'노란 칸 = 읽은 장 · <i class="om om-k"></i> 보라 점 = 필사한 장';
+  var A=pMode?RCOL_P:RCOL_R, first=pMode?"var(--violet)":"#F2C94C";
+  $("modeTip").innerHTML+='<span class="rcl"><b><i style="background:'+first+'"></i>1회</b>'+A.slice(0,5).map(function(c,k){return '<b><i style="background:'+c+'"></i>'+(k+2)+'회</b>'}).join("")+'<b>…</b></span>';
   try{localStorage.setItem(MODE_KEY,pMode?"pilsa":"read")}catch(e){}
   lastOT=countRange(RB,0,OT_TOTAL);lastNT=countRange(RB,OT_TOTAL,TOTAL);
   if(draw)renderAll();
