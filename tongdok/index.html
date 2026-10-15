@@ -513,6 +513,7 @@ function cntText(bi,done,total){var r=rndOf(bi);return done+' / '+total+(r?' · 
 /* 한 번이라도 다 읽은 책은 다 읽은 것으로 센다 (다시 읽느라 칸을 비워도 축하가 또 뜨지 않게) */
 function everCount(){var n=0,R0=rounds();for(var bi=0;bi<BOOKS.length;bi++)n+=R0[bi]?BOOKS[bi][1]:bookDone(bi);return n}
 function roundCtl(bi){
+  return '';   // 2026-10-15 사용자 요청: 버튼 없이, 다 채운 책의 칸을 누르면 다음 회차가 시작됨 (아래 act==="chip")
   var total=BOOKS[bi][1], done=bookDone(bi), r=rndOf(bi);
   if(done===total)return '<button type="button" class="rnd-go" data-act="round" data-b="'+bi+'">🔁 한 번 더 '+(pMode?'쓰기':'읽기')+' <small>('+(r+2)+'회째 시작)</small></button>';
   if(r&&done===0)return '<button type="button" class="rnd-undo" data-act="unround" data-b="'+bi+'">↩ '+r+'회째 다 '+(pMode?'쓴':'읽은')+' 상태로 되돌리기</button>';
@@ -1010,7 +1011,26 @@ document.addEventListener("click",function(ev){
   }
   if(act==="mode"){setMode(el.dataset.m,true);window.scrollTo({top:0,behavior:"smooth"});return}
   if(act==="chip"){
-    var idx=+el.dataset.i, bi2=bookOf(idx);
+    var idx=+el.dataset.i, bi2=bookOf(idx), R1=rounds();
+    /* 🔁 다 채운 책의 칸을 또 누르면 → 다음 회차 시작 (칸을 비우고 누른 칸만 새 색으로 체크) */
+    if(me[idx]&&bookDone(bi2)===BOOKS[bi2][1]){
+      R1[bi2]=(+R1[bi2]||0)+1;
+      for(var k1=OFF[bi2];k1<OFF[bi2]+BOOKS[bi2][1];k1++)me[k1]=0;
+      me[idx]=1; save(); saveRnd(); repaintBook(bi2); renderSummary(); renderShelf();
+      if(!pMode){lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
+      var sp=document.querySelector('.chip[data-i="'+idx+'"]'); if(sp)sparkle(sp);
+      hint("🔁 "+BOOKS[bi2][0]+" "+(R1[bi2]+1)+"회째 시작","잘못 눌렀으면 같은 칸을 한 번 더 누르면 돌아가요");
+      return;
+    }
+    /* 새 회차에서 하나뿐인 칸을 다시 누르면 → 앞 회차(다 채운 상태)로 되돌림 */
+    if(me[idx]&&+R1[bi2]&&bookDone(bi2)===1){
+      R1[bi2]--; if(R1[bi2]<=0)delete R1[bi2];
+      for(var k2=OFF[bi2];k2<OFF[bi2]+BOOKS[bi2][1];k2++)me[k2]=1;
+      save(); saveRnd(); repaintBook(bi2); renderSummary(); renderShelf();
+      if(!pMode){lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
+      hint("되돌렸어요",BOOKS[bi2][0]+" "+((+R1[bi2]||0)+1)+"회째를 다 "+(pMode?"쓴":"읽은")+" 상태예요");
+      return;
+    }
     var before=everCount(), wasFull=bookDone(bi2)===BOOKS[bi2][1];
     me[idx]=me[idx]?0:1;
     save();
@@ -1028,6 +1048,7 @@ document.addEventListener("click",function(ev){
       if(!pMode)checkMilestones(before,after,(!wasFull&&nowFull)?[bi2]:[]);
       // 축복 카드가 떴으면 띠까지 겹치지 않게 한다
       maybeCheer(bi2, idx-OFF[bi2]+1);
+      if(!wasFull&&nowFull)hint("✓ "+BOOKS[bi2][0]+" 다 "+(pMode?"썼어요":"읽었어요"),"아무 칸이나 또 누르면 "+(rndOf(bi2)+2)+"회째가 시작돼요");
     }else if(!pMode){
       lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
     }
