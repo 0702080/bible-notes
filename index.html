@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-placesubj">
+<meta name="app-build" content="2026-10-15-subjfix2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7410,9 +7410,17 @@ button:active{filter:brightness(1.15)}
   function wordsOf(text){return tokens(text).filter(function(x){return !/^\s+$/.test(x)})}
   // 땅·성 이름(니느웨 등)은 장소라서 주어로 칠하지 않는다 (2026-10-15 사용자 요청). 예전에 저장된 분석에도 그대로 적용
   var PLACE_NAME=/^(니느웨|다시스|욥바|예루살렘|시온|베들레헴|나사렛|갈릴리|가버나움|사마리아|여리고|요단|시내산|소돔|고모라|가나안|갈멜|감람산|골고다|베다니|에덴|바벨|두로|시돈|다메섹|안디옥|에베소|고린도|빌립보|데살로니가|갈라디아|유대|브엘세바|헤브론|벧엘|실로|길르앗|바산|모압|에돔|암몬|블레셋|가사|아스돗|가드|에그론|바벨론|애굽)(은|는|이|가|께서)$/;
+  // 주어가 아닌데 주어처럼 보이는 말 빼기 (2026-10-15 사용자 요청)
+  // - 숫자 뒤 날짜·기간: "사십 일이", "삼 년이" → 때를 나타내는 말
+  // - 꾸며 주는 말: "낮은 자를", "굵은 베 옷을" → 뒤의 낱말을 꾸밈
+  var NUM_WORD=/^(\d+|[일이삼사오육칠팔구]?[십백천만]+[일이삼사오육칠팔구]?|[일이삼사오육칠팔구]|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|스무|스물|서른|마흔|쉰|여러|몇|며칠)$/;
+  var TIME_UNIT=/^(일|날|년|해|달|개월|주|주일|밤|낮|시)(이|가|은|는)$/;
+  var ADJ_EUN=/^(낮|굵|높|넓|깊|작|좋|많|적|붉|검|맑|옳|얇|밝|늙|젊|짧|굳|곧|얕|굽|궂|낡|묽|좁|짙|옅|같|없|있|입|믿|얻|찾|잃|죽|씻|먹|넘|숨|닫|묶|읽|듣|앉|남|받|심|품)은$/;
   function placeFix(text,labels){
-    wordsOf(text).forEach(function(w,i){
-      if((labels[i]==="S"||labels[i]==="G")&&PLACE_NAME.test(String(w).replace(/[^가-힣A-Za-z0-9]/g,"")))labels[i]="-";
+    var ws=wordsOf(text).map(function(w){return String(w).replace(/[^가-힣A-Za-z0-9]/g,"")});
+    ws.forEach(function(x,i){
+      if(labels[i]!=="S"&&labels[i]!=="G")return;
+      if(PLACE_NAME.test(x)||ADJ_EUN.test(x)||(TIME_UNIT.test(x)&&i>0&&NUM_WORD.test(ws[i-1])))labels[i]="-";
     });
     return labels;
   }
