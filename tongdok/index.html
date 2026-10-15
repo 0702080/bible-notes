@@ -514,8 +514,8 @@ function cntText(bi,done,total){var r=rndOf(bi);return done+' / '+total+(r?' · 
 function everCount(){var n=0,R0=rounds();for(var bi=0;bi<BOOKS.length;bi++)n+=R0[bi]?BOOKS[bi][1]:bookDone(bi);return n}
 function roundCtl(bi){
   var total=BOOKS[bi][1], done=bookDone(bi), r=rndOf(bi);
-  if(done===total)return '<button type="button" class="rnd-go" data-act="round" data-b="'+bi+'">🔁 한 번 더 읽기 <small>('+(r+2)+'회째 시작)</small></button>';
-  if(r&&done===0)return '<button type="button" class="rnd-undo" data-act="unround" data-b="'+bi+'">↩ '+r+'회째 다 읽은 상태로 되돌리기</button>';
+  if(done===total)return '<button type="button" class="rnd-go" data-act="round" data-b="'+bi+'">🔁 한 번 더 '+(pMode?'쓰기':'읽기')+' <small>('+(r+2)+'회째 시작)</small></button>';
+  if(r&&done===0)return '<button type="button" class="rnd-undo" data-act="unround" data-b="'+bi+'">↩ '+r+'회째 다 '+(pMode?'쓴':'읽은')+' 상태로 되돌리기</button>';
   return '';
 }   // 지금 모드의 친구 표
 var friendName="";
@@ -1005,7 +1005,7 @@ document.addEventListener("click",function(ev){
     save(); saveRnd(); repaintBook(rb); renderSummary(); renderShelf();
     if(!pMode){lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
     if(up)hint("🎉 "+BOOKS[rb][0]+" "+R0[rb]+"번 "+(pMode?"필사했어요":"읽었어요"),(R0[rb]+1)+"회째는 칸 색이 바뀌어요. 다시 처음부터 체크해요");
-    else hint("되돌렸어요",BOOKS[rb][0]+" "+((+R0[rb]||0)+1)+"회째를 다 읽은 상태예요");
+    else hint("되돌렸어요",BOOKS[rb][0]+" "+((+R0[rb]||0)+1)+"회째를 다 "+(pMode?"쓴":"읽은")+" 상태예요");
     return;
   }
   if(act==="mode"){setMode(el.dataset.m,true);window.scrollTo({top:0,behavior:"smooth"});return}
