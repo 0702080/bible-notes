@@ -115,7 +115,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .bk-prog[data-st="full"]{--c:var(--green);box-shadow:0 0 10px color-mix(in srgb,var(--green) 40%,transparent)}
 .bk-prog[data-st="full"] b{background:var(--green);color:#0E1A12;font-size:15px}
 .chips{display:grid;grid-template-columns:repeat(10,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
-.chips>span{background:var(--sheet)}   /* 마지막 줄 빈칸 */
+.chips>span:not(.chip){background:var(--sheet)}   /* 마지막 줄 빈칸 */
 .chip{
   position:relative;isolation:isolate;aspect-ratio:1/1;--d:min(44px,90%);min-height:32px;border:0;border-radius:0;
   background:var(--sheet);font-size:13.5px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums;
@@ -311,7 +311,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 /* 마지막 줄 빈칸은 장이 아니므로 칸처럼 보이지 않게 (2026-10-11: 오바댜처럼 짧은 책에서 빈칸을 누르던 문제) */
 .chips{background:transparent;border:0;gap:0;border-radius:0;overflow:visible}
 .chips .chip{box-shadow:0 0 0 .5px var(--rule)}
-.chips>span{background:transparent;box-shadow:none}
+.chips>span:not(.chip){background:transparent;box-shadow:none}   /* 친구 표 칸(span.chip)은 빼야 내 표와 같은 바탕색이 됨 */
 .fchips{background:transparent}
 /* 친구 표 칸 선도 내 표와 똑같이 (2026-10-15 사용자 요청: 하늘색 줄 없앰) */
 .fchips .chip{box-shadow:0 0 0 .5px var(--rule)}
