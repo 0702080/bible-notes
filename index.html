@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-141">
+<meta name="app-build" content="2026-10-15-142">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2081,6 +2081,16 @@ button:active{filter:brightness(1.15)}
 .prdans b span{font-weight:500;color:var(--faint);margin-left:4px}
 .prdans p{margin:4px 0 0;font-size:16.5px;line-height:1.8;color:var(--gold);white-space:pre-line;word-break:keep-all}
 .prdempty{text-align:center;margin-top:40px}
+.p1add{display:flex;gap:8px;margin:0 0 18px}
+.p1add[hidden]{display:none}
+.p1in,.p1ed{flex:1;min-width:0;height:46px;padding:0 14px;border:1.5px solid #2E2D35;border-radius:14px;background:#141418;color:var(--ink);font:inherit;font-size:16px}
+.p1in:focus,.p1ed:focus{outline:none;border-color:var(--orange)}
+.p1ed{display:block;width:100%;margin-top:8px}
+.p1go{flex:0 0 auto;height:46px;padding:0 18px;border:0;border-radius:14px;background:var(--orange);color:#1A1208;font-size:15px;font-weight:700;white-space:nowrap}
+.p1foot{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.p1foot button{height:30px;padding:0 12px;border:0;border-radius:15px;background:#1E1D24;color:#D9D5E0;font-size:12.5px;white-space:nowrap}
+.p1foot [data-p1="del"]{margin-left:auto;color:var(--faint)}
+.p1foot [data-p1="del"][data-sure]{color:#F08A8A}
 .rqcnt{margin-left:auto;margin-right:10px;font-size:14px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
 .rqbody{flex:1;overflow:auto;display:flex;flex-direction:column;justify-content:center;gap:20px;padding:20px max(18px,calc((100% - 620px) / 2)) 28px}
 .rqcard{border-radius:18px;background:#141418;border:1px solid #26252B;padding:22px 20px;min-height:220px}
@@ -2784,16 +2794,55 @@ button:active{filter:brightness(1.15)}
     var t=d.querySelector(".pt"); t.focus(); try{t.setSelectionRange(t.value.length,t.value.length)}catch(e){}
   }
   /* ---------- 기도 읽기 모드: 적은 기도를 큰 글씨로 차분히 읽기 (한 말씀 또는 모든 말씀) ---------- */
-  var prd=null, prdNote=null, prdFilter="all";
+  /* ---------- 한 줄 기도 (2026-10-15): 말씀 카드와 상관없이 짧게 적는 기도. 기도 모아 읽기 맨 위에서 적고, 거기서 함께 보임
+     저장 bible-oneline-prays {items:[{id,t,at,ans,an,u}],del:{id:시각}}, 클라우드 줄 "__prays1" (나만 보기) */
+  var P1_KEY="bible-oneline-prays";
+  function p1Data(){var o=null;try{o=JSON.parse(localStorage.getItem(P1_KEY)||"null")}catch(e){}
+    if(!o||!Array.isArray(o.items))o={items:[],del:{}}; if(!o.del||typeof o.del!=="object")o.del={};
+    o.items=o.items.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,500),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,500),u:+x.u||+x.at||0}});
+    return o}
+  function p1Save(o){try{localStorage.setItem(P1_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__prays1")}
+  function p1Merge(src){   // 다른 기기·백업에서 온 것과 합치기 (나중에 고친 쪽이 이김, 지운 것은 지운 채로)
+    if(!src||!Array.isArray(src.items))return false;
+    var o=p1Data(), changed=false;
+    Object.keys(src.del||{}).forEach(function(id){var t=+src.del[id]||0;if(!o.del[id]||o.del[id]<t){o.del[id]=t;changed=true}});
+    src.items.forEach(function(x){if(!x||!x.id)return;var i=o.items.findIndex(function(y){return y.id===x.id});
+      if(i<0){o.items.push(x);changed=true}else if((+x.u||0)>(+o.items[i].u||0)){o.items[i]=x;changed=true}});
+    var n0=o.items.length; o.items=o.items.filter(function(x){return !(o.del[x.id]&&o.del[x.id]>=(+x.u||+x.at||0))}); if(o.items.length!==n0)changed=true;
+    if(changed){try{localStorage.setItem(P1_KEY,JSON.stringify(o))}catch(e){}}
+    return changed;
+  }
+  var prd=null, prdNote=null, prdFilter="all", p1Edit="";
   function openPrayRead(nid){
     prdNote=nid; prdFilter="all";
     if(!prd){
       prd=document.createElement("div"); prd.className="rvq prd"; prd.setAttribute("role","dialog"); prd.setAttribute("aria-modal","true"); prd.hidden=true;
       prd.innerHTML='<div class="dlbar"><b class="dltitle">🙏 기도 읽기</b><span class="rqcnt prdcnt"></span><button type="button" class="dlclose prdclose">닫기</button></div>'+
-        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button></div><div class="prdlist"></div></div>';
+        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button></div>'+
+        '<form class="p1add" autocomplete="off"><input class="p1in" type="text" maxlength="500" enterkeyhint="done" placeholder="✏️ 한 줄 기도 적기" aria-label="한 줄 기도"><button type="submit" class="p1go">추가</button></form>'+
+        '<div class="prdlist"></div></div>';
       document.body.appendChild(prd);
       prd.querySelector(".prdclose").addEventListener("click",closePrayRead);
       prd.querySelector(".prdfil").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;prdFilter=b.dataset.f;drawPrayRead()});
+      prd.querySelector(".p1add").addEventListener("submit",function(e){
+        e.preventDefault(); var inp=prd.querySelector(".p1in"), t=inp.value.trim(); if(!t){inp.focus();return}
+        var o=p1Data(), now=Date.now(); o.items.push({id:"o"+now.toString(36)+Math.random().toString(36).slice(2,5),t:t,at:now,ans:0,an:"",u:now}); p1Save(o);
+        inp.value=""; if(prdFilter==="ans")prdFilter="all"; drawPrayRead(); toast("한 줄 기도를 담았어요 🙏");
+      });
+      prd.querySelector(".prdlist").addEventListener("click",function(e){
+        var b=e.target.closest("[data-p1]"); if(!b)return;
+        var id=b.closest(".prdit").dataset.oid, o=p1Data(), x=o.items.find(function(y){return y.id===id}); if(!x)return;
+        var act=b.dataset.p1, now=Date.now();
+        if(act==="ans"){x.ans=x.ans?0:now;x.u=now;p1Save(o);if(x.ans)toast("🙌 응답된 기도로 표시했어요")}
+        else if(act==="edit"){p1Edit=id;drawPrayRead();var ip=prd.querySelector('.prdit[data-oid="'+id+'"] .p1ed');if(ip){ip.focus();try{ip.setSelectionRange(ip.value.length,ip.value.length)}catch(err){}}return}
+        else if(act==="del"){if(!b.dataset.sure){b.dataset.sure="1";b.textContent="한 번 더 누르면 지워요";return}
+          o.items=o.items.filter(function(y){return y.id!==id});o.del[id]=now;p1Save(o)}
+        drawPrayRead();
+      });
+      function p1Commit(ip){var id=ip.closest(".prdit").dataset.oid, o=p1Data(), x=o.items.find(function(y){return y.id===id});p1Edit="";
+        if(x){var t=ip.value.trim();if(t&&t!==x.t){x.t=t;x.u=Date.now();p1Save(o)}} drawPrayRead()}
+      prd.querySelector(".prdlist").addEventListener("keydown",function(e){var ip=e.target.closest(".p1ed");if(!ip)return;if(e.key==="Enter"){e.preventDefault();ip.blur()}else if(e.key==="Escape"){p1Edit="";drawPrayRead()}});
+      prd.querySelector(".prdlist").addEventListener("focusout",function(e){var ip=e.target.closest&&e.target.closest(".p1ed");if(ip&&p1Edit)p1Commit(ip)});
       prd.querySelector(".prdlist").addEventListener("click",function(e){var b=e.target.closest(".prdgo");if(!b)return;var id=b.dataset.id;closePrayRead();tabOf.set(id,"p");openOne(id);render();var c=cards.get(id);if(c)setTimeout(function(){c.scrollIntoView({block:"start",behavior:"smooth"})},80)});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&prd&&!prd.hidden)closePrayRead()});
     }
@@ -2806,6 +2855,26 @@ button:active{filter:brightness(1.15)}
     var list=prd.querySelector(".prdlist"); list.textContent="";
     prd.querySelectorAll(".prdfil button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.f===prdFilter))});
     var src=prdNote?[notes.get(prdNote)].filter(Boolean):sorted(), total=0, ansN=0;
+    prd.querySelector(".p1add").hidden=!!prdNote;
+    if(!prdNote){
+      var ones=p1Data().items.filter(function(x){return x.t.trim()});
+      ones.forEach(function(x){total++;if(x.ans)ansN++});
+      ones=ones.filter(function(x){return prdFilter==="all"||(prdFilter==="ans"?!!x.ans:!x.ans)}).sort(function(a,b){return (a.ans?1:0)-(b.ans?1:0)||b.at-a.at});
+      if(ones.length){
+        var osec=document.createElement("section"); osec.className="prdsec p1sec";
+        osec.innerHTML='<div class="prdhd"><b class="prdref">🙏 한 줄 기도</b></div>';
+        ones.forEach(function(x){
+          var a=document.createElement("article"); a.className="prdit p1it"+(x.ans?" answered":""); a.dataset.oid=x.id;
+          a.innerHTML='<div class="prdmeta"></div>'+(p1Edit===x.id?'<input class="p1ed" type="text" maxlength="500" enterkeyhint="done" aria-label="한 줄 기도 고치기">':'<p class="prdtext"></p>')+
+            '<div class="p1foot"><button type="button" data-p1="ans"></button><button type="button" data-p1="edit">고치기</button><button type="button" data-p1="del">지우기</button></div>';
+          a.querySelector(".prdmeta").textContent=dateLabel(x.at)+(x.ans?"  ·  🙌 응답 "+dlabel(dkey(x.ans)):"  ·  기다리는 기도");
+          if(p1Edit===x.id)a.querySelector(".p1ed").value=x.t; else a.querySelector(".prdtext").textContent=x.t;
+          a.querySelector('[data-p1="ans"]').textContent=x.ans?"응답 취소":"🙌 응답됐어요";
+          osec.appendChild(a);
+        });
+        list.appendChild(osec);
+      }
+    }
     src.forEach(function(n){
       var ps=(n.prays||[]).filter(function(x){return x.t.trim()});
       ps.forEach(function(x){total++;if(x.ans)ansN++});
@@ -2826,7 +2895,7 @@ button:active{filter:brightness(1.15)}
       list.appendChild(sec);
     });
     prd.querySelector(".prdcnt").textContent=total?("응답 "+ansN+" / "+total):"";
-    if(!list.children.length)list.innerHTML='<p class="pempty prdempty">'+(total?"이 보기에 해당하는 기도가 없어요.":"아직 적은 기도가 없어요. 말씀 카드의 기도 탭에서 + 기도로 적어 보세요.")+'</p>';
+    if(!list.children.length)list.innerHTML='<p class="pempty prdempty">'+(total?"이 보기에 해당하는 기도가 없어요.":"아직 적은 기도가 없어요. 위 칸에 한 줄 기도를 적거나, 말씀 카드의 기도 탭에서 + 기도로 적어 보세요.")+'</p>';
   }
 
   function syncCounts(el,n){
@@ -7830,7 +7899,7 @@ button:active{filter:brightness(1.15)}
   /* ---------- 백업 저장 / 불러오기 (claude.ai ↔ 내 GitHub 노트 옮기기) ---------- */
   function backupData(){
     flushAll();
-    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values()),chapters:myChapters(),daily:dailyData()});
+    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values()),chapters:myChapters(),daily:dailyData(),prays1:p1Data()});
   }
   $("backupSave").addEventListener("click",function(){
     var d=new Date(), name="말씀묵상노트_백업_"+d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2)+".json", data=backupData();
@@ -7870,6 +7939,7 @@ button:active{filter:brightness(1.15)}
           if(Array.isArray(obj.daily.groups)){if(!Array.isArray(od.groups))od.groups=[];obj.daily.groups.forEach(function(g){if(g&&g.g&&!od.groups.some(function(x){return x.g===g.g}))od.groups.push(g)})}   // 내가 만든 묶음도 함께
           Object.keys(obj.daily.days||{}).forEach(function(k){var a=od.days[k]||[];(obj.daily.days[k]||[]).forEach(function(id){if(a.indexOf(id)<0)a.push(id)});od.days[k]=a});
           saveDaily(od); renderReviewBar()}
+        if(obj&&obj.prays1)p1Merge(obj.prays1);
         if(obj&&obj.chapters&&typeof obj.chapters==="object"){var mc=myChapters();Object.keys(obj.chapters).forEach(function(k){var c=obj.chapters[k];if(c&&Array.isArray(c.v)&&(!mc[k]||(+c.at||0)>(+mc[k].at||0)))mc[k]=c});try{localStorage.setItem(MYCH,JSON.stringify(mc))}catch(e){}}
         var added=0, updated=0, repush=[];
         arr.forEach(function(x){
@@ -8082,7 +8152,7 @@ button:active{filter:brightness(1.15)}
     detail=String(detail||"").replace(/\s+/g," ").trim().slice(0,140);
     return {msg:what+" ("+r.status+(detail?": "+detail:"")+")",short:what+" "+r.status};
   }
-  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");try{localStorage.removeItem(SB_LAST)}catch(e){}}
+  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");try{localStorage.removeItem(SB_LAST)}catch(e){}}
   var SB_DIRTY="bible-sb-dirty";
   try{(JSON.parse(localStorage.getItem(SB_DIRTY)||"[]")||[]).forEach(function(id){sbDirty.add(String(id))})}catch(e){}
   function sbSaveDirty(){try{if(sbDirty.size)localStorage.setItem(SB_DIRTY,JSON.stringify(Array.from(sbDirty)));else localStorage.removeItem(SB_DIRTY)}catch(e){}}
@@ -8101,6 +8171,11 @@ button:active{filter:brightness(1.15)}
         if(id==="__me"){
           var me={emoji:myEmoji(),on:shareOn()?1:0}, mjs=JSON.stringify(me);
           if(sbLastJson["s:__me"]!==mjs){rows.push({user_id:uid,id:"s:__me",data:me,updated_at:now,deleted:false,visibility:"friends"});sbLastJson["s:__me"]=mjs}
+          return;
+        }
+        if(id==="__prays1"){
+          var pd=p1Data(), pjs=JSON.stringify(pd);
+          if(sbLastJson.__prays1!==pjs){rows.push({user_id:uid,id:"__prays1",data:pd,updated_at:now,deleted:false});sbLastJson.__prays1=pjs}
           return;
         }
         if(id!=="__daily"&&id!=="__chapters"){
@@ -8135,6 +8210,7 @@ button:active{filter:brightness(1.15)}
             if(r.id==="s:__me"&&r.data){sbLastJson["s:__me"]=JSON.stringify(r.data);try{if(r.data.emoji)localStorage.setItem("bible-my-emoji",String(r.data.emoji));localStorage.setItem("bible-share",r.data.on===0?"0":"1")}catch(e){}}
             return;
           }
+          if(r.id==="__prays1"){if(p1Merge(r.data)&&prd&&!prd.hidden)drawPrayRead();sbLastJson.__prays1=JSON.stringify(p1Data());return}
           if(r.id==="__daily"){sbLastJson.__daily=JSON.stringify(r.data);mergeData({daily:r.data},true);return}
           if(r.id==="__chapters"){var before=JSON.stringify(myChapters());mergeData({chapters:r.data},true);sbLastJson.__chapters=JSON.stringify(myChapters());return}
           if(r.deleted)del[r.id]=(r.data&&+r.data.at)||+r.updated_at; else if(r.data&&r.data.id)list.push(r.data);
