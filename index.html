@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-143">
+<meta name="app-build" content="2026-10-15-144">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1123,10 +1123,11 @@ body.reorder .note .pinbtn{display:none!important}
 .verse.vlines{white-space:normal}
 .verse.vlines .vl{display:block;white-space:pre-wrap}
 .verse.vlines .vl+.vl{margin-top:0}   /* 줄 사이를 글이 넘어간 줄과 똑같이 (2026-10-15 사용자 요청) */
-.verse.vlines .vl:empty{height:.45em}
+/* 빈 줄은 편집기에 적은 그대로 한 줄 높이만큼 띄운다 (2026-10-15 사용자 요청) */
+.verse .vl:empty::before{content:"\200b"}
+.verse.vnum .vl:empty+.vl{margin-top:0}
 .note.open .verse{margin:10px 0 20px}
 .note.open .focusrow{margin-bottom:18px;row-gap:8px}
-.verse.vnum .vl:empty{height:.5em}
 .ctlegend{display:flex;flex-wrap:wrap;gap:6px 10px;margin:-4px 0 10px;font-size:11.5px;color:var(--faint);line-height:1.6}
 .ctlegend[hidden]{display:none}
 .ctlegend b{font-weight:700}
