@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-blankline">
+<meta name="app-build" content="2026-10-15-placesubj">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7408,7 +7408,19 @@ button:active{filter:brightness(1.15)}
   /* ---------- focus view (subject / verb / object) ---------- */
   function tokens(text){return String(text).split(/(\s+)/).filter(function(x){return x!==""})}
   function wordsOf(text){return tokens(text).filter(function(x){return !/^\s+$/.test(x)})}
-  function parseOk(n){return n.parse&&n.parse.src===n.text&&n.parse.labels.length===wordsOf(n.text).length}
+  // 땅·성 이름(니느웨 등)은 장소라서 주어로 칠하지 않는다 (2026-10-15 사용자 요청). 예전에 저장된 분석에도 그대로 적용
+  var PLACE_NAME=/^(니느웨|다시스|욥바|예루살렘|시온|베들레헴|나사렛|갈릴리|가버나움|사마리아|여리고|요단|시내산|소돔|고모라|가나안|갈멜|감람산|골고다|베다니|에덴|바벨|두로|시돈|다메섹|안디옥|에베소|고린도|빌립보|데살로니가|갈라디아|유대|브엘세바|헤브론|벧엘|실로|길르앗|바산|모압|에돔|암몬|블레셋|가사|아스돗|가드|에그론|바벨론|애굽)(은|는|이|가|께서)$/;
+  function placeFix(text,labels){
+    wordsOf(text).forEach(function(w,i){
+      if((labels[i]==="S"||labels[i]==="G")&&PLACE_NAME.test(String(w).replace(/[^가-힣A-Za-z0-9]/g,"")))labels[i]="-";
+    });
+    return labels;
+  }
+  function parseOk(n){
+    var ok=n.parse&&n.parse.src===n.text&&n.parse.labels.length===wordsOf(n.text).length;
+    if(ok&&!n.parse.pf){placeFix(n.text,n.parse.labels);n.parse.pf=1}
+    return ok;
+  }
   /* ---------- 대조·비교 보기 ----------
      AI 없이 규칙으로 찾는다: ① 반대말 쌍 ② 같은 꼴 다른 말(사흘 동안 ↔ 하루 동안)
      ③ 대조를 알리는 이음말(그러나, 오직…) ④ 되풀이되는 말 */
@@ -7543,7 +7555,7 @@ button:active{filter:brightness(1.15)}
   /* 역할 보기: 동사만 초록으로 (주어·목적어는 건드리지 않는다) */
   function roleFind(text){
     var toks=ctToks(text), labels=[];
-    try{labels=ruleParse(text)||[]}catch(e){labels=[]}
+    try{labels=placeFix(text,ruleParse(text)||[])}catch(e){labels=[]}
     var marks=[];
     toks.forEach(function(tk,i){ if((labels[i]||"-")==="V")marks.push({s:tk.s,e:tk.e,c:"rl kv"}) });
     return {marks:marks};
@@ -7759,7 +7771,7 @@ button:active{filter:brightness(1.15)}
   async function analyze(card,n){
     if(!sampleFn&&!parsing.has(n.id)){
       var ws=wordsOf(n.text); if(!ws.length)return false;
-      n.parse={src:n.text,labels:ruleParse(n.text),v:1}; scheduleSave(n.id); return true;
+      n.parse={src:n.text,labels:placeFix(n.text,ruleParse(n.text)),v:1,pf:1}; scheduleSave(n.id); return true;
     }
     if(!sampleFn||parsing.has(n.id))return false;
     var words=wordsOf(n.text); if(!words.length)return false;
