@@ -221,11 +221,22 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovc[data-st="full"]{border-color:color-mix(in srgb,var(--green) 55%,var(--rule));color:#fff}
 .ovc[data-st="full"] i{height:100%;background:var(--green)}
 @media (hover:hover){.ovc:hover{border-color:var(--violet)}}
-.ovw-days{display:flex;align-items:flex-end;gap:5px;margin-top:6px;padding-bottom:2px;overflow-x:auto}
-.ovd{flex:0 0 auto;width:24px;display:flex;flex-direction:column;align-items:center;gap:4px}
-.ovd i{width:100%;min-height:4px;height:calc(6px + var(--h,0) * 58px);border-radius:4px 4px 2px 2px;background:linear-gradient(180deg,var(--ring),color-mix(in srgb,var(--ring) 50%,transparent))}
-.ovd b{font-size:10.5px;font-weight:700;color:var(--ink)}
-.ovd small{font-size:9.5px;color:var(--muted);white-space:nowrap}
+.ovw-sum{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 8px;font-size:12px;color:var(--muted)}
+.ovw-sum b{color:var(--ink);font-weight:700}
+.ovw-hist{overflow-x:auto;padding-bottom:6px}
+.ovw-grid{display:inline-flex;flex-direction:column;gap:6px;min-width:100%}
+.ovw-mon{display:flex;gap:3px;height:14px}
+.ovw-mon span{flex:0 0 auto;font-size:10px;color:var(--muted);white-space:nowrap}
+.ovw-wks{display:flex;gap:3px}
+.ovwk{display:flex;flex-direction:column;gap:3px}
+.ovday{width:13px;height:13px;border-radius:3px;background:var(--blank);border:1px solid color-mix(in srgb,var(--rule) 60%,transparent)}
+.ovday[data-l="1"]{background:color-mix(in srgb,var(--ring) 28%,var(--blank));border-color:color-mix(in srgb,var(--ring) 35%,transparent)}
+.ovday[data-l="2"]{background:color-mix(in srgb,var(--ring) 52%,var(--blank));border-color:color-mix(in srgb,var(--ring) 55%,transparent)}
+.ovday[data-l="3"]{background:color-mix(in srgb,var(--ring) 78%,var(--blank));border-color:color-mix(in srgb,var(--ring) 75%,transparent)}
+.ovday[data-l="4"]{background:var(--green);border-color:var(--green)}
+.ovday.pad{background:transparent;border-color:transparent}
+.ovw-key{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:var(--muted)}
+.ovw-key i{width:12px;height:12px;border-radius:3px;background:var(--blank);border:1px solid color-mix(in srgb,var(--rule) 60%,transparent)}
 .ovw-none{margin:6px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
 .shelf{margin-top:14px;padding:12px 13px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);}
 .shelf h3{margin:0 0 9px;font-family:var(--sans);font-size:15px;font-weight:700}
@@ -852,28 +863,58 @@ function renderOverview(){
     }
     body.appendChild(map);
   });
-  // ② 날짜별 기록
-  var h2=document.createElement("p"); h2.className="ovw-h"; h2.textContent="날짜별로 읽은 장"; body.appendChild(h2);
+  // ② 읽어 온 길: 왼쪽이 처음, 오른쪽이 오늘. 해가 바뀌어도 가로로 계속 이어진다
+  var h2=document.createElement("p"); h2.className="ovw-h"; h2.textContent="읽어 온 길"; body.appendChild(h2);
   var keys=Object.keys(readLog).sort();
   if(!keys.length){
     var none=document.createElement("p"); none.className="ovw-none";
-    none.textContent="아직 기록이 없어요. 오늘부터 칸을 체크하면 날마다 몇 장을 읽었는지 여기에 쌓여요.";
+    none.textContent="아직 기록이 없어요. 오늘부터 칸을 체크하면 날마다 몇 장을 읽었는지 여기에 쌓여서, 해가 지날수록 걸어온 길이 보여요.";
     body.appendChild(none);
-  }else{
-    keys=keys.slice(-30);
-    var max=1; keys.forEach(function(k){if(readLog[k]>max)max=readLog[k]});
-    var days=document.createElement("div"); days.className="ovw-days";
-    keys.forEach(function(k){
-      var d=document.createElement("div"); d.className="ovd";
-      d.innerHTML='<b></b><i></i><small></small>';
-      d.querySelector("b").textContent=readLog[k];
-      d.querySelector("i").style.setProperty("--h",(readLog[k]/max).toFixed(3));
-      d.querySelector("small").textContent=k.slice(5).replace("-","/");
-      d.title=k+" · "+readLog[k]+"장";
-      days.appendChild(d);
-    });
-    body.appendChild(days);
+    return;
   }
+  var first=new Date(keys[0]+"T12:00:00"), last=new Date();
+  var startAt=new Date(first); startAt.setDate(startAt.getDate()-startAt.getDay());   // 그 주 일요일부터
+  var total=0, best=0, bestDay="", run=0, bestRun=0, prev=null;
+  keys.forEach(function(k){
+    var v=readLog[k]; total+=v; if(v>best){best=v;bestDay=k}
+    var t=new Date(k+"T12:00:00").getTime();
+    run=(prev!==null&&Math.round((t-prev)/864e5)===1)?run+1:1; prev=t; if(run>bestRun)bestRun=run;
+  });
+  var sum=document.createElement("div"); sum.className="ovw-sum";
+  sum.innerHTML='<span>처음 읽은 날 <b></b></span><span>읽은 날 <b></b>일</span><span>모두 <b></b>장</span><span>가장 많이 읽은 날 <b></b>장</span><span>가장 길게 이어 읽기 <b></b>일</span>';
+  var sb=sum.querySelectorAll("b");
+  sb[0].textContent=keys[0].replace(/-/g,".");
+  sb[1].textContent=keys.length; sb[2].textContent=total; sb[3].textContent=best; sb[4].textContent=bestRun;
+  body.appendChild(sum);
+  var wrap=document.createElement("div"); wrap.className="ovw-hist";
+  var grid=document.createElement("div"); grid.className="ovw-grid";
+  var mon=document.createElement("div"); mon.className="ovw-mon";
+  var wks=document.createElement("div"); wks.className="ovw-wks";
+  var cur=new Date(startAt), lastMon=-1, MON=["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+  while(cur<=last){
+    var col=document.createElement("div"); col.className="ovwk";
+    var label="";
+    for(var d2=0;d2<7;d2++){
+      var k2=dayKey(cur.getTime()), v2=+readLog[k2]||0;
+      var cell=document.createElement("div"); cell.className="ovday";
+      if(cur>last)cell.classList.add("pad");
+      else{
+        cell.dataset.l=v2===0?"0":v2<=2?"1":v2<=5?"2":v2<=10?"3":"4";
+        cell.title=k2.replace(/-/g,".")+" · "+(v2?v2+"장":"쉬었어요");
+      }
+      if(d2===0&&cur.getMonth()!==lastMon){lastMon=cur.getMonth();label=(cur.getMonth()===0?cur.getFullYear()+"년 ":"")+MON[cur.getMonth()]}
+      col.appendChild(cell);
+      cur.setDate(cur.getDate()+1);
+    }
+    var ml=document.createElement("span"); ml.style.width="13px"; ml.textContent=label; mon.appendChild(ml);
+    wks.appendChild(col);
+  }
+  grid.appendChild(mon); grid.appendChild(wks); wrap.appendChild(grid); body.appendChild(wrap);
+  var key=document.createElement("div"); key.className="ovw-key";
+  key.innerHTML='<span>적게</span><i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><span>많이</span>';
+  key.querySelectorAll("i").forEach(function(i2,n2){i2.className="";i2.setAttribute("class","");i2.setAttribute("data-l",String(n2));i2.classList.add("ovday")});
+  body.appendChild(key);
+  setTimeout(function(){wrap.scrollLeft=wrap.scrollWidth},0);   // 오늘(오른쪽 끝)이 보이게
 }
 (function(){
   var tg=document.getElementById("ovwTg"); if(!tg)return;
