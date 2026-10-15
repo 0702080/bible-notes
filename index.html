@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-subjfix2">
+<meta name="app-build" content="2026-10-15-verbfix">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7416,9 +7416,21 @@ button:active{filter:brightness(1.15)}
   var NUM_WORD=/^(\d+|[일이삼사오육칠팔구]?[십백천만]+[일이삼사오육칠팔구]?|[일이삼사오육칠팔구]|한|두|세|네|다섯|여섯|일곱|여덟|아홉|열|스무|스물|서른|마흔|쉰|여러|몇|며칠)$/;
   var TIME_UNIT=/^(일|날|년|해|달|개월|주|주일|밤|낮|시)(이|가|은|는)$/;
   var ADJ_EUN=/^(낮|굵|높|넓|깊|작|좋|많|적|붉|검|맑|옳|얇|밝|늙|젊|짧|굳|곧|얕|굽|궂|낡|묽|좁|짙|옅|같|없|있|입|믿|얻|찾|잃|죽|씻|먹|넘|숨|닫|묶|읽|듣|앉|남|받|심|품)은$/;
+  var NOUN_IDA=/[가-힣][읍림금성산땅집문길곳물불빛것들람님왕종자편일]이(더라|었더라|라|니라|로다|요|니|었고|었으니)$/;
+  var NOT_ACT=/^(막론하고|물론하고|불구하고|인하여|인하여서|인하여도|의하여|대하여|관하여|말미암아|말미암아서)$/;
+  var ADJ_GO=/^(높|낮|크|작|넓|좁|깊|얕|길|짧|많|적|늙|젊|굵|가늘|귀하|천하|부하|가난하|강하|약하|선하|악하|크고)고$/;
+  var ADJ_MOD=/(은|한|운|른|큰|긴|센)$/;
   function placeFix(text,labels){
     var ws=wordsOf(text).map(function(w){return String(w).replace(/[^가-힣A-Za-z0-9]/g,"")});
     ws.forEach(function(x,i){
+      if(labels[i]==="V"){
+        // 동사가 아닌 말 빼기 (2026-10-15 사용자 요청)
+        // - 이름씨 + 이다: "성읍이더라", "왕이라" → 무엇인지 말하는 말
+        // - 뜻만 잇는 말: "막론하고", "불구하고", "인하여"
+        // - 꾸밈 짝: "높고 낮은 자", "크고 작은 일" → 뒤 낱말을 꾸밈
+        if(NOUN_IDA.test(x)||NOT_ACT.test(x)||(ADJ_GO.test(x)&&i+1<ws.length&&ADJ_MOD.test(ws[i+1])))labels[i]="-";
+        return;
+      }
       if(labels[i]!=="S"&&labels[i]!=="G")return;
       if(PLACE_NAME.test(x)||ADJ_EUN.test(x)||(TIME_UNIT.test(x)&&i>0&&NUM_WORD.test(ws[i-1])))labels[i]="-";
     });
