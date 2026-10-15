@@ -33,6 +33,7 @@ body{
 .bar{position:sticky;top:0;z-index:40;background:var(--bar);color:#fff;
   padding:calc(12px + env(safe-area-inset-top,0)) 16px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
 .bar h1{grid-column:2;margin:0;font-size:17px;font-weight:700;color:#fff;letter-spacing:0}
+.bar .bar-back{grid-column:1;justify-self:start;border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:5px 11px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
 .bar .bar-cnt{grid-column:3;justify-self:end;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
 h2{font-family:var(--sans);font-weight:700;font-size:15px;margin:28px 0 0;color:var(--muted)}
 
@@ -346,7 +347,7 @@ body.painting .chips .chip[data-act]{cursor:crosshair}
 </head>
 <body>
 <div class="turn" aria-live="polite"><b aria-hidden="true">📱</b>휴대폰을 세로로 돌려 주세요</div>
-<header class="bar"><h1>성경 통독표</h1><span class="bar-cnt" id="barCnt"></span></header>
+<header class="bar"><button type="button" class="bar-back" id="barBack" hidden aria-label="묵상 노트로 돌아가기">← 노트</button><h1>성경 통독표</h1><span class="bar-cnt" id="barCnt"></span></header>
 <main class="wrap">
   <div class="findbar">
     <input class="findin" id="bkFind" type="search" inputmode="search" placeholder="성경 책 찾기 (초성도 돼요: ㅇㄱㅂㅅ)" aria-label="성경 책 찾기" autocomplete="off">
@@ -423,6 +424,18 @@ body.painting .chips .chip[data-act]{cursor:crosshair}
 
 <script>
 (function(){
+/* 묵상 노트 메뉴(📖 성경 통독표)로 들어왔으면 맨 위에 '← 노트' 버튼을 보여 줌.
+   통독표만 따로 쓰는 사람(주소로 바로 여는 경우)에게는 버튼이 없음 */
+(function(){
+  var FROM_KEY="bible-tongdok-from";
+  try{
+    var q=new URLSearchParams(location.search);
+    if(q.get("from")==="notes"){sessionStorage.setItem(FROM_KEY,"notes");q.delete("from");
+      var qs=q.toString();history.replaceState(null,"",location.pathname+(qs?"?"+qs:"")+location.hash)}
+    if(sessionStorage.getItem(FROM_KEY)==="notes"){var b=document.getElementById("barBack");b.hidden=false;
+      b.addEventListener("click",function(){location.href="../"})}
+  }catch(e){}
+})();
 "use strict";
 
 /* 책 이름과 장 수. 성경 본문은 담지 않고, 권별 장 수만 쓴다. */

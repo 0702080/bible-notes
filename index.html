@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-140">
+<meta name="app-build" content="2026-10-15-141">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2288,6 +2288,7 @@ button:active{filter:brightness(1.15)}
         <button type="button" id="openMedBtn">묵상 진도표</button>
         <button type="button" id="openMemBtn">암송 도장판</button>
         <button type="button" id="openProgBtn">실천 진도표</button>
+        <button type="button" id="openTongdokBtn">📖 성경 통독표</button>
         <button type="button" id="prayReadBtn">기도 모아 읽기</button>
         <button type="button" id="reorderBtn">카드 순서 바꾸기</button>
         <button type="button" id="foldAll">모두 펼치기</button>
@@ -6678,6 +6679,8 @@ button:active{filter:brightness(1.15)}
     body.appendChild(bg);
   }
   $("openMedBtn").addEventListener("click",openMedProgress);
+  // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
+  $("openTongdokBtn").addEventListener("click",function(){location.href="tongdok/?from=notes"});
 
   /* ---------- 말씀 복사 ---------- */
   function copyText(t){
