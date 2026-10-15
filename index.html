@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-16-139">
+<meta name="app-build" content="2026-10-16-141">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1468,10 +1468,14 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
   .tadd{display:inline-flex;align-items:center;border-color:color-mix(in srgb,var(--gold) 55%,var(--rule));background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);-webkit-text-stroke:.3px currentColor}
   .fab{display:none!important}
 }
-body.boardon .wrap{max-width:1280px}
+body.boardon .wrap{max-width:none;padding-left:20px;padding-right:20px}
 body.boardon #list,body.boardon #reviewBar{display:none!important}
-.board4{display:flex;gap:14px;align-items:flex-start;margin-top:8px;overflow-x:auto;padding-bottom:10px}
-.board4>.bcol{flex:1 0 230px;min-width:230px}   /* 칸이 많아져도 폭은 그대로, 넘치면 옆으로 민다 */
+.board4{display:flex;gap:14px;align-items:stretch;margin-top:8px;overflow-x:auto;overflow-y:hidden;height:calc(100vh - 165px);min-height:320px;padding-bottom:10px;overscroll-behavior-x:contain;cursor:grab}
+.board4.panning{cursor:grabbing;-webkit-user-select:none;user-select:none}
+.board4>.bcol{flex:1 0 230px;min-width:230px;display:flex;flex-direction:column;max-height:100%}
+.bclist{overflow-y:auto;flex:1 1 auto;min-height:0;scrollbar-width:thin}
+.bclist::-webkit-scrollbar{width:8px}
+.bclist::-webkit-scrollbar-thumb{background:#34333A;border-radius:4px}
 .board4::-webkit-scrollbar{height:10px}
 .board4::-webkit-scrollbar-thumb{background:#34333A;border-radius:5px}
 .bch b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -8546,6 +8550,37 @@ button:active{filter:brightness(1.15)}
     }
   });
   $("board").addEventListener("keydown",function(e){if(e.key==="Enter"){var cd=e.target.closest(".bcard");if(cd)boardOpen(cd.dataset.id)}});
+  /* 칸반: 스크롤바를 안 잡아도 가로로 움직이게 — 바퀴로 밀거나, 빈 바탕을 끌면 따라온다 */
+  (function(){
+    var bd=$("board");
+    bd.addEventListener("wheel",function(e){
+      if(e.ctrlKey)return;
+      var lst=e.target.closest&&e.target.closest(".bclist");
+      if(lst&&lst.scrollHeight>lst.clientHeight){   // 칸 안에서 아직 위아래로 갈 데가 있으면 그대로 둔다
+        var up=e.deltaY<0&&lst.scrollTop>0, dn=e.deltaY>0&&lst.scrollTop+lst.clientHeight<lst.scrollHeight-1;
+        if(up||dn)return;
+      }
+      if(bd.scrollWidth<=bd.clientWidth)return;
+      var d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
+      if(!d)return;
+      bd.scrollLeft+=d; e.preventDefault();
+    },{passive:false});
+    var pan=null;
+    bd.addEventListener("pointerdown",function(e){
+      if(e.button!==0||!e.isPrimary)return;
+      if(e.target.closest(".bcard,.bch,button,a,input,textarea,select"))return;
+      pan={x:e.clientX,l:bd.scrollLeft,id:e.pointerId};
+      bd.classList.add("panning");
+      try{bd.setPointerCapture(e.pointerId)}catch(err){}
+    });
+    bd.addEventListener("pointermove",function(e){
+      if(!pan||e.pointerId!==pan.id)return;
+      bd.scrollLeft=pan.l-(e.clientX-pan.x);
+    });
+    ["pointerup","pointercancel"].forEach(function(t){bd.addEventListener(t,function(e){
+      if(pan&&e.pointerId===pan.id){pan=null;bd.classList.remove("panning")}
+    })});
+  })();
   // 칸 이름 두 번 눌러 바꾸기
   $("board").addEventListener("dblclick",function(e){
     var hd=e.target.closest(".bch"); if(!hd||hd.querySelector(".bcrn"))return;
