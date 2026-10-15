@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-16-138">
+<meta name="app-build" content="2026-10-16-139">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1470,8 +1470,11 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 }
 body.boardon .wrap{max-width:1280px}
 body.boardon #list,body.boardon #reviewBar{display:none!important}
-.board4{display:flex;gap:14px;align-items:flex-start;margin-top:8px}
-.board4>.bcol{flex:1 1 0;min-width:0}
+.board4{display:flex;gap:14px;align-items:flex-start;margin-top:8px;overflow-x:auto;padding-bottom:10px}
+.board4>.bcol{flex:1 0 230px;min-width:230px}   /* 칸이 많아져도 폭은 그대로, 넘치면 옆으로 민다 */
+.board4::-webkit-scrollbar{height:10px}
+.board4::-webkit-scrollbar-thumb{background:#34333A;border-radius:5px}
+.bch b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .board4[hidden]{display:none}
 .bcol{background:#141417;border:1px solid #24232A;border-radius:16px;padding:10px;min-height:200px}
 .bch{display:flex;align-items:center;gap:8px;padding:4px 6px 10px;color:var(--bc);font-size:14.5px}
