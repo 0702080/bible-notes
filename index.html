@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-15-144">
+<meta name="app-build" content="2026-10-15-145">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1125,7 +1125,7 @@ body.reorder .note .pinbtn{display:none!important}
 .verse.vlines .vl+.vl{margin-top:0}   /* 줄 사이를 글이 넘어간 줄과 똑같이 (2026-10-15 사용자 요청) */
 /* 빈 줄은 편집기에 적은 그대로 한 줄 높이만큼 띄운다 (2026-10-15 사용자 요청) */
 .verse .vl:empty::before{content:"\200b"}
-.verse.vnum .vl:empty+.vl{margin-top:0}
+.verse.vnum .vl.vb+.vl,.verse.vnum .vl:empty+.vl{margin-top:0}
 .note.open .verse{margin:10px 0 20px}
 .note.open .focusrow{margin-bottom:18px;row-gap:8px}
 .ctlegend{display:flex;flex-wrap:wrap;gap:6px 10px;margin:-4px 0 10px;font-size:11.5px;color:var(--faint);line-height:1.6}
@@ -7519,6 +7519,10 @@ button:active{filter:brightness(1.15)}
     });
     frag.appendChild(line);
     v.textContent=""; v.appendChild(frag);
+    // 빈 줄(띄어쓰기·보이지 않는 글자만 있는 줄 포함)은 편집기처럼 한 줄 높이로 띄운다 (2026-10-15)
+    Array.prototype.forEach.call(v.querySelectorAll(".vl"),function(ln){
+      if(!ln.querySelector("*")&&!/[^\s\u200b\ufeff]/.test(ln.textContent||"")){ln.textContent="\u200b";ln.classList.add("vb")}
+    });
     if(!numbered){v.classList.add("vlines");return}   // 절 번호가 없으면 줄만 띄워 준다
     v.classList.add("vnum");
     // 절 번호로 시작하지 않는 줄(같은 절이 이어지는 줄)은 본문 자리에 맞춘다
