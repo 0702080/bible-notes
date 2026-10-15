@@ -151,7 +151,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .who span{font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
 .me-who{color:#F2C94C;margin-top:0}
 .fr-who{color:var(--sky);margin-top:10px}
-.fchips{border-color:color-mix(in srgb,var(--sky) 30%,var(--rule));background:color-mix(in srgb,var(--sky) 18%,var(--rule))}
+
 .fchips .chip{cursor:default}
 .chip[data-s="fr"]{--c:var(--sky);color:#06222E;font-weight:700}
 .chip[data-s="fr"]::before{border:0;background:var(--c)}
@@ -313,7 +313,8 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .chips .chip{box-shadow:0 0 0 .5px var(--rule)}
 .chips>span{background:transparent;box-shadow:none}
 .fchips{background:transparent}
-.fchips .chip{box-shadow:0 0 0 .5px color-mix(in srgb,var(--sky) 35%,var(--rule))}
+/* 친구 표 칸 선도 내 표와 똑같이 (2026-10-15 사용자 요청: 하늘색 줄 없앰) */
+.fchips .chip{box-shadow:0 0 0 .5px var(--rule)}
 .cl-login{margin-top:2px;background:color-mix(in srgb,var(--sky) 12%,var(--sheet));border-color:color-mix(in srgb,var(--sky) 45%,var(--rule));color:var(--ink);font-weight:700}
 .lg-tip{font-size:13px;line-height:1.6;color:var(--muted);margin:10px 0 6px}
 .fr-box{font-size:14px;line-height:1.6}
