@@ -204,6 +204,29 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 }
 
 /* 모은 책 선반 */
+.ovw{margin-top:14px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);overflow:hidden}
+.ovw-tg{display:flex;align-items:center;gap:10px;width:100%;padding:13px;border:0;background:transparent;color:var(--ink);font-family:inherit;text-align:left}
+.ovw-tg b{font-size:15px}
+.ovw-sub{flex:1;font-size:12px;color:var(--muted)}
+.ovw-chev{flex:0 0 auto;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translate(-2px,-2px);transition:transform .2s}
+.ovw-tg[aria-expanded="true"] .ovw-chev{transform:rotate(-135deg) translate(-2px,-2px)}
+.ovw-body{padding:0 13px 14px}
+.ovw-body[hidden]{display:none}
+.ovw-h{margin:10px 0 8px;font-size:13px;font-weight:700;color:var(--muted)}
+.ovw-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
+.ovc{position:relative;height:40px;padding:0;border:1px solid var(--rule);border-radius:8px;background:var(--blank);color:var(--muted);font-family:inherit;font-size:12px;overflow:hidden}
+.ovc i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--f,0) * 100%);background:color-mix(in srgb,var(--ring) 55%,transparent)}
+.ovc b{position:relative;z-index:1;font-weight:700}
+.ovc[data-st="part"]{color:var(--ink)}
+.ovc[data-st="full"]{border-color:color-mix(in srgb,var(--green) 55%,var(--rule));color:#fff}
+.ovc[data-st="full"] i{height:100%;background:var(--green)}
+@media (hover:hover){.ovc:hover{border-color:var(--violet)}}
+.ovw-days{display:flex;align-items:flex-end;gap:5px;margin-top:6px;padding-bottom:2px;overflow-x:auto}
+.ovd{flex:0 0 auto;width:24px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.ovd i{width:100%;min-height:4px;height:calc(6px + var(--h,0) * 58px);border-radius:4px 4px 2px 2px;background:linear-gradient(180deg,var(--ring),color-mix(in srgb,var(--ring) 50%,transparent))}
+.ovd b{font-size:10.5px;font-weight:700;color:var(--ink)}
+.ovd small{font-size:9.5px;color:var(--muted);white-space:nowrap}
+.ovw-none{margin:6px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
 .shelf{margin-top:14px;padding:12px 13px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);}
 .shelf h3{margin:0 0 9px;font-family:var(--sans);font-size:15px;font-weight:700}
 .shelf h3 span{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400;margin-left:6px}
@@ -404,6 +427,13 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
       <span><i style="background:#F2C94C"></i>나</span>
       <span><i style="background:var(--sky)"></i>친구</span>
     </div>
+  </section>
+
+  <section class="ovw" id="ovw">
+    <button class="ovw-tg" id="ovwTg" type="button" aria-expanded="false" aria-controls="ovwBody">
+      <b>📈 전체 진행표</b><span class="ovw-sub">창세기부터 요한계시록까지 한눈에</span><span class="ovw-chev" aria-hidden="true"></span>
+    </button>
+    <div class="ovw-body" id="ovwBody" hidden></div>
   </section>
 
   <section class="shelf">
@@ -782,7 +812,81 @@ function renderSummary(){
   $("btnCmp").hidden=!viewFriends().length;
   $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
 }
-function renderAll(){renderBooks();renderSummary();renderShelf();applyFind()}
+function renderAll(){renderBooks();renderSummary();renderShelf();applyFind();renderOverview()}
+/* ── 전체 진행표 ───────────────────────────────
+   ① 66권 지도: 창세기부터 요한계시록까지 읽은 만큼 칸이 찬다
+   ② 날짜별 기록: 오늘부터 쌓이는 "하루에 몇 장" 막대 */
+var BABBR=["창","출","레","민","신","수","삿","룻","삼상","삼하","왕상","왕하","대상","대하","스","느","에","욥","시","잠","전","아","사","렘","애","겔","단","호","욜","암","옵","욘","미","나","합","습","학","슥","말",
+           "마","막","눅","요","행","롬","고전","고후","갈","엡","빌","골","살전","살후","딤전","딤후","딛","몬","히","약","벧전","벧후","요일","요이","요삼","유","계"];
+var LOG_KEY="bible-tongdok-log", readLog={};
+try{readLog=JSON.parse(localStorage.getItem(LOG_KEY)||"{}")||{}}catch(e){readLog={}}
+function saveLog(){try{localStorage.setItem(LOG_KEY,JSON.stringify(readLog))}catch(e){}}
+function dayKey(t){var d=new Date(t||Date.now());return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+function logRead(d){
+  var k=dayKey(); var v=Math.max(0,(+readLog[k]||0)+d);
+  if(v)readLog[k]=v; else delete readLog[k];
+  var ks=Object.keys(readLog).sort(); while(ks.length>400){delete readLog[ks.shift()]}
+  saveLog();
+}
+var ovwOpen=false;
+function renderOverview(){
+  var body=document.getElementById("ovwBody"); if(!body)return;
+  var tg=document.getElementById("ovwTg");
+  if(tg)tg.setAttribute("aria-expanded",String(ovwOpen));
+  body.hidden=!ovwOpen; if(!ovwOpen)return;
+  body.textContent="";
+  // ① 66권 지도
+  [["구약 39권",0,OT_N],["신약 27권",OT_N,BOOKS.length]].forEach(function(part){
+    var h=document.createElement("p"); h.className="ovw-h"; h.textContent=part[0]; body.appendChild(h);
+    var map=document.createElement("div"); map.className="ovw-map";
+    for(var bi=part[1];bi<part[2];bi++){
+      var total=BOOKS[bi][1], done=bookDone(bi), f=total?done/total:0;
+      var c=document.createElement("button"); c.type="button"; c.className="ovc"; c.dataset.b=String(bi);
+      c.dataset.st=done===0?"none":done>=total?"full":"part";
+      c.style.setProperty("--f",f.toFixed(3));
+      c.innerHTML='<i></i><b></b>';
+      c.querySelector("b").textContent=BABBR[bi]||BOOKS[bi][0].slice(0,2);
+      c.title=BOOKS[bi][0]+" "+done+" / "+total+"장";
+      c.setAttribute("aria-label",c.title);
+      map.appendChild(c);
+    }
+    body.appendChild(map);
+  });
+  // ② 날짜별 기록
+  var h2=document.createElement("p"); h2.className="ovw-h"; h2.textContent="날짜별로 읽은 장"; body.appendChild(h2);
+  var keys=Object.keys(readLog).sort();
+  if(!keys.length){
+    var none=document.createElement("p"); none.className="ovw-none";
+    none.textContent="아직 기록이 없어요. 오늘부터 칸을 체크하면 날마다 몇 장을 읽었는지 여기에 쌓여요.";
+    body.appendChild(none);
+  }else{
+    keys=keys.slice(-30);
+    var max=1; keys.forEach(function(k){if(readLog[k]>max)max=readLog[k]});
+    var days=document.createElement("div"); days.className="ovw-days";
+    keys.forEach(function(k){
+      var d=document.createElement("div"); d.className="ovd";
+      d.innerHTML='<b></b><i></i><small></small>';
+      d.querySelector("b").textContent=readLog[k];
+      d.querySelector("i").style.setProperty("--h",(readLog[k]/max).toFixed(3));
+      d.querySelector("small").textContent=k.slice(5).replace("-","/");
+      d.title=k+" · "+readLog[k]+"장";
+      days.appendChild(d);
+    });
+    body.appendChild(days);
+  }
+}
+(function(){
+  var tg=document.getElementById("ovwTg"); if(!tg)return;
+  tg.addEventListener("click",function(){ovwOpen=!ovwOpen;renderOverview()});
+  var body=document.getElementById("ovwBody");
+  body.addEventListener("click",function(e){
+    var c=e.target.closest(".ovc"); if(!c)return;
+    var bi=+c.dataset.b; setFold(bi,false); saveFold&&saveFold();
+    var sec=document.querySelector('.bk[data-b="'+bi+'"]');
+    if(sec)sec.scrollIntoView({block:"start",behavior:"smooth"});
+  });
+})();
+
 
 /* ── 성경 책 찾기 (초성도 됨) ───────────────────── */
 var CHO="ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
@@ -1033,6 +1137,7 @@ document.addEventListener("click",function(ev){
     }
     var before=everCount(), wasFull=bookDone(bi2)===BOOKS[bi2][1];
     me[idx]=me[idx]?0:1;
+    logRead(me[idx]?1:-1);
     save();
     repaintBook(bi2);
     renderSummary();renderShelf();
