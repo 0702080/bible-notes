@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-146">
+<meta name="app-build" content="2026-10-17-147">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2138,7 +2138,15 @@ button:active{filter:brightness(1.15)}
 .dlw.cur b{color:var(--gold);font-weight:700}
 .dlw.cur i{box-shadow:0 0 0 2px var(--gold)}
 .dlgh{margin:2px 0 8px;padding-left:2px;font-size:13.5px;font-weight:700;color:var(--gc,var(--muted))}
-.dlgrp+.dlgrp{margin-top:26px}
+/* 묶음은 어느 화면에서나 한 칸(카드) — 넓은 화면에서는 이 칸들이 옆으로 늘어선다 */
+.dlgrp{margin:0 0 14px;padding:8px 10px 6px;border:1px solid #232229;border-radius:14px;background:color-mix(in srgb,var(--gc,var(--gold)) 4%,#131317)}
+.dlgrp.pin{border-color:color-mix(in srgb,var(--gold) 45%,#232229);background:color-mix(in srgb,var(--gold) 5%,#131317)}
+.dlgrp.dlgdrag{pointer-events:none;position:relative;z-index:6;box-shadow:0 10px 26px rgba(0,0,0,.6);border-color:color-mix(in srgb,var(--gc,var(--gold)) 55%,#232229)}
+.dllist .dlgh{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.dlgpin{flex:0 0 auto;width:26px;height:26px;border:0;border-radius:13px;background:transparent;color:var(--faint);font-size:14px;line-height:1}
+.dlgpin.on{color:var(--gold)}
+.dlghgrip{margin-left:auto;flex:0 0 auto;width:28px;height:28px;display:grid;place-items:center;border:0;background:transparent;color:var(--faint);font-size:15px;line-height:1;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+.dlgrp.dlgdrag .dlghgrip{cursor:grabbing;color:var(--gc,var(--gold))}
 .dlgchev{display:inline-block;width:7px;height:7px;margin-left:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .18s;opacity:.7}
 .dlgname[aria-expanded="true"] .dlgchev{transform:rotate(-135deg) translate(-2px,-2px)}
 @media (prefers-reduced-motion:reduce){.dlgchev{transition:none}}
@@ -2197,11 +2205,10 @@ button:active{filter:brightness(1.15)}
 .dlgform{display:flex;gap:6px;align-items:center;margin:2px 0 6px}
 .dlitform{display:flex;gap:6px;align-items:center;margin:2px 0}
 /* PC에서는 묶음 칸이 옆으로 늘어서서 모니터 가로 폭을 다 쓴다 (2026-10-17 사용자 요청) */
-@media (min-width:900px){
+@media (min-width:760px){
   .daily{--dlw:1560px}
   .dllist{column-width:380px;column-gap:18px}
-  .dlgrp{display:inline-block;width:100%;box-sizing:border-box;margin:0 0 16px;padding:10px 12px 8px;border:1px solid #232229;border-radius:14px;background:color-mix(in srgb,var(--gc,var(--gold)) 4%,#131317);break-inside:avoid-column;-webkit-column-break-inside:avoid}
-  .dlgrp+.dlgrp{margin-top:0}
+  .dlgrp{display:inline-block;width:100%;box-sizing:border-box;margin:0 0 16px;padding:10px 12px 8px;break-inside:avoid-column;-webkit-column-break-inside:avoid}
   .dlweek,.dladd,.dlnewg{max-width:608px;margin-left:auto;margin-right:auto}
   .dladd,.dlnewg{width:100%}
 }
@@ -6052,6 +6059,19 @@ button:active{filter:brightness(1.15)}
     });
     return all;
   }
+  // 묶음 차례: ⭐로 고정한 것이 맨 위, 그다음은 내가 끌어서 정한 차례 (2026-10-17 사용자 요청)
+  function dlSortGroups(o,gs){
+    var pin=(o&&Array.isArray(o.gpin))?o.gpin:[], ord=(o&&Array.isArray(o.gorder))?o.gorder:[];
+    return gs.map(function(g,i){return {g:g,i:i}}).sort(function(a,b){
+      var pa=pin.indexOf(a.g.g), pb=pin.indexOf(b.g.g);
+      if((pa<0)!==(pb<0))return pa<0?1:-1;
+      if(pa>=0&&pb>=0&&pa!==pb)return pa-pb;
+      var oa=ord.indexOf(a.g.g), ob=ord.indexOf(b.g.g);
+      if(oa<0)oa=1000+a.i; if(ob<0)ob=1000+b.i;
+      return oa!==ob?oa-ob:a.i-b.i;
+    }).map(function(x){return x.g});
+  }
+  function dlPinned(o,g){return (o&&Array.isArray(o.gpin))?o.gpin.indexOf(g)>=0:false}
   // 그날 그 항목에 적어 둔 글 (예: 어떻게 기도했는지)
   function dlMemoGet(o,day,id){var m=o&&o.memo&&o.memo[day]; return (m&&typeof m[id]==="string")?m[id]:""}
   // 한 항목에 기록을 여러 개 따로 둔다: 첫 기록은 id, 더 쓴 기록은 id~2, id~3 … (2026-10-15 사용자 요청)
@@ -6185,6 +6205,14 @@ button:active{filter:brightness(1.15)}
           dlMemoMore.add(id); dlOpenMemo(dlMemoNewKey(dailyData(),dlDay,id)); return;
         }
         if(b.classList.contains("dlmemoedit")){dlEditId=b.closest(".dlmemobox").dataset.id;dlGEditId="";drawDaily();return}
+        if(b.classList.contains("dlgpin")){   // ⭐ 즐겨찾기: 맨 위에 고정
+          var pg=b.dataset.g, pin=Array.isArray(o.gpin)?o.gpin.slice():[], pi=pin.indexOf(pg);
+          if(pi>=0)pin.splice(pi,1); else pin.unshift(pg);
+          o.gpin=pin; saveDaily(o); drawDaily();
+          toast(pi>=0?"고정을 풀었어요":"'"+(dlGroups(o).filter(function(x){return x.g===pg})[0]||{t:"묶음"}).t+"'을(를) 맨 위에 고정했어요 ⭐");
+          return;
+        }
+        if(b.classList.contains("dlghgrip"))return;   // 손잡이는 끌기 전용
         if(b.classList.contains("dlgname")){   // 한 번 누르면 접고 펼치기, 빠르게 두 번이면 이름 바꾸기
           var gg=b.dataset.g, nowT=Date.now();
           if(dlgTap.g===gg&&nowT-dlgTap.t<450){
@@ -6273,6 +6301,52 @@ button:active{filter:brightness(1.15)}
       saveDaily(o); drawDaily(); toast("순서를 바꿨어요");
     }
     list.addEventListener("pointerup",end); list.addEventListener("pointercancel",end);
+    // 묶음 자체를 끌어서 차례 바꾸기 — 손잡이(⠿)를 끌거나 묶음 이름을 꾹 눌러 끌면 된다 (2026-10-17 사용자 요청)
+    var G=null, GP=null;
+    function gstart(sec,e){
+      G={sec:sec,x0:e.clientX,y0:e.clientY,pid:e.pointerId,moved:false};
+      sec.classList.add("dlgdrag"); list.classList.add("dldragging"); buzz(15);
+    }
+    list.addEventListener("pointerdown",function(e){
+      if(G||D||(e.pointerType==="mouse"&&e.button!==0))return;
+      var hd=e.target.closest(".dlgh"); if(!hd||e.target.closest(".dlgdel,.dlgpin"))return;
+      var sec=hd.closest(".dlgrp"); if(!sec||sec.parentNode!==list)return;
+      if(e.target.closest(".dlghgrip")){e.preventDefault();try{e.target.closest(".dlghgrip").setPointerCapture(e.pointerId)}catch(err){}gstart(sec,e);return}
+      GP={sec:sec,x:e.clientX,y:e.clientY,pid:e.pointerId,t:setTimeout(function(){
+        if(!GP)return; var g=GP; GP=null; gstart(g.sec,{clientX:g.x,clientY:g.y,pointerId:g.pid});
+        try{list.setPointerCapture(g.pid)}catch(err){}
+      },450)};
+    });
+    list.addEventListener("pointermove",function(e){
+      if(GP&&e.pointerId===GP.pid&&(Math.abs(e.clientX-GP.x)>8||Math.abs(e.clientY-GP.y)>8)){clearTimeout(GP.t);GP=null}
+      if(!G||e.pointerId!==G.pid)return; e.preventDefault();
+      G.sec.style.transform="translate("+(e.clientX-G.x0)+"px,"+(e.clientY-G.y0)+"px)";
+      var un=document.elementFromPoint(e.clientX,e.clientY), tgt=(un&&un.closest)?un.closest(".dlgrp"):null;
+      if(tgt&&tgt!==G.sec&&tgt.parentNode===list){
+        var r0=G.sec.getBoundingClientRect();
+        if(tgt.compareDocumentPosition(G.sec)&Node.DOCUMENT_POSITION_FOLLOWING)list.insertBefore(G.sec,tgt);
+        else list.insertBefore(G.sec,tgt.nextSibling);
+        var r1=G.sec.getBoundingClientRect();
+        G.x0+=r1.left-r0.left; G.y0+=r1.top-r0.top;
+        G.sec.style.transform="translate("+(e.clientX-G.x0)+"px,"+(e.clientY-G.y0)+"px)";
+        G.moved=true; buzz(4);
+      }
+      var bd=dl.querySelector(".dlbody"), bdr=bd.getBoundingClientRect();
+      if(e.clientY<bdr.top+70)bd.scrollTop-=12; else if(e.clientY>bdr.bottom-70)bd.scrollTop+=12;
+    });
+    function gend(e){
+      if(GP&&(!e||e.pointerId===GP.pid)){clearTimeout(GP.t);GP=null}
+      if(!G||(e&&e.pointerId!==G.pid))return;
+      var g=G; G=null; g.sec.classList.remove("dlgdrag"); list.classList.remove("dldragging"); g.sec.style.transform="";
+      eatClick=true; setTimeout(function(){eatClick=false},350);
+      if(!g.moved)return;
+      var ord=Array.prototype.map.call(list.querySelectorAll(".dlgrp[data-g]"),function(x){return x.dataset.g});
+      var o=dailyData(); o.gorder=ord; saveDaily(o);
+      var after=dlSortGroups(o,dlGroups(o)).map(function(x){return x.g}).filter(function(k){return ord.indexOf(k)>=0});
+      drawDaily();
+      toast(after.join()===ord.join()?"묶음 차례를 바꿨어요":"⭐ 고정한 묶음은 늘 맨 위에 있어요");
+    }
+    list.addEventListener("pointerup",gend); list.addEventListener("pointercancel",gend);
     list.addEventListener("click",function(e){if(eatClick){e.stopPropagation();e.preventDefault();eatClick=false}},true);
   }
   // '한 줄 감사로 자동' 줄을 누르면 실제로 한 줄을 적는 고(감사 실천)으로 데려간다
@@ -6327,12 +6401,12 @@ button:active{filter:brightness(1.15)}
       wk.appendChild(d);
     }
     var list=dl.querySelector(".dllist"), outer=list; list.textContent="";
-    var gs=dlGroups(o), sel=dl.querySelector(".dlg"), keep=dlPickG||sel.value;
+    var gs=dlSortGroups(o,dlGroups(o)), sel=dl.querySelector(".dlg"), keep=dlPickG||sel.value;
     sel.innerHTML=gs.map(function(g){return '<option value="'+g.g+'">'+g.e+' '+g.t.replace(/[<&"]/g,"")+'</option>'}).join(""); if(keep&&gs.some(function(g){return g.g===keep}))sel.value=keep; dlPickG="";
     gs.forEach(function(g){
       var its=o.items.filter(function(it){return it.g===g.g}), mine=/^u/.test(g.g); if(!its.length&&!(dlEdit&&mine))return;
       // 묶음마다 한 칸(칸반) — PC에서는 이 칸들이 옆으로 늘어선다 (2026-10-17 사용자 요청)
-      var list=document.createElement("section"); list.className="dlgrp"; list.dataset.g=g.g; list.style.setProperty("--gc",g.c);
+      var list=document.createElement("section"); list.className="dlgrp"+(dlPinned(o,g.g)?" pin":""); list.dataset.g=g.g; list.style.setProperty("--gc",g.c);
       outer.appendChild(list);
       if(dlGEditId===g.g){   // 묶음 이름 바꾸기
         var gf=document.createElement("div"); gf.className="dlgform"; gf.dataset.g=g.g;
@@ -6351,6 +6425,14 @@ button:active{filter:brightness(1.15)}
         var pen=document.createElement("span"); pen.className="dlgpen"; pen.textContent="✏️"; pen.setAttribute("aria-hidden","true"); gr.appendChild(pen);
         var gch=document.createElement("span"); gch.className="dlgchev"; gch.setAttribute("aria-hidden","true"); gr.appendChild(gch);
         h.appendChild(gr);
+        var pin=dlPinned(o,g.g);
+        var pb=document.createElement("button"); pb.type="button"; pb.className="dlgpin"+(pin?" on":""); pb.dataset.g=g.g;
+        pb.textContent=pin?"★":"☆"; pb.title=pin?"맨 위 고정 풀기":"즐겨찾기 — 맨 위에 고정";
+        pb.setAttribute("aria-label","'"+g.t+"' 묶음 "+(pin?"고정 풀기":"맨 위에 고정")); pb.setAttribute("aria-pressed",String(pin));
+        h.appendChild(pb);
+        var hg=document.createElement("button"); hg.type="button"; hg.className="dlghgrip"; hg.dataset.g=g.g;
+        hg.textContent="⠿"; hg.title="끌어서 묶음 차례 바꾸기 (꾹 눌러도 됩니다)";
+        hg.setAttribute("aria-label","'"+g.t+"' 묶음 자리 옮기기"); h.appendChild(hg);
         if(dlEdit&&mine){var gd=document.createElement("button");gd.type="button";gd.className="dlgdel";gd.dataset.g=g.g;gd.textContent="묶음 지우기";h.appendChild(gd)}
         list.appendChild(h);
       }
@@ -6478,7 +6560,8 @@ button:active{filter:brightness(1.15)}
     bar.hidden=!rows.length;
     if(!rows.length)return;
     // 할 일(위)과 상태 보기(아래)로 나눠 한 줄씩: [아이콘] [이름] [상태 · 버튼들]
-    var todo=rows.filter(function(r){return !r.info}), info=rows.filter(function(r){return r.info});
+    var big=rows.filter(function(r){return r.big});   // '하루 돌아보기'는 맨 위에 (2026-10-17 사용자 요청)
+    var todo=rows.filter(function(r){return !r.info&&!r.big}), info=rows.filter(function(r){return r.info});
     var folded=tdFold||!!filterText;   // 찾는 중에는 결과가 바로 보이게 접는다
     bar.classList.toggle("fold",folded);
     var h=document.createElement("button"); h.type="button"; h.className="tdh";
@@ -6509,8 +6592,8 @@ button:active{filter:brightness(1.15)}
       r.chips.forEach(function(c){var b=document.createElement("button");b.type="button";b.className="rvchip"+(spotId===c.id&&openIds.has(c.id)?" on":"")+(c.act==="rvall"?" main":"");b.dataset.id=c.id;b.dataset.act=c.act;b.textContent=c.t;cs.appendChild(b)});
       row.appendChild(cs); bar.appendChild(row);
     }
-    todo.forEach(drawRow);
-    if(todo.length&&info.length){var hr=document.createElement("div");hr.className="tdsep";bar.appendChild(hr)}
+    big.forEach(drawRow); todo.forEach(drawRow);
+    if((todo.length||big.length)&&info.length){var hr=document.createElement("div");hr.className="tdsep";bar.appendChild(hr)}
     info.forEach(drawRow);
   }
 
@@ -8057,6 +8140,9 @@ button:active{filter:brightness(1.15)}
             if(!od.gname||typeof od.gname!=="object")od.gname={};
             Object.keys(obj.daily.gname).forEach(function(g){if(!od.gname[g])od.gname[g]=obj.daily.gname[g]});
           }
+          // 묶음 차례와 ⭐ 고정도 함께 (이 기기에 없을 때만 받는다)
+          if(Array.isArray(obj.daily.gorder)&&!Array.isArray(od.gorder))od.gorder=obj.daily.gorder.slice();
+          if(Array.isArray(obj.daily.gpin)&&!Array.isArray(od.gpin))od.gpin=obj.daily.gpin.slice();
           saveDaily(od); renderReviewBar()}
         if(obj&&obj.prays1)p1Merge(obj.prays1);
         if(obj&&obj.chapters&&typeof obj.chapters==="object"){var mc=myChapters();Object.keys(obj.chapters).forEach(function(k){var c=obj.chapters[k];if(c&&Array.isArray(c.v)&&(!mc[k]||(+c.at||0)>(+mc[k].at||0)))mc[k]=c});try{localStorage.setItem(MYCH,JSON.stringify(mc))}catch(e){}}
