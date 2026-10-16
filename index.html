@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-145">
+<meta name="app-build" content="2026-10-17-146">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2116,12 +2116,12 @@ button:active{filter:brightness(1.15)}
 .rqb.miss{background:color-mix(in srgb,var(--orange) 18%,#17161b);border-color:color-mix(in srgb,var(--orange) 50%,#34333A);color:var(--orange)}
 .rqb.say{width:48px;padding:0}
 @media (max-width:400px){.rqb{padding:0 14px;font-size:14.5px}}
-.dlbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px max(16px,calc((100% - 608px) / 2));width:100%;box-sizing:border-box;border-bottom:1px solid #222126}
+.dlbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px max(16px,calc((100% - var(--dlw,608px)) / 2));width:100%;box-sizing:border-box;border-bottom:1px solid #222126}
 .dltitle{font-size:18px;color:var(--gold)}
 .dlclose{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:14.5px}
-.dlbody{flex:1;overflow:auto;padding:12px max(16px,calc((100% - 608px) / 2)) 28px;width:100%;box-sizing:border-box;scrollbar-width:none}
+.dlbody{flex:1;overflow:auto;padding:12px max(16px,calc((100% - var(--dlw,608px)) / 2)) 28px;width:100%;box-sizing:border-box;scrollbar-width:none}
 .dlbody::-webkit-scrollbar{display:none}
-.dlfix{display:flex;align-items:center;gap:14px;padding:8px max(16px,calc((100% - 608px) / 2));width:100%;box-sizing:border-box;border-bottom:1px solid #222126;background:#0B0B0D}
+.dlfix{display:flex;align-items:center;gap:14px;padding:8px max(16px,calc((100% - var(--dlw,608px)) / 2));width:100%;box-sizing:border-box;border-bottom:1px solid #222126;background:#0B0B0D}
 .dlday{display:flex;align-items:center;justify-content:center;gap:10px;flex:0 0 auto}
 .dlday button{flex:0 0 auto;width:32px;height:32px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:13px}
 .dlday button:disabled{opacity:.3}
@@ -2137,8 +2137,8 @@ button:active{filter:brightness(1.15)}
 .dlw b{font-size:11px;color:var(--faint);font-weight:500}
 .dlw.cur b{color:var(--gold);font-weight:700}
 .dlw.cur i{box-shadow:0 0 0 2px var(--gold)}
-.dlgh{margin:30px 0 8px;padding-left:2px;font-size:13.5px;font-weight:700;color:var(--gc,var(--muted))}
-.dlgh:first-child{margin-top:8px}
+.dlgh{margin:2px 0 8px;padding-left:2px;font-size:13.5px;font-weight:700;color:var(--gc,var(--muted))}
+.dlgrp+.dlgrp{margin-top:26px}
 .dlgchev{display:inline-block;width:7px;height:7px;margin-left:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .18s;opacity:.7}
 .dlgname[aria-expanded="true"] .dlgchev{transform:rotate(-135deg) translate(-2px,-2px)}
 @media (prefers-reduced-motion:reduce){.dlgchev{transition:none}}
@@ -2194,8 +2194,17 @@ button:active{filter:brightness(1.15)}
 .dlgname .dlgpen{margin-left:6px;font-size:10.5px;opacity:.5}
 .dlgdel{margin-left:auto}
 .dlmemoedit{height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:transparent;color:var(--muted);font-size:12.5px}
-.dlgform{display:flex;gap:6px;align-items:center;margin:18px 0 6px}
+.dlgform{display:flex;gap:6px;align-items:center;margin:2px 0 6px}
 .dlitform{display:flex;gap:6px;align-items:center;margin:2px 0}
+/* PC에서는 묶음 칸이 옆으로 늘어서서 모니터 가로 폭을 다 쓴다 (2026-10-17 사용자 요청) */
+@media (min-width:900px){
+  .daily{--dlw:1560px}
+  .dllist{column-width:380px;column-gap:18px}
+  .dlgrp{display:inline-block;width:100%;box-sizing:border-box;margin:0 0 16px;padding:10px 12px 8px;border:1px solid #232229;border-radius:14px;background:color-mix(in srgb,var(--gc,var(--gold)) 4%,#131317);break-inside:avoid-column;-webkit-column-break-inside:avoid}
+  .dlgrp+.dlgrp{margin-top:0}
+  .dlweek,.dladd,.dlnewg{max-width:608px;margin-left:auto;margin-right:auto}
+  .dladd,.dlnewg{width:100%}
+}
 .dlgform .field,.dlitform .field{height:40px;margin:0}
 .dlge2{width:62px;flex:0 0 auto;text-align:center}
 .dlgn2,.dlted{flex:1;min-width:0}
@@ -6243,7 +6252,8 @@ button:active{filter:brightness(1.15)}
       if(!tgt&&prev){var pr=prev.getBoundingClientRect(); if(mid<pr.top+pr.height/2){tgt=prev;before=false}}
       if(tgt){
         D.row.style.transform=""; var t0=D.row.getBoundingClientRect().top;
-        if(before)list.insertBefore(tgt,D.row); else list.insertBefore(D.row,tgt);
+        var par=D.row.parentNode;
+        if(before)par.insertBefore(tgt,D.row); else par.insertBefore(D.row,tgt);
         D.y0+=D.row.getBoundingClientRect().top-t0; D.row.style.transform="translateY("+(e.clientY-D.y0)+"px)"; D.moved=true; buzz(4);
       }
       // 화면 끝 가까이 끌면 저절로 스크롤
@@ -6316,11 +6326,14 @@ button:active{filter:brightness(1.15)}
       d.querySelector("i").style.setProperty("--f",tot?(cc/tot):0); d.querySelector("i").textContent=cc||"";
       wk.appendChild(d);
     }
-    var list=dl.querySelector(".dllist"); list.textContent="";
+    var list=dl.querySelector(".dllist"), outer=list; list.textContent="";
     var gs=dlGroups(o), sel=dl.querySelector(".dlg"), keep=dlPickG||sel.value;
     sel.innerHTML=gs.map(function(g){return '<option value="'+g.g+'">'+g.e+' '+g.t.replace(/[<&"]/g,"")+'</option>'}).join(""); if(keep&&gs.some(function(g){return g.g===keep}))sel.value=keep; dlPickG="";
     gs.forEach(function(g){
       var its=o.items.filter(function(it){return it.g===g.g}), mine=/^u/.test(g.g); if(!its.length&&!(dlEdit&&mine))return;
+      // 묶음마다 한 칸(칸반) — PC에서는 이 칸들이 옆으로 늘어선다 (2026-10-17 사용자 요청)
+      var list=document.createElement("section"); list.className="dlgrp"; list.dataset.g=g.g; list.style.setProperty("--gc",g.c);
+      outer.appendChild(list);
       if(dlGEditId===g.g){   // 묶음 이름 바꾸기
         var gf=document.createElement("div"); gf.className="dlgform"; gf.dataset.g=g.g;
         var ge=document.createElement("input"); ge.className="field dlge2"; ge.maxLength=4; ge.value=g.e; ge.setAttribute("aria-label","묶음 이모지");
