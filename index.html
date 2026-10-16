@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-171">
+<meta name="app-build" content="2026-10-17-172">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1500,7 +1500,11 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
   body.boardon .bfilter::placeholder{color:var(--faint)}
   body.boardon .bfilter:focus{outline:none;border-color:color-mix(in srgb,var(--violet) 65%,var(--rule));background:rgba(255,255,255,.07)}
   /* 아래 손잡이를 끌어 높이를 바꿀 수 있다 (2026-10-17 사용자 요청) */
-  body.boardon #dlFind{flex:0 0 auto;height:170px;min-height:56px;max-height:70vh;overflow:auto;resize:vertical;margin-bottom:2px;padding-bottom:4px}
+  /* 칸반 칸과 같은 폭으로 나란히 (2026-10-17 사용자 요청) */
+  body.boardon #dlFind{flex:0 0 auto;flex-direction:row;align-items:stretch;justify-content:safe center;gap:14px;height:170px;min-height:56px;max-height:70vh;overflow:auto;resize:vertical;margin-bottom:2px;padding:0 20px 4px}
+  body.boardon .dlfcol{flex:0 0 380px;max-width:380px;min-height:0}
+  body.boardon .dlfl{flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:none;padding-right:2px}
+  body.boardon .dlfl::-webkit-scrollbar{display:none}
   body.boardon .dlfgrip{display:flex;align-items:center;justify-content:center;flex:0 0 auto;height:14px;margin:0 0 6px;cursor:ns-resize;touch-action:none}
   body.boardon .dlfgrip[hidden]{display:none}
   body.boardon .dlfgrip::before{content:"";width:54px;height:4px;border-radius:2px;background:#34333A;transition:background .15s,width .15s}
@@ -2200,7 +2204,9 @@ button:active{filter:brightness(1.15)}
 .solob.main{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 50%,#34333A)}
 body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 /* 찾기: 하루 돌아보기에 적어 둔 기록도 함께 보여 준다 (2026-10-17 사용자 요청) */
-.dlfind{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}
+.dlfind{display:flex;flex-direction:column;gap:14px;margin:0 0 14px}
+.dlfcol{display:flex;flex-direction:column;gap:6px;min-width:0}
+.dlfl{display:flex;flex-direction:column;gap:6px;min-width:0}
 .dlfgrip{display:none}
 .dlfind[hidden]{display:none}
 .dlfh{display:flex;align-items:center;gap:8px;padding:0 2px;font-size:12.5px;color:var(--faint)}
@@ -2869,7 +2875,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function visibleNote(n){if(soloId)return n.id===soloId;return (!topicSel.length||noteSelTopics(n).length>0)&&matches(n)}
   function matches(n){
     if(!filterText)return true;
-    return has(n.ref)||has(n.text)||n.topics.some(function(t){return has(t)})||n.meds.some(function(m){return has(m.text)})||n.qs.some(function(q){return has(q.q)||has(q.a)})||n.acts.some(function(a){return has(a.t)})||n.hymns.some(function(h){return has(h.title)||has((h.no||"")+"장")})||n.vids.some(function(v){return has(v.title)})||n.serms.some(function(x){return has(x.t)})||n.essays.some(function(x){return has(x.title)||has(x.body)});
+    return has(n.ref)||has(n.text)||n.topics.some(function(t){return has(t)})||n.meds.some(function(m){return has(m.text)})||n.qs.some(function(q){return has(q.q)||has(q.a)})||n.acts.some(function(a){return has(a.t)||(a.logs||[]).some(function(l){return has(l.t)})})||n.prays.some(function(pp){return has(pp.t)||has(pp.an)})||n.hymns.some(function(h){return has(h.title)||has((h.no||"")+"장")})||n.vids.some(function(v){return has(v.title)})||n.serms.some(function(x){return has(x.t)})||n.essays.some(function(x){return has(x.title)||has(x.body)});
   }
   function findRange(text,q){
     var mr=matchAll(text,q,true); if(mr.length)return mr[0];
@@ -2923,7 +2929,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       row.appendChild(tag); row.appendChild(body); box.appendChild(row);
     });
   }
-  // 하루 돌아보기에 적어 둔 기록 찾기 (2026-10-17 사용자 요청)
+  // 찾기 결과 모음: 하루 돌아보기 기록 · 기도 · 실천 기록 (2026-10-17 사용자 요청)
   function dailyHits(max){
     if(!filterText)return [];
     var o=dailyData(), gm={}, items={}, out=[];
@@ -2942,11 +2948,51 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     return out;
   }
+  function prayHits(max){   // 내가 쓴 기도와 응답
+    var out=[]; if(!filterText)return out;
+    sorted().forEach(function(n){
+      (n.prays||[]).forEach(function(p){
+        if(out.length>=max)return;
+        var t=String(p.t||""), a=String(p.an||""), hitT=!!t.trim()&&has(t), hitA=!!a.trim()&&has(a);
+        if(!hitT&&!hitA)return;
+        out.push({id:n.id,ref:n.ref||"구절 미입력",text:hitT?t:a,kind:hitT?(p.ans?"응답된 기도":"기도"):"기도 응답"});
+      });
+    });
+    return out;
+  }
+  function actHits(max){   // 실천 제목과 실천하며 적어 둔 한 줄
+    var out=[]; if(!filterText)return out;
+    sorted().forEach(function(n){
+      (n.acts||[]).forEach(function(a){
+        var at=String(a.t||"");
+        if(out.length<max&&at.trim()&&has(at))out.push({id:n.id,ref:n.ref||"구절 미입력",act:at,text:at,kind:"실천"});
+        (a.logs||[]).forEach(function(l){
+          if(out.length>=max)return;
+          var t=String(l.t||""); if(!t.trim()||!has(t))return;
+          out.push({id:n.id,ref:n.ref||"구절 미입력",act:at,text:t,kind:"실천 기록",at:l.at});
+        });
+      });
+    });
+    return out;
+  }
+  function openNoteFocus(id,tab){   // 찾은 기도·실천을 그 말씀 카드에서 바로 보여 준다
+    if(!notes.has(id))return;
+    setTopics([]);
+    if(boardOn){boardOn=false;try{localStorage.setItem("bible-view","list")}catch(e){}applyBoard();soloId=id;soloFrom="board"}
+    if(tab)tabOf.set(id,tab);
+    openIds.clear(); openIds.add(id); try{localStorage.setItem("bible-last-open",id)}catch(e){}
+    spotId=id; render();
+    var c=cards.get(id); if(c)setTimeout(function(){c.scrollIntoView({block:"start",behavior:"smooth"})},60);
+  }
   function renderDailyHits(){
     var box=$("dlFind"); if(!box)return 0;
     if(!box._wired){
       box._wired=1;
-      box.addEventListener("click",function(e){var r=e.target.closest(".dlfr");if(r)openDaily(r.dataset.day,r.dataset.id)});
+      box.addEventListener("click",function(e){
+        var r=e.target.closest(".dlfr"); if(!r)return;
+        if(r.dataset.note)openNoteFocus(r.dataset.note,r.dataset.tab);
+        else openDaily(r.dataset.day,r.dataset.id);
+      });
       try{var h0=localStorage.getItem("bible-dlfind-h"); if(h0)box.style.height=h0}catch(err){}
       if(window.ResizeObserver){   // 끌어서 바꾼 높이를 기억해 둔다
         var ht=null;
@@ -2978,28 +3024,63 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var grip=$("dlFGrip");
     box.textContent="";
     if(!filterText){box.hidden=true;if(grip)grip.hidden=true;return 0}
-    var hits=dailyHits(24);
-    box.hidden=!hits.length; if(grip)grip.hidden=!hits.length;
-    if(!hits.length)return 0;
-    var hd=document.createElement("div"); hd.className="dlfh";
-    var hl=document.createElement("span"); hl.textContent="🌙 하루 돌아보기 기록"; hd.appendChild(hl);
-    var hn=document.createElement("b"); hn.textContent=hits.length+"개"; hd.appendChild(hn); box.appendChild(hd);
-    hits.forEach(function(h){
-      var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.day=h.day; b.dataset.id=h.id;
-      b.style.setProperty("--gc",(h.g&&h.g.c)||"var(--muted)");
-      b.setAttribute("aria-label",dayName(h.day)+" "+h.t+" 기록 보기");
-      var top=document.createElement("span"); top.className="dlfrh";
-      top.textContent=dayName(h.day)+"  ·  "+(h.g?h.g.e+" "+h.g.t+"  ·  ":"")+h.t;
-      var bd=document.createElement("span"); bd.className="dlfrb";
-      var sn=h.body?snippet(h.text,filterText):null;
+    var dh=dailyHits(24), ph=prayHits(24), ah=actHits(24), total=dh.length+ph.length+ah.length;
+    box.hidden=!total; if(grip)grip.hidden=!total;
+    if(!total)return 0;
+    function snipInto(bd,txt){
+      var sn=snippet(txt,filterText);
       if(sn){
         bd.appendChild(document.createTextNode(sn.pre));
         var mk=document.createElement("mark"); mk.textContent=sn.hit; bd.appendChild(mk);
         bd.appendChild(document.createTextNode(sn.post));
-      }else bd.textContent=h.text.replace(/\s+/g," ").slice(0,90)+(h.text.length>90?"…":"");
-      b.appendChild(top); b.appendChild(bd); box.appendChild(b);
-    });
-    return hits.length;
+      }else bd.textContent=String(txt).replace(/\s+/g," ").slice(0,90)+(String(txt).length>90?"…":"");
+    }
+    function col(icon,name,n){
+      var se=document.createElement("section"); se.className="dlfcol";
+      var hd=document.createElement("div"); hd.className="dlfh";
+      var hl=document.createElement("span"); hl.textContent=icon+" "+name; hd.appendChild(hl);
+      var hn=document.createElement("b"); hn.textContent=n+"개"; hd.appendChild(hn);
+      se.appendChild(hd);
+      var ls=document.createElement("div"); ls.className="dlfl"; se.appendChild(ls);
+      box.appendChild(se); return ls;
+    }
+    if(dh.length){
+      var ls1=col("🌙","하루 돌아보기 기록",dh.length);
+      dh.forEach(function(h){
+        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.day=h.day; b.dataset.id=h.id;
+        b.style.setProperty("--gc",(h.g&&h.g.c)||"var(--muted)");
+        b.setAttribute("aria-label",dayName(h.day)+" "+h.t+" 기록 보기");
+        var top=document.createElement("span"); top.className="dlfrh";
+        top.textContent=dayName(h.day)+"  ·  "+(h.g?h.g.e+" "+h.g.t+"  ·  ":"")+h.t;
+        var bd=document.createElement("span"); bd.className="dlfrb";
+        if(h.body)snipInto(bd,h.text); else bd.textContent=h.text.replace(/\s+/g," ").slice(0,90)+(h.text.length>90?"…":"");
+        b.appendChild(top); b.appendChild(bd); ls1.appendChild(b);
+      });
+    }
+    if(ph.length){
+      var ls2=col("🙏","기도",ph.length);
+      ph.forEach(function(h){
+        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.note=h.id; b.dataset.tab="p";
+        b.style.setProperty("--gc","var(--orange)");
+        b.setAttribute("aria-label",h.ref+" "+h.kind+" 보기");
+        var top=document.createElement("span"); top.className="dlfrh"; top.textContent=h.ref+"  ·  "+h.kind;
+        var bd=document.createElement("span"); bd.className="dlfrb"; snipInto(bd,h.text);
+        b.appendChild(top); b.appendChild(bd); ls2.appendChild(b);
+      });
+    }
+    if(ah.length){
+      var ls3=col("✅","실천",ah.length);
+      ah.forEach(function(h){
+        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.note=h.id; b.dataset.tab="a";
+        b.style.setProperty("--gc","var(--green)");
+        b.setAttribute("aria-label",h.ref+" "+h.kind+" 보기");
+        var top=document.createElement("span"); top.className="dlfrh";
+        top.textContent=h.ref+"  ·  "+h.kind+(h.act&&h.act!==h.text?"  ·  "+h.act:"");
+        var bd=document.createElement("span"); bd.className="dlfrb"; snipInto(bd,h.text);
+        b.appendChild(top); b.appendChild(bd); ls3.appendChild(b);
+      });
+    }
+    return total;
   }
   // 내가 끌어서 정한 높이는 그대로 지킨다 (2026-10-17 사용자 요청)
   var manualH=new Map();
