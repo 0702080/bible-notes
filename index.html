@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-165">
+<meta name="app-build" content="2026-10-17-166">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -99,7 +99,11 @@ textarea.field{resize:vertical;min-height:80px;font-family:var(--serif);line-hei
 @media (hover:hover){.homebtn:hover{background:color-mix(in srgb,var(--violet) 26%,transparent);border-color:var(--violet)}}
 @media (prefers-reduced-motion:reduce){.homebtn{transition:none}}
 /* PC에서는 '담은 말씀' 단추를 숨긴다 — 목록·칸반 단추가 그 일을 한다 (2026-10-17 사용자 요청) */
-@media (min-width:900px){.homebtn{display:none}}
+@media (min-width:900px){
+  .homebtn{display:none}
+  #count::before{content:"모은 말씀 : ";color:var(--muted)}   /* 단추를 숨긴 자리에 이름을 적어 둔다 */
+  body.soloon #count::before{content:""}
+}
 .seg{display:inline-flex;border:1.5px solid var(--rule);border-radius:8px;overflow:hidden}
 .seg button{border:0;background:transparent;height:32px;padding:0 10px;font-size:13px;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
