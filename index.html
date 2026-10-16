@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-161">
+<meta name="app-build" content="2026-10-17-163">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -98,6 +98,8 @@ textarea.field{resize:vertical;min-height:80px;font-family:var(--serif);line-hei
 .homebtn:active{transform:scale(.97)}
 @media (hover:hover){.homebtn:hover{background:color-mix(in srgb,var(--violet) 26%,transparent);border-color:var(--violet)}}
 @media (prefers-reduced-motion:reduce){.homebtn{transition:none}}
+/* PC에서는 '담은 말씀' 단추를 숨긴다 — 목록·칸반 단추가 그 일을 한다 (2026-10-17 사용자 요청) */
+@media (min-width:900px){.homebtn{display:none}}
 .seg{display:inline-flex;border:1.5px solid var(--rule);border-radius:8px;overflow:hidden}
 .seg button{border:0;background:transparent;height:32px;padding:0 10px;font-size:13px;color:var(--muted)}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
@@ -1483,11 +1485,17 @@ body.boardon{height:100vh;overflow:hidden}
 body.boardon .wrap{height:100vh;display:flex;flex-direction:column;padding-bottom:0;box-sizing:border-box}
 body.boardon .top,body.boardon .toolbar,body.boardon .topicbar,body.boardon .filter{flex:0 0 auto}
 body.boardon .board4{flex:1 1 auto;height:auto;min-height:0;padding-bottom:0;margin-bottom:0}
-body.boardon #list,body.boardon #reviewBar{display:none!important}
+body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!important}
 /* 칸반일 때 '오늘'을 도구줄에 작은 아이콘 줄로 (2026-10-17 사용자 요청) */
 .todaymini{display:none}
+.bfilter{display:none}
 @media (min-width:900px){
-  body.boardon .todaymini{display:flex;align-items:center;gap:6px;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
+  /* 칸반 도구줄의 찾기 칸 (2026-10-17 사용자 요청) */
+  body.boardon .bfilter{display:block;flex:1 1 200px;min-width:140px;max-width:520px;margin-right:auto;height:32px;padding:0 14px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.04);color:var(--ink);font:inherit;font-size:13px}
+  body.boardon .bfilter::placeholder{color:var(--faint)}
+  body.boardon .bfilter:focus{outline:none;border-color:color-mix(in srgb,var(--violet) 65%,var(--rule));background:rgba(255,255,255,.07)}
+  body.boardon #dlFind{flex:0 0 auto;max-height:170px;overflow:auto;margin-bottom:8px}
+  body.boardon .todaymini{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
   body.boardon .todaymini::-webkit-scrollbar{display:none}
   body.boardon .toolbar h2{flex:0 0 auto}
 }
@@ -1522,6 +1530,7 @@ body.boardon #list,body.boardon #reviewBar{display:none!important}
 .bcn{margin-left:auto;min-width:24px;height:22px;padding:0 7px;border-radius:11px;background:color-mix(in srgb,var(--bc) 18%,transparent);color:var(--bc);font-size:12.5px;line-height:22px;text-align:center}
 .bclist{display:flex;flex-direction:column;gap:8px}
 .bcempty{margin:10px 6px;font-size:13px;color:var(--faint)}
+.bnohit{margin:40px auto;padding:16px 20px;border:1px dashed #2E2D34;border-radius:14px;color:var(--faint);font-size:14px;align-self:flex-start}
 .bcard{position:relative;padding:11px 12px 10px 14px;border:1px solid color-mix(in srgb,var(--tc) 22%,#2A2930);border-radius:12px;cursor:pointer;
   background:linear-gradient(165deg,color-mix(in srgb,var(--tc) 8%,#16151B),#111016);box-shadow:0 2px 6px rgba(0,0,0,.55);transition:transform .15s,border-color .15s,box-shadow .15s;animation:bwenter .35s cubic-bezier(.2,1.2,.4,1) both}
 .bcard::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--tc)}
@@ -2391,6 +2400,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   <div class="toolbar">
     <h2><button type="button" class="homebtn" id="homeBtn" aria-label="처음 화면으로">담은 말씀</button> <span id="count" style="color:var(--muted);font-size:15px;font-family:var(--sans);font-weight:400"></span></h2>
     <div class="todaymini" id="todayMini" aria-label="오늘 할 일"></div>
+    <input class="bfilter" id="bFilter" type="search" placeholder="🔍 말씀 · 묵상 · 기록에서 찾기 (초성도 돼요)" aria-label="말씀에서 찾기">
     <button class="tbtn tadd" id="topAdd" type="button">＋ 말씀 담기</button>
     <div class="viewseg" id="viewSeg" role="group" aria-label="보기 방식"><button type="button" data-v="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>목록</button><button type="button" data-v="board" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="4.5" height="16" rx="1.2"/><rect x="9.75" y="4" width="4.5" height="11" rx="1.2"/><rect x="16" y="4" width="4.5" height="13.5" rx="1.2"/></svg>칸반 보드</button></div>
     <button class="tbtn" id="sortBtn" type="button" aria-label="정렬 바꾸기">최근순</button>
@@ -2722,7 +2732,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     newLaneN=Math.max(1,Math.ceil(fresh.length/BNEW_MAX));
     var per=Math.ceil(fresh.length/newLaneN)||1;
     for(var li=0;li<newLaneN;li++)groups[newLaneKey(li)]=fresh.slice(li*per,(li+1)*per);
+    var finding=!!filterText||!!topicSel.length, shownCols=0;
     boardOrder().forEach(function(col){
+      if(finding&&!groups[col.k].length)return;   // 찾는 중에는 빈 칸을 아예 숨긴다 (2026-10-17 사용자 요청)
+      shownCols++;
       var cl=document.createElement("section"); cl.className="bcol"; cl.dataset.k=col.k; cl.style.setProperty("--bc",col.c);
       var h=document.createElement("div"); h.className="bch"; h.title=col.tip+" · 좌우로 끌면 칸 순서가 바뀌어요"; h.draggable=true;
       h.innerHTML='<span class="bce"></span><b></b><span class="bcn"></span>';
@@ -2750,6 +2763,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       });
       cl.appendChild(lst); box.appendChild(cl);
     });
+    if(finding&&!shownCols){
+      var nb=document.createElement("p"); nb.className="bnohit";
+      nb.textContent=filterText?"“"+filterText+"”이(가) 든 말씀이 없어요.":"고른 주제에 담긴 말씀이 없어요.";
+      box.appendChild(nb);
+    }
   }
   // 칸을 옮기면 도장·복습 상태를 그 칸에 맞게 바꿈. 지운 도장은 보관해 두었다가 다시 옮기면 되살림
   function kanbanMove(n,to){
@@ -3583,6 +3601,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     soloId=null; soloFrom="";
     setBoard(false); setTopics([]); openIds.clear(); spotId=null;
     var f=$("filter"); if(f){f.value="";f.hidden=true}
+    var bf1=$("bFilter"); if(bf1)bf1.value="";
     var fb=$("filterBtn"); if(fb)fb.setAttribute("aria-pressed","false");
     filterText="";
     render();
@@ -9770,7 +9789,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   });
   $("filterBtn").addEventListener("click",function(){
     var f=$("filter"), show=f.hidden; f.hidden=!show; this.setAttribute("aria-pressed",String(show));
-    if(show)f.focus(); else if(f.value){f.value="";filterText="";render()}
+    if(show)f.focus(); else if(f.value){f.value="";filterText="";var bf2=$("bFilter");if(bf2)bf2.value="";render()}
   });
   document.addEventListener("click",function(e){
     // 누른 버튼이 바로 다른 버튼으로 바뀌어도(노트 삭제 → 삭제하기) 메뉴 안을 누른 것으로 봄
@@ -9786,7 +9805,23 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     render();
   });
   var fTimer=null;
-  function applyFilter(){var v=$("filter").value.trim();if(v!==filterText){filterText=v;if(v)soloId=null;render()}}
+  function applyFilter(){var v=$("filter").value.trim();if(v!==filterText){filterText=v;if(v)soloId=null;var bf0=$("bFilter");if(bf0&&bf0.value!==$("filter").value)bf0.value=$("filter").value;render()}}
+  // 칸반 도구줄의 찾기 칸 (아래 찾기 칸과 같은 말을 쓴다 — 2026-10-17 사용자 요청)
+  (function(){
+    var bf=$("bFilter"); if(!bf)return;
+    var t=null;
+    function go(){
+      var v=bf.value.trim(); if(v===filterText)return;
+      filterText=v; if(v)soloId=null;
+      var f=$("filter"); if(f)f.value=bf.value;
+      render();
+    }
+    ["input","search","change","compositionend"].forEach(function(ev){bf.addEventListener(ev,function(){clearTimeout(t);t=setTimeout(go,120)})});
+    bf.addEventListener("keydown",function(e){
+      if(e.key!=="Escape")return;
+      e.stopPropagation(); bf.value=""; clearTimeout(t); go();
+    });
+  })();
   ["input","keyup","compositionupdate","compositionend","search","change"].forEach(function(ev){
     $("filter").addEventListener(ev,function(){clearTimeout(fTimer);fTimer=setTimeout(applyFilter,ev==="compositionupdate"?120:0)});
   });
