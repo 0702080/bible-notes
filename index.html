@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-158">
+<meta name="app-build" content="2026-10-17-159">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3434,7 +3434,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!on)return;
     var t=document.createElement("span"); t.className="solol"; t.textContent="📍 이 말씀만 보는 중"; sb.appendChild(t);
     var b2=document.createElement("button"); b2.type="button"; b2.className="solob main";
-    b2.textContent="전체 보기"; b2.title=soloFrom==="board"?"칸반 보드로 돌아가기":"모든 말씀 보기"; sb.appendChild(b2);
+    b2.textContent="전체 보기"; b2.title=(soloFrom==="board"?"칸반 보드로 돌아가기":"모든 말씀 보기")+" (말씀 제목 줄을 두 번 눌러도 돌아가요)"; sb.appendChild(b2);
   }
   function render(){
     if(drag||actDrag)return;
@@ -9647,6 +9647,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   $("list").addEventListener("click",function(e){if(suppressClick||reorderMode){e.stopPropagation();e.preventDefault()}},true);
   $("reorderBtn").addEventListener("click",function(){setReorder(!reorderMode)});
   $("reorderDone").addEventListener("click",function(){setReorder(false)});
+  // 한 말씀만 보는 중: 말씀 머리 줄을 두 번 누르면 보던 칸반(또는 전체 목록)으로 바로 돌아간다 (2026-10-17 사용자 요청)
+  $("list").addEventListener("dblclick",function(e){
+    if(!soloId)return;
+    if(!e.target.closest(".chead"))return;
+    if(e.target.closest("button,summary,a,input,textarea,select,[contenteditable]"))return;
+    e.preventDefault();
+    var back=soloFrom; soloId=null; soloFrom="";
+    if(back==="board"){setBoard(true);return}
+    render(); try{window.scrollTo({top:0,behavior:"smooth"})}catch(err){window.scrollTo(0,0)}
+  });
   $("list").addEventListener("contextmenu",function(e){if(drag||press||(e.target.closest(".note")&&!e.target.closest(NODRAG)))e.preventDefault()});
   document.addEventListener("touchmove",function(e){if(drag&&e.cancelable)e.preventDefault()},{passive:false});
   $("list").addEventListener("keydown",function(e){
