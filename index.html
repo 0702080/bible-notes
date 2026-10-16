@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-160">
+<meta name="app-build" content="2026-10-17-161">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2193,6 +2193,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlbarw{flex:1;height:8px;border-radius:4px;background:#222126;overflow:hidden}
 .dlbarw i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .35s}
 .dlweek{display:flex;justify-content:space-between;gap:6px;margin:4px 0 6px}
+/* 하루 돌아보기 안에서 찾기 (2026-10-17 사용자 요청) */
+.dlsearch{display:flex;align-items:center;gap:8px;max-width:608px;margin:6px auto 12px;padding:0 2px}
+.dlsearch input{flex:1;min-width:0;height:38px;padding:0 14px;border:1px solid #2A2930;border-radius:19px;background:var(--sheet);color:var(--ink);font:inherit;font-size:14px}
+.dlsearch input:focus{outline:none;border-color:var(--sky)}
+.dlsearch input::placeholder{color:var(--faint)}
+.dlsn{flex:0 0 auto;font-size:12px;color:var(--faint);white-space:nowrap}
+.dlsn:empty{display:none}
+.dlsx{flex:0 0 auto;height:32px;padding:0 12px;border:1px solid #34333A;border-radius:16px;background:transparent;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.dlsx[hidden]{display:none}
+.dlfindhit{display:block;width:100%;box-sizing:border-box;margin:0 0 6px 10px;padding:6px 10px;border:1px solid #232229;border-left:3px solid color-mix(in srgb,var(--sky) 60%,transparent);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--sky) 6%,transparent);color:var(--muted);font:inherit;font-size:12.5px;line-height:1.55;text-align:left}
+.dlfindhit b{margin-right:6px;color:var(--sky);font-weight:700}
+.dlnohit{margin:18px auto;max-width:608px;padding:14px;border:1px dashed #2E2D34;border-radius:12px;color:var(--faint);font-size:13px;text-align:center}
 @media (max-width:420px){.dlfix{gap:8px;padding:8px 12px}.dlday{gap:6px}.dldate{font-size:14px;min-width:96px}.dlday button{width:28px;height:28px;font-size:12px}.dlcnt{font-size:13.5px}}
 .dlw{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 0;border:0;background:transparent;font:inherit;cursor:pointer}
 .dlw i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;color:#141416;background:color-mix(in srgb,var(--gold) calc(var(--f) * 100%),#1c1b21)}
@@ -6215,6 +6227,36 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }).map(function(x){return x.g});
   }
   function dlPinned(o,g){return (o&&Array.isArray(o.gpin))?o.gpin.indexOf(g)>=0:false}
+  // 하루 돌아보기 안에서 찾기: 묶음 이름 · 항목 글 · 적어 둔 기록 (2026-10-17 사용자 요청)
+  var dlFind="";
+  function dlHit(t){return !!dlFind&&matchAll(String(t||""),dlFind,true).length>0}
+  function dlMemoFind(o,id){   // 이 항목에 적어 둔 기록 가운데 찾는 말이 든 것 (모든 날)
+    var out=[], mem=(o&&o.memo)||{};
+    if(!dlFind)return out;
+    Object.keys(mem).sort().reverse().forEach(function(day){
+      var m=mem[day]; if(!m||typeof m!=="object")return;
+      Object.keys(m).forEach(function(k){
+        if(k!==id&&k.indexOf(id+"~")!==0)return;
+        var t=String(m[k]||""); if(t.trim()&&dlHit(t))out.push({day:day,key:k,text:t});
+      });
+    });
+    return out;
+  }
+  function dlMarkIn(el,q){   // 찾은 말에 노란 표시
+    if(!q||!el)return;
+    var nodes=[], w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null);
+    while(w.nextNode())nodes.push(w.currentNode);
+    nodes.forEach(function(node){
+      var t=node.nodeValue||"", rs=matchAll(t,q,false); if(!rs.length)return;
+      var frag=document.createDocumentFragment(), pos=0;
+      rs.forEach(function(r){
+        if(r[0]>pos)frag.appendChild(document.createTextNode(t.slice(pos,r[0])));
+        var mk=document.createElement("mark"); mk.textContent=t.slice(r[0],r[1]); frag.appendChild(mk); pos=r[1];
+      });
+      if(pos<t.length)frag.appendChild(document.createTextNode(t.slice(pos)));
+      node.parentNode.replaceChild(frag,node);
+    });
+  }
   // 그날 그 항목에 적어 둔 글 (예: 어떻게 기도했는지)
   function dlMemoGet(o,day,id){var m=o&&o.memo&&o.memo[day]; return (m&&typeof m[id]==="string")?m[id]:""}
   // 한 항목에 기록을 여러 개 따로 둔다: 첫 기록은 id, 더 쓴 기록은 id~2, id~3 … (2026-10-15 사용자 요청)
@@ -6263,6 +6305,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         '<div class="dlfix"><div class="dlday"><button type="button" class="dlprev" aria-label="전날">◀</button><b class="dldate"></b><button type="button" class="dlnext" aria-label="다음 날">▶</button></div>'+
         '<div class="dlprog"><span class="dlcnt"></span><span class="dlbarw"><i></i></span></div></div>'+
         '<div class="dlbody"><div class="dlweek" aria-label="최근 7일"></div>'+
+        '<div class="dlsearch"><input class="dlsin" type="search" placeholder="찾기 — 묶음 이름 · 항목 · 적어 둔 기록 (초성도 돼요)" aria-label="하루 돌아보기에서 찾기"><span class="dlsn"></span><button type="button" class="dlsx" hidden>지우기</button></div>'+
         '<div class="dllist"></div>'+
         '<form class="dladd" autocomplete="off" hidden><select class="field dlg" aria-label="묶음"></select><input class="field dlin" maxlength="40" placeholder="새 항목 (예: 먼저 인사했는가)" aria-label="새 항목"><button type="submit" class="primary">추가</button></form>'+
         '<form class="dlnewg" autocomplete="off" hidden><input class="field dlge" maxlength="4" placeholder="🙂" aria-label="묶음 이모지"><input class="field dlgn" maxlength="14" placeholder="새 묶음 이름 (예: 가정, 일터)" aria-label="새 묶음 이름"><button type="submit">+ 묶음</button></form>'+
@@ -6277,6 +6320,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         ni.value=""; ei.value=""; dlPickG=id; drawDaily(); toast("'"+t+"' 묶음을 만들었어요. 아래 칸에서 항목을 넣어 주세요");
         var inp=dl.querySelector(".dlin"); setTimeout(function(){inp.scrollIntoView({block:"center"});inp.focus()},60);
       });
+      (function(){   // 찾기 칸 (2026-10-17 사용자 요청)
+        var si=dl.querySelector(".dlsin"), t=null;
+        si.addEventListener("input",function(){clearTimeout(t);t=setTimeout(function(){var v=si.value.trim();if(v!==dlFind){dlFind=v;drawDaily()}},120)});
+        si.addEventListener("keydown",function(e){if(e.key==="Escape"){e.stopPropagation();si.value="";dlFind="";drawDaily()}});
+        dl.querySelector(".dlsx").addEventListener("click",function(){si.value="";dlFind="";drawDaily();si.focus()});
+      })();
       dl.querySelector(".dlclose").addEventListener("click",closeDaily);
       dl.querySelector(".dlprev").addEventListener("click",function(){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()-864e5);drawDaily()});
       dl.querySelector(".dlnext").addEventListener("click",function(){var t=dkey(Date.now());if(dlDay<t){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()+864e5);drawDaily()}});
@@ -6328,6 +6377,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(b.classList.contains("dldel")){
           if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
           o.items=o.items.filter(function(it){return it.id!==id}); saveDaily(o); drawDaily(); return;
+        }
+        if(b.classList.contains("dlfindhit")){   // 찾은 기록: 그날로 옮겨 가서 펼쳐 보여 준다
+          dlDay=b.dataset.day; dlMemoMore.add(b.dataset.hid); drawDaily();
+          setTimeout(function(){var rw=dl.querySelector('.dlitem[data-id="'+b.dataset.hid+'"]');if(rw){rw.scrollIntoView({block:"center"});rw.classList.add("dlflash");setTimeout(function(){rw.classList.remove("dlflash")},1500)}},40);
+          return;
         }
         if(b.classList.contains("dlauto")&&!b.classList.contains("dlmemo")){dlGotoThanks();return}   // 한 줄 감사 쓰는 고으로
         function dlOpenMemo(mid){   // 적는 칸 열기
@@ -6394,6 +6448,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     dlDay=(day&&/^\d{4}-\d{2}-\d{2}$/.test(day))?day:dkey(Date.now());
     dlEdit=false; dlEditId=""; dlGEditId=""; dlMemoId="";
+    dlFind=""; var si0=dl.querySelector(".dlsin"); if(si0)si0.value="";
     if(focusId){   // 찾기에서 들어오면 그 항목의 기록을 펼쳐 둔다
       dlMemoMore.add(focusId);
       var fit=dailyData().items.filter(function(x){return x.id===focusId})[0];
@@ -6565,10 +6620,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       wk.appendChild(d);
     }
     var list=dl.querySelector(".dllist"), outer=list; list.textContent="";
+    var fq=dlFind, fcount=0;
     var gs=dlSortGroups(o,dlGroups(o)), sel=dl.querySelector(".dlg"), keep=dlPickG||sel.value;
     sel.innerHTML=gs.map(function(g){return '<option value="'+g.g+'">'+g.e+' '+g.t.replace(/[<&"]/g,"")+'</option>'}).join(""); if(keep&&gs.some(function(g){return g.g===keep}))sel.value=keep; dlPickG="";
     gs.forEach(function(g){
-      var its=o.items.filter(function(it){return it.g===g.g}), mine=/^u/.test(g.g); if(!its.length&&!(dlEdit&&mine))return;
+      var its=o.items.filter(function(it){return it.g===g.g}), mine=/^u/.test(g.g), hits={};
+      if(fq){   // 찾는 중: 묶음 이름·항목 글·적어 둔 기록에 맞는 것만
+        var gHit=dlHit(g.e+" "+g.t);
+        its=its.filter(function(it){
+          var hs=dlMemoFind(o,it.id); if(hs.length)hits[it.id]=hs;
+          return gHit||dlHit(it.t)||hs.length>0;
+        });
+        if(!its.length)return;
+        fcount+=its.length;
+      }else if(!its.length&&!(dlEdit&&mine))return;
       // 묶음마다 한 칸(칸반) — PC에서는 이 칸들이 옆으로 늘어선다 (2026-10-17 사용자 요청)
       var list=document.createElement("section"); list.className="dlgrp"+(dlPinned(o,g.g)?" pin":""); list.dataset.g=g.g; list.style.setProperty("--gc",g.c);
       outer.appendChild(list);
@@ -6586,6 +6651,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         gr.setAttribute("aria-label","'"+g.t+"' 묶음 "+(gOpen?"접기":"펼치기")+" (두 번 누르면 이름 바꾸기)");
         gr.title="누르면 접고 펼쳐요 · 두 번 누르면 이름을 고쳐요";
         gr.textContent=g.e+" "+g.t+"  "+its.filter(function(it){return on.indexOf(it.id)>=0}).length+"/"+its.length;
+        if(fq)dlMarkIn(gr,fq);
         var pen=document.createElement("span"); pen.className="dlgpen"; pen.textContent="✏️"; pen.setAttribute("aria-hidden","true"); gr.appendChild(pen);
         var gch=document.createElement("span"); gch.className="dlgchev"; gch.setAttribute("aria-hidden","true"); gr.appendChild(gch);
         h.appendChild(gr);
@@ -6600,7 +6666,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(dlEdit&&mine){var gd=document.createElement("button");gd.type="button";gd.className="dlgdel";gd.dataset.g=g.g;gd.textContent="묶음 지우기";h.appendChild(gd)}
         list.appendChild(h);
       }
-      if(dlGFold.has(g.g))return;   // 접힌 묶음은 항목을 그리지 않는다
+      if(!fq&&dlGFold.has(g.g))return;   // 접힌 묶음은 항목을 그리지 않는다 (찾는 중에는 펼쳐서 보여 줌)
       if(!its.length){var em=document.createElement("p");em.className="dlgempty";em.textContent="아래 '새 항목' 칸에서 이 묶음을 골라 항목을 넣어 주세요.";list.appendChild(em)}
       its.forEach(function(it){
         if(dlEditId===it.id){   // 항목 글 고치기
@@ -6616,7 +6682,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var b=document.createElement("button"); b.type="button"; b.className="dlrow"+(on.indexOf(it.id)>=0?" on":""); b.dataset.id=it.id; b.setAttribute("aria-pressed",String(on.indexOf(it.id)>=0));
         if(dlEdit)b.title="눌러서 글 고치기";
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
-        dlRefInto(b.querySelector(".dlt"),it.t); row.appendChild(b);
+        dlRefInto(b.querySelector(".dlt"),it.t); if(fq)dlMarkIn(b.querySelector(".dlt"),fq); row.appendChild(b);
         {   // 기록(한 줄로 적어 두기) 단추는 고치기 중에도 그대로 보인다
           var pill=document.createElement("button"); pill.type="button";
           if(isThx){   // 감사 항목은 '한 줄 감사'가 그 기록 코너
@@ -6632,6 +6698,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         }
         if(dlEdit){var x=document.createElement("button");x.type="button";x.className="dldel";x.dataset.id=it.id;x.textContent="×";x.setAttribute("aria-label","이 항목 지우기");row.appendChild(x)}
         list.appendChild(row);
+        if(fq&&hits[it.id])hits[it.id].slice(0,3).forEach(function(h){   // 찾은 기록: 누르면 그날로
+          var hb=document.createElement("button"); hb.type="button"; hb.className="dlfindhit"; hb.dataset.day=h.day; hb.dataset.hid=it.id;
+          var d=document.createElement("b"); d.textContent=dayName(h.day); hb.appendChild(d);
+          var sp=document.createElement("span"); sp.textContent=String(h.text).replace(/\s+/g," ").slice(0,120)+(h.text.length>120?"…":"");
+          hb.appendChild(sp); dlMarkIn(sp,fq);
+          hb.title=dayName(h.day)+" 기록 보기"; hb.setAttribute("aria-label",dayName(h.day)+" 기록 보기");
+          list.appendChild(hb);
+        });
         // 기록 칸 하나 (첫 기록이면 '항목 글 고치기'도 같이)
         function memoBox(key,val,no){
           var mx=document.createElement("div"); mx.className="dlmemobox"; mx.dataset.id=key; mx.dataset.day=dlDay;
@@ -6667,6 +6741,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var rr=rw.getBoundingClientRect(), pr=pl.getBoundingClientRect();
       rw.style.paddingRight=Math.max(10,Math.round(rr.right-pr.left)+10)+"px";
     });
+    var sn=dl.querySelector(".dlsn"), sx=dl.querySelector(".dlsx");
+    if(sn)sn.textContent=fq?(fcount?fcount+"개":"없어요"):"";
+    if(sx)sx.hidden=!fq;
+    if(fq&&!fcount){var nh=document.createElement("p");nh.className="dlnohit";nh.textContent="“"+fq+"”이(가) 든 묶음·항목·기록이 없어요.";outer.appendChild(nh)}
     dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit;
     var eb=dl.querySelector(".dledit"); eb.textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기"; eb.classList.toggle("on",dlEdit);
   }
