@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-154">
+<meta name="app-build" content="2026-10-17-155">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1479,6 +1479,26 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 }
 body.boardon .wrap{max-width:none;padding-left:20px;padding-right:20px}
 body.boardon #list,body.boardon #reviewBar{display:none!important}
+/* 칸반일 때 '오늘'을 도구줄에 작은 아이콘 줄로 (2026-10-17 사용자 요청) */
+.todaymini{display:none}
+@media (min-width:900px){
+  body.boardon .todaymini{display:flex;align-items:center;gap:6px;flex:1 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
+  body.boardon .todaymini::-webkit-scrollbar{display:none}
+  body.boardon .toolbar h2{flex:0 0 auto}
+}
+.tmchip{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;height:32px;padding:0 11px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.tmchip i{font-style:normal;font-size:14.5px;line-height:1}
+.tmchip b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.tmchip.main{border-color:color-mix(in srgb,var(--violet) 55%,var(--rule));background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet)}
+.tmchip.main b{color:var(--violet)}
+.tmchip.done{border-color:color-mix(in srgb,var(--green) 45%,var(--rule));color:var(--green)}
+.tmchip.done b{color:var(--green)}
+.tmchip.warn{border-color:color-mix(in srgb,var(--gold) 50%,var(--rule));color:var(--gold)}
+.tmchip.warn b{color:var(--gold)}
+.tmchip.bad{border-color:color-mix(in srgb,var(--pink) 50%,var(--rule));color:var(--pink)}
+@media (hover:hover){.tmchip:hover{background:#24232C;border-color:color-mix(in srgb,var(--ink) 25%,var(--rule))}}
+.tmbar{width:52px;height:6px;border-radius:3px;background:#222126;overflow:hidden}
+.tmbar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .35s}
 .board4{display:flex;gap:14px;align-items:stretch;margin-top:8px;overflow-x:auto;overflow-y:hidden;height:calc(100vh - 165px);min-height:320px;padding-bottom:10px;overscroll-behavior-x:contain;cursor:grab}
 .board4.panning{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .board4>.bcol{flex:1 0 230px;min-width:230px;display:flex;flex-direction:column;max-height:100%}
@@ -2353,6 +2373,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 
   <div class="toolbar">
     <h2><button type="button" class="homebtn" id="homeBtn" aria-label="처음 화면으로">담은 말씀</button> <span id="count" style="color:var(--muted);font-size:15px;font-family:var(--sans);font-weight:400"></span></h2>
+    <div class="todaymini" id="todayMini" aria-label="오늘 할 일"></div>
     <button class="tbtn tadd" id="topAdd" type="button">＋ 말씀 담기</button>
     <div class="viewseg" id="viewSeg" role="group" aria-label="보기 방식"><button type="button" data-v="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>목록</button><button type="button" data-v="board" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="4.5" height="16" rx="1.2"/><rect x="9.75" y="4" width="4.5" height="11" rx="1.2"/><rect x="16" y="4" width="4.5" height="13.5" rx="1.2"/></svg>칸반 보드</button></div>
     <button class="tbtn" id="sortBtn" type="button" aria-label="정렬 바꾸기">최근순</button>
@@ -3412,7 +3433,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function render(){
     if(drag||actDrag)return;
-    renderTopicBar(); renderReviewBar(); refreshXrefs(); renderSoloBar();
+    renderTopicBar(); renderReviewBar(); renderTodayMini(); refreshXrefs(); renderSoloBar();
     var list=$("list"), order=sorted(), shown=0;
     if(spotId&&!openIds.has(spotId))spotId=null;
     if(spotId&&notes.has(spotId)){var sp0=notes.get(spotId);order=[sp0].concat(order.filter(function(x){return x!==sp0}))}
@@ -4744,8 +4765,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     var add=document.createElement("button"); add.type="button"; add.className="tchip tcollect"; add.id="openCollect"; add.textContent="+ 주제로 모으기"; bar.appendChild(add);
   }
-  $("reviewBar").addEventListener("click",function(e){
-    var b=e.target.closest(".rvchip"); if(!b)return;
+  function todayActClick(e){
+    var b=e.target.closest(".rvchip,.tmchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
     if(b.dataset.act==="prog"){openProg();return}
     if(b.dataset.act==="friends"){openFr();return}
@@ -4753,7 +4774,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.dataset.act==="sbsync"){sbSync("manual");return}
     if(b.dataset.act==="sblogin"){openSb();return}
     if(b.dataset.act==="rvall"){openRecall();return}
-    var id=b.dataset.id, act=b.dataset.act||"mem"; setTopics([]);
+    var id=b.dataset.id, act=b.dataset.act||"mem"; if(!id)return; setTopics([]);
+    if(boardOn){boardOn=false;try{localStorage.setItem("bible-view","list")}catch(err){}applyBoard()}   // 칸반에서 눌렀으면 목록으로
     if(act==="mem")memOpen.add(id);
     if(act==="med"||act==="act")tabOf.set(id,act==="med"?"m":"a");
     if(act==="act"){var an=notes.get(id), tk=dkey(Date.now()), ch=false; if(an)(an.acts||[]).forEach(function(a){if(aFold.has(a.id)&&(a.stamps||[]).indexOf(tk)<0&&(a.stamps||[]).length<(a.goal||21)){aFold.delete(a.id);ch=true}}); if(ch)saveAFold()}
@@ -4762,7 +4784,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var bar=$("reviewBar"); if(bar){var r0=bar.getBoundingClientRect(); if(r0.top<0||r0.top>window.innerHeight*0.4)bar.scrollIntoView({block:"start",behavior:"smooth"})}
     var sc=cards.get(id); if(sc){sc.classList.remove("spotin");void sc.offsetWidth;sc.classList.add("spotin")}
     if(act==="med"){var cc=cards.get(id);if(cc){var am=cc.querySelector(".addm");if(am)setTimeout(function(){am.click()},120)}}
-  });
+  }
+  $("reviewBar").addEventListener("click",todayActClick);
+  $("todayMini").addEventListener("click",todayActClick);
   $("topicBar").addEventListener("click",function(e){
     var b=e.target.closest("button"); if(!b)return;
     if(b.id==="openCollect"){openCollect("");return}
@@ -6649,6 +6673,57 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       el.appendChild(a); last=m.index+txt.length;
     }
     if(last<t.length)el.appendChild(document.createTextNode(t.slice(last)));
+  }
+  // 칸반일 때 도구줄에 뜨는 작은 '오늘' 아이콘 줄 (2026-10-17 사용자 요청)
+  function renderTodayMini(){
+    var bar=$("todayMini"); if(!bar)return;
+    bar.textContent="";
+    if(!boardOn||!notes.size)return;
+    var all=sorted(), today=dkey(Date.now());
+    function chip(o){
+      var b=document.createElement(o.act?"button":"span");
+      if(o.act){b.type="button";b.dataset.act=o.act;if(o.id)b.dataset.id=o.id}
+      b.className="tmchip"+(o.cls?" "+o.cls:"");
+      b.title=o.title; b.setAttribute("aria-label",o.title);
+      var ic=document.createElement("i"); ic.textContent=o.icon; ic.setAttribute("aria-hidden","true"); b.appendChild(ic);
+      if(o.bar!=null){var w=document.createElement("span");w.className="tmbar";var f=document.createElement("i");f.style.width=o.bar+"%";w.appendChild(f);b.appendChild(w)}
+      if(o.n){var t=document.createElement("b");t.textContent=o.n;b.appendChild(t)}
+      bar.appendChild(b);
+    }
+    // 🌙 하루 돌아보기
+    var dd=dailyData(), dc=dailyChecked(dd,today).length, dt=dd.items.length;
+    chip({icon:"🌙",act:"daily",cls:(dt&&dc===dt)?"done":"main",bar:dt?Math.round(dc/dt*100):0,n:dc+"/"+dt,
+      title:"하루 돌아보기 "+dc+" / "+dt+(dt&&dc===dt?" — 다 돌아봤어요":"")});
+    // 🔁 복습할 말씀
+    var due=all.filter(function(n){var r=reviewInfo(n);return r&&r.due});
+    if(due.length)chip({icon:"🔁",act:"rvall",cls:"warn",n:due.length,title:"복습할 말씀 "+due.length+"개 — 눌러서 한 번에 복습"});
+    // ✍️ 오늘 묵상
+    var st=medStats(), didToday=!!st.days[today], lastMedNote=null, lastAt=0;
+    all.forEach(function(n){(n.meds||[]).forEach(function(m){if(String(m.text||"").trim()&&(+m.at||0)>lastAt){lastAt=+m.at;lastMedNote=n}})});
+    var target=notes.get(lastOpenId())||lastMedNote||all[0];
+    if(didToday)chip({icon:"✨",cls:"done",title:"오늘 묵상 완료"+(st.streak>=2?"  ·  🔥 "+st.streak+"일 연속":"")});
+    else if(target)chip({icon:"✍️",act:"med",id:target.id,title:"오늘 묵상 쓰기 — "+(target.ref||"")+(st.streak>=1?" (쓰면 🔥 "+(st.streak+1)+"일 연속)":"")});
+    // ✅ 오늘 실천
+    var acts=[];
+    all.forEach(function(n){(n.acts||[]).forEach(function(a){if(a.t&&a.t.trim()&&!a.done&&(a.stamps||[]).length&&(a.stamps||[]).indexOf(today)<0)acts.push(n)})});
+    var actNotes=acts.filter(function(n,i){return acts.indexOf(n)===i});
+    if(actNotes.length)chip({icon:"✅",act:"act",id:actNotes[0].id,n:actNotes.length,title:"오늘 실천 "+actNotes.length+"개 남았어요"});
+    // ☁️ 동기화
+    var ss=sbSession(), sst=(typeof sbState==="object"&&sbState)||{}, gc=ghCfg(), gs=(typeof ghState==="object"&&ghState)||{};
+    if(ss){
+      var sago=sst.at?Math.round((Date.now()-sst.at)/60000):-1;
+      chip({icon:"☁️",act:"sbsync",cls:sst.ok===false?"bad":"",
+        title:"동기화 — "+(sst.ok===false?"안 됐어요":sago<0?"맞추는 중…":sago<1?"방금 맞춤":sago+"분 전 맞춤")+" · 눌러서 지금 맞추기"});
+    }else if(gc)chip({icon:"☁️",act:"sync",cls:gs.ok===false?"bad":"",title:"GitHub 동기화 — 눌러서 지금 맞추기"});
+    else chip({icon:"☁️",act:"sblogin",title:"동기화 꺼짐 — 눌러서 로그인"});
+    // 👥 친구
+    if(ss){
+      var fin=(frData&&frData.incoming||[]).length, fct=(frData&&frData.friends||[]).length;
+      chip({icon:fin?"💌":"👥",act:"friends",cls:fin?"warn":"",n:fin||fct||"",
+        title:fin?"친구 신청 "+fin+"개 — 확인하기":fct?"친구 "+fct+"명":"친구 맺기"});
+    }
+    // 📊 실천 진도표
+    if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))chip({icon:"📊",act:"prog",title:"실천 진도표 전체 보기"});
   }
   function renderReviewBar(){
     var bar=$("reviewBar"); if(!bar)return;
