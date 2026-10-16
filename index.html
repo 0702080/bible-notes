@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-168">
+<meta name="app-build" content="2026-10-17-169">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1494,8 +1494,9 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .todaymini{display:none}
 .bfilter{display:none}
 @media (min-width:900px){
+  body.boardon .toolbar>*{flex:0 0 auto}   /* 단추 글자가 찌그러져 겹치지 않게 */
   /* 칸반 도구줄의 찾기 칸 (2026-10-17 사용자 요청) */
-  body.boardon .bfilter{display:block;flex:0 1 520px;min-width:140px;max-width:520px;margin-left:auto;margin-right:auto;height:32px;padding:0 14px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.04);color:var(--ink);font:inherit;font-size:13px}
+  body.boardon .bfilter{display:block;flex:0 1 520px;min-width:72px;max-width:520px;margin-left:auto;margin-right:auto;height:32px;padding:0 14px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.04);color:var(--ink);font:inherit;font-size:13px}
   body.boardon .bfilter::placeholder{color:var(--faint)}
   body.boardon .bfilter:focus{outline:none;border-color:color-mix(in srgb,var(--violet) 65%,var(--rule));background:rgba(255,255,255,.07)}
   /* 아래 손잡이를 끌어 높이를 바꿀 수 있다 (2026-10-17 사용자 요청) */
@@ -1523,6 +1524,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .tmbar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .35s}
 .board4{display:flex;gap:14px;align-items:stretch;margin-top:8px;overflow-x:auto;overflow-y:hidden;height:calc(100vh - 165px);min-height:320px;padding-bottom:10px;overscroll-behavior-x:contain;cursor:grab}
 .board4.panning{cursor:grabbing;-webkit-user-select:none;user-select:none}
+.board4.find{justify-content:safe center}
 .board4>.bcol{flex:1 0 230px;min-width:230px;max-width:380px;display:flex;flex-direction:column;max-height:100%}   /* 칸이 하나뿐일 때 지나치게 넓어지지 않게 */
 .bclist{overflow-y:auto;overscroll-behavior-y:contain;flex:1 1 auto;min-height:0;scrollbar-width:none;-ms-overflow-style:none}
 .bclist::-webkit-scrollbar{display:none}
@@ -2781,6 +2783,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       });
       cl.appendChild(lst); box.appendChild(cl);
     });
+    box.classList.toggle("find",finding&&shownCols>0);   // 찾은 칸이 적으면 화면 가운데로 (2026-10-17 사용자 요청)
     if(finding&&!shownCols){
       var nb=document.createElement("p"); nb.className="bnohit";
       nb.textContent=filterText?"“"+filterText+"”이(가) 든 말씀이 없어요.":"고른 주제에 담긴 말씀이 없어요.";
