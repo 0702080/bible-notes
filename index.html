@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-156">
+<meta name="app-build" content="2026-10-17-157">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2159,7 +2159,7 @@ button:active{filter:brightness(1.15)}
 .rqb.say{width:48px;padding:0}
 @media (max-width:400px){.rqb{padding:0 14px;font-size:14.5px}}
 /* 보드에서 고른 말씀 하나만 보기 (2026-10-17 사용자 요청) */
-.solobar{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:8px 12px;border:1px solid color-mix(in srgb,var(--gold) 35%,#232229);border-radius:12px;background:color-mix(in srgb,var(--gold) 8%,transparent)}
+.solobar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:8px 12px;border:1px solid color-mix(in srgb,var(--gold) 35%,#232229);border-radius:12px;background:color-mix(in srgb,var(--gold) 10%,var(--paper));box-shadow:0 6px 18px rgba(0,0,0,.45)}
 .solobar[hidden]{display:none}
 .solol{font-size:13px;font-weight:700;color:var(--gold)}
 .solob{height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:transparent;color:var(--muted);font-size:12.5px;white-space:nowrap}
@@ -4780,7 +4780,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.dataset.act==="sblogin"){openSb();return}
     if(b.dataset.act==="rvall"){openRecall();return}
     var id=b.dataset.id, act=b.dataset.act||"mem"; if(!id)return; setTopics([]);
-    if(boardOn){boardOn=false;try{localStorage.setItem("bible-view","list")}catch(err){}applyBoard()}   // 칸반에서 눌렀으면 목록으로
+    if(boardOn){   // 칸반에서 눌렀으면: 그 말씀 하나만 펼치고, '전체 보기'로 칸반에 바로 돌아가게 (2026-10-17 사용자 요청)
+      boardOn=false; try{localStorage.setItem("bible-view","list")}catch(err){} applyBoard();
+      soloId=id; soloFrom="board";
+    }
     if(act==="mem")memOpen.add(id);
     if(act==="med"||act==="act")tabOf.set(id,act==="med"?"m":"a");
     if(act==="act"){var an=notes.get(id), tk=dkey(Date.now()), ch=false; if(an)(an.acts||[]).forEach(function(a){if(aFold.has(a.id)&&(a.stamps||[]).indexOf(tk)<0&&(a.stamps||[]).length<(a.goal||21)){aFold.delete(a.id);ch=true}}); if(ch)saveAFold()}
