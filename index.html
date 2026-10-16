@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-16-144">
+<meta name="app-build" content="2026-10-17-145">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8025,6 +8025,25 @@ button:active{filter:brightness(1.15)}
           if(!hasOwn)od.items=obj.daily.items; else obj.daily.items.forEach(function(it){if(it&&it.id&&!od.items.some(function(x){return x.id===it.id}))od.items.push(it)});
           if(Array.isArray(obj.daily.groups)){if(!Array.isArray(od.groups))od.groups=[];obj.daily.groups.forEach(function(g){if(g&&g.g&&!od.groups.some(function(x){return x.g===g.g}))od.groups.push(g)})}   // 내가 만든 묶음도 함께
           Object.keys(obj.daily.days||{}).forEach(function(k){var a=od.days[k]||[];(obj.daily.days[k]||[]).forEach(function(id){if(a.indexOf(id)<0)a.push(id)});od.days[k]=a});
+          // 항목마다 적어 둔 기록도 함께 (이 기기에 없는 것만 채운다 — 적어 둔 글은 지우지 않음)
+          if(obj.daily.memo&&typeof obj.daily.memo==="object"){
+            if(!od.memo||typeof od.memo!=="object")od.memo={};
+            Object.keys(obj.daily.memo).forEach(function(day){
+              var inc=obj.daily.memo[day]; if(!inc||typeof inc!=="object")return;
+              if(!od.memo[day]||typeof od.memo[day]!=="object")od.memo[day]={};
+              Object.keys(inc).forEach(function(iid){
+                var mine=od.memo[day][iid];
+                if((!mine||!String(mine).trim())&&String(inc[iid]||"").trim())od.memo[day][iid]=inc[iid];
+              });
+              if(!Object.keys(od.memo[day]).length)delete od.memo[day];
+            });
+            if(!Object.keys(od.memo).length)delete od.memo;
+          }
+          // 내가 바꾼 묶음 이름도 함께
+          if(obj.daily.gname&&typeof obj.daily.gname==="object"){
+            if(!od.gname||typeof od.gname!=="object")od.gname={};
+            Object.keys(obj.daily.gname).forEach(function(g){if(!od.gname[g])od.gname[g]=obj.daily.gname[g]});
+          }
           saveDaily(od); renderReviewBar()}
         if(obj&&obj.prays1)p1Merge(obj.prays1);
         if(obj&&obj.chapters&&typeof obj.chapters==="object"){var mc=myChapters();Object.keys(obj.chapters).forEach(function(k){var c=obj.chapters[k];if(c&&Array.isArray(c.v)&&(!mc[k]||(+c.at||0)>(+mc[k].at||0)))mc[k]=c});try{localStorage.setItem(MYCH,JSON.stringify(mc))}catch(e){}}
