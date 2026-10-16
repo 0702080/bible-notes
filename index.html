@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-155">
+<meta name="app-build" content="2026-10-17-156">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1478,6 +1478,11 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
   .fab{display:none!important}
 }
 body.boardon .wrap{max-width:none;padding-left:20px;padding-right:20px}
+/* 칸반에서는 화면을 꽉 채운다: 머리 줄은 늘 제자리, 가로 스크롤바 밑 빈 자리 없음 (2026-10-17 사용자 요청) */
+body.boardon{height:100vh;overflow:hidden}
+body.boardon .wrap{height:100vh;display:flex;flex-direction:column;padding-bottom:0;box-sizing:border-box}
+body.boardon .top,body.boardon .toolbar,body.boardon .topicbar,body.boardon .filter{flex:0 0 auto}
+body.boardon .board4{flex:1 1 auto;height:auto;min-height:0;padding-bottom:0;margin-bottom:0}
 body.boardon #list,body.boardon #reviewBar{display:none!important}
 /* 칸반일 때 '오늘'을 도구줄에 작은 아이콘 줄로 (2026-10-17 사용자 요청) */
 .todaymini{display:none}
