@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-153">
+<meta name="app-build" content="2026-10-17-154">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -505,10 +505,18 @@ body{touch-action:manipulation}
 .htag.g{color:var(--green)} .htag.v{color:var(--violet)} .htag.b{color:var(--blue)} .htag.s{color:var(--sky)}
 .hbody{min-width:0;overflow:hidden;text-overflow:ellipsis}
 mark{background:color-mix(in srgb,#FFD54A 55%,transparent);color:inherit;border-radius:3px;padding:0 1px}
+/* 스크롤바: 가로든 세로든 같은 색, 같은 굵기 (2026-10-17 사용자 요청) */
+html{scrollbar-width:thin;scrollbar-color:var(--sbthumb,#3E3C47) transparent}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--sbthumb,#3E3C47);border-radius:5px}
+::-webkit-scrollbar-thumb:hover{background:var(--sbthumb-on,#514F5D)}
+::-webkit-scrollbar-corner{background:transparent}
 
 /* ===== premium black theme (always on) ===== */
 :root:root:root{
   color-scheme:dark;
+  --sbthumb:#3E3C47; --sbthumb-on:#514F5D;   /* 가로·세로 스크롤바 색을 똑같이 */
   --paper:#0D0D0F; --sheet:#17171B; --rule:#2B2A30; --ink:#EEEAE2; --muted:#A09A91; --faint:#6E6A63;
   --violet:#B79CF2; --orange:#F4A45E; --hi:#FFBC73; --green:#6FD09A; --blue:#8FAAFF; --sky:#6ECBF4; --pink:#F48FB6;
   --btn:#EEEAE2; --btn-ink:#121214; --focus:#B79CF2;
@@ -1476,8 +1484,10 @@ body.boardon #list,body.boardon #reviewBar{display:none!important}
 .board4>.bcol{flex:1 0 230px;min-width:230px;display:flex;flex-direction:column;max-height:100%}
 .bclist{overflow-y:auto;overscroll-behavior-y:contain;flex:1 1 auto;min-height:0;scrollbar-width:none;-ms-overflow-style:none}
 .bclist::-webkit-scrollbar{display:none}
+.board4{scrollbar-width:thin;scrollbar-color:var(--sbthumb) transparent}
 .board4::-webkit-scrollbar{height:10px}
-.board4::-webkit-scrollbar-thumb{background:#34333A;border-radius:5px}
+.board4::-webkit-scrollbar-thumb{background:var(--sbthumb);border-radius:5px}
+.board4::-webkit-scrollbar-track{background:transparent}
 .bch b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .board4[hidden]{display:none}
 .bcol{background:#272530;border:1px solid #38343F;border-radius:16px;padding:10px;min-height:200px}
