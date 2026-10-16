@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-159">
+<meta name="app-build" content="2026-10-17-160">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2020,13 +2020,13 @@ button:active{filter:brightness(1.15)}
 .mcalhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .mcalhd b{font-size:15px;color:var(--ink)}
 .mcprev,.mcnext{width:34px;height:34px;border:1px solid #2e2d34;border-radius:17px;background:transparent;color:var(--ink);font-size:18px;line-height:1}
-.mcalwk,.mcalgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
-.mcalwk span{text-align:center;font-size:11px;color:var(--faint);padding-bottom:4px}
+.mcalwk,.mcalgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;justify-items:center}
+.mcalwk span{width:100%;max-width:44px;text-align:center;font-size:11px;color:var(--faint);padding-bottom:4px}
 .mcalwk span:first-child{color:color-mix(in srgb,var(--pink) 70%,var(--faint))}
-.mcd{position:relative;aspect-ratio:1/1;border-radius:50%;display:grid;place-items:center;background:#1b1a20}
+.mcd{position:relative;width:100%;max-width:44px;aspect-ratio:1/1;border-radius:50%;display:grid;place-items:center;background:#1b1a20}
 .mcd.blank{background:transparent}
-.mcn{font-size:11.5px;color:var(--faint);font-variant-numeric:tabular-nums}
-.mce{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;color:#fff}
+.mcn{font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+.mce{position:absolute;inset:0;display:grid;place-items:center;font-size:19px;line-height:1;color:#fff}
 .mcd.on{background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--green) 55%,#25242b),color-mix(in srgb,var(--green) 22%,#18171c) 72%);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--green) 65%,transparent)}
 .mcd.on .mcn{opacity:0}
 .mcd.many{background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--gold) 60%,#25242b),color-mix(in srgb,var(--gold) 25%,#18171c) 72%);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--gold) 70%,transparent)}
@@ -9648,14 +9648,28 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   $("reorderBtn").addEventListener("click",function(){setReorder(!reorderMode)});
   $("reorderDone").addEventListener("click",function(){setReorder(false)});
   // 한 말씀만 보는 중: 말씀 머리 줄을 두 번 누르면 보던 칸반(또는 전체 목록)으로 바로 돌아간다 (2026-10-17 사용자 요청)
-  $("list").addEventListener("dblclick",function(e){
-    if(!soloId)return;
-    if(!e.target.closest(".chead"))return;
-    if(e.target.closest("button,summary,a,input,textarea,select,[contenteditable]"))return;
-    e.preventDefault();
+  function soloBack(e){
+    if(e){e.preventDefault();e.stopPropagation()}
+    if(soloId)openIds.add(soloId);   // 첫 번째 누름으로 접힌 것을 되돌림
     var back=soloFrom; soloId=null; soloFrom="";
     if(back==="board"){setBoard(true);return}
     render(); try{window.scrollTo({top:0,behavior:"smooth"})}catch(err){window.scrollTo(0,0)}
+  }
+  function soloHeadHit(e){
+    if(!soloId||!e.target.closest)return false;
+    if(!e.target.closest(".chead"))return false;
+    return !e.target.closest("button,summary,a,input,textarea,select,[contenteditable]");
+  }
+  // 두 번째 누름(e.detail>=2)을 먼저 가로채서 '접기'가 되지 않게 한다
+  $("list").addEventListener("click",function(e){if(e.detail>=2&&soloHeadHit(e))soloBack(e)},true);
+  $("list").addEventListener("dblclick",function(e){if(soloHeadHit(e))soloBack(e)},true);
+  // Esc 를 눌러도 보던 칸반(또는 전체 목록)으로 (2026-10-17 사용자 요청)
+  document.addEventListener("keydown",function(e){
+    if(e.key!=="Escape"||!soloId)return;
+    if(document.body.style.overflow==="hidden")return;   // 다른 창이 떠 있으면 그 창이 먼저 닫힌다
+    var t=e.target;
+    if(t&&t.closest&&t.closest("input,textarea,select,[contenteditable]"))return;
+    soloBack();
   });
   $("list").addEventListener("contextmenu",function(e){if(drag||press||(e.target.closest(".note")&&!e.target.closest(NODRAG)))e.preventDefault()});
   document.addEventListener("touchmove",function(e){if(drag&&e.cancelable)e.preventDefault()},{passive:false});
