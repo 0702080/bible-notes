@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-167">
+<meta name="app-build" content="2026-10-17-168">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1523,7 +1523,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .tmbar i{display:block;height:100%;width:0;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .35s}
 .board4{display:flex;gap:14px;align-items:stretch;margin-top:8px;overflow-x:auto;overflow-y:hidden;height:calc(100vh - 165px);min-height:320px;padding-bottom:10px;overscroll-behavior-x:contain;cursor:grab}
 .board4.panning{cursor:grabbing;-webkit-user-select:none;user-select:none}
-.board4>.bcol{flex:1 0 230px;min-width:230px;display:flex;flex-direction:column;max-height:100%}
+.board4>.bcol{flex:1 0 230px;min-width:230px;max-width:380px;display:flex;flex-direction:column;max-height:100%}   /* 칸이 하나뿐일 때 지나치게 넓어지지 않게 */
 .bclist{overflow-y:auto;overscroll-behavior-y:contain;flex:1 1 auto;min-height:0;scrollbar-width:none;-ms-overflow-style:none}
 .bclist::-webkit-scrollbar{display:none}
 .board4{scrollbar-width:thin;scrollbar-color:var(--sbthumb) transparent}
