@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-151">
+<meta name="app-build" content="2026-10-17-153">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -90,7 +90,8 @@ textarea.field{resize:vertical;min-height:80px;font-family:var(--serif);line-hei
 
 /* toolbar */
 .toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:30px 0 8px;padding-bottom:10px;border-bottom:2px solid var(--ink)}
-.toolbar h2{font-family:var(--serif);font-size:20px;margin:0;flex:1 1 auto}
+.toolbar h2{font-family:var(--serif);font-size:20px;margin:0;flex:1 1 auto;white-space:nowrap}
+#count{white-space:nowrap}
 .homebtn{display:inline-grid;place-items:center;height:34px;padding:0 12px;border:1px solid color-mix(in srgb,var(--violet) 42%,var(--rule));border-radius:17px;
   background:color-mix(in srgb,var(--violet) 15%,transparent);color:var(--violet);
   font-family:inherit;font-size:13.5px;font-weight:inherit;letter-spacing:inherit;white-space:nowrap;transition:background .15s,border-color .15s}
@@ -1460,8 +1461,8 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 /* PC: 목록 / 칸반 보드 바꾸기 (두 칸 스위치), 상단 말씀 담기 */
 .viewseg,.tadd{display:none}
 @media (min-width:900px){
-  .viewseg{display:inline-flex;padding:3px;gap:2px;border:1px solid var(--rule);border-radius:19px;background:rgba(255,255,255,.03)}
-  .viewseg button{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 13px;border:0;border-radius:15px;background:transparent;color:var(--muted);font-size:13.5px;transition:background .2s,color .2s}
+  .viewseg{display:inline-flex;flex:0 0 auto;padding:3px;gap:2px;border:1px solid var(--rule);border-radius:19px;background:rgba(255,255,255,.03);white-space:nowrap}
+  .viewseg button{display:inline-flex;flex:0 0 auto;white-space:nowrap;align-items:center;gap:6px;height:30px;padding:0 13px;border:0;border-radius:15px;background:transparent;color:var(--muted);font-size:13.5px;transition:background .2s,color .2s}
   .viewseg button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
   .viewseg button[aria-pressed="true"]{background:var(--violet);color:#141416;-webkit-text-stroke:.3px currentColor}
   @media (hover:hover){.viewseg button[aria-pressed="false"]:hover{color:var(--ink);background:#22212A}}
@@ -3389,15 +3390,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     document.body.classList.toggle("soloon",on);
     sb.hidden=!on; sb.textContent="";
     if(!sb._wired){sb._wired=1;sb.addEventListener("click",function(e){
-      var b=e.target.closest("button"); if(!b)return;
-      soloFrom="";
-      if(b.dataset.act==="board"){soloId=null;setBoard(true);return}
-      soloId=null; render(); try{window.scrollTo({top:0,behavior:"smooth"})}catch(err){window.scrollTo(0,0)}
+      if(!e.target.closest("button"))return;
+      var back=soloFrom; soloId=null; soloFrom="";
+      if(back==="board"){setBoard(true);return}   // 칸반으로 보고 있었으면 칸반으로 되돌아간다 (2026-10-17 사용자 요청)
+      render(); try{window.scrollTo({top:0,behavior:"smooth"})}catch(err){window.scrollTo(0,0)}
     })}
     if(!on)return;
     var t=document.createElement("span"); t.className="solol"; t.textContent="📍 이 말씀만 보는 중"; sb.appendChild(t);
-    if(soloFrom==="board"){var b1=document.createElement("button");b1.type="button";b1.className="solob";b1.dataset.act="board";b1.textContent="← 칸반 보드";sb.appendChild(b1)}
-    var b2=document.createElement("button"); b2.type="button"; b2.className="solob main"; b2.textContent="전체 보기"; sb.appendChild(b2);
+    var b2=document.createElement("button"); b2.type="button"; b2.className="solob main";
+    b2.textContent="전체 보기"; b2.title=soloFrom==="board"?"칸반 보드로 돌아가기":"모든 말씀 보기"; sb.appendChild(b2);
   }
   function render(){
     if(drag||actDrag)return;
@@ -3417,7 +3418,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     if(boardOn)renderKanban();
     var dh=renderDailyHits();   // 하루 돌아보기 기록도 찾기 결과에
-    $("count").textContent=!notes.size?"":soloId?"한 말씀만":((filterText||topicSel.length)?shown+" / "+notes.size+"개":notes.size+"개");
+    $("count").textContent=!notes.size?"":soloId?"한 말씀":((filterText||topicSel.length)?shown+" / "+notes.size+"개":notes.size+"개");
     $("empty").hidden=notes.size>0||dh>0;
     if(notes.size&&!shown&&!dh){$("empty").hidden=false;$("emptyMsg").textContent="\u201C"+filterText+"\u201D이(가) 들어 있는 노트가 없어요.";$("emptyAdd").hidden=true}
     else{$("emptyMsg").textContent="아직 담은 말씀이 없어요. 아래 버튼으로 첫 말씀을 담아 보세요.";$("emptyAdd").hidden=false}
