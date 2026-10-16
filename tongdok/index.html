@@ -1441,7 +1441,8 @@ function openLogin(){
     b.disabled=true; b.textContent="보내는 중…";
     try{
       try{localStorage.setItem("bible-sb-email",em);localStorage.setItem("bible-login-next",JSON.stringify({u:"tongdok/",at:Date.now()}))}catch(e){}   // 메일 링크로 들어오면 통독표로 돌아오게
-      var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(SB_SITE),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
+      var back=SB_SITE+"tongdok/";   // 메일 링크를 눌렀을 때 바로 통독표가 열리게
+      var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(back),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
       if(r.status===429){setMsg("잠시 뒤에 다시 눌러 주세요 (메일은 짧은 시간에 여러 번 보낼 수 없어요)",true);return}
       if(!r.ok){setMsg("메일을 보내지 못했어요 ("+r.status+")",true);return}
       $("lgStep2").hidden=false; $("lgOk").hidden=false; b.textContent="메일 다시 받기"; setMsg(em+" 로 로그인 메일을 보냈어요.");
