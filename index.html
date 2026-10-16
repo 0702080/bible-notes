@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-166">
+<meta name="app-build" content="2026-10-17-167">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1498,7 +1498,12 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
   body.boardon .bfilter{display:block;flex:0 1 520px;min-width:140px;max-width:520px;margin-left:auto;margin-right:auto;height:32px;padding:0 14px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.04);color:var(--ink);font:inherit;font-size:13px}
   body.boardon .bfilter::placeholder{color:var(--faint)}
   body.boardon .bfilter:focus{outline:none;border-color:color-mix(in srgb,var(--violet) 65%,var(--rule));background:rgba(255,255,255,.07)}
-  body.boardon #dlFind{flex:0 0 auto;max-height:170px;overflow:auto;margin-bottom:8px}
+  /* 아래 손잡이를 끌어 높이를 바꿀 수 있다 (2026-10-17 사용자 요청) */
+  body.boardon #dlFind{flex:0 0 auto;height:170px;min-height:56px;max-height:70vh;overflow:auto;resize:vertical;margin-bottom:2px;padding-bottom:4px}
+  body.boardon .dlfgrip{display:flex;align-items:center;justify-content:center;flex:0 0 auto;height:14px;margin:0 0 6px;cursor:ns-resize;touch-action:none}
+  body.boardon .dlfgrip[hidden]{display:none}
+  body.boardon .dlfgrip::before{content:"";width:54px;height:4px;border-radius:2px;background:#34333A;transition:background .15s,width .15s}
+  body.boardon .dlfgrip:hover::before,body.boardon .dlfgrip.on::before{background:var(--sky);width:76px}
   body.boardon .todaymini{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
   body.boardon .todaymini::-webkit-scrollbar{display:none}
   body.boardon .toolbar h2{flex:0 0 auto}
@@ -2184,6 +2189,7 @@ button:active{filter:brightness(1.15)}
 body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 /* 찾기: 하루 돌아보기에 적어 둔 기록도 함께 보여 준다 (2026-10-17 사용자 요청) */
 .dlfind{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}
+.dlfgrip{display:none}
 .dlfind[hidden]{display:none}
 .dlfh{display:flex;align-items:center;gap:8px;padding:0 2px;font-size:12.5px;color:var(--faint)}
 .dlfh b{margin-left:auto;font-weight:500}
@@ -2436,6 +2442,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   <input class="filter" id="filter" type="search" placeholder="노트에서 찾기 (초성도 돼요: ㅅㅁ)" aria-label="노트에서 찾기" hidden>
   <div class="reviewbar" id="reviewBar" hidden></div>
   <div class="dlfind" id="dlFind" hidden></div>
+  <div class="dlfgrip" id="dlFGrip" role="separator" aria-label="찾은 기록 칸 높이 바꾸기" title="끌어서 높이를 바꿔요" hidden></div>
   <div class="solobar" id="soloBar" hidden></div>
   <div id="list"></div>
   <div id="board" class="board4" hidden></div>
@@ -2923,11 +2930,43 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function renderDailyHits(){
     var box=$("dlFind"); if(!box)return 0;
-    if(!box._wired){box._wired=1;box.addEventListener("click",function(e){var r=e.target.closest(".dlfr");if(r)openDaily(r.dataset.day,r.dataset.id)})}
+    if(!box._wired){
+      box._wired=1;
+      box.addEventListener("click",function(e){var r=e.target.closest(".dlfr");if(r)openDaily(r.dataset.day,r.dataset.id)});
+      try{var h0=localStorage.getItem("bible-dlfind-h"); if(h0)box.style.height=h0}catch(err){}
+      if(window.ResizeObserver){   // 끌어서 바꾼 높이를 기억해 둔다
+        var ht=null;
+        new ResizeObserver(function(){
+          if(!box.style.height)return;
+          clearTimeout(ht); ht=setTimeout(function(){try{localStorage.setItem("bible-dlfind-h",box.style.height)}catch(err){}},400);
+        }).observe(box);
+      }
+      box.title="아래 손잡이를 끌면 높이를 바꿀 수 있어요";
+      (function(){   // 손잡이를 끌어 높이 바꾸기
+        var g=$("dlFGrip"); if(!g)return;
+        var st=null;
+        g.addEventListener("pointerdown",function(e){
+          st={y:e.clientY,h:box.getBoundingClientRect().height,pid:e.pointerId};
+          g.classList.add("on"); try{g.setPointerCapture(e.pointerId)}catch(err){} e.preventDefault();
+        });
+        g.addEventListener("pointermove",function(e){
+          if(!st||e.pointerId!==st.pid)return; e.preventDefault();
+          var h=Math.max(56,Math.min(window.innerHeight*0.7,st.h+(e.clientY-st.y)));
+          box.style.height=Math.round(h)+"px";
+        });
+        function gend(e){
+          if(!st||(e&&e.pointerId!==st.pid))return; st=null; g.classList.remove("on");
+          try{localStorage.setItem("bible-dlfind-h",box.style.height)}catch(err){}
+        }
+        g.addEventListener("pointerup",gend); g.addEventListener("pointercancel",gend);
+      })();
+    }
+    var grip=$("dlFGrip");
     box.textContent="";
-    if(!filterText){box.hidden=true;return 0}
+    if(!filterText){box.hidden=true;if(grip)grip.hidden=true;return 0}
     var hits=dailyHits(24);
-    box.hidden=!hits.length; if(!hits.length)return 0;
+    box.hidden=!hits.length; if(grip)grip.hidden=!hits.length;
+    if(!hits.length)return 0;
     var hd=document.createElement("div"); hd.className="dlfh";
     var hl=document.createElement("span"); hl.textContent="🌙 하루 돌아보기 기록"; hd.appendChild(hl);
     var hn=document.createElement("b"); hn.textContent=hits.length+"개"; hd.appendChild(hn); box.appendChild(hd);
