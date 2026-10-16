@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-170">
+<meta name="app-build" content="2026-10-17-171">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -281,7 +281,7 @@ details.menu>summary::-webkit-details-marker{display:none}
 .pri.editing .prv{display:none}
 .phint{margin:8px 2px 0;font-size:11.5px;color:var(--faint)}
 .phint[hidden]{display:none}
-.pt,.pan{display:block;width:100%;box-sizing:border-box;border:1px solid color-mix(in srgb,var(--orange) 30%,#2E2D33);border-radius:10px;background:#101013;padding:10px 12px;font:inherit;font-size:16px;line-height:1.7;color:color-mix(in srgb,var(--orange) 85%,var(--ink));resize:none;overflow:hidden;min-height:56px}
+.pt,.pan{display:block;width:100%;box-sizing:border-box;border:1px solid color-mix(in srgb,var(--orange) 30%,#2E2D33);border-radius:10px;background:#101013;padding:10px 12px;font:inherit;font-size:16px;line-height:1.7;color:color-mix(in srgb,var(--orange) 85%,var(--ink));resize:vertical;overflow:auto;min-height:56px}   /* 오른쪽 아래를 끌어 높이 조절 */
 .pri.answered .pt{color:var(--muted);border-color:#2E2D33}
 .pans{display:flex;flex-direction:column;gap:4px;margin-top:6px;padding-left:10px;border-left:2px solid var(--gold)}
 .panl{font-size:12.5px;font-weight:700;color:var(--gold)}
@@ -3001,7 +3001,30 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     return hits.length;
   }
-  function grow(t){if(!t||t.tagName!=="TEXTAREA"||!t.offsetParent)return;t.style.height="auto";t.style.height=t.scrollHeight+"px"}
+  // 내가 끌어서 정한 높이는 그대로 지킨다 (2026-10-17 사용자 요청)
+  var manualH=new Map();
+  function taKey(t){
+    var holder=t.closest&&t.closest("[data-id]");
+    return (t.className||"")+"|"+((holder&&holder.dataset.id)||"")+"|"+(t.placeholder||"");
+  }
+  function grow(t){
+    if(!t||t.tagName!=="TEXTAREA"||!t.offsetParent)return;
+    var h=manualH.get(taKey(t));
+    if(h){t.style.height=h;return}
+    t.style.height="auto"; t.style.height=t.scrollHeight+"px";
+  }
+  document.addEventListener("pointerdown",function(e){   // 오른쪽 아래 손잡이를 잡으면 그 높이를 기억
+    var t=e.target; if(!t||t.tagName!=="TEXTAREA")return;
+    if(getComputedStyle(t).resize==="none")return;
+    var r=t.getBoundingClientRect();
+    if(e.clientX<r.right-22||e.clientY<r.bottom-22)return;
+    var k=taKey(t);
+    function done(){
+      document.removeEventListener("pointerup",done,true);
+      manualH.set(k,(t.style.height||Math.round(t.getBoundingClientRect().height)+"px"));
+    }
+    document.addEventListener("pointerup",done,true);
+  },true);
   function setVal(el,v){if(document.activeElement!==el&&el.value!==v){el.value=v;grow(el)}}
 
   var tabOf=new Map();
