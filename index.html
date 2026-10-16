@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-157">
+<meta name="app-build" content="2026-10-17-158">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5502,8 +5502,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!("speechSynthesis" in window)||typeof SpeechSynthesisUtterance==="undefined")return true;
     try{return !(window.speechSynthesis.getVoices()||[]).length}catch(e){return true}
   }
-  function sayWord(t){
-    if(!quizVoice)return;
+  function sayWord(t,force){   // force: 내가 직접 눌러서 듣는 경우 (읽어 주기 꺼져 있어도 들려줌)
+    if(!quizVoice&&!force)return;
     if(voiceMissing()){
       if(!voiceWarned){voiceWarned=true;toast("이 화면에서는 음성이 나오지 않아요. 크롬에서 열면 들을 수 있어요")}
       return;
@@ -5862,8 +5862,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.5)ccGoNext();
       },{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
-      ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 가린 낱말을 누르면 톡 뒤집혀 잠깐 보기
-        var w=e.target.closest(".ccw.hid"); if(!w||!C||C.revealing||w.classList.contains("peek"))return;
+      ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 낱말을 누르면 소리로 들려주고, 가린 낱말은 톡 뒤집혀 잠깐 보인다
+        var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
+        var wt=String(w.dataset.w||w.textContent||"").trim();
+        if(wt)sayWord(wt,true);   // 누를 때마다 그 낱말 소리 (2026-10-17 사용자 요청)
+        if(!w.classList.contains("hid")||w.classList.contains("peek"))return;
         w.classList.add("peek"); C.peek++; buzz(5);
         setTimeout(function(){if(w.isConnected&&C&&C.stage<4&&!C.revealing)w.classList.remove("peek")},1600);
       });
