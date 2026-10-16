@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-147">
+<meta name="app-build" content="2026-10-17-149">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2116,6 +2116,18 @@ button:active{filter:brightness(1.15)}
 .rqb.miss{background:color-mix(in srgb,var(--orange) 18%,#17161b);border-color:color-mix(in srgb,var(--orange) 50%,#34333A);color:var(--orange)}
 .rqb.say{width:48px;padding:0}
 @media (max-width:400px){.rqb{padding:0 14px;font-size:14.5px}}
+/* 찾기: 하루 돌아보기에 적어 둔 기록도 함께 보여 준다 (2026-10-17 사용자 요청) */
+.dlfind{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}
+.dlfind[hidden]{display:none}
+.dlfh{display:flex;align-items:center;gap:8px;padding:0 2px;font-size:12.5px;color:var(--faint)}
+.dlfh b{margin-left:auto;font-weight:500}
+.dlfr{display:block;width:100%;padding:9px 12px;border:1px solid #232229;border-left:3px solid color-mix(in srgb,var(--gc,var(--muted)) 60%,transparent);border-radius:10px;background:color-mix(in srgb,var(--gc,var(--muted)) 5%,#121216);color:var(--ink);font:inherit;text-align:left}
+.dlfrh{display:block;margin-bottom:3px;font-size:11.5px;color:var(--faint)}
+.dlfrb{display:block;font-size:14px;line-height:1.6;color:var(--muted);word-break:break-word}
+.dlfr mark{background:color-mix(in srgb,var(--gold) 32%,transparent);color:var(--ink);border-radius:3px}
+.dlitem.dlflash .dlrow{animation:dlflash 1.4s ease-out}
+@keyframes dlflash{0%{box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 60%,transparent)}100%{box-shadow:none}}
+@media (prefers-reduced-motion:reduce){.dlitem.dlflash .dlrow{animation:none}}
 .dlbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px max(16px,calc((100% - var(--dlw,608px)) / 2));width:100%;box-sizing:border-box;border-bottom:1px solid #222126}
 .dltitle{font-size:18px;color:var(--gold)}
 .dlclose{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:14.5px}
@@ -2343,6 +2355,7 @@ button:active{filter:brightness(1.15)}
   <div class="topicbar" id="topicBar" role="toolbar" aria-label="주제"></div>
   <input class="filter" id="filter" type="search" placeholder="노트에서 찾기 (초성도 돼요: ㅅㅁ)" aria-label="노트에서 찾기" hidden>
   <div class="reviewbar" id="reviewBar" hidden></div>
+  <div class="dlfind" id="dlFind" hidden></div>
   <div id="list"></div>
   <div id="board" class="board4" hidden></div>
   <input type="file" id="hymnFile" accept="image/*" hidden>
@@ -2792,6 +2805,52 @@ button:active{filter:brightness(1.15)}
       body.appendChild(document.createTextNode(sn.post));
       row.appendChild(tag); row.appendChild(body); box.appendChild(row);
     });
+  }
+  // 하루 돌아보기에 적어 둔 기록 찾기 (2026-10-17 사용자 요청)
+  function dailyHits(max){
+    if(!filterText)return [];
+    var o=dailyData(), gm={}, items={}, out=[];
+    dlGroups(o).forEach(function(g){gm[g.g]=g});
+    o.items.forEach(function(it){items[it.id]=it});
+    var mem=o.memo||{};
+    Object.keys(mem).sort().reverse().forEach(function(day){
+      var m=mem[day]; if(!m||typeof m!=="object")return;
+      Object.keys(m).forEach(function(k){
+        if(out.length>=max)return;
+        var txt=String(m[k]||""); if(!txt.trim())return;
+        var iid=k.split("~")[0], it=items[iid], hit=has(txt), tHit=it&&has(it.t);
+        if(!hit&&!tHit)return;
+        out.push({day:day,id:iid,t:it?it.t:"지운 항목",g:it?gm[it.g]:null,text:txt,body:hit});
+      });
+    });
+    return out;
+  }
+  function renderDailyHits(){
+    var box=$("dlFind"); if(!box)return 0;
+    if(!box._wired){box._wired=1;box.addEventListener("click",function(e){var r=e.target.closest(".dlfr");if(r)openDaily(r.dataset.day,r.dataset.id)})}
+    box.textContent="";
+    if(!filterText){box.hidden=true;return 0}
+    var hits=dailyHits(24);
+    box.hidden=!hits.length; if(!hits.length)return 0;
+    var hd=document.createElement("div"); hd.className="dlfh";
+    var hl=document.createElement("span"); hl.textContent="🌙 하루 돌아보기 기록"; hd.appendChild(hl);
+    var hn=document.createElement("b"); hn.textContent=hits.length+"개"; hd.appendChild(hn); box.appendChild(hd);
+    hits.forEach(function(h){
+      var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.day=h.day; b.dataset.id=h.id;
+      b.style.setProperty("--gc",(h.g&&h.g.c)||"var(--muted)");
+      b.setAttribute("aria-label",dayName(h.day)+" "+h.t+" 기록 보기");
+      var top=document.createElement("span"); top.className="dlfrh";
+      top.textContent=dayName(h.day)+"  ·  "+(h.g?h.g.e+" "+h.g.t+"  ·  ":"")+h.t;
+      var bd=document.createElement("span"); bd.className="dlfrb";
+      var sn=h.body?snippet(h.text,filterText):null;
+      if(sn){
+        bd.appendChild(document.createTextNode(sn.pre));
+        var mk=document.createElement("mark"); mk.textContent=sn.hit; bd.appendChild(mk);
+        bd.appendChild(document.createTextNode(sn.post));
+      }else bd.textContent=h.text.replace(/\s+/g," ").slice(0,90)+(h.text.length>90?"…":"");
+      b.appendChild(top); b.appendChild(bd); box.appendChild(b);
+    });
+    return hits.length;
   }
   function grow(t){if(!t||t.tagName!=="TEXTAREA"||!t.offsetParent)return;t.style.height="auto";t.style.height=t.scrollHeight+"px"}
   function setVal(el,v){if(document.activeElement!==el&&el.value!==v){el.value=v;grow(el)}}
@@ -3321,9 +3380,10 @@ button:active{filter:brightness(1.15)}
       if(list.children[i]!==el)list.insertBefore(el,list.children[i]||null);
     });
     if(boardOn)renderKanban();
+    var dh=renderDailyHits();   // 하루 돌아보기 기록도 찾기 결과에
     $("count").textContent=!notes.size?"":((filterText||topicSel.length)?shown+" / "+notes.size+"개":notes.size+"개");
-    $("empty").hidden=notes.size>0;
-    if(notes.size&&!shown){$("empty").hidden=false;$("emptyMsg").textContent="\u201C"+filterText+"\u201D이(가) 들어 있는 노트가 없어요.";$("emptyAdd").hidden=true}
+    $("empty").hidden=notes.size>0||dh>0;
+    if(notes.size&&!shown&&!dh){$("empty").hidden=false;$("emptyMsg").textContent="\u201C"+filterText+"\u201D이(가) 들어 있는 노트가 없어요.";$("emptyAdd").hidden=true}
     else{$("emptyMsg").textContent="아직 담은 말씀이 없어요. 아래 버튼으로 첫 말씀을 담아 보세요.";$("emptyAdd").hidden=false}
     $("foldAll").textContent=(notes.size&&openIds.size>=notes.size)?"모두 접기":"모두 펼치기";
     requestAnimationFrame(function(){document.querySelectorAll(".note.open textarea").forEach(grow)});
@@ -6113,7 +6173,7 @@ button:active{filter:brightness(1.15)}
   try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
   function saveGFold(){try{localStorage.setItem("bible-daily-gfold",JSON.stringify(Array.from(dlGFold)))}catch(e){}}
   function dayName(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"}
-  function openDaily(){
+  function openDaily(day,focusId){
     if(!dl){
       dl=document.createElement("div"); dl.className="daily"; dl.setAttribute("role","dialog"); dl.setAttribute("aria-modal","true"); dl.hidden=true;
       dl.innerHTML='<div class="dlbar"><b class="dltitle">🌙 하루 돌아보기</b><button type="button" class="dledit">✏️ 항목 고치기</button><button type="button" class="dlclose">닫기</button></div>'+
@@ -6249,9 +6309,20 @@ button:active{filter:brightness(1.15)}
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dl&&!dl.hidden)closeDaily()});
       dlDragInit(dl.querySelector(".dllist"));
     }
-    dlDay=dkey(Date.now()); dlEdit=false; dlEditId=""; dlGEditId=""; dlMemoId="";
+    dlDay=(day&&/^\d{4}-\d{2}-\d{2}$/.test(day))?day:dkey(Date.now());
+    dlEdit=false; dlEditId=""; dlGEditId=""; dlMemoId="";
+    if(focusId){   // 찾기에서 들어오면 그 항목의 기록을 펼쳐 둔다
+      dlMemoMore.add(focusId);
+      var fit=dailyData().items.filter(function(x){return x.id===focusId})[0];
+      if(fit){dlGFold.delete(fit.g); saveGFold()}
+    }
     dl.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawDaily();   // 창이 보인 뒤에 그려야 알약 단추 너비를 재서 글자 자리를 비울 수 있다
+    if(focusId)setTimeout(function(){
+      var row=dl.querySelector('.dlitem[data-id="'+focusId+'"]'); if(!row)return;
+      row.scrollIntoView({block:"center"}); row.classList.add("dlflash");
+      setTimeout(function(){row.classList.remove("dlflash")},1500);
+    },40);
   }
   /* 순서 바꾸기: 항목을 꾹 눌렀다가(0.4초) 끌기. 항목 고치기에서는 ⠿ 손잡이를 바로 끌어도 됨. 같은 묶음 안에서만 움직임 */
   function dlDragInit(list){
@@ -6271,7 +6342,12 @@ button:active{filter:brightness(1.15)}
     list.addEventListener("touchmove",function(e){if(D)e.preventDefault()},{passive:false});
     list.addEventListener("contextmenu",function(e){if(D||P)e.preventDefault()});
     list.addEventListener("pointermove",function(e){
-      if(P&&e.pointerId===P.pid&&(Math.abs(e.clientX-P.x)>8||Math.abs(e.clientY-P.y)>8)){clearTimeout(P.t);P=null}
+      if(P&&e.pointerId===P.pid&&(Math.abs(e.clientX-P.x)>10||Math.abs(e.clientY-P.y)>10)){
+        var p0=P; clearTimeout(P.t); P=null;
+        if(e.pointerType==="mouse"){   // 마우스는 잡고 끌면 바로 움직인다 (꾹 누를 필요 없음 — 2026-10-17 사용자 요청)
+          start(p0.row,{clientY:p0.y,pointerId:p0.pid}); try{list.setPointerCapture(p0.pid)}catch(err){}
+        }
+      }
       if(!D||e.pointerId!==D.pid)return; e.preventDefault();
       D.row.style.transform="translateY("+(e.clientY-D.y0)+"px)";
       var sibs=Array.from(list.querySelectorAll('.dlitem[data-g="'+D.g+'"]')), i=sibs.indexOf(D.row);
@@ -6318,7 +6394,12 @@ button:active{filter:brightness(1.15)}
       },450)};
     });
     list.addEventListener("pointermove",function(e){
-      if(GP&&e.pointerId===GP.pid&&(Math.abs(e.clientX-GP.x)>8||Math.abs(e.clientY-GP.y)>8)){clearTimeout(GP.t);GP=null}
+      if(GP&&e.pointerId===GP.pid&&(Math.abs(e.clientX-GP.x)>10||Math.abs(e.clientY-GP.y)>10)){
+        var q0=GP; clearTimeout(GP.t); GP=null;
+        if(e.pointerType==="mouse"){   // 마우스는 묶음 이름을 잡고 끌면 바로 움직인다
+          gstart(q0.sec,{clientX:q0.x,clientY:q0.y,pointerId:q0.pid}); try{list.setPointerCapture(q0.pid)}catch(err){}
+        }
+      }
       if(!G||e.pointerId!==G.pid)return; e.preventDefault();
       G.sec.style.transform="translate("+(e.clientX-G.x0)+"px,"+(e.clientY-G.y0)+"px)";
       var un=document.elementFromPoint(e.clientX,e.clientY), tgt=(un&&un.closest)?un.closest(".dlgrp"):null;
