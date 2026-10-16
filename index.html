@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-163">
+<meta name="app-build" content="2026-10-17-164">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1553,6 +1553,9 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 @media (hover:hover){.bch:hover{background:#1C1B20}}
 .bcol.cdrag{opacity:.45;border-style:dashed;border-color:var(--bc)}
 .bcol.over{background:color-mix(in srgb,var(--bc) 10%,#141417);border-color:var(--bc);box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--bc) 50%,transparent)}
+/* 찾은 말은 찐한 노란 바탕으로 (2026-10-17 사용자 요청) */
+.bcard mark{background:#FFD54A;color:#141416;border-radius:3px;padding:0 2px;font-weight:700;-webkit-text-stroke:0}
+.bctext.full{display:block;-webkit-line-clamp:none;overflow:visible}
 .bcard.landed{animation:kbland .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes kbland{0%{transform:scale(.9);box-shadow:0 0 0 0 var(--tc)}60%{transform:scale(1.03);box-shadow:0 0 0 6px color-mix(in srgb,var(--tc) 30%,transparent)}100%{transform:none;box-shadow:none}}
 @media (hover:none){.bcgo{opacity:1}}
@@ -2754,8 +2757,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
           '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div>'+
           '<button type="button" class="bcgo"></button>';
-        cd.querySelector(".bcref b").textContent=n.ref||"구절 미입력";
-        cd.querySelector(".bctext").textContent=String(n.text||"").replace(/\s+/g," ").trim();
+        var bref=n.ref||"구절 미입력", btxt=String(n.text||"").replace(/\s+/g," ").trim();
+        if(filterText&&has(bref))markInto(cd.querySelector(".bcref b"),bref,filterText);
+        else cd.querySelector(".bcref b").textContent=bref;
+        var bte=cd.querySelector(".bctext");
+        if(filterText&&has(btxt)){markInto(bte,btxt,filterText);bte.classList.add("full")}   // 찾은 말이 보이게 다 펼쳐서 (2026-10-17 사용자 요청)
+        else bte.textContent=btxt;
         cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
         if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
         cd.querySelector(".bcgo").textContent=col.k==="due"?"🔁 복습하기":col.k==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
