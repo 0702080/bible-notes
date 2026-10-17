@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-183">
+<meta name="app-build" content="2026-10-18-184">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2244,6 +2244,32 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlitem.dlflash .dlrow{animation:dlflash 1.4s ease-out}
 @keyframes dlflash{0%{box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 60%,transparent)}100%{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){.dlitem.dlflash .dlrow{animation:none}}
+/* 믿음의 한 마디 (2026-10-18 사용자 요청) */
+.saytoday{display:block;width:100%;margin:2px 0 8px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--gold) 32%,#232229);border-radius:14px;background:color-mix(in srgb,var(--gold) 8%,transparent);color:var(--ink);font:inherit;text-align:left}
+.saytoday .sayq1{display:block;font-family:var(--serif);font-size:15px;line-height:1.7;color:color-mix(in srgb,var(--gold) 35%,var(--ink));word-break:keep-all}
+.saytoday .sayw1{display:block;margin-top:4px;font-size:12px;color:var(--gold);text-align:right}
+@media (hover:hover){.saytoday:hover{background:color-mix(in srgb,var(--gold) 14%,transparent)}}
+.saybox{max-width:640px;margin:0 auto}
+.sayform{display:flex;flex-direction:column;gap:8px;margin:4px 0 16px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 35%,#232229);border-radius:16px;background:color-mix(in srgb,var(--gold) 6%,#131317)}
+.sayform[hidden]{display:none}
+.sayt{width:100%;box-sizing:border-box;min-height:96px;padding:12px 14px;border:1px solid #2A2930;border-radius:12px;background:var(--sheet);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.75;resize:vertical}
+.sayt:focus{outline:none;border-color:var(--gold)}
+.sayrow2{display:flex;gap:8px;flex-wrap:wrap}
+.sayrow2 .field{flex:1 1 150px;min-width:0;height:40px;font-size:14px}
+.saysave{flex:0 0 auto;height:40px;padding:0 18px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:14px;font-weight:700}
+.saycancel{flex:0 0 auto;height:40px;padding:0 14px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
+.saylist{display:flex;flex-direction:column;gap:10px}
+.saycard{padding:14px 16px;border:1px solid #232229;border-left:3px solid color-mix(in srgb,var(--gold) 55%,transparent);border-radius:0 14px 14px 0;background:color-mix(in srgb,var(--gold) 5%,#131317)}
+.sayq{margin:0;font-family:var(--serif);font-size:16.5px;line-height:1.8;color:var(--ink);word-break:keep-all;white-space:pre-wrap}
+.sayf{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px;font-size:12.5px}
+.sayf b{color:var(--gold);font-weight:700}
+.saytag{padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--violet) 14%,transparent);color:var(--violet);font-size:11.5px}
+.saynotebtn{padding:3px 10px;border:1px solid color-mix(in srgb,var(--violet) 40%,#232229);border-radius:12px;background:transparent;color:var(--violet);font:inherit;font-size:11.5px;font-weight:700}
+.saybtn{margin-left:auto;height:26px;padding:0 10px;border:1px solid #34333A;border-radius:13px;background:transparent;color:var(--faint);font:inherit;font-size:11.5px}
+.saybtn+.saybtn{margin-left:0}
+.saybtn.sure{color:var(--pink);border-color:color-mix(in srgb,var(--pink) 50%,#34333A)}
+.sayempty{margin:24px auto;max-width:520px;padding:16px;border:1px dashed #2E2D34;border-radius:14px;color:var(--faint);font-size:13.5px;text-align:center;line-height:1.7}
+.sayadd{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 50%,#34333A)}
 /* 한 주 돌아보기 한 장 (2026-10-18 사용자 요청) */
 .wkcard{max-width:620px;margin:0 auto}
 .wkhd{text-align:center;margin:6px 0 18px}
@@ -2491,6 +2517,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     <button class="tbtn" id="filterBtn" type="button" aria-label="노트에서 찾기" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
     <details class="menu" id="topMenu"><summary class="tbtn" aria-label="더보기">⋯</summary>
       <div class="pop">
+        <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
         <button type="button" id="openMedBtn">묵상 진도표</button>
         <button type="button" id="openMemBtn">암송 도장판</button>
         <button type="button" id="openProgBtn">실천 진도표</button>
@@ -3135,6 +3162,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var ch=+m[2]; if(!ch)return null;
     return {book:bi,chapter:ch,verse:+m[3]||0,label:BOOKS[bi]+" "+ch+(bi===18?"편":"장")+(m[3]?" "+m[3]+"절":"")};
   }
+  function sayHits(max){
+    var out=[]; if(!filterText)return out;
+    sayData().items.forEach(function(x){
+      if(out.length>=max)return;
+      var t=String(x.t||""), w=String(x.who||""), tp=String(x.topic||"");
+      if(!t.trim())return;
+      if(has(t)||has(w)||has(tp))out.push(x);
+    });
+    return out;
+  }
   function openNoteFocus(id,tab){   // 찾은 기도·실천을 그 말씀 카드에서 바로 보여 준다
     if(!notes.has(id))return;
     setTopics([]);
@@ -3183,7 +3220,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       box._wired=1;
       box.addEventListener("click",function(e){
         var r=e.target.closest(".dlfr"); if(!r)return;
-        if(r.dataset.read)openReader({book:+r.dataset.b,chapter:+r.dataset.c,verse:+r.dataset.v||0});
+        if(r.dataset.say)openSay();
+        else if(r.dataset.read)openReader({book:+r.dataset.b,chapter:+r.dataset.c,verse:+r.dataset.v||0});
         else if(r.dataset.note)openNoteFocus(r.dataset.note,r.dataset.tab);
         else openDaily(r.dataset.day,r.dataset.id);
       });
@@ -3219,8 +3257,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     box.textContent=""; renderRecent();
     if(!filterText){box.hidden=true;if(grip)grip.hidden=true;return 0}
     pushRecent(filterText);
-    var dh=dailyHits(24), ph=prayHits(24), ah=actHits(24), th=textHits(24), rq=refQuery();
-    var total=dh.length+ph.length+ah.length+th.med.length+th.qa.length+th.doc.length+(rq?1:0);
+    var dh=dailyHits(24), ph=prayHits(24), ah=actHits(24), th=textHits(24), sh=sayHits(24), rq=refQuery();
+    var total=dh.length+ph.length+ah.length+th.med.length+th.qa.length+th.doc.length+sh.length+(rq?1:0);
     box.hidden=!total; if(grip)grip.hidden=!total;
     if(!total)return 0;
     function snipInto(bd,txt){
@@ -3302,6 +3340,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     noteCol("✍️","묵상",th.med,"var(--violet)");
     noteCol("❓","질문·답",th.qa,"var(--blue)");
     noteCol("📄","설교 요약·글",th.doc,"var(--pink)");
+    if(sh.length){   // 💬 믿음의 한 마디
+      var lsq=col("💬","믿음의 한 마디",sh.length);
+      sh.forEach(function(x){
+        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.say="1";
+        b.style.setProperty("--gc","var(--gold)");
+        b.setAttribute("aria-label","믿음의 한 마디 보기");
+        var top=document.createElement("span"); top.className="dlfrh"; top.textContent=(x.who||"한 마디")+(x.topic?"  ·  #"+x.topic:"");
+        var bd=document.createElement("span"); bd.className="dlfrb"; snipInto(bd,x.t);
+        b.appendChild(top); b.appendChild(bd); lsq.appendChild(b);
+      });
+    }
     return total;
   }
   // 내가 끌어서 정한 높이는 그대로 지킨다 (2026-10-17 사용자 요청)
@@ -5193,11 +5242,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var add=document.createElement("button"); add.type="button"; add.className="tchip tcollect"; add.id="openCollect"; add.textContent="+ 주제로 모으기"; bar.appendChild(add);
   }
   function todayActClick(e){
+    var sayb=e.target.closest(".saytoday"); if(sayb){openSay();return}
     var b=e.target.closest(".rvchip,.tmchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
     if(b.dataset.act==="prog"){openProg();return}
     if(b.dataset.act==="medprog"){openMedProgress();return}
     if(b.dataset.act==="week"){openWeek();return}
+    if(b.dataset.act==="say"){openSay();return}
     if(b.dataset.act==="friends"){openFr();return}
     if(b.dataset.act==="sync"){if(ghCfg())ghSync("manual");else openGh();return}
     if(b.dataset.act==="sbsync"){sbSync("manual");return}
@@ -7492,6 +7543,144 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     chip({icon:"📅",act:"week",title:"한 주 돌아보기 — 이번 주에 걸어온 길"});
     if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))chip({icon:"📊",act:"prog",title:"실천 진도표 전체 보기"});
   }
+  /* ---------- 믿음의 한 마디 (영적 리더들의 신앙 잠언) 2026-10-18 사용자 요청 ---------- */
+  var SAY_KEY="bible-sayings", sayEdit="";
+  function sayData(){
+    var o=null; try{o=JSON.parse(localStorage.getItem(SAY_KEY)||"null")}catch(e){}
+    if(!o||!Array.isArray(o.items))o={items:[]};
+    return o;
+  }
+  function saveSay(o){
+    try{localStorage.setItem(SAY_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")}
+    if(typeof sbMark==="function")sbMark("__sayings");
+  }
+  function sayMerge(inc){   // 다른 기기 것 받기: 없는 것만 채우고, 더 늦게 고친 것을 쓴다
+    if(!inc||!Array.isArray(inc.items))return;
+    var o=sayData(), by={};
+    o.items.forEach(function(x){by[x.id]=x});
+    inc.items.forEach(function(x){
+      if(!x||!x.id)return;
+      var mine=by[x.id];
+      if(!mine||(+x.at||0)>(+mine.at||0)){by[x.id]=x}
+    });
+    o.items=Object.keys(by).map(function(k){return by[k]}).sort(function(a,b){return (+b.at||0)-(+a.at||0)});
+    try{localStorage.setItem(SAY_KEY,JSON.stringify(o))}catch(e){}
+    if(say&&!say.hidden)drawSay();
+    renderReviewBar();
+  }
+  // "순종하면 고난이 짧아진다. -하용조 목사님-" 처럼 붙여넣으면 글과 이름을 갈라 준다
+  function saySplit(raw){
+    var t=String(raw||"").replace(/\r/g,"").trim();
+    var m=t.match(/^([\s\S]+?)[\s]*[-–—]\s*([^\n\-–—]{1,24})\s*[-–—]?\s*$/);
+    if(m&&m[2]&&/[가-힣A-Za-z]/.test(m[2]))return {t:m[1].trim(),who:m[2].trim()};
+    var lines=t.split("\n").map(function(x){return x.trim()}).filter(Boolean);
+    if(lines.length>1&&lines[lines.length-1].length<=24)return {t:lines.slice(0,-1).join("\n"),who:lines[lines.length-1].replace(/^[-–—\s]+|[-–—\s]+$/g,"")};
+    return {t:t,who:""};
+  }
+  function sayOfDay(){   // 날마다 바뀌는 오늘의 한 마디
+    var items=sayData().items.filter(function(x){return String(x.t||"").trim()});
+    if(!items.length)return null;
+    var k=dkey(Date.now()), h=0, i;
+    for(i=0;i<k.length;i++)h=(h*31+k.charCodeAt(i))>>>0;
+    return items[h%items.length];
+  }
+  var say=null;
+  function closeSay(){if(!say)return; say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
+  function openSay(focus){
+    if(!say){
+      say=document.createElement("div"); say.className="daily saysheet"; say.setAttribute("role","dialog"); say.setAttribute("aria-modal","true"); say.hidden=true;
+      say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose">닫기</button></div>'+
+        '<div class="dlbody"><div class="saybox"><div class="sayform" hidden></div><div class="saylist"></div></div></div>';
+      document.body.appendChild(say);
+      say.querySelector(".sayclose").addEventListener("click",closeSay);
+      say.querySelector(".sayadd").addEventListener("click",function(){sayEdit="new";drawSay();var ta=say.querySelector(".sayt");if(ta)setTimeout(function(){ta.focus()},30)});
+      say.querySelector(".saybox").addEventListener("click",sayClick);
+      say.querySelector(".saybox").addEventListener("paste",function(e){
+        var ta=e.target; if(!ta.classList||!ta.classList.contains("sayt"))return;
+        var txt=(e.clipboardData||window.clipboardData).getData("text"); if(!txt||!/[-–—]/.test(txt))return;
+        var sp=saySplit(txt); if(!sp.who)return;
+        e.preventDefault(); ta.value=sp.t;
+        var wi=say.querySelector(".saywho"); if(wi&&!wi.value.trim())wi.value=sp.who;
+        toast("말한 분을 갈라 넣었어요");
+      });
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&say&&!say.hidden)closeSay()});
+    }
+    sayEdit=focus==="new"?"new":"";
+    say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+    drawSay();
+    if(sayEdit==="new"){var ta=say.querySelector(".sayt"); if(ta)setTimeout(function(){ta.focus()},40)}
+  }
+  function drawSay(){
+    if(!say)return;
+    var o=sayData(), form=say.querySelector(".sayform"), list=say.querySelector(".saylist");
+    form.textContent=""; form.hidden=!sayEdit;
+    if(sayEdit){
+      var cur=sayEdit==="new"?{t:"",who:"",topic:"",note:""}:(o.items.filter(function(x){return x.id===sayEdit})[0]||{t:"",who:"",topic:"",note:""});
+      var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=600; ta.value=cur.t||"";
+      ta.placeholder="한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
+      ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
+      var row=document.createElement("div"); row.className="sayrow2";
+      var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder="말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
+      var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
+      row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
+      var row2=document.createElement("div"); row2.className="sayrow2";
+      var sel=document.createElement("select"); sel.className="field saynote"; sel.setAttribute("aria-label","붙일 말씀");
+      var o0=document.createElement("option"); o0.value=""; o0.textContent="📖 말씀 없음"; sel.appendChild(o0);
+      sorted().forEach(function(nn){var op=document.createElement("option");op.value=nn.id;op.textContent=nn.ref||"구절 미입력";sel.appendChild(op)});
+      sel.value=cur.note&&notes.has(cur.note)?cur.note:"";
+      row2.appendChild(sel);
+      var sv=document.createElement("button"); sv.type="button"; sv.className="saysave"; sv.dataset.act="save"; sv.textContent="저장";
+      var cn=document.createElement("button"); cn.type="button"; cn.className="saycancel"; cn.dataset.act="cancel"; cn.textContent="취소";
+      row2.appendChild(cn); row2.appendChild(sv); form.appendChild(row2);
+    }
+    list.textContent="";
+    var items=o.items.slice().sort(function(a,b){return (+b.at||0)-(+a.at||0)});
+    if(!items.length&&!sayEdit){
+      var em=document.createElement("p"); em.className="sayempty";
+      em.textContent="아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
+      list.appendChild(em); return;
+    }
+    items.forEach(function(x){
+      if(sayEdit===x.id)return;
+      var c=document.createElement("article"); c.className="saycard"; c.dataset.id=x.id;
+      var q=document.createElement("p"); q.className="sayq"; q.textContent=x.t||""; c.appendChild(q);
+      var f=document.createElement("div"); f.className="sayf";
+      if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
+      if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
+      if(x.note&&notes.has(x.note)){
+        var nb=document.createElement("button"); nb.type="button"; nb.className="saynotebtn"; nb.dataset.act="note"; nb.dataset.note=x.note;
+        nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
+      }
+      var ed=document.createElement("button"); ed.type="button"; ed.className="saybtn"; ed.dataset.act="edit"; ed.textContent="고치기";
+      var dl2=document.createElement("button"); dl2.type="button"; dl2.className="saybtn"; dl2.dataset.act="del"; dl2.textContent="지우기";
+      f.appendChild(ed); f.appendChild(dl2);
+      c.appendChild(f); list.appendChild(c);
+    });
+  }
+  function sayClick(e){
+    var b=e.target.closest("button"); if(!b)return;
+    var act=b.dataset.act||"", card=b.closest(".saycard"), id=card?card.dataset.id:"";
+    if(act==="cancel"){sayEdit="";drawSay();return}
+    if(act==="save"){
+      var t=say.querySelector(".sayt").value.trim();
+      if(!t){toast("한 마디를 적어 주세요");return}
+      var o=sayData(), who=say.querySelector(".saywho").value.trim(), tp=say.querySelector(".saytopic").value.trim(), nt=say.querySelector(".saynote").value;
+      if(sayEdit==="new")o.items.unshift({id:"s"+Date.now().toString(36),t:t,who:who,topic:tp,note:nt,at:Date.now()});
+      else{
+        var it=o.items.filter(function(x){return x.id===sayEdit})[0];
+        if(it){it.t=t;it.who=who;it.topic=tp;it.note=nt;it.at=Date.now()}
+      }
+      saveSay(o); sayEdit=""; drawSay(); renderReviewBar(); toast("담았어요 💬");
+      return;
+    }
+    if(act==="edit"){sayEdit=id;drawSay();var ta=say.querySelector(".sayt");if(ta)setTimeout(function(){ta.focus()},30);return}
+    if(act==="del"){
+      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="정말 지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="지우기";b.classList.remove("sure")}},3000);return}
+      var o2=sayData(); o2.items=o2.items.filter(function(x){return x.id!==id}); saveSay(o2); drawSay(); renderReviewBar(); toast("지웠어요");
+      return;
+    }
+    if(act==="note"){closeSay();openNoteFocus(b.dataset.note);return}
+  }
   function renderReviewBar(){
     var bar=$("reviewBar"); if(!bar)return;
     bar.textContent="";
@@ -7546,6 +7735,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       tdFold=!tdFold; try{localStorage.setItem("bible-today-fold",tdFold?"1":"0")}catch(err){} renderReviewBar();
     });
     bar.appendChild(h);
+    var sd=sayOfDay();
+    if(sd){   // 오늘의 한 마디 (2026-10-18 사용자 요청)
+      var sb2=document.createElement("button"); sb2.type="button"; sb2.className="saytoday"; sb2.dataset.act="say";
+      sb2.setAttribute("aria-label","오늘의 한 마디 — 믿음의 한 마디 보기");
+      var q2=document.createElement("span"); q2.className="sayq1"; q2.textContent="\u201c"+String(sd.t).replace(/\s+/g," ")+"\u201d";
+      sb2.appendChild(q2);
+      if(sd.who){var w2=document.createElement("span"); w2.className="sayw1"; w2.textContent="— "+sd.who; sb2.appendChild(w2)}
+      bar.appendChild(sb2);
+    }
     function drawRow(r){
       if(r.big){   // 하루 돌아보기: 눈에 잘 띄게 한 줄 전체를 큰 버튼으로 (2026-10-15 사용자 요청)
         var bb=document.createElement("button"); bb.type="button"; bb.className="rvchip tdbig"+(r.done?" done":""); bb.dataset.id=""; bb.dataset.act="daily";
@@ -7982,6 +8180,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     body.appendChild(bg);
   }
+  $("openSayBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay()});
   $("openMedBtn").addEventListener("click",openMedProgress);
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
   $("openTongdokBtn").addEventListener("click",function(){location.href="tongdok/?from=notes"});
@@ -9451,7 +9650,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     detail=String(detail||"").replace(/\s+/g," ").trim().slice(0,140);
     return {msg:what+" ("+r.status+(detail?": "+detail:"")+")",short:what+" "+r.status};
   }
-  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");try{localStorage.removeItem(SB_LAST)}catch(e){}}
+  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__sayings");try{localStorage.removeItem(SB_LAST)}catch(e){}}
   var SB_DIRTY="bible-sb-dirty";
   try{(JSON.parse(localStorage.getItem(SB_DIRTY)||"[]")||[]).forEach(function(id){sbDirty.add(String(id))})}catch(e){}
   function sbSaveDirty(){try{if(sbDirty.size)localStorage.setItem(SB_DIRTY,JSON.stringify(Array.from(sbDirty)));else localStorage.removeItem(SB_DIRTY)}catch(e){}}
@@ -9477,12 +9676,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           if(sbLastJson.__prays1!==pjs){rows.push({user_id:uid,id:"__prays1",data:pd,updated_at:now,deleted:false});sbLastJson.__prays1=pjs}
           return;
         }
-        if(id!=="__daily"&&id!=="__chapters"){
+        if(id!=="__daily"&&id!=="__chapters"&&id!=="__sayings"){
           var sd=shareData(notes.get(id)), skey="s:"+id, sjs=JSON.stringify(sd);
           if(sbLastJson[skey]!==sjs){rows.push({user_id:uid,id:skey,data:sd||{},updated_at:now,deleted:!sd,visibility:"friends"});sbLastJson[skey]=sjs}
         }
-        if(id==="__daily"||id==="__chapters"){
-          var d=id==="__daily"?dailyData():myChapters(), js=JSON.stringify(d);
+        if(id==="__daily"||id==="__chapters"||id==="__sayings"){
+          var d=id==="__daily"?dailyData():id==="__chapters"?myChapters():sayData(), js=JSON.stringify(d);
           if(sbLastJson[id]!==js){rows.push({user_id:uid,id:id,data:d,updated_at:now,deleted:false});sbLastJson[id]=js}
           return;
         }
@@ -9510,6 +9709,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             return;
           }
           if(r.id==="__prays1"){if(p1Merge(r.data)&&prd&&!prd.hidden)drawPrayRead();sbLastJson.__prays1=JSON.stringify(p1Data());return}
+          if(r.id==="__sayings"){sbLastJson.__sayings=JSON.stringify(r.data);sayMerge(r.data);return}
           if(r.id==="__daily"){sbLastJson.__daily=JSON.stringify(r.data);mergeData({daily:r.data},true);return}
           if(r.id==="__chapters"){var before=JSON.stringify(myChapters());mergeData({chapters:r.data},true);sbLastJson.__chapters=JSON.stringify(myChapters());return}
           if(r.deleted)del[r.id]=(r.data&&+r.data.at)||+r.updated_at; else if(r.data&&r.data.id)list.push(r.data);
