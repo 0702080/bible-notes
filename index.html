@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-180">
+<meta name="app-build" content="2026-10-18-181">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1514,6 +1514,14 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
   body.boardon .todaymini::-webkit-scrollbar{display:none}
   body.boardon .toolbar h2{flex:0 0 auto}
 }
+/* 오늘 아이콘 미리 보기 (2026-10-18 사용자 요청) */
+.tmpop{position:fixed;z-index:95;min-width:230px;max-width:380px;padding:12px 14px;border:1px solid #2E2D34;border-radius:14px;background:#15141A;box-shadow:0 18px 40px rgba(0,0,0,.6);pointer-events:none;font-size:13px;line-height:1.65;color:var(--muted)}
+.tmpop[hidden]{display:none}
+.tmpt{margin-bottom:6px;font-size:12.5px;font-weight:700;color:var(--gold)}
+.tmpl{display:block;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tmps{display:block;color:var(--faint);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tmpb{height:6px;margin:4px 0 8px;border-radius:3px;background:#222126;overflow:hidden}
+.tmpb i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--green))}
 .tmchip{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;height:32px;padding:0 11px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
 .tmchip i{font-style:normal;font-size:14.5px;line-height:1}
 .tmchip b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
@@ -7252,8 +7260,143 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(last<t.length)el.appendChild(document.createTextNode(t.slice(last)));
   }
   // 칸반일 때 도구줄에 뜨는 작은 '오늘' 아이콘 줄 (2026-10-17 사용자 요청)
+  /* ---------- 오늘 아이콘: 커서만 올려도 내용이 보이게 (2026-10-18 사용자 요청) ---------- */
+  var tmPop=null, tmT=null, tmFor="";
+  function tmEl(){
+    if(!tmPop){tmPop=document.createElement("div");tmPop.className="tmpop";tmPop.hidden=true;document.body.appendChild(tmPop)}
+    return tmPop;
+  }
+  function tmHide(){clearTimeout(tmT); tmFor=""; if(tmPop)tmPop.hidden=true}
+  function tmLine(box,txt,cls){
+    var d=document.createElement("span"); d.className=cls||"tmpl"; d.textContent=txt; box.appendChild(d); return d;
+  }
+  function tmBar(box,pc){
+    var w=document.createElement("div"); w.className="tmpb"; var i=document.createElement("i");
+    i.style.width=Math.max(0,Math.min(100,pc))+"%"; w.appendChild(i); box.appendChild(w);
+  }
+  function tmBuild(act){
+    var box=document.createElement("div"), today=dkey(Date.now()), all=sorted(), i;
+    function title(t){var h=document.createElement("div");h.className="tmpt";h.textContent=t;box.appendChild(h)}
+    if(act==="daily"){
+      var o=dailyData(), on=dailyChecked(o,today), left=o.items.filter(function(it){return on.indexOf(it.id)<0});
+      title("🌙 하루 돌아보기  "+on.length+" / "+o.items.length);
+      tmBar(box,o.items.length?Math.round(on.length/o.items.length*100):0);
+      if(!left.length)tmLine(box,"오늘 할 일을 다 돌아봤어요 🙌");
+      else{
+        var gs={}; dlGroups(o).forEach(function(g){gs[g.g]=g});
+        left.slice(0,5).forEach(function(it){tmLine(box,"· "+((gs[it.g]&&gs[it.g].e)||"")+" "+it.t)});
+        if(left.length>5)tmLine(box,"그리고 "+(left.length-5)+"개 더","tmps");
+      }
+      return box;
+    }
+    if(act==="rvall"){
+      var due=all.filter(function(n){var r=reviewInfo(n);return r&&r.due});
+      title("🔁 오늘 복습할 말씀 "+due.length+"개");
+      due.slice(0,6).forEach(function(n){tmLine(box,"· "+(n.ref||"구절 미입력"))});
+      if(due.length>6)tmLine(box,"그리고 "+(due.length-6)+"개 더","tmps");
+      tmLine(box,"누르면 한 번에 복습해요","tmps");
+      return box;
+    }
+    if(act==="med"||act==="medprog"){
+      var st=medStats(), did=!!st.days[today];
+      title(did?"✨ 오늘 묵상 완료":"✍️ 오늘 묵상");
+      if(st.streak>=1)tmLine(box,"🔥 "+st.streak+"일 연속","tmps");
+      if(did)tmLine(box,"누르면 묵상 진도표를 봐요","tmps");
+      else{
+        var lastN=null,lastAt=0;
+        all.forEach(function(n){(n.meds||[]).forEach(function(m){if(String(m.text||"").trim()&&(+m.at||0)>lastAt){lastAt=+m.at;lastN=n}})});
+        var tg=notes.get(lastOpenId())||lastN||all[0];
+        if(tg){
+          tmLine(box,tg.ref||"구절 미입력");
+          tmLine(box,String(tg.text||"").replace(/\s+/g," ").slice(0,70)+"…","tmps");
+        }
+        tmLine(box,"누르면 바로 묵상을 써요","tmps");
+      }
+      return box;
+    }
+    if(act==="act"){
+      var rows=[];
+      all.forEach(function(n){(n.acts||[]).forEach(function(a){
+        if(a.t&&a.t.trim()&&!a.done&&(a.stamps||[]).length&&(a.stamps||[]).indexOf(today)<0)rows.push({ref:n.ref,t:a.t});
+      })});
+      title("✅ 오늘 남은 실천 "+rows.length+"개");
+      rows.slice(0,5).forEach(function(r){tmLine(box,"· "+r.t)});
+      if(rows.length>5)tmLine(box,"그리고 "+(rows.length-5)+"개 더","tmps");
+      return box;
+    }
+    if(act==="sbsync"||act==="sync"||act==="sblogin"){
+      var ss=sbSession(), sst=(typeof sbState==="object"&&sbState)||{};
+      title("☁️ 동기화");
+      if(ss){
+        var ago=sst.at?Math.round((Date.now()-sst.at)/60000):-1;
+        tmLine(box,sst.ok===false?"안 됐어요"+(sst.short?" · "+sst.short:""):ago<0?"맞추는 중…":ago<1?"방금 맞춤":ago+"분 전 맞춤");
+        if(ss.email)tmLine(box,ss.email,"tmps");
+        tmLine(box,"누르면 지금 맞춰요","tmps");
+      }else{
+        tmLine(box,"꺼져 있어요");
+        tmLine(box,"로그인하면 폰과 PC가 같이 보여요","tmps");
+      }
+      return box;
+    }
+    if(act==="friends"){
+      var fin=(frData&&frData.incoming||[]), fr=(frData&&frData.friends||[]);
+      title("👥 친구 "+fr.length+"명"+(fin.length?" · 신청 "+fin.length:""));
+      fr.slice(0,5).forEach(function(f){tmLine(box,"· "+(f.name||f.code||"친구"))});
+      if(!fr.length&&!fin.length)tmLine(box,"친구 코드를 주고받으면 서로 진도를 봐요","tmps");
+      return box;
+    }
+    if(act==="week"){
+      var w=weekStats();
+      title("📅 한 주 돌아보기  "+weekLabel(w.from)+" ~ "+weekLabel(w.to));
+      tmLine(box,"🌙 하루 돌아보기 "+w.dchk+"번   ✍️ 묵상 "+w.med+"편");
+      tmLine(box,"🧠 외운 말씀 "+w.mem+"편   ✅ 실천 "+w.act+"번");
+      tmLine(box,"🙏 새 기도 "+w.pray+"개"+(w.ans?" (응답 "+w.ans+")":"")+"   📖 담은 말씀 "+w.added+"편");
+      return box;
+    }
+    if(act==="prog"){
+      var cnt=0, done=0;
+      all.forEach(function(n){(n.acts||[]).forEach(function(a){if(a.t&&a.t.trim()){cnt++; if(a.done)done++}})});
+      title("📊 실천 진도표");
+      tmLine(box,"실천 "+cnt+"개 · 끝낸 것 "+done+"개");
+      tmLine(box,"누르면 전체를 봐요","tmps");
+      return box;
+    }
+    return null;
+  }
+  function tmShow(chip){
+    var act=chip.dataset.act||"";
+    if(!act)return;
+    var el=tmEl(); el.textContent="";
+    var box=null;
+    try{box=tmBuild(act)}catch(e){box=null}
+    if(!box){tmHide();return}
+    el.appendChild(box); el.hidden=false; tmFor=act;
+    el.style.left="0px"; el.style.top="-999px";
+    var r=chip.getBoundingClientRect(), w=el.offsetWidth, h=el.offsetHeight;
+    var x=Math.min(Math.max(10,r.left-6),Math.max(10,window.innerWidth-w-10));
+    var y=r.bottom+8; if(y+h>window.innerHeight-10)y=Math.max(10,r.top-h-8);
+    el.style.left=Math.round(x)+"px"; el.style.top=Math.round(y)+"px";
+  }
+  function tmHoverInit(){
+    var bar=$("todayMini"); if(!bar||bar._hov)return; bar._hov=1;
+    if(!(window.matchMedia&&matchMedia("(hover:hover)").matches))return;
+    bar.addEventListener("mouseover",function(e){
+      var c=e.target.closest(".tmchip"); if(!c)return;
+      if(tmFor===(c.dataset.act||""))return;
+      clearTimeout(tmT); tmT=setTimeout(function(){tmShow(c)},120);
+    });
+    bar.addEventListener("mouseout",function(e){
+      var to=e.relatedTarget;
+      if(to&&to.closest&&to.closest(".tmchip"))return;
+      tmHide();
+    });
+    window.addEventListener("scroll",tmHide,true);
+    window.addEventListener("resize",tmHide);
+    bar.addEventListener("click",tmHide);
+  }
   function renderTodayMini(){
     var bar=$("todayMini"); if(!bar)return;
+    tmHoverInit(); tmHide();
     bar.textContent="";
     if(!boardOn||!notes.size)return;
     var all=sorted(), today=dkey(Date.now());
