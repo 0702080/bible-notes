@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-187">
+<meta name="app-build" content="2026-10-18-188">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6353,7 +6353,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       },{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
       ccBox.querySelector(".ccedit").addEventListener("click",function(){ccAct("eopen")});
+      ccBox.querySelector(".ccverse").addEventListener("dblclick",function(e){   // 두 번 누르면 문장 배치 고치기 (2026-10-18 사용자 요청)
+        if(!C||C.edit||C.revealing)return;
+        if(e.target.closest("textarea,input,button"))return;
+        e.preventDefault(); ccAct("eopen");
+      });
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 낱말을 누르면 소리로 들려주고, 가린 낱말은 톡 뒤집혀 잠깐 보인다
+        if(e.detail>=2)return;   // 두 번째 누름은 '고치기'로 넘긴다
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
         var wt=String(w.dataset.w||w.textContent||"").trim();
         if(wt)sayWord(wt,true);   // 누를 때마다 그 낱말 소리 (2026-10-17 사용자 요청)
