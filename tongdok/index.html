@@ -344,7 +344,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .toast small{color:#EAD9C2}
 .fchips .chip{cursor:not-allowed}
 /* 마지막 줄 빈칸은 장이 아니므로 칸처럼 보이지 않게 (2026-10-11: 오바댜처럼 짧은 책에서 빈칸을 누르던 문제) */
-.chips{background:transparent;border:0;gap:0;border-radius:0;overflow:visible}
+.chips{background:transparent;border:0;gap:0;border-radius:8px;overflow:hidden}   /* 표 네 모서리를 둥글게 (2026-10-17 사용자 요청) */
 .chips .chip{box-shadow:0 0 0 .5px var(--rule)}
 .chips>span:not(.chip){background:transparent;box-shadow:none}   /* 친구 표 칸(span.chip)은 빼야 내 표와 같은 바탕색이 됨 */
 .fchips{background:transparent}
