@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-177">
+<meta name="app-build" content="2026-10-18-179">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2260,6 +2260,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlsn:empty{display:none}
 .dlsx{flex:0 0 auto;height:32px;padding:0 12px;border:1px solid #34333A;border-radius:16px;background:transparent;color:var(--muted);font-size:12.5px;white-space:nowrap}
 .dlsx[hidden]{display:none}
+.dlnote{display:inline-block;margin:0 0 8px 10px;padding:5px 12px;border:1px solid color-mix(in srgb,var(--violet) 40%,#232229);border-radius:14px;background:color-mix(in srgb,var(--violet) 10%,transparent);color:var(--violet);font:inherit;font-size:12.5px;font-weight:700;white-space:nowrap}
+.dlnotesel{flex:0 0 auto;max-width:170px;height:40px;font-size:13px}
 .dlfindhit{display:block;width:100%;box-sizing:border-box;margin:0 0 6px 10px;padding:6px 10px;border:1px solid #232229;border-left:3px solid color-mix(in srgb,var(--sky) 60%,transparent);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--sky) 6%,transparent);color:var(--muted);font:inherit;font-size:12.5px;line-height:1.55;text-align:left}
 .dlfindhit b{margin-right:6px;color:var(--sky);font-weight:700}
 .dlnohit{margin:18px auto;max-width:608px;padding:14px;border:1px dashed #2E2D34;border-radius:12px;color:var(--faint);font-size:13px;text-align:center}
@@ -5167,6 +5169,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var b=e.target.closest(".rvchip,.tmchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
     if(b.dataset.act==="prog"){openProg();return}
+    if(b.dataset.act==="medprog"){openMedProgress();return}
     if(b.dataset.act==="friends"){openFr();return}
     if(b.dataset.act==="sync"){if(ghCfg())ghSync("manual");else openGh();return}
     if(b.dataset.act==="sbsync"){sbSync("manual");return}
@@ -6794,6 +6797,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         }
       });
       // 이름과 항목은 엔터로도 저장
+      dl.querySelector(".dllist").addEventListener("change",function(e){   // 항목에 말씀 붙이기
+        var sl=e.target; if(!sl.classList||!sl.classList.contains("dlnotesel"))return;
+        var o=dailyData(), it=o.items.filter(function(x){return x.id===sl.dataset.id})[0]; if(!it)return;
+        if(sl.value)it.note=sl.value; else delete it.note;
+        saveDaily(o); toast(sl.value?"말씀을 붙였어요 📖":"말씀을 뗐어요");
+      });
       dl.querySelector(".dllist").addEventListener("keydown",function(e){
         if(e.key!=="Enter")return; var t=e.target, f;
         if(t.classList.contains("dlted")||t.classList.contains("dlgn2")||t.classList.contains("dlge2")){e.preventDefault();t.blur()}   // 빠져나가면 저장됨
@@ -6814,6 +6823,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
           o.items=o.items.filter(function(it){return it.id!==id}); saveDaily(o); drawDaily(); return;
         }
+        if(b.classList.contains("dlnote")){closeDaily();openNoteFocus(b.dataset.note);return}
         if(b.classList.contains("dlfindhit")){   // 찾은 기록: 그날로 옮겨 가서 펼쳐 보여 준다
           dlDay=b.dataset.day; dlMemoMore.add(b.dataset.hid); drawDaily();
           setTimeout(function(){var rw=dl.querySelector('.dlitem[data-id="'+b.dataset.hid+'"]');if(rw){rw.scrollIntoView({block:"center"});rw.classList.add("dlflash");setTimeout(function(){rw.classList.remove("dlflash")},1500)}},40);
@@ -7108,7 +7118,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(dlEditId===it.id){   // 항목 글 고치기
           var ef=document.createElement("div"); ef.className="dlitform"; ef.dataset.id=it.id;
           var ei2=document.createElement("input"); ei2.className="field dlted"; ei2.maxLength=40; ei2.value=it.t; ei2.setAttribute("aria-label","항목 글 고치기");
-          ef.appendChild(ei2); list.appendChild(ef);
+          ef.appendChild(ei2);
+          var sel2=document.createElement("select"); sel2.className="field dlnotesel"; sel2.dataset.id=it.id;   // 이 항목에 붙일 말씀 (2026-10-18 사용자 요청)
+          sel2.setAttribute("aria-label","이 항목에 붙일 말씀");
+          var o0=document.createElement("option"); o0.value=""; o0.textContent="📖 말씀 없음"; sel2.appendChild(o0);
+          sorted().forEach(function(nn){var op=document.createElement("option");op.value=nn.id;op.textContent=nn.ref||"구절 미입력";sel2.appendChild(op)});
+          sel2.value=it.note&&notes.has(it.note)?it.note:"";
+          ef.appendChild(sel2);
+          list.appendChild(ef);
           setTimeout(function(){ei2.focus();ei2.setSelectionRange(ei2.value.length,ei2.value.length)},0);
           return;
         }
@@ -7134,6 +7151,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         }
         if(dlEdit){var x=document.createElement("button");x.type="button";x.className="dldel";x.dataset.id=it.id;x.textContent="×";x.setAttribute("aria-label","이 항목 지우기");row.appendChild(x)}
         list.appendChild(row);
+        if(it.note&&notes.has(it.note)&&!dlEdit){   // 붙여 둔 말씀 (2026-10-18 사용자 요청)
+          var nb=document.createElement("button"); nb.type="button"; nb.className="dlnote"; nb.dataset.note=it.note;
+          var nn0=notes.get(it.note);
+          nb.textContent="📖 "+(nn0.ref||"구절 미입력");
+          nb.title=String(nn0.text||"").replace(/\s+/g," ").slice(0,80);
+          nb.setAttribute("aria-label",(nn0.ref||"")+" 말씀 보기");
+          list.appendChild(nb);
+        }
         if(fq&&hits[it.id])hits[it.id].slice(0,3).forEach(function(h){   // 찾은 기록: 누르면 그날로
           var hb=document.createElement("button"); hb.type="button"; hb.className="dlfindhit"; hb.dataset.day=h.day; hb.dataset.hid=it.id;
           var d=document.createElement("b"); d.textContent=dayName(h.day); hb.appendChild(d);
@@ -7233,7 +7258,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var st=medStats(), didToday=!!st.days[today], lastMedNote=null, lastAt=0;
     all.forEach(function(n){(n.meds||[]).forEach(function(m){if(String(m.text||"").trim()&&(+m.at||0)>lastAt){lastAt=+m.at;lastMedNote=n}})});
     var target=notes.get(lastOpenId())||lastMedNote||all[0];
-    if(didToday)chip({icon:"✨",cls:"done",title:"오늘 묵상 완료"+(st.streak>=2?"  ·  🔥 "+st.streak+"일 연속":"")});
+    if(didToday)chip({icon:"✨",cls:"done",act:"medprog",title:"오늘 묵상 완료"+(st.streak>=2?"  ·  🔥 "+st.streak+"일 연속":"")+" · 눌러서 묵상 진도표"});
     else if(target)chip({icon:"✍️",act:"med",id:target.id,title:"오늘 묵상 쓰기 — "+(target.ref||"")+(st.streak>=1?" (쓰면 🔥 "+(st.streak+1)+"일 연속)":"")});
     // ✅ 오늘 실천
     var acts=[];
