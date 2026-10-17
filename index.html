@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-176">
+<meta name="app-build" content="2026-10-18-177">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1765,6 +1765,15 @@ button:active{filter:brightness(1.15)}
 .cctip{margin:6px 0 16px;font-size:14.5px;line-height:1.6;color:var(--muted)}
 .cctip b{color:var(--ink);font-size:16px}
 .ccverse{font-family:var(--serif);font-size:21px;line-height:2;color:var(--orange);word-break:keep-all}
+/* 받아쓰기 (2026-10-18 사용자 요청) */
+.ccdict{display:flex;flex-direction:column;gap:10px;width:100%}
+.ccdta{width:100%;box-sizing:border-box;min-height:150px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--gold) 35%,#2E2D33);border-radius:14px;background:#101013;color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.9;resize:vertical}
+.ccdta:focus{outline:none;border-color:var(--gold)}
+.ccdres{font-family:var(--serif);font-size:20px;line-height:2;word-break:keep-all}
+.ccdres .dw.ok{color:var(--green)}
+.ccdres .dw.near{color:var(--hi);text-decoration:underline dotted 2px}
+.ccdres .dw.miss{color:var(--pink);background:color-mix(in srgb,var(--pink) 16%,transparent);border-radius:5px;padding:0 3px}
+.ccsc{color:var(--gold);font-size:17px}
 .ccverse.big{font-size:22px}
 .ccw.hid{position:relative;color:var(--faint);cursor:pointer;border-radius:6px}
 .ccw.hid .ccg{visibility:hidden}
@@ -6259,7 +6268,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       window.addEventListener("popstate",function(){if(ccBox&&!ccBox.hidden){ccHist=false;closeCoach()}});
     }
     var done3=n.mem&&n.mem.s&&n.mem.s[0]&&n.mem.s[1]&&n.mem.s[2];
-    C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",anim:true,seen:opt.seen||{},order:opt.order||1};
+    C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",dict:null,anim:true,seen:opt.seen||{},order:opt.order||1};
     ccBox.querySelector(".ccref").textContent=n.ref;
     var cn=ccBox.querySelector(".ccnum"); cn.hidden=C.order<2; cn.textContent=C.order+"번째";   // 밀어서 이어 외울 때 몇 번째 말씀인지
     if(C.order>=2){cn.classList.remove("bump");void cn.offsetWidth;cn.classList.add("bump")}
@@ -6338,6 +6347,44 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     return hide;
   }
+  // 받아쓰기 채점: 조사만 다른 것은 '거의 맞음'으로 너그럽게 (2026-10-18 사용자 요청)
+  function dictBare(x){return String(x||"").replace(/[^가-힣A-Za-z0-9]/g,"")}
+  function dictStem(x){var b=dictBare(x);return b.length>2?b.replace(/(으로|에게|께서|이다|은|는|이|가|을|를|에|의|와|과|도|로|께|요|다)$/,""):b}
+  function dictScore(expect,typed){
+    var E=wordsOf(expect), T=wordsOf(typed).map(dictBare).filter(Boolean);
+    var rows=[], j=0, ok=0, near=0, k;
+    E.forEach(function(w){
+      var b=dictBare(w), st=dictStem(w), hit=-1, kind="";
+      for(k=j;k<Math.min(T.length,j+3);k++)if(T[k]===b){hit=k;kind="ok";break}
+      if(hit<0&&st)for(k=j;k<Math.min(T.length,j+3);k++)if(dictStem(T[k])===st){hit=k;kind="near";break}
+      if(hit>=0){j=hit+1; if(kind==="ok")ok++; else near++; rows.push({w:w,s:kind})}
+      else rows.push({w:w,s:"miss"});
+    });
+    return {rows:rows,ok:ok,near:near,total:E.length};
+  }
+  function ccDict(n,tip,btn){
+    var v=ccBox.querySelector(".ccverse"); v.textContent=""; v.classList.remove("big","recall");
+    var d=C.dict||{};
+    if(!d.res){
+      tip.innerHTML="<b>✍️ 받아쓰기</b><br>기억나는 대로 적어 보세요. 조사(은·는·이·가)만 달라도 맞은 것으로 쳐요.";
+      var box=document.createElement("div"); box.className="ccdict";
+      var ta=document.createElement("textarea"); ta.className="ccdta"; ta.placeholder="여기에 말씀을 적어 보세요";
+      ta.value=d.text||""; box.appendChild(ta); v.appendChild(box);
+      setTimeout(function(){try{ta.focus()}catch(e){}},30);
+      btn("← 돌아가기","dback"); btn("채점하기 ✓","dscore",true);
+      return;
+    }
+    var r=d.res, pc=Math.round((r.ok+r.near)/Math.max(1,r.total)*100);
+    tip.innerHTML="<b>✍️ 받아쓰기 결과</b><br><b class='ccsc'>"+(r.ok+r.near)+" / "+r.total+"</b> 낱말 ("+pc+"%)"+(r.near?" · 조사만 다른 것 "+r.near+"개":"");
+    var wrap=document.createElement("div"); wrap.className="ccdres";
+    r.rows.forEach(function(x,i){
+      if(i){wrap.appendChild(document.createTextNode(" "))}
+      var sp=document.createElement("span"); sp.className="dw "+x.s; sp.textContent=x.w; wrap.appendChild(sp);
+    });
+    v.appendChild(wrap);
+    btn("다시 써 보기","dretry");
+    btn("😅 잘 모르겠어요","g0"); btn("🤔 조금 틀렸어요","g1"); btn("😊 다 기억났어요","g2",true);
+  }
   function ccMeter(tip,on,just,icon){   // 이 단계에서 얼마나 했는지 불 켜지는 구슬 3개
     var m=document.createElement("div"); m.className="ccmeter";
     for(var i=0;i<3;i++){var d=document.createElement("i");if(i<on){d.className="on"+(i===just?" just":"");d.textContent=icon}m.appendChild(d)}
@@ -6371,7 +6418,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       btn("한 번 더","again");
       btn(C.round<2?"말했어요 → 더 가리기":"말했어요 →","next",true);
     }else if(C.stage===3){
+      if(C.dict&&C.dict.on){ccDict(n,tip,btn);return}
+      tip.innerHTML="<b>4단계 · 떠올리기</b><br>구슬만 보고 말씀을 떠올려 보세요. 손으로 적어 보면 더 잘 외워져요.";
       ccWords(n.text,"none",0,C.seed);
+      btn("✍️ 받아쓰기","dict");
       btn("확인하기 👀","show",true);
     }else if(C.stage===4){
       ccWords(n.text,"got",0,C.seed);
@@ -6389,9 +6439,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccDraw();return}
     if(a==="again"){C.seed=newSeed();C.anim=true;buzz(6);ccDraw();return}
     if(a==="next"){buzz(8);C.anim=true;if(C.stage===2&&C.round<2){C.round++;C.keepPrev=true;ccDraw();return}C.stage++;ccDraw();return}
+    if(a==="dict"){C.dict={on:true,text:"",res:null};ccDraw();return}
+    if(a==="dback"){C.dict=null;ccDraw();return}
+    if(a==="dscore"){
+      var ta=ccBox.querySelector(".ccdta"), val=ta?ta.value:"";
+      C.dict={on:true,text:val,res:dictScore(n.text,val)}; buzz(8); ccDraw(); return;
+    }
+    if(a==="dretry"){C.dict={on:true,text:(C.dict&&C.dict.text)||"",res:null};ccDraw();return}
     if(a==="show"){ccReveal();return}
     if(a==="g0"||a==="g1"||a==="g2"){C.grade=a;C.stage=5;ccFinish(n);ccDraw();return}
-    if(a==="restart"){C.stage=0;C.shown=0;C.reads=0;C.round=0;C.grade="";C.anim=true;ccDraw();return}
+    if(a==="restart"){C.stage=0;C.shown=0;C.reads=0;C.round=0;C.grade="";C.dict=null;C.anim=true;ccDraw();return}
     if(a==="close"){closeCoach();return}
   }
   function ccNextNote(){   // 다음 암송 말씀: 오늘 복습할 것 → 아직 외우는 중인 것 → 나머지 (목록 순서)
