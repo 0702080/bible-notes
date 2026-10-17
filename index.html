@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-174">
+<meta name="app-build" content="2026-10-17-175">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2714,7 +2714,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 
   /* ---------- rendering ---------- */
   /* ---------- PC 칸반 보드: 암송 단계별로 한눈에 (새로 담음 → 외우는 중 → 복습할 차례 → 다 외움) ---------- */
-  var boardOn=false; try{boardOn=localStorage.getItem("bible-view")==="board"}catch(e){}
+  // PC에서는 칸반 보드로 열린다 (2026-10-17 사용자 요청). 목록으로 바꾸면 그 뒤로는 그대로 기억한다
+  var boardOn=false;
+  (function(){
+    var wide=!!(window.matchMedia&&matchMedia("(min-width:900px)").matches), v=null;
+    try{
+      v=localStorage.getItem("bible-view");
+      if(wide&&localStorage.getItem("bible-view-pc")!=="1"){   // 이 PC에서 처음 열 때 한 번만 칸반으로
+        localStorage.setItem("bible-view-pc","1"); localStorage.setItem("bible-view","board"); v="board";
+      }
+    }catch(e){}
+    boardOn=v?v==="board":wide;
+  })();
   var tdFold=false; try{tdFold=localStorage.getItem("bible-today-fold")==="1"}catch(e){}   // '오늘' 카드 접어 두기
   var BCOLS=[{k:"new",t:"새로 담음",e:"🌱",c:"var(--muted)",tip:"아직 암송을 시작하지 않은 말씀"},{k:"doing",t:"외우는 중",e:"✏️",c:"var(--sky)",tip:"도장을 모으는 중"},{k:"due",t:"복습할 차례",e:"🔁",c:"var(--gold)",tip:"오늘 다시 떠올릴 말씀"},{k:"done",t:"다 외움",e:"🏅",c:"var(--green)",tip:"도장 4개를 다 받은 말씀"}];
   function boardCol(n){
