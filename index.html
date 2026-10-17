@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-185">
+<meta name="app-build" content="2026-10-18-186">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1864,6 +1864,14 @@ button:active{filter:brightness(1.15)}
 .ccbtn:not(.main){background:#2A2932;border-color:#46454F;color:var(--ink)}
 .ccbtn:active{transform:scale(.97)}
 .ccbtn:disabled{opacity:.55}
+/* PC: 진행 줄과 단추를 화면 가운데 알맞은 크기로 (2026-10-18 사용자 요청) */
+@media (min-width:900px){
+  .ccsteps{width:100%;max-width:460px;margin:0 auto;padding:10px 0 2px}
+  .cctip{margin:4px 0 10px}
+  .ccfoot{max-width:460px;justify-content:center;gap:10px;padding:10px 0 18px}
+  .ccbtn{flex:0 0 auto;height:40px;padding:0 20px;border-radius:20px;font-size:14px}
+  .ccbtn.main{flex:0 0 auto;order:0;min-width:150px;height:40px;border-radius:20px;font-size:14.5px;box-shadow:none}
+}
 @media (prefers-reduced-motion:reduce){.ccst.done.just i,.ccst.now i,.ccmeter i.on.just,.ccw.hid.peek,.ccw.enter,.ccverse.recall .ccw.hid,.ccw.flip,.ccres{animation:none}}
 .mcoach{display:inline-flex;align-items:baseline;gap:8px;max-width:100%;height:38px;margin:10px 0 4px;padding:0 16px;border:1px solid color-mix(in srgb,var(--gold) 60%,#34333A);border-radius:19px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);line-height:36px;white-space:nowrap;overflow:hidden}
 .mcoach b{font-size:14.5px}
@@ -6501,7 +6509,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       btn(C.round<2?"말했어요 → 더 가리기":"말했어요 →","next",true);
     }else if(C.stage===3){
       if(C.dict&&C.dict.on){ccDict(n,tip,btn);return}
-      tip.innerHTML="<b>4단계 · 떠올리기</b><br>구슬만 보고 말씀을 떠올려 보세요. 손으로 적어 보면 더 잘 외워져요.";
+      tip.innerHTML="<b>4단계 · 떠올리기</b>";
       ccWords(n.text,"none",0,C.seed);
       btn("✍️ 받아쓰기","dict");
       btn("확인하기 👀","show",true);
