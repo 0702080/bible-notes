@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-17-173">
+<meta name="app-build" content="2026-10-17-174">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2343,6 +2343,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlmemobox textarea:focus{border-color:var(--sky);outline:none}
 .dlmemofoot{display:flex;gap:8px;margin-top:8px}
 .dlmemop+.dlmemop{margin-top:10px}
+.dlmemodt{display:block;margin-top:8px;text-align:right;font-size:12.5px;line-height:1.4;color:var(--faint);opacity:.85}
 .dlmemop.mc0{--mc:var(--sky)} .dlmemop.mc1{--mc:var(--violet)} .dlmemop.mc2{--mc:var(--green)} .dlmemop.mc3{--mc:var(--gold)}
 .dlmemop[class*="mc"]{border-left:3px solid color-mix(in srgb,var(--mc) 70%,transparent);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--mc) 7%,transparent);color:color-mix(in srgb,var(--mc) 45%,var(--muted))}
 .dlmemoadd{display:block;height:32px;margin:0 0 10px 12px;padding:0 14px;border:1px dashed color-mix(in srgb,var(--sky) 50%,#34333A);border-radius:16px;background:transparent;color:var(--sky);font-size:13px;font-weight:700;white-space:nowrap}
@@ -6463,6 +6464,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     t=String(t||"").slice(0,8000);   // 이어 쓰기로 길어질 수 있어 넉넉히
     if(t.trim())o.memo[day][id]=t; else delete o.memo[day][id];
     if(!Object.keys(o.memo[day]).length)delete o.memo[day];
+    // 기록마다 처음 적은 시각을 따로 둔다 (2026-10-17 사용자 요청: 기도문 아래 날짜 표시)
+    if(!o.mt||typeof o.mt!=="object")o.mt={};
+    if(t.trim()){ if(!o.mt[day]||typeof o.mt[day]!=="object")o.mt[day]={}; if(!o.mt[day][id])o.mt[day][id]=Date.now(); }
+    else if(o.mt[day]){ delete o.mt[day][id]; if(!Object.keys(o.mt[day]).length)delete o.mt[day]; }
   }
   function dailyData(){
     var o=null; try{o=JSON.parse(localStorage.getItem(DAILY_KEY)||"null")}catch(e){}
@@ -6912,7 +6917,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         }
         function memoPrev(key,val,no){   // 기록마다 색을 살짝 달리해 한눈에 나뉘어 보이게 (2026-10-15 사용자 요청)
           var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo mc"+((no-1)%4); mp.dataset.id=key;
-          mp.textContent=val; list.appendChild(mp);
+          mp.textContent=val;
+          var at=o.mt&&o.mt[dlDay]&&o.mt[dlDay][key], dt=document.createElement("span"); dt.className="dlmemodt";   // 기록 아래 날짜(와 적은 시각)
+          if(at){var hd=new Date(at), hh=hd.getHours(); dt.textContent=dayName(dlDay)+" · "+(hh<12?"오전 ":"오후 ")+((hh%12)||12)+":"+String(hd.getMinutes()).padStart(2,"0")}
+          else dt.textContent=dayName(dlDay);
+          mp.appendChild(dt); list.appendChild(mp);
         }
         var extras=isThx?[]:dlMemoExtras(o,dlDay,it.id), openNew=dlMemoId.indexOf(it.id+"~")===0&&extras.indexOf(dlMemoId)<0;
         // 가장 최근 기록이 맨 위에 오게: 새 기록 칸·'＋ 새 기록' 단추 → 최근 기록 → 첫 기록 (2026-10-17 사용자 요청)
@@ -8624,6 +8633,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
               if(!Object.keys(od.memo[day]).length)delete od.memo[day];
             });
             if(!Object.keys(od.memo).length)delete od.memo;
+            if(obj.daily.mt&&typeof obj.daily.mt==="object"){   // 기록을 적은 시각
+              if(!od.mt||typeof od.mt!=="object")od.mt={};
+              Object.keys(obj.daily.mt).forEach(function(day){var inc=obj.daily.mt[day]; if(!inc||typeof inc!=="object")return; if(!od.mt[day])od.mt[day]={};
+                Object.keys(inc).forEach(function(k){if(!od.mt[day][k]&&+inc[k])od.mt[day][k]=+inc[k]})});
+            }
           }
           // 내가 바꾼 묶음 이름도 함께
           if(obj.daily.gname&&typeof obj.daily.gname==="object"){
