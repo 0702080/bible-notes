@@ -1,0 +1,1591 @@
+<!doctype html>
+<html lang="ko"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>성경 통독표</title>
+<meta name="theme-color" content="#2A211C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* 아이보리 밝은 바탕 (2026-10-11 사용자 요청으로 검정에서 바꿈). 색은 아래 '아이보리 테마' 블록에서 덮어씀 */
+  color-scheme:light;
+  --paper:#121214; --sheet:#1A1A1D; --rule:#2E2E33; --ink:#ECEAF0; --muted:#9C98A4;
+  --bar:#2A211C; --ring:#E8B92E; --ring5:#F4974A; --blank:#2C2C31;
+  --violet:#AE90E0; --orange:#F4974A; --green:#52B87A; --blue:#7C98EE; --sky:#5CC0EE; --pink:#F08AC0;
+  --five:#E1609F; --five2:#2BA3B0;
+  --focus:#6B9BE6;
+  --sans:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  box-sizing:border-box;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;color:var(--ink);
+  background:var(--paper);
+  font-family:var(--sans);font-size:15px;line-height:1.55;
+  padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0);
+  touch-action:manipulation;
+}
+.wrap{max-width:680px;margin:0 auto;padding:16px 14px 40px}
+/* 맨 위 갈색 띠: 제목과 전체 진도 */
+.bar{position:sticky;top:0;z-index:40;background:var(--bar);color:#fff;
+  padding:calc(12px + env(safe-area-inset-top,0)) 16px 12px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center}
+.bar h1{grid-column:2;margin:0;font-size:17px;font-weight:700;color:#fff;letter-spacing:0}
+.bar .bar-back{grid-column:1;justify-self:start;border:0;background:rgba(255,255,255,.14);color:#fff;border-radius:999px;padding:5px 11px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.bar .bar-cnt{grid-column:3;justify-self:end;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+h2{font-family:var(--sans);font-weight:700;font-size:15px;margin:28px 0 0;color:var(--muted)}
+
+button{font-family:inherit;font-size:inherit;color:inherit}
+
+/* 요약 */
+.sum{margin-top:16px;padding:14px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);}
+.sum-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sum-now{font-family:var(--sans);font-size:17px;font-weight:700}
+.sum-cnt{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+.meter{height:10px;border-radius:5px;background:var(--rule);overflow:hidden;margin-top:10px;display:flex}
+.meter i{display:block;height:100%}
+.meter .me{background:var(--ring)}
+.meter .both{background:var(--green)}
+.halves{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.half{background:var(--paper);border:1px solid var(--rule);border-radius:9px;padding:8px 10px}
+.half b{display:block;font-size:12.5px;color:var(--muted);font-weight:500}
+.half span{font-family:var(--sans);font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+
+/* 도구 줄 */
+.tools{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+.btn{
+  padding:9px 13px;border:1px solid var(--rule);border-radius:999px;
+  background:var(--sheet);font-size:13.5px;font-weight:500;cursor:pointer;
+}
+.btn:active{background:var(--rule)}
+.btn.on{background:var(--violet);border-color:var(--violet);color:#fff;font-weight:700}
+.btn.wide{flex:1 1 100%;text-align:center;padding:12px}
+.btn:disabled{opacity:.45}
+
+/* 범례 */
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin:12px 2px 0;font-size:12.5px;color:var(--muted)}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:12px;height:12px;border-radius:50%;display:block}
+.legend[hidden]{display:none}
+
+/* 책 목록: 접지 않고 모두 펼친다. 책 이름 아래 10칸짜리 표 */
+.books{margin-top:2px}
+.bk{margin-top:18px}
+.bk-h{display:flex;align-items:baseline;gap:8px;padding:0 2px 7px}
+.bk-name{font-size:16px;font-weight:700}
+.bk-cnt{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+/* 책 이름은 갈래마다 다른 색 (율법서, 역사서, 시가서, 선지서, 복음서, 서신서…) */
+.bk[data-g="law"] .bk-name{color:#F5B971}
+.bk[data-g="hist"] .bk-name{color:#7EC8E3}
+.bk[data-g="poem"] .bk-name{color:#B9A2F0}
+.bk[data-g="major"] .bk-name{color:#F28CA6}
+.bk[data-g="minor"] .bk-name{color:#8FD6B4}
+.bk[data-g="gospel"] .bk-name{color:#FFD27A}
+.bk[data-g="paul"] .bk-name{color:#A7B8F5}
+.bk[data-g="general"] .bk-name{color:#F7A98B}
+.bk[data-g="rev"] .bk-name{color:#E99BD0}
+.bk.full .bk-name::after{content:" ✓";color:var(--green)}
+/* 책 접기·펴기 */
+.bk-tg{display:flex;align-items:baseline;gap:8px;min-width:0;padding:4px 2px;margin:-4px -2px;background:none;border:0;color:inherit;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bk-chev{align-self:center;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-2px);transition:transform .2s;flex:0 0 auto;margin-right:2px}
+.bk.shut .bk-chev{transform:rotate(-45deg)}
+.bk.shut .bk-body{display:none}
+.bk.shut .bk-h{padding-bottom:0}
+.bk.shut{margin-top:12px}
+.findbar{position:relative;margin:0 0 2px}
+.findin{width:100%;box-sizing:border-box;height:44px;padding:0 40px 0 14px;border:1.5px solid var(--rule);border-radius:12px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:15px}
+.findin:focus{border-color:var(--violet);outline:none}
+.findin::placeholder{color:var(--faint)}
+.findx{position:absolute;top:50%;right:6px;transform:translateY(-50%);width:32px;height:32px;padding:0;border:0;border-radius:16px;background:transparent;color:var(--muted);font-size:20px;line-height:1}
+.findx[hidden]{display:none}
+.findmsg{margin:8px 2px 0;font-size:12.5px;color:var(--muted)}
+.findmsg[hidden]{display:none}
+.foldbar{display:flex;justify-content:flex-end;margin-top:18px}
+.tg-all.tg-every{font-size:13.5px;padding:7px 16px;border-radius:18px;color:var(--ink);background:color-mix(in srgb,var(--ring) 12%,#232328);border-color:color-mix(in srgb,var(--ring) 35%,var(--rule))}
+h2.tg{display:flex;align-items:center;justify-content:space-between}
+h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:none}
+.tg-all{font-size:12.5px;font-weight:500;color:var(--muted);background:#232328;border:1px solid var(--rule);border-radius:14px;padding:4px 12px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.bk-chev{transition:none}}
+.bk-prog{--c:var(--ring);margin-left:auto;align-self:center;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;
+  background:conic-gradient(var(--c) calc(var(--p)*1%),#34343B 0)}
+.bk-prog b{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--paper);font-size:11px;font-weight:700;color:var(--c);font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.bk-prog[data-st="none"]{--c:var(--muted)}
+.bk-prog[data-st="none"] b{color:#7A7782}
+.bk-prog[data-st="full"]{--c:var(--green);box-shadow:0 0 10px color-mix(in srgb,var(--green) 40%,transparent)}
+.bk-prog[data-st="full"] b{background:var(--green);color:#0E1A12;font-size:15px}
+.chips{display:grid;grid-template-columns:repeat(10,1fr);gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.chips>span:not(.chip){background:var(--sheet)}   /* 마지막 줄 빈칸 */
+.chip{
+  position:relative;isolation:isolate;aspect-ratio:1/1;--d:min(44px,90%);min-height:32px;border:0;border-radius:0;
+  background:var(--sheet);font-size:13.5px;font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums;
+  cursor:pointer;padding:0;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;
+}
+/* 동그라미 */
+.chip::before{
+  content:"";position:absolute;left:50%;top:50%;width:var(--d);aspect-ratio:1/1;transform:translate(-50%,-50%);
+  border-radius:50%;border:1px solid color-mix(in srgb,var(--blank) 70%,var(--rule));background:#3A3A42;z-index:-1;transition:background .15s,box-shadow .2s;
+}
+.chip:focus-visible{outline:2px solid var(--focus);outline-offset:-3px}
+.chip[data-s]{color:var(--ink);font-weight:700}
+/* 휴대폰에서는 칸이 좁아 동그라미를 조금 작게 */
+@media (max-width:520px){.chip{--d:66%;font-size:12px}.ring{transform-origin:center;width:34px!important;height:34px!important;margin:-17px 0 0 -17px!important}}
+/* 읽은 장: 반짝이 없이 납작하게 채운 동그라미 (바깥 고리 없음) */
+.chip[data-s="me"]{--c:#F2C94C;color:#3A2A00}
+.chip[data-s="me"][data-five]{--c:#F2994A;color:#3A1C00}
+.chip[data-s="both"]{--c:#5CC08A;color:#0E2E1C}
+.chip[data-s="me"]::before,.chip[data-s="both"]::before{
+  border:0;background:var(--c);
+  box-shadow:none;
+}
+/* 5, 10, 15… 장째를 읽으면 번호 뒤에 꽃이 은은하게 핀다 (안 읽은 칸에는 없음) */
+.chip[data-s="me"][data-five]::after,.chip[data-s="both"][data-five]::after{
+  content:"🌸";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-12deg);
+  font-size:26px;line-height:1;opacity:.38;z-index:-1;pointer-events:none;filter:saturate(.7) brightness(1.15);
+}
+@media (max-width:520px){.chip[data-s][data-five]::after{font-size:13px}}   /* 원 안에 쏙 들어가게 */
+.chip[data-s="friend"]::before{border:2px dashed var(--sky)}
+.chip[data-s="friend"]{color:var(--sky)}
+/* 친구 표 (보기 전용) */
+.who{display:flex;align-items:baseline;gap:6px;margin:8px 2px 5px;font-size:12.5px;font-weight:700}
+.who span{font-weight:500;color:var(--muted);font-variant-numeric:tabular-nums}
+.me-who{color:#F2C94C;margin-top:0}
+.fr-who{color:var(--sky);margin-top:10px}
+
+.fchips .chip{cursor:default}
+.chip[data-s="fr"]{--c:var(--sky);color:#06222E;font-weight:700}
+.chip[data-s="fr"]::before{border:0;background:var(--c)}
+/* 얻는 순간 동그라미가 톡 튀어 오른다 */
+.chip.got::before,.chip.got5::before{animation:pop .42s cubic-bezier(.26,1.4,.4,1)}
+@keyframes pop{0%{transform:translate(-50%,-50%) scale(.55)}55%{transform:translate(-50%,-50%) scale(1.22)}100%{transform:translate(-50%,-50%) scale(1)}}
+
+/* 5장마다 뜨는 작은 격려 띠 */
+.toast{
+  position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0));
+  z-index:60;margin:0 auto;max-width:420px;
+  background:var(--sheet);border:1px solid var(--rule);border-radius:14px;
+  box-shadow:0 8px 26px rgba(0,0,0,.35);
+  padding:12px 14px;display:grid;grid-template-columns:28px 1fr;gap:11px;align-items:center;
+  animation:tin .32s cubic-bezier(.26,1.4,.4,1);
+}
+.toast[hidden]{display:none}
+.toast.out{opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s}
+/* 꽃잎이 겹치면 네모 덩어리로 보인다. 꽃잎을 작게 하고 바깥으로 벌려
+   다섯 장이 따로 보이게 한다. */
+.toast .ic{
+  width:28px;height:28px;
+  background:
+    radial-gradient(circle at 50% 20%, #FFD166 0 19%, transparent 20%),
+    radial-gradient(circle at 78.5% 40.7%, #FFD166 0 19%, transparent 20%),
+    radial-gradient(circle at 67.6% 74.3%, #FFD166 0 19%, transparent 20%),
+    radial-gradient(circle at 32.4% 74.3%, #FFD166 0 19%, transparent 20%),
+    radial-gradient(circle at 21.5% 40.7%, #FFD166 0 19%, transparent 20%),
+    radial-gradient(circle at 50% 50%, #F2769F 0 12%, transparent 13%);
+}
+.toast b{display:block;font-size:14px;line-height:1.5;font-weight:500}
+.toast small{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
+@keyframes tin{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* 칸 밖으로 번지지 않게 동그라미 바로 바깥까지만 퍼진다 */
+.ring{
+  position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;pointer-events:none;
+  border:1.5px solid color-mix(in srgb,var(--ring) 80%,transparent);
+  animation:ring .36s ease-out forwards;
+}
+@keyframes ring{from{opacity:.6;transform:scale(.9)}to{opacity:0;transform:scale(1.14)}}
+.spark{
+  position:absolute;left:50%;top:50%;width:4px;height:4px;border-radius:50%;
+  background:#FFD36B;pointer-events:none;animation:spark .5s ease-out forwards;
+}
+@keyframes spark{
+  from{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  to{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.25)}
+}
+
+/* 모은 책 선반 */
+.ovw{margin-top:14px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);overflow:hidden}
+.ovw-tg{display:flex;align-items:center;gap:10px;width:100%;padding:13px;border:0;background:transparent;color:var(--ink);font-family:inherit;text-align:left}
+.ovw-tg b{font-size:15px}
+.ovw-sub{flex:1;font-size:12px;color:var(--muted)}
+.ovw-chev{flex:0 0 auto;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translate(-2px,-2px);transition:transform .2s}
+.ovw-tg[aria-expanded="true"] .ovw-chev{transform:rotate(-135deg) translate(-2px,-2px)}
+.ovw-body{padding:0 13px 14px}
+.ovw-body[hidden]{display:none}
+.ovw-h{margin:10px 0 8px;font-size:13px;font-weight:700;color:var(--muted)}
+.ovw-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
+.ovc{position:relative;height:40px;padding:0;border:1px solid var(--rule);border-radius:8px;background:var(--blank);color:var(--muted);font-family:inherit;font-size:12px;overflow:hidden}
+.ovc i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--f,0) * 100%);background:color-mix(in srgb,var(--ring) 55%,transparent)}
+.ovc b{position:relative;z-index:1;font-weight:700}
+.ovc[data-st="part"]{color:var(--ink)}
+.ovc[data-st="full"]{border-color:color-mix(in srgb,var(--green) 55%,var(--rule));color:#fff}
+.ovc[data-st="full"] i{height:100%;background:var(--green)}
+@media (hover:hover){.ovc:hover{border-color:var(--violet)}}
+.ovw-sum{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 8px;font-size:12px;color:var(--muted)}
+.ovw-sum b{color:var(--ink);font-weight:700}
+.ovw-hist{overflow-x:auto;padding-bottom:6px}
+.ovw-grid{display:inline-flex;flex-direction:column;gap:6px;min-width:100%}
+.ovw-mon{display:flex;gap:3px;height:14px}
+.ovw-mon span{flex:0 0 auto;font-size:10px;color:var(--muted);white-space:nowrap}
+.ovw-wks{display:flex;gap:3px}
+.ovwk{display:flex;flex-direction:column;gap:3px}
+.ovday{width:13px;height:13px;border-radius:3px;background:var(--blank);border:1px solid color-mix(in srgb,var(--rule) 60%,transparent)}
+.ovday[data-l="1"]{background:color-mix(in srgb,var(--ring) 28%,var(--blank));border-color:color-mix(in srgb,var(--ring) 35%,transparent)}
+.ovday[data-l="2"]{background:color-mix(in srgb,var(--ring) 52%,var(--blank));border-color:color-mix(in srgb,var(--ring) 55%,transparent)}
+.ovday[data-l="3"]{background:color-mix(in srgb,var(--ring) 78%,var(--blank));border-color:color-mix(in srgb,var(--ring) 75%,transparent)}
+.ovday[data-l="4"]{background:var(--green);border-color:var(--green)}
+.ovday.pad{background:transparent;border-color:transparent}
+.ovw-key{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:var(--muted)}
+.ovw-key i{width:12px;height:12px;border-radius:3px;background:var(--blank);border:1px solid color-mix(in srgb,var(--rule) 60%,transparent)}
+.ovw-none{margin:6px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.shelf{margin-top:14px;padding:12px 13px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);}
+.shelf h3{margin:0 0 9px;font-family:var(--sans);font-size:15px;font-weight:700}
+.shelf h3 span{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400;margin-left:6px}
+.medals{display:flex;flex-wrap:wrap;gap:6px}
+.medal{
+  padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--ink);
+  border:2px solid var(--ring);
+  animation:pop .4s cubic-bezier(.26,1.4,.4,1);
+}
+.shelf .none{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* 축복 카드 */
+.cel .card{text-align:center;border-radius:18px 18px 0 0}
+.cel .seal{
+  width:84px;height:84px;margin:4px auto 10px;border-radius:50%;
+  display:grid;place-items:center;font-size:34px;color:#fff;
+  background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 85%,#fff),var(--violet) 55%,color-mix(in srgb,var(--violet) 55%,#000));
+  box-shadow:0 6px 20px color-mix(in srgb,var(--violet) 45%,transparent),inset 0 -3px 8px rgba(0,0,0,.2);
+  animation:seal .6s cubic-bezier(.26,1.4,.4,1);
+}
+@keyframes seal{0%{transform:scale(.3) rotate(-18deg);opacity:0}60%{transform:scale(1.14) rotate(4deg);opacity:1}100%{transform:scale(1) rotate(0)}}
+.cel h3{font-size:20px;color:var(--violet);margin-bottom:2px}
+.cel .bless{margin:10px 0 0;font-family:var(--sans);font-size:15.5px;color:var(--ink);line-height:1.75}
+.cel .ref{margin:7px 0 0;font-size:13px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){
+  .chip.got,.chip.got5,.medal,.cel .seal,.toast,.chip.got::before,.chip.got5::before{animation:none}
+  .ring,.spark{display:none}
+}
+
+/* 대화상자 */
+.sheet{
+  position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);
+  display:flex;align-items:flex-end;justify-content:center;padding:0;
+}
+.sheet[hidden]{display:none}
+.card{
+  width:100%;max-width:680px;background:var(--paper);
+  border-radius:16px 16px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0));
+  max-height:86vh;overflow:auto;
+}
+.card h3{font-family:var(--sans);font-size:18px;margin:0 0 4px}
+.card p{margin:6px 0 0;font-size:13.5px;color:var(--muted);line-height:1.65}
+.card textarea,.card input[type=text]{
+  width:100%;margin-top:10px;padding:11px;font-family:var(--sans);font-size:14px;
+  color:var(--ink);background:var(--sheet);border:1px solid var(--rule);border-radius:10px;
+}
+.card textarea{height:96px;resize:vertical;word-break:break-all}
+.card .tools{margin-top:12px}
+.msg{margin-top:10px;font-size:13px;color:var(--green);min-height:1.2em}
+.msg.bad{color:var(--orange)}
+.note{margin:16px 2px 0;font-size:12.5px;color:var(--muted);line-height:1.7}
+/* 휴대폰을 가로로 돌리면 표가 깨지므로 세로로 돌려 달라고 안내한다.
+   (웹 페이지는 회전을 직접 막을 수 없어, 홈 화면 앱일 때만 세로로 고정된다) */
+.turn{display:none}
+@media (orientation:landscape) and (max-height:500px) and (pointer:coarse){
+  .turn{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    background:var(--paper);color:var(--ink);font-size:15px;text-align:center;padding:20px}
+  .turn b{font-size:40px;display:block;animation:turn 1.6s ease-in-out infinite}
+  body{overflow:hidden}
+}
+@keyframes turn{0%,30%{transform:rotate(90deg)}60%,100%{transform:rotate(0)}}
+/* 진도 카드·뱃지 칸에 살짝 색감 (2026-10-11 사용자 요청) */
+.sum{background:linear-gradient(160deg,color-mix(in srgb,var(--ring) 9%,var(--sheet)) 0%,var(--sheet) 55%,color-mix(in srgb,var(--violet) 8%,var(--sheet)) 100%);border-color:color-mix(in srgb,var(--ring) 22%,var(--rule))}
+.sum-now{color:color-mix(in srgb,var(--ring) 70%,var(--ink))}
+.meter{background:color-mix(in srgb,var(--ring) 12%,#2A2A30)}
+.half{background:color-mix(in srgb,var(--orange) 9%,var(--paper));border-color:color-mix(in srgb,var(--orange) 26%,var(--rule))}
+.half b{color:color-mix(in srgb,var(--orange) 55%,var(--muted))}
+.half+.half{background:color-mix(in srgb,var(--sky) 9%,var(--paper));border-color:color-mix(in srgb,var(--sky) 26%,var(--rule))}
+.half+.half b{color:color-mix(in srgb,var(--sky) 55%,var(--muted))}
+#btnShare{background:color-mix(in srgb,var(--green) 12%,transparent);border-color:color-mix(in srgb,var(--green) 40%,var(--rule))}
+#btnFriend{background:color-mix(in srgb,var(--sky) 12%,transparent);border-color:color-mix(in srgb,var(--sky) 40%,var(--rule))}
+.shelf{background:linear-gradient(160deg,color-mix(in srgb,var(--violet) 11%,var(--sheet)),var(--sheet) 70%);border-color:color-mix(in srgb,var(--violet) 28%,var(--rule))}
+.shelf h3{color:color-mix(in srgb,var(--violet) 65%,var(--ink))}
+/* ===== 아이보리 테마 (2026-10-11 사용자 요청) ===== */
+:root{
+  --paper:#F7F1E3; --sheet:#FFFBF2; --rule:#E2D8C2; --ink:#2E2820; --muted:#857B6A; --blank:#EDE4D0;
+  --bar:#6E5038; --ring:#D9A514; --violet:#8A68C9; --orange:#E07F2E; --green:#3E9E64; --sky:#2E9BCB; --pink:#D2558F;
+}
+.bk[data-g="law"] .bk-name{color:#C27A1F}
+.bk[data-g="hist"] .bk-name{color:#2F86A8}
+.bk[data-g="poem"] .bk-name{color:#7A5CC4}
+.bk[data-g="major"] .bk-name{color:#C24D6E}
+.bk[data-g="minor"] .bk-name{color:#2E9A6A}
+.bk[data-g="gospel"] .bk-name{color:#B07D08}
+.bk[data-g="paul"] .bk-name{color:#4F67C2}
+.bk[data-g="general"] .bk-name{color:#C26444}
+.bk[data-g="rev"] .bk-name{color:#B2508F}
+.chip::before{background:#EFE7D5;border-color:#DFD4BD}
+.chip{color:#8C8270}
+.chip[data-s="me"]{--c:#F2C94C;color:#3A2A00}
+.meter{background:#ECE2CE}
+.tg-all{background:#F1E9D8;color:var(--muted)}
+.tg-all.tg-every{background:color-mix(in srgb,var(--ring) 16%,#FFFBF2);color:var(--ink)}
+.bk-prog{background:conic-gradient(var(--c) calc(var(--p)*1%),#E6DCC8 0)}
+.bk-prog b{background:var(--paper)}
+.bk-prog[data-st="none"] b{color:#A39886}
+.bk-prog[data-st="full"] b{color:#fff}
+.me-who{color:#B8900F}
+.chip[data-s="fr"]{color:#fff}
+.sum,.shelf{box-shadow:0 1px 3px rgba(80,60,30,.08)}
+.half span{color:var(--ink)}
+/* 격려 알림: 바탕과 구분되게 진한 갈색, 그리고 아래 칸을 가리지 않게 손가락이 통과함 (2026-10-11: 알림이 떠 있는 동안 체크가 안 눌리던 문제) */
+.toast{background:#5A4130;border-color:#5A4130;color:#FFF8EA;pointer-events:none;box-shadow:0 8px 22px rgba(60,40,20,.3)}
+.toast small{color:#EAD9C2}
+.fchips .chip{cursor:not-allowed}
+/* 마지막 줄 빈칸은 장이 아니므로 칸처럼 보이지 않게 (2026-10-11: 오바댜처럼 짧은 책에서 빈칸을 누르던 문제) */
+.chips{background:transparent;border:0;gap:0;border-radius:8px;overflow:hidden}   /* 표 네 모서리를 둥글게 (2026-10-17 사용자 요청) */
+/* 마지막 줄이 덜 찬 책: 계단처럼 꺾이는 자리도 둥글게 (2026-10-17 사용자 요청) */
+.chips .chip.r-tl{border-top-left-radius:8px}
+.chips .chip.r-tr{border-top-right-radius:8px}
+.chips .chip.r-bl{border-bottom-left-radius:8px}
+.chips .chip.r-br{border-bottom-right-radius:8px}
+/* 칸 선: 칸마다 '안쪽 오른쪽·아래'에만 그린다. 세로줄이 모두 같은 자리에 찍혀 어긋나 보이지 않는다 (2026-10-17 사용자 요청) */
+.chips .chip{box-shadow:inset -.5px -.5px 0 0 var(--rule)}
+.chips .chip:nth-child(-n+10){box-shadow:inset -.5px -.5px 0 0 var(--rule),inset 0 .5px 0 0 var(--rule)}        /* 첫 줄 위선 */
+.chips .chip:nth-child(10n+1){box-shadow:inset -.5px -.5px 0 0 var(--rule),inset .5px 0 0 0 var(--rule)}        /* 첫 칸 왼선 */
+.chips .chip:nth-child(1){box-shadow:inset -.5px -.5px 0 0 var(--rule),inset 0 .5px 0 0 var(--rule),inset .5px 0 0 0 var(--rule)}
+.chips>span:not(.chip){background:transparent;box-shadow:none}   /* 친구 표 칸(span.chip)은 빼야 내 표와 같은 바탕색이 됨 */
+.fchips{background:transparent}
+/* 친구 표 칸 선도 내 표와 똑같이 (2026-10-15 사용자 요청: 하늘색 줄 없앰) */
+.cl-login{margin-top:2px;background:color-mix(in srgb,var(--sky) 12%,var(--sheet));border-color:color-mix(in srgb,var(--sky) 45%,var(--rule));color:var(--ink);font-weight:700}
+.lg-tip{font-size:13px;line-height:1.6;color:var(--muted);margin:10px 0 6px}
+.fr-box{font-size:14px;line-height:1.6}
+.fr-me{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fr-code{font-size:20px;letter-spacing:2px;color:var(--violet)}
+.fr-name,.fr-add{display:flex;align-items:center;gap:6px;margin-top:10px}
+.fr-name input,.fr-add input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--rule);border-radius:9px;background:var(--paper);color:var(--ink);font:inherit}
+.fr-h{margin-top:14px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.fr-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid var(--rule)}
+.fr-none{color:var(--muted);font-size:13px}
+.cloud{margin-top:10px;font-size:12.5px;line-height:1.6;color:var(--muted)}
+.cloud.on{color:#2E7D52}
+.cloud.bad{color:var(--pink)}
+.cloud a{color:var(--violet);font-weight:700}
+.cloud small{color:var(--muted)}
+.cloud select,.cloud .cl-re{font:inherit;font-size:12.5px;padding:2px 6px;border:1px solid var(--rule);border-radius:8px;background:var(--sheet);color:var(--ink)}
+.chips .chip{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.painting{-webkit-user-select:none;user-select:none}
+body.painting .chips .chip[data-act]{cursor:crosshair}
+/* ===== 읽는 중인 책 고정 (📌) ===== */
+.bk-pin{align-self:center;flex:0 0 auto;width:34px;height:34px;margin-left:auto;border:1px solid var(--rule);border-radius:50%;background:var(--sheet);display:grid;place-items:center;font-size:15px;cursor:pointer;filter:grayscale(1);opacity:.55;padding:0}
+.bk-pin[aria-pressed="true"]{filter:none;opacity:1;border-color:color-mix(in srgb,var(--pink) 50%,var(--rule));background:color-mix(in srgb,var(--pink) 10%,var(--sheet))}
+.bk-pin+.bk-prog{margin-left:8px}
+.pinned{margin-top:16px;padding:12px 12px 4px;border-radius:12px;background:color-mix(in srgb,var(--pink) 6%,var(--sheet));border:1px solid color-mix(in srgb,var(--pink) 28%,var(--rule))}
+.pinned[hidden]{display:none}
+.pinned>h3{margin:0;font-size:14px;font-weight:700;color:var(--pink)}
+.pinned .bk:first-of-type{margin-top:10px}
+/* ✍️ 통독/필사 바꾸기 (2026-10-15) */
+.modeseg{display:flex;gap:6px;margin:12px 0 0;padding:4px;background:var(--sheet);border:1px solid var(--rule);border-radius:999px}
+.modeseg button{flex:1;border:0;border-radius:999px;padding:8px 0;background:transparent;font-size:14.5px;font-weight:700;color:var(--muted);cursor:pointer;white-space:nowrap}
+.modeseg button[aria-pressed="true"]{background:var(--ring);color:#fff}
+body.pm .modeseg button[aria-pressed="true"]{background:var(--violet)}
+.modetip{margin:6px 4px 0;font-size:12px;color:var(--muted);text-align:center}
+.om{position:absolute;top:9%;right:9%;width:7px;height:7px;border-radius:50%;background:var(--violet);box-shadow:0 0 0 1.5px var(--sheet);pointer-events:none}
+body.pm .om{background:var(--ring)}
+.om.om-k{position:static;display:inline-block;vertical-align:middle;margin:0 2px 0 4px}
+body.pm .chip[data-s="me"],body.pm .chip[data-s="me"][data-five]{--c:var(--violet);color:#fff}
+body.pm #btnShare,body.pm #btnFriend{display:none}
+/* 친구 여러 명: 사람마다 색 (2026-10-15) */
+.fr-who{color:var(--fc,var(--sky))}
+.fchips .chip[data-s="fr"]{--c:var(--fc,var(--sky))}
+/* 🔁 반복 읽기: 회차마다 내 칸 색이 바뀜 (1회째 노랑 → 2회째 산호 → 3회째 초록 → 4회째 파랑 → 다시 노랑) */
+.bk[data-rc] .chips:not(.fchips) .chip[data-s="me"],.bk[data-rc] .chips:not(.fchips) .chip[data-s="me"][data-five]{--c:var(--rc);color:#fff}
+.bk[data-rc] .bk-prog[data-st="part"]{--c:var(--rc)}
+.bk[data-rc] .bk-prog[data-st="full"]{--c:var(--rc);box-shadow:0 0 10px color-mix(in srgb,var(--rc) 40%,transparent)}
+.bk[data-rc] .bk-prog[data-st="full"] b{background:var(--rc)}
+.rcl{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:3px 7px;margin-top:4px}
+.rcl b{display:inline-flex;align-items:center;gap:3px;font-weight:500}
+.rcl i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.rnd-go,.rnd-undo{display:block;width:100%;margin:8px 0 2px;padding:10px 12px;border-radius:12px;font-size:14.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+.rnd-go{border:1px solid color-mix(in srgb,var(--green) 45%,var(--rule));background:color-mix(in srgb,var(--green) 12%,var(--sheet));color:var(--ink)}
+.rnd-go small{font-weight:500;color:var(--muted)}
+.rnd-undo{border:1px dashed var(--rule);background:transparent;color:var(--muted);font-size:13px;font-weight:500}
+</style>
+</head>
+<body>
+<div class="turn" aria-live="polite"><b aria-hidden="true">📱</b>휴대폰을 세로로 돌려 주세요</div>
+<header class="bar"><button type="button" class="bar-back" id="barBack" hidden aria-label="묵상 노트로 돌아가기">← 노트</button><h1>성경 통독표</h1><span class="bar-cnt" id="barCnt"></span></header>
+<main class="wrap">
+  <div class="findbar">
+    <input class="findin" id="bkFind" type="search" inputmode="search" placeholder="성경 책 찾기 (초성도 돼요: ㅇㄱㅂㅅ)" aria-label="성경 책 찾기" autocomplete="off">
+    <button class="findx" id="bkFindX" type="button" aria-label="찾기 지우기" hidden>×</button>
+  </div>
+  <p class="findmsg" id="findMsg" hidden></p>
+  <div class="modeseg" role="group" aria-label="표시할 것"><button type="button" data-act="mode" data-m="read" aria-pressed="true">📖 통독</button><button type="button" data-act="mode" data-m="pilsa" aria-pressed="false">✍️ 필사</button></div>
+  <p class="modetip" id="modeTip"></p>
+  <section class="pinned" id="pinned" hidden><h3 id="pinTitle">📌 읽는 중</h3><div class="books" id="pin"></div></section>
+
+  <section class="sum" aria-live="polite">
+    <div class="sum-top">
+      <span class="sum-now" id="who">내 진도</span>
+      <span class="sum-cnt" id="cnt"></span>
+    </div>
+    <div class="meter"><i class="both" id="mBoth"></i><i class="me" id="mMe"></i></div>
+    <div class="halves">
+      <div class="half"><b>구약 39권</b><span id="otCnt"></span></div>
+      <div class="half"><b>신약 27권</b><span id="ntCnt"></span></div>
+    </div>
+    <div class="tools">
+      <button class="btn" id="btnShare" type="button">내 진도 보내기</button>
+      <button class="btn" id="btnFriend" type="button">친구 진도 불러오기</button>
+      <button class="btn" id="btnCmp" type="button" hidden>비교 끄기</button>
+    </div>
+    <div class="cloud" id="cloud"></div>
+    <div class="legend" id="legend" hidden>
+      <span><i style="background:#F2C94C"></i>나</span>
+      <span><i style="background:var(--sky)"></i>친구</span>
+    </div>
+  </section>
+
+  <section class="ovw" id="ovw">
+    <button class="ovw-tg" id="ovwTg" type="button" aria-expanded="false" aria-controls="ovwBody">
+      <b>📈 전체 진행표</b><span class="ovw-sub">창세기부터 요한계시록까지 한눈에</span><span class="ovw-chev" aria-hidden="true"></span>
+    </button>
+    <div class="ovw-body" id="ovwBody" hidden></div>
+  </section>
+
+  <section class="shelf">
+    <h3>모은 책 뱃지<span id="shelfCnt"></span></h3>
+    <div class="medals" id="medals"></div>
+    <p class="none" id="shelfNone">한 책을 끝까지 읽으면 여기에 뱃지가 쌓여요.</p>
+  </section>
+
+  <div class="foldbar"><button class="tg-all tg-every" type="button" data-act="foldall" data-t="all">66권 모두 접기</button></div>
+  <h2 class="tg">구약<button class="tg-all" type="button" data-act="foldall" data-t="ot">모두 접기</button></h2>
+  <div class="books" id="ot"></div>
+  <h2 class="tg">신약<button class="tg-all" type="button" data-act="foldall" data-t="nt">모두 접기</button></h2>
+  <div class="books" id="nt"></div>
+
+  <p class="note">
+    체크는 이 기기에만 저장돼요. 다른 기기에서 이어 보려면 <b>내 진도 보내기</b>로 만든 링크를 자기에게 보내 두세요.<br>
+    친구 진도를 불러오면 두 사람 진도가 한 화면에 겹쳐 보여요. 친구 것은 보기만 하고 바뀌지 않아요.
+  </p>
+</main>
+
+<div class="sheet" id="dlg" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <h3 id="dlgTitle"></h3>
+    <p id="dlgDesc"></p>
+    <div id="dlgBody"></div>
+    <div class="msg" id="dlgMsg"></div>
+    <div class="tools" id="dlgTools"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden>
+  <span class="ic" aria-hidden="true"></span>
+  <span><b id="toastMsg"></b><small id="toastRef"></small></span>
+</div>
+
+<div class="sheet cel" id="cel" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="celTitle">
+    <div class="seal" id="celSeal" aria-hidden="true">✦</div>
+    <h3 id="celTitle"></h3>
+    <p id="celSub"></p>
+    <p class="bless" id="celBless"></p>
+    <p class="ref" id="celRef"></p>
+    <div class="tools"><button class="btn on wide" type="button" id="celOk">고마워요</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+/* 묵상 노트 메뉴(📖 성경 통독표)로 들어왔으면 맨 위에 '← 노트' 버튼을 보여 줌.
+   통독표만 따로 쓰는 사람(주소로 바로 여는 경우)에게는 버튼이 없음 */
+(function(){
+  var FROM_KEY="w-bible-tongdok-from";
+  try{
+    var q=new URLSearchParams(location.search);
+    if(q.get("from")==="notes"){sessionStorage.setItem(FROM_KEY,"notes");q.delete("from");
+      var qs=q.toString();history.replaceState(null,"",location.pathname+(qs?"?"+qs:"")+location.hash)}
+    if(sessionStorage.getItem(FROM_KEY)==="notes"){var b=document.getElementById("barBack");b.hidden=false;
+      b.addEventListener("click",function(){location.href="../"})}
+  }catch(e){}
+})();
+"use strict";
+
+/* 책 이름과 장 수. 성경 본문은 담지 않고, 권별 장 수만 쓴다. */
+var OT=[["창세기",50],["출애굽기",40],["레위기",27],["민수기",36],["신명기",34],
+["여호수아",24],["사사기",21],["룻기",4],["사무엘상",31],["사무엘하",24],
+["열왕기상",22],["열왕기하",25],["역대상",29],["역대하",36],["에스라",10],
+["느헤미야",13],["에스더",10],["욥기",42],["시편",150],["잠언",31],
+["전도서",12],["아가",8],["이사야",66],["예레미야",52],["예레미야애가",5],
+["에스겔",48],["다니엘",12],["호세아",14],["요엘",3],["아모스",9],
+["오바댜",1],["요나",4],["미가",7],["나훔",3],["하박국",3],
+["스바냐",3],["학개",2],["스가랴",14],["말라기",4]];
+var NT=[["마태복음",28],["마가복음",16],["누가복음",24],["요한복음",21],["사도행전",28],
+["로마서",16],["고린도전서",16],["고린도후서",13],["갈라디아서",6],["에베소서",6],
+["빌립보서",4],["골로새서",4],["데살로니가전서",5],["데살로니가후서",3],["디모데전서",6],
+["디모데후서",4],["디도서",3],["빌레몬서",1],["히브리서",13],["야고보서",5],
+["베드로전서",5],["베드로후서",3],["요한일서",5],["요한이서",1],["요한삼서",1],
+["유다서",1],["요한계시록",22]];
+
+var BOOKS=OT.concat(NT);
+var OT_N=OT.length;
+var OFF=[],TOTAL=0;
+for(var i=0;i<BOOKS.length;i++){OFF.push(TOTAL);TOTAL+=BOOKS[i][1];}   // 1189
+var OT_TOTAL=OFF[OT_N], NT_TOTAL=TOTAL-OT_TOTAL;
+
+var LS="w-bible-tongdok-v1";       // 기존 앱들과 겹치지 않는 저장 키
+var me=new Uint8Array(TOTAL);    // 내 진도
+var friend=null;                 // 친구 진도 (불러왔을 때만)
+/* ✍️ 필사 (2026-10-15): 같은 표에 필사한 장도 따로 표시. RB=통독, PB=필사, me는 지금 고른 쪽을 가리킴 */
+var RB=me, PB=new Uint8Array(TOTAL), pMode=false, pilAt=0, friendPil=null;
+var PIL_KEY="w-bible-tongdok-pilsa", MODE_KEY="w-bible-tongdok-mode";
+function fb(){return pMode?friendPil:friend}
+/* 🔁 반복 읽기 (2026-10-15): 한 책을 다 읽으면 '한 번 더 읽기'로 회차를 올리고 칸을 비워 다시 체크. 회차마다 칸 색이 다름
+   RND.r = 통독 회차, RND.p = 필사 회차 {책번호: 끝낸 횟수} */
+var RND_KEY="w-bible-tongdok-rounds", RND={r:{},p:{}}, rndAt=0;
+try{var rj=JSON.parse(localStorage.getItem(RND_KEY)||"null");if(rj){RND={r:rj.r||{},p:rj.p||{}};rndAt=+rj.t||0}}catch(e){}
+function rounds(){return pMode?RND.p:RND.r}
+function rndOf(bi){return +rounds()[bi]||0}
+function storeRnd(){try{localStorage.setItem(RND_KEY,JSON.stringify({r:RND.r,p:RND.p,t:rndAt}))}catch(e){}}
+function saveRnd(){rndAt=Date.now();storeRnd();if(typeof cloudPush==="function")cloudPush()}
+/* 회차 색 (2026-10-15 사용자 요청: 처음과 반복이 확실히 다르게, 여러 색으로)
+   1회째는 기본색(통독 노랑 / 필사 보라), 2회째부터 10회째까지 모두 다른 색, 그 뒤로는 2회째 색부터 다시 */
+var RCOL_R=["#EE8467","#4FAE78","#6F8FE8","#A57BD8","#E46FA6","#2FB3A6","#4C5FB8","#8DBF3A","#D9534F"];
+var RCOL_P=["#D2558F","#3E9E64","#2E9BCB","#E07F2E","#1F9C8F","#4C5FB8","#C9443F","#6E9E2A","#A86F45"];
+function rcol(r){if(!r)return "";var A=pMode?RCOL_P:RCOL_R;return A[(r-1)%A.length]}
+function rcAttr(bi){var r=rndOf(bi);return r?' data-rc="'+r+'" style="--rc:'+rcol(r)+'"':''}
+function cntText(bi,done,total){var r=rndOf(bi);return done+' / '+total+(r?' · '+(r+1)+'회째':'')}
+/* 한 번이라도 다 읽은 책은 다 읽은 것으로 센다 (다시 읽느라 칸을 비워도 축하가 또 뜨지 않게) */
+function everCount(){var n=0,R0=rounds();for(var bi=0;bi<BOOKS.length;bi++)n+=R0[bi]?BOOKS[bi][1]:bookDone(bi);return n}
+function roundCtl(bi){
+  return '';   // 2026-10-15 사용자 요청: 버튼 없이, 다 채운 책의 칸을 누르면 다음 회차가 시작됨 (아래 act==="chip")
+  var total=BOOKS[bi][1], done=bookDone(bi), r=rndOf(bi);
+  if(done===total)return '<button type="button" class="rnd-go" data-act="round" data-b="'+bi+'">🔁 한 번 더 '+(pMode?'쓰기':'읽기')+' <small>('+(r+2)+'회째 시작)</small></button>';
+  if(r&&done===0)return '<button type="button" class="rnd-undo" data-act="unround" data-b="'+bi+'">↩ '+r+'회째 다 '+(pMode?'쓴':'읽은')+' 상태로 되돌리기</button>';
+  return '';
+}   // 지금 모드의 친구 표
+var friendName="";
+var myName="";
+var compare=false;
+
+var $=function(id){return document.getElementById(id)};
+
+/* 페이지 확대 막기 */
+["gesturestart","gesturechange"].forEach(function(t){document.addEventListener(t,function(e){e.preventDefault()},{passive:false})});
+document.addEventListener("touchmove",function(e){if(e.touches&&e.touches.length>1)e.preventDefault()},{passive:false});
+/* 홈 화면 앱·전체 화면일 때는 세로로 고정 (일반 브라우저 탭에서는 조용히 실패) */
+try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock("portrait").catch(function(){})}catch(e){}
+
+/* 모든 버튼에서 짧게 진동 (프로젝트 공통 규칙) */
+/* 기존 앱(index.html)과 세기를 맞춘다. 8ms 는 폰에서 거의 안 느껴진다. */
+function buzz(ms){try{if(navigator.vibrate)navigator.vibrate(Math.max(22,+ms||22))}catch(e){}}
+document.addEventListener("click",function(ev){
+  var b=ev.target.closest("button");
+  if(!b)return;
+  buzz(b.classList.contains("chip")?28:22);   // 장을 누를 때 조금 더 또렷하게
+},true);
+
+/* ── 저장 ─────────────────────────────── */
+var meAt=0;   // 내 체크를 마지막으로 바꾼 시각 (여러 기기에서 맞출 때 더 최근 것을 씀)
+function storePil(){try{localStorage.setItem(PIL_KEY,JSON.stringify({b:toB64(PB),t:pilAt}))}catch(e){}}
+function save(){
+  if(pMode){pilAt=Date.now();storePil();if(typeof cloudPush==="function")cloudPush();return}
+  var b=toB64(me), old=null; try{old=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){}
+  if(!old||old.b!==b)meAt=Date.now();
+  try{localStorage.setItem(LS,JSON.stringify({n:myName,b:b,t:meAt}))}catch(e){}
+  if(typeof cloudPush==="function")cloudPush();
+}
+function load(){
+  try{
+    var raw=localStorage.getItem(LS); if(!raw)return;
+    var o=JSON.parse(raw);
+    if(o&&typeof o.b==="string"){var a=fromB64(o.b); if(a)me=RB=a;}
+    if(o&&typeof o.n==="string")myName=o.n;
+    if(o&&+o.t)meAt=+o.t;
+  }catch(e){}
+}
+
+/* ── 코드 변환 (1189장을 비트로 눌러 담는다) ── */
+function toB64(bits){
+  var bytes=new Uint8Array(Math.ceil(TOTAL/8));
+  for(var i=0;i<TOTAL;i++)if(bits[i])bytes[i>>3]|=1<<(i&7);
+  var s="";for(var j=0;j<bytes.length;j++)s+=String.fromCharCode(bytes[j]);
+  return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+}
+function fromB64(str){
+  try{
+    var s=String(str).replace(/-/g,"+").replace(/_/g,"/");
+    while(s.length%4)s+="=";
+    var bin=atob(s), bits=new Uint8Array(TOTAL);
+    for(var i=0;i<TOTAL;i++){
+      var b=bin.charCodeAt(i>>3)||0;
+      bits[i]=(b>>(i&7))&1;
+    }
+    return bits;
+  }catch(e){return null}
+}
+function encName(n){
+  try{return btoa(unescape(encodeURIComponent(n||""))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"")}
+  catch(e){return ""}
+}
+function decName(s){
+  try{
+    var t=String(s||"").replace(/-/g,"+").replace(/_/g,"/");
+    while(t.length%4)t+="=";
+    return decodeURIComponent(escape(atob(t)));
+  }catch(e){return ""}
+}
+/* 짧은 코드 (2026-10-11): 읽은 장은 대개 이어져 있으니 "안 읽음 n장, 읽음 m장…" 길이만 적는다.
+   숫자 하나는 base64url 글자 1~3개 (5비트씩, 32를 더하면 다음 글자가 이어짐).
+   모양: "2" + 길이들 [+ "." + 이름]   예) 아무것도 안 읽음 → "2"
+   이게 비트 그대로보다 길면 "1" + 비트(base64) [+ "." + 이름]. 예전 "T1~이름~비트"도 그대로 읽는다 */
+var B64C="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+function putNum(n){var out="";do{var v=n&31;n>>=5;out+=B64C[v|(n?32:0)]}while(n);return out}
+function toRuns(bits){
+  var runs=[],cur=0,len=0;
+  for(var i=0;i<TOTAL;i++){var b=bits[i]?1:0;if(b===cur)len++;else{runs.push(len);cur=b;len=1}}
+  if(cur===1)runs.push(len);   // 끝에 남은 '안 읽음'은 적지 않음
+  return runs.map(putNum).join("");
+}
+function fromRuns(str){
+  var bits=new Uint8Array(TOTAL),pos=0,cur=0,i=0;
+  while(i<str.length){
+    var n=0,sh=0,c;
+    do{c=B64C.indexOf(str[i++]);if(c<0)return null;n|=(c&31)<<sh;sh+=5}while(c&32&&i<=str.length);
+    if(cur)for(var k=0;k<n&&pos<TOTAL;k++)bits[pos++]=1;else pos+=n;
+    if(pos>TOTAL)return null; cur^=1;
+  }
+  return bits;
+}
+function makeCode(){
+  var r="2"+toRuns(RB), raw="1"+toB64(RB), body=r.length<=raw.length?r:raw;
+  return body+(myName?"."+encName(myName):"");
+}
+function parseCode(txt){
+  var s=String(txt||"").trim();
+  var m=s.match(/[#?&]f=([^&\s]+)/);          // 링크를 통째로 붙여넣어도 받는다
+  if(m)s=decodeURIComponent(m[1]);
+  else{var h=s.indexOf("#");if(h>=0)s=s.slice(h+1)}   // 짧은 주소: …/t#코드
+  var bits,name="";
+  if(/^T1~/.test(s)){   // 예전 긴 코드
+    var p=s.split("~"); if(p.length<3)return null;
+    bits=fromB64(p[2]); name=decName(p[1]);
+  }else if(/^[12]/.test(s)){
+    var q=s.split("."), body=q[0].slice(1);
+    bits=s[0]==="2"?fromRuns(body):fromB64(body); name=q[1]?decName(q[1]):"";
+  }else return null;
+  if(!bits)return null;
+  return {name:name,bits:bits};
+}
+/* is.gd로 아주 짧게 (예: is.gd/AbC123). 같은 코드는 한 번만 줄이고 기억해 둠.
+   is.gd가 #뒤를 놓칠 수 있어 ?c=코드 모양의 주소를 줄인다 (t 폴더가 통독표로 넘겨 줌) */
+var SHORT_KEY="w-bible-tongdok-short";
+function shortCache(){try{return JSON.parse(localStorage.getItem(SHORT_KEY)||"{}")||{}}catch(e){return {}}}
+function shorten(code,done){
+  var c=shortCache(); if(c[code]){done(c[code]);return}
+  var cb="isgd_"+Date.now().toString(36)+Math.floor(Math.random()*1e4), sc=document.createElement("script"), fin=false;
+  function end(v){if(fin)return;fin=true;try{delete window[cb]}catch(e){window[cb]=undefined}sc.remove();done(v)}
+  window[cb]=function(r){
+    var u=r&&r.shorturl?String(r.shorturl).replace(/^https?:\/\//,""):null;
+    if(u){var m=shortCache();m[code]=u;var ks=Object.keys(m);if(ks.length>30)delete m[ks[0]];try{localStorage.setItem(SHORT_KEY,JSON.stringify(m))}catch(e){}}
+    end(u);
+  };
+  var long=new URL("../t/",location.href.split("#")[0].split("?")[0]).href+"?c="+encodeURIComponent(code);
+  sc.src="https://is.gd/create.php?format=json&callback="+cb+"&url="+encodeURIComponent(long);
+  sc.onerror=function(){end(null)}; setTimeout(function(){end(null)},6000);
+  document.head.appendChild(sc);
+}
+function makeLink(){
+  // 가장 짧은 주소: …/bible-notes/t#코드 (t 폴더가 통독표로 넘겨 줌). "https://"도 빼서 카톡에 그대로 붙여도 링크가 됨
+  var u=new URL("../t",location.href.split("#")[0].split("?")[0]);
+  return u.host+u.pathname+"#"+makeCode();
+}
+
+/* ── 세기 ─────────────────────────────── */
+function countRange(bits,from,to){var n=0;for(var i=from;i<to;i++)if(bits[i])n++;return n}
+function bookDone(bi){return countRange(me,OFF[bi],OFF[bi]+BOOKS[bi][1])}
+
+/* ── 그리기 ───────────────────────────── */
+function chipState(idx){return me[idx]?"me":""}   // 내 표에는 내 것만 (친구 것은 바로 아래 따로 그림)
+/* 친구와 비교할 때: 책마다 내 표 아래에 친구 표를 나란히 (보기 전용) */
+/* 같이 보는 친구들 (2026-10-15): 로그인해서 맺은 친구는 모두 한꺼번에, 아니면 링크로 불러온 친구 한 명 */
+var FCOL=["var(--sky)","var(--pink)","var(--green)","var(--orange)","var(--blue)"];
+function viewFriends(){
+  var L=cloudFriends.length?cloudFriends.map(function(f){return {name:f.name,bits:pMode?(f.pbits||new Uint8Array(TOTAL)):f.bits,rnd:pMode?f.prounds:f.rounds}})
+    :friend?[{name:friendName||"친구",bits:fb()}]:[];
+  return L.filter(function(f){return !!f.bits}).map(function(f,k){f.col=FCOL[k%FCOL.length];return f});
+}
+function cmpOn(){return !!(compare&&viewFriends().length)}
+function friendChipsHTML(bi,F){
+  var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips fchips" style="--fc:'+F.col+'" aria-label="'+esc(F.name)+'의 '+BOOKS[bi][0]+'">';
+  var rr=cornerCls(total);   // 모서리 둥글기
+  for(var c=1;c<=total;c++){
+    var idx=base+c-1, rc=rr(c);
+    s+='<span class="chip'+rc+'"'+(F.bits[idx]?' data-s="fr"':'')+(c%5===0?' data-five':'')+'>'+c+'</span>';
+  }
+  for(var e=total%10?10-total%10:0;e>0;e--)s+='<span></span>';
+  return s+'</div>';
+}
+function bodyHTML(bi){
+  if(!cmpOn())return chipsHTML(bi)+roundCtl(bi);
+  var total=BOOKS[bi][1];
+  return '<div class="who me-who">🙋 나 <span>'+bookDone(bi)+' / '+total+'</span></div>'+chipsHTML(bi)+roundCtl(bi)
+    +viewFriends().map(function(F){var fr=+(F.rnd&&F.rnd[bi])||0;return '<div class="who fr-who" style="--fc:'+F.col+'">👤 '+esc(F.name)+' <span>'+countRange(F.bits,OFF[bi],OFF[bi]+total)+' / '+total+(fr?' · '+(fr+1)+'회째':'')+'</span></div>'+friendChipsHTML(bi,F)}).join("");
+}
+/* 책 갈래: 색으로 구분하려고 쓴다 */
+function bookGroup(bi){
+  if(bi<5)return "law"; if(bi<17)return "hist"; if(bi<22)return "poem"; if(bi<27)return "major"; if(bi<39)return "minor";
+  if(bi<43)return "gospel"; if(bi===43)return "hist"; if(bi<57)return "paul"; if(bi<65)return "general"; return "rev";
+}
+/* 📌 고정한 책: {책번호: 고정한 시각} — 맨 위 '읽는 중' 칸에 따로 보여 줌 (이 기기에 기억) */
+var PIN_KEY="w-bible-tongdok-pin", pins={};
+try{var pj=JSON.parse(localStorage.getItem(PIN_KEY)||"{}");if(pj&&typeof pj==="object")pins=pj}catch(e){}
+function renderBooks(){
+  var html=["",""], pinHtml={};
+  for(var bi=0;bi<BOOKS.length;bi++){
+    var name=BOOKS[bi][0], total=BOOKS[bi][1], done=bookDone(bi);
+    var shut=!!folded[bi];
+    var h='<section class="bk'+(done===total?" full":"")+(shut?" shut":"")+'" data-b="'+bi+'" data-g="'+bookGroup(bi)+'"'+rcAttr(bi)+'>'
+      +'<div class="bk-h"><button class="bk-tg" type="button" data-act="fold" data-b="'+bi+'" aria-expanded="'+(!shut)+'"><span class="bk-chev" aria-hidden="true"></span><span class="bk-name">'+name+'</span>'
+      +'<span class="bk-cnt">'+cntText(bi,done,total)+'</span></button>'
+      +'<button class="bk-pin" type="button" data-act="pin" data-b="'+bi+'" aria-pressed="'+(!!pins[bi])+'" aria-label="'+name+(pins[bi]?" 고정 풀기":" 위에 고정")+'">📌</button>'
+      +progBadge(done,total,rndOf(bi))+'</div>'
+      +'<div class="bk-body">'+bodyHTML(bi)+'</div></section>';
+    if(pins[bi])pinHtml[pins[bi]]=h; else html[bi<OT_N?0:1]+=h;
+  }
+  $("ot").innerHTML=html[0];
+  $("nt").innerHTML=html[1];
+  var pk=Object.keys(pinHtml).sort(function(a,b){return b-a});   // 최근에 고정한 책이 맨 위
+  $("pin").innerHTML=pk.map(function(k){return pinHtml[k]}).join(""); $("pinned").hidden=!pk.length;
+  syncFoldAll();
+}
+/* 책 접기·펴기 (이 기기에 기억) */
+var FOLD_KEY="w-bible-tongdok-fold", folded={};
+try{(JSON.parse(localStorage.getItem(FOLD_KEY)||"[]")||[]).forEach(function(b){folded[b]=1})}catch(e){}
+function saveFold(){try{localStorage.setItem(FOLD_KEY,JSON.stringify(Object.keys(folded).map(Number)))}catch(e){}}
+function setFold(bi,shut){
+  if(shut)folded[bi]=1;else delete folded[bi];
+  var sec=document.querySelector('.bk[data-b="'+bi+'"]'); if(!sec)return;
+  sec.classList.toggle("shut",shut); sec.querySelector(".bk-tg").setAttribute("aria-expanded",String(!shut));
+}
+function syncFoldAll(){
+  [["ot",0,OT_N],["nt",OT_N,BOOKS.length],["all",0,BOOKS.length]].forEach(function(t){
+    var all=true; for(var b=t[1];b<t[2];b++)if(!folded[b]){all=false;break}
+    var btn=document.querySelector('.tg-all[data-t="'+t[0]+'"]'); if(btn)btn.textContent=(t[0]==="all"?"66권 ":"")+(all?"모두 펴기":"모두 접기");
+  });
+}
+/* 책 오른쪽 끝: 진행 상황을 링(색)과 숫자로 — 안 읽음 회색, 읽는 중 금빛 %, 다 읽음 초록 ✓ (2026-10-11 사용자 요청) */
+function progBadge(done,total,r){
+  var p=Math.round(done/total*100), st=done===0?"none":done===total?"full":"part";
+  var txt=done===total?(r?"×"+(r+1):"✓"):done===0?"0":p+"%";
+  return '<span class="bk-prog" data-st="'+st+'" style="--p:'+(done/total*100).toFixed(1)+'" role="img" aria-label="'+(done===total?"다 읽음":p+"% 읽음")+'"><b>'+txt+'</b></span>';
+}
+// 표의 바깥 모서리(계단으로 꺾이는 자리 포함)를 둥글게 할 칸 고르기 (2026-10-17 사용자 요청)
+function cornerCls(total){
+  var rows=Math.ceil(total/10), lastStart=(rows-1)*10+1, firstEnd=Math.min(10,total);
+  var pad=total%10?10-total%10:0, step=(pad&&total>10)?Math.floor((total-1)/10)*10:0;
+  return function(c){
+    var s="";
+    if(c===1)s+=" r-tl";
+    if(c===firstEnd)s+=" r-tr";
+    if(c===lastStart)s+=" r-bl";
+    if(c===total)s+=" r-br";
+    if(step&&c===step)s+=" r-br";
+    return s;
+  };
+}
+function chipsHTML(bi){
+  var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips">';
+  var rr=cornerCls(total);   // 모서리 둥글기
+  for(var c=1;c<=total;c++){
+    var idx=base+c-1, st=chipState(idx), o=(pMode?RB:PB)[idx];   // o: 다른 쪽(통독↔필사)도 했으면 작은 점
+    var rc=rr(c);
+    s+='<button class="chip'+rc+'" type="button" data-act="chip" data-i="'+idx+'"'
+      +(st?' data-s="'+st+'"':'')+(c%5===0?' data-five':'')
+      +' aria-pressed="'+(!!me[idx])+'" aria-label="'+BOOKS[bi][0]+' '+c+'장'+(o?(pMode?' (읽음)':' (필사함)'):'')+'">'+c+(o?'<i class="om" aria-hidden="true"></i>':'')+'</button>';
+  }
+  for(var e=total%10?10-total%10:0;e>0;e--)s+='<span></span>';   // 마지막 줄을 빈칸으로 채워 표 모양 유지
+  return s+'</div>';
+}
+function repaintBook(bi){
+  var sec=document.querySelector('.bk[data-b="'+bi+'"]');
+  if(!sec)return;
+  var total=BOOKS[bi][1], done=bookDone(bi);
+  sec.classList.toggle("full",done===total);
+  var r0=rndOf(bi); if(r0){sec.dataset.rc=r0;sec.style.setProperty("--rc",rcol(r0))}else{delete sec.dataset.rc;sec.style.removeProperty("--rc")}
+  sec.querySelector(".bk-cnt").textContent=cntText(bi,done,total);
+  sec.querySelector(".bk-prog").outerHTML=progBadge(done,total,rndOf(bi));
+  sec.querySelector(".bk-body").innerHTML=bodyHTML(bi);
+}
+function renderSummary(){
+  var mine=countRange(me,0,TOTAL);
+  var pctMe=mine/TOTAL*100;
+  var VF=compare?viewFriends():[], F=VF.length===1?VF[0].bits:null;
+  if(VF.length>1){
+    $("who").textContent="함께 보기 "+(VF.length+1)+"명";
+    $("cnt").textContent="나 "+mine+" · "+VF.map(function(f){return f.name+" "+countRange(f.bits,0,TOTAL)}).join(" · ")+"장";
+    $("mBoth").style.width="0%";
+    $("mMe").style.width=pctMe+"%";
+  }else if(F){
+    var friendName=VF[0].name, both=0,fo=0;
+    for(var i=0;i<TOTAL;i++){if(me[i]&&F[i])both++;else if(F[i])fo++;}
+    $("who").textContent="나와 "+(friendName||"친구");
+    $("cnt").textContent="나 "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
+    $("mBoth").style.width=(both/TOTAL*100)+"%";
+    $("mMe").style.width=((mine-both)/TOTAL*100)+"%";
+  }else{
+    $("who").textContent=(myName?myName+"의 ":"내 ")+(pMode?"필사":"진도");
+    $("cnt").textContent=mine+" / "+TOTAL+"장 ("+Math.round(mine/TOTAL*100)+"%)";
+    $("mBoth").style.width="0%";
+    $("mMe").style.width=pctMe+"%";
+  }
+  $("barCnt").textContent=mine.toLocaleString()+" / "+TOTAL.toLocaleString();
+  $("otCnt").textContent=countRange(me,0,OT_TOTAL)+" / "+OT_TOTAL+"장";
+  $("ntCnt").textContent=countRange(me,OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
+  $("legend").hidden=!VF.length;
+  $("legend").innerHTML='<span><i style="background:'+(pMode?'var(--violet)':'#F2C94C')+'"></i>나</span>'+VF.map(function(f){return '<span><i style="background:'+f.col+'"></i>'+esc(f.name)+'</span>'}).join("");
+  $("btnCmp").hidden=!viewFriends().length;
+  $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
+}
+function renderAll(){renderBooks();renderSummary();renderShelf();applyFind();renderOverview()}
+/* ── 전체 진행표 ───────────────────────────────
+   ① 66권 지도: 창세기부터 요한계시록까지 읽은 만큼 칸이 찬다
+   ② 날짜별 기록: 오늘부터 쌓이는 "하루에 몇 장" 막대 */
+var BABBR=["창","출","레","민","신","수","삿","룻","삼상","삼하","왕상","왕하","대상","대하","스","느","에","욥","시","잠","전","아","사","렘","애","겔","단","호","욜","암","옵","욘","미","나","합","습","학","슥","말",
+           "마","막","눅","요","행","롬","고전","고후","갈","엡","빌","골","살전","살후","딤전","딤후","딛","몬","히","약","벧전","벧후","요일","요이","요삼","유","계"];
+var LOG_KEY="w-bible-tongdok-log", readLog={};
+try{readLog=JSON.parse(localStorage.getItem(LOG_KEY)||"{}")||{}}catch(e){readLog={}}
+function saveLog(){try{localStorage.setItem(LOG_KEY,JSON.stringify(readLog))}catch(e){}}
+function dayKey(t){var d=new Date(t||Date.now());return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
+function logRead(d){
+  var k=dayKey(); var v=Math.max(0,(+readLog[k]||0)+d);
+  if(v)readLog[k]=v; else delete readLog[k];
+  var ks=Object.keys(readLog).sort(); while(ks.length>400){delete readLog[ks.shift()]}
+  saveLog();
+}
+var ovwOpen=false;
+function renderOverview(){
+  var body=document.getElementById("ovwBody"); if(!body)return;
+  var tg=document.getElementById("ovwTg");
+  if(tg)tg.setAttribute("aria-expanded",String(ovwOpen));
+  body.hidden=!ovwOpen; if(!ovwOpen)return;
+  body.textContent="";
+  // ① 66권 지도
+  [["구약 39권",0,OT_N],["신약 27권",OT_N,BOOKS.length]].forEach(function(part){
+    var h=document.createElement("p"); h.className="ovw-h"; h.textContent=part[0]; body.appendChild(h);
+    var map=document.createElement("div"); map.className="ovw-map";
+    for(var bi=part[1];bi<part[2];bi++){
+      var total=BOOKS[bi][1], done=bookDone(bi), f=total?done/total:0;
+      var c=document.createElement("button"); c.type="button"; c.className="ovc"; c.dataset.b=String(bi);
+      c.dataset.st=done===0?"none":done>=total?"full":"part";
+      c.style.setProperty("--f",f.toFixed(3));
+      c.innerHTML='<i></i><b></b>';
+      c.querySelector("b").textContent=BABBR[bi]||BOOKS[bi][0].slice(0,2);
+      c.title=BOOKS[bi][0]+" "+done+" / "+total+"장";
+      c.setAttribute("aria-label",c.title);
+      map.appendChild(c);
+    }
+    body.appendChild(map);
+  });
+  // ② 읽어 온 길: 왼쪽이 처음, 오른쪽이 오늘. 해가 바뀌어도 가로로 계속 이어진다
+  var h2=document.createElement("p"); h2.className="ovw-h"; h2.textContent="읽어 온 길"; body.appendChild(h2);
+  var keys=Object.keys(readLog).sort();
+  if(!keys.length){
+    var none=document.createElement("p"); none.className="ovw-none";
+    none.textContent="아직 기록이 없어요. 오늘부터 칸을 체크하면 날마다 몇 장을 읽었는지 여기에 쌓여서, 해가 지날수록 걸어온 길이 보여요.";
+    body.appendChild(none);
+    return;
+  }
+  var first=new Date(keys[0]+"T12:00:00"), last=new Date();
+  var startAt=new Date(first); startAt.setDate(startAt.getDate()-startAt.getDay());   // 그 주 일요일부터
+  var total=0, best=0, bestDay="", run=0, bestRun=0, prev=null;
+  keys.forEach(function(k){
+    var v=readLog[k]; total+=v; if(v>best){best=v;bestDay=k}
+    var t=new Date(k+"T12:00:00").getTime();
+    run=(prev!==null&&Math.round((t-prev)/864e5)===1)?run+1:1; prev=t; if(run>bestRun)bestRun=run;
+  });
+  var sum=document.createElement("div"); sum.className="ovw-sum";
+  sum.innerHTML='<span>처음 읽은 날 <b></b></span><span>읽은 날 <b></b>일</span><span>모두 <b></b>장</span><span>가장 많이 읽은 날 <b></b>장</span><span>가장 길게 이어 읽기 <b></b>일</span>';
+  var sb=sum.querySelectorAll("b");
+  sb[0].textContent=keys[0].replace(/-/g,".");
+  sb[1].textContent=keys.length; sb[2].textContent=total; sb[3].textContent=best; sb[4].textContent=bestRun;
+  body.appendChild(sum);
+  var wrap=document.createElement("div"); wrap.className="ovw-hist";
+  var grid=document.createElement("div"); grid.className="ovw-grid";
+  var mon=document.createElement("div"); mon.className="ovw-mon";
+  var wks=document.createElement("div"); wks.className="ovw-wks";
+  var cur=new Date(startAt), lastMon=-1, MON=["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
+  while(cur<=last){
+    var col=document.createElement("div"); col.className="ovwk";
+    var label="";
+    for(var d2=0;d2<7;d2++){
+      var k2=dayKey(cur.getTime()), v2=+readLog[k2]||0;
+      var cell=document.createElement("div"); cell.className="ovday";
+      if(cur>last)cell.classList.add("pad");
+      else{
+        cell.dataset.l=v2===0?"0":v2<=2?"1":v2<=5?"2":v2<=10?"3":"4";
+        cell.title=k2.replace(/-/g,".")+" · "+(v2?v2+"장":"쉬었어요");
+      }
+      if(d2===0&&cur.getMonth()!==lastMon){lastMon=cur.getMonth();label=(cur.getMonth()===0?cur.getFullYear()+"년 ":"")+MON[cur.getMonth()]}
+      col.appendChild(cell);
+      cur.setDate(cur.getDate()+1);
+    }
+    var ml=document.createElement("span"); ml.style.width="13px"; ml.textContent=label; mon.appendChild(ml);
+    wks.appendChild(col);
+  }
+  grid.appendChild(mon); grid.appendChild(wks); wrap.appendChild(grid); body.appendChild(wrap);
+  var key=document.createElement("div"); key.className="ovw-key";
+  key.innerHTML='<span>적게</span><i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><span>많이</span>';
+  key.querySelectorAll("i").forEach(function(i2,n2){i2.className="";i2.setAttribute("class","");i2.setAttribute("data-l",String(n2));i2.classList.add("ovday")});
+  body.appendChild(key);
+  setTimeout(function(){wrap.scrollLeft=wrap.scrollWidth},0);   // 오늘(오른쪽 끝)이 보이게
+}
+(function(){
+  var tg=document.getElementById("ovwTg"); if(!tg)return;
+  tg.addEventListener("click",function(){ovwOpen=!ovwOpen;renderOverview()});
+  var body=document.getElementById("ovwBody");
+  body.addEventListener("click",function(e){
+    var c=e.target.closest(".ovc"); if(!c)return;
+    var bi=+c.dataset.b; setFold(bi,false); saveFold&&saveFold();
+    var sec=document.querySelector('.bk[data-b="'+bi+'"]');
+    if(sec)sec.scrollIntoView({block:"start",behavior:"smooth"});
+  });
+})();
+
+
+/* ── 성경 책 찾기 (초성도 됨) ───────────────────── */
+var CHO="ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
+function chosung(t){return Array.prototype.map.call(String(t),function(ch){
+  var c=ch.charCodeAt(0);
+  return (c>=0xAC00&&c<=0xD7A3)?CHO.charAt(Math.floor((c-0xAC00)/588)):ch;
+}).join("")}
+function bkHit(name,q){
+  var n=String(name).replace(/\s/g,""), w=String(q).replace(/\s/g,"");
+  if(!w)return true;
+  if(n.indexOf(w)>=0)return true;
+  if(/^[ㄱ-ㅎ]+$/.test(w))return chosung(n).indexOf(w)>=0;
+  return false;
+}
+function applyFind(){
+  var el=document.getElementById("bkFind"); if(!el)return;
+  var q=el.value.trim(), x=document.getElementById("bkFindX"), msg=document.getElementById("findMsg");
+  if(x)x.hidden=!q;
+  var secs=document.querySelectorAll(".bk[data-b]"), shown=0, seen={};
+  Array.prototype.forEach.call(secs,function(sec){
+    var bi=+sec.dataset.b, hit=bkHit(BOOKS[bi][0],q);
+    sec.hidden=!hit;
+    if(hit&&!seen[bi]){seen[bi]=1;shown++}
+  });
+  // 비어 버린 구약·신약 제목과 접기 단추는 찾는 동안 숨긴다
+  document.querySelectorAll("h2.tg,.foldbar,.sum,.shelf").forEach(function(h){h.hidden=!!q});
+  var pn=document.getElementById("pinned");
+  if(pn&&q)pn.hidden=!Array.prototype.some.call(pn.querySelectorAll(".bk[data-b]"),function(s2){return !s2.hidden});
+  if(msg){msg.hidden=!q; msg.textContent=q?(shown?shown+"권 찾았어요":"'"+q+"' 로 찾은 책이 없어요"):""}
+}
+(function(){
+  var el=document.getElementById("bkFind"), x=document.getElementById("bkFindX");
+  if(!el)return;
+  ["input","compositionupdate","search"].forEach(function(ev){el.addEventListener(ev,applyFind)});
+  if(x)x.addEventListener("click",function(){el.value="";applyFind();el.focus()});
+})();
+
+/* ── 축복 카드 ─────────────────────────
+   성경 본문은 담지 않는다(프로젝트 규칙). 축복 문구는 직접 쓰고
+   말씀은 찾아보시도록 장절만 적는다. */
+var MILES=[
+ {n:1,    t:"첫 장을 열었어요",   b:"오늘 펼친 한 장이 앞길을 비추는 등불이 되기를 바라요.", r:"시편 119:105"},
+ {n:10,   t:"열 장",             b:"꾸준함이 쌓이면 마음에 길이 납니다. 그 길에 평안이 함께하기를.", r:"시편 1:2"},
+ {n:30,   t:"서른 장",           b:"말씀을 가까이 두는 사람에게 깊은 뿌리가 자라납니다.", r:"예레미야 17:8"},
+ {n:50,   t:"쉰 장",             b:"지치는 날에도 새 힘으로 걸어가시기를 바라요.", r:"이사야 40:31"},
+ {n:100,  t:"백 장",             b:"지나온 백 장이 마음에 심겨 좋은 열매를 맺기를.", r:"골로새서 3:16"},
+ {n:200,  t:"이백 장",           b:"읽는 기쁨이 날마다 마음의 양식이 되기를 바라요.", r:"예레미야 15:16"},
+ {n:300,  t:"삼백 장",           b:"한 걸음씩 걸어온 날들을 하나님이 기억하십니다.", r:"히브리서 6:10"},
+ {n:400,  t:"사백 장",           b:"오늘 들은 말씀이 마음을 든든히 지켜 주기를.", r:"빌립보서 4:7"},
+ {n:500,  t:"오백 장, 절반 가까이", b:"여기까지 걸어온 걸음에 축복이 가득하기를.", r:"민수기 6:24-26"},
+ {n:600,  t:"육백 장",           b:"말씀이 마음에 새겨져 흔들리지 않기를 바라요.", r:"시편 119:11"},
+ {n:700,  t:"칠백 장",           b:"지혜와 분별이 날마다 더해지기를.", r:"잠언 2:6"},
+ {n:800,  t:"팔백 장",           b:"끝까지 함께 걸어 주실 분을 신뢰하며 나아가요.", r:"신명기 31:8"},
+ {n:900,  t:"구백 장",           b:"선한 일에 지치지 않는 마음을 주시기를.", r:"갈라디아서 6:9"},
+ {n:1000, t:"천 장을 넘었어요",   b:"큰 일을 해내셨어요. 그 기쁨이 오래 머물기를.", r:"시편 126:3"},
+ {n:1100, t:"천백 장",           b:"마지막 고개를 넘는 걸음에 힘이 더해지기를.", r:"이사야 41:10"},
+ {n:1189, t:"성경 전체 통독 완료", b:"끝까지 걸어오셨어요. 이 여정이 평생의 선물로 남기를.", r:"디모데후서 4:7"}
+];
+var BOOK_BLESS=[
+ {b:"한 권을 끝까지 읽어 냈어요. 그 성실함이 참 귀합니다.", r:"골로새서 3:23"},
+ {b:"오늘 쌓은 한 권이 마음의 보물이 되기를 바라요.", r:"마태복음 6:21"},
+ {b:"읽는 사람에게 복이 있다고 했어요. 그 복이 함께하기를.", r:"요한계시록 1:3"},
+ {b:"한 권만큼 더 가까워졌어요. 그 길에 기쁨이 있기를.", r:"시편 16:11"}
+];
+var queue=[], celOpen=false, pendingCheer=null;
+
+function pushCel(c){queue.push(c);if(!celOpen)nextCel()}
+function nextCel(){
+  if(!queue.length){
+    celOpen=false;$("cel").hidden=true;
+    // 카드에 가려 못 띄운 격려가 있으면 이제 보여 준다
+    if(pendingCheer){var p=pendingCheer;pendingCheer=0;cheer(p.bi,p.c)}
+    return;
+  }
+  celOpen=true;
+  var c=queue.shift();
+  $("celSeal").textContent=c.icon||"✦";
+  $("celTitle").textContent=c.t;
+  $("celSub").textContent=c.s||"";
+  $("celBless").textContent=c.b;
+  $("celRef").textContent=c.r?"— "+c.r+" 말씀을 찾아 읽어 보세요":"";
+  $("cel").hidden=false;
+}
+$("celOk").addEventListener("click",nextCel);
+$("cel").addEventListener("click",function(ev){if(ev.target===$("cel"))nextCel()});
+
+/* 체크한 칸에서 반짝이 터뜨리기 */
+function sparkle(el){
+  if(!el)return;
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  el.classList.remove("got");void el.offsetWidth;el.classList.add("got");
+  var ring=document.createElement("span");ring.className="ring";el.appendChild(ring);
+  for(var i=0;i<6;i++){
+    var s=document.createElement("span");s.className="spark";
+    var a=(Math.PI*2/6)*i-Math.PI/2, d=12+Math.random()*5;
+    s.style.setProperty("--dx",(Math.cos(a)*d).toFixed(1)+"px");
+    s.style.setProperty("--dy",(Math.sin(a)*d).toFixed(1)+"px");
+    s.style.animationDelay=(i*12)+"ms";
+    el.appendChild(s);
+  }
+  setTimeout(function(){
+    var junk=el.querySelectorAll(".ring,.spark");
+    for(var j=0;j<junk.length;j++)junk[j].remove();
+  },700);
+}
+
+/* 다섯 장마다 뜨는 짧은 격려. 본문 대신 직접 쓴 문장과 장절만 둔다. */
+var CHEERS=[
+ ["다섯 장을 더 걸었어요. 오늘의 걸음을 기억해 주실 거예요.","시편 37:23"],
+ ["말씀이 마음에 차곡차곡 쌓이고 있어요.","골로새서 3:16"],
+ ["꾸준한 걸음이 가장 멀리 갑니다.","갈라디아서 6:9"],
+ ["오늘 읽은 자리에 평안이 머물기를.","요한복음 14:27"],
+ ["작은 성실이 큰 길을 냅니다.","누가복음 16:10"],
+ ["읽는 마음에 기쁨이 더해지기를.","느헤미야 8:10"],
+ ["지치지 않도록 새 힘 주시기를.","이사야 40:31"],
+ ["오늘 받은 말씀이 발걸음을 비추기를.","시편 119:105"],
+ ["마음 밭에 좋은 씨가 심기고 있어요.","마태복음 13:23"],
+ ["조용히 쌓이는 시간이 가장 단단합니다.","이사야 30:15"],
+ ["여기까지 온 걸음을 축복합니다.","민수기 6:24"],
+ ["말씀 곁에 머무는 하루가 복됩니다.","시편 1:2"],
+ ["오늘도 한 걸음, 참 잘하셨어요.","빌립보서 3:14"],
+ ["읽고 지키는 사람에게 복이 있어요.","요한계시록 1:3"]
+];
+var toastTimer=null, cheerTurn=0;
+/* bi = 책 번호, c = 그 책 안의 장 번호 */
+function hint(msg,sub){
+  var el=$("toast"); $("toastMsg").textContent=msg; $("toastRef").textContent=sub||"";
+  el.hidden=false; el.classList.remove("out"); clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){el.classList.add("out");setTimeout(function(){el.hidden=true},320)},2200);
+}
+document.addEventListener("click",function(ev){
+  if(ev.target.closest(".fchips"))hint("친구 표는 보기만 할 수 있어요","내 체크는 바로 위 🙋 나 표에서 눌러 주세요");
+});
+function cheer(bi,c){
+  var t=(c===1)
+    ? ["«"+BOOKS[bi][0]+"»을 펼쳤어요. 첫 장에 좋은 만남이 있기를.","시편 119:18"]
+    : CHEERS[(cheerTurn++)%CHEERS.length];
+  var el=$("toast");
+  $("toastMsg").textContent=t[0];
+  $("toastRef").textContent=BOOKS[bi][0]+" "+c+"장 · "+t[1]+" 말씀을 찾아 읽어 보세요";
+  el.hidden=false;el.classList.remove("out");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(function(){
+    el.classList.add("out");
+    setTimeout(function(){el.hidden=true},320);
+  },3200);
+}
+$("toast").addEventListener("click",function(){
+  clearTimeout(toastTimer);this.classList.add("out");
+  var el=this;setTimeout(function(){el.hidden=true},320);
+});
+
+/* 책 안의 장 번호가 1 이거나 5의 배수면 격려한다.
+   축복 카드가 떠 있으면 미뤄 두었다가 카드를 닫은 뒤에 보여 준다. */
+function maybeCheer(bi,c){
+  if(!(c===1||c%5===0))return;
+  if(celOpen){pendingCheer={bi:bi,c:c};return}
+  cheer(bi,c);
+}
+
+/* 달라진 만큼만 축하한다 */
+function checkMilestones(before,after,finishedBooks){
+  for(var i=0;i<finishedBooks.length;i++){
+    var bi=finishedBooks[i];
+    var pick=BOOK_BLESS[bi%BOOK_BLESS.length];
+    pushCel({icon:"✺",t:BOOKS[bi][0]+(rndOf(bi)?" "+(rndOf(bi)+1)+"회":"")+" 완독",
+      s:BOOKS[bi][1]+"장을 모두 읽었어요. 뱃지를 하나 모았어요.",
+      b:pick.b,r:pick.r});
+  }
+  for(var m=0;m<MILES.length;m++){
+    var x=MILES[m];
+    if(before<x.n&&after>=x.n){
+      pushCel({icon:x.n===TOTAL?"♕":"✦",t:x.t,
+        s:after+" / "+TOTAL+"장을 읽었어요.",b:x.b,r:x.r});
+    }
+  }
+  var obT=countRange(me,0,OT_TOTAL);
+  if(obT===OT_TOTAL&&before<after&&lastOT!==OT_TOTAL)
+    pushCel({icon:"✵",t:"구약 39권 완독",s:OT_TOTAL+"장을 모두 읽었어요.",
+      b:"긴 길을 끝까지 걸어오셨어요. 그 수고를 하나님이 아십니다.",r:"시편 126:5"});
+  var nbT=countRange(me,OT_TOTAL,TOTAL);
+  if(nbT===NT_TOTAL&&before<after&&lastNT!==NT_TOTAL)
+    pushCel({icon:"✵",t:"신약 27권 완독",s:NT_TOTAL+"장을 모두 읽었어요.",
+      b:"끝까지 읽어 내신 그 마음에 기쁨이 가득하기를.",r:"요한복음 20:31"});
+  lastOT=obT;lastNT=nbT;
+}
+var lastOT=0,lastNT=0;
+
+/* 모은 책 뱃지 선반 */
+function renderShelf(){
+  var got=[];
+  for(var bi=0;bi<BOOKS.length;bi++)if(rndOf(bi)||bookDone(bi)===BOOKS[bi][1])got.push(bi);
+  $("shelfCnt").textContent=got.length?"  "+got.length+" / 66권":"";
+  $("shelfNone").hidden=got.length>0;
+  $("medals").innerHTML=got.map(function(bi){
+    var n=rndOf(bi)+(bookDone(bi)===BOOKS[bi][1]?1:0);
+    return '<span class="medal">'+BOOKS[bi][0]+(n>1?' ×'+n:'')+'</span>';
+  }).join("");
+}
+
+/* ── 조작 ─────────────────────────────── */
+document.addEventListener("click",function(ev){
+  var el=ev.target.closest("[data-act]"); if(!el)return;
+  var act=el.dataset.act;
+  if(act==="pin"){
+    var pb=+el.dataset.b; if(pins[pb])delete pins[pb]; else{pins[pb]=Date.now();delete folded[pb];saveFold()}
+    try{localStorage.setItem(PIN_KEY,JSON.stringify(pins))}catch(e){}
+    renderBooks(); if(pins[pb])window.scrollTo({top:0,behavior:"smooth"});
+    return;
+  }
+  if(act==="fold"){var fb=+el.dataset.b;setFold(fb,!folded[fb]);saveFold();syncFoldAll();return}
+  if(act==="foldall"){
+    var t=el.dataset.t, a=t==="nt"?OT_N:0, z=t==="ot"?OT_N:BOOKS.length, shutAll=/접기$/.test(el.textContent);
+    for(var fb2=a;fb2<z;fb2++)setFold(fb2,shutAll); saveFold(); syncFoldAll(); return;
+  }
+
+  if(act==="round"||act==="unround"){
+    var rb=+el.dataset.b, R0=rounds(), up=act==="round";
+    if(up)R0[rb]=(+R0[rb]||0)+1; else{R0[rb]=(+R0[rb]||0)-1; if(R0[rb]<=0)delete R0[rb]}
+    for(var k=OFF[rb];k<OFF[rb]+BOOKS[rb][1];k++)me[k]=up?0:1;
+    save(); saveRnd(); repaintBook(rb); renderSummary(); renderShelf();
+    if(!pMode){lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
+    if(up)hint("🎉 "+BOOKS[rb][0]+" "+R0[rb]+"번 "+(pMode?"필사했어요":"읽었어요"),(R0[rb]+1)+"회째는 칸 색이 바뀌어요. 다시 처음부터 체크해요");
+    else hint("되돌렸어요",BOOKS[rb][0]+" "+((+R0[rb]||0)+1)+"회째를 다 "+(pMode?"쓴":"읽은")+" 상태예요");
+    return;
+  }
+  if(act==="mode"){setMode(el.dataset.m,true);window.scrollTo({top:0,behavior:"smooth"});return}
+  if(act==="chip"){
+    var idx=+el.dataset.i, bi2=bookOf(idx), R1=rounds();
+    /* 🔁 다 채운 책의 칸을 또 누르면 → 다음 회차 시작 (칸을 비우고 누른 칸만 새 색으로 체크) */
+    if(me[idx]&&bookDone(bi2)===BOOKS[bi2][1]){
+      R1[bi2]=(+R1[bi2]||0)+1;
+      for(var k1=OFF[bi2];k1<OFF[bi2]+BOOKS[bi2][1];k1++)me[k1]=0;
+      me[idx]=1; save(); saveRnd(); repaintBook(bi2); renderSummary(); renderShelf();
+      if(!pMode){lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
+      var sp=document.querySelector('.chip[data-i="'+idx+'"]'); if(sp)sparkle(sp);
+      hint("🔁 "+BOOKS[bi2][0]+" "+(R1[bi2]+1)+"회째 시작","잘못 눌렀으면 같은 칸을 한 번 더 누르면 돌아가요");
+      return;
+    }
+    /* 새 회차에서 하나뿐인 칸을 다시 누르면 → 앞 회차(다 채운 상태)로 되돌림 */
+    if(me[idx]&&+R1[bi2]&&bookDone(bi2)===1){
+      R1[bi2]--; if(R1[bi2]<=0)delete R1[bi2];
+      for(var k2=OFF[bi2];k2<OFF[bi2]+BOOKS[bi2][1];k2++)me[k2]=1;
+      save(); saveRnd(); repaintBook(bi2); renderSummary(); renderShelf();
+      if(!pMode){lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
+      hint("되돌렸어요",BOOKS[bi2][0]+" "+((+R1[bi2]||0)+1)+"회째를 다 "+(pMode?"쓴":"읽은")+" 상태예요");
+      return;
+    }
+    var before=everCount(), wasFull=bookDone(bi2)===BOOKS[bi2][1];
+    me[idx]=me[idx]?0:1;
+    logRead(me[idx]?1:-1);
+    save();
+    repaintBook(bi2);
+    renderSummary();renderShelf();
+    var after=everCount();
+    if(me[idx]){
+      var spot=document.querySelector('.chip[data-i="'+idx+'"]');
+      sparkle(spot);
+      // 다섯 장째면 금빛 테두리가 한 번 번진다
+      if(spot&&spot.hasAttribute("data-five")){
+        spot.classList.remove("got5");void spot.offsetWidth;spot.classList.add("got5");
+      }
+      var nowFull=bookDone(bi2)===BOOKS[bi2][1];
+      if(!pMode)checkMilestones(before,after,(!wasFull&&nowFull)?[bi2]:[]);
+      // 축복 카드가 떴으면 띠까지 겹치지 않게 한다
+      maybeCheer(bi2, idx-OFF[bi2]+1);
+      if(!wasFull&&nowFull)hint("✓ "+BOOKS[bi2][0]+" 다 "+(pMode?"썼어요":"읽었어요"),"아무 칸이나 또 누르면 "+(rndOf(bi2)+2)+"회째가 시작돼요");
+    }else if(!pMode){
+      lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL);
+    }
+    return;
+  }
+});
+/* 장 번호를 누른 채 옆으로 밀거나, 꾹 눌렀다가(0.3초) 끌면 지나가는 장을 한꺼번에 체크 (처음 누른 장이 체크돼 있었으면 한꺼번에 해제)
+   휴대폰(카톡 안 브라우저 포함)에서는 포인터 이벤트가 중간에 끊길 수 있어 터치 이벤트로 직접 처리하고, 마우스만 포인터 이벤트로 처리 */
+(function(){
+  var P=null, D=null, eat=false;
+  function chipAt(x,y){var t=document.elementFromPoint(x,y);return t&&t.closest?t.closest('.chip[data-act="chip"]'):null}
+  function buzzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+  function paint(c){
+    var i=+c.dataset.i; if(D.done[i])return; D.done[i]=1;
+    if(!!me[i]===!!D.fill)return;
+    me[i]=D.fill; D.books[bookOf(i)]=1; D.n++;
+    if(D.fill){c.setAttribute("data-s","me");c.classList.remove("got5");void c.offsetWidth;c.classList.add("got5")}else c.removeAttribute("data-s");
+    c.setAttribute("aria-pressed",String(!!D.fill)); buzzz(6);
+  }
+  function begin(c){
+    var i0=+c.dataset.i;
+    D={fill:me[i0]?0:1,done:{},books:{},n:0,before:everCount(),full:{}};
+    BOOKS.forEach(function(b,bi){D.full[bi]=bookDone(bi)===b[1]});
+    document.body.classList.add("painting"); paint(c); buzzz(25);
+  }
+  function arm(c,x,y){cancelArm(); P={c:c,x:x,y:y,t:setTimeout(function(){if(!P)return;var c0=P.c;P=null;begin(c0)},300)}}
+  function cancelArm(){if(P){clearTimeout(P.t);P=null}}
+  function move(x,y){
+    if(P){var dx=Math.abs(x-P.x),dy=Math.abs(y-P.y);
+      if(dx>8&&dx>dy*1.2){var c1=P.c;cancelArm();begin(c1)}   // 기다리지 않고 바로 옆으로 밀어도 칠하기 시작 (위아래로 밀면 스크롤)
+      else if(dx>10||dy>10)cancelArm();
+    }
+    if(!D)return false;
+    var c=chipAt(x,y); if(c)paint(c);
+    if(y<70)window.scrollBy(0,-14); else if(y>innerHeight-50)window.scrollBy(0,14);   // 화면 끝에서는 저절로 스크롤
+    return true;
+  }
+  function end(){
+    cancelArm(); if(!D)return;
+    var d=D; D=null; document.body.classList.remove("painting"); eat=true; setTimeout(function(){eat=false},450);
+    if(!d.n)return;
+    save(); Object.keys(d.books).forEach(function(bi){repaintBook(+bi)}); renderSummary(); renderShelf();
+    var after=everCount();
+    if(pMode){}
+    else if(d.fill){var fin=Object.keys(d.books).map(Number).filter(function(bi){return !d.full[bi]&&bookDone(bi)===BOOKS[bi][1]});checkMilestones(d.before,after,fin)}
+    else{lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
+    hint(d.fill?"✓ "+d.n+"장을 한꺼번에 체크했어요":d.n+"장 체크를 풀었어요","꾹 눌러 끌면 여러 장을 한 번에 바꿀 수 있어요");
+  }
+  // 터치
+  document.addEventListener("touchstart",function(e){
+    if(e.touches.length!==1){cancelArm();return}
+    var t=e.touches[0], c=e.target.closest&&e.target.closest('.chip[data-act="chip"]'); if(c)arm(c,t.clientX,t.clientY);
+  },{passive:true});
+  document.addEventListener("touchmove",function(e){
+    var t=e.touches[0]; if(!t)return;
+    if(move(t.clientX,t.clientY)&&e.cancelable)e.preventDefault();   // 끄는 동안 화면이 스크롤되지 않게
+  },{passive:false});
+  document.addEventListener("touchend",end,{passive:true});
+  document.addEventListener("touchcancel",end,{passive:true});
+  // 마우스 (PC)
+  document.addEventListener("pointerdown",function(e){
+    if(e.pointerType!=="mouse"||e.button!==0)return;
+    var c=e.target.closest&&e.target.closest('.chip[data-act="chip"]'); if(c)arm(c,e.clientX,e.clientY);
+  });
+  document.addEventListener("pointermove",function(e){if(e.pointerType==="mouse")move(e.clientX,e.clientY)});
+  document.addEventListener("pointerup",function(e){if(e.pointerType==="mouse")end()});
+  document.addEventListener("contextmenu",function(e){if(D||P)e.preventDefault()});
+  document.addEventListener("click",function(e){if(eat&&e.target.closest&&e.target.closest(".chip")){e.stopPropagation();e.preventDefault();eat=false}},true);
+})();
+function bookOf(idx){
+  for(var i=BOOKS.length-1;i>=0;i--)if(idx>=OFF[i])return i;
+  return 0;
+}
+
+/* ── 대화상자 ─────────────────────────── */
+function closeDlg(){$("dlg").hidden=true;$("dlgBody").innerHTML="";$("dlgTools").innerHTML="";$("dlgMsg").textContent=""}
+$("dlg").addEventListener("click",function(ev){if(ev.target===$("dlg"))closeDlg()});
+function setMsg(t,bad){var m=$("dlgMsg");m.textContent=t||"";m.className="msg"+(bad?" bad":"")}
+
+function openShare(){
+  $("dlgTitle").textContent="내 진도 보내기";
+  $("dlgDesc").textContent="아래 링크를 카톡으로 보내면, 친구가 열어서 내 진도를 볼 수 있어요. 내 이름을 적으면 친구 화면에 그 이름이 보여요.";
+  $("dlgBody").innerHTML='<input type="text" id="nm" placeholder="내 이름 (예: 은혜)" value="'+esc(myName)+'">'
+    +'<textarea id="lk" readonly></textarea>';
+  $("dlgTools").innerHTML='<button class="btn on wide" type="button" id="cp">링크 복사하기</button>'
+    +'<button class="btn wide" type="button" id="cl">닫기</button>';
+  $("dlg").hidden=false;
+  var nm=$("nm"), lk=$("lk");
+  var tmr=0;
+  function refresh(){
+    lk.value=makeLink(); var code=makeCode(), now=code;
+    shorten(code,function(u){if(u&&now===makeCode()&&!$("dlg").hidden){lk.value=u}});
+  }
+  refresh();
+  nm.addEventListener("input",function(){myName=nm.value.slice(0,20);save();lk.value=makeLink();renderSummary();clearTimeout(tmr);tmr=setTimeout(refresh,900)});
+  $("cp").addEventListener("click",function(){
+    copy(lk.value).then(function(){setMsg("복사했어요. 카톡에 붙여 넣어 보내세요.")},
+                        function(){lk.select();setMsg("길게 눌러 복사해 주세요.",true)});
+  });
+  $("cl").addEventListener("click",closeDlg);
+}
+function openFriend(){
+  $("dlgTitle").textContent="친구 진도 불러오기";
+  $("dlgDesc").textContent="친구가 보낸 링크나 코드를 그대로 붙여 넣으세요. 친구 진도는 보기만 하고, 내 체크는 그대로 있어요.";
+  $("dlgBody").innerHTML='<textarea id="pf" placeholder="여기에 붙여 넣기"></textarea>';
+  $("dlgTools").innerHTML='<button class="btn on wide" type="button" id="ok">불러오기</button>'
+    +(friend?'<button class="btn wide" type="button" id="rm">친구 진도 지우기</button>':"")
+    +'<button class="btn wide" type="button" id="cl2">닫기</button>';
+  $("dlg").hidden=false;
+  $("ok").addEventListener("click",function(){
+    var r=parseCode($("pf").value);
+    if(!r){setMsg("코드를 알아볼 수 없어요. 링크 전체를 다시 붙여 넣어 주세요.",true);return}
+    friend=r.bits;friendPil=null;friendName=r.name;compare=true;saveFriend();
+    renderAll();
+    setMsg((friendName||"친구")+" 진도를 불러왔어요.");
+    setTimeout(closeDlg,900);
+  });
+  if(friend)$("rm").addEventListener("click",function(){
+    friend=null;friendPil=null;friendName="";compare=false;saveFriend();renderAll();closeDlg();
+  });
+  $("cl2").addEventListener("click",closeDlg);
+}
+function copy(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t);
+  return new Promise(function(res,rej){
+    try{
+      var ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);
+      ta.select();var ok=document.execCommand("copy");document.body.removeChild(ta);
+      ok?res():rej();
+    }catch(e){rej()}
+  });
+}
+function esc(s){return String(s||"").replace(/[&<>"]/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]})}
+
+$("btnShare").addEventListener("click",openShare);
+$("btnFriend").addEventListener("click",openFriend);
+$("btnCmp").addEventListener("click",function(){compare=!compare;saveFriend();renderAll()});
+/* 불러온 친구 진도는 이 기기에 기억해 두고, 다음에 열어도 내 표와 같이 보여 줌 */
+var FRIEND_KEY="w-bible-tongdok-friend", friendCloud="";
+function saveFriend(){try{if(friend)localStorage.setItem(FRIEND_KEY,JSON.stringify({c:"2"+toRuns(friend),p:friendPil?"2"+toRuns(friendPil):"",n:friendName,cmp:compare,fc:friendCloud}));else localStorage.removeItem(FRIEND_KEY)}catch(e){}}
+function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"null");if(!o||!o.c)return;var bits=fromRuns(String(o.c).slice(1));if(!bits)return;friend=bits;friendPil=o.p?fromRuns(String(o.p).slice(1)):null;friendName=o.n||"";compare=o.cmp!==false;friendCloud=o.fc||""}catch(e){}}
+
+
+/* ── ☁️ 자동 맞춤 (묵상 노트의 Supabase 로그인을 그대로 씀) ──────────────
+   같은 주소(0702080.github.io)라 묵상 노트에서 로그인해 두면 여기서도 로그인된 상태.
+   내 진도는 notes 표에 id "s:tongdok" 한 줄로 '친구 공개'로 올리고(묵상 노트는 s: 줄을 노트로 보지 않음),
+   묵상 노트에서 친구를 맺은 사람의 "s:tongdok" 줄을 받아 친구 표로 보여 준다. 1분마다, 화면으로 돌아올 때마다 다시 받음 */
+var SB_URL="https://fsctntwrqocjvkboqmzn.supabase.co", SB_KEY="sb_publishable_8ARyO5q9ODokIT0um2ShnQ_DgZarC_E", SB_SES="w-bible-sb-session";
+var CLOUD_ID="s:tongdok", cloudFriends=[], cloudPick="", cloudState={ok:null,at:0,msg:""}, cloudTimer=0, cloudBusy=false;
+try{cloudPick=localStorage.getItem("w-bible-tongdok-cloudpick")||""}catch(e){}
+/* 친구들 진도를 이 기기에도 기억해 두어, 켤 때 인터넷을 기다리지 않고 바로 보이게 */
+var CF_KEY="w-bible-tongdok-cloudfriends";
+function saveCF(){try{localStorage.setItem(CF_KEY,JSON.stringify(cloudFriends.map(function(f){return {id:f.id,n:f.name,at:f.at,c:"2"+toRuns(f.bits),p:f.pbits?"2"+toRuns(f.pbits):"",rr:f.rounds||{},pr:f.prounds||{}}})))}catch(e){}}
+function loadCF(){try{var a=JSON.parse(localStorage.getItem(CF_KEY)||"[]");cloudFriends=a.map(function(o){return {id:o.id,name:o.n||"친구",at:+o.at||0,bits:fromRuns(String(o.c||"").slice(1)),pbits:o.p?fromRuns(String(o.p).slice(1)):null,rounds:o.rr||{},prounds:o.pr||{}}}).filter(function(f){return !!f.bits})}catch(e){cloudFriends=[]}}
+function sbSession(){try{var x=JSON.parse(localStorage.getItem(SB_SES)||"null");return x&&x.access_token&&x.user&&x.user.id?x:null}catch(e){return null}}
+function sbH(tok){var h={"apikey":SB_KEY,"Content-Type":"application/json"};if(tok)h.Authorization="Bearer "+tok;return h}
+async function sbToken(){
+  var x=sbSession(); if(!x)return null;
+  if(Date.now()/1000<(x.expires_at||0)-60)return x.access_token;
+  var r=await fetch(SB_URL+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:sbH(),body:JSON.stringify({refresh_token:x.refresh_token})});
+  if(!r.ok){if(r.status===400||r.status===401){try{localStorage.removeItem(SB_SES)}catch(e){}}return null}
+  var j=await r.json(), nx={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}};
+  try{localStorage.setItem(SB_SES,JSON.stringify(nx))}catch(e){}
+  return nx.access_token;
+}
+async function sbGet(tok,path){var r=await fetch(SB_URL+path,{headers:sbH(tok),cache:"no-store"});if(!r.ok)throw new Error(String(r.status));return r.json()}
+function cloudPush(){if(!sbSession())return;clearTimeout(cloudTimer);cloudTimer=setTimeout(function(){cloudSync(true)},1500)}
+async function cloudSync(pushOnly){
+  if(cloudBusy){clearTimeout(cloudTimer);cloudTimer=setTimeout(function(){cloudSync(pushOnly)},1500);return}
+  var x=sbSession(); if(!x){drawCloud();return}
+  cloudBusy=true;
+  try{
+    var tok=await sbToken(); if(!tok)throw new Error("login");
+    var uid=sbSession().user.id;
+    if(!pushOnly){
+      // 1) 다른 기기에서 더 최근에 바꾼 내 진도가 있으면 받기
+      var mine=await sbGet(tok,"/rest/v1/notes?select=data&user_id=eq."+uid+"&id=eq."+encodeURIComponent(CLOUD_ID));
+      var md=mine&&mine[0]&&mine[0].data;
+      if(md&&md.c&&(+md.at||0)>meAt){var bits=fromRuns(String(md.c).slice(1));if(bits){RB=bits;if(!pMode)me=RB;meAt=+md.at;if(typeof md.n==="string"&&md.n&&!myName)myName=md.n;try{localStorage.setItem(LS,JSON.stringify({n:myName,b:toB64(RB),t:meAt}))}catch(e){}lastOT=countRange(RB,0,OT_TOTAL);lastNT=countRange(RB,OT_TOTAL,TOTAL)}}
+      if(md&&(+md.rat||0)>rndAt){RND={r:md.rr||{},p:md.pr||{}};rndAt=+md.rat;storeRnd()}
+      if(md&&md.p&&(+md.pat||0)>pilAt){var pb=fromRuns(String(md.p).slice(1));if(pb){PB=pb;if(pMode)me=PB;pilAt=+md.pat;storePil()}}
+    }
+    // 2) 내 진도 올리기 (친구 공개)
+    var row={user_id:uid,id:CLOUD_ID,data:{c:"2"+toRuns(RB),at:meAt||Date.now(),n:myName,p:"2"+toRuns(PB),pat:pilAt,rr:RND.r,pr:RND.p,rat:rndAt},updated_at:Date.now(),deleted:false,visibility:"friends"};
+    var pr=await fetch(SB_URL+"/rest/v1/notes?on_conflict=user_id,id",{method:"POST",headers:Object.assign(sbH(tok),{"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify([row])});
+    if(!pr.ok)throw new Error("up "+pr.status);
+    if(!pushOnly){
+      // 3) 친구들 진도 받기
+      var fr=await sbGet(tok,"/rest/v1/friendships?select=requester,addressee,status&status=eq.accepted");
+      var ids=fr.map(function(f){return f.requester===uid?f.addressee:f.requester}).filter(function(v,i,a){return a.indexOf(v)===i});
+      var list=[];
+      if(ids.length){
+        var pf=await sbGet(tok,"/rest/v1/profiles?select=id,name&id=in.("+ids.join(",")+")"), nm={}; pf.forEach(function(p){nm[p.id]=p.name});
+        var rows=await sbGet(tok,"/rest/v1/notes?select=user_id,data,updated_at&id=eq."+encodeURIComponent(CLOUD_ID)+"&user_id=in.("+ids.join(",")+")&deleted=is.false");
+        rows.forEach(function(r){if(!r.data||!r.data.c)return;var bits=fromRuns(String(r.data.c).slice(1));if(bits)list.push({id:r.user_id,name:nm[r.user_id]||r.data.n||"친구",bits:bits,pbits:r.data.p?fromRuns(String(r.data.p).slice(1)):null,rounds:r.data.rr||{},prounds:r.data.pr||{},at:+r.data.at||+r.updated_at})});
+        cloudFriends=list; saveCF(); cloudState.noRows=ids.length>list.length?ids.filter(function(u){return !list.some(function(l){return l.id===u})}).map(function(u){return nm[u]||"친구"}):[];
+      }else{cloudFriends=[];saveCF();cloudState.noRows=[]}
+      cloudState.nFriends=ids.length;
+      applyCloudFriend();
+    }
+    cloudState.ok=true; cloudState.at=Date.now(); cloudState.msg="";
+  }catch(e){cloudState.ok=false;cloudState.msg=e&&e.message==="login"?"다시 로그인해 주세요":"서버에 닿지 못했어요"}
+  finally{cloudBusy=false;renderAll();drawCloud()}
+}
+function applyCloudFriend(){
+  if(!cloudFriends.length)return;
+  var f=cloudFriends.filter(function(x){return x.id===cloudPick})[0]||cloudFriends[0];
+  var wasOff=!!friend&&!compare;   // 비교를 꺼 두었으면 그대로
+  friend=f.bits; friendPil=f.pbits||null; friendName=f.name; friendCloud=f.id; if(!wasOff)compare=true; saveFriend();
+}
+function ago(t){var m=Math.round((Date.now()-t)/60000);return m<1?"방금":m<60?m+"분 전":m<1440?Math.round(m/60)+"시간 전":Math.round(m/1440)+"일 전"}
+function drawCloud(){
+  var el=$("cloud"); if(!el)return;
+  if(!sbSession()){el.innerHTML='<button type="button" class="btn cl-login" data-act="login">☁️ 로그인하고 친구와 자동으로 같이 보기</button>';el.className="cloud off";return}
+  if(cloudState.ok===false){el.innerHTML='☁️ 자동 맞춤이 안 됐어요 · '+esc(cloudState.msg)+' <button type="button" class="cl-re" data-act="cloud">다시</button>';el.className="cloud bad";return}
+  var h='☁️ 자동 맞춤 켜짐'+(cloudState.at?' · '+ago(cloudState.at):'');
+  if(cloudFriends.length)h+=' · '+cloudFriends.map(function(f){return '👤 '+esc(f.name)+' ('+ago(f.at)+' 체크)'}).join(" · ");
+  else if(cloudState.nFriends===0)h+=' · 아래 👥 친구에서 친구 코드로 친구를 맺어 주세요';
+  if(cloudState.noRows&&cloudState.noRows.length)h+='<br><small>'+esc(cloudState.noRows.join(", "))+'님은 아직 통독표를 안 열었어요 (한 번 열면 보여요)</small>';
+  h+=' <button type="button" class="cl-re" data-act="friends">👥 친구</button>';
+  el.innerHTML=h; el.className="cloud on";
+}
+document.addEventListener("change",function(ev){if(ev.target.classList&&ev.target.classList.contains("cl-pick")){cloudPick=ev.target.value;try{localStorage.setItem("w-bible-tongdok-cloudpick",cloudPick)}catch(e){}compare=true;applyCloudFriend();renderAll()}});
+document.addEventListener("click",function(ev){
+  if(ev.target.closest('[data-act="cloud"]'))cloudSync(false);
+  if(ev.target.closest('[data-act="login"]'))openLogin();
+  if(ev.target.closest('[data-act="friends"]'))openFriends();
+});
+/* 로그인: 이메일로 로그인 링크를 받아 한 번만 하면 이 휴대폰에서 계속 로그인된 상태 (묵상 노트와 같은 계정·같은 저장) */
+var SB_SITE="https://0702080.github.io/bible-notes/";
+function setSes(j){try{localStorage.setItem(SB_SES,JSON.stringify({access_token:j.access_token,refresh_token:j.refresh_token,expires_at:j.expires_at||Math.floor(Date.now()/1000)+(+j.expires_in||3600),user:{id:j.user.id,email:j.user.email}}))}catch(e){}}
+function openLogin(){
+  $("dlgTitle").textContent="☁️ 로그인";
+  $("dlgDesc").textContent="이메일로 한 번만 로그인하면, 친구 코드로 맺은 친구의 진도가 내 표 아래에 저절로 보여요. 내 진도는 친구로 맺은 사람에게만 보여요.";
+  var rem=""; try{rem=localStorage.getItem("w-bible-sb-email")||""}catch(e){}
+  $("dlgBody").innerHTML='<input type="text" id="lgMail" inputmode="email" autocomplete="email" placeholder="이메일 (예: name@naver.com)" value="'+esc(rem)+'">'
+    +'<div id="lgStep2" hidden><p class="lg-tip">📧 메일함에서 <b>로그인 링크</b>를 눌러 주세요. 링크가 다른 앱에서 열리면, 링크를 <b>길게 눌러 복사</b>해서 아래에 붙여 넣고 [확인]을 누르세요.</p><textarea id="lgLink" placeholder="로그인 링크 붙여 넣기"></textarea></div>';
+  $("dlgTools").innerHTML='<button class="btn on wide" type="button" id="lgSend">로그인 메일 받기</button><button class="btn wide" type="button" id="lgOk" hidden>확인</button><button class="btn wide" type="button" id="lgCl">닫기</button>';
+  $("dlg").hidden=false;
+  $("lgCl").addEventListener("click",closeDlg);
+  $("lgSend").addEventListener("click",async function(){
+    var em=$("lgMail").value.trim(), b=this; if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){setMsg("이메일을 확인해 주세요",true);return}
+    b.disabled=true; b.textContent="보내는 중…";
+    try{
+      try{localStorage.setItem("w-bible-sb-email",em);localStorage.setItem("w-bible-login-next",JSON.stringify({u:"tongdok/",at:Date.now()}))}catch(e){}   // 메일 링크로 들어오면 통독표로 돌아오게
+      var back=SB_SITE+"tongdok2/";   // 메일 링크를 눌렀을 때 바로 통독표가 열리게
+      var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(back),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
+      if(r.status===429){setMsg("잠시 뒤에 다시 눌러 주세요 (메일은 짧은 시간에 여러 번 보낼 수 없어요)",true);return}
+      if(!r.ok){setMsg("메일을 보내지 못했어요 ("+r.status+")",true);return}
+      $("lgStep2").hidden=false; $("lgOk").hidden=false; b.textContent="메일 다시 받기"; setMsg(em+" 로 로그인 메일을 보냈어요.");
+    }catch(e){setMsg("인터넷 연결을 확인해 주세요",true)}
+    finally{b.disabled=false; if(b.textContent==="보내는 중…")b.textContent="로그인 메일 받기"}
+  });
+  $("lgOk").addEventListener("click",async function(){
+    var raw=$("lgLink").value.trim(), em=$("lgMail").value.trim(), body=null;
+    var lm=raw.match(/[?&#]token=([^&#\s]+)/), tm=raw.match(/[?&#]type=([a-z_]+)/), am=raw.match(/access_token=([^&#\s]+)/);
+    if(am){var rt=(raw.match(/refresh_token=([^&#\s]+)/)||[])[1];if(rt){await finishLogin({access_token:decodeURIComponent(am[1]),refresh_token:decodeURIComponent(rt),expires_in:3600});return}}
+    if(lm)body={type:tm?tm[1]:"magiclink",token_hash:decodeURIComponent(lm[1])};
+    else{var code=raw.replace(/\D/g,"");if(code.length<6){setMsg("메일의 로그인 링크를 복사해 붙여 넣어 주세요",true);return}body={type:"email",email:em,token:code}}
+    try{
+      var vr=await fetch(SB_URL+"/auth/v1/verify",{method:"POST",headers:sbH(),body:JSON.stringify(body)});
+      if(!vr.ok){setMsg("링크가 이미 쓰였거나 시간이 지났어요. '메일 다시 받기'로 새 링크를 받아 주세요",true);return}
+      var j=await vr.json(); setSes(j); loginDone();
+    }catch(e){setMsg("인터넷 연결을 확인해 주세요",true)}
+  });
+}
+async function finishLogin(q){
+  try{var u=await (await fetch(SB_URL+"/auth/v1/user",{headers:sbH(q.access_token)})).json();setSes({access_token:q.access_token,refresh_token:q.refresh_token,expires_in:+q.expires_in||3600,expires_at:+q.expires_at||0,user:u});loginDone()}
+  catch(e){setMsg("로그인하지 못했어요. 다시 해 주세요",true)}
+}
+function loginDone(){
+  try{localStorage.removeItem("w-bible-login-next")}catch(e){}
+  closeDlg(); hint("로그인했어요 ☁️","이제 친구 코드로 친구를 맺으면 진도가 저절로 같이 보여요");
+  cloudSync(false).then(function(){if(!cloudFriends.length)openFriends()});
+  if(myName)setProfileName(myName);
+}
+async function setProfileName(n){try{var tok=await sbToken();if(!tok)return;await fetch(SB_URL+"/rest/v1/profiles?id=eq."+sbSession().user.id,{method:"PATCH",headers:Object.assign(sbH(tok),{"Prefer":"return=minimal"}),body:JSON.stringify({name:String(n).slice(0,20)})})}catch(e){}}
+/* 👥 친구: 내 친구 코드를 알려 주고, 친구 코드를 넣어 신청·수락 (묵상 노트의 친구와 같은 것) */
+async function openFriends(){
+  if(!sbSession()){openLogin();return}
+  $("dlgTitle").textContent="👥 친구";
+  $("dlgDesc").textContent="서로 친구 코드를 주고받아 한 사람이 넣으면 신청, 다른 사람이 수락하면 친구가 돼요. 친구가 되면 진도가 저절로 같이 보여요.";
+  $("dlgBody").innerHTML='<div class="fr-box">불러오는 중…</div>';
+  $("dlgTools").innerHTML='<button class="btn wide" type="button" id="frOut">로그아웃</button><button class="btn wide" type="button" id="frCl">닫기</button>';
+  $("dlg").hidden=false;
+  $("frCl").addEventListener("click",function(){closeDlg();cloudSync(false)});
+  $("frOut").addEventListener("click",function(){
+    if(!this.dataset.sure){this.dataset.sure="1";this.textContent="한 번 더 누르면 로그아웃";return}
+    try{localStorage.removeItem(SB_SES)}catch(e){} cloudFriends=[]; saveCF(); closeDlg(); drawCloud(); hint("로그아웃했어요","체크는 이 휴대폰에 그대로 있어요");
+  });
+  drawFriends();
+}
+async function drawFriends(){
+  var box=$("dlgBody").querySelector(".fr-box"); if(!box)return;
+  try{
+    var tok=await sbToken(); if(!tok){box.textContent="다시 로그인해 주세요";return}
+    var uid=sbSession().user.id;
+    var fr=await sbGet(tok,"/rest/v1/friendships?select=requester,addressee,status");
+    var ids=fr.map(function(f){return f.requester===uid?f.addressee:f.requester});
+    var pf=await sbGet(tok,"/rest/v1/profiles?select=id,name,friend_code&id=in.("+[uid].concat(ids).join(",")+")"), pm={}; pf.forEach(function(p){pm[p.id]=p});
+    var meP=pm[uid]||{}, nm=function(id){return esc((pm[id]&&pm[id].name)||"이름 없음")};
+    var acc=fr.filter(function(f){return f.status==="accepted"}), inc=fr.filter(function(f){return f.status==="pending"&&f.addressee===uid}), out=fr.filter(function(f){return f.status==="pending"&&f.requester===uid});
+    var h='<div class="fr-me">내 친구 코드 <b class="fr-code">'+esc(meP.friend_code||"……")+'</b> <button type="button" class="cl-re" id="frCopy">복사</button></div>'
+      +'<div class="fr-name">내 이름 <input type="text" id="frNm" maxlength="20" value="'+esc(meP.name||myName||"")+'" placeholder="친구에게 보일 이름"><button type="button" class="cl-re" id="frNmSave">저장</button></div>'
+      +'<div class="fr-add"><input type="text" id="frCode" maxlength="8" placeholder="친구 코드 6자리" autocapitalize="characters"><button type="button" class="btn on" id="frReq">친구 신청</button></div>';
+    if(inc.length)h+='<div class="fr-h">받은 신청</div>'+inc.map(function(f){return '<div class="fr-row">'+nm(f.requester)+' <button type="button" class="btn on fr-acc" data-u="'+f.requester+'">수락</button></div>'}).join("");
+    if(out.length)h+='<div class="fr-h">보낸 신청 (상대가 수락하면 친구)</div>'+out.map(function(f){return '<div class="fr-row">'+nm(f.addressee)+' · 기다리는 중</div>'}).join("");
+    h+='<div class="fr-h">친구 '+acc.length+'명</div>'+(acc.length?acc.map(function(f){var o=f.requester===uid?f.addressee:f.requester;return '<div class="fr-row">👤 '+nm(o)+'</div>'}).join(""):'<div class="fr-row fr-none">아직 없어요. 친구 코드를 주고받아 보세요.</div>');
+    box.innerHTML=h;
+    $("frCopy").addEventListener("click",function(){copy(meP.friend_code||"").then(function(){setMsg("친구 코드를 복사했어요. 카톡으로 보내 주세요.")})});
+    $("frNmSave").addEventListener("click",async function(){var v=$("frNm").value.trim();if(!v)return;myName=v;save();await setProfileName(v);setMsg("이름을 저장했어요.")});
+    $("frReq").addEventListener("click",async function(){
+      var c=$("frCode").value.trim().toUpperCase(); if(c.length<4){setMsg("친구 코드를 넣어 주세요",true);return}
+      try{var r=await fetch(SB_URL+"/rest/v1/rpc/request_friend",{method:"POST",headers:sbH(await sbToken()),body:JSON.stringify({code:c})});var t=await r.json();
+        setMsg({requested:"친구 신청을 보냈어요. 친구가 수락하면 진도가 보여요.",accepted:"친구가 됐어요! 🎉",already:"이미 친구예요.",self:"내 코드예요. 친구의 코드를 넣어 주세요.",notfound:"그 코드를 찾지 못했어요.",login:"다시 로그인해 주세요."}[t]||("결과: "+t),t==="notfound"||t==="self");
+        drawFriends(); if(t==="accepted")cloudSync(false);
+      }catch(e){setMsg("인터넷 연결을 확인해 주세요",true)}
+    });
+    box.querySelectorAll(".fr-acc").forEach(function(b){b.addEventListener("click",async function(){
+      try{var tk=await sbToken();await fetch(SB_URL+"/rest/v1/friendships?requester=eq."+b.dataset.u+"&addressee=eq."+uid,{method:"PATCH",headers:Object.assign(sbH(tk),{"Prefer":"return=minimal"}),body:JSON.stringify({status:"accepted"})});setMsg("친구가 됐어요! 🎉");drawFriends();cloudSync(false)}catch(e){setMsg("인터넷 연결을 확인해 주세요",true)}
+    })});
+  }catch(e){box.textContent="친구 정보를 받지 못했어요. 인터넷 연결을 확인해 주세요."}
+}
+document.addEventListener("visibilitychange",function(){if(!document.hidden&&sbSession())cloudSync(false)});
+setInterval(function(){if(!document.hidden&&sbSession())cloudSync(false)},60000);
+
+/* ── 통독 / 필사 바꾸기 ── */
+function setMode(m,draw){
+  pMode=m==="pilsa"; me=pMode?PB:RB;
+  document.body.classList.toggle("pm",pMode);
+  document.querySelector(".bar h1").textContent=pMode?"성경 필사표":"성경 통독표";
+  $("pinTitle").textContent=pMode?"📌 쓰는 중":"📌 읽는 중";   // 필사는 쓰는 것이라 (2026-10-17 사용자 요청)
+  document.querySelectorAll('.modeseg button').forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===(pMode?"pilsa":"read")))});
+  $("modeTip").innerHTML=pMode?'보라 칸 = 필사한 장 · <i class="om om-k"></i> 노란 점 = 읽은 장':'노란 칸 = 읽은 장 · <i class="om om-k"></i> 보라 점 = 필사한 장';
+  var A=pMode?RCOL_P:RCOL_R, first=pMode?"var(--violet)":"#F2C94C";
+  $("modeTip").innerHTML+='<span class="rcl"><b><i style="background:'+first+'"></i>1회</b>'+A.slice(0,5).map(function(c,k){return '<b><i style="background:'+c+'"></i>'+(k+2)+'회</b>'}).join("")+'<b>…</b></span>';
+  try{localStorage.setItem(MODE_KEY,pMode?"pilsa":"read")}catch(e){}
+  lastOT=countRange(RB,0,OT_TOTAL);lastNT=countRange(RB,OT_TOTAL,TOTAL);
+  if(draw)renderAll();
+}
+/* ── 시작 ─────────────────────────────── */
+load();
+try{var pj2=JSON.parse(localStorage.getItem(PIL_KEY)||"null");if(pj2&&typeof pj2.b==="string"){var pa=fromB64(pj2.b);if(pa)PB=pa;pilAt=+pj2.t||0}}catch(e){}
+/* 이미 읽어 둔 만큼은 축하가 다시 뜨지 않게 기준을 맞춰 둔다 */
+lastOT=countRange(me,0,OT_TOTAL);
+lastNT=countRange(me,OT_TOTAL,TOTAL);
+/* 링크로 열렸으면 그 진도를 친구 것으로 본다 (내 체크는 건드리지 않는다) */
+if(/access_token=/.test(location.hash)){   // 메일 링크가 통독표로 바로 돌아온 경우
+  var lq={}; location.hash.replace(/^#/,"").split("&").forEach(function(kv){var a=kv.split("=");lq[decodeURIComponent(a[0])]=decodeURIComponent(a[1]||"")});
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+  if(lq.access_token&&lq.refresh_token)finishLogin(lq);
+}
+var fromLink=parseCode(location.hash);
+if(fromLink){
+  friend=fromLink.bits;friendPil=null;friendName=fromLink.name;compare=true;saveFriend();
+  try{history.replaceState(null,"",location.pathname)}catch(e){}
+}else loadFriend();
+var sm="read";try{sm=localStorage.getItem(MODE_KEY)||"read"}catch(e){}
+setMode(sm,false);
+if(sbSession()){loadCF();applyCloudFriend()}
+renderAll();
+drawCloud(); if(sbSession())cloudSync(false);
+})();
+</script>
+</body></html>
