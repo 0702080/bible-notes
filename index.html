@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-182">
+<meta name="app-build" content="2026-10-18-183">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7395,7 +7395,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     else if(act==="prog")openProg();
     else if(act==="friends")openFr();
     else return;
-    tmOpenAct="";   // 열고 나면 보통 화면과 똑같이 — 닫기나 Esc 로 닫는다
+    tmOpenAct=act;   // 커서가 다른 데로 가면 저절로 닫히게 표시해 둔다
   }
   function tmFullClose(){
     var a=tmOpenAct; tmOpenAct=""; clearTimeout(tmCloseT);
@@ -7427,11 +7427,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var to=e.relatedTarget;
       if(to&&to.closest&&to.closest(".tmchip"))return;
       clearTimeout(tmT); tmHide();
+      if(tmOpenAct){clearTimeout(tmCloseT); tmCloseT=setTimeout(tmFullClose,500)}   // 그 화면 쪽으로 가지 않으면 닫는다
     });
-    document.addEventListener("mouseover",function(e){
+    document.addEventListener("mousemove",function(e){   // 그 화면 안으로 가면 그대로, 딴 데로 가면 닫는다
       if(!tmOpenAct)return;
-      var el=tmPanel(tmOpenAct);
-      if(el&&e.target&&el.contains(e.target))tmKeep();
+      var el=tmPanel(tmOpenAct), bb=$("todayMini"), t=e.target;
+      if(el&&t&&el.contains(t)){tmKeep();return}
+      if(bb&&t&&bb.contains(t)){clearTimeout(tmCloseT);return}
+      clearTimeout(tmCloseT); tmCloseT=setTimeout(tmFullClose,500);
     },true);
     window.addEventListener("scroll",tmHide,true);
     window.addEventListener("resize",tmHide);
