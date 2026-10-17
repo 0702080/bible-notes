@@ -345,11 +345,17 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .fchips .chip{cursor:not-allowed}
 /* 마지막 줄 빈칸은 장이 아니므로 칸처럼 보이지 않게 (2026-10-11: 오바댜처럼 짧은 책에서 빈칸을 누르던 문제) */
 .chips{background:transparent;border:0;gap:0;border-radius:8px;overflow:hidden}   /* 표 네 모서리를 둥글게 (2026-10-17 사용자 요청) */
-.chips .chip{box-shadow:0 0 0 .5px var(--rule)}
+/* 마지막 줄이 덜 찬 책: 계단처럼 꺾이는 자리도 둥글게 (2026-10-17 사용자 요청) */
+.chips .chip.r-br{border-bottom-right-radius:8px}
+.chips .chip.r-tr{border-top-right-radius:8px}
+/* 칸 선: 칸마다 '안쪽 오른쪽·아래'에만 그린다. 세로줄이 모두 같은 자리에 찍혀 어긋나 보이지 않는다 (2026-10-17 사용자 요청) */
+.chips .chip{box-shadow:inset -.5px -.5px 0 0 var(--rule)}
+.chips .chip:nth-child(-n+10){box-shadow:inset -.5px -.5px 0 0 var(--rule),inset 0 .5px 0 0 var(--rule)}        /* 첫 줄 위선 */
+.chips .chip:nth-child(10n+1){box-shadow:inset -.5px -.5px 0 0 var(--rule),inset .5px 0 0 0 var(--rule)}        /* 첫 칸 왼선 */
+.chips .chip:nth-child(1){box-shadow:inset -.5px -.5px 0 0 var(--rule),inset 0 .5px 0 0 var(--rule),inset .5px 0 0 0 var(--rule)}
 .chips>span:not(.chip){background:transparent;box-shadow:none}   /* 친구 표 칸(span.chip)은 빼야 내 표와 같은 바탕색이 됨 */
 .fchips{background:transparent}
 /* 친구 표 칸 선도 내 표와 똑같이 (2026-10-15 사용자 요청: 하늘색 줄 없앰) */
-.fchips .chip{box-shadow:0 0 0 .5px var(--rule)}
 .cl-login{margin-top:2px;background:color-mix(in srgb,var(--sky) 12%,var(--sheet));border-color:color-mix(in srgb,var(--sky) 45%,var(--rule));color:var(--ink);font-weight:700}
 .lg-tip{font-size:13px;line-height:1.6;color:var(--muted);margin:10px 0 6px}
 .fr-box{font-size:14px;line-height:1.6}
@@ -714,7 +720,11 @@ function viewFriends(){
 function cmpOn(){return !!(compare&&viewFriends().length)}
 function friendChipsHTML(bi,F){
   var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips fchips" style="--fc:'+F.col+'" aria-label="'+esc(F.name)+'의 '+BOOKS[bi][0]+'">';
-  for(var c=1;c<=total;c++){var idx=base+c-1;s+='<span class="chip"'+(F.bits[idx]?' data-s="fr"':'')+(c%5===0?' data-five':'')+'>'+c+'</span>'}
+  var pad=total%10?10-total%10:0, step=(pad&&total>10)?Math.floor((total-1)/10)*10:0;   // 계단 모서리
+  for(var c=1;c<=total;c++){
+    var idx=base+c-1, rc=pad?((c===total?" r-br"+(total<=10?" r-tr":""):"")+(c===step?" r-br":"")):"";
+    s+='<span class="chip'+rc+'"'+(F.bits[idx]?' data-s="fr"':'')+(c%5===0?' data-five':'')+'>'+c+'</span>';
+  }
   for(var e=total%10?10-total%10:0;e>0;e--)s+='<span></span>';
   return s+'</div>';
 }
@@ -774,9 +784,11 @@ function progBadge(done,total,r){
 }
 function chipsHTML(bi){
   var total=BOOKS[bi][1], base=OFF[bi], s='<div class="chips">';
+  var pad=total%10?10-total%10:0, step=(pad&&total>10)?Math.floor((total-1)/10)*10:0;   // 계단 모서리
   for(var c=1;c<=total;c++){
     var idx=base+c-1, st=chipState(idx), o=(pMode?RB:PB)[idx];   // o: 다른 쪽(통독↔필사)도 했으면 작은 점
-    s+='<button class="chip" type="button" data-act="chip" data-i="'+idx+'"'
+    var rc=pad?((c===total?" r-br"+(total<=10?" r-tr":""):"")+(c===step?" r-br":"")):"";
+    s+='<button class="chip'+rc+'" type="button" data-act="chip" data-i="'+idx+'"'
       +(st?' data-s="'+st+'"':'')+(c%5===0?' data-five':'')
       +' aria-pressed="'+(!!me[idx])+'" aria-label="'+BOOKS[bi][0]+' '+c+'장'+(o?(pMode?' (읽음)':' (필사함)'):'')+'">'+c+(o?'<i class="om" aria-hidden="true"></i>':'')+'</button>';
   }
