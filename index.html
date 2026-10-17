@@ -2293,6 +2293,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dldel.sure{color:var(--pink);font-size:12px}
 .dladd{display:flex;gap:6px;margin-top:14px}
 .dlnewg{display:flex;gap:6px;margin-top:8px}
+.dltop{padding:10px max(16px,calc((100% - var(--dlw,608px)) / 2));width:100%;box-sizing:border-box;border-bottom:1px solid #222126;background:#0B0B0D}
+.dltop[hidden]{display:none}
+.dltop .dladd{margin-top:0}
+@media (max-width:420px){.dltop{padding:10px 12px}}
 .dlnewg[hidden]{display:none}
 .dlge{flex:0 0 auto;width:52px;height:40px;font-size:18px;text-align:center;padding:0 4px}
 .dlgn{flex:1;min-width:0;height:40px;font-size:14px}
@@ -6489,13 +6493,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!dl){
       dl=document.createElement("div"); dl.className="daily"; dl.setAttribute("role","dialog"); dl.setAttribute("aria-modal","true"); dl.hidden=true;
       dl.innerHTML='<div class="dlbar"><b class="dltitle">🌙 하루 돌아보기</b><button type="button" class="dledit">✏️ 항목 고치기</button><button type="button" class="dlclose">닫기</button></div>'+
+        // 고치기 때 새 항목 · 새 묶음 칸은 제목 바로 아래 고정 (2026-10-17 사용자 요청)
+        '<div class="dltop" hidden>'+
+        '<form class="dladd" autocomplete="off" hidden><select class="field dlg" aria-label="묶음"></select><input class="field dlin" maxlength="40" placeholder="새 항목 (예: 먼저 인사했는가)" aria-label="새 항목"><button type="submit" class="primary">추가</button></form>'+
+        '<form class="dlnewg" autocomplete="off" hidden><input class="field dlge" maxlength="4" placeholder="🙂" aria-label="묶음 이모지"><input class="field dlgn" maxlength="14" placeholder="새 묶음 이름 (예: 가정, 일터)" aria-label="새 묶음 이름"><button type="submit">+ 묶음</button></form>'+
+        '</div>'+
         '<div class="dlfix"><div class="dlday"><button type="button" class="dlprev" aria-label="전날">◀</button><b class="dldate"></b><button type="button" class="dlnext" aria-label="다음 날">▶</button></div>'+
         '<div class="dlprog"><span class="dlcnt"></span><span class="dlbarw"><i></i></span></div></div>'+
         '<div class="dlbody"><div class="dlweek" aria-label="최근 7일"></div>'+
         '<div class="dlsearch"><input class="dlsin" type="search" placeholder="찾기 — 묶음 이름 · 항목 · 적어 둔 기록 (초성도 돼요)" aria-label="하루 돌아보기에서 찾기"><span class="dlsn"></span><button type="button" class="dlsx" hidden>지우기</button></div>'+
         '<div class="dllist"></div>'+
-        '<form class="dladd" autocomplete="off" hidden><select class="field dlg" aria-label="묶음"></select><input class="field dlin" maxlength="40" placeholder="새 항목 (예: 먼저 인사했는가)" aria-label="새 항목"><button type="submit" class="primary">추가</button></form>'+
-        '<form class="dlnewg" autocomplete="off" hidden><input class="field dlge" maxlength="4" placeholder="🙂" aria-label="묶음 이모지"><input class="field dlgn" maxlength="14" placeholder="새 묶음 이름 (예: 가정, 일터)" aria-label="새 묶음 이름"><button type="submit">+ 묶음</button></form>'+
         '</div>';
       document.body.appendChild(dl);
       dl.querySelector(".dlnewg").addEventListener("submit",function(e){
@@ -6505,7 +6512,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var em=(Array.from(ei.value.trim())[0]||"")||"📌", id="u"+Date.now().toString(36);
         o.groups.push({g:id,e:em,t:t.slice(0,14),c:DAILY_GCOL[o.groups.length%DAILY_GCOL.length]}); saveDaily(o);
         ni.value=""; ei.value=""; dlPickG=id; drawDaily(); toast("'"+t+"' 묶음을 만들었어요. 아래 칸에서 항목을 넣어 주세요");
-        var inp=dl.querySelector(".dlin"); setTimeout(function(){inp.scrollIntoView({block:"center"});inp.focus()},60);
+        var inp=dl.querySelector(".dlin"); setTimeout(function(){inp.focus()},60);
       });
       (function(){   // 찾기 칸 (2026-10-17 사용자 요청)
         var si=dl.querySelector(".dlsin"), t=null;
@@ -6932,7 +6939,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(sn)sn.textContent=fq?(fcount?fcount+"개":"없어요"):"";
     if(sx)sx.hidden=!fq;
     if(fq&&!fcount){var nh=document.createElement("p");nh.className="dlnohit";nh.textContent="“"+fq+"”이(가) 든 묶음·항목·기록이 없어요.";outer.appendChild(nh)}
-    dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit;
+    dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit; dl.querySelector(".dltop").hidden=!dlEdit;
     var eb=dl.querySelector(".dledit"); eb.textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기"; eb.classList.toggle("on",dlEdit);
   }
 
