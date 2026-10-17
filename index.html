@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-188">
+<meta name="app-build" content="2026-10-18-191">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1776,8 +1776,7 @@ button:active{filter:brightness(1.15)}
 .ccedit{flex:0 0 auto;width:34px;height:34px;border:1px solid var(--rule);border-radius:17px;background:transparent;color:var(--muted);font-size:14px;line-height:1}
 .ccedit[hidden]{display:none}
 @media (hover:hover){.ccedit:hover{color:var(--ink);background:#22212A}}
-.ccedta{width:100%;max-width:640px;box-sizing:border-box;min-height:220px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--gold) 35%,#2E2D33);border-radius:14px;background:#101013;color:var(--ink);font-family:var(--serif);font-size:19px;line-height:2;resize:vertical}
-.ccedta:focus{outline:none;border-color:var(--gold)}
+.ccverse.ccediting{white-space:pre-wrap;outline:none;cursor:text;caret-color:var(--gold);color:var(--hi);min-width:280px}
 .ccverse{font-family:var(--serif);font-size:21px;line-height:2;color:var(--orange);word-break:keep-all}
 /* 받아쓰기 (2026-10-18 사용자 요청) */
 .ccdict{display:flex;flex-direction:column;gap:10px;width:100%}
@@ -1827,8 +1826,7 @@ button:active{filter:brightness(1.15)}
 .ccw.hid b{font-weight:700;color:var(--hi)}
 .ccw.hid.peek{color:var(--hi);background:color-mix(in srgb,var(--bc) 24%,transparent);letter-spacing:0;animation:bwflip .42s cubic-bezier(.2,1.5,.4,1)}
 .ccw.enter{animation:bwenter .38s cubic-bezier(.2,1.4,.4,1) both;animation-delay:var(--d,0s)}
-.ccverse.recall .ccw.hid{animation:bwenter .38s cubic-bezier(.2,1.4,.4,1) both,ccbreath 2.6s ease-in-out infinite;animation-delay:var(--d,0s),calc(var(--d,0s) + .4s)}
-@keyframes ccbreath{0%,100%{transform:none;opacity:1}50%{transform:translateY(-3px);opacity:.7}}
+.ccverse.recall .ccw.hid{animation:bwenter .38s cubic-bezier(.2,1.4,.4,1) both;animation-delay:var(--d,0s)}   /* 구슬이 둥실거리지 않게 (2026-10-18 사용자 요청) */
 .ccw.got{color:var(--bc);font-weight:600}
 .ccw.flip{animation:bwflip .42s cubic-bezier(.2,1.5,.4,1)}
 .ccres{animation:bqres .5s cubic-bezier(.2,1.5,.4,1)}
@@ -2935,7 +2933,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   var kbDrag=null;
   function boardOpen(id){   // 보드에서 카드를 누르면: 그 말씀 하나만 크게 펼쳐 보여 준다 (2026-10-17 사용자 요청)
-    boardOn=false; try{localStorage.setItem("bible-view","list")}catch(e){} applyBoard();
+    boardOn=false; applyBoard();   // 보기 방식 설정은 그대로 둔다 (다음에 열면 다시 칸반)
     setTopics([]); openIds.clear(); openIds.add(id); try{localStorage.setItem("bible-last-open",id)}catch(e){}
     var f=$("filter"); if(f&&f.value){f.value="";filterText=""}
     soloId=id; soloFrom="board"; spotId=id; render(); window.scrollTo(0,0);
@@ -3190,7 +3188,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function openNoteFocus(id,tab){   // 찾은 기도·실천을 그 말씀 카드에서 바로 보여 준다
     if(!notes.has(id))return;
     setTopics([]);
-    if(boardOn){boardOn=false;try{localStorage.setItem("bible-view","list")}catch(e){}applyBoard();soloId=id;soloFrom="board"}
+    if(boardOn){boardOn=false;applyBoard();soloId=id;soloFrom="board"}   // 설정은 칸반 그대로
     if(tab)tabOf.set(id,tab);
     openIds.clear(); openIds.add(id); try{localStorage.setItem("bible-last-open",id)}catch(e){}
     spotId=id; render();
@@ -5271,7 +5269,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.dataset.act==="rvall"){openRecall();return}
     var id=b.dataset.id, act=b.dataset.act||"mem"; if(!id)return; setTopics([]);
     if(boardOn){   // 칸반에서 눌렀으면: 그 말씀 하나만 펼치고, '전체 보기'로 칸반에 바로 돌아가게 (2026-10-17 사용자 요청)
-      boardOn=false; try{localStorage.setItem("bible-view","list")}catch(err){} applyBoard();
+      boardOn=false; applyBoard();   // 설정은 칸반 그대로
       soloId=id; soloFrom="board";
     }
     if(act==="mem")memOpen.add(id);
@@ -6489,12 +6487,23 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     btn("다시 써 보기","dretry");
     btn("😅 잘 모르겠어요","g0"); btn("🤔 조금 틀렸어요","g1"); btn("😊 다 기억났어요","g2",true);
   }
-  function ccEditForm(n,tip,btn){   // 문장(줄 나눔) 고치기 — 2026-10-18 사용자 요청
-    var v=ccBox.querySelector(".ccverse"); v.textContent=""; v.classList.remove("big","recall","vnum","vlines");
-    tip.innerHTML="<b>✏️ 문장 고치기</b><br>줄을 나눈 대로 외우기 화면에 그대로 나와요.";
-    var ta=document.createElement("textarea"); ta.className="ccedta"; ta.value=String(n.text||"");
-    ta.setAttribute("aria-label","말씀 본문 고치기"); v.appendChild(ta);
-    setTimeout(function(){try{ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}catch(e){}},30);
+  function ccEditForm(n,tip,btn){   // 상자 없이 말씀 자리에서 그대로 고친다 (2026-10-18 사용자 요청)
+    var v=ccBox.querySelector(".ccverse");
+    v.textContent=""; v.classList.remove("big","recall","vnum","vlines");
+    tip.innerHTML="<b>✏️ 문장 고치기</b><br>엔터로 줄을 나누면 그대로 외우기 화면에 나와요.";
+    v.classList.add("ccediting");
+    v.setAttribute("contenteditable","plaintext-only");
+    if(v.contentEditable!=="plaintext-only")v.setAttribute("contenteditable","true");
+    v.setAttribute("spellcheck","false");
+    v.setAttribute("aria-label","말씀 본문 고치기");
+    v.textContent=String(n.text||"");
+    setTimeout(function(){
+      try{
+        v.focus();
+        var r=document.createRange(); r.selectNodeContents(v); r.collapse(false);
+        var sel=window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      }catch(e){}
+    },30);
     btn("취소","ecancel"); btn("저장 ✓","esave",true);
   }
   function ccMeter(tip,on,just,icon){   // 이 단계에서 얼마나 했는지 불 켜지는 구슬 3개
@@ -6517,7 +6526,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     function btn(t,a,main){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(main?" main":"");b.dataset.a=a;b.textContent=t;ft.appendChild(b);return b}
     var anim=C.anim; C.anim=false;
     ccBox.querySelector(".ccedit").hidden=!!C.edit;
-    if(C.edit){ccBox.querySelector(".ccverse").classList.remove("big");ccEditForm(n,tip,btn);return}
+    var vEl=ccBox.querySelector(".ccverse");
+    if(!C.edit){vEl.removeAttribute("contenteditable");vEl.removeAttribute("spellcheck");vEl.classList.remove("ccediting")}
+    if(C.edit){vEl.classList.remove("big");ccEditForm(n,tip,btn);return}
     ccBox.querySelector(".ccverse").classList.toggle("big",C.stage<4);
     if(C.stage===0){
       tip.innerHTML="<b>1단계 · 소리 내어 읽기</b><br>천천히, 뜻을 생각하며 소리 내어 3번 읽어요.";
@@ -6561,7 +6572,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(a==="eopen"){C.edit=true;C.dict=null;ccDraw();return}
     if(a==="ecancel"){C.edit=false;ccDraw();return}
     if(a==="esave"){
-      var eta=ccBox.querySelector(".ccedta"), nv=eta?String(eta.value).replace(/[ \t]+$/gm,""):"";
+      var vEd=ccBox.querySelector(".ccverse");
+      var nv=vEd?String(vEd.innerText||"").split(String.fromCharCode(160)).join(" ").split(String.fromCharCode(13)).join("").split(String.fromCharCode(10)).map(function(x){return x.replace(/\s+$/,"")}).join(String.fromCharCode(10)):"";
       if(nv.trim()&&nv!==n.text){
         n.text=nv; if(typeof focusMode!=="undefined")focusMode.delete(n.id);
         scheduleSave(n.id); render(); toast("말씀을 고쳤어요");
