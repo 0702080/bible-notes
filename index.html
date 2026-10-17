@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-179">
+<meta name="app-build" content="2026-10-18-180">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2236,6 +2236,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlitem.dlflash .dlrow{animation:dlflash 1.4s ease-out}
 @keyframes dlflash{0%{box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 60%,transparent)}100%{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){.dlitem.dlflash .dlrow{animation:none}}
+/* 한 주 돌아보기 한 장 (2026-10-18 사용자 요청) */
+.wkcard{max-width:620px;margin:0 auto}
+.wkhd{text-align:center;margin:6px 0 18px}
+.wkhd b{display:block;font-size:22px;color:var(--gold)}
+.wkhd span{display:block;margin-top:4px;font-size:13px;color:var(--muted)}
+.wkgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.wktile{position:relative;padding:14px 16px;border:1px solid #232229;border-radius:16px;background:color-mix(in srgb,var(--wc,var(--muted)) 7%,#131317)}
+.wktile.g{--wc:var(--green)} .wktile.v{--wc:var(--violet)} .wktile.o{--wc:var(--orange)}
+.wktile.s{--wc:var(--sky)} .wktile.p{--wc:var(--pink)} .wktile.b{--wc:var(--blue)}
+.wktile i{font-style:normal;font-size:20px}
+.wktile b{display:block;margin-top:2px;font-size:30px;font-weight:700;color:var(--wc,var(--ink));font-variant-numeric:tabular-nums}
+.wktile span{display:block;font-size:13px;color:var(--muted)}
+.wktile em{display:block;margin-top:2px;font-style:normal;font-size:11.5px;color:var(--faint)}
+.wkdays{display:flex;justify-content:space-between;gap:6px;margin:18px 0 10px}
+.wkday{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.wkday i{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:700;color:#141416;background:color-mix(in srgb,var(--gold) calc(var(--f) * 100%),#1c1b21)}
+.wkday b{font-size:11px;font-weight:500;color:var(--faint)}
+.wktip{margin:14px 0 0;text-align:center;font-size:13.5px;color:var(--muted);line-height:1.7}
+.wkshot{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 50%,#34333A)}
 .dlbar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px max(16px,calc((100% - var(--dlw,608px)) / 2));width:100%;box-sizing:border-box;border-bottom:1px solid #222126}
 .dltitle{font-size:18px;color:var(--gold)}
 .dlclose{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--ink);font-size:14.5px}
@@ -5170,6 +5189,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.dataset.act==="daily"){openDaily();return}
     if(b.dataset.act==="prog"){openProg();return}
     if(b.dataset.act==="medprog"){openMedProgress();return}
+    if(b.dataset.act==="week"){openWeek();return}
     if(b.dataset.act==="friends"){openFr();return}
     if(b.dataset.act==="sync"){if(ghCfg())ghSync("manual");else openGh();return}
     if(b.dataset.act==="sbsync"){sbSync("manual");return}
@@ -7280,6 +7300,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         title:fin?"친구 신청 "+fin+"개 — 확인하기":fct?"친구 "+fct+"명":"친구 맺기"});
     }
     // 📊 실천 진도표
+    chip({icon:"📅",act:"week",title:"한 주 돌아보기 — 이번 주에 걸어온 길"});
     if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))chip({icon:"📊",act:"prog",title:"실천 진도표 전체 보기"});
   }
   function renderReviewBar(){
@@ -7317,6 +7338,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       rows.push({icon:"👥",info:1,label:"친구",tag:fin?"신청 "+fin+"개 💌":fct?fct+"명":"",chips:[{id:"",t:fin?"확인하기":fct?"친구 보기":"친구 맺기",act:"friends"}]})}
     var dd=dailyData(), dc=dailyChecked(dd,dkey(Date.now())).length, dt=dd.items.length;
     rows.push({icon:"🌙",label:"하루 돌아보기",big:{dc:dc,dt:dt},chips:[],done:dt>0&&dc===dt});
+    rows.push({icon:"📅",info:1,label:"한 주 돌아보기",chips:[{id:"",t:"이번 주 보기",act:"week"}]});
     if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))rows.push({icon:"📊",info:1,label:"실천 진도표",chips:[{id:"",t:"전체 보기",act:"prog"}]});
     bar.hidden=!rows.length;
     if(!rows.length)return;
@@ -7608,6 +7630,123 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function medChipText(){
     var st=medStats();
     return st.streak>=2?"🔥 "+st.streak+"일 연속":"🕊️ 묵상 진도표";
+  }
+  /* ---------- 한 주 돌아보기 한 장 (2026-10-18 사용자 요청) ---------- */
+  function weekStats(){
+    var t0=new Date(); t0.setHours(0,0,0,0);
+    var from=t0.getTime()-6*864e5, days=[], i;
+    for(i=0;i<7;i++)days.push(dkey(from+i*864e5));
+    var o=dailyData(), dchk=0, dtot=o.items.length*7, memoN=0;
+    days.forEach(function(k){
+      dchk+=dailyChecked(o,k).length;
+      var m=(o.memo||{})[k];
+      if(m)Object.keys(m).forEach(function(x){if(String(m[x]||"").trim())memoN++});
+    });
+    var med=0, mem={}, pray=0, ansd=0, act=0, logs=0, added=0;
+    notes.forEach(function(n){
+      (n.meds||[]).forEach(function(m){if(String(m.text||"").trim()&&+m.at>=from)med++});
+      ((n.mem&&n.mem.s)||[]).forEach(function(t){if(t&&t>=from)mem[n.id]=1});
+      (n.drill||[]).forEach(function(d){if(+d.at>=from)mem[n.id]=1});
+      (n.prays||[]).forEach(function(pp){if(+pp.at>=from)pray++; if(pp.ans&&+pp.ans>=from)ansd++});
+      (n.acts||[]).forEach(function(a){
+        (a.stamps||[]).forEach(function(d){if(days.indexOf(d)>=0)act++});
+        (a.logs||[]).forEach(function(l){if(+l.at>=from)logs++});
+      });
+      if(+n.createdAt>=from)added++;
+    });
+    return {days:days,from:days[0],to:days[6],dchk:dchk,dtot:dtot,memo:memoN,med:med,
+            mem:Object.keys(mem).length,pray:pray,ans:ansd,act:act,logs:logs,added:added,o:o};
+  }
+  function weekLabel(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()}
+  var wk=null;
+  function closeWeek(){if(!wk)return; wk.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
+  function openWeek(){
+    var st=weekStats();
+    if(!wk){
+      wk=document.createElement("div"); wk.className="daily wksheet"; wk.setAttribute("role","dialog"); wk.setAttribute("aria-modal","true"); wk.hidden=true;
+      wk.innerHTML='<div class="dlbar"><b class="dltitle">📅 한 주 돌아보기</b><button type="button" class="dlclose wkshot">🖼️ 사진으로 저장</button><button type="button" class="dlclose wkclose">닫기</button></div>'+
+        '<div class="dlbody"><div class="wkcard"></div></div>';
+      document.body.appendChild(wk);
+      wk.querySelector(".wkclose").addEventListener("click",closeWeek);
+      wk.querySelector(".wkshot").addEventListener("click",function(){weekShot(weekStats())});
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&wk&&!wk.hidden)closeWeek()});
+    }
+    var c=wk.querySelector(".wkcard"); c.textContent="";
+    var hd=document.createElement("div"); hd.className="wkhd";
+    hd.innerHTML='<b></b><span></span>';
+    hd.querySelector("b").textContent=weekLabel(st.from)+" ~ "+weekLabel(st.to);
+    hd.querySelector("span").textContent="이번 한 주, 이렇게 걸어왔어요";
+    c.appendChild(hd);
+    var grid=document.createElement("div"); grid.className="wkgrid";
+    function tile(icon,n,label,sub,cls){
+      var d=document.createElement("div"); d.className="wktile"+(cls?" "+cls:"");
+      d.innerHTML='<i></i><b></b><span></span><em></em>';
+      d.querySelector("i").textContent=icon; d.querySelector("b").textContent=n;
+      d.querySelector("span").textContent=label; d.querySelector("em").textContent=sub||"";
+      grid.appendChild(d);
+    }
+    var pc=st.dtot?Math.round(st.dchk/st.dtot*100):0;
+    tile("🌙",st.dchk,"하루 돌아보기",pc+"% 채움","g");
+    tile("✍️",st.med,"적은 묵상",st.memo?"기록 "+st.memo+"개":"","v");
+    tile("🧠",st.mem,"외운 말씀","이번 주에 연습","o");
+    tile("✅",st.act,"실천 체크",st.logs?"한 줄 "+st.logs+"개":"","s");
+    tile("🙏",st.pray,"새 기도",st.ans?"응답 "+st.ans+"개 🎉":"","p");
+    tile("📖",st.added,"담은 말씀","","b");
+    c.appendChild(grid);
+    var wkl=document.createElement("div"); wkl.className="wkdays";
+    st.days.forEach(function(k){
+      var cnt=dailyChecked(st.o,k).length, tot=st.o.items.length;
+      var d=document.createElement("div"); d.className="wkday";
+      d.innerHTML='<i></i><b></b>';
+      d.querySelector("i").style.setProperty("--f",tot?(cnt/tot):0);
+      d.querySelector("i").textContent=cnt||"";
+      d.querySelector("b").textContent="일월화수목금토".charAt(new Date(k+"T12:00:00").getDay());
+      d.title=weekLabel(k)+" "+cnt+"/"+tot;
+      wkl.appendChild(d);
+    });
+    c.appendChild(wkl);
+    var tip=document.createElement("p"); tip.className="wktip";
+    tip.textContent=(st.dchk+st.med+st.mem+st.act)?"작은 걸음이 쌓여 길이 됩니다. 이번 주도 수고하셨어요 🙌":"이번 주는 쉬어 갔네요. 오늘 한 가지부터 다시 시작해 보세요 🙂";
+    c.appendChild(tip);
+    wk.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+  }
+  function weekShot(st){
+    try{
+      var W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;
+      var g=cv.getContext("2d"), F='"Binggrae","Noto Sans KR",system-ui,sans-serif';
+      g.fillStyle="#0D0D0F"; g.fillRect(0,0,W,H);
+      g.fillStyle="#E3BE72"; g.font="700 46px "+F; g.textAlign="center";
+      g.fillText("한 주 돌아보기",W/2,130);
+      g.fillStyle="#A09A91"; g.font="400 32px "+F;
+      g.fillText(weekLabel(st.from)+" ~ "+weekLabel(st.to),W/2,185);
+      var pc=st.dtot?Math.round(st.dchk/st.dtot*100):0;
+      var rows=[["🌙","하루 돌아보기",st.dchk+" 번",pc+"%","#6FD09A"],
+                ["✍️","적은 묵상",st.med+" 편",st.memo?"기록 "+st.memo:"","#B79CF2"],
+                ["🧠","외운 말씀",st.mem+" 편","","#F4A45E"],
+                ["✅","실천 체크",st.act+" 번",st.logs?"한 줄 "+st.logs:"","#6ECBF4"],
+                ["🙏","새 기도",st.pray+" 개",st.ans?"응답 "+st.ans:"","#F48FB6"],
+                ["📖","담은 말씀",st.added+" 편","","#8FAAFF"]];
+      var y=265;
+      rows.forEach(function(r){
+        g.fillStyle="#17171B"; g.beginPath();
+        if(g.roundRect)g.roundRect(70,y,W-140,140,24); else g.rect(70,y,W-140,140);
+        g.fill();
+        g.textAlign="left"; g.font="400 50px "+F; g.fillStyle="#EEEAE2"; g.fillText(r[0],112,y+92);
+        g.font="500 34px "+F; g.fillStyle="#A09A91"; g.fillText(r[1],190,y+85);
+        g.textAlign="right"; g.font="700 54px "+F; g.fillStyle=r[4]; g.fillText(r[2],W-112,y+88);
+        if(r[3]){g.font="400 26px "+F; g.fillStyle="#6E6A63"; g.fillText(r[3],W-112,y+124)}
+        y+=160;
+      });
+      g.textAlign="center"; g.font="400 28px "+F; g.fillStyle="#6E6A63";
+      g.fillText("말씀 묵상 노트",W/2,H-60);
+      cv.toBlob(function(b){
+        if(!b){toast("사진으로 저장할 수 없어요");return}
+        var a=document.createElement("a"); a.href=URL.createObjectURL(b);
+        a.download="한주돌아보기_"+st.to+".png"; document.body.appendChild(a); a.click();
+        setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},2000);
+        toast("사진으로 저장했어요 🖼️");
+      },"image/png");
+    }catch(e){toast("사진으로 저장할 수 없어요")}
   }
   function openMedProgress(){
     ts.mode="medprog"; openTS("묵상 진도표"); drawMedProgress();
