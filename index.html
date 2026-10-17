@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-193">
+<meta name="app-build" content="2026-10-18-195">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2253,6 +2253,26 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlitem.dlflash .dlrow{animation:dlflash 1.4s ease-out}
 @keyframes dlflash{0%{box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 60%,transparent)}100%{box-shadow:none}}
 @media (prefers-reduced-motion:reduce){.dlitem.dlflash .dlrow{animation:none}}
+/* 묵상 질문 (2026-10-18 사용자 요청) */
+.mqbox{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.mqnote{flex:0 1 240px;min-width:0;height:34px;font-size:13px}
+.mqverse{padding:14px 16px;border:1px solid color-mix(in srgb,var(--violet) 32%,#232229);border-radius:14px;background:color-mix(in srgb,var(--violet) 7%,#131317)}
+.mqverse b{display:block;font-size:14px;color:var(--violet)}
+.mqverse p{margin:6px 0 8px;font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--ink);word-break:keep-all}
+.mqopen{height:28px;padding:0 12px;border:1px solid #34333A;border-radius:14px;background:transparent;color:var(--muted);font:inherit;font-size:12px}
+.mqitem{padding:12px 14px;border:1px solid #232229;border-radius:14px;background:#121216}
+.mqq{display:flex;align-items:baseline;gap:8px;margin-bottom:8px;font-size:14px;color:var(--ink);word-break:keep-all}
+.mqq i{flex:0 0 auto;width:20px;height:20px;border-radius:10px;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);font-style:normal;font-size:11.5px;font-weight:700;display:grid;place-items:center}
+.mqsaved{margin-left:auto;flex:0 0 auto;font-size:11px;color:var(--faint)}
+.mqa{width:100%;box-sizing:border-box;min-height:60px;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.7;resize:none;overflow:hidden}
+.mqa:focus{outline:none;border-color:var(--gold)}
+.mqa::placeholder{color:var(--faint)}
+.mqqs{width:100%;box-sizing:border-box;min-height:220px;padding:12px 14px;border:1px solid #2A2930;border-radius:12px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.9;resize:vertical}
+.mqhint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.mqfoot{display:flex;align-items:center;gap:10px;margin:4px 0 10px}
+.mqcnt{font-size:12.5px;color:var(--faint)}
+.mqtomed{margin-left:auto;height:38px;padding:0 16px;border:0;border-radius:19px;background:var(--gold);color:#141416;font-size:13.5px;font-weight:700}
+.mqedit.on{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,#34333A);background:color-mix(in srgb,var(--gold) 12%,transparent)}
 /* 믿음의 한 마디 (2026-10-18 사용자 요청) */
 .saytoday{display:block;width:100%;margin:2px 0 8px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--gold) 32%,#232229);border-radius:14px;background:color-mix(in srgb,var(--gold) 8%,transparent);color:var(--ink);font:inherit;text-align:left}
 .saytoday .sayq1{display:block;font-family:var(--serif);font-size:15px;line-height:1.7;color:color-mix(in srgb,var(--gold) 35%,var(--ink));word-break:keep-all}
@@ -5257,6 +5277,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.dataset.act==="prog"){openProg();return}
     if(b.dataset.act==="medprog"){openMedProgress();return}
     if(b.dataset.act==="week"){openWeek();return}
+    if(b.dataset.act==="medq"){openMedq();return}
     if(b.dataset.act==="say"){openSay();return}
     if(b.dataset.act==="friends"){openFr();return}
     if(b.dataset.act==="sync"){if(ghCfg())ghSync("manual");else openGh();return}
@@ -7499,10 +7520,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     el.style.left=Math.round(x)+"px"; el.style.top=Math.round(y)+"px";
   }
   // 커서만 올려도 그 화면이 바로 열린다. 보기만 하는 화면에만 (맞추기·로그인처럼 무언가를 바꾸는 것은 제외)
-  var TM_FULL={daily:1,week:1,medprog:1,prog:1,friends:1};
+  var TM_FULL={daily:1,week:1,medprog:1,prog:1,friends:1,medq:1};
   var tmOpenAct="", tmCloseT=null;
   function tmPanel(act){
-    if(act==="daily")return document.querySelector(".daily:not(.wksheet)");
+    if(act==="medq")return document.querySelector(".medqsheet");
+    if(act==="daily")return document.querySelector(".daily:not(.wksheet):not(.medqsheet):not(.saysheet)");
     if(act==="week")return document.querySelector(".wksheet");
     if(act==="medprog"||act==="prog")return document.querySelector("#topicSheet .sheetpanel");
     if(act==="friends")return document.querySelector(".frsheet .ghbox");
@@ -7511,6 +7533,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function tmFullOpen(act){
     tmHide();
     if(act==="daily")openDaily();
+    else if(act==="medq")openMedq();
     else if(act==="week")openWeek();
     else if(act==="medprog")openMedProgress();
     else if(act==="prog")openProg();
@@ -7522,6 +7545,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var a=tmOpenAct; tmOpenAct=""; clearTimeout(tmCloseT);
     if(!a)return;
     if(a==="daily")closeDaily();
+    else if(a==="medq")closeMedq();
     else if(a==="week")closeWeek();
     else if(a==="medprog"||a==="prog")closeTS();
     else if(a==="friends")closeFr();
@@ -7610,6 +7634,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         title:fin?"친구 신청 "+fin+"개 — 확인하기":fct?"친구 "+fct+"명":"친구 맺기"});
     }
     // 📊 실천 진도표
+    chip({icon:"📝",act:"medq",cls:"main",title:"묵상 질문 — 질문에 답을 적어 보세요"});
     chip({icon:"📅",act:"week",title:"한 주 돌아보기 — 이번 주에 걸어온 길"});
     if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))chip({icon:"📊",act:"prog",title:"실천 진도표 전체 보기"});
   }
@@ -7751,6 +7776,152 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     if(act==="note"){closeSay();openNoteFocus(b.dataset.note);return}
   }
+  /* ---------- 묵상 질문: 질문에 답을 적어 보는 화면 (2026-10-18 사용자 요청) ---------- */
+  var MEDQ_KEY="bible-medq";
+  var MEDQ_DEF=[
+    "이 말씀에서 하나님은 어떤 분이신가요?",
+    "이 말씀이 보여 주는 나는 어떤 사람인가요?",
+    "오늘 내게 주시는 약속이나 명령은 무엇인가요?",
+    "버릴 것이나 회개할 것이 있나요?",
+    "오늘 하루 어떻게 살아 낼까요? (한 가지)",
+    "이 말씀으로 어떻게 기도할까요?"
+  ];
+  function medqData(){
+    var o=null; try{o=JSON.parse(localStorage.getItem(MEDQ_KEY)||"null")}catch(e){}
+    if(!o||typeof o!=="object")o={};
+    if(!Array.isArray(o.q)||!o.q.length)o.q=MEDQ_DEF.slice();
+    if(!o.days||typeof o.days!=="object")o.days={};
+    return o;
+  }
+  function saveMedq(o){
+    try{localStorage.setItem(MEDQ_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")}
+    if(typeof sbMark==="function")sbMark("__medq");
+  }
+  function medqMerge(inc){   // 다른 기기 것 받기: 비어 있는 칸만 채운다
+    if(!inc||typeof inc!=="object")return;
+    var o=medqData();
+    if(Array.isArray(inc.q)&&inc.q.length&&JSON.stringify(o.q)===JSON.stringify(MEDQ_DEF))o.q=inc.q.slice();
+    Object.keys(inc.days||{}).forEach(function(d){
+      var mine=o.days[d], his=inc.days[d]; if(!his)return;
+      if(!mine){o.days[d]=his;return}
+      if(!mine.note&&his.note)mine.note=his.note;
+      Object.keys(his.v||{}).forEach(function(k){
+        if(!String((mine.v||{})[k]||"").trim()&&String(his.v[k]||"").trim()){mine.v=mine.v||{};mine.v[k]=his.v[k]}
+      });
+    });
+    try{localStorage.setItem(MEDQ_KEY,JSON.stringify(o))}catch(e){}
+    if(mq&&!mq.hidden)drawMedq();
+  }
+  var mq=null, mqDay="", mqEditQ=false;
+  function closeMedq(){if(!mq)return; mq.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; render()}
+  function openMedq(){
+    if(!mq){
+      mq=document.createElement("div"); mq.className="daily medqsheet"; mq.setAttribute("role","dialog"); mq.setAttribute("aria-modal","true"); mq.hidden=true;
+      mq.innerHTML='<div class="dlbar"><b class="dltitle">📝 묵상 질문</b><button type="button" class="dlclose mqedit">질문 고치기</button><button type="button" class="dlclose mqclose">닫기</button></div>'+
+        '<div class="dlfix"><div class="dlday"><button type="button" class="dlprev mqprev" aria-label="전날">◀</button><b class="dldate mqdate"></b><button type="button" class="dlnext mqnext" aria-label="다음 날">▶</button></div>'+
+        '<select class="field mqnote" aria-label="오늘 묵상할 말씀"></select></div>'+
+        '<div class="dlbody"><div class="mqbox"></div></div>';
+      document.body.appendChild(mq);
+      mq.querySelector(".mqclose").addEventListener("click",closeMedq);
+      mq.querySelector(".mqedit").addEventListener("click",function(){mqEditQ=!mqEditQ;drawMedq()});
+      mq.querySelector(".mqprev").addEventListener("click",function(){mqDay=dkey(new Date(mqDay+"T12:00:00").getTime()-864e5);drawMedq()});
+      mq.querySelector(".mqnext").addEventListener("click",function(){var t=dkey(Date.now());if(mqDay<t){mqDay=dkey(new Date(mqDay+"T12:00:00").getTime()+864e5);drawMedq()}});
+      mq.querySelector(".mqnote").addEventListener("change",function(e){
+        var o=medqData(); o.days[mqDay]=o.days[mqDay]||{v:{}}; o.days[mqDay].note=e.target.value; saveMedq(o); drawMedq();
+      });
+      mq.querySelector(".mqbox").addEventListener("input",function(e){
+        var t=e.target;
+        if(t.classList.contains("mqa")){
+          var o=medqData(); o.days[mqDay]=o.days[mqDay]||{v:{}}; o.days[mqDay].v=o.days[mqDay].v||{};
+          o.days[mqDay].v[t.dataset.i]=t.value; saveMedq(o);
+          var tip=t.parentNode.querySelector(".mqsaved");
+          if(tip){tip.textContent="저장됨"; clearTimeout(tip._t); tip._t=setTimeout(function(){tip.textContent=""},1400)}
+          var cEl=mq.querySelector(".mqcnt");   // 답한 개수를 바로 고쳐 준다
+          if(cEl){
+            var tot=mq.querySelectorAll(".mqa").length, dn=0;
+            Array.prototype.forEach.call(mq.querySelectorAll(".mqa"),function(x){if(String(x.value||"").trim())dn++});
+            cEl.textContent=dn+" / "+tot+" 답했어요";
+          }
+          grow(t);
+        }else if(t.classList.contains("mqqs")){
+          var o2=medqData(); o2.q=t.value.split("\n").map(function(x){return x.trim()}).filter(Boolean); if(!o2.q.length)o2.q=MEDQ_DEF.slice(); saveMedq(o2);
+        }
+      });
+      mq.querySelector(".mqbox").addEventListener("click",function(e){
+        var b=e.target.closest("button"); if(!b)return;
+        if(b.classList.contains("mqtomed"))medqToMed();
+        else if(b.classList.contains("mqopen")){var nid=b.dataset.note; closeMedq(); openNoteFocus(nid,"m")}
+      });
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&mq&&!mq.hidden&&!(e.target&&e.target.closest&&e.target.closest("textarea,input,select")))closeMedq()});
+    }
+    mqDay=dkey(Date.now()); mqEditQ=false;
+    mq.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+    drawMedq();
+  }
+  function medqPick(){   // 오늘 묵상할 말씀 고르기 (정해 둔 게 없으면 알아서)
+    var o=medqData(), d=o.days[mqDay];
+    if(d&&d.note&&notes.has(d.note))return d.note;
+    var all=sorted(), lastN=null, lastAt=0;
+    all.forEach(function(n){(n.meds||[]).forEach(function(m){if(String(m.text||"").trim()&&(+m.at||0)>lastAt){lastAt=+m.at;lastN=n}})});
+    var t=notes.get(lastOpenId())||lastN||all[0];
+    return t?t.id:"";
+  }
+  function drawMedq(){
+    if(!mq)return;
+    var o=medqData(), today=dkey(Date.now());
+    mq.querySelector(".mqdate").textContent=(mqDay===today?"오늘 ":mqDay===dkey(Date.now()-864e5)?"어제 ":"")+dayName(mqDay);
+    mq.querySelector(".mqnext").disabled=mqDay>=today;
+    var sel=mq.querySelector(".mqnote"), nid=medqPick();
+    sel.textContent="";
+    var o0=document.createElement("option"); o0.value=""; o0.textContent="📖 말씀 고르기"; sel.appendChild(o0);
+    sorted().forEach(function(nn){var op=document.createElement("option");op.value=nn.id;op.textContent=nn.ref||"구절 미입력";sel.appendChild(op)});
+    sel.value=nid||"";
+    var box=mq.querySelector(".mqbox"); box.textContent="";
+    var eb=mq.querySelector(".mqedit"); eb.textContent=mqEditQ?"고치기 끝":"질문 고치기"; eb.classList.toggle("on",mqEditQ);
+    if(mqEditQ){
+      var p0=document.createElement("p"); p0.className="mqhint"; p0.textContent="한 줄에 질문 하나씩 적어 주세요. 내 묵상에 맞게 바꾸면 다음부터 그대로 나와요.";
+      box.appendChild(p0);
+      var ta0=document.createElement("textarea"); ta0.className="mqqs"; ta0.value=o.q.join("\n"); ta0.setAttribute("aria-label","묵상 질문 목록");
+      box.appendChild(ta0); return;
+    }
+    if(nid&&notes.has(nid)){   // 오늘 묵상할 말씀
+      var n=notes.get(nid), vb=document.createElement("div"); vb.className="mqverse";
+      var rf=document.createElement("b"); rf.textContent=n.ref||"구절 미입력"; vb.appendChild(rf);
+      var tx=document.createElement("p"); tx.textContent=String(n.text||"").replace(/\s+/g," "); vb.appendChild(tx);
+      var ob=document.createElement("button"); ob.type="button"; ob.className="mqopen"; ob.dataset.note=nid; ob.textContent="말씀 카드 열기 ›"; vb.appendChild(ob);
+      box.appendChild(vb);
+    }
+    var v=((o.days[mqDay]||{}).v)||{}, done=0;
+    o.q.forEach(function(q,i){
+      var c=document.createElement("div"); c.className="mqitem";
+      var h=document.createElement("div"); h.className="mqq";
+      var num=document.createElement("i"); num.textContent=String(i+1); h.appendChild(num);
+      var qt=document.createElement("span"); qt.textContent=q; h.appendChild(qt);
+      var sv=document.createElement("small"); sv.className="mqsaved"; h.appendChild(sv);
+      c.appendChild(h);
+      var ta=document.createElement("textarea"); ta.className="mqa"; ta.dataset.i=String(i);
+      ta.value=String(v[i]||""); ta.placeholder="여기에 답을 적어 보세요";
+      ta.setAttribute("aria-label",q); c.appendChild(ta);
+      if(String(v[i]||"").trim())done++;
+      box.appendChild(c);
+    });
+    var ft=document.createElement("div"); ft.className="mqfoot";
+    var cnt=document.createElement("span"); cnt.className="mqcnt"; cnt.textContent=done+" / "+o.q.length+" 답했어요"; ft.appendChild(cnt);
+    var tb=document.createElement("button"); tb.type="button"; tb.className="mqtomed"; tb.textContent="✍️ 이 답을 묵상으로 담기"; ft.appendChild(tb);
+    box.appendChild(ft);
+    setTimeout(function(){Array.prototype.forEach.call(box.querySelectorAll(".mqa"),grow)},0);
+  }
+  function medqToMed(){   // 적은 답을 묵상 글로 옮겨 담기
+    var o=medqData(), nid=medqPick(), n=notes.get(nid);
+    if(!n){toast("먼저 말씀을 골라 주세요");return}
+    var v=((o.days[mqDay]||{}).v)||{}, lines=[];
+    o.q.forEach(function(q,i){var a=String(v[i]||"").trim(); if(a)lines.push(q+"\n"+a)});
+    if(!lines.length){toast("아직 적은 답이 없어요");return}
+    if(!n.meds)n.meds=[];
+    n.meds.push({id:mid(),text:lines.join("\n\n"),at:Date.now()});
+    scheduleSave(n.id); render(); toast("묵상으로 담았어요 ✍️");
+    closeMedq(); openNoteFocus(nid,"m");
+  }
   function renderReviewBar(){
     var bar=$("reviewBar"); if(!bar)return;
     bar.textContent="";
@@ -7786,6 +7957,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       rows.push({icon:"👥",info:1,label:"친구",tag:fin?"신청 "+fin+"개 💌":fct?fct+"명":"",chips:[{id:"",t:fin?"확인하기":fct?"친구 보기":"친구 맺기",act:"friends"}]})}
     var dd=dailyData(), dc=dailyChecked(dd,dkey(Date.now())).length, dt=dd.items.length;
     rows.push({icon:"🌙",label:"하루 돌아보기",big:{dc:dc,dt:dt},chips:[],done:dt>0&&dc===dt});
+    rows.push({icon:"📝",label:"묵상 질문",chips:[{id:"",t:"답 적어 보기",act:"medq"}]});
     rows.push({icon:"📅",info:1,label:"한 주 돌아보기",chips:[{id:"",t:"이번 주 보기",act:"week"}]});
     if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))rows.push({icon:"📊",info:1,label:"실천 진도표",chips:[{id:"",t:"전체 보기",act:"prog"}]});
     bar.hidden=!rows.length;
@@ -9720,7 +9892,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     detail=String(detail||"").replace(/\s+/g," ").trim().slice(0,140);
     return {msg:what+" ("+r.status+(detail?": "+detail:"")+")",short:what+" "+r.status};
   }
-  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__sayings");try{localStorage.removeItem(SB_LAST)}catch(e){}}
+  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__sayings");sbDirty.add("__medq");try{localStorage.removeItem(SB_LAST)}catch(e){}}
   var SB_DIRTY="bible-sb-dirty";
   try{(JSON.parse(localStorage.getItem(SB_DIRTY)||"[]")||[]).forEach(function(id){sbDirty.add(String(id))})}catch(e){}
   function sbSaveDirty(){try{if(sbDirty.size)localStorage.setItem(SB_DIRTY,JSON.stringify(Array.from(sbDirty)));else localStorage.removeItem(SB_DIRTY)}catch(e){}}
@@ -9746,12 +9918,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           if(sbLastJson.__prays1!==pjs){rows.push({user_id:uid,id:"__prays1",data:pd,updated_at:now,deleted:false});sbLastJson.__prays1=pjs}
           return;
         }
-        if(id!=="__daily"&&id!=="__chapters"&&id!=="__sayings"){
+        if(id!=="__daily"&&id!=="__chapters"&&id!=="__sayings"&&id!=="__medq"){
           var sd=shareData(notes.get(id)), skey="s:"+id, sjs=JSON.stringify(sd);
           if(sbLastJson[skey]!==sjs){rows.push({user_id:uid,id:skey,data:sd||{},updated_at:now,deleted:!sd,visibility:"friends"});sbLastJson[skey]=sjs}
         }
-        if(id==="__daily"||id==="__chapters"||id==="__sayings"){
-          var d=id==="__daily"?dailyData():id==="__chapters"?myChapters():sayData(), js=JSON.stringify(d);
+        if(id==="__daily"||id==="__chapters"||id==="__sayings"||id==="__medq"){
+          var d=id==="__daily"?dailyData():id==="__chapters"?myChapters():id==="__sayings"?sayData():medqData(), js=JSON.stringify(d);
           if(sbLastJson[id]!==js){rows.push({user_id:uid,id:id,data:d,updated_at:now,deleted:false});sbLastJson[id]=js}
           return;
         }
@@ -9779,6 +9951,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             return;
           }
           if(r.id==="__prays1"){if(p1Merge(r.data)&&prd&&!prd.hidden)drawPrayRead();sbLastJson.__prays1=JSON.stringify(p1Data());return}
+          if(r.id==="__medq"){sbLastJson.__medq=JSON.stringify(r.data);medqMerge(r.data);return}
           if(r.id==="__sayings"){sbLastJson.__sayings=JSON.stringify(r.data);sayMerge(r.data);return}
           if(r.id==="__daily"){sbLastJson.__daily=JSON.stringify(r.data);mergeData({daily:r.data},true);return}
           if(r.id==="__chapters"){var before=JSON.stringify(myChapters());mergeData({chapters:r.data},true);sbLastJson.__chapters=JSON.stringify(myChapters());return}
