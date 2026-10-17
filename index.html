@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-192">
+<meta name="app-build" content="2026-10-18-193">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1773,9 +1773,6 @@ button:active{filter:brightness(1.15)}
 .cctip{margin:6px 0 16px;font-size:14.5px;line-height:1.6;color:var(--muted)}
 .cctip b{color:var(--ink);font-size:16px}
 .ccmid{flex:1 1 auto;min-height:0;display:grid;place-items:center;width:100%}   /* 말씀을 화면 한가운데로 (2026-10-18 사용자 요청) */
-.ccedit{flex:0 0 auto;width:34px;height:34px;border:1px solid var(--rule);border-radius:17px;background:transparent;color:var(--muted);font-size:14px;line-height:1}
-.ccedit[hidden]{display:none}
-@media (hover:hover){.ccedit:hover{color:var(--ink);background:#22212A}}
 .ccverse.ccediting{white-space:pre-wrap;outline:none;cursor:text;caret-color:var(--gold);color:var(--hi);min-width:280px}
 .ccverse{font-family:var(--serif);font-size:21px;line-height:2;color:var(--orange);word-break:keep-all}
 /* 받아쓰기 (2026-10-18 사용자 요청) */
@@ -1805,7 +1802,6 @@ button:active{filter:brightness(1.15)}
 .ccr4{font-size:14px;color:var(--muted);margin-top:8px}
 /* ===== 암송 코치: 색과 움직임 ===== */
 .cch .bqbar{justify-content:center;position:relative}
-.cch .ccedit{position:absolute;right:16px;top:50%;transform:translateY(-50%)}
 .ccst{position:relative}
 .ccst:not(:last-child)::after{content:"";position:absolute;top:12px;left:calc(50% + 17px);right:calc(-50% + 15px);height:2px;border-radius:1px;background:#2A2930;transition:background .4s}
 .ccst.done:not(:last-child)::after{background:linear-gradient(90deg,var(--green),color-mix(in srgb,var(--green) 55%,#2A2930))}
@@ -6337,7 +6333,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
       ccBox=document.createElement("div"); ccBox.className="cch"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
-      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b><small class="ccnum" hidden></small></div><button type="button" class="ccedit" title="문장 고치기" aria-label="문장 고치기">✏️</button></div>'+
+      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b><small class="ccnum" hidden></small></div></div>'+
         '<div class="ccsteps" aria-hidden="true"></div>'+
         '<div class="ccbody"><div class="cctip"></div><div class="ccmid"><div class="ccverse"></div></div></div>'+
         '<div class="ccfoot"></div>';
@@ -6350,7 +6346,6 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.5)ccGoNext();
       },{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
-      ccBox.querySelector(".ccedit").addEventListener("click",function(){ccAct("eopen")});
       ccBox.querySelector(".ccverse").addEventListener("dblclick",function(e){   // 두 번 누르면 문장 배치 고치기 (2026-10-18 사용자 요청)
         if(!C||C.edit||C.revealing)return;
         if(e.target.closest("textarea,input,button"))return;
@@ -6525,7 +6520,6 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var tip=ccBox.querySelector(".cctip"), ft=ccBox.querySelector(".ccfoot"); ft.textContent=""; tip.textContent="";
     function btn(t,a,main){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(main?" main":"");b.dataset.a=a;b.textContent=t;ft.appendChild(b);return b}
     var anim=C.anim; C.anim=false;
-    ccBox.querySelector(".ccedit").hidden=!!C.edit;
     var vEl=ccBox.querySelector(".ccverse");
     if(!C.edit){vEl.removeAttribute("contenteditable");vEl.removeAttribute("spellcheck");vEl.classList.remove("ccediting")}
     if(C.edit){vEl.classList.remove("big");ccEditForm(n,tip,btn);return}
