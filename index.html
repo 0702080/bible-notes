@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-191">
+<meta name="app-build" content="2026-10-18-192">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7125,14 +7125,31 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(!G||e.pointerId!==G.pid)return; e.preventDefault();
       G.sec.style.transform="translate("+(e.clientX-G.x0)+"px,"+(e.clientY-G.y0)+"px)";
       var un=document.elementFromPoint(e.clientX,e.clientY), tgt=(un&&un.closest)?un.closest(".dlgrp"):null;
-      if(tgt&&tgt!==G.sec&&tgt.parentNode===list){
-        var r0=G.sec.getBoundingClientRect();
-        if(tgt.compareDocumentPosition(G.sec)&Node.DOCUMENT_POSITION_FOLLOWING)list.insertBefore(G.sec,tgt);
-        else list.insertBefore(G.sec,tgt.nextSibling);
-        var r1=G.sec.getBoundingClientRect();
-        G.x0+=r1.left-r0.left; G.y0+=r1.top-r0.top;
-        G.sec.style.transform="translate("+(e.clientX-G.x0)+"px,"+(e.clientY-G.y0)+"px)";
-        G.moved=true; buzz(4);
+      if(tgt&&(tgt===G.sec||tgt.parentNode!==list))tgt=null;
+      var after=false;
+      if(!tgt){   // 빈 자리에 놓을 때: 그 칸에서 바로 위에 있는 묶음 뒤로 (2026-10-18 사용자 요청)
+        var best=null, bd0=1e9;
+        Array.prototype.forEach.call(list.querySelectorAll(".dlgrp"),function(el){
+          if(el===G.sec||el.parentNode!==list)return;
+          var r=el.getBoundingClientRect();
+          if(e.clientX<r.left-12||e.clientX>r.right+12)return;   // 같은 칸(세로줄) 안에서만
+          var d=e.clientY-r.bottom;
+          if(d>=0&&d<bd0){bd0=d;best=el}
+        });
+        if(best){tgt=best;after=true}
+      }
+      if(tgt){
+        var stay=after?(G.sec.previousSibling===tgt):false;
+        if(!stay){
+          var r0=G.sec.getBoundingClientRect();
+          if(after)list.insertBefore(G.sec,tgt.nextSibling);
+          else if(tgt.compareDocumentPosition(G.sec)&Node.DOCUMENT_POSITION_FOLLOWING)list.insertBefore(G.sec,tgt);
+          else list.insertBefore(G.sec,tgt.nextSibling);
+          var r1=G.sec.getBoundingClientRect();
+          G.x0+=r1.left-r0.left; G.y0+=r1.top-r0.top;
+          G.sec.style.transform="translate("+(e.clientX-G.x0)+"px,"+(e.clientY-G.y0)+"px)";
+          G.moved=true; buzz(4);
+        }
       }
       var bd=dl.querySelector(".dlbody"), bdr=bd.getBoundingClientRect();
       if(e.clientY<bdr.top+70)bd.scrollTop-=12; else if(e.clientY>bdr.bottom-70)bd.scrollTop+=12;
