@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-197">
+<meta name="app-build" content="2026-10-18-198">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1452,13 +1452,13 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 .verse.memv .mk{display:inline-block;line-height:1.35;margin:2px 0}
 /* ===== simpler, round 3 ===== */
 .sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.top{position:relative;display:flex;align-items:flex-end;justify-content:flex-end;min-height:22px;margin:0 0 2px;padding-top:6px}
+.top{position:relative;display:flex;align-items:flex-end;justify-content:flex-end;min-height:32px;margin:0 0 2px;padding-top:6px}
 .top .status{font-size:11.5px;color:var(--faint)}
 /* 머리말 말씀 한 줄 (2026-10-18 사용자 요청) */
-.topverse{position:absolute;left:50%;top:6px;transform:translateX(-50%);max-width:min(92%,640px);font-family:var(--serif);font-size:13px;font-weight:400;line-height:1.5;letter-spacing:.2px;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.topverse{position:absolute;left:50%;top:4px;transform:translateX(-50%);max-width:min(92%,720px);font-family:var(--serif);font-size:19.5px;font-weight:700;line-height:1.4;letter-spacing:.2px;color:var(--gold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 @media (max-width:620px){   /* 좁은 화면에서는 한 줄 위에 따로 (2026-10-18 사용자 요청) */
   .top{display:block;min-height:0;padding-top:4px}
-  .topverse{position:static;transform:none;display:block;max-width:100%;font-size:11.5px;text-align:center}
+  .topverse{position:static;transform:none;display:block;max-width:100%;font-size:15px;text-align:center}
   .top .status{display:block;text-align:right}
 }
 .toolbar{margin-top:0}
@@ -11048,6 +11048,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   });
   var fTimer=null;
   function applyFilter(){var v=$("filter").value.trim();if(v!==filterText){filterText=v;if(v)soloId=null;var bf0=$("bFilter");if(bf0&&bf0.value!==$("filter").value)bf0.value=$("filter").value;render()}}
+  // 머리말 말씀을 찾기 칸 한가운데에 맞춰 준다 (2026-10-18 사용자 요청)
+  function alignTopVerse(){
+    var v=document.querySelector(".topverse"), h=document.querySelector(".top"), f=$("bFilter");
+    if(!v||!h)return;
+    var narrow=!!(window.matchMedia&&matchMedia("(max-width:620px)").matches);
+    if(narrow||!f||!f.offsetParent){v.style.left="";v.style.transform="";return}   // 찾기 칸이 없으면 화면 한가운데
+    var hr=h.getBoundingClientRect(), fr=f.getBoundingClientRect();
+    if(!fr.width){v.style.left="";v.style.transform="";return}
+    v.style.left=Math.round(fr.left+fr.width/2-hr.left)+"px";
+    v.style.transform="translateX(-50%)";
+  }
+  window.addEventListener("resize",alignTopVerse);
+  if(window.ResizeObserver)try{new ResizeObserver(alignTopVerse).observe(document.querySelector(".toolbar"))}catch(e){}
+  setTimeout(alignTopVerse,0);
   // 칸반 도구줄의 찾기 칸 (아래 찾기 칸과 같은 말을 쓴다 — 2026-10-17 사용자 요청)
   (function(){
     var bf=$("bFilter"); if(!bf)return;
