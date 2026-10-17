@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-181">
+<meta name="app-build" content="2026-10-18-182">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7377,22 +7377,65 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var y=r.bottom+8; if(y+h>window.innerHeight-10)y=Math.max(10,r.top-h-8);
     el.style.left=Math.round(x)+"px"; el.style.top=Math.round(y)+"px";
   }
+  // 커서만 올려도 그 화면이 바로 열린다. 보기만 하는 화면에만 (맞추기·로그인처럼 무언가를 바꾸는 것은 제외)
+  var TM_FULL={daily:1,week:1,medprog:1,prog:1,friends:1};
+  var tmOpenAct="", tmCloseT=null;
+  function tmPanel(act){
+    if(act==="daily")return document.querySelector(".daily:not(.wksheet)");
+    if(act==="week")return document.querySelector(".wksheet");
+    if(act==="medprog"||act==="prog")return document.querySelector("#topicSheet .sheetpanel");
+    if(act==="friends")return document.querySelector(".frsheet .ghbox");
+    return null;
+  }
+  function tmFullOpen(act){
+    tmHide();
+    if(act==="daily")openDaily();
+    else if(act==="week")openWeek();
+    else if(act==="medprog")openMedProgress();
+    else if(act==="prog")openProg();
+    else if(act==="friends")openFr();
+    else return;
+    tmOpenAct="";   // 열고 나면 보통 화면과 똑같이 — 닫기나 Esc 로 닫는다
+  }
+  function tmFullClose(){
+    var a=tmOpenAct; tmOpenAct=""; clearTimeout(tmCloseT);
+    if(!a)return;
+    if(a==="daily")closeDaily();
+    else if(a==="week")closeWeek();
+    else if(a==="medprog"||a==="prog")closeTS();
+    else if(a==="friends")closeFr();
+  }
+  function tmKeep(){tmOpenAct=""; clearTimeout(tmCloseT)}   // 그 화면 안으로 들어오면 그대로 둔다
   function tmHoverInit(){
     var bar=$("todayMini"); if(!bar||bar._hov)return; bar._hov=1;
     if(!(window.matchMedia&&matchMedia("(hover:hover)").matches))return;
     bar.addEventListener("mouseover",function(e){
       var c=e.target.closest(".tmchip"); if(!c)return;
-      if(tmFor===(c.dataset.act||""))return;
+      var act=c.dataset.act||"";
+      clearTimeout(tmCloseT);
+      if(TM_FULL[act]){   // 그 화면을 바로 연다
+        if(tmOpenAct===act)return;
+        if(tmOpenAct)tmFullClose();
+        clearTimeout(tmT); tmT=setTimeout(function(){tmFullOpen(act)},180);   // 스쳐 지나갈 때는 열리지 않게 아주 짧게만 기다림
+        return;
+      }
+      if(tmOpenAct)tmFullClose();
+      if(tmFor===act)return;
       clearTimeout(tmT); tmT=setTimeout(function(){tmShow(c)},120);
     });
     bar.addEventListener("mouseout",function(e){
       var to=e.relatedTarget;
       if(to&&to.closest&&to.closest(".tmchip"))return;
-      tmHide();
+      clearTimeout(tmT); tmHide();
     });
+    document.addEventListener("mouseover",function(e){
+      if(!tmOpenAct)return;
+      var el=tmPanel(tmOpenAct);
+      if(el&&e.target&&el.contains(e.target))tmKeep();
+    },true);
     window.addEventListener("scroll",tmHide,true);
     window.addEventListener("resize",tmHide);
-    bar.addEventListener("click",tmHide);
+    bar.addEventListener("click",function(){tmHide();tmKeep()});
   }
   function renderTodayMini(){
     var bar=$("todayMini"); if(!bar)return;
