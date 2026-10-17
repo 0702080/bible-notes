@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-186">
+<meta name="app-build" content="2026-10-18-187">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1772,6 +1772,12 @@ button:active{filter:brightness(1.15)}
 .ccbody{flex:1;overflow-y:auto;padding:10px 20px 16px;max-width:720px;width:100%;margin:0 auto}
 .cctip{margin:6px 0 16px;font-size:14.5px;line-height:1.6;color:var(--muted)}
 .cctip b{color:var(--ink);font-size:16px}
+.ccmid{flex:1 1 auto;min-height:0;display:grid;place-items:center;width:100%}   /* 말씀을 화면 한가운데로 (2026-10-18 사용자 요청) */
+.ccedit{flex:0 0 auto;width:34px;height:34px;border:1px solid var(--rule);border-radius:17px;background:transparent;color:var(--muted);font-size:14px;line-height:1}
+.ccedit[hidden]{display:none}
+@media (hover:hover){.ccedit:hover{color:var(--ink);background:#22212A}}
+.ccedta{width:100%;max-width:640px;box-sizing:border-box;min-height:220px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--gold) 35%,#2E2D33);border-radius:14px;background:#101013;color:var(--ink);font-family:var(--serif);font-size:19px;line-height:2;resize:vertical}
+.ccedta:focus{outline:none;border-color:var(--gold)}
 .ccverse{font-family:var(--serif);font-size:21px;line-height:2;color:var(--orange);word-break:keep-all}
 /* 받아쓰기 (2026-10-18 사용자 요청) */
 .ccdict{display:flex;flex-direction:column;gap:10px;width:100%}
@@ -1799,7 +1805,8 @@ button:active{filter:brightness(1.15)}
 .ccr3{font-size:15px;color:var(--sky);margin-top:12px}
 .ccr4{font-size:14px;color:var(--muted);margin-top:8px}
 /* ===== 암송 코치: 색과 움직임 ===== */
-.cch .bqbar{justify-content:center}
+.cch .bqbar{justify-content:center;position:relative}
+.cch .ccedit{position:absolute;right:16px;top:50%;transform:translateY(-50%)}
 .ccst{position:relative}
 .ccst:not(:last-child)::after{content:"";position:absolute;top:12px;left:calc(50% + 17px);right:calc(-50% + 15px);height:2px;border-radius:1px;background:#2A2930;transition:background .4s}
 .ccst.done:not(:last-child)::after{background:linear-gradient(90deg,var(--green),color-mix(in srgb,var(--green) 55%,#2A2930))}
@@ -1856,7 +1863,7 @@ button:active{filter:brightness(1.15)}
 .ccbody{display:flex;flex-direction:column}
 .cctip{text-align:center}
 .ccmeter{justify-content:center}
-.ccverse{margin:auto 0;padding:14px 0;text-align:left}
+.ccverse{margin:0;padding:14px 0;text-align:left}
 .ccverse.recall{padding-top:14px}
 .ccfoot{justify-content:center;gap:10px;padding:14px 16px calc(52px + env(safe-area-inset-bottom,0px));border-top:0}
 .ccbtn{flex:1;height:60px;border-radius:30px;font-size:15.5px}
@@ -6332,9 +6339,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
       ccBox=document.createElement("div"); ccBox.className="cch"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
-      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b><small class="ccnum" hidden></small></div></div>'+
+      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b><small class="ccnum" hidden></small></div><button type="button" class="ccedit" title="문장 고치기" aria-label="문장 고치기">✏️</button></div>'+
         '<div class="ccsteps" aria-hidden="true"></div>'+
-        '<div class="ccbody"><div class="cctip"></div><div class="ccverse"></div></div>'+
+        '<div class="ccbody"><div class="cctip"></div><div class="ccmid"><div class="ccverse"></div></div></div>'+
         '<div class="ccfoot"></div>';
       document.body.appendChild(ccBox);
       // 결과 화면에서 오른쪽 → 왼쪽으로 밀면 다음 암송 말씀
@@ -6345,6 +6352,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.5)ccGoNext();
       },{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
+      ccBox.querySelector(".ccedit").addEventListener("click",function(){ccAct("eopen")});
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 낱말을 누르면 소리로 들려주고, 가린 낱말은 톡 뒤집혀 잠깐 보인다
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
         var wt=String(w.dataset.w||w.textContent||"").trim();
@@ -6358,7 +6366,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       window.addEventListener("popstate",function(){if(ccBox&&!ccBox.hidden){ccHist=false;closeCoach()}});
     }
     var done3=n.mem&&n.mem.s&&n.mem.s[0]&&n.mem.s[1]&&n.mem.s[2];
-    C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",dict:null,anim:true,seen:opt.seen||{},order:opt.order||1};
+    C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",dict:null,edit:false,anim:true,seen:opt.seen||{},order:opt.order||1};
     ccBox.querySelector(".ccref").textContent=n.ref;
     var cn=ccBox.querySelector(".ccnum"); cn.hidden=C.order<2; cn.textContent=C.order+"번째";   // 밀어서 이어 외울 때 몇 번째 말씀인지
     if(C.order>=2){cn.classList.remove("bump");void cn.offsetWidth;cn.classList.add("bump")}
@@ -6475,12 +6483,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     btn("다시 써 보기","dretry");
     btn("😅 잘 모르겠어요","g0"); btn("🤔 조금 틀렸어요","g1"); btn("😊 다 기억났어요","g2",true);
   }
+  function ccEditForm(n,tip,btn){   // 문장(줄 나눔) 고치기 — 2026-10-18 사용자 요청
+    var v=ccBox.querySelector(".ccverse"); v.textContent=""; v.classList.remove("big","recall","vnum","vlines");
+    tip.innerHTML="<b>✏️ 문장 고치기</b><br>줄을 나눈 대로 외우기 화면에 그대로 나와요.";
+    var ta=document.createElement("textarea"); ta.className="ccedta"; ta.value=String(n.text||"");
+    ta.setAttribute("aria-label","말씀 본문 고치기"); v.appendChild(ta);
+    setTimeout(function(){try{ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length)}catch(e){}},30);
+    btn("취소","ecancel"); btn("저장 ✓","esave",true);
+  }
   function ccMeter(tip,on,just,icon){   // 이 단계에서 얼마나 했는지 불 켜지는 구슬 3개
     var m=document.createElement("div"); m.className="ccmeter";
     for(var i=0;i<3;i++){var d=document.createElement("i");if(i<on){d.className="on"+(i===just?" just":"");d.textContent=icon}m.appendChild(d)}
     tip.appendChild(m);
   }
-  function ccDraw(){
+  function ccDraw(){   // 말씀이 화면 한가운데 오도록 위 안내만큼 아래도 비워 준다 (2026-10-18 사용자 요청)
+    ccDraw0();
+    var mid=ccBox&&ccBox.querySelector(".ccmid"), tp=ccBox&&ccBox.querySelector(".cctip");
+    if(mid&&tp)mid.style.paddingBottom=Math.round(tp.offsetHeight||0)+"px";
+  }
+  function ccDraw0(){
     var n=notes.get(C.id); if(!n){closeCoach();return}
     if(!C.roles||C.rolesSrc!==n.text){C.roles=ccRoles(n);C.rolesSrc=n.text}
     var st=ccBox.querySelector(".ccsteps"); st.textContent="";
@@ -6489,6 +6510,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var tip=ccBox.querySelector(".cctip"), ft=ccBox.querySelector(".ccfoot"); ft.textContent=""; tip.textContent="";
     function btn(t,a,main){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(main?" main":"");b.dataset.a=a;b.textContent=t;ft.appendChild(b);return b}
     var anim=C.anim; C.anim=false;
+    ccBox.querySelector(".ccedit").hidden=!!C.edit;
+    if(C.edit){ccBox.querySelector(".ccverse").classList.remove("big");ccEditForm(n,tip,btn);return}
     ccBox.querySelector(".ccverse").classList.toggle("big",C.stage<4);
     if(C.stage===0){
       tip.innerHTML="<b>1단계 · 소리 내어 읽기</b><br>천천히, 뜻을 생각하며 소리 내어 3번 읽어요.";
@@ -6529,6 +6552,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccDraw();return}
     if(a==="again"){C.seed=newSeed();C.anim=true;buzz(6);ccDraw();return}
     if(a==="next"){buzz(8);C.anim=true;if(C.stage===2&&C.round<2){C.round++;C.keepPrev=true;ccDraw();return}C.stage++;ccDraw();return}
+    if(a==="eopen"){C.edit=true;C.dict=null;ccDraw();return}
+    if(a==="ecancel"){C.edit=false;ccDraw();return}
+    if(a==="esave"){
+      var eta=ccBox.querySelector(".ccedta"), nv=eta?String(eta.value).replace(/[ \t]+$/gm,""):"";
+      if(nv.trim()&&nv!==n.text){
+        n.text=nv; if(typeof focusMode!=="undefined")focusMode.delete(n.id);
+        scheduleSave(n.id); render(); toast("말씀을 고쳤어요");
+      }
+      C.edit=false; C.seed=newSeed(); C.anim=true; ccDraw(); return;
+    }
     if(a==="dict"){C.dict={on:true,text:"",res:null};ccDraw();return}
     if(a==="dback"){C.dict=null;ccDraw();return}
     if(a==="dscore"){
