@@ -416,7 +416,7 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
   <p class="findmsg" id="findMsg" hidden></p>
   <div class="modeseg" role="group" aria-label="표시할 것"><button type="button" data-act="mode" data-m="read" aria-pressed="true">📖 통독</button><button type="button" data-act="mode" data-m="pilsa" aria-pressed="false">✍️ 필사</button></div>
   <p class="modetip" id="modeTip"></p>
-  <section class="pinned" id="pinned" hidden><h3>📌 읽는 중</h3><div class="books" id="pin"></div></section>
+  <section class="pinned" id="pinned" hidden><h3 id="pinTitle">📌 읽는 중</h3><div class="books" id="pin"></div></section>
 
   <section class="sum" aria-live="polite">
     <div class="sum-top">
@@ -1527,6 +1527,7 @@ function setMode(m,draw){
   pMode=m==="pilsa"; me=pMode?PB:RB;
   document.body.classList.toggle("pm",pMode);
   document.querySelector(".bar h1").textContent=pMode?"성경 필사표":"성경 통독표";
+  $("pinTitle").textContent=pMode?"📌 쓰는 중":"📌 읽는 중";   // 필사는 쓰는 것이라 (2026-10-17 사용자 요청)
   document.querySelectorAll('.modeseg button').forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.m===(pMode?"pilsa":"read")))});
   $("modeTip").innerHTML=pMode?'보라 칸 = 필사한 장 · <i class="om om-k"></i> 노란 점 = 읽은 장':'노란 칸 = 읽은 장 · <i class="om om-k"></i> 보라 점 = 필사한 장';
   var A=pMode?RCOL_P:RCOL_R, first=pMode?"var(--violet)":"#F2C94C";
