@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-4">
+<meta name="app-build" content="2026-10-21-5">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1783,7 +1783,7 @@ button:active{filter:brightness(1.15)}
 .oquiz{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .oquiz[hidden]{display:none}
 .cch{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-.cch{touch-action:pan-y}   /* 가로로 밀기는 앱이 받아서 다음 말씀으로 */
+.cch,.cch *{touch-action:pan-y}   /* 가로로 밀기는 앱이 받아서 다음 말씀으로 (안쪽 스크롤 칸에도) */
 .cch[hidden]{display:none}
 .ccsteps{display:flex;gap:4px;padding:12px 16px 4px}
 .ccst{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;color:var(--faint)}
@@ -6414,11 +6414,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(e.target.closest("button,textarea,input,a,.ccfoot"))return;
         sx=e.clientX; sy=e.clientY; sw=true;
       });
+      var swAt=0;
+      function ccSwipe(dx,dy){if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.3&&Date.now()-swAt>600){swAt=Date.now();try{window.getSelection().removeAllRanges()}catch(err){} ccGoNext()}}
       ccBox.addEventListener("pointerup",function(e){
-        if(!sw||!C||C.edit)return; sw=false; var dx=e.clientX-sx, dy=e.clientY-sy;
-        if(dx<-70&&Math.abs(dx)>Math.abs(dy)*1.5){try{window.getSelection().removeAllRanges()}catch(err){} ccGoNext()}
+        if(!sw||!C||C.edit)return; sw=false; ccSwipe(e.clientX-sx,e.clientY-sy);
       });
       ccBox.addEventListener("pointercancel",function(){sw=false});
+      // 휴대폰: 손가락 밀기는 터치로도 한 번 더 받아 둔다 (브라우저가 포인터를 중간에 끊어도 넘어가게)
+      var tx0=0,ty0=0,tOn=false;
+      ccBox.addEventListener("touchstart",function(e){tOn=false;if(!C||C.edit||C.revealing||e.touches.length!==1||e.target.closest("button,textarea,input,a,.ccfoot"))return;tx0=e.touches[0].clientX;ty0=e.touches[0].clientY;tOn=true},{passive:true});
+      ccBox.addEventListener("touchend",function(e){if(!tOn||!C||C.edit)return;tOn=false;var t=e.changedTouches[0];ccSwipe(t.clientX-tx0,t.clientY-ty0)},{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
       // 문장 배치 고치기: 말씀을 꾹(0.8초) 누르면 열림. 연습 중 빠르게 두 번 눌러도 고치기로 넘어가지 않게 (2026-10-21 사용자 요청)
       var ccHold=0, ccHx=0, ccHy=0;
