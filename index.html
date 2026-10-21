@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-1">
+<meta name="app-build" content="2026-10-21-2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1791,6 +1791,11 @@ button:active{filter:brightness(1.15)}
 .ccst.done{color:var(--green)}
 .ccst.now i{border-color:var(--gold);color:var(--gold);box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 20%,transparent)}
 .ccst.now{color:var(--gold);font-weight:700}
+/* 진행 표시: 지금 단계만 또렷하게, 나머지(지난 단계·다음 단계·줄)는 흐리게 (2026-10-21 사용자 요청) */
+.ccst:not(.now){opacity:.38}
+.ccst.now::after{opacity:.38}
+.ccst.now i{width:32px;height:32px;margin-top:-3px;font-size:15px;background:color-mix(in srgb,var(--gold) 22%,transparent);border-width:2px}
+.ccst.now span{font-size:12.5px;-webkit-text-stroke:.35px currentColor}
 .ccbody{flex:1;overflow-y:auto;padding:10px 20px 16px;max-width:720px;width:100%;margin:0 auto}
 .cctip{margin:6px 0 16px;font-size:14.5px;line-height:1.6;color:var(--muted)}
 .cctip b{color:var(--ink);font-size:16px}
@@ -6590,25 +6595,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(C.edit){vEl.classList.remove("big");ccEditForm(n,tip,btn);return}
     ccBox.querySelector(".ccverse").classList.toggle("big",C.stage<4);
     if(C.stage===0){
-      tip.innerHTML="<b>1단계 · 소리 내어 읽기</b><br>천천히, 뜻을 생각하며 소리 내어 3번 읽어요.";
+      /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
       ccMeter(tip,C.reads,C.justRead?C.reads-1:-1,"🗣️"); C.justRead=false;
       ccWords(n.text,"all",0,C.seed);
       if(canSpeak)btn("🔊 들려주기","say");
       btn("읽었어요 ✓  "+C.reads+" / 3","read",true);
     }else if(C.stage===1){
-      tip.innerHTML="<b>2단계 · 첫 글자 보고 말하기</b><br>첫 글자만 보고 소리 내어 말해 보세요. 막히면 낱말을 눌러 잠깐 봐요.";
+      /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
       ccWords(n.text,"first",0,C.seed,{anim:anim});
       btn("다 말했어요 →","next",true);
     }else if(C.stage===2){
       var FR=[0.35,0.65,1];
-      tip.innerHTML="<b>3단계 · 점점 가리기 "+(C.round+1)+" / 3</b><br>"+(C.round<2?"가려진 곳을 채워 말해 보세요.":"이제 전부 가렸어요. 처음부터 끝까지 말해 보세요.");
+      /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
       ccMeter(tip,C.round+1,anim?C.round:-1,"🙈");
       C.prevHide=ccWords(n.text,"hide",FR[C.round],C.seed,{anim:anim,prevHide:C.keepPrev?C.prevHide:null}); C.keepPrev=false;
       btn("한 번 더","again");
       btn(C.round<2?"말했어요 → 더 가리기":"말했어요 →","next",true);
     }else if(C.stage===3){
       if(C.dict&&C.dict.on){ccDict(n,tip,btn);return}
-      tip.innerHTML="<b>4단계 · 떠올리기</b>";
+      /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
       ccWords(n.text,"none",0,C.seed);
       btn("✍️ 받아쓰기","dict");
       btn("확인하기 👀","show",true);
