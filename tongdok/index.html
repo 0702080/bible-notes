@@ -221,6 +221,18 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovc[data-st="full"]{border-color:color-mix(in srgb,var(--green) 55%,var(--rule));color:#fff}
 .ovc[data-st="full"] i{height:100%;background:var(--green)}
 @media (hover:hover){.ovc:hover{border-color:var(--violet)}}
+/* 걸어온 길: 가로 한 줄 연표 */
+.tl{overflow-x:auto;padding:4px 0 8px;scrollbar-width:thin}
+.tl-row{position:relative;display:flex;margin:0;padding:0;list-style:none;min-width:100%}
+.tl-n{position:relative;flex:0 0 96px;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 4px}
+.tl-n::before{content:"";position:absolute;top:39px;left:0;right:0;height:3px;background:color-mix(in srgb,var(--c) 45%,var(--rule))}
+.tl-n:first-child::before{left:50%} .tl-n:last-child::before{right:50%}
+.tl-n:only-child::before{display:none}
+.tl-ms{--c:#8BBF8F} .tl-mr{--c:#E2A93B} .tl-mp{--c:var(--violet)}
+.tl-d{height:18px;font-size:12px;font-weight:700;color:var(--c)}
+.tl-dot{position:relative;z-index:1;display:grid;place-items:center;width:40px;height:40px;margin:2px 0 6px;border-radius:50%;background:color-mix(in srgb,var(--c) 18%,var(--sheet));border:2px solid var(--c);font-size:18px}
+.tl-t{font-size:12.5px;line-height:1.35;color:var(--ink);word-break:keep-all}
+.tl-s{margin-top:2px;font-size:11px;color:var(--muted)}
 .ovw-sum{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 8px;font-size:12px;color:var(--muted)}
 .ovw-sum b{color:var(--ink);font-weight:700}
 .ovw-hist{overflow-x:auto;padding-bottom:6px}
@@ -822,6 +834,7 @@ function repaintBook(bi){
   sec.querySelector(".bk-body").innerHTML=bodyHTML(bi);
 }
 function renderSummary(){
+  try{histSync()}catch(e){}
   var mine=countRange(me,0,TOTAL);
   var pctMe=mine/TOTAL*100;
   var VF=compare?viewFriends():[], F=VF.length===1?VF[0].bits:null;
@@ -891,58 +904,57 @@ function renderOverview(){
     }
     body.appendChild(map);
   });
-  // ② 읽어 온 길: 왼쪽이 처음, 오른쪽이 오늘. 해가 바뀌어도 가로로 계속 이어진다
-  var h2=document.createElement("p"); h2.className="ovw-h"; h2.textContent="읽어 온 길"; body.appendChild(h2);
-  var keys=Object.keys(readLog).sort();
-  if(!keys.length){
-    var none=document.createElement("p"); none.className="ovw-none";
-    none.textContent="아직 기록이 없어요. 오늘부터 칸을 체크하면 날마다 몇 장을 읽었는지 여기에 쌓여서, 해가 지날수록 걸어온 길이 보여요.";
-    body.appendChild(none);
-    return;
-  }
-  var first=new Date(keys[0]+"T12:00:00"), last=new Date();
-  var startAt=new Date(first); startAt.setDate(startAt.getDate()-startAt.getDay());   // 그 주 일요일부터
-  var total=0, best=0, bestDay="", run=0, bestRun=0, prev=null;
-  keys.forEach(function(k){
-    var v=readLog[k]; total+=v; if(v>best){best=v;bestDay=k}
-    var t=new Date(k+"T12:00:00").getTime();
-    run=(prev!==null&&Math.round((t-prev)/864e5)===1)?run+1:1; prev=t; if(run>bestRun)bestRun=run;
+  // ② 걸어온 길: 책을 다 읽은(쓴) 날을 왼쪽→오른쪽 한 줄 연표로 (2026-10-21 사용자 요청, 날짜별 칸 그림·숫자 요약 대신)
+  var h2=document.createElement("p"); h2.className="ovw-h"; h2.textContent="걸어온 길"; body.appendChild(h2);
+  histSync();
+  var lk=Object.keys(readLog).sort(), nodes=[];
+  if(lk.length)nodes.push({d:lk[0],m:"s",t:"시작",sub:"처음 체크한 날"});
+  var before={r:[],p:[]}, days={};
+  HIST.ev.forEach(function(e){if(!e.d){before[e.m].push(e);return} var k=e.d+"|"+e.m; (days[k]=days[k]||{d:e.d,m:e.m,list:[]}).list.push(e)});
+  ["r","p"].forEach(function(m){var L=before[m], u={}; L.forEach(function(e){u[e.b]=1}); var nb=Object.keys(u).length; if(nb)nodes.push({d:"",m:m,t:nb+"권",sub:m==="r"?"그동안 읽은 책":"그동안 쓴 책"})});
+  Object.keys(days).sort().forEach(function(k){
+    var g=days[k], top={}, ord=[];   // 같은 날 같은 책을 여러 번 끝냈으면 마지막 회차만
+    g.list.forEach(function(e){if(!(e.b in top))ord.push(e.b); top[e.b]=Math.max(top[e.b]||0,e.n)});
+    var nm=ord.map(function(b){return BOOKS[b][0]+(top[b]>1?" "+top[b]+"회":"")});
+    nodes.push({d:g.d,m:g.m,t:nm.slice(0,2).join(" · ")+(nm.length>2?" 외 "+(nm.length-2)+"권":""),sub:g.m==="r"?"다 읽음":"다 씀"});
   });
-  var sum=document.createElement("div"); sum.className="ovw-sum";
-  sum.innerHTML='<span>처음 읽은 날 <b></b></span><span>읽은 날 <b></b>일</span><span>모두 <b></b>장</span><span>가장 많이 읽은 날 <b></b>장</span><span>가장 길게 이어 읽기 <b></b>일</span>';
-  var sb=sum.querySelectorAll("b");
-  sb[0].textContent=keys[0].replace(/-/g,".");
-  sb[1].textContent=keys.length; sb[2].textContent=total; sb[3].textContent=best; sb[4].textContent=bestRun;
-  body.appendChild(sum);
-  var wrap=document.createElement("div"); wrap.className="ovw-hist";
-  var grid=document.createElement("div"); grid.className="ovw-grid";
-  var mon=document.createElement("div"); mon.className="ovw-mon";
-  var wks=document.createElement("div"); wks.className="ovw-wks";
-  var cur=new Date(startAt), lastMon=-1, MON=["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
-  while(cur<=last){
-    var col=document.createElement("div"); col.className="ovwk";
-    var label="";
-    for(var d2=0;d2<7;d2++){
-      var k2=dayKey(cur.getTime()), v2=+readLog[k2]||0;
-      var cell=document.createElement("div"); cell.className="ovday";
-      if(cur>last)cell.classList.add("pad");
-      else{
-        cell.dataset.l=v2===0?"0":v2<=2?"1":v2<=5?"2":v2<=10?"3":"4";
-        cell.title=k2.replace(/-/g,".")+" · "+(v2?v2+"장":"쉬었어요");
-      }
-      if(d2===0&&cur.getMonth()!==lastMon){lastMon=cur.getMonth();label=(cur.getMonth()===0?cur.getFullYear()+"년 ":"")+MON[cur.getMonth()]}
-      col.appendChild(cell);
-      cur.setDate(cur.getDate()+1);
-    }
-    var ml=document.createElement("span"); ml.style.width="13px"; ml.textContent=label; mon.appendChild(ml);
-    wks.appendChild(col);
+  if(!nodes.length){
+    var none=document.createElement("p"); none.className="ovw-none";
+    none.textContent="아직 기록이 없어요. 한 권을 끝까지 읽거나 쓰면 그날이 여기에 하나씩 이어져요.";
+    body.appendChild(none); return;
   }
-  grid.appendChild(mon); grid.appendChild(wks); wrap.appendChild(grid); body.appendChild(wrap);
-  var key=document.createElement("div"); key.className="ovw-key";
-  key.innerHTML='<span>적게</span><i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><span>많이</span>';
-  key.querySelectorAll("i").forEach(function(i2,n2){i2.className="";i2.setAttribute("class","");i2.setAttribute("data-l",String(n2));i2.classList.add("ovday")});
-  body.appendChild(key);
-  setTimeout(function(){wrap.scrollLeft=wrap.scrollWidth},0);   // 오늘(오른쪽 끝)이 보이게
+  var wrap=document.createElement("div"); wrap.className="tl";
+  var row=document.createElement("ol"); row.className="tl-row";
+  nodes.forEach(function(nd,ix){
+    var li=document.createElement("li"); li.className="tl-n tl-m"+nd.m;
+    li.innerHTML='<span class="tl-d"></span><span class="tl-dot"></span><b class="tl-t"></b><span class="tl-s"></span>';
+    li.querySelector(".tl-d").textContent=nd.d?(nd.d.slice(0,4)===String(new Date().getFullYear())?nd.d.slice(5):nd.d.slice(2)).replace(/-/g,"."):"이전";
+    li.querySelector(".tl-dot").textContent=nd.m==="s"?"🌱":nd.m==="r"?"📖":"✍️";
+    li.querySelector(".tl-t").textContent=nd.t; li.querySelector(".tl-s").textContent=nd.sub;
+    row.appendChild(li);
+  });
+  wrap.appendChild(row); body.appendChild(wrap);
+  setTimeout(function(){wrap.scrollLeft=wrap.scrollWidth},0);   // 가장 최근(오른쪽 끝)이 보이게
+}
+/* 걸어온 길 기록: 책마다 '다 끝낸 횟수'(회차 + 지금 다 채웠으면 1)가 늘면 그날을 적고, 줄면(되돌리기·체크 풀기) 지운다 */
+var HIST_KEY="bible-tongdok-hist", HIST={snap:null,ev:[]};
+try{var hj=JSON.parse(localStorage.getItem(HIST_KEY)||"null");if(hj&&Array.isArray(hj.ev))HIST={snap:hj.snap||null,ev:hj.ev}}catch(e){}
+var histReady=false; setTimeout(function(){histReady=true;try{histSync()}catch(e){}},0);   // 저장된 진도를 다 불러온 뒤부터 센다
+function histSync(){
+  if(!histReady)return;
+  var snap={r:{},p:{}}, first=!HIST.snap, ch=first, today=dayKey();
+  [["r",RB],["p",PB]].forEach(function(x){
+    var m=x[0], arr=x[1], R=RND[m]||{};
+    for(var bi=0;bi<BOOKS.length;bi++){
+      var t=BOOKS[bi][1], n=(+R[bi]||0)+(countRange(arr,OFF[bi],OFF[bi]+t)===t?1:0);
+      if(n)snap[m][bi]=n;
+      var old=first?0:(+HIST.snap[m][bi]||0);
+      for(var k=old+1;k<=n;k++){HIST.ev.push({d:first?"":today,m:m,b:bi,n:k});ch=true}
+      if(n<old){HIST.ev=HIST.ev.filter(function(e){return !(e.m===m&&e.b===bi&&e.n>n)});ch=true}
+    }
+  });
+  HIST.snap=snap;
+  if(ch)try{localStorage.setItem(HIST_KEY,JSON.stringify(HIST))}catch(e){}
 }
 (function(){
   var tg=document.getElementById("ovwTg"); if(!tg)return;
