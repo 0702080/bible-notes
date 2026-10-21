@@ -214,7 +214,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovw-body[hidden]{display:none}
 .ovw-h{margin:10px 0 8px;font-size:13px;font-weight:700;color:var(--muted)}
 .ovw-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
-.ovc{position:relative;height:40px;padding:0;border:1px solid var(--rule);border-radius:8px;background:var(--blank);color:var(--muted);font-family:inherit;font-size:12px;overflow:hidden}
+.ovc{position:relative;justify-self:center;width:100%;max-width:46px;height:auto;aspect-ratio:1;padding:0;border:1px solid var(--rule);border-radius:50%;   /* 동그란 원 (2026-10-21 사용자 요청) */background:var(--blank);color:var(--muted);font-family:inherit;font-size:12px;overflow:hidden}
 .ovc i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--f,0) * 100%);background:color-mix(in srgb,var(--ring) 55%,transparent)}
 .ovc b{position:relative;z-index:1;font-weight:700}
 .ovc[data-st="part"]{color:var(--ink)}
@@ -238,6 +238,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovw-key{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:var(--muted)}
 .ovw-key i{width:12px;height:12px;border-radius:3px;background:var(--blank);border:1px solid color-mix(in srgb,var(--rule) 60%,transparent)}
 .ovw-none{margin:6px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.shelf{display:none!important}
 .shelf{margin-top:14px;padding:12px 13px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);}
 .shelf h3{margin:0 0 9px;font-family:var(--sans);font-size:15px;font-weight:700}
 .shelf h3 span{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400;margin-left:6px}
@@ -454,7 +455,7 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
     <div class="ovw-body" id="ovwBody" hidden></div>
   </section>
 
-  <section class="shelf">
+  <section class="shelf" hidden>   <!-- 모은 책 뱃지는 보이지 않게 (2026-10-21 사용자 요청). 코드는 남겨 둠 -->
     <h3>모은 책 뱃지<span id="shelfCnt"></span></h3>
     <div class="medals" id="medals"></div>
     <p class="none" id="shelfNone">한 책을 끝까지 읽으면 여기에 뱃지가 쌓여요.</p>
@@ -980,7 +981,7 @@ function applyFind(){
     if(hit&&!seen[bi]){seen[bi]=1;shown++}
   });
   // 비어 버린 구약·신약 제목과 접기 단추는 찾는 동안 숨긴다
-  document.querySelectorAll("h2.tg,.foldbar,.sum,.shelf").forEach(function(h){h.hidden=!!q});
+  document.querySelectorAll("h2.tg,.foldbar,.sum").forEach(function(h){h.hidden=!!q});
   var pn=document.getElementById("pinned");
   if(pn&&q)pn.hidden=!Array.prototype.some.call(pn.querySelectorAll(".bk[data-b]"),function(s2){return !s2.hidden});
   if(msg){msg.hidden=!q; msg.textContent=q?(shown?shown+"권 찾았어요":"'"+q+"' 로 찾은 책이 없어요"):""}
