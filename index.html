@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-7">
+<meta name="app-build" content="2026-10-21-8">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4427,7 +4427,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(tapCard&&!e.target.closest("button,textarea,input,select,a,details,summary,.pop,.editbox,.xpanel,.focusrow,.chip,.sugg,.himgs,.pastezone,.sform,.hsheets,.essays,.topics,.verse.picking,.verse.picking .w,.verse.memv,.mempanel,.usepanel")){
       var tid=tapCard.dataset.id, isOpen=openIds.has(tid);
       var vtap=e.target.closest(".verse");
-      if(vtap&&memOpen.has(tid))return;   // 암송 칸을 연 채 연습 중이면 말씀을 눌러도 고치기·접기가 되지 않게 (2026-10-21 사용자 요청)
+      // 말씀을 가리고 연습하는 중(암송 연습·단계 보기)일 때만 두 번 눌러도 고치기가 되지 않게. 암송 칸만 열려 있으면 두 번 눌러 고칠 수 있음 (2026-10-21 사용자 요청)
+      if(vtap&&(memView.get(tid)||memStep.has(tid)||vtap.classList.contains("memv")))return;
       if(vtap&&!tapCard.classList.contains("vediting")){
         var tnow=Date.now();
         if(vTap.id===tid&&tnow-vTap.t<380){clearTimeout(vTap.timer);vTap={id:"",t:0,timer:0};enterVerseEdit(tid,e.clientX,e.clientY);return}
