@@ -457,7 +457,7 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
     </div>
     <div class="cloud" id="cloud"></div>
     <div class="legend" id="legend" hidden>
-      <span><i style="background:#F2C94C"></i>나</span>
+      <span><i style="background:#F2C94C"></i>혜진</span>
       <span><i style="background:var(--sky)"></i>친구</span>
     </div>
   </section>
@@ -584,6 +584,8 @@ function roundCtl(bi){
 }   // 지금 모드의 친구 표
 var friendName="";
 var myName="";
+/* 화면에 보이는 이름 (2026-10-22 사용자 요청: 나 → 혜진, 친구 이름 → 친구로 글자 고정) */
+var ME_LABEL="혜진", FR_LABEL="친구";
 var compare=false;
 
 var $=function(id){return document.getElementById(id)};
@@ -747,8 +749,8 @@ function friendChipsHTML(bi,F){
 function bodyHTML(bi){
   if(!cmpOn())return chipsHTML(bi)+roundCtl(bi);
   var total=BOOKS[bi][1];
-  return '<div class="who me-who">🙋 나 <span>'+bookDone(bi)+' / '+total+'</span></div>'+chipsHTML(bi)+roundCtl(bi)
-    +viewFriends().map(function(F){var fr=+(F.rnd&&F.rnd[bi])||0;return '<div class="who fr-who" style="--fc:'+F.col+'">👤 '+esc(F.name)+' <span>'+countRange(F.bits,OFF[bi],OFF[bi]+total)+' / '+total+(fr?' · '+(fr+1)+'회째':'')+'</span></div>'+friendChipsHTML(bi,F)}).join("");
+  return '<div class="who me-who">🙋 '+ME_LABEL+' <span>'+bookDone(bi)+' / '+total+'</span></div>'+chipsHTML(bi)+roundCtl(bi)
+    +viewFriends().map(function(F){var fr=+(F.rnd&&F.rnd[bi])||0;return '<div class="who fr-who" style="--fc:'+F.col+'">👤 '+FR_LABEL+' <span>'+countRange(F.bits,OFF[bi],OFF[bi]+total)+' / '+total+(fr?' · '+(fr+1)+'회째':'')+'</span></div>'+friendChipsHTML(bi,F)}).join("");
 }
 /* 책 갈래: 색으로 구분하려고 쓴다 */
 function bookGroup(bi){
@@ -842,14 +844,14 @@ function renderSummary(){
   var VF=compare?viewFriends():[], F=VF.length===1?VF[0].bits:null;
   if(VF.length>1){
     $("who").textContent="함께 보기 "+(VF.length+1)+"명";
-    $("cnt").textContent="나 "+mine+" · "+VF.map(function(f){return f.name+" "+countRange(f.bits,0,TOTAL)}).join(" · ")+"장";
+    $("cnt").textContent=ME_LABEL+" "+mine+" · "+VF.map(function(f){return FR_LABEL+" "+countRange(f.bits,0,TOTAL)}).join(" · ")+"장";
     $("mBoth").style.width="0%";
     $("mMe").style.width=pctMe+"%";
   }else if(F){
-    var friendName=VF[0].name, both=0,fo=0;
+    var friendName=FR_LABEL, both=0,fo=0;
     for(var i=0;i<TOTAL;i++){if(me[i]&&F[i])both++;else if(F[i])fo++;}
-    $("who").textContent="나와 "+(friendName||"친구");
-    $("cnt").textContent="나 "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
+    $("who").textContent=ME_LABEL+"와 "+friendName;
+    $("cnt").textContent=ME_LABEL+" "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
     $("mBoth").style.width=(both/TOTAL*100)+"%";
     $("mMe").style.width=((mine-both)/TOTAL*100)+"%";
   }else{
@@ -862,7 +864,7 @@ function renderSummary(){
   $("otCnt").textContent=countRange(me,0,OT_TOTAL)+" / "+OT_TOTAL+"장";
   $("ntCnt").textContent=countRange(me,OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
   $("legend").hidden=!VF.length;
-  $("legend").innerHTML='<span><i style="background:'+(pMode?'var(--violet)':'#F2C94C')+'"></i>나</span>'+VF.map(function(f){return '<span><i style="background:'+f.col+'"></i>'+esc(f.name)+'</span>'}).join("");
+  $("legend").innerHTML='<span><i style="background:'+(pMode?'var(--violet)':'#F2C94C')+'"></i>'+ME_LABEL+'</span>'+VF.map(function(f){return '<span><i style="background:'+f.col+'"></i>'+FR_LABEL+'</span>'}).join("");
   $("btnCmp").hidden=!viewFriends().length;
   $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
 }
@@ -1454,7 +1456,7 @@ function drawCloud(){
   if(!sbSession()){el.innerHTML='<button type="button" class="btn cl-login" data-act="login">☁️ 로그인하고 친구와 자동으로 같이 보기</button>';el.className="cloud off";return}
   if(cloudState.ok===false){el.innerHTML='☁️ 자동 맞춤이 안 됐어요 · '+esc(cloudState.msg)+' <button type="button" class="cl-re" data-act="cloud">다시</button>';el.className="cloud bad";return}
   var h='☁️ 자동 맞춤 켜짐'+(cloudState.at?' · '+ago(cloudState.at):'');
-  if(cloudFriends.length)h+=' · '+cloudFriends.map(function(f){return '👤 '+esc(f.name)+' ('+ago(f.at)+' 체크)'}).join(" · ");
+  if(cloudFriends.length)h+=' · '+cloudFriends.map(function(f){return '👤 '+FR_LABEL+' ('+ago(f.at)+' 체크)'}).join(" · ");
   else if(cloudState.nFriends===0)h+=' · 아래 👥 친구에서 친구 코드로 친구를 맺어 주세요';
   if(cloudState.noRows&&cloudState.noRows.length)h+='<br><small>'+esc(cloudState.noRows.join(", "))+'님은 아직 통독표를 안 열었어요 (한 번 열면 보여요)</small>';
   h+=' <button type="button" class="cl-re" data-act="friends">👥 친구</button>';
