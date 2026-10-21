@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-20">
+<meta name="app-build" content="2026-10-21-21">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1919,7 +1919,7 @@ button:active{filter:brightness(1.15)}
   .ccfoot .ccbtn,.ccfoot .ccbtn.main{flex:1 1 0;min-width:0;order:0;height:54px;padding:0 8px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ccfoot .ccbtn.main{flex-grow:1.4}
 }
-.ccvwrap{width:100%}
+.ccvwrap{width:fit-content;max-width:100%;margin:0 auto}   /* 말씀 덩어리는 화면 가운데, 글은 왼쪽 맞춤 (2026-10-21 사용자 요청) */
 .ccvref{cursor:pointer;margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
 .cch .bqtitle .ccref{display:none}
 .ccw.ccpopx{animation:ccpopx .45s cubic-bezier(.2,1.8,.4,1)}
@@ -6530,6 +6530,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ["pointerup","pointercancel","pointerleave"].forEach(function(ev){ccBox.querySelector(".ccverse").addEventListener(ev,function(){clearTimeout(ccHold)})});
       ccBox.querySelector(".ccverse").addEventListener("pointermove",function(e){if(Math.abs(e.clientX-ccHx)>10||Math.abs(e.clientY-ccHy)>10)clearTimeout(ccHold)});
       ccBox.querySelector(".ccverse").addEventListener("contextmenu",function(e){if(C&&!C.edit)e.preventDefault()});
+      // 말씀 덩어리를 가장 긴 줄 폭에 딱 맞춰 화면 가운데에 두고, 글은 왼쪽 맞춤 (2026-10-21 사용자 요청)
+      (function(){
+        var vw=ccBox.querySelector(".ccvwrap"), vv=ccBox.querySelector(".ccverse"), ft=0;
+        function fit(){
+          vw.style.width="";
+          if(ccBox.hidden||(C&&C.edit)||!vv.firstChild)return;
+          var rg=document.createRange(); rg.selectNodeContents(vv);
+          var L=vv.getBoundingClientRect().left, R=0, rs=rg.getClientRects();
+          for(var i=0;i<rs.length;i++)if(rs[i].width)R=Math.max(R,rs[i].right);
+          var rf=document.createRange(); rf.selectNodeContents(ccBox.querySelector(".ccvref")); var rr=rf.getBoundingClientRect(); if(rr.width)R=Math.max(R,rr.right);
+          if(R>L)vw.style.width=Math.ceil(R-L+2)+"px";
+        }
+        function later(){clearTimeout(ft);ft=setTimeout(fit,30)}
+        if(window.MutationObserver)new MutationObserver(later).observe(vv,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["class"]});
+        window.addEventListener("resize",later);
+      })();
       ccBox.querySelector(".ccvref").addEventListener("click",function(){   // 구절 이름을 누르면 "잠언 11장 3절"처럼 한 번에 읽어 줌 (2026-10-21 사용자 요청)
         var n0=C&&notes.get(C.id); if(!n0||!n0.ref)return; buzz(18);
         sayWord(refSay(n0.ref),true);
