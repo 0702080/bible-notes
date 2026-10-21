@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-17">
+<meta name="app-build" content="2026-10-21-18">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1521,6 +1521,13 @@ body.boardon{height:100vh;overflow:hidden}
 body.boardon .wrap{height:100vh;display:flex;flex-direction:column;padding-bottom:0;box-sizing:border-box}
 body.boardon .top,body.boardon .toolbar,body.boardon .topicbar,body.boardon .filter{flex:0 0 auto}
 body.boardon .board4{flex:1 1 auto;height:auto;min-height:0;padding-bottom:0;margin-bottom:0}
+/* PC 칸반 맨 아래 한 줄: 믿음의 한 마디 (2026-10-21 사용자 요청) */
+.boardsay{display:none}
+body.boardon .boardsay:not([hidden]){display:flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;height:40px;margin:0 -20px;padding:0 20px;border-top:1px solid #1f1e24;background:#0d0d10}
+.boardsay .bsq{flex:0 1 auto;min-width:0;max-width:min(1100px,90%);padding:4px 12px;border:0;border-radius:14px;background:transparent;color:color-mix(in srgb,var(--gold) 35%,var(--ink));font-family:var(--serif);font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.boardsay .bsq small{margin-left:10px;font-family:var(--sans);font-size:12px;color:var(--gold)}
+@media (hover:hover){.boardsay .bsq:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
+.boardsay .saypin{position:static;flex:0 0 auto}
 body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!important}
 /* 칸반일 때 '오늘'을 도구줄에 작은 아이콘 줄로 (2026-10-17 사용자 요청) */
 .todaymini{display:none}
@@ -2646,6 +2653,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   <div class="solobar" id="soloBar" hidden></div>
   <div id="list"></div>
   <div id="board" class="board4" hidden></div>
+  <div id="boardSay" class="boardsay" hidden></div>
   <input type="file" id="hymnFile" accept="image/*" hidden>
   <div class="empty" id="empty" hidden><p id="emptyMsg"></p><button type="button" class="primary" id="emptyAdd">첫 말씀 담기</button></div>
 </main>
@@ -2894,8 +2902,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // PC도 휴대폰처럼 목록으로 열린다 (2026-10-21 사용자 요청). [칸반 보드]를 고르면 그 뒤로는 그대로 기억한다
   // PC도 휴대폰과 똑같이 늘 목록(말씀 카드)으로 연다 (2026-10-21 사용자 요청 두 번째).
   // 칸반 보드는 위의 [칸반 보드]를 누를 때만 보이고, 다시 열면 목록으로 돌아온다
-  var boardOn=false;
-  try{localStorage.setItem("bible-view","list")}catch(e){}
+  // → 다시 바꿈: PC(폭 900px 이상)에서는 무조건 칸반으로 연다 (2026-10-21 사용자 요청 세 번째). 휴대폰은 목록 그대로
+  var boardOn=!!(window.matchMedia&&matchMedia("(min-width:900px)").matches);
+  try{localStorage.setItem("bible-view",boardOn?"board":"list")}catch(e){}
   var tdFold=false; try{tdFold=localStorage.getItem("bible-today-fold")==="1"}catch(e){}   // '오늘' 카드 접어 두기
   var BCOLS=[{k:"new",t:"새로 담음",e:"🌱",c:"var(--muted)",tip:"아직 암송을 시작하지 않은 말씀"},{k:"doing",t:"외우는 중",e:"✏️",c:"var(--sky)",tip:"도장을 모으는 중"},{k:"due",t:"복습할 차례",e:"🔁",c:"var(--gold)",tip:"오늘 다시 떠올릴 말씀"},{k:"done",t:"다 외움",e:"🏅",c:"var(--green)",tip:"도장 4개를 다 받은 말씀"}];
   function boardCol(n){
@@ -8196,7 +8205,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     scheduleSave(n.id); render(); toast("묵상으로 담았어요 ✍️");
     closeMedq(); openNoteFocus(n.id,"m");
   }
+  function renderBoardSay(){   // PC 칸반에서는 '오늘' 카드가 숨으니, 같은 한 마디를 맨 아래 한 줄로
+    var bs=$("boardSay"); if(!bs)return;
+    var sd=sayOfDay(); bs.hidden=!sd; bs.textContent=""; if(!sd)return;
+    var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
+    var q=document.createElement("button"); q.type="button"; q.className="bsq"; q.title="믿음의 한 마디 모두 보기";
+    q.textContent="💬  “"+String(sd.t).replace(/\s+/g," ")+"”";
+    if(sd.who){var w=document.createElement("small"); w.textContent="— "+sd.who; q.appendChild(w)}
+    var pb=document.createElement("button"); pb.type="button"; pb.className="saypin"+(isPin?" on":""); pb.dataset.sid=sd.id;
+    pb.textContent="📌"; pb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; pb.setAttribute("aria-label",pb.title); pb.setAttribute("aria-pressed",String(isPin));
+    q.addEventListener("click",function(){openSay()}); pb.addEventListener("click",function(){sayTogglePin(sd.id)});
+    bs.appendChild(q); bs.appendChild(pb);
+  }
   function renderReviewBar(){
+    try{renderBoardSay()}catch(e){}
     var bar=$("reviewBar"); if(!bar)return;
     bar.textContent="";
     if(reorderMode||!notes.size){bar.hidden=true;return}
