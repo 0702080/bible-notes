@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-19">
+<meta name="app-build" content="2026-10-21-20">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6124,6 +6124,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!("speechSynthesis" in window)||typeof SpeechSynthesisUtterance==="undefined")return true;
     try{return !(window.speechSynthesis.getVoices()||[]).length}catch(e){return true}
   }
+  // 구절 이름 읽기: "잠언 11:3" → "잠언 십일장 삼절" (숫자를 '열한'이 아니라 한자어 수로, 2026-10-21 사용자 요청)
+  function koNum(n){
+    n=+n; if(!(n>0)||n>9999)return String(n);
+    var D=["","일","이","삼","사","오","육","칠","팔","구"], U=["","십","백","천"], out="", s=String(n);
+    for(var i=0;i<s.length;i++){var d=+s[i], u=s.length-1-i; if(!d)continue; out+=(d===1&&u>0?"":D[d])+U[u]}
+    return out;
+  }
+  function refSay(ref){
+    return String(ref||"").replace(/(\d+)\s*:\s*(\d+)(?:\s*[-~–]\s*(\d+))?/g,function(m,c,v,v2){return koNum(c)+"장 "+koNum(v)+"절"+(v2?"에서 "+koNum(v2)+"절":"")});
+  }
   function sayWord(t,force,pre){   // force: 내가 직접 눌러서 듣는 경우 (읽어 주기 꺼져 있어도 들려줌), pre: 먼저 읽을 말 (구절 이름)
     if(!quizVoice&&!force)return;
     if(voiceMissing()){
@@ -6132,7 +6142,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     try{
       window.speechSynthesis.cancel();
-      (pre?[String(pre).replace(/(\d+)\s*:\s*(\d+)/g,"$1장 $2절"),t]:[t]).forEach(function(x){
+      (pre?[refSay(pre),t]:[t]).forEach(function(x){
         var u=new SpeechSynthesisUtterance(String(x).replace(/[^가-힣A-Za-z0-9\s]/g," ")); u.lang="ko-KR"; u.rate=1; if(koVoice)u.voice=koVoice;
         window.speechSynthesis.speak(u)});
     }catch(e){}
@@ -6522,7 +6532,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccBox.querySelector(".ccverse").addEventListener("contextmenu",function(e){if(C&&!C.edit)e.preventDefault()});
       ccBox.querySelector(".ccvref").addEventListener("click",function(){   // 구절 이름을 누르면 "잠언 11장 3절"처럼 한 번에 읽어 줌 (2026-10-21 사용자 요청)
         var n0=C&&notes.get(C.id); if(!n0||!n0.ref)return; buzz(18);
-        sayWord(String(n0.ref).replace(/(\d+)\s*:\s*(\d+)/g,"$1장 $2절"),true);
+        sayWord(refSay(n0.ref),true);
       });
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 낱말을 누르면 소리로 들려주고, 가린 낱말은 톡 뒤집혀 잠깐 보인다
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
@@ -6730,7 +6740,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function ccAct(a){
     var n=notes.get(C&&C.id); if(!n)return;
-    if(a==="say"){try{window.speechSynthesis.cancel();[n.ref,n.text].forEach(function(t){if(!t)return;var u=new SpeechSynthesisUtterance(String(t).replace(/(\d+):(\d+)/g,"$1장 $2절"));u.lang="ko-KR";u.rate=.9;window.speechSynthesis.speak(u)})}catch(e){}return}   // 구절 이름 먼저, 그다음 말씀 전체 (2026-10-21 사용자 요청)
+    if(a==="say"){try{window.speechSynthesis.cancel();[refSay(n.ref),n.text].forEach(function(t){if(!t)return;var u=new SpeechSynthesisUtterance(String(t));u.lang="ko-KR";u.rate=.9;window.speechSynthesis.speak(u)})}catch(e){}return}   // 구절 이름 먼저, 그다음 말씀 전체 (2026-10-21 사용자 요청)
     if(a==="read"){
       if(C.reads>=3)return; C.reads++;C.justRead=true;buzz(8);
       if(C.reads>=3){ccDraw();var lamp=ccBox.querySelector(".ccmeter i:last-child");setTimeout(function(){if(!C)return;C.stage=1;C.anim=true;toast("🗣️ 3번 읽었어요!");ccDraw()},lamp?520:0);return}
