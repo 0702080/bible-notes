@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-14">
+<meta name="app-build" content="2026-10-21-15">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6640,7 +6640,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     v.appendChild(wrap);
     btn("다시 써 보기","dretry");
-    btn("😅 잘 모르겠어요","g0"); btn("🤔 조금 틀렸어요","g1"); btn("😊 다 기억났어요","g2",true);
+    btn("😊 다 기억났어요","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
   }
   function ccEditForm(n,tip,btn){   // 상자 없이 말씀 자리에서 그대로 고친다 (2026-10-18 사용자 요청)
     var v=ccBox.querySelector(".ccverse");
@@ -6709,7 +6709,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       btn("확인하기 👀","show",true);
     }else if(C.stage===4){
       ccWords(n.text,"got",0,C.seed);
-      btn("😅 잘 모르겠어요","g0"); btn("🤔 조금 틀렸어요","g1"); btn("😊 다 기억났어요","g2",true);
+      btn("😊 다 기억났어요","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
     }else{
       ccResult(n); return;
     }
@@ -6782,7 +6782,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(C.revealing)return; C.revealing=true; buzz(8);
     // 다음 화면의 고르기 버튼을 미리 (눌리지 않게) 깔아 두어 말씀 자리가 끝날 때 움직이지 않게
     var ft=ccBox.querySelector(".ccfoot"); ft.textContent="";
-    [["😅 잘 모르겠어요","g0",0],["🤔 조금 틀렸어요","g1",0],["😊 다 기억났어요","g2",1]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(x[2]?" main":"");b.dataset.a=x[1];b.textContent=x[0];b.disabled=true;ft.appendChild(b)});
+    [["😊 다 기억났어요","g2",1]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(x[2]?" main":"");b.dataset.a=x[1];b.textContent=x[0];b.disabled=true;ft.appendChild(b)});
     var n=notes.get(C.id), v=ccBox.querySelector(".ccverse"), still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
     if(!n){C.revealing=false;return}
     var cnt=wordsOf(n.text).length, step=still?0:Math.max(40,Math.min(110,1400/Math.max(1,cnt))), FADE=still?0:700;
