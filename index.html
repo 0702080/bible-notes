@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-3">
+<meta name="app-build" content="2026-10-21-4">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1783,6 +1783,7 @@ button:active{filter:brightness(1.15)}
 .oquiz{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .oquiz[hidden]{display:none}
 .cch{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+.cch{touch-action:pan-y}   /* 가로로 밀기는 앱이 받아서 다음 말씀으로 */
 .cch[hidden]{display:none}
 .ccsteps{display:flex;gap:4px;padding:12px 16px 4px}
 .ccst{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;color:var(--faint)}
@@ -6407,11 +6408,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       document.body.appendChild(ccBox);
       // 결과 화면에서 오른쪽 → 왼쪽으로 밀면 다음 암송 말씀
       var sx=0,sy=0,sw=false;
-      ccBox.addEventListener("touchstart",function(e){var t=e.touches[0];sx=t.clientX;sy=t.clientY;sw=!!(C&&C.stage===5&&e.touches.length===1)},{passive:true});
-      ccBox.addEventListener("touchend",function(e){
-        if(!sw||!C||C.stage!==5)return; sw=false; var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
-        if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.5)ccGoNext();
-      },{passive:true});
+      // 어느 단계에서든 오른쪽 → 왼쪽으로 밀거나 끌면 다음 암송 말씀 (휴대폰 손가락·PC 마우스 모두, 2026-10-21 사용자 요청)
+      ccBox.addEventListener("pointerdown",function(e){
+        sw=false; if(!C||C.edit||C.revealing||e.button>0)return;
+        if(e.target.closest("button,textarea,input,a,.ccfoot"))return;
+        sx=e.clientX; sy=e.clientY; sw=true;
+      });
+      ccBox.addEventListener("pointerup",function(e){
+        if(!sw||!C||C.edit)return; sw=false; var dx=e.clientX-sx, dy=e.clientY-sy;
+        if(dx<-70&&Math.abs(dx)>Math.abs(dy)*1.5){try{window.getSelection().removeAllRanges()}catch(err){} ccGoNext()}
+      });
+      ccBox.addEventListener("pointercancel",function(){sw=false});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
       // 문장 배치 고치기: 말씀을 꾹(0.8초) 누르면 열림. 연습 중 빠르게 두 번 눌러도 고치기로 넘어가지 않게 (2026-10-21 사용자 요청)
       var ccHold=0, ccHx=0, ccHy=0;
