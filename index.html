@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-23">
+<meta name="app-build" content="2026-10-21-24">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2243,6 +2243,18 @@ button:active{filter:brightness(1.15)}
 .prdbody::-webkit-scrollbar{display:none}
 .prdfil{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
 .prdfil button{height:32px;padding:0 14px;border:0;border-radius:16px;background:#1E1D24;color:#D9D5E0;font-size:13px;font-weight:600;white-space:nowrap}
+.prdfil .prdall{margin-left:auto;background:transparent;border:1px solid #2E2D35;color:var(--muted)}
+.prdfil .prdall[hidden]{display:none}
+.prdfold{display:inline-flex;align-items:center;gap:6px;height:28px;margin-left:auto;padding:0 10px 0 12px;border:0;border-radius:14px;background:#1E1D24;color:var(--muted);font-size:12.5px;white-space:nowrap}
+.prdfold i{width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(1px) rotate(-135deg);transition:transform .2s}
+.prdsec.fold .prdfold i{transform:translateY(-2px) rotate(45deg)}
+.prdsec.fold .prdfold{color:var(--orange);background:color-mix(in srgb,var(--orange) 14%,#1E1D24)}
+.prdhd .prdfold+.prdgo{margin-left:0}
+.prdsec.fold .prdit{display:none}
+.prdsec.fold{margin-bottom:12px}
+.prdsec.fold .prdword{margin-bottom:0}
+.prdsec.fold .prdword .prdverse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;font-size:16px}
+.prdsec.fold .prdword::after{display:none}
 .prdfil button[aria-pressed="true"]{background:color-mix(in srgb,var(--orange) 26%,#1E1D24);color:var(--orange)}
 .prdsec{margin:0 0 26px}
 .prdhd{display:flex;align-items:center;gap:10px}
@@ -3594,12 +3606,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!prd){
       prd=document.createElement("div"); prd.className="rvq prd"; prd.setAttribute("role","dialog"); prd.setAttribute("aria-modal","true"); prd.hidden=true;
       prd.innerHTML='<div class="dlbar"><b class="dltitle">🙏 기도 읽기</b><span class="rqcnt prdcnt"></span><button type="button" class="dlclose prdclose">닫기</button></div>'+
-        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button></div>'+
+        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button><button type="button" class="prdall"></button></div>'+
         '<form class="p1add" autocomplete="off"><input class="p1in" type="text" maxlength="500" enterkeyhint="done" placeholder="✏️ 한 줄 기도 적기" aria-label="한 줄 기도"><button type="submit" class="p1go">추가</button></form>'+
         '<div class="prdlist"></div></div>';
       document.body.appendChild(prd);
       prd.querySelector(".prdclose").addEventListener("click",closePrayRead);
-      prd.querySelector(".prdfil").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;prdFilter=b.dataset.f;drawPrayRead()});
+      prd.querySelector(".prdfil").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+        if(b.classList.contains("prdall")){   // 모두 접기 / 모두 펼치기
+          var secs=prd.querySelectorAll(".prdsec[data-fk]"), shut=!Array.prototype.every.call(secs,function(x){return x.classList.contains("fold")});
+          secs.forEach(function(x){x.classList.toggle("fold",shut); if(shut)prdFold[x.dataset.fk]=1; else delete prdFold[x.dataset.fk]});
+          prdFoldSave(); prdFoldSync(); return}
+        prdFilter=b.dataset.f;drawPrayRead()});
+      prd.querySelector(".prdlist").addEventListener("click",function(e){   // 말씀(또는 한 줄 기도) 칸 접기·펼치기
+        var t=e.target.closest(".prdfold"); if(!t)return;
+        var sec=t.closest(".prdsec"), on=!sec.classList.contains("fold"); sec.classList.toggle("fold",on);
+        if(on)prdFold[sec.dataset.fk]=1; else delete prdFold[sec.dataset.fk]; prdFoldSave(); prdFoldSync();
+      });
       prd.querySelector(".p1add").addEventListener("submit",function(e){
         e.preventDefault(); var inp=prd.querySelector(".p1in"), t=inp.value.trim(); if(!t){inp.focus();return}
         var o=p1Data(), now=Date.now(); o.items.push({id:"o"+now.toString(36)+Math.random().toString(36).slice(2,5),t:t,at:now,ans:0,an:"",u:now}); p1Save(o);
@@ -3626,6 +3648,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     prd.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     prd.querySelector(".prdbody").scrollTop=0;
   }
+  // 기도 읽기 접기: 기도가 많이 쌓여도 말씀별로 접어 두고 필요한 것만 펼쳐 봄 (2026-10-21 사용자 요청)
+  var PRD_FOLD="bible-prd-fold", prdFold={};
+  try{prdFold=JSON.parse(localStorage.getItem(PRD_FOLD)||"{}")||{}}catch(e){prdFold={}}
+  function prdFoldSave(){try{localStorage.setItem(PRD_FOLD,JSON.stringify(prdFold))}catch(e){}}
+  function prdFoldSync(){
+    if(!prd)return; var secs=prd.querySelectorAll(".prdsec[data-fk]"), b=prd.querySelector(".prdall");
+    secs.forEach(function(x){var f=x.querySelector(".prdfold"); if(f)f.setAttribute("aria-expanded",String(!x.classList.contains("fold")))});
+    b.hidden=secs.length<2; b.textContent=Array.prototype.every.call(secs,function(x){return x.classList.contains("fold")})?"모두 펼치기":"모두 접기";
+  }
+  function prdFoldBtn(sec,key,n){
+    sec.dataset.fk=key; if(prdFold[key])sec.classList.add("fold");
+    var f=document.createElement("button"); f.type="button"; f.className="prdfold"; f.setAttribute("aria-label","접기·펼치기");
+    f.innerHTML='<span></span><i aria-hidden="true"></i>'; f.querySelector("span").textContent="기도 "+n;
+    return f;
+  }
   function closePrayRead(){if(!prd)return; prd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
   function drawPrayRead(){
     var list=prd.querySelector(".prdlist"); list.textContent="";
@@ -3638,6 +3675,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(ones.length){
         var osec=document.createElement("section"); osec.className="prdsec p1sec";
         osec.innerHTML='<div class="prdhd"><b class="prdref">🙏 한 줄 기도</b></div>';
+        osec.querySelector(".prdhd").appendChild(prdFoldBtn(osec,"one",ones.length));
         ones.forEach(function(x){
           var a=document.createElement("article"); a.className="prdit p1it"+(x.ans?" answered":""); a.dataset.oid=x.id;
           a.innerHTML='<div class="prdmeta"></div>'+(p1Edit===x.id?'<input class="p1ed" type="text" maxlength="500" enterkeyhint="done" aria-label="한 줄 기도 고치기">':'<p class="prdtext"></p>')+
@@ -3659,6 +3697,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       sec.innerHTML='<div class="prdword"><div class="prdhd"><b class="prdref"></b><button type="button" class="prdgo">카드로 가기</button></div><p class="prdverse"></p></div>';
       sec.querySelector(".prdref").textContent=n.ref; sec.querySelector(".prdverse").textContent=n.text; sec.querySelector(".prdgo").dataset.id=n.id;
       if(prdNote)sec.querySelector(".prdgo").remove();
+      var hd0=sec.querySelector(".prdhd"); hd0.insertBefore(prdFoldBtn(sec,n.id,ps.length),hd0.querySelector(".prdgo"));
       ps.forEach(function(x){
         var a=document.createElement("article"); a.className="prdit"+(x.ans?" answered":"");
         a.innerHTML='<div class="prdmeta"></div><p class="prdtext"></p>'+(x.ans?'<div class="prdans"><b>🙌 응답 <span></span></b><p></p></div>':'');
@@ -3670,6 +3709,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       list.appendChild(sec);
     });
     prd.querySelector(".prdcnt").textContent=total?("응답 "+ansN+" / "+total):"";
+    prdFoldSync();
     if(!list.children.length)list.innerHTML='<p class="pempty prdempty">'+(total?"이 보기에 해당하는 기도가 없어요.":"아직 적은 기도가 없어요. 위 칸에 한 줄 기도를 적거나, 말씀 카드의 기도 탭에서 + 기도로 적어 보세요.")+'</p>';
   }
 
