@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-6">
+<meta name="app-build" content="2026-10-21-7">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6684,7 +6684,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function ccGoNext(){
     var nx=ccNextNote(); if(!nx){toast("이번에 외울 말씀을 다 했어요 🎉");return}
-    var seen=Object.assign({},C.seen); seen[C.id]=1; buzz(8);
+    var seen=Object.assign({},C.seen); seen[C.id]=1; buzz([35,50,35]);   // 다음 말씀으로 넘어갈 때 '톡톡' 진동 (2026-10-21 사용자 요청)
     ccBack.push({id:C.id,seen:C.seen,order:C.order});
     var body=ccBox.querySelector(".ccbody"), still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
     body.classList.remove("ccin","ccinb","ccoutb"); body.classList.add("ccout");
@@ -6696,8 +6696,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function ccGoPrev(){   // 왼쪽 → 오른쪽으로 밀면 좀 전에 한 말씀을 다시 (2026-10-21 사용자 요청)
     var h=null; while(ccBack.length&&!h){var x=ccBack.pop();if(notes.get(x.id))h=x}
-    if(!h){toast("이번에 처음 연 말씀이에요");return}
-    buzz(8);
+    if(!h){toast("이번에 처음 연 말씀이에요");buzz(25);return}
+    buzz([35,50,35]);
     var body=ccBox.querySelector(".ccbody"), still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
     body.classList.remove("ccin","ccout","ccinb"); body.classList.add("ccoutb");
     setTimeout(function(){
