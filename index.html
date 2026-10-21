@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-18">
+<meta name="app-build" content="2026-10-21-19">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10553,6 +10553,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var cards=Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id});
     if(d.type==="col"){
       var li=+cl.dataset.li; if(li===d.li||!cards.length)return;
+      // 칸 이름도 칸을 따라 옮김 (이름은 자리 L1, L2…에 붙어 있으므로 자리 이름을 같이 돌림, 2026-10-21 사용자 요청)
+      var nc=document.querySelectorAll("#board .bcol").length, nm=[];
+      for(var q=0;q<nc;q++)nm.push(bNames["L"+(q+1)]);
+      nm.splice(li,0,nm.splice(d.li,1)[0]);
+      nm.forEach(function(v,q){if(v)bNames["L"+(q+1)]=v; else delete bNames["L"+(q+1)]}); saveBNames();
       if(d.li<li)lmApply(null,d.ids,null,cards[cards.length-1]); else lmApply(null,d.ids,cards[0],null);
       toast("칸을 통째로 옮겼어요"); return;
     }
