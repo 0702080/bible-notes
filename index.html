@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-8">
+<meta name="app-build" content="2026-10-21-9">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6774,7 +6774,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function chMemSave(k,r){var o=chMemAll();o[k]=r;try{localStorage.setItem(CHM_KEY,JSON.stringify(o))}catch(e){}}
   function chKeyOf(n){return (n.book>=0&&n.chapter?USFM[n.book]+"-"+n.chapter:"note-"+n.id)}
   function chVersesOf(n){   // 장 전체를 담은 카드(번호 붙은 줄 3개 이상)면 절 목록
-    var t=String(n.text||""); if(t.split("\n").filter(function(l){return /^\s*\d{1,3}\s+\S/.test(l)}).length<3)return null;
+    var t=String(n.text||""); if(t.split("\n").filter(function(l){return /^\s*\d{1,3}[.)]?\s+\S/.test(l)}).length<3)return null;
     var vs=parseChapterPaste(t); return vs.length>=3?vs:null;
   }
   function chFirst(text){   // 낱말마다 첫 글자만 남기고 나머지는 ○
@@ -9426,7 +9426,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   /* 절 번호(1, 2, 3 …)로 시작하는 말씀은 번호를 왼쪽에 두고 본문을 가지런히 맞춘다 */
   function vLines(v){
     var txt=v.textContent||"";
-    var numbered=(txt.match(/^[ 	]*\d{1,3}[ 	]/gm)||[]).length>=2;
+    var numbered=(txt.match(/^[ 	]*\d{1,3}[.)]?[ 	]/gm)||[]).length>=2;
     if(!numbered&&txt.indexOf(String.fromCharCode(10))<0)return;   // 한 줄짜리는 그대로
     var kids=Array.prototype.slice.call(v.childNodes), frag=document.createDocumentFragment();
     var line=document.createElement("span"); line.className="vl";
@@ -9448,10 +9448,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     // 절 번호로 시작하지 않는 줄(같은 절이 이어지는 줄)은 본문 자리에 맞춘다
     Array.prototype.forEach.call(v.querySelectorAll(".vl"),function(ln){
       // 빈 줄 표시(vb)는 남겨 둬야 다음 절에 여백이 또 붙지 않는다 (편집기와 같은 한 줄 공백, 2026-10-15)
-      if(!/^[ 	]*\d{1,3}[ 	]/.test(ln.textContent||"")){ln.classList.add("cont");return}
+      if(!/^[ 	]*\d{1,3}[.)]?[ 	]/.test(ln.textContent||"")){ln.classList.add("cont");var f0=ln.firstChild;if(f0&&f0.nodeType===3)f0.data=String(f0.data).replace(/^[ 	　]+/,"");return}   // 이어지는 줄 앞의 띄어쓰기는 지워서 첫 글자 자리에 딱 맞춤
       var f=ln.firstChild;   // 절 번호를 고정폭 칸에 넣어 본문 시작 자리를 똑같이 맞춘다
       if(f&&f.nodeType===3){
-        var mm=String(f.data).match(/^[ 	]*(\d{1,3})[ 	]+/);
+        var mm=String(f.data).match(/^[ 	]*(\d{1,3})[.)]?[ 	]+/);
         if(mm){
           f.data=String(f.data).slice(mm[0].length);
           var sp=document.createElement("span"); sp.className="vno"; sp.textContent=mm[1];
