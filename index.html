@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-15">
+<meta name="app-build" content="2026-10-21-16">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6115,7 +6115,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!("speechSynthesis" in window)||typeof SpeechSynthesisUtterance==="undefined")return true;
     try{return !(window.speechSynthesis.getVoices()||[]).length}catch(e){return true}
   }
-  function sayWord(t,force){   // force: 내가 직접 눌러서 듣는 경우 (읽어 주기 꺼져 있어도 들려줌)
+  function sayWord(t,force,pre){   // force: 내가 직접 눌러서 듣는 경우 (읽어 주기 꺼져 있어도 들려줌), pre: 먼저 읽을 말 (구절 이름)
     if(!quizVoice&&!force)return;
     if(voiceMissing()){
       if(!voiceWarned){voiceWarned=true;toast("이 화면에서는 음성이 나오지 않아요. 크롬에서 열면 들을 수 있어요")}
@@ -6123,8 +6123,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     try{
       window.speechSynthesis.cancel();
-      var u=new SpeechSynthesisUtterance(String(t).replace(/[^가-힣A-Za-z0-9\s]/g," ")); u.lang="ko-KR"; u.rate=1; if(koVoice)u.voice=koVoice;
-      window.speechSynthesis.speak(u);
+      (pre?[String(pre).replace(/(\d+)\s*:\s*(\d+)/g,"$1장 $2절"),t]:[t]).forEach(function(x){
+        var u=new SpeechSynthesisUtterance(String(x).replace(/[^가-힣A-Za-z0-9\s]/g," ")); u.lang="ko-KR"; u.rate=1; if(koVoice)u.voice=koVoice;
+        window.speechSynthesis.speak(u)});
     }catch(e){}
   }
   function voiceBtnHtml(){return quizVoice?'<span aria-hidden="true">🔊</span>':'<span aria-hidden="true">🔇</span>'}
@@ -6513,7 +6514,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 낱말을 누르면 소리로 들려주고, 가린 낱말은 톡 뒤집혀 잠깐 보인다
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
         var wt=String(w.dataset.w||w.textContent||"").trim();
-        if(wt)sayWord(wt,true);   // 누를 때마다 그 낱말 소리 (2026-10-17 사용자 요청)
+        var first=w===ccBox.querySelector(".ccverse .ccw"), cn0=first&&notes.get(C.id);
+        if(wt)sayWord(wt,true,cn0&&cn0.ref);   // 누를 때마다 그 낱말 소리 (2026-10-17), 첫 낱말은 구절 이름(잠언 11장 3절)부터 (2026-10-21 사용자 요청)
         if(!w.classList.contains("hid")||w.classList.contains("peek")){buzz(18);return}   // 누를 때마다 진동 (2026-10-21 사용자 요청)
         w.classList.add("peek"); C.peek++; buzz([25,30,15]);
         ccBurst(w);   // 가린 낱말을 누르면 풍선 터지듯 '팡' (2026-10-21 사용자 요청)
