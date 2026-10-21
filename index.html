@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-11">
+<meta name="app-build" content="2026-10-21-12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1498,6 +1498,7 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 .viewseg,.tadd{display:none}
 @media (min-width:900px){
   .bmodeseg[hidden]{display:none!important}
+  .bcol.blist{padding-top:10px}
   .viewseg{display:inline-flex;flex:0 0 auto;padding:3px;gap:2px;border:1px solid var(--rule);border-radius:19px;background:rgba(255,255,255,.03);white-space:nowrap}
   .viewseg button{display:inline-flex;flex:0 0 auto;white-space:nowrap;align-items:center;gap:6px;height:30px;padding:0 13px;border:0;border-radius:15px;background:transparent;color:var(--muted);font-size:13.5px;transition:background .2s,color .2s}
   .viewseg button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
@@ -2985,10 +2986,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     for(var c=0;c<cols;c++){
       var part=items.slice(c*per,(c+1)*per); if(!part.length)break;
       var cl=document.createElement("section"); cl.className="bcol blist"; cl.style.setProperty("--bc","var(--violet)");
-      var h=document.createElement("div"); h.className="bch";
-      h.innerHTML='<span class="bce">📖</span><b></b><span class="bcn"></span>';
-      h.querySelector("b").textContent=(c*per+1)+" – "+(c*per+part.length); h.querySelector(".bcn").textContent=part.length;
-      cl.appendChild(h);
+      // 칸 머리(번호)는 헷갈려서 두지 않는다 (2026-10-21 사용자 요청)
       var lst=document.createElement("div"); lst.className="bclist";
       part.forEach(function(n,i){
         var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0;
