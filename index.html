@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-13">
+<meta name="app-build" content="2026-10-21-14">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1500,6 +1500,9 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
   .bmodeseg[hidden]{display:none!important}
   .bcol.blist .bch{cursor:grab}
   .bcol.lmdrag{opacity:.45}
+  .blist .bch{cursor:grab} .blist .bcard{cursor:grab}
+  body.lmmoving,body.lmmoving *{cursor:grabbing!important;user-select:none!important}
+  .lmghost{position:fixed;z-index:300;pointer-events:none;opacity:.85;overflow:hidden;transform:rotate(1.5deg);box-shadow:0 12px 30px rgba(0,0,0,.5);margin:0}
   .bcol.lmover{background:color-mix(in srgb,var(--violet) 10%,#141417);border-color:var(--violet)}
   .bcard.lmdrag{opacity:.35}
   .bcard.lmbefore{box-shadow:0 -3px 0 0 var(--gold)}
@@ -1911,16 +1914,13 @@ button:active{filter:brightness(1.15)}
 }
 .ccvwrap{width:100%}
 .ccvref{margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
-.ccvend{margin-top:12px;font-size:15px;color:color-mix(in srgb,var(--violet) 80%,var(--muted));text-align:right}
-.ccvend::before{content:"— "}
 .cch .bqtitle .ccref{display:none}
 .ccw.ccpopx{animation:ccpopx .45s cubic-bezier(.2,1.8,.4,1)}
 @keyframes ccpopx{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
 .ccburst{position:fixed;width:0;height:0;pointer-events:none;z-index:200}
 .ccburst i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;animation:ccbx .6s cubic-bezier(.15,.8,.3,1) forwards}
 @keyframes ccbx{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--x),var(--y)) scale(.3);opacity:0}}
-.ccburst b{position:absolute;left:-18px;top:-18px;width:36px;height:36px;border-radius:50%;border:2px solid #FFD43B;animation:ccbring .5s ease-out forwards}
-@keyframes ccbring{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.8);opacity:0}}   /* 휴대폰: 아래 단추 가로 폭 20% 줄이기 (2026-10-21 사용자 요청) */
+   /* 휴대폰: 아래 단추 가로 폭 20% 줄이기 (2026-10-21 사용자 요청) */
 /* PC: 진행 줄과 단추를 화면 가운데 알맞은 크기로 (2026-10-18 사용자 요청) */
 @media (min-width:900px){
   .ccsteps{width:100%;max-width:460px;margin:0 auto;padding:10px 0 2px}
@@ -3008,14 +3008,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     for(var c=0;c<cols;c++){
       var part=items.slice(c*per,(c+1)*per); if(!part.length)break;
       var cl=document.createElement("section"); cl.className="bcol blist"; cl.style.setProperty("--bc","var(--violet)"); cl.dataset.k="L"+(c+1); cl.dataset.li=String(c);
-      var h=document.createElement("div"); h.className="bch"; h.draggable=true;   // 칸 제목: 두 번 눌러 이름 바꾸기, 좌우로 끌면 칸 통째로 옮기기
+      var h=document.createElement("div"); h.className="bch";   // 칸 제목: 두 번 눌러 이름 바꾸기, 좌우로 끌면 칸 통째로 옮기기
       h.title="두 번 누르면 이름 바꾸기 · 좌우로 끌면 이 칸의 말씀을 통째로 옮겨요";
       h.innerHTML='<span class="bce">📖</span><b></b><span class="bcn"></span>';
       h.querySelector("b").textContent=bTitle({k:"L"+(c+1),t:"말씀 "+(c+1)}); h.querySelector(".bcn").textContent=part.length;
       cl.appendChild(h);
       var lst=document.createElement("div"); lst.className="bclist";
       part.forEach(function(n,i){
-        var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0; cd.draggable=true;
+        var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0;
         var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)"); cd.style.animationDelay=(Math.min(i,12)*30)+"ms";
         var col=boardCol(n), mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
         cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
@@ -6246,7 +6246,6 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       for(var i=0;i<14;i++){var p=document.createElement("i"),a=Math.PI*2*i/14+Math.random()*.5,d=30+Math.random()*34;
         p.style.setProperty("--x",Math.cos(a)*d+"px"); p.style.setProperty("--y",Math.sin(a)*d+"px"); p.style.background=cols[i%cols.length];
         if(i%3===0)p.style.borderRadius="2px"; box.appendChild(p)}
-      var ring=document.createElement("b"); box.appendChild(ring);
       document.body.appendChild(box); setTimeout(function(){box.remove()},700);
     }catch(e){}
   }
@@ -6479,7 +6478,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccBox=document.createElement("div"); ccBox.className="cch"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
       ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b><small class="ccnum" hidden></small></div></div>'+
         '<div class="ccsteps" aria-hidden="true"></div>'+
-        '<div class="ccbody"><div class="cctip"></div><div class="ccmid"><div class="ccvwrap"><div class="ccvref"></div><div class="ccverse"></div><div class="ccvend"></div></div></div></div>'+
+        '<div class="ccbody"><div class="cctip"></div><div class="ccmid"><div class="ccvwrap"><div class="ccvref"></div><div class="ccverse"></div></div></div></div>'+
         '<div class="ccfoot"></div>';
       document.body.appendChild(ccBox);
       // 결과 화면에서 오른쪽 → 왼쪽으로 밀면 다음 암송 말씀
@@ -6528,7 +6527,6 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",dict:null,edit:false,anim:true,seen:opt.seen||{},order:opt.order||1};
     ccBox.querySelector(".ccref").textContent=n.ref;
     ccBox.querySelector(".ccvref").textContent=n.ref;   // 말씀 바로 위에 구절 이름 (2026-10-21 사용자 요청)
-    ccBox.querySelector(".ccvend").textContent=n.ref;   // 외울 때 끝에도 구절 이름까지 말하도록
     var cn=ccBox.querySelector(".ccnum"); cn.hidden=C.order<2; cn.textContent=C.order+"번째";   // 밀어서 이어 외울 때 몇 번째 말씀인지
     if(C.order>=2){cn.classList.remove("bump");void cn.offsetWidth;cn.classList.add("bump")}
     var wasOpen=!ccBox.hidden;
@@ -6718,7 +6716,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function ccAct(a){
     var n=notes.get(C&&C.id); if(!n)return;
-    if(a==="say"){try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(n.text);u.lang="ko-KR";u.rate=.9;window.speechSynthesis.speak(u)}catch(e){}return}
+    if(a==="say"){try{window.speechSynthesis.cancel();[n.ref,n.text].forEach(function(t){if(!t)return;var u=new SpeechSynthesisUtterance(String(t).replace(/(\d+):(\d+)/g,"$1장 $2절"));u.lang="ko-KR";u.rate=.9;window.speechSynthesis.speak(u)})}catch(e){}return}   // 구절 이름 먼저, 그다음 말씀 전체 (2026-10-21 사용자 요청)
     if(a==="read"){
       if(C.reads>=3)return; C.reads++;C.justRead=true;buzz(8);
       if(C.reads>=3){ccDraw();var lamp=ccBox.querySelector(".ccmeter i:last-child");setTimeout(function(){if(!C)return;C.stage=1;C.anim=true;toast("🗣️ 3번 읽었어요!");ccDraw()},lamp?520:0);return}
@@ -10492,36 +10490,52 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(sortMode!=="custom"){sortMode="custom"; try{localStorage.setItem("bible-notes-sort","custom")}catch(e){} syncSortBtn()}
     render(); buzz(12);
   }
-  $("board").addEventListener("dragstart",function(e){
-    if(bMode!=="list"||!boardOn)return;
-    var hd=e.target.closest&&e.target.closest(".bch"), cd=e.target.closest&&e.target.closest(".bcard");
-    if(hd){var cl=hd.closest(".bcol"); lmDrag={type:"col",li:+cl.dataset.li,ids:Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id})}; cl.classList.add("lmdrag")}
-    else if(cd){lmDrag={type:"card",ids:[cd.dataset.id]}; cd.classList.add("lmdrag")}
-    else return;
-    e.stopPropagation(); try{e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain","x")}catch(err){}
+  // 브라우저 기본 끌기(HTML5 drag)는 PC에서 자주 끊겨서, 마우스 누르고 움직이는 것으로 직접 끎 (2026-10-21)
+  var lmP=null;
+  function lmTarget(x,y){var el=document.elementFromPoint(x,y); return el&&el.closest?{cl:el.closest("#board .bcol"),cd:el.closest("#board .bcard")}:{cl:null,cd:null}}
+  $("board").addEventListener("pointerdown",function(e){
+    if(bMode!=="list"||!boardOn||e.button!==0)return;
+    if(e.target.closest("button,input,textarea,a"))return;
+    var hd=e.target.closest(".bch"), cd=e.target.closest(".bcard"); if(!hd&&!cd)return;
+    var cl=(hd||cd).closest(".bcol");
+    lmP={el:hd?cl:cd, type:hd?"col":"card", li:+cl.dataset.li, x:e.clientX, y:e.clientY, on:false,
+      ids:hd?Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id}):[cd.dataset.id]};
   },true);
-  $("board").addEventListener("dragover",function(e){
-    if(!lmDrag)return; e.stopPropagation(); e.preventDefault(); try{e.dataTransfer.dropEffect="move"}catch(err){}
-    lmClear(); var cl=e.target.closest(".bcol"); if(!cl)return;
-    if(lmDrag.type==="col"){cl.classList.add("lmover");return}
-    var cd=e.target.closest(".bcard");
-    if(cd&&cd.dataset.id!==lmDrag.ids[0]){var r=cd.getBoundingClientRect(); cd.classList.add(e.clientY<r.top+r.height/2?"lmbefore":"lmafter")}
-    else if(!cd)cl.classList.add("lmover");
-  },true);
-  $("board").addEventListener("drop",function(e){
-    if(!lmDrag)return; e.stopPropagation(); e.preventDefault();
-    var d=lmDrag; lmDrag=null; lmClear(); var cl=e.target.closest(".bcol"); if(!cl)return;
+  document.addEventListener("pointermove",function(e){
+    if(!lmP)return;
+    if(!lmP.on){if(Math.abs(e.clientX-lmP.x)+Math.abs(e.clientY-lmP.y)<8)return;
+      lmP.on=true; lmDrag=lmP; lmP.el.classList.add("lmdrag"); document.body.classList.add("lmmoving");
+      var r=lmP.el.getBoundingClientRect(), g=lmP.el.cloneNode(true); g.classList.remove("lmdrag"); g.classList.add("lmghost");
+      g.style.width=r.width+"px"; g.style.height=Math.min(r.height,lmP.type==="col"?260:r.height)+"px"; lmP.dx=lmP.x-r.left; lmP.dy=lmP.y-r.top;
+      document.body.appendChild(g); lmP.g=g; buzz(10)}
+    e.preventDefault();
+    lmP.g.style.left=(e.clientX-lmP.dx)+"px"; lmP.g.style.top=(e.clientY-lmP.dy)+"px";
+    document.querySelectorAll("#board .lmbefore,#board .lmafter,#board .lmover").forEach(function(x){x.classList.remove("lmbefore","lmafter","lmover")});
+    var t=lmTarget(e.clientX,e.clientY); if(!t.cl)return;
+    if(lmP.type==="col"){if(+t.cl.dataset.li!==lmP.li)t.cl.classList.add("lmover");return}
+    if(t.cd&&t.cd.dataset.id!==lmP.ids[0]){var cr=t.cd.getBoundingClientRect(); t.cd.classList.add(e.clientY<cr.top+cr.height/2?"lmbefore":"lmafter")}
+    else if(!t.cd)t.cl.classList.add("lmover");
+  });
+  function lmEnd(e,cancel){
+    var d=lmP; lmP=null; lmDrag=null; if(!d||!d.on)return;
+    if(d.g)d.g.remove(); document.body.classList.remove("lmmoving"); lmClear();
+    // 끌고 난 뒤 따라오는 click(카드 열기)은 한 번 막음
+    var stop=function(ev){ev.stopPropagation();ev.preventDefault()}; document.addEventListener("click",stop,true); setTimeout(function(){document.removeEventListener("click",stop,true)},50);
+    if(cancel)return;
+    var t=lmTarget(e.clientX,e.clientY), cl=t.cl; if(!cl)return;
     var cards=Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id});
     if(d.type==="col"){
       var li=+cl.dataset.li; if(li===d.li||!cards.length)return;
       if(d.li<li)lmApply(null,d.ids,null,cards[cards.length-1]); else lmApply(null,d.ids,cards[0],null);
       toast("칸을 통째로 옮겼어요"); return;
     }
-    var cd=e.target.closest(".bcard");
+    var cd=t.cd;
     if(cd){if(cd.dataset.id===d.ids[0])return; var r=cd.getBoundingClientRect(); if(e.clientY<r.top+r.height/2)lmApply(null,d.ids,cd.dataset.id,null); else lmApply(null,d.ids,null,cd.dataset.id)}
     else if(cards.length)lmApply(null,d.ids,null,cards[cards.length-1]);
-  },true);
-  $("board").addEventListener("dragend",function(e){if(lmDrag){lmDrag=null;lmClear()}},true);
+  }
+  document.addEventListener("pointerup",function(e){lmEnd(e,false)});
+  document.addEventListener("pointercancel",function(e){lmEnd(e,true)});
+  $("board").addEventListener("dragstart",function(e){if(bMode==="list"&&boardOn){e.preventDefault();e.stopPropagation()}},true);
   $("bModeSeg").addEventListener("click",function(e){var b=e.target.closest("button");if(!b||b.dataset.m===bMode)return;bMode=b.dataset.m;try{localStorage.setItem("bible-board-mode",bMode)}catch(err){}applyBoard();render()});
   $("board").addEventListener("drop",function(e){
     if(colDrag){e.preventDefault();return}
@@ -10578,7 +10592,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     function finish(save){
       if(!inp.isConnected)return;
       var v=inp.value.trim();
-      inp.remove(); b.hidden=false; hd.draggable=true;
+      inp.remove(); b.hidden=false; hd.draggable=bMode!=="list";
       if(save&&v&&v!==was){bNames[k]=v; saveBNames(); b.textContent=v; toast("칸 이름을 '"+v+"'으로 바꿨어요")}
     }
     inp.addEventListener("keydown",function(ev){
