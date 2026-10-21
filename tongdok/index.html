@@ -244,8 +244,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .medals{display:flex;flex-wrap:wrap;gap:6px}
 .medal{
   padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--ink);
-  border:2px solid var(--ring);
-  animation:pop .4s cubic-bezier(.26,1.4,.4,1);
+  border:2px solid var(--mc,var(--ring));   /* 커졌다 작아지는 움직임은 뺌 (2026-10-21 사용자 요청) */
 }
 .shelf .none{margin:0;font-size:12.5px;color:var(--muted)}
 
@@ -263,7 +262,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .cel .bless{margin:10px 0 0;font-family:var(--sans);font-size:15.5px;color:var(--ink);line-height:1.75}
 .cel .ref{margin:7px 0 0;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){
-  .chip.got,.chip.got5,.medal,.cel .seal,.toast,.chip.got::before,.chip.got5::before{animation:none}
+  .chip.got,.chip.got5,.cel .seal,.toast,.chip.got::before,.chip.got5::before{animation:none}
   .ring,.spark{display:none}
 }
 
@@ -1152,7 +1151,7 @@ function renderShelf(){
   $("shelfNone").hidden=got.length>0;
   $("medals").innerHTML=got.map(function(bi){
     var n=rndOf(bi)+(bookDone(bi)===BOOKS[bi][1]?1:0);
-    return '<span class="medal">'+BOOKS[bi][0]+(n>1?' ×'+n:'')+'</span>';
+    return '<span class="medal"'+(n>1?' style="--mc:'+rcol(n-1)+'"':'')+'>'+BOOKS[bi][0]+(n>1?' ×'+n:'')+'</span>';   // 여러 번 다 읽은 책은 그 회차 칸 색 테두리
   }).join("");
 }
 
