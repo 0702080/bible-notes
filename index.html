@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-21">
+<meta name="app-build" content="2026-10-21-22">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2249,6 +2249,13 @@ button:active{filter:brightness(1.15)}
 .prdref{font-size:16px;color:var(--violet)}
 .prdgo{margin-left:auto;height:28px;padding:0 12px;border:0;border-radius:14px;background:#1E1D24;color:#D9D5E0;font-size:12.5px;white-space:nowrap}
 .prdverse{margin:6px 0 12px;font-size:14px;line-height:1.7;color:var(--muted);white-space:pre-line;word-break:keep-all}
+/* 말씀을 놓고 드린 기도: 말씀도 기도문과 같은 크기·색으로, 보라 줄이 있는 말씀 카드에 (2026-10-21 사용자 요청) */
+.prdword{position:relative;margin:0 0 12px;padding:14px 18px 16px 20px;border-radius:16px;border:1px solid color-mix(in srgb,var(--violet) 30%,#26252B);background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 13%,#141418),#141418 70%);overflow:hidden}
+.prdword::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--violet),color-mix(in srgb,var(--violet) 35%,transparent))}
+.prdword::after{content:"”";position:absolute;right:16px;bottom:-30px;font-family:Georgia,"Times New Roman",serif;font-size:90px;line-height:1;color:color-mix(in srgb,var(--violet) 16%,transparent);pointer-events:none}
+.prdword .prdref{font-size:13.5px;letter-spacing:.2px}
+.prdword .prdgo{background:color-mix(in srgb,var(--violet) 14%,#1E1D24)}
+.prdword .prdverse{position:relative;z-index:1;margin:8px 0 0;font-size:19px;line-height:1.85;color:color-mix(in srgb,var(--orange) 85%,var(--ink))}
 .prdit{margin:0 0 12px;padding:16px 18px;border-radius:16px;background:#141418;border:1px solid #26252B}
 .prdmeta{font-size:12px;color:var(--faint)}
 .prdtext{margin:8px 0 0;font-size:19px;line-height:1.85;color:color-mix(in srgb,var(--orange) 85%,var(--ink));white-space:pre-line;word-break:keep-all}
@@ -3649,7 +3656,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ps=ps.filter(function(x){return prdFilter==="all"||(prdFilter==="ans"?!!x.ans:!x.ans)}).sort(function(a,b){return b.at-a.at});
       if(!ps.length)return;
       var sec=document.createElement("section"); sec.className="prdsec";
-      sec.innerHTML='<div class="prdhd"><b class="prdref"></b><button type="button" class="prdgo">카드로 가기</button></div><p class="prdverse"></p>';
+      sec.innerHTML='<div class="prdword"><div class="prdhd"><b class="prdref"></b><button type="button" class="prdgo">카드로 가기</button></div><p class="prdverse"></p></div>';
       sec.querySelector(".prdref").textContent=n.ref; sec.querySelector(".prdverse").textContent=n.text; sec.querySelector(".prdgo").dataset.id=n.id;
       if(prdNote)sec.querySelector(".prdgo").remove();
       ps.forEach(function(x){
