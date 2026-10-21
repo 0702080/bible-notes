@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-16">
+<meta name="app-build" content="2026-10-21-17">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1913,7 +1913,7 @@ button:active{filter:brightness(1.15)}
   .ccfoot .ccbtn.main{flex-grow:1.4}
 }
 .ccvwrap{width:100%}
-.ccvref{margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
+.ccvref{cursor:pointer;margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
 .cch .bqtitle .ccref{display:none}
 .ccw.ccpopx{animation:ccpopx .45s cubic-bezier(.2,1.8,.4,1)}
 @keyframes ccpopx{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
@@ -6511,11 +6511,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ["pointerup","pointercancel","pointerleave"].forEach(function(ev){ccBox.querySelector(".ccverse").addEventListener(ev,function(){clearTimeout(ccHold)})});
       ccBox.querySelector(".ccverse").addEventListener("pointermove",function(e){if(Math.abs(e.clientX-ccHx)>10||Math.abs(e.clientY-ccHy)>10)clearTimeout(ccHold)});
       ccBox.querySelector(".ccverse").addEventListener("contextmenu",function(e){if(C&&!C.edit)e.preventDefault()});
+      ccBox.querySelector(".ccvref").addEventListener("click",function(){   // 구절 이름을 누르면 "잠언 11장 3절"처럼 한 번에 읽어 줌 (2026-10-21 사용자 요청)
+        var n0=C&&notes.get(C.id); if(!n0||!n0.ref)return; buzz(18);
+        sayWord(String(n0.ref).replace(/(\d+)\s*:\s*(\d+)/g,"$1장 $2절"),true);
+      });
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 낱말을 누르면 소리로 들려주고, 가린 낱말은 톡 뒤집혀 잠깐 보인다
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
         var wt=String(w.dataset.w||w.textContent||"").trim();
-        var first=w===ccBox.querySelector(".ccverse .ccw"), cn0=first&&notes.get(C.id);
-        if(wt)sayWord(wt,true,cn0&&cn0.ref);   // 누를 때마다 그 낱말 소리 (2026-10-17), 첫 낱말은 구절 이름(잠언 11장 3절)부터 (2026-10-21 사용자 요청)
+        if(wt)sayWord(wt,true);   // 누를 때마다 그 낱말 소리 (2026-10-17 사용자 요청)
         if(!w.classList.contains("hid")||w.classList.contains("peek")){buzz(18);return}   // 누를 때마다 진동 (2026-10-21 사용자 요청)
         w.classList.add("peek"); C.peek++; buzz([25,30,15]);
         ccBurst(w);   // 가린 낱말을 누르면 풍선 터지듯 '팡' (2026-10-21 사용자 요청)
