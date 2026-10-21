@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-18-198">
+<meta name="app-build" content="2026-10-21-1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1478,6 +1478,21 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 /* 언제 쓸까 panel: the button already says it */
 .usepanel .uhd{display:none}
 .usepanel .uform{margin-top:0}
+.chmgrid{display:flex;flex-wrap:wrap;gap:4px;padding:8px 16px 2px;max-width:720px;width:100%;margin:0 auto}
+.chmc{min-width:26px;height:22px;padding:0 4px;border-radius:6px;background:#1C1B21;color:var(--faint);font-size:11.5px;line-height:22px;text-align:center}
+.chmc.on{background:color-mix(in srgb,var(--green) 70%,#1C1B21);color:#0E1A12}
+.chmc.now{background:var(--gold);color:#17120A;box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 35%,transparent)}
+.chmbody{display:flex;flex-direction:column;gap:10px}
+.chml{display:grid;grid-template-columns:28px 1fr;gap:6px;font-size:19px;line-height:1.8;color:#E8C3A0;word-break:keep-all}
+.chml.hid{cursor:pointer}
+.chml.hid .chmt{color:var(--muted);letter-spacing:.5px}
+.chml.peek .chmt{color:var(--hi);letter-spacing:0}
+.chmv{font-size:12px;color:var(--faint);padding-top:6px;text-align:right}
+.chmres{text-align:center;padding:20px 0}
+.mchmem{display:inline-flex;align-items:baseline;gap:8px;height:38px;margin:10px 0 4px 8px;padding:0 14px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);border-radius:19px;background:color-mix(in srgb,var(--sky) 12%,transparent);color:var(--sky);line-height:36px;white-space:nowrap}
+.mchmem b{font-weight:400;-webkit-text-stroke:.3px currentColor;font-size:14.5px}
+.mchmem small{font-size:12px;color:var(--muted)}
+.rdpbar .rdchm{color:var(--sky)}
 /* PC 칸반 보드 */
 /* PC: 목록 / 칸반 보드 바꾸기 (두 칸 스위치), 상단 말씀 담기 */
 .viewseg,.tadd{display:none}
@@ -2292,6 +2307,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 /* 믿음의 한 마디 (2026-10-18 사용자 요청) */
 .saytoday{display:block;width:100%;margin:2px 0 8px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--gold) 32%,#232229);border-radius:14px;background:color-mix(in srgb,var(--gold) 8%,transparent);color:var(--ink);font:inherit;text-align:left}
 .saytoday .sayq1{display:block;font-family:var(--serif);font-size:15px;line-height:1.7;color:color-mix(in srgb,var(--gold) 35%,var(--ink));word-break:keep-all}
+.saywrap{position:relative}
+.saywrap .saytoday{padding-right:40px}
+.saypin{position:absolute;top:6px;right:6px;width:30px;height:30px;padding:0;border:0;border-radius:15px;background:transparent;font-size:14px;line-height:30px;opacity:.35;filter:grayscale(1);transition:opacity .15s,filter .15s,background .15s}
+.saypin.on{opacity:1;filter:none;background:color-mix(in srgb,var(--gold) 16%,transparent)}
+@media (hover:hover){.saypin:hover{opacity:.9;filter:none}}
 .saytoday .sayw1{display:block;margin-top:4px;font-size:12px;color:var(--gold);text-align:right}
 @media (hover:hover){.saytoday:hover{background:color-mix(in srgb,var(--gold) 14%,transparent)}}
 .saybox{max-width:640px;margin:0 auto}
@@ -2835,17 +2855,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 
   /* ---------- rendering ---------- */
   /* ---------- PC 칸반 보드: 암송 단계별로 한눈에 (새로 담음 → 외우는 중 → 복습할 차례 → 다 외움) ---------- */
-  // PC에서는 칸반 보드로 열린다 (2026-10-17 사용자 요청). 목록으로 바꾸면 그 뒤로는 그대로 기억한다
+  // PC도 휴대폰처럼 목록으로 열린다 (2026-10-21 사용자 요청). [칸반 보드]를 고르면 그 뒤로는 그대로 기억한다
   var boardOn=false;
   (function(){
     var wide=!!(window.matchMedia&&matchMedia("(min-width:900px)").matches), v=null;
     try{
       v=localStorage.getItem("bible-view");
-      if(wide&&localStorage.getItem("bible-view-pc")!=="1"){   // 이 PC에서 처음 열 때 한 번만 칸반으로
-        localStorage.setItem("bible-view-pc","1"); localStorage.setItem("bible-view","board"); v="board";
+      if(localStorage.getItem("bible-view-pc2")!=="1"){   // 2026-10-21 사용자 요청: PC도 휴대폰처럼 목록으로 (한 번만 바꿔 두고, 그 뒤로는 고른 대로)
+        localStorage.setItem("bible-view-pc2","1"); localStorage.setItem("bible-view","list"); v="list";
       }
     }catch(e){}
-    boardOn=v?v==="board":wide;
+    boardOn=v==="board";
   })();
   var tdFold=false; try{tdFold=localStorage.getItem("bible-today-fold")==="1"}catch(e){}   // '오늘' 카드 접어 두기
   var BCOLS=[{k:"new",t:"새로 담음",e:"🌱",c:"var(--muted)",tip:"아직 암송을 시작하지 않은 말씀"},{k:"doing",t:"외우는 중",e:"✏️",c:"var(--sky)",tip:"도장을 모으는 중"},{k:"due",t:"복습할 차례",e:"🔁",c:"var(--gold)",tip:"오늘 다시 떠올릴 말씀"},{k:"done",t:"다 외움",e:"🏅",c:"var(--green)",tip:"도장 4개를 다 받은 말씀"}];
@@ -4396,6 +4416,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(tapCard&&!e.target.closest("button,textarea,input,select,a,details,summary,.pop,.editbox,.xpanel,.focusrow,.chip,.sugg,.himgs,.pastezone,.sform,.hsheets,.essays,.topics,.verse.picking,.verse.picking .w,.verse.memv,.mempanel,.usepanel")){
       var tid=tapCard.dataset.id, isOpen=openIds.has(tid);
       var vtap=e.target.closest(".verse");
+      if(vtap&&memOpen.has(tid))return;   // 암송 칸을 연 채 연습 중이면 말씀을 눌러도 고치기·접기가 되지 않게 (2026-10-21 사용자 요청)
       if(vtap&&!tapCard.classList.contains("vediting")){
         var tnow=Date.now();
         if(vTap.id===tid&&tnow-vTap.t<380){clearTimeout(vTap.timer);vTap={id:"",t:0,timer:0};enterVerseEdit(tid,e.clientX,e.clientY);return}
@@ -4502,6 +4523,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     if(b.classList.contains("mreveal")){memView.set(id,"");memStep.delete(id);memPeek.delete(id);buzz(8);render();return}
     if(b.classList.contains("morder")){openOrderQuiz(n);return}
+    if(b.classList.contains("mchmem")){var cv=chVersesOf(n);if(cv)openChMem(chKeyOf(n),n.ref,cv);return}
     if(b.classList.contains("mcoach")){openCoach(n);return}
     if(b.classList.contains("mmoretg")){if(memMore.has(id))memMore.delete(id);else memMore.add(id);render();return}
     if(b.classList.contains("mladder")){openLadder(n,false);return}
@@ -5288,6 +5310,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var add=document.createElement("button"); add.type="button"; add.className="tchip tcollect"; add.id="openCollect"; add.textContent="+ 주제로 모으기"; bar.appendChild(add);
   }
   function todayActClick(e){
+    var spn=e.target.closest(".saypin"); if(spn){e.stopPropagation();sayTogglePin(spn.dataset.sid);return}
     var sayb=e.target.closest(".saytoday"); if(sayb){openSay();return}
     var b=e.target.closest(".rvchip,.tmchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
@@ -6384,13 +6407,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.5)ccGoNext();
       },{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
-      ccBox.querySelector(".ccverse").addEventListener("dblclick",function(e){   // 두 번 누르면 문장 배치 고치기 (2026-10-18 사용자 요청)
-        if(!C||C.edit||C.revealing)return;
-        if(e.target.closest("textarea,input,button"))return;
-        e.preventDefault(); ccAct("eopen");
+      // 문장 배치 고치기: 말씀을 꾹(0.8초) 누르면 열림. 연습 중 빠르게 두 번 눌러도 고치기로 넘어가지 않게 (2026-10-21 사용자 요청)
+      var ccHold=0, ccHx=0, ccHy=0;
+      ccBox.querySelector(".ccverse").addEventListener("pointerdown",function(e){
+        if(!C||C.edit||C.revealing||e.target.closest("textarea,input,button"))return;
+        ccHx=e.clientX; ccHy=e.clientY; clearTimeout(ccHold);
+        ccHold=setTimeout(function(){if(C&&!C.edit&&!C.revealing){buzz([10,30,10]);ccAct("eopen")}},800);
       });
+      ["pointerup","pointercancel","pointerleave"].forEach(function(ev){ccBox.querySelector(".ccverse").addEventListener(ev,function(){clearTimeout(ccHold)})});
+      ccBox.querySelector(".ccverse").addEventListener("pointermove",function(e){if(Math.abs(e.clientX-ccHx)>10||Math.abs(e.clientY-ccHy)>10)clearTimeout(ccHold)});
+      ccBox.querySelector(".ccverse").addEventListener("contextmenu",function(e){if(C&&!C.edit)e.preventDefault()});
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 낱말을 누르면 소리로 들려주고, 가린 낱말은 톡 뒤집혀 잠깐 보인다
-        if(e.detail>=2)return;   // 두 번째 누름은 '고치기'로 넘긴다
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
         var wt=String(w.dataset.w||w.textContent||"").trim();
         if(wt)sayWord(wt,true);   // 누를 때마다 그 낱말 소리 (2026-10-17 사용자 요청)
@@ -6699,6 +6726,114 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     try{window.speechSynthesis.cancel()}catch(e){}
     var id=C&&C.id; C=null; if(id){var c=cards.get(id);if(c){var p=c.querySelector(".mempanel");if(p)p.dataset.key=""}render();renderReviewBar()}
   }
+
+  /* ---------- 한 장 암송 (2026-10-21 사용자 요청) ----------
+     긴 본문을 외우는 가장 쉬운 방법: ① 하루에 새 절 하나만 (읽기 → 첫 글자 → 가리기)
+     ② 그날 외운 절까지 처음부터 눈덩이처럼 이어 말하기 (각 절의 첫 글자만 단서로)
+     ③ 잘 되면 다음 날 새 절, 헷갈리면 같은 절을 하루 더. 기록은 이 기기에 저장 */
+  var CHM_KEY="bible-chmem", chm=null, CM=null;
+  function chMemAll(){try{var o=JSON.parse(localStorage.getItem(CHM_KEY)||"{}");return o&&typeof o==="object"?o:{}}catch(e){return {}}}
+  function chMemRec(k){var r=chMemAll()[k];return {n:r&&+r.n||0,last:r&&r.last||"",days:r&&Array.isArray(r.days)?r.days:[]}}
+  function chMemSave(k,r){var o=chMemAll();o[k]=r;try{localStorage.setItem(CHM_KEY,JSON.stringify(o))}catch(e){}}
+  function chKeyOf(n){return (n.book>=0&&n.chapter?USFM[n.book]+"-"+n.chapter:"note-"+n.id)}
+  function chVersesOf(n){   // 장 전체를 담은 카드(번호 붙은 줄 3개 이상)면 절 목록
+    var t=String(n.text||""); if(t.split("\n").filter(function(l){return /^\s*\d{1,3}\s+\S/.test(l)}).length<3)return null;
+    var vs=parseChapterPaste(t); return vs.length>=3?vs:null;
+  }
+  function chFirst(text){   // 낱말마다 첫 글자만 남기고 나머지는 ○
+    return tokens(text).map(function(tok){if(/^\s+$/.test(tok))return " ";var a=Array.from(tok);return a[0]+circles(a.slice(1).join(""))}).join("");
+  }
+  function openChMem(key,title,verses){
+    if(!verses||!verses.length)return;
+    if(!chm){
+      chm=document.createElement("div"); chm.className="cch chm"; chm.setAttribute("role","dialog"); chm.setAttribute("aria-modal","true"); chm.hidden=true;
+      chm.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="chmref"></b><span class="chmcnt"></span></div><div class="qbarbtns"><button type="button" class="chmclose">닫기</button></div></div>'+
+        '<div class="chmgrid" aria-label="절별 진도"></div>'+
+        '<div class="ccbody"><div class="cctip chmtip"></div><div class="chmbody"></div></div><div class="ccfoot chmfoot"></div>';
+      document.body.appendChild(chm);
+      chm.querySelector(".chmclose").addEventListener("click",closeChMem);
+      chm.querySelector(".chmfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b)chmAct(b.dataset.a)});
+      chm.querySelector(".chmbody").addEventListener("click",function(e){   // 막히면 그 절을 눌러 잠깐 보기
+        var l=e.target.closest(".chml.hid"); if(!l||!CM)return;
+        l.classList.add("peek"); l.querySelector(".chmt").textContent=l.dataset.full; CM.peek++; buzz(5);
+        setTimeout(function(){if(l.isConnected&&CM&&CM.stage!=="grade"){l.classList.remove("peek");l.querySelector(".chmt").textContent=l.dataset.cue}},2200);
+      });
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&chm&&!chm.hidden)closeChMem()});
+    }
+    var rec=chMemRec(key), today=dkey(Date.now()), learned=Math.min(rec.n,verses.length);
+    var target=learned<verses.length?learned:-1;   // 오늘 새로 외울 절 (모두 외웠으면 복습만)
+    CM={key:key,title:title,verses:verses,rec:rec,learned:learned,target:target,stage:target>=0?"read":"chain",reads:0,peek:0,today:today};
+    if(rec.last===today&&target>=0&&rec.n>0)CM.stage="chain";   // 오늘 이미 새 절을 했으면 이어 말하기 복습부터
+    chm.querySelector(".chmref").textContent=title+" 한 장 암송";
+    chm.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true; chmDraw();
+  }
+  function chmGrid(){
+    var g=chm.querySelector(".chmgrid"); g.textContent="";
+    CM.verses.forEach(function(x,i){var d=document.createElement("span");d.className="chmc"+(i<CM.learned?" on":"")+(i===CM.target?" now":"");d.textContent=x.v;d.title=x.v+"절"+(i<CM.learned?" · 외움":i===CM.target?" · 오늘 외울 절":"");g.appendChild(d)});
+    chm.querySelector(".chmcnt").textContent=CM.learned+" / "+CM.verses.length+"절";
+  }
+  function chmDraw(){
+    chmGrid();
+    var tip=chm.querySelector(".chmtip"), body=chm.querySelector(".chmbody"), ft=chm.querySelector(".chmfoot");
+    body.textContent=""; ft.textContent="";
+    function btn(t,a,main){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(main?" main":"");b.dataset.a=a;b.textContent=t;ft.appendChild(b)}
+    function line(x,mode){   // mode: full | cue | hid
+      var l=document.createElement("div"); l.className="chml"+(mode==="full"?"":" hid"); l.dataset.full=x.t; l.dataset.cue=mode==="cue"?chFirst(x.t):circles(x.t);
+      l.innerHTML='<span class="chmv"></span><span class="chmt"></span>'; l.querySelector(".chmv").textContent=x.v; l.querySelector(".chmt").textContent=mode==="full"?x.t:l.dataset.cue;
+      body.appendChild(l);
+    }
+    var tv=CM.target>=0?CM.verses[CM.target]:null;
+    if(CM.stage==="read"){
+      tip.innerHTML="<b>① 오늘의 새 절 · 소리 내어 3번 읽기</b><br>뜻을 생각하며 천천히 읽어요. 앞 절과 어떻게 이어지는지도 떠올려 보세요.";
+      if(CM.target>0)line(CM.verses[CM.target-1],"cue");
+      line(tv,"full");
+      if(canSpeak)btn("🔊 들려주기","say");
+      btn("읽었어요 ✓  "+CM.reads+" / 3","read",true);
+    }else if(CM.stage==="first"){
+      tip.innerHTML="<b>② 첫 글자만 보고 말하기</b><br>막히면 그 줄을 눌러 잠깐 봐요.";
+      line(tv,"cue"); btn("다 말했어요 →","next",true);
+    }else if(CM.stage==="hide"){
+      tip.innerHTML="<b>③ 안 보고 말하기</b><br>전부 가렸어요. 소리 내어 말해 보세요.";
+      line(tv,"hid"); btn("한 번 더 보기","back"); btn("말했어요 →","next",true);
+    }else if(CM.stage==="chain"){
+      var upto=CM.target>=0?CM.target+1:CM.verses.length;
+      tip.innerHTML="<b>④ 처음부터 이어 말하기 (1~"+CM.verses[upto-1].v+"절)</b><br>절마다 첫 글자만 보고 1절부터 끝까지 이어서 말해요. 막힌 절은 눌러서 잠깐 보면 돼요.";
+      CM.verses.slice(0,upto).forEach(function(x){line(x,"cue")});
+      btn("말했어요, 확인하기 👀","show",true);
+    }else if(CM.stage==="grade"){
+      var upto2=CM.target>=0?CM.target+1:CM.verses.length;
+      tip.innerHTML="<b>얼마나 이어서 말했나요?</b>";
+      CM.verses.slice(0,upto2).forEach(function(x){line(x,"full")});
+      btn("😅 많이 막혔어요","g0"); btn("🤔 조금 막혔어요","g1"); btn("😊 술술 됐어요","g2",true);
+    }else{
+      var done=CM.learned>=CM.verses.length;
+      tip.innerHTML=CM.result||"";
+      var box=document.createElement("div"); box.className="chmres";
+      box.innerHTML='<div class="ccr1"></div><div class="ccr3"></div>';
+      box.querySelector(".ccr1").textContent=done?"🏅 한 장을 다 외웠어요!":CM.ok?"잘했어요! 🎉":"괜찮아요, 내일 한 번 더 🌱";
+      box.querySelector(".ccr3").textContent=done?"이제 날마다 처음부터 이어 말하기로 복습해요.":CM.ok?"내일은 "+CM.verses[Math.min(CM.learned,CM.verses.length-1)].v+"절을 새로 외워요 · 지금까지 "+CM.learned+"절":"내일 같은 절을 한 번 더 하고 넘어가요";
+      body.appendChild(box);
+      btn("처음부터 이어 말하기 한 번 더","chainagain"); btn("끝내기","close",true);
+      if(CM.ok){confetti(box.querySelector(".ccr1"));buzz([14,50,22])}
+    }
+  }
+  function chmAct(a){
+    if(!CM)return; var tv=CM.target>=0?CM.verses[CM.target]:null;
+    if(a==="say"&&tv){try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(tv.t);u.lang="ko-KR";u.rate=.9;window.speechSynthesis.speak(u)}catch(e){}return}
+    if(a==="read"){CM.reads++;buzz(8);if(CM.reads>=3)CM.stage="first";chmDraw();return}
+    if(a==="next"){CM.stage=CM.stage==="first"?"hide":"chain";buzz(8);chmDraw();return}
+    if(a==="back"){CM.stage="first";chmDraw();return}
+    if(a==="show"){CM.stage="grade";chmDraw();return}
+    if(a==="chainagain"){CM.stage="chain";chmDraw();return}
+    if(a==="close"){closeChMem();return}
+    if(a==="g0"||a==="g1"||a==="g2"){
+      var r=CM.rec; CM.ok=a!=="g0";
+      if(CM.ok&&CM.target>=0&&CM.learned===CM.target){CM.learned=CM.target+1;r.n=CM.learned}
+      if(r.days.indexOf(CM.today)<0)r.days.push(CM.today); r.days=r.days.slice(-400); r.last=CM.today;
+      chMemSave(CM.key,r); CM.target=-1; CM.stage="end"; chmDraw(); return;
+    }
+  }
+  function closeChMem(){if(!chm||chm.hidden)return; chm.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; try{window.speechSynthesis.cancel()}catch(e){} CM=null; render()}
 
   /* ---------- 듣기 (읽어 주기) ---------- */
   var canSpeak=("speechSynthesis" in window)&&typeof SpeechSynthesisUtterance!=="undefined", speakingId=null;
@@ -7650,12 +7785,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(lines.length>1&&lines[lines.length-1].length<=24)return {t:lines.slice(0,-1).join("\n"),who:lines[lines.length-1].replace(/^[-–—\s]+|[-–—\s]+$/g,"")};
     return {t:t,who:""};
   }
-  function sayOfDay(){   // 날마다 바뀌는 오늘의 한 마디
+  // 오늘의 한 마디: 5분마다 바뀜. 📌 고정하면 그 한 마디가 하루(24시간) 동안 그대로 (2026-10-21 사용자 요청)
+  var SAY_PIN="bible-say-pin";
+  function sayPinned(){try{var o=JSON.parse(localStorage.getItem(SAY_PIN)||"null");if(o&&o.id&&Date.now()<+o.until)return o}catch(e){}return null}
+  function sayOfDay(){
     var items=sayData().items.filter(function(x){return String(x.t||"").trim()});
     if(!items.length)return null;
-    var k=dkey(Date.now()), h=0, i;
+    var pin=sayPinned(); if(pin){var pi=items.filter(function(x){return x.id===pin.id})[0]; if(pi)return pi}
+    var k="s"+Math.floor(Date.now()/300000), h=0, i;
     for(i=0;i<k.length;i++)h=(h*31+k.charCodeAt(i))>>>0;
     return items[h%items.length];
+  }
+  function sayTogglePin(id){
+    var cur=sayPinned();
+    try{if(cur&&cur.id===id)localStorage.removeItem(SAY_PIN);else localStorage.setItem(SAY_PIN,JSON.stringify({id:id,until:Date.now()+864e5}))}catch(e){}
+    var on=!(cur&&cur.id===id); toast(on?"📌 이 한 마디를 하루 동안 고정했어요":"고정을 풀었어요. 5분마다 바뀌어요"); buzz(10); renderReviewBar();
   }
   var say=null;
   function closeSay(){if(!say)return; say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
@@ -7996,12 +8140,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     bar.appendChild(h);
     var sd=sayOfDay();
     if(sd){   // 오늘의 한 마디 (2026-10-18 사용자 요청)
+      var swrap=document.createElement("div"); swrap.className="saywrap";
+      var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
+      var spb=document.createElement("button"); spb.type="button"; spb.className="saypin"+(isPin?" on":""); spb.dataset.sid=sd.id;
+      spb.textContent="📌"; spb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; spb.setAttribute("aria-label",spb.title); spb.setAttribute("aria-pressed",String(isPin));
       var sb2=document.createElement("button"); sb2.type="button"; sb2.className="saytoday"; sb2.dataset.act="say";
       sb2.setAttribute("aria-label","오늘의 한 마디 — 믿음의 한 마디 보기");
       var q2=document.createElement("span"); q2.className="sayq1"; q2.textContent="\u201c"+String(sd.t).replace(/\s+/g," ")+"\u201d";
       sb2.appendChild(q2);
       if(sd.who){var w2=document.createElement("span"); w2.className="sayw1"; w2.textContent="— "+sd.who; sb2.appendChild(w2)}
-      bar.appendChild(sb2);
+      swrap.appendChild(sb2); swrap.appendChild(spb); bar.appendChild(swrap);
     }
     function drawRow(r){
       if(r.big){   // 하루 돌아보기: 눈에 잘 띄게 한 줄 전체를 큰 버튼으로 (2026-10-15 사용자 요청)
@@ -8555,6 +8703,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var cs=memDone(n)||nx0===3||(nx0===-1&&n.mem.s[2])?"1분":"읽기 → 첫 글자 → 가리기 → 떠올리기";
     cb.innerHTML='<b></b><small></small>'; cb.querySelector("b").textContent=ct; cb.querySelector("small").textContent=cs;
     mtop.appendChild(cb);
+    var chv=chVersesOf(n);
+    if(chv){var chb=document.createElement("button");chb.type="button";chb.className="mchmem";var chr=chMemRec(chKeyOf(n));
+      chb.innerHTML='<b>🧠 한 장 암송</b><small></small>'; chb.querySelector("small").textContent=Math.min(chr.n,chv.length)+" / "+chv.length+"절";
+      mtop.appendChild(chb)}
     if(ri0){var nr=document.createElement("p");nr.className="mnext"+(ri0.due?" due":"");var dr=new Date(ri0.next);nr.textContent=ri0.due?"🔁 오늘 복습할 차례예요":"🔁 다음 복습 "+(dr.getMonth()+1)+"/"+dr.getDate()+" ("+ri0.gap+"일 간격)";panel.appendChild(nr)}
     var view0=memView.get(n.id)||"", mOpen=memMore.has(n.id)||!!view0||memStep.has(n.id);
     var mt=document.createElement("button"); mt.type="button"; mt.className="mmoretg"; mt.setAttribute("aria-expanded",String(mOpen));
@@ -8723,12 +8875,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         '<a class="rdhb" target="_blank" rel="noopener">개역개정으로 보기 (대한성서공회) ↗</a>'+
         '<p class="rdalt">안 열리면 <a class="rdhb2" target="_blank" rel="noopener">홀리바이블로 보기</a>를 길게 눌러 크롬에서 열어 주세요.</p>'+
         '<div class="rdscroll"><ol class="rdlist"></ol><div class="rdmsg" aria-live="polite"></div>'+'</div>'+
-        '<div class="rdpbar"><button type="button" class="rdedit" hidden>✏️ 본문 고치기</button><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button><button type="button" class="rdcard" hidden>📌 이 장을 말씀 카드로 담기</button></div>'+
+        '<div class="rdpbar"><button type="button" class="rdchm" hidden>🧠 한 장 암송</button><button type="button" class="rdedit" hidden>✏️ 본문 고치기</button><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button><button type="button" class="rdcard" hidden>📌 이 장을 말씀 카드로 담기</button></div>'+
         '<div class="rdpform" hidden><p class="rdphint">성서공회나 홀리바이블에서 장 본문을 복사해 붙여 넣으세요. 절 번호(1, 2, 3 …)가 있으면 그대로 나누고, 없으면 한 줄을 한 절로 보고 번호를 붙여요. 이 기기에만 저장돼요.</p>'+
         '<textarea class="field rdptext" placeholder="1 그는 허물과 죄로 죽었던 너희를 살리셨도다&#10;2 그 때에 너희는 …&#10;(절 번호가 없으면 한 줄을 한 절로 봐요)" aria-label="장 본문 붙여넣기"></textarea>'+
         '<div class="rdpbtns"><button type="button" class="rdpcancel">취소</button><button type="button" class="primary rdpsave">저장</button></div></div>';
       document.body.appendChild(rd);
       rd.querySelector(".rdclose").addEventListener("click",closeReader);
+      rd.querySelector(".rdchm").addEventListener("click",function(){
+        var sv=myChapters()[rd.dataset.key]; if(!sv)return;
+        var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1];
+        openChMem(rd.dataset.key, (bk>=0?BOOKS[bk]+" "+ch+(bk===18?"편":"장"):rd.dataset.key), sv.v);
+      });
       rd.querySelector(".rdpaste").addEventListener("click",function(){var f=rd.querySelector(".rdpform");f.hidden=false;f.classList.remove("editing");var t=f.querySelector(".rdptext");t.value="";t.focus()});
       // 저장해 둔 본문 고치기: 지금 본문을 "절번호 본문" 줄로 채워 두고 고친 뒤 저장
       rd.querySelector(".rdedit").addEventListener("click",function(){
@@ -8938,6 +9095,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var saved=myChapters()[rd.dataset.key], msg=rd.querySelector(".rdmsg");
     rd.querySelector(".rdpaste").textContent=saved?"📋 다시 붙여넣기":"📋 복사한 본문 붙여넣기";
     rd.querySelector(".rdedit").hidden=!saved;
+    rd.querySelector(".rdchm").hidden=!(saved&&saved.v&&saved.v.length>=2);
     var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1], cardBtn=rd.querySelector(".rdcard");
     cardBtn.hidden=!saved||!!myNoteAt(bk,ch,0);
     if(saved){msg.textContent="";drawReader(saved.v,+rd.dataset.hl);return}
