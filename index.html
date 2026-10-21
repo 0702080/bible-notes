@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-5">
+<meta name="app-build" content="2026-10-21-6">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1880,6 +1880,10 @@ button:active{filter:brightness(1.15)}
 .ccbody.ccin{animation:ccin .32s cubic-bezier(.2,1.2,.4,1)}
 @keyframes ccout{to{transform:translateX(-40%);opacity:0}}
 @keyframes ccin{from{transform:translateX(40%);opacity:0}to{transform:none;opacity:1}}
+.ccbody.ccoutb{animation:ccoutb .22s ease-in forwards}
+.ccbody.ccinb{animation:ccinb .32s cubic-bezier(.2,1.2,.4,1)}
+@keyframes ccoutb{to{transform:translateX(40%);opacity:0}}
+@keyframes ccinb{from{transform:translateX(-40%);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.ccnarw,.ccbody.ccout,.ccbody.ccin{animation:none}}
 /* 말씀은 화면 가운데, 버튼은 엄지가 닿기 쉬운 아래쪽에 크게 */
 .ccbody{display:flex;flex-direction:column}
@@ -6396,8 +6400,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
      끝나면 단계 도장(읽기·첫 글자·가리기, 다음 날이면 '내일')을 찍고, 떠올린 결과로 다음 복습 날을 정함 */
   var ccBox=null, C=null;
   var CC_STEPS=["읽기","첫 글자","가리기","떠올리기"];
+  var ccBack=[];   // 밀어서 넘어온 말씀들 (왼쪽→오른쪽으로 밀면 하나씩 되돌아감)
   function openCoach(n,opt){
-    opt=opt||{};
+    opt=opt||{}; if(!opt.nav)ccBack=[];
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
       ccBox=document.createElement("div"); ccBox.className="cch"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
@@ -6415,7 +6420,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         sx=e.clientX; sy=e.clientY; sw=true;
       });
       var swAt=0;
-      function ccSwipe(dx,dy){if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.3&&Date.now()-swAt>600){swAt=Date.now();try{window.getSelection().removeAllRanges()}catch(err){} ccGoNext()}}
+      function ccSwipe(dx,dy){if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3&&Date.now()-swAt>600){swAt=Date.now();try{window.getSelection().removeAllRanges()}catch(err){} if(dx<0)ccGoNext();else ccGoPrev()}}
       ccBox.addEventListener("pointerup",function(e){
         if(!sw||!C||C.edit)return; sw=false; ccSwipe(e.clientX-sx,e.clientY-sy);
       });
@@ -6680,12 +6685,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function ccGoNext(){
     var nx=ccNextNote(); if(!nx){toast("이번에 외울 말씀을 다 했어요 🎉");return}
     var seen=Object.assign({},C.seen); seen[C.id]=1; buzz(8);
+    ccBack.push({id:C.id,seen:C.seen,order:C.order});
     var body=ccBox.querySelector(".ccbody"), still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
-    body.classList.remove("ccin"); body.classList.add("ccout");
+    body.classList.remove("ccin","ccinb","ccoutb"); body.classList.add("ccout");
     setTimeout(function(){
       if(ccBox.hidden)return; body.classList.remove("ccout");
-      openCoach(nx,{seen:seen,order:(C?C.order:1)+1}); body.classList.add("ccin");
+      openCoach(nx,{seen:seen,order:(C?C.order:1)+1,nav:true}); body.classList.add("ccin");
       setTimeout(function(){body.classList.remove("ccin")},400);
+    },still?0:220);
+  }
+  function ccGoPrev(){   // 왼쪽 → 오른쪽으로 밀면 좀 전에 한 말씀을 다시 (2026-10-21 사용자 요청)
+    var h=null; while(ccBack.length&&!h){var x=ccBack.pop();if(notes.get(x.id))h=x}
+    if(!h){toast("이번에 처음 연 말씀이에요");return}
+    buzz(8);
+    var body=ccBox.querySelector(".ccbody"), still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    body.classList.remove("ccin","ccout","ccinb"); body.classList.add("ccoutb");
+    setTimeout(function(){
+      if(ccBox.hidden)return; body.classList.remove("ccoutb");
+      openCoach(notes.get(h.id),{seen:h.seen,order:h.order,nav:true}); body.classList.add("ccinb");
+      setTimeout(function(){body.classList.remove("ccinb")},400);
     },still?0:220);
   }
   function ccReveal(){   // 확인하기: 구슬이 사르르 사라지고, 말씀이 앞에서부터 부드럽게 번져 나타남
