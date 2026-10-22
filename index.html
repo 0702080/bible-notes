@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-15">
+<meta name="app-build" content="2026-10-22-16">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2632,7 +2632,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlmemosave{margin-left:auto;font-size:11px;font-weight:400;color:var(--faint)}
 .dlmemobox textarea{width:100%;box-sizing:border-box;min-height:96px;resize:vertical;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.6}
 .dlmemobox textarea:focus{border-color:var(--sky);outline:none}
-.dlmemobox textarea.dlbig{resize:none;transition:height .2s ease}
+.dlmemobox textarea.dlbig{resize:vertical;overscroll-behavior:contain}
+.dlbody.dltyping{overflow:hidden}   /* 적는 동안에는 화면이 위아래로 끌려가지 않게 (2026-10-22 사용자 요청) */
 @media (min-width:900px){.dlmemobox textarea{min-height:calc(100vh - 230px)}}   /* PC: 적을 때는 모니터 세로로 길게 (2026-10-21 사용자 요청) */
 .dlmemofoot{display:flex;gap:8px;margin-top:8px}
 .dlmemop+.dlmemop{margin-top:10px}
@@ -3660,7 +3661,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     return (t.className||"")+"|"+((holder&&holder.dataset.id)||"")+"|"+(t.placeholder||"");
   }
   function grow(t){
-    if(!t||t.tagName!=="TEXTAREA"||!t.offsetParent)return;
+    if(!t||t.tagName!=="TEXTAREA"||!t.offsetParent||t.classList.contains("dlbig"))return;   // 크게 펼친 기록칸은 글자에 따라 줄이지 않음
     var h=manualH.get(taKey(t));
     if(h){t.style.height=h;return}
     t.style.height="auto"; t.style.height=t.scrollHeight+"px";
@@ -7505,9 +7506,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         }
         dl.querySelector(".dllist").addEventListener("focusin",function(e){
           var ta=e.target; if(ta.tagName!=="TEXTAREA"||!ta.closest(".dlmemobox")||(window.matchMedia&&matchMedia("(min-width:900px)").matches))return;
-          cur=ta; ta.classList.add("dlbig"); setTimeout(fit,60); setTimeout(fit,350);
+          cur=ta; ta.classList.add("dlbig"); var bd=dl.querySelector(".dlbody"); if(bd)bd.classList.add("dltyping"); setTimeout(fit,60); setTimeout(fit,350);
         });
-        dl.querySelector(".dllist").addEventListener("focusout",function(e){if(e.target===cur){cur.classList.remove("dlbig");cur.style.height="";cur=null}});
+        dl.querySelector(".dllist").addEventListener("focusout",function(e){if(e.target===cur){cur.classList.remove("dlbig");cur.style.height="";cur=null;var bd=dl.querySelector(".dlbody");if(bd)bd.classList.remove("dltyping")}});
+        // 적는 동안: 입력칸 밖을 끌어도 화면이 움직이지 않음 (입력칸 안의 글 넘기기·크기 손잡이는 그대로)
+        dl.addEventListener("touchmove",function(e){if(cur&&!(e.target.closest&&e.target.closest("textarea")))e.preventDefault()},{passive:false});
         if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){if(cur)setTimeout(fit,30)});
       })();
       // 입력칸을 벗어나면 저장 (저장·취소 단추 없이)
