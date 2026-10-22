@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-17">
+<meta name="app-build" content="2026-10-22-18">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1375,6 +1375,7 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .xlform textarea.xlmemo{flex:none;display:block;width:100%;box-sizing:border-box;min-height:44px;height:64px;max-height:none;resize:vertical;line-height:1.55;padding-top:9px;padding-bottom:9px;font-family:inherit}
 .xmemo{white-space:pre-line}
 /* 말씀 연결 지도 */
+.grico{width:1.1em;height:1.1em;vertical-align:-.17em;color:var(--sky);filter:drop-shadow(0 0 3px color-mix(in srgb,var(--sky) 55%,transparent))}   /* 밝은 연결 지도 아이콘 (2026-10-22 사용자 요청) */
 .grtools{display:flex;gap:6px;margin-left:auto}
 .grtools button{height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:#17161b;color:var(--muted);font-size:12.5px;font-weight:700;white-space:nowrap}
 .grtools button[hidden]{display:none}
@@ -2745,7 +2746,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         <button type="button" id="openMemBtn">암송 도장판</button>
         <button type="button" id="openProgBtn">실천 진도표</button>
         <button type="button" id="openTongdokBtn">📖 성경 통독표</button>
-        <button type="button" id="openGraphBtn">🕸️ 말씀 연결 지도</button>
+        <button type="button" id="openGraphBtn"><svg class="grico" viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M12 4 4.5 18.5h15Z"/><path d="M12 4v9M4.5 18.5 12 13l7.5 5.5"/></g><g fill="currentColor"><circle cx="12" cy="4" r="2.6"/><circle cx="4.5" cy="18.5" r="2.6"/><circle cx="19.5" cy="18.5" r="2.6"/><circle cx="12" cy="13" r="2.2"/></g></svg> 말씀 연결 지도</button>
         <button type="button" id="prayReadBtn">기도 모아 읽기</button>
         <button type="button" id="reorderBtn">카드 순서 바꾸기</button>
         <button type="button" id="foldAll">모두 펼치기</button>
@@ -9475,7 +9476,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function fillXref(pn,n){
     pn.dataset.sig=xrefSig();
-    pn.innerHTML='<div class="xhd">🔗 연결 말씀<button type="button" class="xgraph">🕸️ 연결 지도</button></div>'+
+    pn.innerHTML='<div class="xhd">🔗 연결 말씀<button type="button" class="xgraph"><svg class="grico" viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M12 4 4.5 18.5h15Z"/><path d="M12 4v9M4.5 18.5 12 13l7.5 5.5"/></g><g fill="currentColor"><circle cx="12" cy="4" r="2.6"/><circle cx="4.5" cy="18.5" r="2.6"/><circle cx="19.5" cy="18.5" r="2.6"/><circle cx="12" cy="13" r="2.2"/></g></svg> 연결 지도</button></div>'+
       '<div class="xsec">내가 연결한 말씀 <span>직접 적기</span></div>'+
       '<form class="xlform" autocomplete="off"><div class="xlrow"><input class="field xlref" maxlength="40" enterkeyhint="next" placeholder="구절 (예: 요한복음 14:27)" aria-label="연결할 구절"><button type="submit" class="xladd">추가</button></div>'+
       '<textarea class="field xlmemo" maxlength="1000" rows="2" placeholder="왜 연결했는지 (선택) · 오른쪽 아래 모서리를 끌면 칸이 커져요" aria-label="연결한 이유"></textarea></form>'+
@@ -9549,7 +9550,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function openGraph(centerId){
     if(!GR){
       var ov=document.createElement("div"); ov.className="rvq grov"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-modal","true"); ov.hidden=true;
-      ov.innerHTML='<div class="dlbar"><b class="dltitle">🕸️ 말씀 연결 지도</b><span class="grtools"><button type="button" class="grtp" aria-pressed="false">#주제도 잇기</button><button type="button" class="grall" hidden>전체 보기</button></span><button type="button" class="dlclose grclose">닫기</button></div>'+
+      ov.innerHTML='<div class="dlbar"><b class="dltitle"><svg class="grico" viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M12 4 4.5 18.5h15Z"/><path d="M12 4v9M4.5 18.5 12 13l7.5 5.5"/></g><g fill="currentColor"><circle cx="12" cy="4" r="2.6"/><circle cx="4.5" cy="18.5" r="2.6"/><circle cx="19.5" cy="18.5" r="2.6"/><circle cx="12" cy="13" r="2.2"/></g></svg> 말씀 연결 지도</b><span class="grtools"><button type="button" class="grtp" aria-pressed="false">#주제도 잇기</button><button type="button" class="grall" hidden>전체 보기</button></span><button type="button" class="dlclose grclose">닫기</button></div>'+
         '<div class="grwrap"><svg class="grsvg" xmlns="http://www.w3.org/2000/svg"><g class="grview"><g class="gre"></g><g class="grn"></g></g></svg><p class="grempty" hidden></p>'+
         '<div class="grzoom"><button type="button" data-z="1.25" aria-label="크게">+</button><button type="button" data-z="0.8" aria-label="작게">−</button><button type="button" data-z="0" aria-label="한눈에">⤢</button></div></div>'+
         '<div class="grinfo" hidden></div>';
