@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-6">
+<meta name="app-build" content="2026-10-22-7">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1597,6 +1597,17 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcrn{min-width:90px;max-width:150px;height:24px;padding:0 6px;border:1px solid var(--violet);border-radius:6px;background:#141318;color:var(--ink);font-family:inherit;font-size:13.5px;font-weight:700}
 .bcn{margin-left:auto;min-width:24px;height:22px;padding:0 7px;border-radius:11px;background:color-mix(in srgb,var(--bc) 18%,transparent);color:var(--bc);font-size:12.5px;line-height:22px;text-align:center}
 .bclist{display:flex;flex-direction:column;gap:8px}
+.bcfold{flex:0 0 auto;width:26px;height:26px;margin-left:2px;padding:0;border:0;border-radius:13px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.bcfold::before{content:"";width:7px;height:7px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateX(1px) rotate(45deg)}
+@media (hover:hover){.bcfold:hover{background:#34313D;color:var(--ink)}}
+.board4>.bcol.bfold{flex:0 0 54px;min-width:54px;max-width:54px;padding:10px 4px;cursor:pointer;transition:background .15s}
+@media (hover:hover){.board4>.bcol.bfold:hover{background:#2F2C39}}
+.bcol.bfold .bclist{display:none}
+.bcol.bfold .bch{flex-direction:column;align-items:center;gap:10px;padding:2px 0;cursor:pointer}
+.bcol.bfold .bch b{writing-mode:vertical-rl;letter-spacing:2px;white-space:nowrap}
+.bcol.bfold .bcn{margin:0;order:-1}
+.bcol.bfold .bcfold{order:-2;margin:0}
+.bcol.bfold .bcfold::before{transform:translateX(-1px) rotate(-135deg)}
 .bcempty{margin:10px 6px;font-size:13px;color:var(--faint)}
 .bnohit{margin:40px auto;padding:16px 20px;border:1px dashed #2E2D34;border-radius:14px;color:var(--faint);font-size:14px;align-self:flex-start}
 .bcard{position:relative;padding:11px 12px 10px 14px;border:1px solid color-mix(in srgb,var(--tc) 22%,#2A2930);border-radius:12px;cursor:pointer;
@@ -3049,6 +3060,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
   }
   // 목록 순서 칸반: 휴대폰 목록(sorted)과 같은 차례. 첫 칸 위에서 아래로, 다 차면 다음 칸으로
+  // 칸 접기·펼치기: 접으면 좁은 세로 띠로 (2026-10-22 사용자 요청). 자리(L1, L2…)별로 기억, 칸을 옮기면 같이 옮김
+  var BFOLD_KEY="bible-board-fold", bFold={};
+  try{bFold=JSON.parse(localStorage.getItem(BFOLD_KEY)||"{}")||{}}catch(e){bFold={}}
+  function saveBFold(){try{localStorage.setItem(BFOLD_KEY,JSON.stringify(bFold))}catch(e){}}
+  $("board").addEventListener("click",function(e){
+    if(bMode!=="list")return;
+    var fb=e.target.closest(".bcfold"), cl=fb?fb.closest(".bcol"):e.target.closest(".bcol.bfold");
+    if(!cl||!cl.dataset.k)return;
+    e.stopPropagation(); e.preventDefault();
+    var on=!cl.classList.contains("bfold"); cl.classList.toggle("bfold",on); cl.title=on?"눌러서 펼치기":"";
+    if(on)bFold[cl.dataset.k]=1; else delete bFold[cl.dataset.k]; saveBFold(); buzz(8);
+  },true);
   function renderKanbanList(box){
     var items=sorted().filter(function(n){return visibleNote(n)});
     box.classList.remove("find");
@@ -3061,8 +3084,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var cl=document.createElement("section"); cl.className="bcol blist"; cl.style.setProperty("--bc","var(--violet)"); cl.dataset.k="L"+(c+1); cl.dataset.li=String(c);
       var h=document.createElement("div"); h.className="bch";   // 칸 제목: 두 번 눌러 이름 바꾸기, 좌우로 끌면 칸 통째로 옮기기
       h.title="두 번 누르면 이름 바꾸기 · 좌우로 끌면 이 칸의 말씀을 통째로 옮겨요";
-      h.innerHTML='<span class="bce">📖</span><b></b><span class="bcn"></span>';
+      h.innerHTML='<span class="bce">📖</span><b></b><span class="bcn"></span><button type="button" class="bcfold" aria-label="이 칸 접기·펼치기" title="접기·펼치기"></button>';
       h.querySelector("b").textContent=bTitle({k:"L"+(c+1),t:"말씀 "+(c+1)}); h.querySelector(".bcn").textContent=part.length;
+      if(bFold["L"+(c+1)]){cl.classList.add("bfold"); cl.title="눌러서 펼치기"}
       cl.appendChild(h);
       var lst=document.createElement("div"); lst.className="bclist";
       part.forEach(function(n,i){
@@ -10735,6 +10759,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       for(var q=0;q<nc;q++)nm.push(bNames["L"+(q+1)]);
       nm.splice(li,0,nm.splice(d.li,1)[0]);
       nm.forEach(function(v,q){if(v)bNames["L"+(q+1)]=v; else delete bNames["L"+(q+1)]}); saveBNames();
+      var fo=[]; for(var q2=0;q2<nc;q2++)fo.push(bFold["L"+(q2+1)]); fo.splice(li,0,fo.splice(d.li,1)[0]);
+      fo.forEach(function(v,q2){if(v)bFold["L"+(q2+1)]=1; else delete bFold["L"+(q2+1)]}); saveBFold();
       if(d.li<li)lmApply(null,d.ids,null,cards[cards.length-1]); else lmApply(null,d.ids,cards[0],null);
       toast("칸을 통째로 옮겼어요"); return;
     }
@@ -10792,7 +10818,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   })();
   // 칸 이름 두 번 눌러 바꾸기
   $("board").addEventListener("dblclick",function(e){
-    var hd=e.target.closest(".bch"); if(!hd||hd.querySelector(".bcrn"))return;
+    var hd=e.target.closest(".bch"); if(!hd||hd.querySelector(".bcrn")||e.target.closest(".bcfold")||hd.closest(".bfold"))return;
     var cl=hd.closest(".bcol"), k=cl&&cl.dataset.k; if(!k)return;
     var b=hd.querySelector("b"), was=b.textContent;
     var inp=document.createElement("input"); inp.className="bcrn"; inp.maxLength=20; inp.value=was;
