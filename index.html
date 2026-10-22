@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-3">
+<meta name="app-build" content="2026-10-23-4">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2723,6 +2723,26 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .note .tab .tc{display:inline-block!important;min-width:0;height:auto;padding:0;margin:-10px 0 0 1px;background:transparent!important;border-radius:0;font-size:11px;font-weight:700;color:#7C7686!important}
 .note .tab .tc:empty{display:none!important}
 .note .tab[aria-selected="true"] .tc{color:var(--c)!important}
+/* ===== 카드 도구 줄을 아주 단순하게 (2026-10-23 사용자 요청)
+   알약 바탕을 없애고 글자만, 탭은 아이콘 + 고른 것만 아래 짧은 밑줄 ===== */
+.note .focusrow{gap:2px 16px;margin:6px 0 10px}
+.note .focusrow .chapread.primary-read,.note .focusrow .useopen,.note .focusrow .vedit,.note .focusrow .vtopic,.note .focusrow .vxref,.note .focusrow .vctr,.note .focusrow .vrep,.note .focusrow .vrol{
+  height:28px;padding:0;background:transparent!important;border:0;border-radius:0;font-size:13px;font-weight:400;color:#8E889A;-webkit-text-stroke:0!important}
+.note .focusrow .chapread.primary-read{color:var(--orange);font-weight:400}
+@media (hover:hover){.note .focusrow .useopen:hover,.note .focusrow .vedit:hover,.note .focusrow .vtopic:hover,.note .focusrow .vxref:hover,.note .focusrow .vctr:hover,.note .focusrow .vrep:hover,.note .focusrow .vrol:hover,.note .focusrow .chapread.primary-read:hover{background:transparent!important;color:#fff}}
+.note .focusrow .useopen[aria-expanded="true"],.note .focusrow .vedit[aria-expanded="true"],.note .focusrow .vxref[aria-expanded="true"],
+.note .focusrow .vctr[aria-pressed="true"],.note .focusrow .vrep[aria-pressed="true"],.note .focusrow .vrol[aria-pressed="true"]{background:transparent!important;color:var(--mint);box-shadow:inset 0 -2px 0 var(--mint)}
+.note .focusrow .ctopic{height:28px;padding:0;background:transparent;border:0;font-size:13px;font-weight:400;color:var(--tc,var(--violet));-webkit-text-stroke:0!important}
+.note .focusrow .ctopic.on{background:transparent;color:var(--tc,var(--violet));box-shadow:inset 0 -2px 0 var(--tc,var(--violet))}
+.note .tabs{background:transparent;border-radius:0;padding:0;margin:4px 0 12px;gap:0;border-bottom:1px solid #26252B}
+.note .tab{height:40px;border-radius:0;color:#7C7686;background:transparent}
+@media (hover:hover){.note .tab:hover{background:transparent;color:#D9D5E0}}
+.note .tab[aria-selected="true"]{background:transparent;color:var(--c);box-shadow:inset 0 -2px 0 var(--c)}
+.note .tab:focus:not(:focus-visible){outline:none}
+.note .qbtns{gap:16px;margin-left:0}
+.note .qbtns .addbtn.s{height:28px;padding:0;border:0;background:transparent;font-size:13px}
+.note .qbtns .mpriv{height:28px;padding:0;border:0;border-radius:0;background:transparent;color:#8E889A;font-size:12.5px;font-weight:400}
+.note .qbtns .mpriv.on{background:transparent;color:var(--gold)}
 </style>
 </head>
 <body>
