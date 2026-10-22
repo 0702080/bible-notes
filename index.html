@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-18">
+<meta name="app-build" content="2026-10-22-19">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9528,7 +9528,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   /* ---------- 🕸️ 말씀 연결 지도 (옵시디안 그래프처럼, 2026-10-22 사용자 요청)
      점 = 말씀 (내가 담은 말씀은 보라 점, 아직 안 담은 구절은 빈 원), 선 = '내가 연결한 말씀'.
      '#주제도 잇기'를 켜면 주제 점(민트)도 생겨 같은 주제 말씀끼리 이어짐.
-     점을 누르면 이어진 말씀이 밝아지고 아래에 목록이 나옴. '이 말씀 중심으로'는 그 점에서 두 걸음 안의 말씀만 모아 봄 */
+     점을 누르면 이어진 말씀이 밝아짐(아래 목록은 뺌). '이 말씀 중심으로'는 그 점에서 두 걸음 안의 말씀만 모아 봄 */
   var GR=null, grTopics=false;
   try{grTopics=localStorage.getItem("bible-graph-topics")==="1"}catch(e){}
   function grBuild(){
@@ -9647,18 +9647,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(o.t==="n")h+='<button type="button" class="grgo" data-act="open">카드 열기</button>';
     if(o.t==="x"&&o.b>=0&&o.c>0)h+='<a class="grgo" target="_blank" rel="noopener">보기 ↗</a>';
     if(k!==GR.center&&o.t!=="t")h+='<button type="button" class="grgo" data-act="center">이 말씀 중심으로</button>';
-    h+='</div>'+(o.t==="n"?'<p class="grtext"></p>':o.t==="x"?'<p class="grtext dim">아직 담지 않은 구절이에요</p>':'')+'<div class="grnb"></div>';
+    h+='</div>'+(o.t==="n"?'<p class="grtext"></p>':o.t==="x"?'<p class="grtext dim">아직 담지 않은 구절이에요</p>':'');   // 아래 '이어진 말씀' 목록은 뺌 (2026-10-22 사용자 요청)
     inf.innerHTML=h; inf.querySelector(".grref").textContent=o.ref;
     if(o.t==="n")inf.querySelector(".grtext").textContent=String(o.text).replace(/\s+/g," ");
     if(o.t==="x"&&o.b>=0&&o.c>0)inf.querySelector("a.grgo").href=hbLink(o.b,o.c);
-    var box=inf.querySelector(".grnb"), ms=Object.keys(nb);
-    if(!ms.length)box.innerHTML='<span class="grnone">이어진 말씀이 없어요</span>';
-    else{var lab=document.createElement("span"); lab.className="grnl"; lab.textContent="이어진 말씀 "+ms.length; box.appendChild(lab)}
-    ms.forEach(function(m){
-      var e=g.E[k<m?k+"|"+m:m+"|"+k], b=document.createElement("button"); b.type="button"; b.className="grchip grchip-"+g.N[m].t; b.dataset.k=m;
-      b.textContent=g.N[m].ref; if(e&&e.memo){var sm=document.createElement("small"); sm.textContent=e.memo.replace(/\s+/g," "); b.appendChild(sm)}
-      box.appendChild(b);
-    });
   }
   function grInfoClick(e){
     var c=e.target.closest(".grchip"); if(c){var k=c.dataset.k; if(!GR.dots[k]){GR.center=k;grDraw(true)} grSel(k); grPanTo(k); buzz(8); return}
