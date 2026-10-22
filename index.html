@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-22">
+<meta name="app-build" content="2026-10-22-23">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1612,6 +1612,8 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
   /* 아래 손잡이를 끌어 높이를 바꿀 수 있다 (2026-10-17 사용자 요청) */
   /* 칸반 칸과 같은 폭으로 나란히 (2026-10-17 사용자 요청) */
   body.boardon #recentFind{justify-content:center;padding:0 20px}
+  /* PC 칸반에서 찾을 때: 말씀 카드(칸반)가 먼저, 찾은 기록은 그 아래 (2026-10-22 사용자 요청) */
+  body.boardon #board{order:1} body.boardon #dlFGrip{order:2;margin-top:6px} body.boardon #dlFind{order:3;resize:none} body.boardon #boardSay{order:4}
   body.boardon #dlFind{flex:0 0 auto;flex-direction:row;align-items:stretch;justify-content:safe center;gap:14px;height:170px;min-height:56px;max-height:70vh;overflow:auto;resize:vertical;margin-bottom:2px;padding:0 20px 4px}
   body.boardon .dlfcol{flex:0 0 380px;max-width:380px;min-height:0}
   body.boardon .dlfl{flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:none;padding-right:2px}
@@ -3555,12 +3557,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var g=$("dlFGrip"); if(!g)return;
         var st=null;
         g.addEventListener("pointerdown",function(e){
-          st={y:e.clientY,h:box.getBoundingClientRect().height,pid:e.pointerId};
+          st={y:e.clientY,h:box.getBoundingClientRect().height,pid:e.pointerId,up:g.getBoundingClientRect().top<box.getBoundingClientRect().top};   // 손잡이가 칸 위에 있으면 위로 끌수록 커짐
           g.classList.add("on"); try{g.setPointerCapture(e.pointerId)}catch(err){} e.preventDefault();
         });
         g.addEventListener("pointermove",function(e){
           if(!st||e.pointerId!==st.pid)return; e.preventDefault();
-          var h=Math.max(56,Math.min(window.innerHeight*0.7,st.h+(e.clientY-st.y)));
+          var h=Math.max(56,Math.min(window.innerHeight*0.7,st.h+(e.clientY-st.y)*(st.up?-1:1)));
           box.style.height=Math.round(h)+"px";
         });
         function gend(e){
