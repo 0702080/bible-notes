@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-11">
+<meta name="app-build" content="2026-10-23-12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9671,7 +9671,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     notes.forEach(function(n){
       (n.links||[]).forEach(function(l){
         var r=parseRef(l.ref), k=grLinkKey(l,r);
-        if(k.charAt(0)==="x")node(k,{t:"x",ref:l.ref,b:r.book,c:r.chapter});
+        if(k.charAt(0)==="x"){var xo=node(k,{t:"x",ref:l.ref,b:r.book,c:r.chapter,v:r.verse,text:""}); if(!xo.text&&String(l.memo||"").trim())xo.text=String(l.memo).trim()}   // 연결할 때 적어 둔 본문을 그 점의 말씀으로
         edge("n:"+n.id,k,l.memo,"l");
       });
       if(grTopics)(n.topics||[]).forEach(function(t){var k="t:"+t; node(k,{t:"t",ref:"#"+t,topic:t}); edge("n:"+n.id,k,"","t")});
@@ -9729,7 +9729,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     GR.dots={};
     ks.forEach(function(k){
       var o=g.N[k], deg=Object.keys(g.adj[k]).length, r=o.t==="t"?5:Math.min(16,6+Math.sqrt(deg)*2.2);
-      var el=document.createElementNS(SV,"g"); el.setAttribute("class","gd gd-"+o.t); el.dataset.k=k;
+      var el=document.createElementNS(SV,"g"); el.setAttribute("class","gd gd-"+(o.t==="x"&&o.text?"n gd-xn":o.t)); el.dataset.k=k;   // 본문이 있는 연결 구절은 담은 말씀처럼 색 점으로
       var c=document.createElementNS(SV,"circle"); c.setAttribute("r",r); el.appendChild(c);
       var tx=document.createElementNS(SV,"text"); tx.setAttribute("y",r+13); tx.textContent=o.ref.length>14?o.ref.slice(0,13)+"…":o.ref; el.appendChild(tx);
       if(o.t==="t")el.style.setProperty("--tc",topicColor(o.topic));
@@ -9796,12 +9796,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var o=g.N[k], h='<div class="grih"><b class="grref"></b>';
     if(o.t==="n")h+='<button type="button" class="grgo" data-act="open">카드 열기</button>';
     if(o.t==="x"&&o.b>=0&&o.c>0)h+='<a class="grgo" target="_blank" rel="noopener">보기 ↗</a>';
+    if(o.t==="x"&&o.b>=0&&o.c>0&&o.v>0)h+='<button type="button" class="grgo" data-act="save">📥 카드로 담기</button>';
     if(k!==GR.center&&o.t!=="t")h+='<button type="button" class="grgo" data-act="center">이 말씀 중심으로</button>';
     if(o.t==="x"||(o.t==="n"&&Object.keys(nb).some(function(m){var e=g.E[k<m?k+"|"+m:m+"|"+k];return e&&e.kind==="l"})))
       h+='<button type="button" class="grgo grdel" data-act="del">'+(o.t==="x"?"지우기":"연결 끊기")+'</button>';
     // 담지 않은 구절은 연결할 때 적어 둔 글(본문)을 보여 줌 (2026-10-23 사용자 요청)
-    var xmemo=o.t==="x"?Object.keys(nb).map(function(m){var e=g.E[k<m?k+"|"+m:m+"|"+k];return e&&e.memo||""}).filter(Boolean)[0]||"":"";
-    h+='</div>'+(o.t==="n"||xmemo?'<p class="grtext"></p>':'')+(o.t==="x"?'<p class="grtext dim">'+(xmemo?"연결만 해 둔 구절이에요 · 카드로 담으려면 그 말씀 카드의 연결 말씀 칸에서 [📥 모두 담고 주제 붙이기]":"아직 담지 않은 구절이에요")+'</p>':'');   // 아래 '이어진 말씀' 목록은 뺌 (2026-10-22 사용자 요청)
+    var xmemo=o.t==="x"?(o.text||""):"";
+    h+='</div>'+(o.t==="n"||xmemo?'<p class="grtext"></p>':'')+(o.t==="x"&&!xmemo?'<p class="grtext dim">아직 본문을 적지 않은 구절이에요</p>':'');   // 아래 '이어진 말씀' 목록은 뺌 (2026-10-22 사용자 요청)
     inf.innerHTML=h; inf.querySelector(".grref").textContent=o.ref;
     if(o.t==="n")inf.querySelector(".grtext").textContent=String(o.text).replace(/\s+/g," ");
     else if(xmemo)inf.querySelector(".grtext").textContent=xmemo.replace(/\s+/g," ");
@@ -9812,6 +9813,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var b=e.target.closest("button.grgo"); if(!b)return;
     var o=GR.g.N[GR.sel]; if(!o)return;
     if(b.dataset.act==="center"){GR.center=GR.sel; grDraw(true); return}
+    if(b.dataset.act==="save"){   // 연결만 해 둔 구절을 말씀 카드로 (적어 둔 본문 그대로)
+      var mo=Infinity; notes.forEach(function(x){if(x.order!=null&&x.order<mo)mo=x.order});
+      var nn=cleanNote({id:uid(),ref:o.ref,text:o.text||"",book:o.b,chapter:o.c,verse:o.v,meds:[{id:mid(),text:"",at:Date.now()}],qs:[],order:isFinite(mo)?mo-1000:null,topics:[],tw:{},createdAt:Date.now()});
+      notes.set(nn.id,nn); scheduleSave(nn.id,0); render();
+      var nk="n:"+nn.id; if(GR.pos[GR.sel])GR.pos[nk]=GR.pos[GR.sel]; if(GR.center===GR.sel)GR.center=nk; GR.sel=nk; grDraw(false);
+      toast(o.ref+" 말씀을 담았어요"); buzz([12,40,12]); return;
+    }
     if(b.dataset.act==="del"){
       if(!b.dataset.sure){var t0=b.textContent;b.dataset.sure="1";b.classList.add("sure");b.textContent="한 번 더";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.classList.remove("sure");b.textContent=t0}},3000);return}
       var k=GR.sel, isX=o.t==="x", cnt=grRemove(k);
