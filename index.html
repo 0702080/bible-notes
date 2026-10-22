@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-4">
+<meta name="app-build" content="2026-10-22-5">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6822,7 +6822,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(C.dict&&C.dict.on){ccDict(n,tip,btn);return}
       /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
       ccWords(n.text,"none",0,C.seed);
-      if(window.matchMedia&&matchMedia("(min-width:900px)").matches)btn("✍️ 받아쓰기","dict");   // 휴대폰에서는 받아쓰기 단추를 두지 않음 (2026-10-21 사용자 요청)
+      /* 받아쓰기 단추는 PC에서도 뺌 (2026-10-22 사용자 요청) */
       btn("확인하기 👀","show",true);
     }else if(C.stage===4){
       ccWords(n.text,"got",0,C.seed);
