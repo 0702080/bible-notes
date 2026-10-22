@@ -1078,6 +1078,20 @@ function nextCel(){
 $("celOk").addEventListener("click",nextCel);
 $("cel").addEventListener("click",function(ev){if(ev.target===$("cel"))nextCel()});
 
+/* PC에서 체크하면 '띡!' 짧은 소리 (2026-10-22 사용자 요청). 휴대폰은 진동이 있으니 소리 없음 */
+var tickAC=null, tickAt=0;
+function tick(){
+  try{
+    if(!(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches))return;
+    var now=Date.now(); if(now-tickAt<45)return; tickAt=now;   // 끌어서 여러 칸을 칠할 때 소리가 뭉개지지 않게
+    var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+    if(!tickAC)tickAC=new AC(); if(tickAC.state==="suspended")tickAC.resume();
+    var t=tickAC.currentTime, o=tickAC.createOscillator(), g=tickAC.createGain();
+    o.type="sine"; o.frequency.setValueAtTime(1760,t); o.frequency.exponentialRampToValueAtTime(2350,t+.05);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.22,t+.006); g.gain.exponentialRampToValueAtTime(.0001,t+.09);
+    o.connect(g); g.connect(tickAC.destination); o.start(t); o.stop(t+.1);
+  }catch(e){}
+}
 /* 체크한 칸에서 반짝이 터뜨리기 */
 function sparkle(el){
   if(!el)return;
@@ -1227,7 +1241,7 @@ document.addEventListener("click",function(ev){
       for(var k1=OFF[bi2];k1<OFF[bi2]+BOOKS[bi2][1];k1++)me[k1]=0;
       me[idx]=1; save(); saveRnd(); repaintBook(bi2); renderSummary(); renderShelf();
       if(!pMode){lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
-      var sp=document.querySelector('.chip[data-i="'+idx+'"]'); if(sp)sparkle(sp);
+      var sp=document.querySelector('.chip[data-i="'+idx+'"]'); if(sp)sparkle(sp); tick();
       hint("🔁 "+BOOKS[bi2][0]+" "+(R1[bi2]+1)+"회째 시작","잘못 눌렀으면 같은 칸을 한 번 더 누르면 돌아가요");
       return;
     }
@@ -1249,7 +1263,7 @@ document.addEventListener("click",function(ev){
     var after=everCount();
     if(me[idx]){
       var spot=document.querySelector('.chip[data-i="'+idx+'"]');
-      sparkle(spot);
+      sparkle(spot); tick();
       // 다섯 장째면 금빛 테두리가 한 번 번진다
       if(spot&&spot.hasAttribute("data-five")){
         spot.classList.remove("got5");void spot.offsetWidth;spot.classList.add("got5");
@@ -1275,7 +1289,7 @@ document.addEventListener("click",function(ev){
     var i=+c.dataset.i; if(D.done[i])return; D.done[i]=1;
     if(!!me[i]===!!D.fill)return;
     me[i]=D.fill; D.books[bookOf(i)]=1; D.n++;
-    if(D.fill){c.setAttribute("data-s","me");c.classList.remove("got5");void c.offsetWidth;c.classList.add("got5")}else c.removeAttribute("data-s");
+    if(D.fill){tick();c.setAttribute("data-s","me");c.classList.remove("got5");void c.offsetWidth;c.classList.add("got5")}else c.removeAttribute("data-s");
     c.setAttribute("aria-pressed",String(!!D.fill)); buzzz(6);
   }
   function begin(c){
