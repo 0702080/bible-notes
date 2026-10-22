@@ -1002,17 +1002,19 @@ var JAMO2={"ㄳ":"ㄱㅅ","ㄵ":"ㄴㅈ","ㄶ":"ㄴㅎ","ㄺ":"ㄹㄱ","ㄻ":"�
 function bkHit(name,q){
   var n=String(name).replace(/\s/g,""), w=String(q).replace(/\s/g,"").replace(/[ㄳㄵㄶㄺㄻㄼㄽㄾㄿㅀㅄ]/g,function(c){return JAMO2[c]});
   if(!w)return true;
-  if(n.indexOf(w)>=0)return true;
-  if(/^[ㄱ-ㅎ]+$/.test(w))return chosung(n).indexOf(w)>=0;
-  return false;
+  var hay=/^[ㄱ-ㅎ]+$/.test(w)?chosung(n):n, at=hay.indexOf(w);
+  if(at<0)return false;
+  return at===0?2:1;   // 2 = 이름 앞부분이 맞음, 1 = 가운데가 맞음
 }
 function applyFind(){
   var el=document.getElementById("bkFind"); if(!el)return;
   var q=el.value.trim(), x=document.getElementById("bkFindX"), msg=document.getElementById("findMsg");
   if(x)x.hidden=!q;
   var secs=document.querySelectorAll(".bk[data-b]"), shown=0, seen={};
+  // 이름 앞부분이 맞는 책이 있으면 그 책만 (ㄹㅁㅅ → 로마서만, 빌레몬서는 빼기, 2026-10-22 사용자 요청)
+  var front=BOOKS.some(function(b){return bkHit(b[0],q)===2});
   Array.prototype.forEach.call(secs,function(sec){
-    var bi=+sec.dataset.b, hit=bkHit(BOOKS[bi][0],q);
+    var bi=+sec.dataset.b, h=bkHit(BOOKS[bi][0],q), hit=front?h===2:!!h;
     sec.hidden=!hit;
     if(hit&&!seen[bi]){seen[bi]=1;shown++}
   });
