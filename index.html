@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-17">
+<meta name="app-build" content="2026-10-22-18">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -548,6 +548,15 @@ html{scrollbar-width:thin;scrollbar-color:var(--sbthumb,#3E3C47) transparent}
   --btn:#EEEAE2; --btn-ink:#121214; --focus:#B79CF2;
 }
 body{background:radial-gradient(1200px 500px at 50% -120px,#1B1A22 0%,var(--paper) 60%) fixed,var(--paper)}
+/* 바탕은 통독표와 같은 아이보리 (2026-10-22 사용자 요청). 카드·칸반 칸은 검정 그대로 두고, 바탕 위에 바로 놓인 글자만 진하게 */
+body{background:#F7F1E3}
+body .topverse{color:#9A6A12}
+body .top .status{color:#8C8270}
+body .toolbar #count{color:#6E6452!important}
+/* 아이보리 바탕 위 단추·주제 칩은 카드처럼 짙은 바탕으로 (밝은 글자가 그대로 잘 보이게) */
+body .toolbar .tbtn,body .toolbar summary.tbtn,body .homebtn,body .todaymini .tmchip,body .topicbar .tchip:not(.on),body .toolbar .viewseg,body.boardon .bfilter{background:#1E1D24!important;border-color:#1E1D24!important}
+body .toolbar .viewseg button[aria-pressed="false"]{color:#C9C3D3}
+body.boardon .bfilter::placeholder{color:#8E8899}
 h1{color:var(--ink);font-weight:700;letter-spacing:.02em}
 h1::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet);margin-left:6px;vertical-align:middle;transform:translateY(-4px)}
 .searchbar input{background:var(--sheet);border-color:var(--rule);color:var(--ink)}
