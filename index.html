@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-2">
+<meta name="app-build" content="2026-10-23-3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3701,6 +3701,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     document.addEventListener("pointerup",done,true);
   },true);
   function setVal(el,v){if(document.activeElement!==el&&el.value!==v){el.value=v;grow(el)}}
+  // PC: 기도 제목·응답 칸을 누르면 화면 세로로 크게 펼침 (오른쪽 아래 손잡이로 줄이고 늘리기도 그대로, 2026-10-23 사용자 요청)
+  document.addEventListener("focusin",function(e){
+    var t=e.target; if(!t||!t.classList||!(t.classList.contains("pt")||t.classList.contains("pan")))return;
+    if(!(window.matchMedia&&matchMedia("(min-width:900px)").matches))return;
+    var k=taKey(t); if(manualH.get(k))return;   // 손으로 맞춘 높이가 있으면 그대로
+    var H=Math.max(220,Math.round(window.innerHeight-230));
+    if(t.getBoundingClientRect().height<H-10){t.style.height=H+"px"; manualH.set(k,H+"px")}
+    var r=t.getBoundingClientRect(); if(r.top<90||r.bottom>window.innerHeight-20)window.scrollBy(0,r.top-110);
+  });
 
   var tabOf=new Map();
   /* ---------- 기도: 이 말씀으로 드리는 기도 제목, 응답되면 표시 ---------- */
