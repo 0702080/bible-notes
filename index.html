@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-4">
+<meta name="app-build" content="2026-10-23-5">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4577,6 +4577,26 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     else himsg(hyEl,"붙여넣은 것이 사진이 아니에요. 이미지를 길게 눌러 '이미지 복사'를 한 뒤 다시 붙여넣어 주세요.");
   });
   // 연결 말씀: 구절 칸에서 엔터 → 메모 칸으로
+  // 질문 칸: 엔터 → 바로 아래 답 칸으로, 시프트+엔터 → 질문 다음 줄 (2026-10-23 사용자 요청)
+  (function(){
+    var shiftEnter=false;
+    function toAnswer(q){
+      var qa=q.closest(".qa"); if(!qa)return;
+      var f=qa.querySelector(".qfold"); if(f&&f.getAttribute("aria-expanded")==="false")f.click();
+      var a=(q.closest(".qa")||qa).querySelector("textarea.a"); if(!a)return;
+      setTimeout(function(){a.focus();try{a.setSelectionRange(a.value.length,a.value.length)}catch(err){}},0);
+    }
+    list.addEventListener("keydown",function(e){
+      var t=e.target; if(e.key!=="Enter"||!t.classList||!t.classList.contains("q")||!t.closest(".qa"))return;
+      shiftEnter=e.shiftKey; if(e.shiftKey||e.isComposing||e.keyCode===229)return;   // 한글 조합 중이면 아래 beforeinput에서 처리
+      e.preventDefault(); toAnswer(t);
+    });
+    list.addEventListener("beforeinput",function(e){
+      var t=e.target; if(!t.classList||!t.classList.contains("q")||!t.closest(".qa"))return;
+      if((e.inputType==="insertLineBreak"||e.inputType==="insertParagraph")&&!shiftEnter){e.preventDefault(); toAnswer(t)}
+      shiftEnter=false;
+    });
+  })();
   list.addEventListener("keydown",function(e){var t=e.target; if(e.key==="Enter"&&!e.isComposing&&t.classList&&t.classList.contains("xlref")&&t.value.trim()){e.preventDefault();var m=t.form&&t.form.querySelector(".xlmemo");if(m)m.focus()}});
   list.addEventListener("click",function(e){
     var pv=e.target.closest&&e.target.closest(".prv"); if(!pv)return;
