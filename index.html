@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-9">
+<meta name="app-build" content="2026-10-23-11">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1376,6 +1376,8 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .xgraph{margin-left:auto;height:30px;padding:0 12px;border:1px solid color-mix(in srgb,var(--violet) 45%,#34333A);border-radius:15px;background:color-mix(in srgb,var(--violet) 12%,transparent);color:var(--violet);font-size:12.5px;font-weight:700;white-space:nowrap}
 .xlform textarea.xlmemo{flex:none;display:block;width:100%;box-sizing:border-box;min-height:44px;height:64px;max-height:none;resize:vertical;line-height:1.55;padding-top:9px;padding-bottom:9px;font-family:inherit}
 .xmemo{white-space:pre-line}
+.xlallrow{justify-content:center;border-bottom:0!important}
+.xlall{height:34px;padding:0 14px;border:1px dashed color-mix(in srgb,var(--mint) 55%,#34333A);border-radius:17px;background:color-mix(in srgb,var(--mint) 8%,transparent);color:var(--mint);font-size:13px;font-weight:700}
 /* 말씀 연결 지도 */
 .grico{width:1.1em;height:1.1em;vertical-align:-.17em;color:var(--sky);filter:drop-shadow(0 0 3px color-mix(in srgb,var(--sky) 55%,transparent))}   /* 밝은 연결 지도 아이콘 (2026-10-22 사용자 요청) */
 .grtools{display:flex;gap:6px;margin-left:auto}
@@ -4910,6 +4912,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(!b.dataset.sure){b.dataset.sure="1";b.classList.add("sure");b.textContent="한 번 더";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.classList.remove("sure");b.textContent="지우기"}},3000);return}
       var lid=b.closest("li").dataset.lid; linkTomb(n,(n.links||[]).filter(function(l){return l.id===lid})); n.links=(n.links||[]).filter(function(l){return l.id!==lid}); scheduleSave(id); fillXref(card.querySelector(".xpanel"),n); return;
     }
+    if(b.classList.contains("xlall")){collectLinks(card,n);return}
     if(b.classList.contains("xadd")){addFromXref(b.dataset.b,b.dataset.c,b.dataset.v,b.dataset.label);return}
     if(b.classList.contains("xdel")){
       var xd=b.dataset.id;
@@ -9796,9 +9799,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(k!==GR.center&&o.t!=="t")h+='<button type="button" class="grgo" data-act="center">이 말씀 중심으로</button>';
     if(o.t==="x"||(o.t==="n"&&Object.keys(nb).some(function(m){var e=g.E[k<m?k+"|"+m:m+"|"+k];return e&&e.kind==="l"})))
       h+='<button type="button" class="grgo grdel" data-act="del">'+(o.t==="x"?"지우기":"연결 끊기")+'</button>';
-    h+='</div>'+(o.t==="n"?'<p class="grtext"></p>':o.t==="x"?'<p class="grtext dim">아직 담지 않은 구절이에요</p>':'');   // 아래 '이어진 말씀' 목록은 뺌 (2026-10-22 사용자 요청)
+    // 담지 않은 구절은 연결할 때 적어 둔 글(본문)을 보여 줌 (2026-10-23 사용자 요청)
+    var xmemo=o.t==="x"?Object.keys(nb).map(function(m){var e=g.E[k<m?k+"|"+m:m+"|"+k];return e&&e.memo||""}).filter(Boolean)[0]||"":"";
+    h+='</div>'+(o.t==="n"||xmemo?'<p class="grtext"></p>':'')+(o.t==="x"?'<p class="grtext dim">'+(xmemo?"연결만 해 둔 구절이에요 · 카드로 담으려면 그 말씀 카드의 연결 말씀 칸에서 [📥 모두 담고 주제 붙이기]":"아직 담지 않은 구절이에요")+'</p>':'');   // 아래 '이어진 말씀' 목록은 뺌 (2026-10-22 사용자 요청)
     inf.innerHTML=h; inf.querySelector(".grref").textContent=o.ref;
     if(o.t==="n")inf.querySelector(".grtext").textContent=String(o.text).replace(/\s+/g," ");
+    else if(xmemo)inf.querySelector(".grtext").textContent=xmemo.replace(/\s+/g," ");
     if(o.t==="x"&&o.b>=0&&o.c>0)inf.querySelector("a.grgo").href=hbLink(o.b,o.c);
   }
   function grInfoClick(e){
@@ -9866,6 +9872,33 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(l.memo)li.querySelector(".xmemo").textContent=l.memo;   // 여러 줄 그대로 (.xmemo는 줄바꿈을 지킴)
       ul.appendChild(li);
     });
+    if(n.links.length){   // 연결한 말씀을 한꺼번에 말씀 카드로 담고 같은 주제를 붙임 (2026-10-23 사용자 요청)
+      var al=document.createElement("li"); al.className="xlallrow";
+      al.innerHTML='<button type="button" class="xlall">📥 연결한 말씀 모두 담고 주제 붙이기</button>';
+      ul.appendChild(al);
+    }
+  }
+  function collectLinks(card,n){
+    var t=window.prompt("이 말씀과 연결한 말씀 "+n.links.length+"개에 붙일 주제를 적어 주세요 (예: 분노)",(n.topics&&n.topics[0])||"");
+    if(t===null)return; t=String(t).replace(/^#+/,"").trim().slice(0,20);
+    if(!t){toast("주제를 적어 주세요");return}
+    var made=0, tagged=0, now=Date.now(), minOrder=Infinity, chs=myChapters();
+    notes.forEach(function(x){if(x.order!=null&&x.order<minOrder)minOrder=x.order});
+    function tag(x){if(x.topics.indexOf(t)<0){x.topics.push(t);tagged++;scheduleSave(x.id)}}
+    tag(n);
+    n.links.slice().reverse().forEach(function(l,i){
+      var r=parseRef(l.ref); if(!(r.book>=0&&r.chapter>0))return;
+      var have=r.verse>0?myNoteAt(r.book,r.chapter,r.verse):null;
+      if(have){tag(have);return}
+      var txt=String(l.memo||"").trim();
+      if(!txt){var ch=chs[USFM[r.book]+"-"+r.chapter], vv=ch&&r.verse?ch.v.filter(function(x){return x.v===r.verse})[0]:null; if(vv)txt=vv.t}
+      var nn=cleanNote({id:uid(),ref:l.ref,text:txt,book:r.book,chapter:r.chapter,verse:r.verse,meds:[{id:mid(),text:"",at:now}],qs:[],
+        order:isFinite(minOrder)?(minOrder-=1000):null,topics:[t],tw:{},createdAt:now+i});
+      notes.set(nn.id,nn); scheduleSave(nn.id,0); made++;
+    });
+    setTopics([t]); render();
+    toast(made?("말씀 "+made+"개를 새로 담고 #"+t+" 주제를 붙였어요"):("#"+t+" 주제를 붙였어요"));
+    buzz([12,40,12]);
   }
   function addMyLink(card,n,f){
     var ri=f.querySelector(".xlref"), mi=f.querySelector(".xlmemo"), ref=ri.value.trim();
