@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-2">
+<meta name="app-build" content="2026-10-22-3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2734,6 +2734,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   var parsing=new Set();
   var sortMode="recent", filterText="";
   try{var sv=localStorage.getItem("bible-notes-sort");if(sv==="bible"||sv==="recent"||sv==="custom")sortMode=sv}catch(e){}
+  // 말씀 순서(최근순·성경순·내 순서)를 로그인한 모든 기기가 같이 씀: 마지막에 바꾼 쪽을 따름. 처음엔 휴대폰 순서가 기준 (2026-10-22 사용자 요청)
+  var SORT_AT="bible-notes-sort-at", sortAt=0;
+  try{sortAt=+localStorage.getItem(SORT_AT)||0}catch(e){}
+  function setSortMode(m){
+    sortMode=m; sortAt=Date.now();
+    try{localStorage.setItem("bible-notes-sort",m);localStorage.setItem(SORT_AT,String(sortAt))}catch(e){}
+    if(typeof sbMark==="function")sbMark("__sort");
+  }
+  if(!sortAt&&!(window.matchMedia&&matchMedia("(min-width:900px)").matches)){
+    sortAt=1; try{localStorage.setItem(SORT_AT,"1")}catch(e){}
+    setTimeout(function(){try{sbMark("__sort")}catch(e){}},4000);
+  }
   var backend=null;             // {kind, put(note), del(id)}
   var downloadsNs=null;
   var sampleFn=null;
@@ -10346,7 +10358,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     detail=String(detail||"").replace(/\s+/g," ").trim().slice(0,140);
     return {msg:what+" ("+r.status+(detail?": "+detail:"")+")",short:what+" "+r.status};
   }
-  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__sayings");sbDirty.add("__medq");try{localStorage.removeItem(SB_LAST)}catch(e){}}
+  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__sayings");sbDirty.add("__medq");sbDirty.add("__sort");try{localStorage.removeItem(SB_LAST)}catch(e){}}
   var SB_DIRTY="bible-sb-dirty";
   try{(JSON.parse(localStorage.getItem(SB_DIRTY)||"[]")||[]).forEach(function(id){sbDirty.add(String(id))})}catch(e){}
   function sbSaveDirty(){try{if(sbDirty.size)localStorage.setItem(SB_DIRTY,JSON.stringify(Array.from(sbDirty)));else localStorage.removeItem(SB_DIRTY)}catch(e){}}
@@ -10365,6 +10377,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(id==="__me"){
           var me={emoji:myEmoji(),on:shareOn()?1:0}, mjs=JSON.stringify(me);
           if(sbLastJson["s:__me"]!==mjs){rows.push({user_id:uid,id:"s:__me",data:me,updated_at:now,deleted:false,visibility:"friends"});sbLastJson["s:__me"]=mjs}
+          return;
+        }
+        if(id==="__sort"){
+          var so={m:sortMode,at:sortAt}, sojs=JSON.stringify(so);
+          if(sbLastJson.__sort!==sojs){rows.push({user_id:uid,id:"__sort",data:so,updated_at:now,deleted:false});sbLastJson.__sort=sojs}
           return;
         }
         if(id==="__prays1"){
@@ -10403,6 +10420,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           if(String(r.id).indexOf("s:")===0){   // 친구용 사본은 노트가 아님
             if(r.id==="s:__me"&&r.data){sbLastJson["s:__me"]=JSON.stringify(r.data);try{if(r.data.emoji)localStorage.setItem("bible-my-emoji",String(r.data.emoji));localStorage.setItem("bible-share",r.data.on===0?"0":"1")}catch(e){}}
             return;
+          }
+          if(r.id==="__sort"){
+            var so2=r.data||{};
+            if((so2.m==="bible"||so2.m==="recent"||so2.m==="custom")&&(+so2.at||0)>sortAt){
+              sortMode=so2.m; sortAt=+so2.at; try{localStorage.setItem("bible-notes-sort",sortMode);localStorage.setItem(SORT_AT,String(sortAt))}catch(e){}
+              try{syncSortBtn()}catch(e){} setTimeout(render,0);
+            }
+            sbLastJson.__sort=JSON.stringify({m:sortMode,at:sortAt}); return;
           }
           if(r.id==="__prays1"){if(p1Merge(r.data)&&prd&&!prd.hidden)drawPrayRead();sbLastJson.__prays1=JSON.stringify(p1Data());return}
           if(r.id==="__medq"){sbLastJson.__medq=JSON.stringify(r.data);medqMerge(r.data);return}
@@ -10658,7 +10683,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     out.forEach(function(id,i){var n=notes.get(id); if(!n)return; var o=(i+1)*1000, ch=false;
       if(set[id]&&nb&&!!n.pinned!==!!nb.pinned){n.pinned=!!nb.pinned; n.pinnedAt=n.pinned?Date.now():0; ch=true}
       if(n.order!==o){n.order=o; ch=true} if(ch)scheduleSave(id,600)});
-    if(sortMode!=="custom"){sortMode="custom"; try{localStorage.setItem("bible-notes-sort","custom")}catch(e){} syncSortBtn()}
+    if(sortMode!=="custom"){setSortMode("custom"); syncSortBtn()}
     render(); buzz(12);
   }
   // 브라우저 기본 끌기(HTML5 drag)는 PC에서 자주 끊겨서, 마우스 누르고 움직이는 것으로 직접 끎 (2026-10-21)
@@ -11330,7 +11355,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var ids=Array.prototype.map.call($("list").children,function(c){return c.dataset.id}).filter(Boolean);
     var changed=false;
     ids.forEach(function(id,i){var n=notes.get(id); if(!n)return; var o=(i+1)*1000; if(n.order!==o){n.order=o; scheduleSave(id,600); changed=true}});
-    if(sortMode!=="custom"){sortMode="custom"; try{localStorage.setItem("bible-notes-sort","custom")}catch(e){} syncSortBtn(); setStatus("내 순서로 바꿨어요")}
+    if(sortMode!=="custom"){setSortMode("custom"); syncSortBtn(); setStatus("내 순서로 바꿨어요")}
     return changed;
   }
   var drag=null, dragRAF=0;
@@ -11530,8 +11555,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   /* ---------- toolbar ---------- */
   function syncSortBtn(){$("sortBtn").textContent=sortMode==="recent"?"최근순":sortMode==="bible"?"성경순":"내 순서"}
   $("sortBtn").addEventListener("click",function(){
-    sortMode=sortMode==="recent"?"bible":sortMode==="bible"?"custom":"recent";
-    try{localStorage.setItem("bible-notes-sort",sortMode)}catch(e){}
+    setSortMode(sortMode==="recent"?"bible":sortMode==="bible"?"custom":"recent");
     syncSortBtn(); render();
   });
   $("filterBtn").addEventListener("click",function(){
