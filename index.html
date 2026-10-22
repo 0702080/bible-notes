@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-23">
+<meta name="app-build" content="2026-10-23-1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9644,12 +9644,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function grLoop(){
     if(!GR||GR.ov.hidden)return;
     if(GR.alpha>.02){grTick(GR.alpha); GR.alpha*=.985; grPaint(); if(GR.alpha<=.02&&!GR.touched)grFit()}
+    else if(!grStill)grPaint();   // 멈춘 뒤에도 둥둥 떠 있는 느낌으로 계속 살짝 움직임
     GR.raf=requestAnimationFrame(grLoop);
   }
+  // 옵시디안처럼 점마다 제 박자로 아주 살짝 떠다님 (그리는 자리만 흔들고 실제 자리는 그대로, 2026-10-23 사용자 요청)
+  var grStill=!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
+  function grBob(k){
+    if(!GR.bob)GR.bob={}; var b=GR.bob[k];
+    if(!b){b=GR.bob[k]={a:Math.random()*6.28,c:Math.random()*6.28,s1:.00045+Math.random()*.00035,s2:.00038+Math.random()*.00035,r:2.2+Math.random()*2.6}}
+    return b;
+  }
+  function grAt(k,t){
+    var p=GR.pos[k]; if(grStill||p.drag)return {x:p.x,y:p.y};
+    var b=grBob(k); return {x:p.x+Math.sin(t*b.s1+b.a)*b.r, y:p.y+Math.cos(t*b.s2+b.c)*b.r};
+  }
   function grPaint(){
-    var P=GR.pos;
-    GR.es.forEach(function(e,i){var a=P[e.a], b=P[e.b], l=GR.lines[i]; l.setAttribute("x1",a.x.toFixed(1)); l.setAttribute("y1",a.y.toFixed(1)); l.setAttribute("x2",b.x.toFixed(1)); l.setAttribute("y2",b.y.toFixed(1))});
-    GR.ks.forEach(function(k){var p=P[k]; GR.dots[k].setAttribute("transform","translate("+p.x.toFixed(1)+","+p.y.toFixed(1)+")")});
+    var t=performance.now(), Q={};
+    GR.ks.forEach(function(k){Q[k]=grAt(k,t)});
+    GR.es.forEach(function(e,i){var a=Q[e.a], b=Q[e.b], l=GR.lines[i]; l.setAttribute("x1",a.x.toFixed(1)); l.setAttribute("y1",a.y.toFixed(1)); l.setAttribute("x2",b.x.toFixed(1)); l.setAttribute("y2",b.y.toFixed(1))});
+    GR.ks.forEach(function(k){var p=Q[k]; GR.dots[k].setAttribute("transform","translate("+p.x.toFixed(1)+","+p.y.toFixed(1)+")")});
     GR.view.setAttribute("transform","translate("+GR.tx.toFixed(1)+","+GR.ty.toFixed(1)+") scale("+GR.sc.toFixed(3)+")");
     GR.svg.classList.toggle("grsmall",GR.sc<.75&&GR.ks.length>25);
   }
