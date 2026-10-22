@@ -281,6 +281,11 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
   .ring,.spark{display:none}
 }
 
+/* 좌우로 밀어 탭 바꿀 때 살짝 미끄러지듯 (2026-10-22) */
+@keyframes mswl{from{opacity:.4;transform:translateX(28px)}to{opacity:1;transform:none}}
+@keyframes mswr{from{opacity:.4;transform:translateX(-28px)}to{opacity:1;transform:none}}
+main.mswl{animation:mswl .22s ease-out}
+main.mswr{animation:mswr .22s ease-out}
 /* 대화상자 */
 .sheet{
   position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.45);
@@ -1615,6 +1620,43 @@ setMode(sm,false);
 if(sbSession()){loadCF();applyCloudFriend()}
 renderAll();
 drawCloud(); if(sbSession())cloudSync(false);
+/* ── 좌우로 밀어 통독 ↔ 필사 바꾸기 (2026-10-22 사용자 요청) ──
+   오른쪽→왼쪽으로 밀면 필사, 왼쪽→오른쪽으로 밀면 통독.
+   장 칸 위에서 옆으로 밀면 칠하기라서, 칸 밖(제목·빈 곳·책 이름 줄 등)에서 시작한 밀기만 셈 */
+(function(){
+  var S=null;
+  function hscroll(el){   // 옆으로 스크롤되는 곳(걸어온 길 연표 등)은 그대로 스크롤
+    for(;el&&el!==document.body;el=el.parentElement){
+      if(el.scrollWidth>el.clientWidth+2){var o=getComputedStyle(el).overflowX;if(o==="auto"||o==="scroll")return true}
+    }
+    return false;
+  }
+  document.addEventListener("touchstart",function(e){
+    S=null;
+    if(e.touches.length!==1)return;
+    var t=e.target;
+    if(!t.closest||t.closest('.chip[data-act="chip"],.sheet,.turn,input,textarea,select')||hscroll(t))return;
+    var p=e.touches[0]; S={x:p.clientX,y:p.clientY,t:Date.now(),bad:false};
+  },{passive:true});
+  document.addEventListener("touchmove",function(e){
+    if(!S)return;
+    if(document.body.classList.contains("painting")||e.touches.length!==1){S.bad=true;return}
+    var p=e.touches[0]; if(Math.abs(p.clientY-S.y)>60)S.bad=true;   // 위아래 스크롤이면 무시
+  },{passive:true});
+  document.addEventListener("touchend",function(e){
+    var s=S; S=null; if(!s||s.bad)return;
+    var p=e.changedTouches[0]; if(!p)return;
+    var dx=p.clientX-s.x, dy=p.clientY-s.y;
+    if(Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*1.8||Date.now()-s.t>700)return;
+    var to=dx<0?"pilsa":"read";
+    if((to==="pilsa")===pMode)return;   // 이미 그 탭
+    setMode(to,true);
+    try{navigator.vibrate&&navigator.vibrate(15)}catch(err){}
+    var m=document.querySelector("main"); if(m){m.classList.remove("mswl","mswr");void m.offsetWidth;m.classList.add(dx<0?"mswl":"mswr")}
+  },{passive:true});
+  document.addEventListener("touchcancel",function(){S=null},{passive:true});
 })();
+})();
+
 </script>
 </body></html>
