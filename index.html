@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-20">
+<meta name="app-build" content="2026-10-22-21">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -814,6 +814,8 @@ body.reorder .note .topics{display:none}
 .tswrap{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
 .tpick{height:34px;padding:0 13px;border:1px solid var(--rule);border-radius:17px;background:transparent;color:var(--ink);font-size:14px}
 .tpick[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:#141416;font-weight:700}
+.tpick[hidden]{display:none}
+.tsnohit{margin:4px 2px 8px;font-size:13px;color:var(--muted)}
 .tsrow{display:flex;gap:8px;align-items:center;margin:4px 0 12px}
 .tsrow .field{margin:0;flex:1;height:44px;font-size:16px;background:var(--paper)}
 .tsdone{width:100%;margin-top:4px}
@@ -5718,10 +5720,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       body.appendChild(wrap);
     }
     var row=document.createElement("form"); row.className="tsrow"; row.autocomplete="off";
-    row.innerHTML='<input class="field tsnew" maxlength="20" placeholder="새 주제 (예: 두려움, 빛, 사랑)" aria-label="새 주제"><button type="submit" class="primary">추가</button>';
-    body.appendChild(row);
+    row.innerHTML='<input class="field tsnew" maxlength="20" placeholder="주제 찾기 · 새 주제 (초성도 돼요: ㅅㄹ)" aria-label="주제 찾기 또는 새 주제"><button type="submit" class="primary">추가</button>';
+    var nohit=document.createElement("p"); nohit.className="tsnohit"; nohit.hidden=true;
+    body.appendChild(nohit); body.appendChild(row);
     var done=document.createElement("button"); done.type="button"; done.className="primary tsdone"; done.textContent="완료"; body.appendChild(done);
   }
+  // 주제 고르기: 아래 칸에 적으면 위 주제 칩을 바로 걸러 보여 줌 (초성도 됨). 없으면 [추가]로 새로 만듦 (2026-10-22 사용자 요청)
+  $("tsBody").addEventListener("input",function(e){
+    var i=e.target; if(!i.classList||!i.classList.contains("tsnew"))return;
+    var q=i.value.trim(), shown=0, body=$("tsBody");
+    body.querySelectorAll(".tpick").forEach(function(b){var hit=!q||matchAll(b.dataset.topic,q,true).length>0; b.hidden=!hit; if(hit)shown++});
+    var nh=body.querySelector(".tsnohit"); if(nh){nh.hidden=!q||shown>0; nh.textContent="‘"+q+"’ 주제가 아직 없어요 · [추가]를 누르면 새로 만들어요"}
+  });
   function openCollect(topic){
     ts.mode="collect"; ts.results=[]; openTS("주제로 말씀 모으기");
     var body=$("tsBody"); body.innerHTML=
