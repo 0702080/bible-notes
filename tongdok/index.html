@@ -514,11 +514,23 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
 </div>
 
 <script>
+/* 같은 파일을 두 곳에서 씀 (2026-10-22 사용자 요청)
+   tongdok/  = 아내(혜진)와 아내 친구가 쓰는 통독표. 이름표는 "혜진 / 친구"로 고정
+   tongdok2/ = 묵상 노트 주인(김재식)과 그 가족·친구들이 쓰는 통독표. 저장 키·클라우드 줄이 따로라 서로 섞이지 않음
+   tongdok2/index.html은 이 파일과 똑같은 복사본. 고치면 두 파일을 똑같이 맞춘다 */
+var TD2=/\/tongdok2\//.test(location.pathname), KP=TD2?"bible-tongdok2-":"bible-tongdok-";
+if(TD2)(function(){   // 묵상 노트에서 처음 들어오면, 이 기기에서 쓰던 통독표 진도를 한 번 옮겨 옴
+  try{
+    if(!/[?&]from=notes/.test(location.search)||localStorage.getItem(KP+"v1")!==null||localStorage.getItem(KP+"moved"))return;
+    for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i); if(k&&k.indexOf("bible-tongdok-")===0&&k!=="bible-tongdok-"+"short"){var nk=KP+k.slice(14); if(localStorage.getItem(nk)===null)localStorage.setItem(nk,localStorage.getItem(k))}}
+    localStorage.setItem(KP+"moved","1");
+  }catch(e){}
+})();
 (function(){
 /* 묵상 노트 메뉴(📖 성경 통독표)로 들어왔으면 맨 위에 '← 노트' 버튼을 보여 줌.
    통독표만 따로 쓰는 사람(주소로 바로 여는 경우)에게는 버튼이 없음 */
 (function(){
-  var FROM_KEY="bible-tongdok-from";
+  var FROM_KEY=KP+"from";
   try{
     var q=new URLSearchParams(location.search);
     if(q.get("from")==="notes"){sessionStorage.setItem(FROM_KEY,"notes");q.delete("from");
@@ -551,16 +563,16 @@ var OFF=[],TOTAL=0;
 for(var i=0;i<BOOKS.length;i++){OFF.push(TOTAL);TOTAL+=BOOKS[i][1];}   // 1189
 var OT_TOTAL=OFF[OT_N], NT_TOTAL=TOTAL-OT_TOTAL;
 
-var LS="bible-tongdok-v1";       // 기존 앱들과 겹치지 않는 저장 키
+var LS=KP+"v1";       // 기존 앱들과 겹치지 않는 저장 키
 var me=new Uint8Array(TOTAL);    // 내 진도
 var friend=null;                 // 친구 진도 (불러왔을 때만)
 /* ✍️ 필사 (2026-10-15): 같은 표에 필사한 장도 따로 표시. RB=통독, PB=필사, me는 지금 고른 쪽을 가리킴 */
 var RB=me, PB=new Uint8Array(TOTAL), pMode=false, pilAt=0, friendPil=null;
-var PIL_KEY="bible-tongdok-pilsa", MODE_KEY="bible-tongdok-mode";
+var PIL_KEY=KP+"pilsa", MODE_KEY=KP+"mode";
 function fb(){return pMode?friendPil:friend}
 /* 🔁 반복 읽기 (2026-10-15): 한 책을 다 읽으면 '한 번 더 읽기'로 회차를 올리고 칸을 비워 다시 체크. 회차마다 칸 색이 다름
    RND.r = 통독 회차, RND.p = 필사 회차 {책번호: 끝낸 횟수} */
-var RND_KEY="bible-tongdok-rounds", RND={r:{},p:{}}, rndAt=0;
+var RND_KEY=KP+"rounds", RND={r:{},p:{}}, rndAt=0;
 try{var rj=JSON.parse(localStorage.getItem(RND_KEY)||"null");if(rj){RND={r:rj.r||{},p:rj.p||{}};rndAt=+rj.t||0}}catch(e){}
 function rounds(){return pMode?RND.p:RND.r}
 function rndOf(bi){return +rounds()[bi]||0}
@@ -585,7 +597,8 @@ function roundCtl(bi){
 var friendName="";
 var myName="";
 /* 화면에 보이는 이름 (2026-10-22 사용자 요청: 나 → 혜진, 친구 이름 → 친구로 글자 고정) */
-var ME_LABEL="혜진", FR_LABEL="친구";
+var ME_LABEL=TD2?"나":"혜진", FR_LABEL=TD2?"":"친구";   // tongdok2는 나 / 친구 이름 그대로
+function frLabel(f){return FR_LABEL||(f&&f.name)||"친구"}
 var compare=false;
 
 var $=function(id){return document.getElementById(id)};
@@ -699,7 +712,7 @@ function parseCode(txt){
 }
 /* is.gd로 아주 짧게 (예: is.gd/AbC123). 같은 코드는 한 번만 줄이고 기억해 둠.
    is.gd가 #뒤를 놓칠 수 있어 ?c=코드 모양의 주소를 줄인다 (t 폴더가 통독표로 넘겨 줌) */
-var SHORT_KEY="bible-tongdok-short";
+var SHORT_KEY=KP+"short";
 function shortCache(){try{return JSON.parse(localStorage.getItem(SHORT_KEY)||"{}")||{}}catch(e){return {}}}
 function shorten(code,done){
   var c=shortCache(); if(c[code]){done(c[code]);return}
@@ -710,14 +723,14 @@ function shorten(code,done){
     if(u){var m=shortCache();m[code]=u;var ks=Object.keys(m);if(ks.length>30)delete m[ks[0]];try{localStorage.setItem(SHORT_KEY,JSON.stringify(m))}catch(e){}}
     end(u);
   };
-  var long=new URL("../t/",location.href.split("#")[0].split("?")[0]).href+"?c="+encodeURIComponent(code);
+  var long=new URL(TD2?"../t2/":"../t/",location.href.split("#")[0].split("?")[0]).href+"?c="+encodeURIComponent(code);
   sc.src="https://is.gd/create.php?format=json&callback="+cb+"&url="+encodeURIComponent(long);
   sc.onerror=function(){end(null)}; setTimeout(function(){end(null)},6000);
   document.head.appendChild(sc);
 }
 function makeLink(){
   // 가장 짧은 주소: …/bible-notes/t#코드 (t 폴더가 통독표로 넘겨 줌). "https://"도 빼서 카톡에 그대로 붙여도 링크가 됨
-  var u=new URL("../t",location.href.split("#")[0].split("?")[0]);
+  var u=new URL(TD2?"../t2":"../t",location.href.split("#")[0].split("?")[0]);
   return u.host+u.pathname+"#"+makeCode();
 }
 
@@ -750,7 +763,7 @@ function bodyHTML(bi){
   if(!cmpOn())return chipsHTML(bi)+roundCtl(bi);
   var total=BOOKS[bi][1];
   return '<div class="who me-who">🙋 '+ME_LABEL+' <span>'+bookDone(bi)+' / '+total+'</span></div>'+chipsHTML(bi)+roundCtl(bi)
-    +viewFriends().map(function(F){var fr=+(F.rnd&&F.rnd[bi])||0;return '<div class="who fr-who" style="--fc:'+F.col+'">👤 '+FR_LABEL+' <span>'+countRange(F.bits,OFF[bi],OFF[bi]+total)+' / '+total+(fr?' · '+(fr+1)+'회째':'')+'</span></div>'+friendChipsHTML(bi,F)}).join("");
+    +viewFriends().map(function(F){var fr=+(F.rnd&&F.rnd[bi])||0;return '<div class="who fr-who" style="--fc:'+F.col+'">👤 '+esc(frLabel(F))+' <span>'+countRange(F.bits,OFF[bi],OFF[bi]+total)+' / '+total+(fr?' · '+(fr+1)+'회째':'')+'</span></div>'+friendChipsHTML(bi,F)}).join("");
 }
 /* 책 갈래: 색으로 구분하려고 쓴다 */
 function bookGroup(bi){
@@ -758,7 +771,7 @@ function bookGroup(bi){
   if(bi<43)return "gospel"; if(bi===43)return "hist"; if(bi<57)return "paul"; if(bi<65)return "general"; return "rev";
 }
 /* 📌 고정한 책: {책번호: 고정한 시각} — 맨 위 '읽는 중' 칸에 따로 보여 줌 (이 기기에 기억) */
-var PIN_KEY="bible-tongdok-pin", pins={};
+var PIN_KEY=KP+"pin", pins={};
 try{var pj=JSON.parse(localStorage.getItem(PIN_KEY)||"{}");if(pj&&typeof pj==="object")pins=pj}catch(e){}
 function renderBooks(){
   var html=["",""], pinHtml={};
@@ -780,7 +793,7 @@ function renderBooks(){
   syncFoldAll();
 }
 /* 책 접기·펴기 (이 기기에 기억) */
-var FOLD_KEY="bible-tongdok-fold", folded={};
+var FOLD_KEY=KP+"fold", folded={};
 try{(JSON.parse(localStorage.getItem(FOLD_KEY)||"[]")||[]).forEach(function(b){folded[b]=1})}catch(e){}
 function saveFold(){try{localStorage.setItem(FOLD_KEY,JSON.stringify(Object.keys(folded).map(Number)))}catch(e){}}
 function setFold(bi,shut){
@@ -844,13 +857,13 @@ function renderSummary(){
   var VF=compare?viewFriends():[], F=VF.length===1?VF[0].bits:null;
   if(VF.length>1){
     $("who").textContent="함께 보기 "+(VF.length+1)+"명";
-    $("cnt").textContent=ME_LABEL+" "+mine+" · "+VF.map(function(f){return FR_LABEL+" "+countRange(f.bits,0,TOTAL)}).join(" · ")+"장";
+    $("cnt").textContent=ME_LABEL+" "+mine+" · "+VF.map(function(f){return frLabel(f)+" "+countRange(f.bits,0,TOTAL)}).join(" · ")+"장";
     $("mBoth").style.width="0%";
     $("mMe").style.width=pctMe+"%";
   }else if(F){
-    var friendName=FR_LABEL, both=0,fo=0;
+    var friendName=frLabel(VF[0]), both=0,fo=0;
     for(var i=0;i<TOTAL;i++){if(me[i]&&F[i])both++;else if(F[i])fo++;}
-    $("who").textContent=ME_LABEL+"와 "+friendName;
+    $("who").textContent=(TD2?"나와 ":ME_LABEL+"와 ")+friendName;
     $("cnt").textContent=ME_LABEL+" "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
     $("mBoth").style.width=(both/TOTAL*100)+"%";
     $("mMe").style.width=((mine-both)/TOTAL*100)+"%";
@@ -864,7 +877,7 @@ function renderSummary(){
   $("otCnt").textContent=countRange(me,0,OT_TOTAL)+" / "+OT_TOTAL+"장";
   $("ntCnt").textContent=countRange(me,OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
   $("legend").hidden=!VF.length;
-  $("legend").innerHTML='<span><i style="background:'+(pMode?'var(--violet)':'#F2C94C')+'"></i>'+ME_LABEL+'</span>'+VF.map(function(f){return '<span><i style="background:'+f.col+'"></i>'+FR_LABEL+'</span>'}).join("");
+  $("legend").innerHTML='<span><i style="background:'+(pMode?'var(--violet)':'#F2C94C')+'"></i>'+ME_LABEL+'</span>'+VF.map(function(f){return '<span><i style="background:'+f.col+'"></i>'+esc(frLabel(f))+'</span>'}).join("");
   $("btnCmp").hidden=!viewFriends().length;
   $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
 }
@@ -874,7 +887,7 @@ function renderAll(){renderBooks();renderSummary();renderShelf();applyFind();ren
    ② 날짜별 기록: 오늘부터 쌓이는 "하루에 몇 장" 막대 */
 var BABBR=["창","출","레","민","신","수","삿","룻","삼상","삼하","왕상","왕하","대상","대하","스","느","에","욥","시","잠","전","아","사","렘","애","겔","단","호","욜","암","옵","욘","미","나","합","습","학","슥","말",
            "마","막","눅","요","행","롬","고전","고후","갈","엡","빌","골","살전","살후","딤전","딤후","딛","몬","히","약","벧전","벧후","요일","요이","요삼","유","계"];
-var LOG_KEY="bible-tongdok-log", readLog={};
+var LOG_KEY=KP+"log", readLog={};
 try{readLog=JSON.parse(localStorage.getItem(LOG_KEY)||"{}")||{}}catch(e){readLog={}}
 function saveLog(){try{localStorage.setItem(LOG_KEY,JSON.stringify(readLog))}catch(e){}}
 function dayKey(t){var d=new Date(t||Date.now());return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
@@ -941,7 +954,7 @@ function renderOverview(){
   setTimeout(function(){wrap.scrollLeft=wrap.scrollWidth},0);   // 가장 최근(오른쪽 끝)이 보이게
 }
 /* 걸어온 길 기록: 책마다 '다 끝낸 횟수'(회차 + 지금 다 채웠으면 1)가 늘면 그날을 적고, 줄면(되돌리기·체크 풀기) 지운다 */
-var HIST_KEY="bible-tongdok-hist", HIST={snap:null,ev:[]};
+var HIST_KEY=KP+"hist", HIST={snap:null,ev:[]};
 try{var hj=JSON.parse(localStorage.getItem(HIST_KEY)||"null");if(hj&&Array.isArray(hj.ev))HIST={snap:hj.snap||null,ev:hj.ev}}catch(e){}
 var histReady=false; setTimeout(function(){histReady=true;try{histSync()}catch(e){}},0);   // 저장된 진도를 다 불러온 뒤부터 센다
 function histSync(){
@@ -1378,7 +1391,7 @@ $("btnShare").addEventListener("click",openShare);
 $("btnFriend").addEventListener("click",openFriend);
 $("btnCmp").addEventListener("click",function(){compare=!compare;saveFriend();renderAll()});
 /* 불러온 친구 진도는 이 기기에 기억해 두고, 다음에 열어도 내 표와 같이 보여 줌 */
-var FRIEND_KEY="bible-tongdok-friend", friendCloud="";
+var FRIEND_KEY=KP+"friend", friendCloud="";
 function saveFriend(){try{if(friend)localStorage.setItem(FRIEND_KEY,JSON.stringify({c:"2"+toRuns(friend),p:friendPil?"2"+toRuns(friendPil):"",n:friendName,cmp:compare,fc:friendCloud}));else localStorage.removeItem(FRIEND_KEY)}catch(e){}}
 function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"null");if(!o||!o.c)return;var bits=fromRuns(String(o.c).slice(1));if(!bits)return;friend=bits;friendPil=o.p?fromRuns(String(o.p).slice(1)):null;friendName=o.n||"";compare=o.cmp!==false;friendCloud=o.fc||""}catch(e){}}
 
@@ -1388,10 +1401,10 @@ function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"nu
    내 진도는 notes 표에 id "s:tongdok" 한 줄로 '친구 공개'로 올리고(묵상 노트는 s: 줄을 노트로 보지 않음),
    묵상 노트에서 친구를 맺은 사람의 "s:tongdok" 줄을 받아 친구 표로 보여 준다. 1분마다, 화면으로 돌아올 때마다 다시 받음 */
 var SB_URL="https://fsctntwrqocjvkboqmzn.supabase.co", SB_KEY="sb_publishable_8ARyO5q9ODokIT0um2ShnQ_DgZarC_E", SB_SES="bible-sb-session";
-var CLOUD_ID="s:tongdok", cloudFriends=[], cloudPick="", cloudState={ok:null,at:0,msg:""}, cloudTimer=0, cloudBusy=false;
-try{cloudPick=localStorage.getItem("bible-tongdok-cloudpick")||""}catch(e){}
+var CLOUD_ID=TD2?"s:tongdok2":"s:tongdok", cloudFriends=[], cloudPick="", cloudState={ok:null,at:0,msg:""}, cloudTimer=0, cloudBusy=false;
+try{cloudPick=localStorage.getItem(KP+"cloudpick")||""}catch(e){}
 /* 친구들 진도를 이 기기에도 기억해 두어, 켤 때 인터넷을 기다리지 않고 바로 보이게 */
-var CF_KEY="bible-tongdok-cloudfriends";
+var CF_KEY=KP+"cloudfriends";
 function saveCF(){try{localStorage.setItem(CF_KEY,JSON.stringify(cloudFriends.map(function(f){return {id:f.id,n:f.name,at:f.at,c:"2"+toRuns(f.bits),p:f.pbits?"2"+toRuns(f.pbits):"",rr:f.rounds||{},pr:f.prounds||{}}})))}catch(e){}}
 function loadCF(){try{var a=JSON.parse(localStorage.getItem(CF_KEY)||"[]");cloudFriends=a.map(function(o){return {id:o.id,name:o.n||"친구",at:+o.at||0,bits:fromRuns(String(o.c||"").slice(1)),pbits:o.p?fromRuns(String(o.p).slice(1)):null,rounds:o.rr||{},prounds:o.pr||{}}}).filter(function(f){return !!f.bits})}catch(e){cloudFriends=[]}}
 function sbSession(){try{var x=JSON.parse(localStorage.getItem(SB_SES)||"null");return x&&x.access_token&&x.user&&x.user.id?x:null}catch(e){return null}}
@@ -1456,13 +1469,13 @@ function drawCloud(){
   if(!sbSession()){el.innerHTML='<button type="button" class="btn cl-login" data-act="login">☁️ 로그인하고 친구와 자동으로 같이 보기</button>';el.className="cloud off";return}
   if(cloudState.ok===false){el.innerHTML='☁️ 자동 맞춤이 안 됐어요 · '+esc(cloudState.msg)+' <button type="button" class="cl-re" data-act="cloud">다시</button>';el.className="cloud bad";return}
   var h='☁️ 자동 맞춤 켜짐'+(cloudState.at?' · '+ago(cloudState.at):'');
-  if(cloudFriends.length)h+=' · '+cloudFriends.map(function(f){return '👤 '+FR_LABEL+' ('+ago(f.at)+' 체크)'}).join(" · ");
+  if(cloudFriends.length)h+=' · '+cloudFriends.map(function(f){return '👤 '+esc(frLabel(f))+' ('+ago(f.at)+' 체크)'}).join(" · ");
   else if(cloudState.nFriends===0)h+=' · 아래 👥 친구에서 친구 코드로 친구를 맺어 주세요';
   if(cloudState.noRows&&cloudState.noRows.length)h+='<br><small>'+esc(cloudState.noRows.join(", "))+'님은 아직 통독표를 안 열었어요 (한 번 열면 보여요)</small>';
   h+=' <button type="button" class="cl-re" data-act="friends">👥 친구</button>';
   el.innerHTML=h; el.className="cloud on";
 }
-document.addEventListener("change",function(ev){if(ev.target.classList&&ev.target.classList.contains("cl-pick")){cloudPick=ev.target.value;try{localStorage.setItem("bible-tongdok-cloudpick",cloudPick)}catch(e){}compare=true;applyCloudFriend();renderAll()}});
+document.addEventListener("change",function(ev){if(ev.target.classList&&ev.target.classList.contains("cl-pick")){cloudPick=ev.target.value;try{localStorage.setItem(KP+"cloudpick",cloudPick)}catch(e){}compare=true;applyCloudFriend();renderAll()}});
 document.addEventListener("click",function(ev){
   if(ev.target.closest('[data-act="cloud"]'))cloudSync(false);
   if(ev.target.closest('[data-act="login"]'))openLogin();
@@ -1484,7 +1497,7 @@ function openLogin(){
     var em=$("lgMail").value.trim(), b=this; if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){setMsg("이메일을 확인해 주세요",true);return}
     b.disabled=true; b.textContent="보내는 중…";
     try{
-      try{localStorage.setItem("bible-sb-email",em);localStorage.setItem("bible-login-next",JSON.stringify({u:"tongdok/",at:Date.now()}))}catch(e){}   // 메일 링크로 들어오면 통독표로 돌아오게
+      try{localStorage.setItem("bible-sb-email",em);localStorage.setItem("bible-login-next",JSON.stringify({u:TD2?"tongdok2/":"tongdok/",at:Date.now()}))}catch(e){}   // 메일 링크로 들어오면 통독표로 돌아오게
       var back=SB_SITE+"tongdok/";   // 메일 링크를 눌렀을 때 바로 통독표가 열리게
       var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(back),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
       if(r.status===429){setMsg("잠시 뒤에 다시 눌러 주세요 (메일은 짧은 시간에 여러 번 보낼 수 없어요)",true);return}

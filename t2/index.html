@@ -1,0 +1,12 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>성경 통독표</title>
+<style>body{margin:0;background:#121214}</style>
+<script>
+// 짧은 진도 링크를 통독표로 넘겨 줌: …/t#코드 또는 …/t/?c=코드 (is.gd로 줄인 링크가 여기로 옴)
+var c=(location.search.match(/[?&]c=([^&]+)/)||[])[1];
+if(c)c=decodeURIComponent(c); else if(location.hash.length>1)c=location.hash.slice(1);
+location.replace("../tongdok2/"+(c?"#f="+c:""));
+</script>
+<noscript><a href="../tongdok2/">성경 통독표 열기</a></noscript>

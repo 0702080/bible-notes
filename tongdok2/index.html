@@ -207,6 +207,8 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovw{margin-top:14px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);overflow:hidden}
 .ovw-tg{display:flex;align-items:center;gap:10px;width:100%;padding:13px;border:0;background:transparent;color:var(--ink);font-family:inherit;text-align:left}
 .ovw-tg b{font-size:15px}
+.ovw-tg:focus{outline:none}   /* 누른 뒤 검은 테두리가 남지 않게, 위 진도 카드와 같은 테두리만 (2026-10-21 사용자 요청) */
+.ovw-tg:focus-visible{outline:2px solid color-mix(in srgb,var(--ring) 45%,transparent);outline-offset:-2px;border-radius:12px}
 .ovw-sub{flex:1;font-size:12px;color:var(--muted)}
 .ovw-chev{flex:0 0 auto;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translate(-2px,-2px);transition:transform .2s}
 .ovw-tg[aria-expanded="true"] .ovw-chev{transform:rotate(-135deg) translate(-2px,-2px)}
@@ -214,13 +216,25 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovw-body[hidden]{display:none}
 .ovw-h{margin:10px 0 8px;font-size:13px;font-weight:700;color:var(--muted)}
 .ovw-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
-.ovc{position:relative;height:40px;padding:0;border:1px solid var(--rule);border-radius:8px;background:var(--blank);color:var(--muted);font-family:inherit;font-size:12px;overflow:hidden}
+.ovc{position:relative;justify-self:center;width:100%;max-width:46px;height:auto;aspect-ratio:1;padding:0;border:1px solid var(--rule);border-radius:50%;   /* 동그란 원 (2026-10-21 사용자 요청) */background:var(--blank);color:var(--muted);font-family:inherit;font-size:12px;overflow:hidden}
 .ovc i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--f,0) * 100%);background:color-mix(in srgb,var(--ring) 55%,transparent)}
 .ovc b{position:relative;z-index:1;font-weight:700}
 .ovc[data-st="part"]{color:var(--ink)}
 .ovc[data-st="full"]{border-color:color-mix(in srgb,var(--green) 55%,var(--rule));color:#fff}
 .ovc[data-st="full"] i{height:100%;background:var(--green)}
 @media (hover:hover){.ovc:hover{border-color:var(--violet)}}
+/* 걸어온 길: 가로 한 줄 연표 */
+.tl{overflow-x:auto;padding:4px 0 8px;scrollbar-width:thin}
+.tl-row{position:relative;display:flex;margin:0;padding:0;list-style:none;min-width:100%}
+.tl-n{position:relative;flex:0 0 96px;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 4px}
+.tl-n::before{content:"";position:absolute;top:39px;left:0;right:0;height:3px;background:color-mix(in srgb,var(--c) 45%,var(--rule))}
+.tl-n:first-child::before{left:50%} .tl-n:last-child::before{right:50%}
+.tl-n:only-child::before{display:none}
+.tl-ms{--c:#8BBF8F} .tl-mr{--c:#E2A93B} .tl-mp{--c:var(--violet)}
+.tl-d{height:18px;font-size:12px;font-weight:700;color:var(--c)}
+.tl-dot{position:relative;z-index:1;display:grid;place-items:center;width:40px;height:40px;margin:2px 0 6px;border-radius:50%;background:color-mix(in srgb,var(--c) 18%,var(--sheet));border:2px solid var(--c);font-size:18px}
+.tl-t{font-size:12.5px;line-height:1.35;color:var(--ink);word-break:keep-all}
+.tl-s{margin-top:2px;font-size:11px;color:var(--muted)}
 .ovw-sum{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 8px;font-size:12px;color:var(--muted)}
 .ovw-sum b{color:var(--ink);font-weight:700}
 .ovw-hist{overflow-x:auto;padding-bottom:6px}
@@ -238,14 +252,14 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovw-key{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:var(--muted)}
 .ovw-key i{width:12px;height:12px;border-radius:3px;background:var(--blank);border:1px solid color-mix(in srgb,var(--rule) 60%,transparent)}
 .ovw-none{margin:6px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.shelf{display:none!important}
 .shelf{margin-top:14px;padding:12px 13px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);}
 .shelf h3{margin:0 0 9px;font-family:var(--sans);font-size:15px;font-weight:700}
 .shelf h3 span{font-family:var(--sans);font-size:12.5px;color:var(--muted);font-weight:400;margin-left:6px}
 .medals{display:flex;flex-wrap:wrap;gap:6px}
 .medal{
   padding:5px 11px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--ink);
-  border:2px solid var(--ring);
-  animation:pop .4s cubic-bezier(.26,1.4,.4,1);
+  border:2px solid var(--mc,var(--ring));   /* 커졌다 작아지는 움직임은 뺌 (2026-10-21 사용자 요청) */
 }
 .shelf .none{margin:0;font-size:12.5px;color:var(--muted)}
 
@@ -263,7 +277,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .cel .bless{margin:10px 0 0;font-family:var(--sans);font-size:15.5px;color:var(--ink);line-height:1.75}
 .cel .ref{margin:7px 0 0;font-size:13px;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){
-  .chip.got,.chip.got5,.medal,.cel .seal,.toast,.chip.got::before,.chip.got5::before{animation:none}
+  .chip.got,.chip.got5,.cel .seal,.toast,.chip.got::before,.chip.got5::before{animation:none}
   .ring,.spark{display:none}
 }
 
@@ -300,8 +314,8 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 }
 @keyframes turn{0%,30%{transform:rotate(90deg)}60%,100%{transform:rotate(0)}}
 /* 진도 카드·뱃지 칸에 살짝 색감 (2026-10-11 사용자 요청) */
-.sum{background:linear-gradient(160deg,color-mix(in srgb,var(--ring) 9%,var(--sheet)) 0%,var(--sheet) 55%,color-mix(in srgb,var(--violet) 8%,var(--sheet)) 100%);border-color:color-mix(in srgb,var(--ring) 22%,var(--rule))}
-.sum-now{color:color-mix(in srgb,var(--ring) 70%,var(--ink))}
+.sum,.ovw{background:linear-gradient(160deg,color-mix(in srgb,var(--ring) 9%,var(--sheet)) 0%,var(--sheet) 55%,color-mix(in srgb,var(--violet) 8%,var(--sheet)) 100%);border-color:color-mix(in srgb,var(--ring) 22%,var(--rule))}
+.sum-now,.ovw-tg b{color:color-mix(in srgb,var(--ring) 70%,var(--ink))}   /* 전체 진행표 제목도 위 '내 진도'와 같은 색 */
 .meter{background:color-mix(in srgb,var(--ring) 12%,#2A2A30)}
 .half{background:color-mix(in srgb,var(--orange) 9%,var(--paper));border-color:color-mix(in srgb,var(--orange) 26%,var(--rule))}
 .half b{color:color-mix(in srgb,var(--orange) 55%,var(--muted))}
@@ -443,19 +457,19 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
     </div>
     <div class="cloud" id="cloud"></div>
     <div class="legend" id="legend" hidden>
-      <span><i style="background:#F2C94C"></i>나</span>
+      <span><i style="background:#F2C94C"></i>혜진</span>
       <span><i style="background:var(--sky)"></i>친구</span>
     </div>
   </section>
 
   <section class="ovw" id="ovw">
     <button class="ovw-tg" id="ovwTg" type="button" aria-expanded="false" aria-controls="ovwBody">
-      <b>📈 전체 진행표</b><span class="ovw-sub">창세기부터 요한계시록까지 한눈에</span><span class="ovw-chev" aria-hidden="true"></span>
+      <b>🗺️ 전체 진행표</b><span class="ovw-sub">창세기부터 요한계시록까지 한눈에</span><span class="ovw-chev" aria-hidden="true"></span>
     </button>
     <div class="ovw-body" id="ovwBody" hidden></div>
   </section>
 
-  <section class="shelf">
+  <section class="shelf" hidden>   <!-- 모은 책 뱃지는 보이지 않게 (2026-10-21 사용자 요청). 코드는 남겨 둠 -->
     <h3>모은 책 뱃지<span id="shelfCnt"></span></h3>
     <div class="medals" id="medals"></div>
     <p class="none" id="shelfNone">한 책을 끝까지 읽으면 여기에 뱃지가 쌓여요.</p>
@@ -500,11 +514,23 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
 </div>
 
 <script>
+/* 같은 파일을 두 곳에서 씀 (2026-10-22 사용자 요청)
+   tongdok/  = 아내(혜진)와 아내 친구가 쓰는 통독표. 이름표는 "혜진 / 친구"로 고정
+   tongdok2/ = 묵상 노트 주인(김재식)과 그 가족·친구들이 쓰는 통독표. 저장 키·클라우드 줄이 따로라 서로 섞이지 않음
+   tongdok2/index.html은 이 파일과 똑같은 복사본. 고치면 두 파일을 똑같이 맞춘다 */
+var TD2=/\/tongdok2\//.test(location.pathname), KP=TD2?"bible-tongdok2-":"bible-tongdok-";
+if(TD2)(function(){   // 묵상 노트에서 처음 들어오면, 이 기기에서 쓰던 통독표 진도를 한 번 옮겨 옴
+  try{
+    if(!/[?&]from=notes/.test(location.search)||localStorage.getItem(KP+"v1")!==null||localStorage.getItem(KP+"moved"))return;
+    for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i); if(k&&k.indexOf("bible-tongdok-")===0&&k!=="bible-tongdok-"+"short"){var nk=KP+k.slice(14); if(localStorage.getItem(nk)===null)localStorage.setItem(nk,localStorage.getItem(k))}}
+    localStorage.setItem(KP+"moved","1");
+  }catch(e){}
+})();
 (function(){
 /* 묵상 노트 메뉴(📖 성경 통독표)로 들어왔으면 맨 위에 '← 노트' 버튼을 보여 줌.
    통독표만 따로 쓰는 사람(주소로 바로 여는 경우)에게는 버튼이 없음 */
 (function(){
-  var FROM_KEY="w-bible-tongdok-from";
+  var FROM_KEY=KP+"from";
   try{
     var q=new URLSearchParams(location.search);
     if(q.get("from")==="notes"){sessionStorage.setItem(FROM_KEY,"notes");q.delete("from");
@@ -537,16 +563,16 @@ var OFF=[],TOTAL=0;
 for(var i=0;i<BOOKS.length;i++){OFF.push(TOTAL);TOTAL+=BOOKS[i][1];}   // 1189
 var OT_TOTAL=OFF[OT_N], NT_TOTAL=TOTAL-OT_TOTAL;
 
-var LS="w-bible-tongdok-v1";       // 기존 앱들과 겹치지 않는 저장 키
+var LS=KP+"v1";       // 기존 앱들과 겹치지 않는 저장 키
 var me=new Uint8Array(TOTAL);    // 내 진도
 var friend=null;                 // 친구 진도 (불러왔을 때만)
 /* ✍️ 필사 (2026-10-15): 같은 표에 필사한 장도 따로 표시. RB=통독, PB=필사, me는 지금 고른 쪽을 가리킴 */
 var RB=me, PB=new Uint8Array(TOTAL), pMode=false, pilAt=0, friendPil=null;
-var PIL_KEY="w-bible-tongdok-pilsa", MODE_KEY="w-bible-tongdok-mode";
+var PIL_KEY=KP+"pilsa", MODE_KEY=KP+"mode";
 function fb(){return pMode?friendPil:friend}
 /* 🔁 반복 읽기 (2026-10-15): 한 책을 다 읽으면 '한 번 더 읽기'로 회차를 올리고 칸을 비워 다시 체크. 회차마다 칸 색이 다름
    RND.r = 통독 회차, RND.p = 필사 회차 {책번호: 끝낸 횟수} */
-var RND_KEY="w-bible-tongdok-rounds", RND={r:{},p:{}}, rndAt=0;
+var RND_KEY=KP+"rounds", RND={r:{},p:{}}, rndAt=0;
 try{var rj=JSON.parse(localStorage.getItem(RND_KEY)||"null");if(rj){RND={r:rj.r||{},p:rj.p||{}};rndAt=+rj.t||0}}catch(e){}
 function rounds(){return pMode?RND.p:RND.r}
 function rndOf(bi){return +rounds()[bi]||0}
@@ -570,6 +596,9 @@ function roundCtl(bi){
 }   // 지금 모드의 친구 표
 var friendName="";
 var myName="";
+/* 화면에 보이는 이름 (2026-10-22 사용자 요청: 나 → 혜진, 친구 이름 → 친구로 글자 고정) */
+var ME_LABEL=TD2?"나":"혜진", FR_LABEL=TD2?"":"친구";   // tongdok2는 나 / 친구 이름 그대로
+function frLabel(f){return FR_LABEL||(f&&f.name)||"친구"}
 var compare=false;
 
 var $=function(id){return document.getElementById(id)};
@@ -683,7 +712,7 @@ function parseCode(txt){
 }
 /* is.gd로 아주 짧게 (예: is.gd/AbC123). 같은 코드는 한 번만 줄이고 기억해 둠.
    is.gd가 #뒤를 놓칠 수 있어 ?c=코드 모양의 주소를 줄인다 (t 폴더가 통독표로 넘겨 줌) */
-var SHORT_KEY="w-bible-tongdok-short";
+var SHORT_KEY=KP+"short";
 function shortCache(){try{return JSON.parse(localStorage.getItem(SHORT_KEY)||"{}")||{}}catch(e){return {}}}
 function shorten(code,done){
   var c=shortCache(); if(c[code]){done(c[code]);return}
@@ -694,14 +723,14 @@ function shorten(code,done){
     if(u){var m=shortCache();m[code]=u;var ks=Object.keys(m);if(ks.length>30)delete m[ks[0]];try{localStorage.setItem(SHORT_KEY,JSON.stringify(m))}catch(e){}}
     end(u);
   };
-  var long=new URL("../t/",location.href.split("#")[0].split("?")[0]).href+"?c="+encodeURIComponent(code);
+  var long=new URL(TD2?"../t2/":"../t/",location.href.split("#")[0].split("?")[0]).href+"?c="+encodeURIComponent(code);
   sc.src="https://is.gd/create.php?format=json&callback="+cb+"&url="+encodeURIComponent(long);
   sc.onerror=function(){end(null)}; setTimeout(function(){end(null)},6000);
   document.head.appendChild(sc);
 }
 function makeLink(){
   // 가장 짧은 주소: …/bible-notes/t#코드 (t 폴더가 통독표로 넘겨 줌). "https://"도 빼서 카톡에 그대로 붙여도 링크가 됨
-  var u=new URL("../t",location.href.split("#")[0].split("?")[0]);
+  var u=new URL(TD2?"../t2":"../t",location.href.split("#")[0].split("?")[0]);
   return u.host+u.pathname+"#"+makeCode();
 }
 
@@ -733,8 +762,8 @@ function friendChipsHTML(bi,F){
 function bodyHTML(bi){
   if(!cmpOn())return chipsHTML(bi)+roundCtl(bi);
   var total=BOOKS[bi][1];
-  return '<div class="who me-who">🙋 나 <span>'+bookDone(bi)+' / '+total+'</span></div>'+chipsHTML(bi)+roundCtl(bi)
-    +viewFriends().map(function(F){var fr=+(F.rnd&&F.rnd[bi])||0;return '<div class="who fr-who" style="--fc:'+F.col+'">👤 '+esc(F.name)+' <span>'+countRange(F.bits,OFF[bi],OFF[bi]+total)+' / '+total+(fr?' · '+(fr+1)+'회째':'')+'</span></div>'+friendChipsHTML(bi,F)}).join("");
+  return '<div class="who me-who">🙋 '+ME_LABEL+' <span>'+bookDone(bi)+' / '+total+'</span></div>'+chipsHTML(bi)+roundCtl(bi)
+    +viewFriends().map(function(F){var fr=+(F.rnd&&F.rnd[bi])||0;return '<div class="who fr-who" style="--fc:'+F.col+'">👤 '+esc(frLabel(F))+' <span>'+countRange(F.bits,OFF[bi],OFF[bi]+total)+' / '+total+(fr?' · '+(fr+1)+'회째':'')+'</span></div>'+friendChipsHTML(bi,F)}).join("");
 }
 /* 책 갈래: 색으로 구분하려고 쓴다 */
 function bookGroup(bi){
@@ -742,7 +771,7 @@ function bookGroup(bi){
   if(bi<43)return "gospel"; if(bi===43)return "hist"; if(bi<57)return "paul"; if(bi<65)return "general"; return "rev";
 }
 /* 📌 고정한 책: {책번호: 고정한 시각} — 맨 위 '읽는 중' 칸에 따로 보여 줌 (이 기기에 기억) */
-var PIN_KEY="w-bible-tongdok-pin", pins={};
+var PIN_KEY=KP+"pin", pins={};
 try{var pj=JSON.parse(localStorage.getItem(PIN_KEY)||"{}");if(pj&&typeof pj==="object")pins=pj}catch(e){}
 function renderBooks(){
   var html=["",""], pinHtml={};
@@ -764,7 +793,7 @@ function renderBooks(){
   syncFoldAll();
 }
 /* 책 접기·펴기 (이 기기에 기억) */
-var FOLD_KEY="w-bible-tongdok-fold", folded={};
+var FOLD_KEY=KP+"fold", folded={};
 try{(JSON.parse(localStorage.getItem(FOLD_KEY)||"[]")||[]).forEach(function(b){folded[b]=1})}catch(e){}
 function saveFold(){try{localStorage.setItem(FOLD_KEY,JSON.stringify(Object.keys(folded).map(Number)))}catch(e){}}
 function setFold(bi,shut){
@@ -822,19 +851,20 @@ function repaintBook(bi){
   sec.querySelector(".bk-body").innerHTML=bodyHTML(bi);
 }
 function renderSummary(){
+  try{histSync()}catch(e){}
   var mine=countRange(me,0,TOTAL);
   var pctMe=mine/TOTAL*100;
   var VF=compare?viewFriends():[], F=VF.length===1?VF[0].bits:null;
   if(VF.length>1){
     $("who").textContent="함께 보기 "+(VF.length+1)+"명";
-    $("cnt").textContent="나 "+mine+" · "+VF.map(function(f){return f.name+" "+countRange(f.bits,0,TOTAL)}).join(" · ")+"장";
+    $("cnt").textContent=ME_LABEL+" "+mine+" · "+VF.map(function(f){return frLabel(f)+" "+countRange(f.bits,0,TOTAL)}).join(" · ")+"장";
     $("mBoth").style.width="0%";
     $("mMe").style.width=pctMe+"%";
   }else if(F){
-    var friendName=VF[0].name, both=0,fo=0;
+    var friendName=frLabel(VF[0]), both=0,fo=0;
     for(var i=0;i<TOTAL;i++){if(me[i]&&F[i])both++;else if(F[i])fo++;}
-    $("who").textContent="나와 "+(friendName||"친구");
-    $("cnt").textContent="나 "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
+    $("who").textContent=(TD2?"나와 ":ME_LABEL+"와 ")+friendName;
+    $("cnt").textContent=ME_LABEL+" "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
     $("mBoth").style.width=(both/TOTAL*100)+"%";
     $("mMe").style.width=((mine-both)/TOTAL*100)+"%";
   }else{
@@ -847,7 +877,7 @@ function renderSummary(){
   $("otCnt").textContent=countRange(me,0,OT_TOTAL)+" / "+OT_TOTAL+"장";
   $("ntCnt").textContent=countRange(me,OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
   $("legend").hidden=!VF.length;
-  $("legend").innerHTML='<span><i style="background:'+(pMode?'var(--violet)':'#F2C94C')+'"></i>나</span>'+VF.map(function(f){return '<span><i style="background:'+f.col+'"></i>'+esc(f.name)+'</span>'}).join("");
+  $("legend").innerHTML='<span><i style="background:'+(pMode?'var(--violet)':'#F2C94C')+'"></i>'+ME_LABEL+'</span>'+VF.map(function(f){return '<span><i style="background:'+f.col+'"></i>'+esc(frLabel(f))+'</span>'}).join("");
   $("btnCmp").hidden=!viewFriends().length;
   $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
 }
@@ -857,7 +887,7 @@ function renderAll(){renderBooks();renderSummary();renderShelf();applyFind();ren
    ② 날짜별 기록: 오늘부터 쌓이는 "하루에 몇 장" 막대 */
 var BABBR=["창","출","레","민","신","수","삿","룻","삼상","삼하","왕상","왕하","대상","대하","스","느","에","욥","시","잠","전","아","사","렘","애","겔","단","호","욜","암","옵","욘","미","나","합","습","학","슥","말",
            "마","막","눅","요","행","롬","고전","고후","갈","엡","빌","골","살전","살후","딤전","딤후","딛","몬","히","약","벧전","벧후","요일","요이","요삼","유","계"];
-var LOG_KEY="w-bible-tongdok-log", readLog={};
+var LOG_KEY=KP+"log", readLog={};
 try{readLog=JSON.parse(localStorage.getItem(LOG_KEY)||"{}")||{}}catch(e){readLog={}}
 function saveLog(){try{localStorage.setItem(LOG_KEY,JSON.stringify(readLog))}catch(e){}}
 function dayKey(t){var d=new Date(t||Date.now());return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
@@ -891,58 +921,57 @@ function renderOverview(){
     }
     body.appendChild(map);
   });
-  // ② 읽어 온 길: 왼쪽이 처음, 오른쪽이 오늘. 해가 바뀌어도 가로로 계속 이어진다
-  var h2=document.createElement("p"); h2.className="ovw-h"; h2.textContent="읽어 온 길"; body.appendChild(h2);
-  var keys=Object.keys(readLog).sort();
-  if(!keys.length){
-    var none=document.createElement("p"); none.className="ovw-none";
-    none.textContent="아직 기록이 없어요. 오늘부터 칸을 체크하면 날마다 몇 장을 읽었는지 여기에 쌓여서, 해가 지날수록 걸어온 길이 보여요.";
-    body.appendChild(none);
-    return;
-  }
-  var first=new Date(keys[0]+"T12:00:00"), last=new Date();
-  var startAt=new Date(first); startAt.setDate(startAt.getDate()-startAt.getDay());   // 그 주 일요일부터
-  var total=0, best=0, bestDay="", run=0, bestRun=0, prev=null;
-  keys.forEach(function(k){
-    var v=readLog[k]; total+=v; if(v>best){best=v;bestDay=k}
-    var t=new Date(k+"T12:00:00").getTime();
-    run=(prev!==null&&Math.round((t-prev)/864e5)===1)?run+1:1; prev=t; if(run>bestRun)bestRun=run;
+  // ② 걸어온 길: 책을 다 읽은(쓴) 날을 왼쪽→오른쪽 한 줄 연표로 (2026-10-21 사용자 요청, 날짜별 칸 그림·숫자 요약 대신)
+  var h2=document.createElement("p"); h2.className="ovw-h"; h2.textContent="걸어온 길"; body.appendChild(h2);
+  histSync();
+  var lk=Object.keys(readLog).sort(), nodes=[];
+  if(lk.length)nodes.push({d:lk[0],m:"s",t:"시작",sub:"처음 체크한 날"});
+  var before={r:[],p:[]}, days={};
+  HIST.ev.forEach(function(e){if(!e.d){before[e.m].push(e);return} var k=e.d+"|"+e.m; (days[k]=days[k]||{d:e.d,m:e.m,list:[]}).list.push(e)});
+  ["r","p"].forEach(function(m){var L=before[m], u={}; L.forEach(function(e){u[e.b]=1}); var nb=Object.keys(u).length; if(nb)nodes.push({d:"",m:m,t:nb+"권",sub:m==="r"?"그동안 읽은 책":"그동안 쓴 책"})});
+  Object.keys(days).sort().forEach(function(k){
+    var g=days[k], top={}, ord=[];   // 같은 날 같은 책을 여러 번 끝냈으면 마지막 회차만
+    g.list.forEach(function(e){if(!(e.b in top))ord.push(e.b); top[e.b]=Math.max(top[e.b]||0,e.n)});
+    var nm=ord.map(function(b){return BOOKS[b][0]+(top[b]>1?" "+top[b]+"회":"")});
+    nodes.push({d:g.d,m:g.m,t:nm.slice(0,2).join(" · ")+(nm.length>2?" 외 "+(nm.length-2)+"권":""),sub:g.m==="r"?"다 읽음":"다 씀"});
   });
-  var sum=document.createElement("div"); sum.className="ovw-sum";
-  sum.innerHTML='<span>처음 읽은 날 <b></b></span><span>읽은 날 <b></b>일</span><span>모두 <b></b>장</span><span>가장 많이 읽은 날 <b></b>장</span><span>가장 길게 이어 읽기 <b></b>일</span>';
-  var sb=sum.querySelectorAll("b");
-  sb[0].textContent=keys[0].replace(/-/g,".");
-  sb[1].textContent=keys.length; sb[2].textContent=total; sb[3].textContent=best; sb[4].textContent=bestRun;
-  body.appendChild(sum);
-  var wrap=document.createElement("div"); wrap.className="ovw-hist";
-  var grid=document.createElement("div"); grid.className="ovw-grid";
-  var mon=document.createElement("div"); mon.className="ovw-mon";
-  var wks=document.createElement("div"); wks.className="ovw-wks";
-  var cur=new Date(startAt), lastMon=-1, MON=["1월","2월","3월","4월","5월","6월","7월","8월","9월","10월","11월","12월"];
-  while(cur<=last){
-    var col=document.createElement("div"); col.className="ovwk";
-    var label="";
-    for(var d2=0;d2<7;d2++){
-      var k2=dayKey(cur.getTime()), v2=+readLog[k2]||0;
-      var cell=document.createElement("div"); cell.className="ovday";
-      if(cur>last)cell.classList.add("pad");
-      else{
-        cell.dataset.l=v2===0?"0":v2<=2?"1":v2<=5?"2":v2<=10?"3":"4";
-        cell.title=k2.replace(/-/g,".")+" · "+(v2?v2+"장":"쉬었어요");
-      }
-      if(d2===0&&cur.getMonth()!==lastMon){lastMon=cur.getMonth();label=(cur.getMonth()===0?cur.getFullYear()+"년 ":"")+MON[cur.getMonth()]}
-      col.appendChild(cell);
-      cur.setDate(cur.getDate()+1);
-    }
-    var ml=document.createElement("span"); ml.style.width="13px"; ml.textContent=label; mon.appendChild(ml);
-    wks.appendChild(col);
+  if(!nodes.length){
+    var none=document.createElement("p"); none.className="ovw-none";
+    none.textContent="아직 기록이 없어요. 한 권을 끝까지 읽거나 쓰면 그날이 여기에 하나씩 이어져요.";
+    body.appendChild(none); return;
   }
-  grid.appendChild(mon); grid.appendChild(wks); wrap.appendChild(grid); body.appendChild(wrap);
-  var key=document.createElement("div"); key.className="ovw-key";
-  key.innerHTML='<span>적게</span><i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><span>많이</span>';
-  key.querySelectorAll("i").forEach(function(i2,n2){i2.className="";i2.setAttribute("class","");i2.setAttribute("data-l",String(n2));i2.classList.add("ovday")});
-  body.appendChild(key);
-  setTimeout(function(){wrap.scrollLeft=wrap.scrollWidth},0);   // 오늘(오른쪽 끝)이 보이게
+  var wrap=document.createElement("div"); wrap.className="tl";
+  var row=document.createElement("ol"); row.className="tl-row";
+  nodes.forEach(function(nd,ix){
+    var li=document.createElement("li"); li.className="tl-n tl-m"+nd.m;
+    li.innerHTML='<span class="tl-d"></span><span class="tl-dot"></span><b class="tl-t"></b><span class="tl-s"></span>';
+    li.querySelector(".tl-d").textContent=nd.d?(nd.d.slice(0,4)===String(new Date().getFullYear())?nd.d.slice(5):nd.d.slice(2)).replace(/-/g,"."):"이전";
+    li.querySelector(".tl-dot").textContent=nd.m==="s"?"🌱":nd.m==="r"?"📖":"✍️";
+    li.querySelector(".tl-t").textContent=nd.t; li.querySelector(".tl-s").textContent=nd.sub;
+    row.appendChild(li);
+  });
+  wrap.appendChild(row); body.appendChild(wrap);
+  setTimeout(function(){wrap.scrollLeft=wrap.scrollWidth},0);   // 가장 최근(오른쪽 끝)이 보이게
+}
+/* 걸어온 길 기록: 책마다 '다 끝낸 횟수'(회차 + 지금 다 채웠으면 1)가 늘면 그날을 적고, 줄면(되돌리기·체크 풀기) 지운다 */
+var HIST_KEY=KP+"hist", HIST={snap:null,ev:[]};
+try{var hj=JSON.parse(localStorage.getItem(HIST_KEY)||"null");if(hj&&Array.isArray(hj.ev))HIST={snap:hj.snap||null,ev:hj.ev}}catch(e){}
+var histReady=false; setTimeout(function(){histReady=true;try{histSync()}catch(e){}},0);   // 저장된 진도를 다 불러온 뒤부터 센다
+function histSync(){
+  if(!histReady)return;
+  var snap={r:{},p:{}}, first=!HIST.snap, ch=first, today=dayKey();
+  [["r",RB],["p",PB]].forEach(function(x){
+    var m=x[0], arr=x[1], R=RND[m]||{};
+    for(var bi=0;bi<BOOKS.length;bi++){
+      var t=BOOKS[bi][1], n=(+R[bi]||0)+(countRange(arr,OFF[bi],OFF[bi]+t)===t?1:0);
+      if(n)snap[m][bi]=n;
+      var old=first?0:(+HIST.snap[m][bi]||0);
+      for(var k=old+1;k<=n;k++){HIST.ev.push({d:first?"":today,m:m,b:bi,n:k});ch=true}
+      if(n<old){HIST.ev=HIST.ev.filter(function(e){return !(e.m===m&&e.b===bi&&e.n>n)});ch=true}
+    }
+  });
+  HIST.snap=snap;
+  if(ch)try{localStorage.setItem(HIST_KEY,JSON.stringify(HIST))}catch(e){}
 }
 (function(){
   var tg=document.getElementById("ovwTg"); if(!tg)return;
@@ -981,7 +1010,7 @@ function applyFind(){
     if(hit&&!seen[bi]){seen[bi]=1;shown++}
   });
   // 비어 버린 구약·신약 제목과 접기 단추는 찾는 동안 숨긴다
-  document.querySelectorAll("h2.tg,.foldbar,.sum,.shelf").forEach(function(h){h.hidden=!!q});
+  document.querySelectorAll("h2.tg,.foldbar,.sum").forEach(function(h){h.hidden=!!q});
   var pn=document.getElementById("pinned");
   if(pn&&q)pn.hidden=!Array.prototype.some.call(pn.querySelectorAll(".bk[data-b]"),function(s2){return !s2.hidden});
   if(msg){msg.hidden=!q; msg.textContent=q?(shown?shown+"권 찾았어요":"'"+q+"' 로 찾은 책이 없어요"):""}
@@ -1152,7 +1181,7 @@ function renderShelf(){
   $("shelfNone").hidden=got.length>0;
   $("medals").innerHTML=got.map(function(bi){
     var n=rndOf(bi)+(bookDone(bi)===BOOKS[bi][1]?1:0);
-    return '<span class="medal">'+BOOKS[bi][0]+(n>1?' ×'+n:'')+'</span>';
+    return '<span class="medal"'+(n>1?' style="--mc:'+rcol(n-1)+'"':'')+'>'+BOOKS[bi][0]+(n>1?' ×'+n:'')+'</span>';   // 여러 번 다 읽은 책은 그 회차 칸 색 테두리
   }).join("");
 }
 
@@ -1362,7 +1391,7 @@ $("btnShare").addEventListener("click",openShare);
 $("btnFriend").addEventListener("click",openFriend);
 $("btnCmp").addEventListener("click",function(){compare=!compare;saveFriend();renderAll()});
 /* 불러온 친구 진도는 이 기기에 기억해 두고, 다음에 열어도 내 표와 같이 보여 줌 */
-var FRIEND_KEY="w-bible-tongdok-friend", friendCloud="";
+var FRIEND_KEY=KP+"friend", friendCloud="";
 function saveFriend(){try{if(friend)localStorage.setItem(FRIEND_KEY,JSON.stringify({c:"2"+toRuns(friend),p:friendPil?"2"+toRuns(friendPil):"",n:friendName,cmp:compare,fc:friendCloud}));else localStorage.removeItem(FRIEND_KEY)}catch(e){}}
 function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"null");if(!o||!o.c)return;var bits=fromRuns(String(o.c).slice(1));if(!bits)return;friend=bits;friendPil=o.p?fromRuns(String(o.p).slice(1)):null;friendName=o.n||"";compare=o.cmp!==false;friendCloud=o.fc||""}catch(e){}}
 
@@ -1371,11 +1400,11 @@ function loadFriend(){try{var o=JSON.parse(localStorage.getItem(FRIEND_KEY)||"nu
    같은 주소(0702080.github.io)라 묵상 노트에서 로그인해 두면 여기서도 로그인된 상태.
    내 진도는 notes 표에 id "s:tongdok" 한 줄로 '친구 공개'로 올리고(묵상 노트는 s: 줄을 노트로 보지 않음),
    묵상 노트에서 친구를 맺은 사람의 "s:tongdok" 줄을 받아 친구 표로 보여 준다. 1분마다, 화면으로 돌아올 때마다 다시 받음 */
-var SB_URL="https://fsctntwrqocjvkboqmzn.supabase.co", SB_KEY="sb_publishable_8ARyO5q9ODokIT0um2ShnQ_DgZarC_E", SB_SES="w-bible-sb-session";
-var CLOUD_ID="s:tongdok", cloudFriends=[], cloudPick="", cloudState={ok:null,at:0,msg:""}, cloudTimer=0, cloudBusy=false;
-try{cloudPick=localStorage.getItem("w-bible-tongdok-cloudpick")||""}catch(e){}
+var SB_URL="https://fsctntwrqocjvkboqmzn.supabase.co", SB_KEY="sb_publishable_8ARyO5q9ODokIT0um2ShnQ_DgZarC_E", SB_SES="bible-sb-session";
+var CLOUD_ID=TD2?"s:tongdok2":"s:tongdok", cloudFriends=[], cloudPick="", cloudState={ok:null,at:0,msg:""}, cloudTimer=0, cloudBusy=false;
+try{cloudPick=localStorage.getItem(KP+"cloudpick")||""}catch(e){}
 /* 친구들 진도를 이 기기에도 기억해 두어, 켤 때 인터넷을 기다리지 않고 바로 보이게 */
-var CF_KEY="w-bible-tongdok-cloudfriends";
+var CF_KEY=KP+"cloudfriends";
 function saveCF(){try{localStorage.setItem(CF_KEY,JSON.stringify(cloudFriends.map(function(f){return {id:f.id,n:f.name,at:f.at,c:"2"+toRuns(f.bits),p:f.pbits?"2"+toRuns(f.pbits):"",rr:f.rounds||{},pr:f.prounds||{}}})))}catch(e){}}
 function loadCF(){try{var a=JSON.parse(localStorage.getItem(CF_KEY)||"[]");cloudFriends=a.map(function(o){return {id:o.id,name:o.n||"친구",at:+o.at||0,bits:fromRuns(String(o.c||"").slice(1)),pbits:o.p?fromRuns(String(o.p).slice(1)):null,rounds:o.rr||{},prounds:o.pr||{}}}).filter(function(f){return !!f.bits})}catch(e){cloudFriends=[]}}
 function sbSession(){try{var x=JSON.parse(localStorage.getItem(SB_SES)||"null");return x&&x.access_token&&x.user&&x.user.id?x:null}catch(e){return null}}
@@ -1440,13 +1469,13 @@ function drawCloud(){
   if(!sbSession()){el.innerHTML='<button type="button" class="btn cl-login" data-act="login">☁️ 로그인하고 친구와 자동으로 같이 보기</button>';el.className="cloud off";return}
   if(cloudState.ok===false){el.innerHTML='☁️ 자동 맞춤이 안 됐어요 · '+esc(cloudState.msg)+' <button type="button" class="cl-re" data-act="cloud">다시</button>';el.className="cloud bad";return}
   var h='☁️ 자동 맞춤 켜짐'+(cloudState.at?' · '+ago(cloudState.at):'');
-  if(cloudFriends.length)h+=' · '+cloudFriends.map(function(f){return '👤 '+esc(f.name)+' ('+ago(f.at)+' 체크)'}).join(" · ");
+  if(cloudFriends.length)h+=' · '+cloudFriends.map(function(f){return '👤 '+esc(frLabel(f))+' ('+ago(f.at)+' 체크)'}).join(" · ");
   else if(cloudState.nFriends===0)h+=' · 아래 👥 친구에서 친구 코드로 친구를 맺어 주세요';
   if(cloudState.noRows&&cloudState.noRows.length)h+='<br><small>'+esc(cloudState.noRows.join(", "))+'님은 아직 통독표를 안 열었어요 (한 번 열면 보여요)</small>';
   h+=' <button type="button" class="cl-re" data-act="friends">👥 친구</button>';
   el.innerHTML=h; el.className="cloud on";
 }
-document.addEventListener("change",function(ev){if(ev.target.classList&&ev.target.classList.contains("cl-pick")){cloudPick=ev.target.value;try{localStorage.setItem("w-bible-tongdok-cloudpick",cloudPick)}catch(e){}compare=true;applyCloudFriend();renderAll()}});
+document.addEventListener("change",function(ev){if(ev.target.classList&&ev.target.classList.contains("cl-pick")){cloudPick=ev.target.value;try{localStorage.setItem(KP+"cloudpick",cloudPick)}catch(e){}compare=true;applyCloudFriend();renderAll()}});
 document.addEventListener("click",function(ev){
   if(ev.target.closest('[data-act="cloud"]'))cloudSync(false);
   if(ev.target.closest('[data-act="login"]'))openLogin();
@@ -1458,7 +1487,7 @@ function setSes(j){try{localStorage.setItem(SB_SES,JSON.stringify({access_token:
 function openLogin(){
   $("dlgTitle").textContent="☁️ 로그인";
   $("dlgDesc").textContent="이메일로 한 번만 로그인하면, 친구 코드로 맺은 친구의 진도가 내 표 아래에 저절로 보여요. 내 진도는 친구로 맺은 사람에게만 보여요.";
-  var rem=""; try{rem=localStorage.getItem("w-bible-sb-email")||""}catch(e){}
+  var rem=""; try{rem=localStorage.getItem("bible-sb-email")||""}catch(e){}
   $("dlgBody").innerHTML='<input type="text" id="lgMail" inputmode="email" autocomplete="email" placeholder="이메일 (예: name@naver.com)" value="'+esc(rem)+'">'
     +'<div id="lgStep2" hidden><p class="lg-tip">📧 메일함에서 <b>로그인 링크</b>를 눌러 주세요. 링크가 다른 앱에서 열리면, 링크를 <b>길게 눌러 복사</b>해서 아래에 붙여 넣고 [확인]을 누르세요.</p><textarea id="lgLink" placeholder="로그인 링크 붙여 넣기"></textarea></div>';
   $("dlgTools").innerHTML='<button class="btn on wide" type="button" id="lgSend">로그인 메일 받기</button><button class="btn wide" type="button" id="lgOk" hidden>확인</button><button class="btn wide" type="button" id="lgCl">닫기</button>';
@@ -1468,8 +1497,8 @@ function openLogin(){
     var em=$("lgMail").value.trim(), b=this; if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){setMsg("이메일을 확인해 주세요",true);return}
     b.disabled=true; b.textContent="보내는 중…";
     try{
-      try{localStorage.setItem("w-bible-sb-email",em);localStorage.setItem("w-bible-login-next",JSON.stringify({u:"tongdok/",at:Date.now()}))}catch(e){}   // 메일 링크로 들어오면 통독표로 돌아오게
-      var back=SB_SITE+"tongdok2/";   // 메일 링크를 눌렀을 때 바로 통독표가 열리게
+      try{localStorage.setItem("bible-sb-email",em);localStorage.setItem("bible-login-next",JSON.stringify({u:TD2?"tongdok2/":"tongdok/",at:Date.now()}))}catch(e){}   // 메일 링크로 들어오면 통독표로 돌아오게
+      var back=SB_SITE+"tongdok/";   // 메일 링크를 눌렀을 때 바로 통독표가 열리게
       var r=await fetch(SB_URL+"/auth/v1/otp?redirect_to="+encodeURIComponent(back),{method:"POST",headers:sbH(),body:JSON.stringify({email:em,create_user:true})});
       if(r.status===429){setMsg("잠시 뒤에 다시 눌러 주세요 (메일은 짧은 시간에 여러 번 보낼 수 없어요)",true);return}
       if(!r.ok){setMsg("메일을 보내지 못했어요 ("+r.status+")",true);return}
@@ -1495,7 +1524,7 @@ async function finishLogin(q){
   catch(e){setMsg("로그인하지 못했어요. 다시 해 주세요",true)}
 }
 function loginDone(){
-  try{localStorage.removeItem("w-bible-login-next")}catch(e){}
+  try{localStorage.removeItem("bible-login-next")}catch(e){}
   closeDlg(); hint("로그인했어요 ☁️","이제 친구 코드로 친구를 맺으면 진도가 저절로 같이 보여요");
   cloudSync(false).then(function(){if(!cloudFriends.length)openFriends()});
   if(myName)setProfileName(myName);
