@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-8">
+<meta name="app-build" content="2026-10-23-9">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4908,7 +4908,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     if(b.classList.contains("xldel")){
       if(!b.dataset.sure){b.dataset.sure="1";b.classList.add("sure");b.textContent="한 번 더";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.classList.remove("sure");b.textContent="지우기"}},3000);return}
-      var lid=b.closest("li").dataset.lid; linkTomb(n,(n.links||[]).filter(function(l){return l.id===lid})); n.links=(n.links||[]).filter(function(l){return l.id!==lid}); scheduleSave(id); renderMyLinks(card.querySelector(".xpanel"),n); return;
+      var lid=b.closest("li").dataset.lid; linkTomb(n,(n.links||[]).filter(function(l){return l.id===lid})); n.links=(n.links||[]).filter(function(l){return l.id!==lid}); scheduleSave(id); fillXref(card.querySelector(".xpanel"),n); return;
     }
     if(b.classList.contains("xadd")){addFromXref(b.dataset.b,b.dataset.c,b.dataset.v,b.dataset.label);return}
     if(b.classList.contains("xdel")){
@@ -9576,8 +9576,19 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     pn.hidden=!open; bt.setAttribute("aria-expanded",String(open));
     if(open)fillXref(pn,n);
   }
+  // 내가 이미 연결한 구절 ("책.장.절"), 범위(6:16-17)면 그 안의 절 모두 — 관주·내 말씀 목록에서는 빼고 보여 줌 (2026-10-23 사용자 요청)
+  function linkedKeys(n){
+    var K={};
+    (n.links||[]).forEach(function(l){
+      var r=parseRef(l.ref); if(!(r.book>=0&&r.chapter>0&&r.verse>0))return;
+      var m=String(l.ref).match(/-\s*(\d+)\s*$/), end=m?Math.max(r.verse,Math.min(+m[1],r.verse+60)):r.verse;
+      for(var v=r.verse;v<=end;v++)K[r.book+"."+r.chapter+"."+v]=1;
+    });
+    return K;
+  }
   function fillXref(pn,n){
     pn.dataset.sig=xrefSig();
+    var LK=linkedKeys(n);
     pn.innerHTML='<div class="xhd">🔗 연결 말씀<button type="button" class="xgraph"><svg class="grico" viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M12 4 4.5 18.5h15Z"/><path d="M12 4v9M4.5 18.5 12 13l7.5 5.5"/></g><g fill="currentColor"><circle cx="12" cy="4" r="2.6"/><circle cx="4.5" cy="18.5" r="2.6"/><circle cx="19.5" cy="18.5" r="2.6"/><circle cx="12" cy="13" r="2.2"/></g></svg> 연결 지도</button></div>'+
       '<div class="xsec">내가 연결한 말씀 <span>직접 적기</span></div>'+
       '<form class="xlform" autocomplete="off"><div class="xlrow"><input class="field xlref" maxlength="40" enterkeyhint="next" placeholder="구절 (예: 요한복음 14:27)" aria-label="연결할 구절"><button type="submit" class="xladd">추가</button></div>'+
@@ -9586,7 +9597,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       '<div class="xsec">성경 관주 <span>서로 연결된 구절</span></div><ul class="xlist xcross"><li class="xmsg">불러오는 중이에요…</li></ul>'+
       '<div class="xsec">내 말씀 중에서 <span>같은 낱말·주제</span></div><ul class="xlist xmine"></ul><p class="xsrc">관주 자료: OpenBible.info (CC BY)</p>';
     renderMyLinks(pn,n);
-    var mine=pn.querySelector(".xmine"), rel=relatedMine(n);
+    var mine=pn.querySelector(".xmine"), rel=relatedMine(n).filter(function(r){return !LK[r.n.book+"."+r.n.chapter+"."+r.n.verse]});
     if(!rel.length)mine.innerHTML='<li class="xmsg">아직 이어지는 내 말씀이 없어요.</li>';
     // 같은 구절·같은 본문으로 두 번 담긴 말씀은 [삭제] 버튼을 보여 줌
     var dupKey=function(x){return String(x.ref||"").replace(/\s+/g,"")+"|"+String(x.text||"").replace(/\s+/g,"")}, dupCnt={};
@@ -9606,7 +9617,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var line=m[n.book+"."+n.chapter+"."+n.verse]; cross.textContent="";
       if(!line){cross.innerHTML='<li class="xmsg">이 구절은 관주 자료가 없어요.</li>';return}
       line.split(",").forEach(function(s){
-        var r=parseX(s), have=myNoteAt(r.b,r.c,r.v), li=document.createElement("li"), lab=xLabel(r);
+        var r=parseX(s); if(LK[r.b+"."+r.c+"."+r.v])return;   // 이미 내가 연결한 구절
+        var have=myNoteAt(r.b,r.c,r.v), li=document.createElement("li"), lab=xLabel(r);
         // 이미 담은 관주 구절은 위에서 빼고 '내 말씀 중에서'에만 보여 줌
         if(have){
           if(have.id===n.id)return;
@@ -9645,7 +9657,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var ls=n.links||[], keep=ls.filter(function(l){return ("n:"+n.id===k)?false:grLinkKey(l)!==k});
       if(keep.length!==ls.length){linkTomb(n,ls.filter(function(l){return keep.indexOf(l)<0}));n.links=keep;changed.push(n)}
     });
-    changed.forEach(function(n){scheduleSave(n.id);var c=cards.get(n.id),xp=c&&c.querySelector(".xpanel");if(xp)try{renderMyLinks(xp,n)}catch(e){}});
+    changed.forEach(function(n){scheduleSave(n.id);var c=cards.get(n.id),xp=c&&c.querySelector(".xpanel");if(xp&&!xp.hidden)try{fillXref(xp,n)}catch(e){}});
     return changed.length;
   }
   function grBuild(){
@@ -9863,7 +9875,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!n.links)n.links=[];
     if(n.links.some(function(l){return l.ref===ref})){toast("이미 연결한 말씀이에요");return}
     n.links.unshift({id:"k"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),ref:ref,memo:mi.value.trim(),at:Date.now()});
-    ri.value=""; mi.value=""; scheduleSave(n.id); renderMyLinks(card.querySelector(".xpanel"),n);
+    ri.value=""; mi.value=""; scheduleSave(n.id); fillXref(card.querySelector(".xpanel"),n);
     toast(r.book>=0?"연결했어요":"연결했어요 (성경 이름을 못 알아봐서 보기 링크는 없어요)"); buzz(8);
   }
   // 관주 구절 담기: 말씀 담기 창을 열고 구절 주소를 채움 (장 본문을 붙여 둔 적이 있으면 본문도 채움)
