@@ -2428,7 +2428,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlcnt{font-size:15px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
 .dlbarw{flex:1;height:8px;border-radius:4px;background:#222126;overflow:hidden}
 .dlbarw i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .35s}
-.dlweek{display:flex;justify-content:space-between;gap:6px;margin:4px 0 6px}
+.dlweek{display:flex;justify-content:space-between;gap:6px;margin:4px 0 6px;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+/* 요일 줄 좌우로 끌어 날짜 옮기기 (2026-10-22 사용자 요청) */
+.dlweek{overflow:hidden;padding:3px 2px}
+.dlweek .dlw{transform:translateX(var(--wx,0px));transition:var(--wt,none)}
+.dlweek.drag{cursor:grabbing}
+.dlweek.drag .dlw{cursor:grabbing}
 /* 하루 돌아보기 안에서 찾기 (2026-10-17 사용자 요청) */
 .dlsearch{display:flex;align-items:center;gap:8px;max-width:608px;margin:6px auto 12px;padding:0 2px}
 .dlsearch input{flex:1;min-width:0;height:38px;padding:0 14px;border:1px solid #2A2930;border-radius:19px;background:var(--sheet);color:var(--ink);font:inherit;font-size:14px}
@@ -7230,7 +7235,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     o.items.forEach(function(it){if(it.auto==="thanks"&&on.indexOf(it.id)<0){if(th===null)th=thanksOn(day);if(th)on.push(it.id)}});
     return on.filter(function(id){return o.items.some(function(it){return it.id===id})});
   }
-  var dl=null, dlDay="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set(), dlmTap={id:"",t:0};
+  var dl=null, dlDay="", dlWEnd="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set(), dlmTap={id:"",t:0};
   try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
   function saveGFold(){try{localStorage.setItem("bible-daily-gfold",JSON.stringify(Array.from(dlGFold)))}catch(e){}}
   function dayName(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"}
@@ -7269,6 +7274,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       dl.querySelector(".dlprev").addEventListener("click",function(){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()-864e5);drawDaily()});
       dl.querySelector(".dlnext").addEventListener("click",function(){var t=dkey(Date.now());if(dlDay<t){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()+864e5);drawDaily()}});
       dl.querySelector(".dlweek").addEventListener("click",function(e){var b=e.target.closest(".dlw");if(b&&b.dataset.day&&b.dataset.day!==dlDay){dlDay=b.dataset.day;drawDaily()}});   // 요일 칸을 누르면 그날로
+      dlWeekSwipe(dl.querySelector(".dlweek"));   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
       dl.querySelector(".dledit").addEventListener("click",function(){dlEdit=!dlEdit;dlEditId="";dlGEditId="";dlMemoId="";drawDaily()});
       // 기록칸에 적으면 바로 저장
       dl.querySelector(".dllist").addEventListener("input",function(e){
@@ -7392,7 +7398,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dl&&!dl.hidden)closeDaily()});
       dlDragInit(dl.querySelector(".dllist"));
     }
-    dlDay=(day&&/^\d{4}-\d{2}-\d{2}$/.test(day))?day:dkey(Date.now());
+    dlDay=(day&&/^\d{4}-\d{2}-\d{2}$/.test(day))?day:dkey(Date.now()); dlWEnd="";
     dlEdit=false; dlEditId=""; dlGEditId=""; dlMemoId="";
     dlFind=""; var si0=dl.querySelector(".dlsin"); if(si0)si0.value="";
     if(focusId){   // 찾기에서 들어오면 그 항목의 기록을 펼쳐 둔다
@@ -7567,6 +7573,53 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     },140);
   }
   function closeDaily(){if(!dl)return; dl.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
+  function dlAddDay(k,n){return dkey(new Date(k+"T12:00:00").getTime()+n*864e5)}
+  function dlDayDiff(a,b){return Math.round((new Date(a+"T12:00:00")-new Date(b+"T12:00:00"))/864e5)}
+  // 요일 줄 끌기: 손가락을 따라 줄이 움직이고, 놓으면 끈 칸 수만큼 날짜가 옮겨진다.
+  // 오른쪽으로 끌면 지난날, 왼쪽으로 끌면 다음 날 (오늘까지만)
+  function dlWeekSwipe(wk){
+    var S=null, eat=false;
+    function step(){var c=wk.children;return c.length>1?(c[1].offsetLeft-c[0].offsetLeft)||44:44}
+    wk.addEventListener("pointerdown",function(e){
+      if(e.pointerType==="mouse"&&e.button!==0)return;
+      S={x:e.clientX,y:e.clientY,pid:e.pointerId,on:false,dx:0}; eat=false;
+    });
+    wk.addEventListener("pointermove",function(e){
+      if(!S||e.pointerId!==S.pid)return;
+      var dx=e.clientX-S.x, dy=e.clientY-S.y;
+      if(!S.on){
+        if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){S=null;return}   // 세로로 움직이면 화면 넘기기에 양보
+        if(Math.abs(dx)<8)return;
+        S.on=true; wk.classList.add("drag"); wk.style.setProperty("--wt","none");
+        try{wk.setPointerCapture(S.pid)}catch(err){}
+      }
+      var today=dkey(Date.now()), max=dlDayDiff(today,dlDay)*step();
+      if(dx<-max)dx=-max+(dx+max)*.25;   // 오늘 너머로는 살짝만 끌리고 되돌아옴
+      S.dx=dx; wk.style.setProperty("--wx",dx+"px");
+    });
+    function end(e){
+      if(!S||(e&&e.pointerId!==S.pid))return;
+      var s=S; S=null; if(!s.on)return;
+      eat=true; setTimeout(function(){eat=false},350);   // 끈 뒤 따라오는 누르기는 무시
+      wk.classList.remove("drag");
+      var w=step(), n=Math.round(-s.dx/w);
+      if(!n&&Math.abs(s.dx)>w*.35)n=s.dx>0?-1:1;   // 반 칸이 안 돼도 확실히 밀면 하루
+      var today=dkey(Date.now()), nd=dlAddDay(dlDay,n); if(nd>today)nd=today;
+      var oldEnd=dlWEnd;
+      if(nd!==dlDay){
+        dlDay=nd;
+        var ne=dlAddDay(dlWEnd,n); if(ne>today)ne=today; dlWEnd=ne;
+        drawDaily(); if(navigator.vibrate)try{navigator.vibrate(12)}catch(err){}
+      }
+      var shift=dlDayDiff(dlWEnd,oldEnd);
+      wk.style.setProperty("--wt","none"); wk.style.setProperty("--wx",(s.dx+shift*w)+"px");
+      void wk.offsetWidth;
+      wk.style.setProperty("--wt","transform .22s ease-out"); wk.style.setProperty("--wx","0px");
+      setTimeout(function(){wk.style.removeProperty("--wt")},260);
+    }
+    wk.addEventListener("pointerup",end); wk.addEventListener("pointercancel",end);
+    wk.addEventListener("click",function(e){if(eat){e.stopPropagation();e.preventDefault()}},true);
+  }
   function drawDaily(){
     var o=dailyData(), on=dailyChecked(o,dlDay), today=dkey(Date.now());
     dl.querySelector(".dldate").textContent=(dlDay===today?"오늘 ":dlDay===dkey(Date.now()-864e5)?"어제 ":"")+dayName(dlDay);
@@ -7575,8 +7628,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     dl.querySelector(".dlcnt").textContent=c+" / "+tot;
     dl.querySelector(".dlbarw i").style.width=(tot?Math.round(c/tot*100):0)+"%";
     var wk=dl.querySelector(".dlweek"); wk.textContent="";
+    // 요일 줄 7칸: 고른 날이 늘 보이게 따라 움직인다 (끝은 오늘을 넘지 않음)
+    if(!dlWEnd||dlWEnd>today)dlWEnd=today;
+    if(dlDay>dlWEnd)dlWEnd=dlDay;
+    else if(dlDay<dlAddDay(dlWEnd,-6)){dlWEnd=dlAddDay(dlDay,6);if(dlWEnd>today)dlWEnd=today}
+    var wEndT=new Date(dlWEnd+"T12:00:00").getTime();
     for(var i=6;i>=0;i--){
-      var k=dkey(Date.now()-i*864e5), cc=dailyChecked(o,k).length, d=document.createElement("button"); d.type="button"; d.dataset.day=k; d.setAttribute("aria-label",dayName(k)+" 보기, "+cc+"/"+tot);
+      var k=dkey(wEndT-i*864e5), cc=dailyChecked(o,k).length, d=document.createElement("button"); d.type="button"; d.dataset.day=k; d.setAttribute("aria-label",dayName(k)+" 보기, "+cc+"/"+tot);
       d.className="dlw"+(k===dlDay?" cur":""); d.title=dayName(k)+" "+cc+"/"+tot;
       d.innerHTML='<i></i><b></b>'; d.querySelector("b").textContent="일월화수목금토".charAt(new Date(k+"T12:00:00").getDay());
       d.querySelector("i").style.setProperty("--f",tot?(cc/tot):0); d.querySelector("i").textContent=cc||"";
