@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-14">
+<meta name="app-build" content="2026-10-22-15">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2632,6 +2632,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlmemosave{margin-left:auto;font-size:11px;font-weight:400;color:var(--faint)}
 .dlmemobox textarea{width:100%;box-sizing:border-box;min-height:96px;resize:vertical;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.6}
 .dlmemobox textarea:focus{border-color:var(--sky);outline:none}
+.dlmemobox textarea.dlbig{resize:none;transition:height .2s ease}
 @media (min-width:900px){.dlmemobox textarea{min-height:calc(100vh - 230px)}}   /* PC: 적을 때는 모니터 세로로 길게 (2026-10-21 사용자 요청) */
 .dlmemofoot{display:flex;gap:8px;margin-top:8px}
 .dlmemop+.dlmemop{margin-top:10px}
@@ -7491,6 +7492,24 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var o=dailyData(); dlMemoSet(o,box.dataset.day,box.dataset.id,ta.value); saveDaily(o);
         var tip=box.querySelector(".dlmemosave"); if(tip){tip.textContent="저장됨"; clearTimeout(tip._t); tip._t=setTimeout(function(){tip.textContent=""},1400)}
       });
+      // 휴대폰: 기록칸에 적을 때는 키보드 위 남은 화면을 세로로 거의 다 쓰게 (2026-10-22 사용자 요청)
+      (function(){
+        var cur=null;
+        function fit(){
+          if(!cur||!cur.isConnected)return;
+          var vv=window.visualViewport, h=vv?vv.height:window.innerHeight, top=(dl.querySelector(".dlbody")||dl).getBoundingClientRect().top;
+          var hd=cur.closest(".dlmemobox"), hdTop=cur.getBoundingClientRect().top-hd.getBoundingClientRect().top, below=hd.getBoundingClientRect().bottom-cur.getBoundingClientRect().bottom;
+          var room=Math.round(h-Math.max(top,0)-hdTop-below-18);
+          cur.style.height=Math.max(160,room)+"px";
+          try{hd.scrollIntoView({block:"start"})}catch(e){}
+        }
+        dl.querySelector(".dllist").addEventListener("focusin",function(e){
+          var ta=e.target; if(ta.tagName!=="TEXTAREA"||!ta.closest(".dlmemobox")||(window.matchMedia&&matchMedia("(min-width:900px)").matches))return;
+          cur=ta; ta.classList.add("dlbig"); setTimeout(fit,60); setTimeout(fit,350);
+        });
+        dl.querySelector(".dllist").addEventListener("focusout",function(e){if(e.target===cur){cur.classList.remove("dlbig");cur.style.height="";cur=null}});
+        if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){if(cur)setTimeout(fit,30)});
+      })();
       // 입력칸을 벗어나면 저장 (저장·취소 단추 없이)
       dl.querySelector(".dllist").addEventListener("focusout",function(e){
         var t=e.target; if(!t.classList)return;
