@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-13">
+<meta name="app-build" content="2026-10-22-14">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1435,6 +1435,9 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .xmy li{flex-wrap:wrap;row-gap:2px}
 .xmy .xref{flex:1}
 .xmy .xmemo{flex-basis:100%;font-size:12.5px;color:var(--muted);line-height:1.5;word-break:keep-all}
+/* 칸과 칸 사이를 넉넉히 띄우고 가는 줄로 나눔 (2026-10-22 사용자 요청) */
+.xlist+.xsec{margin-top:22px;padding-top:16px;border-top:1px solid #2A2930}
+.xmy:empty{display:none}
 .xldel{height:28px;padding:0 9px;border:0;border-radius:14px;background:transparent;color:var(--faint);font-size:12px;white-space:nowrap}
 .xldel.sure{color:var(--pink);background:color-mix(in srgb,var(--pink) 12%,transparent)}
 .xsrc{margin:8px 0 0;font-size:11px;color:var(--faint)}
