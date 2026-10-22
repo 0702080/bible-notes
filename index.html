@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-21-24">
+<meta name="app-build" content="2026-10-22-1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1580,6 +1580,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .board4>.bcol{flex:1 0 230px;min-width:230px;max-width:380px;display:flex;flex-direction:column;max-height:100%}   /* 칸이 하나뿐일 때 지나치게 넓어지지 않게 */
 .bclist{overflow-y:auto;overscroll-behavior-y:contain;flex:1 1 auto;min-height:0;scrollbar-width:none;-ms-overflow-style:none}
 .bclist::-webkit-scrollbar{display:none}
+.board4.bsolo{justify-content:center}
 .board4{scrollbar-width:thin;scrollbar-color:var(--sbthumb) transparent}
 .board4::-webkit-scrollbar{height:10px}
 .board4::-webkit-scrollbar-thumb{background:var(--sbthumb);border-radius:5px}
@@ -2980,7 +2981,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function renderKanban(){
     var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
-    box.textContent="";
+    box.textContent=""; box.classList.remove("bsolo");
     if(bMode==="list"){renderKanbanList(box);return}
     var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
     sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
@@ -3035,6 +3036,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function renderKanbanList(box){
     var items=sorted().filter(function(n){return visibleNote(n)});
     box.classList.remove("find");
+    box.classList.toggle("bsolo",items.length===1);   // 찾아서 딱 하나만 남으면 화면 가로 가운데에 (2026-10-22 사용자 요청)
     if(!items.length){var nb=document.createElement("p");nb.className="bnohit";nb.textContent=filterText?"\u201c"+filterText+"\u201d이(가) 든 말씀이 없어요.":"담긴 말씀이 없어요.";box.appendChild(nb);return}
     var w=box.clientWidth||document.documentElement.clientWidth||1200, cols=Math.max(1,Math.min(items.length,Math.floor((w+14)/284)));
     var per=Math.ceil(items.length/cols);
