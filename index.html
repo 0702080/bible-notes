@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-7">
+<meta name="app-build" content="2026-10-23-8">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2741,6 +2741,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .note .tab:focus:not(:focus-visible){outline:none}
 /* 카드 도구 줄: 글자 대신 예쁜 아이콘 (이름은 마우스를 올리면 보임, 2026-10-23 사용자 요청) */
 .note .focusrow{gap:4px 2px}
+/* 도구 아이콘 줄을 아래 탭 줄과 같은 폭에 고르게 펼쳐 줄을 맞춤, 주제(#)는 그 위 한 줄로 (2026-10-23 사용자 요청) */
+.note.open .focusrow:not([hidden]){justify-content:space-between;margin:10px 0 6px;padding:0 4px}
+.note .focusrow .topics:not([hidden]){display:flex!important;flex-wrap:wrap;gap:2px 12px;width:100%;order:-2;margin-bottom:4px}
+.note .focusrow .chapread{order:-1!important}
+.note .focusrow .fpills,.note .focusrow .fmsg{flex-basis:100%}
 .note .focusrow .useopen,.note .focusrow .vtopic,.note .focusrow .vxref,.note .focusrow .vctr,.note .focusrow .vrep,.note .focusrow .vrol,.note .focusrow .chapread.primary-read{
   display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:34px;height:34px!important;padding:0 6px!important;border-radius:11px!important;font-size:0!important;color:#9D97AA;box-shadow:none!important}
 .note .focusrow .chapread.primary-read{font-size:12.5px!important;color:var(--orange);padding:0 10px 0 8px!important}
