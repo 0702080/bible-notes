@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-7">
+<meta name="app-build" content="2026-10-22-8">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -238,6 +238,26 @@ details.menu>summary::-webkit-details-marker{display:none}
 @media (min-width:700px){.note.vediting .editbox .etext{line-height:1.9;word-spacing:.2em}}
 .note.vediting .editbox .etext:focus{outline:none;border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 18%,transparent)}
 .note.vediting .editbox .donedit,.note.vediting .vedit{display:none}
+.lmvbar{display:none}
+.note.vediting .editbox .lmvbar:not([hidden]){display:flex;align-items:center;gap:10px;margin-top:8px}
+.lmvbtn{height:32px;padding:0 14px;border:1px solid color-mix(in srgb,var(--orange) 40%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--orange) 10%,#17161b);color:var(--orange);font-size:13px;font-weight:700}
+.lmvtip{font-size:11.5px;color:var(--faint)}
+@media (hover:none){.lmvtip{display:none}}
+.note.vediting .editbox .etext[hidden]{display:none}
+.lmvbox{display:flex;flex-direction:column;gap:6px;padding:8px;border:1px solid color-mix(in srgb,var(--orange) 50%,#34333A);border-radius:12px;background:#141418;outline:none}
+.lmvbox[hidden]{display:none}
+.lmvrow{display:flex;align-items:center;gap:8px;min-height:44px;padding:4px 6px 4px 4px;border-radius:10px;background:#1C1B22;border:1px solid #2A2930;transition:box-shadow .15s,background .15s}
+.lmvrow.empty{min-height:30px;opacity:.6}
+.lmvgrip{flex:0 0 34px;height:36px;display:grid;place-items:center;font-size:18px;color:var(--muted);cursor:grab;touch-action:none;border-radius:8px;user-select:none;-webkit-user-select:none}
+.lmvt{flex:1;min-width:0;font-family:var(--serif);font-size:16px;line-height:1.5;color:var(--orange);word-break:keep-all}
+.lmvrow.empty .lmvt{font-size:12px;color:var(--faint)}
+.lmvup,.lmvdn{flex:0 0 32px;height:32px;padding:0;border:0;border-radius:8px;background:#26252C;color:var(--muted);font-size:11px}
+.lmvrow.lmvdrag{position:relative;z-index:2;background:#2A2833;border-color:var(--gold);box-shadow:0 10px 24px rgba(0,0,0,.5);transition:none}
+.lmvrow.lmvb{box-shadow:0 -4px 0 0 var(--gold)}
+.lmvrow.lmva{box-shadow:0 4px 0 0 var(--gold)}
+.lmvrow.lmvhit{background:color-mix(in srgb,var(--gold) 18%,#1C1B22)}
+.lmvfoot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;font-size:11.5px;color:var(--faint)}
+.lmvdone{flex:0 0 auto;white-space:nowrap;height:32px;padding:0 14px;border:0;border-radius:16px;background:var(--orange);color:#141416;font-size:13px;font-weight:700}
 .focusrow{gap:6px;margin:0 0 8px}
 .focusrow .fl{font-size:12.5px}
 .fbtn{height:28px;padding:0 11px;font-size:13px;border-width:1px;border-radius:14px}
@@ -3802,7 +3822,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       '<div class="verse"></div>'+
       '<div class="ctlegend" hidden></div>'+
       '<div class="hits"></div>'+
-      '<div class="editbox" hidden><input class="field eref" aria-label="성경 구절"><textarea class="field etext" aria-label="말씀"></textarea><button type="button" class="small donedit">완료</button></div>'+
+      '<div class="editbox" hidden><input class="field eref" aria-label="성경 구절"><textarea class="field etext" aria-label="말씀"></textarea><div class="lmvbox" tabindex="-1" hidden></div><div class="lmvbar"><button type="button" class="lmvbtn">↕ 줄 옮기기</button><span class="lmvtip">PC: Alt + ↑↓</span></div><button type="button" class="small donedit">완료</button></div>'+
       '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">언제 쓸까</button><button type="button" class="vtopic">주제 정하기</button><button type="button" class="vxref" aria-expanded="false">연결 말씀</button><button type="button" class="vctr" aria-pressed="false">대조</button><button type="button" class="vrep" aria-pressed="false">반복</button><button type="button" class="vrol" aria-pressed="false">역할</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
       '<div class="xpanel" hidden></div>'+
       '<div class="usepanel" hidden></div>'+
@@ -4553,6 +4573,79 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   list.addEventListener("keydown",function(e){
     if(e.key==="Escape"&&e.target.closest&&e.target.closest(".note.vediting .editbox")){e.target.blur()}
   });
+  /* ---------- 말씀 고치기에서 줄 옮기기 (2026-10-22 사용자 요청)
+     PC: 말씀 칸에서 Alt + 위/아래 화살표로 지금 줄(고른 줄들)을 위아래로
+     휴대폰: [줄 옮기기]를 누르면 줄마다 손잡이가 생겨 끌어서 옮기거나 위아래 단추로 한 칸씩 */
+  function lmvSet(et,lines){et.value=lines.join("\n"); et.dispatchEvent(new Event("input",{bubbles:true})); try{grow(et)}catch(e){}}
+  list.addEventListener("keydown",function(e){
+    var et=e.target; if(!et.classList||!et.classList.contains("etext")||!e.altKey||(e.key!=="ArrowUp"&&e.key!=="ArrowDown"))return;
+    e.preventDefault();
+    var v=et.value, a=et.selectionStart, b=et.selectionEnd, lines=v.split("\n");
+    var l0=v.slice(0,a).split("\n").length-1, l1=v.slice(0,Math.max(a,b-(b>a&&v.charAt(b-1)==="\n"?1:0))).split("\n").length-1, up=e.key==="ArrowUp";
+    if(up?l0===0:l1===lines.length-1)return;
+    var off=a-(lines.slice(0,l0).join("\n").length+(l0?1:0)), len=b-a;
+    var blk=lines.splice(l0,l1-l0+1), at=up?l0-1:l0+1;
+    Array.prototype.splice.apply(lines,[at,0].concat(blk));
+    var st=lines.slice(0,at).join("\n").length+(at?1:0);
+    lmvSet(et,lines);
+    try{et.setSelectionRange(st+off,st+off+len)}catch(err){}
+    buzz(8);
+  });
+  function lmvDraw(eb){
+    var et=eb.querySelector(".etext"), box=eb.querySelector(".lmvbox"), lines=et.value.split("\n");
+    box.textContent="";
+    lines.forEach(function(t,i){
+      var r=document.createElement("div"); r.className="lmvrow"+(t.trim()?"":" empty"); r.dataset.i=String(i);
+      r.innerHTML='<span class="lmvgrip" aria-hidden="true">⠿</span><span class="lmvt"></span><button type="button" class="lmvup" aria-label="위로">▲</button><button type="button" class="lmvdn" aria-label="아래로">▼</button>';
+      r.querySelector(".lmvt").textContent=t.trim()?t:"(빈 줄)";
+      box.appendChild(r);
+    });
+    var d=document.createElement("div"); d.className="lmvfoot"; d.innerHTML='<span>⠿ 끌거나 ▲▼로 옮겨요</span><button type="button" class="lmvdone">다 옮겼어요</button>'; box.appendChild(d);
+  }
+  function lmvOpen(eb,on){
+    var et=eb.querySelector(".etext"), box=eb.querySelector(".lmvbox"), bar=eb.querySelector(".lmvbar");
+    box.hidden=!on; et.hidden=on; bar.hidden=on;
+    if(on){lmvDraw(eb); box.focus({preventScroll:true})} else {try{grow(et)}catch(e){} et.focus({preventScroll:true})}
+  }
+  function lmvMove(eb,from,to){
+    var et=eb.querySelector(".etext"), lines=et.value.split("\n");
+    if(to<0||to>=lines.length||from===to)return;
+    var x=lines.splice(from,1)[0]; lines.splice(to,0,x); lmvSet(et,lines); lmvDraw(eb);
+    var r=eb.querySelector('.lmvrow[data-i="'+to+'"]'); if(r){r.classList.add("lmvhit");setTimeout(function(){r.classList.remove("lmvhit")},500)}
+    eb.querySelector(".lmvbox").focus({preventScroll:true});
+    buzz(8);
+  }
+  list.addEventListener("click",function(e){
+    var b=e.target.closest&&e.target.closest(".lmvbtn,.lmvdone,.lmvup,.lmvdn"); if(!b)return;
+    var eb=b.closest(".editbox"); if(!eb)return; e.stopPropagation();
+    if(b.classList.contains("lmvbtn")){lmvOpen(eb,true);return}
+    if(b.classList.contains("lmvdone")){lmvOpen(eb,false);return}
+    var i=+b.closest(".lmvrow").dataset.i; lmvMove(eb,i,b.classList.contains("lmvup")?i-1:i+1);
+  },true);
+  (function(){   // 손잡이를 잡고 끌기 (마우스·손가락 모두)
+    var D=null;
+    list.addEventListener("pointerdown",function(e){
+      var g=e.target.closest&&e.target.closest(".lmvgrip"); if(!g)return;
+      var row=g.closest(".lmvrow"), box=row.parentNode; e.preventDefault();
+      D={row:row,box:box,eb:box.closest(".editbox"),from:+row.dataset.i,y:e.clientY,to:null};
+      row.classList.add("lmvdrag"); try{g.setPointerCapture(e.pointerId)}catch(err){} buzz(10);
+    });
+    list.addEventListener("pointermove",function(e){
+      if(!D)return; e.preventDefault();
+      D.row.style.transform="translateY("+(e.clientY-D.y)+"px)";
+      var rows=Array.prototype.slice.call(D.box.querySelectorAll(".lmvrow")), to=D.from;
+      rows.forEach(function(r){r.classList.remove("lmvb","lmva")});
+      for(var i=0;i<rows.length;i++){if(rows[i]===D.row)continue; var rc=rows[i].getBoundingClientRect(); if(e.clientY>rc.top&&e.clientY<rc.bottom){to=i; rows[i].classList.add(i<D.from?"lmvb":"lmva"); break}}
+      D.to=to;
+    });
+    function end(){
+      if(!D)return; var d=D; D=null;
+      d.row.classList.remove("lmvdrag"); d.row.style.transform="";
+      d.box.querySelectorAll(".lmvrow").forEach(function(r){r.classList.remove("lmvb","lmva")});
+      if(d.to!=null&&d.to!==d.from)lmvMove(d.eb,d.from,d.to); else d.box.focus({preventScroll:true});
+    }
+    list.addEventListener("pointerup",end); list.addEventListener("pointercancel",end);
+  })();
   document.addEventListener("pointerdown",function(e){   // 편집 칸 밖을 누르면 고치기 끝
     document.querySelectorAll(".note.vediting").forEach(function(card){
       var eb=card.querySelector(".editbox"); if(eb&&!eb.contains(e.target))exitVerseEdit(card.dataset.id);
