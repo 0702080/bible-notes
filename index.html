@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-9">
+<meta name="app-build" content="2026-10-22-12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1370,7 +1370,48 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .note:not(.open) .xpanel{display:none}
 .xpanel{margin:0 0 12px;padding:12px 14px;border-radius:14px;background:#101013;border:1px solid #232229}
 .xpanel[hidden]{display:none}
-.xhd{font-size:14px;font-weight:700;color:var(--mint);margin-bottom:6px}
+.xhd{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--mint);margin-bottom:6px}
+.xgraph{margin-left:auto;height:30px;padding:0 12px;border:1px solid color-mix(in srgb,var(--violet) 45%,#34333A);border-radius:15px;background:color-mix(in srgb,var(--violet) 12%,transparent);color:var(--violet);font-size:12.5px;font-weight:700;white-space:nowrap}
+textarea.xlmemo{display:block;width:100%;box-sizing:border-box;min-height:44px;height:auto;resize:vertical;line-height:1.55;padding-top:9px;padding-bottom:9px;font-family:inherit}
+.xmemo{white-space:pre-line}
+/* 말씀 연결 지도 */
+.grtools{display:flex;gap:6px;margin-left:auto}
+.grtools button{height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:#17161b;color:var(--muted);font-size:12.5px;font-weight:700;white-space:nowrap}
+.grtools button[hidden]{display:none}
+.grtp[aria-pressed="true"]{background:color-mix(in srgb,var(--mint) 16%,#17161b);border-color:color-mix(in srgb,var(--mint) 50%,#34333A);color:var(--mint)}
+.grwrap{position:relative;flex:1;min-height:0}
+.grsvg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.grsvg .gl{stroke:#3B3946;stroke-width:1.4;transition:stroke .2s,opacity .2s}
+.grsvg .gl.gt{stroke-dasharray:3 4;stroke:#2F3B38}
+.grsvg .gd{cursor:pointer;transition:opacity .2s}
+.grsvg .gd circle{fill:var(--violet);stroke:#0B0B0D;stroke-width:2}
+.grsvg .gd-x circle{fill:#0B0B0D;stroke:#8A8796;stroke-width:1.6}
+.grsvg .gd-t circle{fill:var(--tc,var(--mint))}
+.grsvg .gd text{fill:#C9C5D3;font-size:11px;text-anchor:middle;paint-order:stroke;stroke:#0B0B0D;stroke-width:3px;font-family:var(--sans)}
+.grsvg .gd-t text{fill:var(--tc,var(--mint));font-size:10px}
+.grsvg.grsmall .gd text{opacity:0}
+.grsvg.grhas .gd{opacity:.22} .grsvg.grhas .gl{opacity:.15}
+.grsvg.grhas .gd.on,.grsvg.grhas .gd.near{opacity:1} .grsvg.grhas .gd.on text,.grsvg.grhas .gd.near text{opacity:1}
+.grsvg.grhas .gl.on{opacity:1;stroke:var(--gold);stroke-width:2}
+.grsvg .gd.on circle{stroke:var(--gold);stroke-width:3}
+.grsvg .gd.on text{fill:var(--gold);font-weight:700;font-size:12.5px}
+.grempty{position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);width:min(86%,420px);margin:0;text-align:center;color:var(--muted);font-size:14px;line-height:1.7}
+.grzoom{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:6px}
+.grzoom button{width:38px;height:38px;border:1px solid #34333A;border-radius:12px;background:#17161bE6;color:var(--ink);font-size:18px;line-height:1}
+.grinfo{flex:0 0 auto;max-height:42vh;overflow:auto;padding:12px max(16px,calc((100% - 640px) / 2)) 16px;border-top:1px solid #26252B;background:#121216}
+.grinfo[hidden]{display:none}
+.grih{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.grref{font-size:16px;color:var(--gold);margin-right:auto}
+.grgo{height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:#1E1D24;color:#D9D5E0;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap}
+.grtext{margin:8px 0 4px;font-family:var(--serif);font-size:15px;line-height:1.7;color:var(--orange);word-break:keep-all}
+.grtext.dim{font-family:var(--sans);font-size:13px;color:var(--muted)}
+.grnb{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.grnl,.grnone{width:100%;font-size:12px;color:var(--faint)}
+.grchip{display:inline-flex;flex-direction:column;align-items:flex-start;max-width:100%;padding:6px 12px;border:1px solid color-mix(in srgb,var(--violet) 40%,#34333A);border-radius:14px;background:color-mix(in srgb,var(--violet) 10%,#17161b);color:var(--violet);font-size:13px;font-weight:700;text-align:left}
+.grchip small{font-weight:400;color:var(--muted);font-size:11.5px;margin-top:2px;white-space:normal;word-break:keep-all}
+.grchip-x{border-color:#3A3944;background:#17161b;color:#C9C5D3}
+.grchip-t{border-color:color-mix(in srgb,var(--mint) 40%,#34333A);background:color-mix(in srgb,var(--mint) 10%,#17161b);color:var(--mint)}
+@media (max-width:520px){.grov .dltitle{font-size:15px}.grtools button{padding:0 9px;font-size:12px}}
 .xsec{margin:10px 0 4px;font-size:12.5px;font-weight:700;color:var(--ink)}
 .xsec span{font-weight:400;color:var(--faint);margin-left:4px}
 .xlist{list-style:none;margin:0;padding:0}
@@ -1618,16 +1659,22 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcn{margin-left:auto;min-width:24px;height:22px;padding:0 7px;border-radius:11px;background:color-mix(in srgb,var(--bc) 18%,transparent);color:var(--bc);font-size:12.5px;line-height:22px;text-align:center}
 .bclist{display:flex;flex-direction:column;gap:8px}
 .bcfold{flex:0 0 auto;width:26px;height:26px;margin-left:2px;padding:0;border:0;border-radius:13px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
-.bcfold::before{content:"";width:7px;height:7px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateX(1px) rotate(45deg)}
+.bcfold::before{content:"";width:7px;height:7px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateX(1px) rotate(45deg);transition:transform .3s}
 @media (hover:hover){.bcfold:hover{background:#34313D;color:var(--ink)}}
-.board4>.bcol.bfold{flex:0 0 54px;min-width:54px;max-width:54px;padding:10px 4px;cursor:pointer;transition:background .15s}
+.board4>.bcol{transition:flex-grow .42s cubic-bezier(.32,.72,0,1),flex-basis .42s cubic-bezier(.32,.72,0,1),min-width .42s cubic-bezier(.32,.72,0,1),max-width .42s cubic-bezier(.32,.72,0,1),padding .42s cubic-bezier(.32,.72,0,1),background .15s}
+.board4>.bcol .bclist,.board4>.bcol .bch{transition:opacity .17s ease,transform .25s ease}
+.board4>.bcol.bfade{overflow:hidden}
+.board4>.bcol.bfade .bclist,.board4>.bcol.bfade .bch{opacity:0;transform:scale(.97)}
+.board4>.bcol.bfold{flex:0 0 54px;min-width:54px;max-width:54px;padding:10px 4px;cursor:pointer}
+@media (prefers-reduced-motion:reduce){.board4>.bcol,.board4>.bcol .bclist,.board4>.bcol .bch{transition:none}}
 @media (hover:hover){.board4>.bcol.bfold:hover{background:#2F2C39}}
 .bcol.bfold .bclist{display:none}
 .bcol.bfold .bch{flex-direction:column;align-items:center;gap:10px;padding:2px 0;cursor:pointer}
 .bcol.bfold .bch b{writing-mode:vertical-rl;letter-spacing:2px;white-space:nowrap}
 .bcol.bfold .bcn{margin:0;order:-1}
 .bcol.bfold .bcfold{order:-2;margin:0}
-.bcol.bfold .bcfold::before{transform:translateX(-1px) rotate(-135deg)}
+.bcol.bfold .bcfold::before{transform:translateX(-2px) rotate(-135deg)}
+.bcol.bfold .bcfold{width:28px;height:28px;background:#34313D;color:var(--ink)}
 .bcempty{margin:10px 6px;font-size:13px;color:var(--faint)}
 .bnohit{margin:40px auto;padding:16px 20px;border:1px dashed #2E2D34;border-radius:14px;color:var(--faint);font-size:14px;align-self:flex-start}
 .bcard{position:relative;padding:11px 12px 10px 14px;border:1px solid color-mix(in srgb,var(--tc) 22%,#2A2930);border-radius:12px;cursor:pointer;
@@ -2693,6 +2740,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         <button type="button" id="openMemBtn">암송 도장판</button>
         <button type="button" id="openProgBtn">실천 진도표</button>
         <button type="button" id="openTongdokBtn">📖 성경 통독표</button>
+        <button type="button" id="openGraphBtn">🕸️ 말씀 연결 지도</button>
         <button type="button" id="prayReadBtn">기도 모아 읽기</button>
         <button type="button" id="reorderBtn">카드 순서 바꾸기</button>
         <button type="button" id="foldAll">모두 펼치기</button>
@@ -2863,7 +2911,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       mem:(n.mem&&Array.isArray(n.mem.s))?{s:(function(a){if(a.length>=5)a=[a[0],a[1],a[2],a[4]||a[3]];return [0,1,2,3].map(function(i){return +a[i]||0})})(n.mem.s),bak:Array.isArray(n.mem.bak)?[0,1,2,3].map(function(i){return +n.mem.bak[i]||0}):null}:{s:[0,0,0,0],bak:null},   // 예전 5단계(다음 날, 내일)는 4단계(내일) 하나로
       pinned:!!n.pinned, pinnedAt:n.pinned?(+n.pinnedAt||0):0, priv:!!n.priv,
       tw:(function(o){var r={};if(o&&typeof o==="object"&&!Array.isArray(o)){Object.keys(o).slice(0,20).forEach(function(k){if(Array.isArray(o[k]))r[String(k).slice(0,20)]=o[k].map(String).map(function(w){return w.trim()}).filter(Boolean).slice(0,8)})}return r})(n.tw),
-      links:Array.isArray(n.links)?n.links.filter(function(l){return l&&String(l.ref||"").trim()}).slice(0,60).map(function(l){return {id:String(l.id||("k"+Math.random().toString(36).slice(2,8))),ref:String(l.ref).trim().slice(0,40),memo:String(l.memo||"").trim().slice(0,120)}}):[],
+      links:Array.isArray(n.links)?n.links.filter(function(l){return l&&String(l.ref||"").trim()}).slice(0,60).map(function(l){return {id:String(l.id||("k"+Math.random().toString(36).slice(2,8))),ref:String(l.ref).trim().slice(0,40),memo:String(l.memo||"").trim().slice(0,1000)}}):[],
       topics:Array.isArray(n.topics)?n.topics.map(function(t){return String(t).replace(/^#+/,"").trim().slice(0,20)}).filter(function(t,i,a){return t&&a.indexOf(t)===i}).slice(0,12):[],
       createdAt:+n.createdAt||Date.now(),updatedAt:+n.updatedAt||+n.createdAt||0};
   }
@@ -3091,8 +3139,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var fb=e.target.closest(".bcfold"), cl=fb?fb.closest(".bcol"):e.target.closest(".bcol.bfold");
     if(!cl||!cl.dataset.k)return;
     e.stopPropagation(); e.preventDefault();
-    var on=!cl.classList.contains("bfold"); cl.classList.toggle("bfold",on); cl.title=on?"눌러서 펼치기":"";
+    if(cl.dataset.anim)return;
+    var on=!cl.classList.contains("bfold"); cl.title=on?"눌러서 펼치기":"";
     if(on)bFold[cl.dataset.k]=1; else delete bFold[cl.dataset.k]; saveBFold(); buzz(8);
+    // 부드럽게: 안의 글이 먼저 사르르 사라지고 → 폭이 줄거나 늘고 → 새 모양이 사르르 (2026-10-22 사용자 요청)
+    cl.dataset.anim="1"; cl.classList.add("bfade");
+    setTimeout(function(){
+      cl.classList.toggle("bfold",on);
+      setTimeout(function(){cl.classList.remove("bfade"); setTimeout(function(){delete cl.dataset.anim},200)},on?260:330);
+    },170);
   },true);
   function renderKanbanList(box){
     var items=sorted().filter(function(n){return visibleNote(n)});
@@ -4764,6 +4819,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       try{await backend.del(xd);toast("중복된 말씀을 지웠어요")}catch(err){setStatus("삭제하지 못했어요. 다시 시도해 주세요.")}
       return;
     }
+    if(b.classList.contains("xgraph")){openGraph(id);return}
     if(b.classList.contains("xopen")){var xo=b.dataset.id;openOne(xo);render();var xe=cards.get(xo);if(xe)setTimeout(function(){xe.scrollIntoView({block:"start",behavior:"smooth"})},80);return}
     if(b.classList.contains("medit")||b.classList.contains("vedit")){
       var eb=card.querySelector(".editbox");
@@ -9005,6 +9061,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   $("openSayBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay()});
   $("openMedBtn").addEventListener("click",openMedProgress);
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
+  $("openGraphBtn").addEventListener("click",function(){openGraph(null)});
   $("openTongdokBtn").addEventListener("click",function(){location.href="tongdok2/?from=notes"   /* 내 통독표는 tongdok2 (아내용 tongdok과 따로, 2026-10-22) */});
 
   /* ---------- 말씀 복사 ---------- */
@@ -9393,10 +9450,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function fillXref(pn,n){
     pn.dataset.sig=xrefSig();
-    pn.innerHTML='<div class="xhd">🔗 연결 말씀</div>'+
+    pn.innerHTML='<div class="xhd">🔗 연결 말씀<button type="button" class="xgraph">🕸️ 연결 지도</button></div>'+
       '<div class="xsec">내가 연결한 말씀 <span>직접 적기</span></div>'+
       '<form class="xlform" autocomplete="off"><div class="xlrow"><input class="field xlref" maxlength="40" enterkeyhint="next" placeholder="구절 (예: 요한복음 14:27)" aria-label="연결할 구절"><button type="submit" class="xladd">추가</button></div>'+
-      '<input class="field xlmemo" maxlength="120" enterkeyhint="done" placeholder="왜 연결했는지 한 줄 (선택)" aria-label="연결한 이유"></form>'+
+      '<textarea class="field xlmemo" maxlength="1000" rows="2" placeholder="왜 연결했는지 (선택) · 오른쪽 아래 모서리를 끌면 칸이 커져요" aria-label="연결한 이유"></textarea></form>'+
       '<ul class="xlist xmy"></ul>'+
       '<div class="xsec">성경 관주 <span>서로 연결된 구절</span></div><ul class="xlist xcross"><li class="xmsg">불러오는 중이에요…</li></ul>'+
       '<div class="xsec">내 말씀 중에서 <span>같은 낱말·주제</span></div><ul class="xlist xmine"></ul><p class="xsrc">관주 자료: OpenBible.info (CC BY)</p>';
@@ -9442,6 +9499,183 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(!cross.children.length)cross.innerHTML='<li class="xmsg">관주 구절은 모두 담았어요. 아래 내 말씀에서 볼 수 있어요.</li>';
     }).catch(function(){cross.innerHTML='<li class="xmsg">관주를 불러오지 못했어요. 인터넷 연결을 확인해 주세요.</li>'});
   }
+  /* ---------- 🕸️ 말씀 연결 지도 (옵시디안 그래프처럼, 2026-10-22 사용자 요청)
+     점 = 말씀 (내가 담은 말씀은 보라 점, 아직 안 담은 구절은 빈 원), 선 = '내가 연결한 말씀'.
+     '#주제도 잇기'를 켜면 주제 점(민트)도 생겨 같은 주제 말씀끼리 이어짐.
+     점을 누르면 이어진 말씀이 밝아지고 아래에 목록이 나옴. '이 말씀 중심으로'는 그 점에서 두 걸음 안의 말씀만 모아 봄 */
+  var GR=null, grTopics=false;
+  try{grTopics=localStorage.getItem("bible-graph-topics")==="1"}catch(e){}
+  function grBuild(){
+    var N={}, E={}, adj={};
+    function node(k,o){if(!N[k]){o.k=k;N[k]=o;adj[k]={}}return N[k]}
+    function edge(a,b,memo,kind){if(a===b)return;var key=a<b?a+"|"+b:b+"|"+a;if(!E[key])E[key]={a:a,b:b,memo:memo||"",kind:kind};else if(memo&&!E[key].memo)E[key].memo=memo;adj[a][b]=1;adj[b][a]=1}
+    notes.forEach(function(n){node("n:"+n.id,{t:"n",id:n.id,ref:n.ref||"구절 없음",text:n.text||""})});
+    notes.forEach(function(n){
+      (n.links||[]).forEach(function(l){
+        var r=parseRef(l.ref), have=r.book>=0&&r.chapter>0&&r.verse>0?myNoteAt(r.book,r.chapter,r.verse):null, k;
+        if(have)k="n:"+have.id;
+        else{k="x:"+(r.book>=0&&r.chapter>0?r.book+"."+r.chapter+"."+(r.verse||0):String(l.ref).replace(/\s+/g,"")); node(k,{t:"x",ref:l.ref,b:r.book,c:r.chapter})}
+        edge("n:"+n.id,k,l.memo,"l");
+      });
+      if(grTopics)(n.topics||[]).forEach(function(t){var k="t:"+t; node(k,{t:"t",ref:"#"+t,topic:t}); edge("n:"+n.id,k,"","t")});
+    });
+    return {N:N,E:E,adj:adj};
+  }
+  function openGraph(centerId){
+    if(!GR){
+      var ov=document.createElement("div"); ov.className="rvq grov"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-modal","true"); ov.hidden=true;
+      ov.innerHTML='<div class="dlbar"><b class="dltitle">🕸️ 말씀 연결 지도</b><span class="grtools"><button type="button" class="grtp" aria-pressed="false">#주제도 잇기</button><button type="button" class="grall" hidden>전체 보기</button></span><button type="button" class="dlclose grclose">닫기</button></div>'+
+        '<div class="grwrap"><svg class="grsvg" xmlns="http://www.w3.org/2000/svg"><g class="grview"><g class="gre"></g><g class="grn"></g></g></svg><p class="grempty" hidden></p>'+
+        '<div class="grzoom"><button type="button" data-z="1.25" aria-label="크게">+</button><button type="button" data-z="0.8" aria-label="작게">−</button><button type="button" data-z="0" aria-label="한눈에">⤢</button></div></div>'+
+        '<div class="grinfo" hidden></div>';
+      document.body.appendChild(ov);
+      GR={ov:ov,svg:ov.querySelector(".grsvg"),view:ov.querySelector(".grview"),pos:{},tx:0,ty:0,sc:1,sel:null,center:null,raf:0};
+      ov.querySelector(".grclose").addEventListener("click",closeGraph);
+      ov.querySelector(".grtp").addEventListener("click",function(){grTopics=!grTopics;try{localStorage.setItem("bible-graph-topics",grTopics?"1":"0")}catch(e){}grDraw(true)});
+      ov.querySelector(".grall").addEventListener("click",function(){GR.center=null;grDraw(true)});
+      ov.querySelector(".grzoom").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;var z=+b.dataset.z;if(!z){grFit();return}var r=GR.svg.getBoundingClientRect();grZoom(z,r.width/2,r.height/2)});
+      ov.querySelector(".grinfo").addEventListener("click",grInfoClick);
+      grPointer();
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&GR&&!GR.ov.hidden)closeGraph()});
+    }
+    GR.center=centerId?"n:"+centerId:null; GR.sel=GR.center; GR.touched=false;
+    GR.ov.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+    grDraw(true);
+  }
+  function closeGraph(){if(!GR)return; cancelAnimationFrame(GR.raf); GR.ov.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
+  function grDraw(refit){
+    var g=grBuild(); GR.g=g;
+    var ov=GR.ov; ov.querySelector(".grtp").setAttribute("aria-pressed",String(grTopics));
+    var vis={};
+    if(GR.center&&g.N[GR.center]){   // 두 걸음 안
+      vis[GR.center]=1; var fr=[GR.center];
+      for(var d=0;d<2;d++){var nx=[];fr.forEach(function(k){Object.keys(g.adj[k]).forEach(function(m){if(!vis[m]){vis[m]=1;nx.push(m)}})});fr=nx}
+    }else{GR.center=null; Object.keys(g.N).forEach(function(k){if(Object.keys(g.adj[k]).length)vis[k]=1})}
+    ov.querySelector(".grall").hidden=!GR.center;
+    var ks=Object.keys(vis), es=Object.keys(g.E).map(function(k){return g.E[k]}).filter(function(e){return vis[e.a]&&vis[e.b]});
+    GR.ks=ks; GR.es=es;
+    var em=ov.querySelector(".grempty"), lone=ks.length<=1&&!es.length;
+    em.hidden=!lone;
+    if(lone)em.textContent=GR.center?"이 말씀은 아직 이어진 말씀이 없어요. 말씀 카드의 '🔗 연결 말씀'에서 구절을 이어 보세요.":"아직 연결한 말씀이 없어요. 말씀 카드의 '🔗 연결 말씀'에서 구절을 이어 보세요. 위의 '#주제도 잇기'를 켜면 같은 주제끼리도 이어져요.";
+    // 자리: 이미 있던 점은 그 자리, 새 점은 이웃 곁에
+    var P=GR.pos, live={};
+    ks.forEach(function(k,i){
+      live[k]=1; if(P[k])return;
+      var nb=Object.keys(g.adj[k]).filter(function(m){return P[m]&&vis[m]})[0], a=Math.random()*Math.PI*2, r=nb?40:120+Math.random()*80;
+      P[k]={x:(nb?P[nb].x:0)+Math.cos(a)*r,y:(nb?P[nb].y:0)+Math.sin(a)*r,vx:0,vy:0};
+    });
+    if(GR.center&&P[GR.center]){P[GR.center].fx=1}
+    Object.keys(P).forEach(function(k){if(!live[k])delete P[k]; else if(k!==GR.center)delete P[k].fx});
+    // 그리기 (점·선 요소는 새로 만들고, 위치는 움직일 때마다 바꿈)
+    var ge=ov.querySelector(".gre"), gn=ov.querySelector(".grn"), SV="http://www.w3.org/2000/svg"; ge.textContent=""; gn.textContent="";
+    GR.lines=es.map(function(e){var l=document.createElementNS(SV,"line"); l.setAttribute("class","gl"+(e.kind==="t"?" gt":"")); ge.appendChild(l); return l});
+    GR.dots={};
+    ks.forEach(function(k){
+      var o=g.N[k], deg=Object.keys(g.adj[k]).length, r=o.t==="t"?5:Math.min(16,6+Math.sqrt(deg)*2.2);
+      var el=document.createElementNS(SV,"g"); el.setAttribute("class","gd gd-"+o.t); el.dataset.k=k;
+      var c=document.createElementNS(SV,"circle"); c.setAttribute("r",r); el.appendChild(c);
+      var tx=document.createElementNS(SV,"text"); tx.setAttribute("y",r+13); tx.textContent=o.ref.length>14?o.ref.slice(0,13)+"…":o.ref; el.appendChild(tx);
+      if(o.t==="t")el.style.setProperty("--tc",topicColor(o.topic));
+      gn.appendChild(el); GR.dots[k]=el;
+    });
+    if(GR.sel&&!vis[GR.sel])GR.sel=null;
+    for(var i=0;i<300;i++)grTick(Math.max(.1,1-i/300));   // 미리 자리 잡기
+    grSel(GR.sel); grPaint(); if(refit)grFit();   // 아래 설명 칸을 먼저 열고 그 남은 자리에 맞춤
+    GR.alpha=.5; cancelAnimationFrame(GR.raf); GR.raf=requestAnimationFrame(grLoop);
+  }
+  function grTick(al){
+    var P=GR.pos, ks=GR.ks, n=ks.length, i, j;
+    for(i=0;i<n;i++){var a=P[ks[i]];
+      for(j=i+1;j<n;j++){var b=P[ks[j]], dx=a.x-b.x, dy=a.y-b.y, d2=dx*dx+dy*dy+.01; if(d2>250000)continue; var f=1500/d2*al; a.vx+=dx*f; a.vy+=dy*f; b.vx-=dx*f; b.vy-=dy*f}}
+    GR.es.forEach(function(e){var a=P[e.a], b=P[e.b], dx=b.x-a.x, dy=b.y-a.y, d=Math.sqrt(dx*dx+dy*dy)+.01, L=e.kind==="t"?70:95, f=(d-L)/d*.06*al; a.vx+=dx*f; a.vy+=dy*f; b.vx-=dx*f; b.vy-=dy*f});
+    ks.forEach(function(k){var p=P[k]; p.vx-=p.x*.018*al; p.vy-=p.y*.018*al; p.vx*=.82; p.vy*=.82; if(p.fx||p.drag){p.vx=0;p.vy=0;return} var sp=Math.sqrt(p.vx*p.vx+p.vy*p.vy); if(sp>30){p.vx*=30/sp;p.vy*=30/sp} p.x+=p.vx; p.y+=p.vy});
+  }
+  function grLoop(){
+    if(!GR||GR.ov.hidden)return;
+    if(GR.alpha>.02){grTick(GR.alpha); GR.alpha*=.985; grPaint(); if(GR.alpha<=.02&&!GR.touched)grFit()}
+    GR.raf=requestAnimationFrame(grLoop);
+  }
+  function grPaint(){
+    var P=GR.pos;
+    GR.es.forEach(function(e,i){var a=P[e.a], b=P[e.b], l=GR.lines[i]; l.setAttribute("x1",a.x.toFixed(1)); l.setAttribute("y1",a.y.toFixed(1)); l.setAttribute("x2",b.x.toFixed(1)); l.setAttribute("y2",b.y.toFixed(1))});
+    GR.ks.forEach(function(k){var p=P[k]; GR.dots[k].setAttribute("transform","translate("+p.x.toFixed(1)+","+p.y.toFixed(1)+")")});
+    GR.view.setAttribute("transform","translate("+GR.tx.toFixed(1)+","+GR.ty.toFixed(1)+") scale("+GR.sc.toFixed(3)+")");
+    GR.svg.classList.toggle("grsmall",GR.sc<.75&&GR.ks.length>25);
+  }
+  function grFit(){
+    var r=GR.svg.getBoundingClientRect(), P=GR.pos, x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+    GR.ks.forEach(function(k){var p=P[k];x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x);y1=Math.max(y1,p.y)});
+    if(!GR.ks.length||!r.width){GR.sc=1;GR.tx=r.width/2;GR.ty=r.height/2;grPaint();return}
+    var w=Math.max(80,x1-x0)+90, h=Math.max(80,y1-y0)+90;
+    GR.sc=Math.max(.25,Math.min(1.6,Math.min(r.width/w,r.height/h)));
+    GR.tx=r.width/2-(x0+x1)/2*GR.sc; GR.ty=r.height/2-(y0+y1)/2*GR.sc; grPaint();
+  }
+  function grZoom(z,cx,cy){var ns=Math.max(.2,Math.min(4,GR.sc*z)); z=ns/GR.sc; GR.tx=cx-(cx-GR.tx)*z; GR.ty=cy-(cy-GR.ty)*z; GR.sc=ns; grPaint()}
+  function grSel(k){
+    GR.sel=k||null; var g=GR.g, nb=k?g.adj[k]:{};
+    GR.svg.classList.toggle("grhas",!!k);
+    GR.ks.forEach(function(m){var d=GR.dots[m]; d.classList.toggle("on",m===k); d.classList.toggle("near",!!(k&&nb[m]))});
+    GR.es.forEach(function(e,i){GR.lines[i].classList.toggle("on",!!k&&(e.a===k||e.b===k))});
+    var inf=GR.ov.querySelector(".grinfo"); inf.hidden=!k; if(!k)return;
+    var o=g.N[k], h='<div class="grih"><b class="grref"></b>';
+    if(o.t==="n")h+='<button type="button" class="grgo" data-act="open">카드 열기</button>';
+    if(o.t==="x"&&o.b>=0&&o.c>0)h+='<a class="grgo" target="_blank" rel="noopener">보기 ↗</a>';
+    if(k!==GR.center&&o.t!=="t")h+='<button type="button" class="grgo" data-act="center">이 말씀 중심으로</button>';
+    h+='</div>'+(o.t==="n"?'<p class="grtext"></p>':o.t==="x"?'<p class="grtext dim">아직 담지 않은 구절이에요</p>':'')+'<div class="grnb"></div>';
+    inf.innerHTML=h; inf.querySelector(".grref").textContent=o.ref;
+    if(o.t==="n")inf.querySelector(".grtext").textContent=String(o.text).replace(/\s+/g," ");
+    if(o.t==="x"&&o.b>=0&&o.c>0)inf.querySelector("a.grgo").href=hbLink(o.b,o.c);
+    var box=inf.querySelector(".grnb"), ms=Object.keys(nb);
+    if(!ms.length)box.innerHTML='<span class="grnone">이어진 말씀이 없어요</span>';
+    else{var lab=document.createElement("span"); lab.className="grnl"; lab.textContent="이어진 말씀 "+ms.length; box.appendChild(lab)}
+    ms.forEach(function(m){
+      var e=g.E[k<m?k+"|"+m:m+"|"+k], b=document.createElement("button"); b.type="button"; b.className="grchip grchip-"+g.N[m].t; b.dataset.k=m;
+      b.textContent=g.N[m].ref; if(e&&e.memo){var sm=document.createElement("small"); sm.textContent=e.memo.replace(/\s+/g," "); b.appendChild(sm)}
+      box.appendChild(b);
+    });
+  }
+  function grInfoClick(e){
+    var c=e.target.closest(".grchip"); if(c){var k=c.dataset.k; if(!GR.dots[k]){GR.center=k;grDraw(true)} grSel(k); grPanTo(k); buzz(8); return}
+    var b=e.target.closest("button.grgo"); if(!b)return;
+    var o=GR.g.N[GR.sel]; if(!o)return;
+    if(b.dataset.act==="center"){GR.center=GR.sel; grDraw(true); return}
+    if(b.dataset.act==="open"){
+      closeGraph(); var id=o.id;
+      if(boardOn&&boardWide())boardOpen(id);
+      else{openOne(id);render();var c2=cards.get(id);if(c2)setTimeout(function(){c2.scrollIntoView({block:"start",behavior:"smooth"})},80)}
+    }
+  }
+  function grPanTo(k){var p=GR.pos[k], r=GR.svg.getBoundingClientRect(); if(!p)return; GR.tx=r.width/2-p.x*GR.sc; GR.ty=r.height*.42-p.y*GR.sc; grPaint()}
+  function grPointer(){   // 점 끌기 · 바탕 끌어 옮기기 · 두 손가락/휠로 크게 작게 · 점 누르기
+    var svg=GR.svg, pts={}, D=null, pinch=null;
+    function loc(e){var r=svg.getBoundingClientRect();return {x:e.clientX-r.left,y:e.clientY-r.top}}
+    svg.addEventListener("pointerdown",function(e){
+      try{svg.setPointerCapture(e.pointerId)}catch(err){} pts[e.pointerId]=loc(e); GR.touched=true;
+      var ids=Object.keys(pts);
+      if(ids.length===2){var a=pts[ids[0]],b=pts[ids[1]]; pinch={d:Math.hypot(a.x-b.x,a.y-b.y)||1}; if(D&&D.k&&GR.pos[D.k])GR.pos[D.k].drag=false; D=null; return}
+      var dot=e.target.closest(".gd"), l=loc(e);
+      D={k:dot?dot.dataset.k:null,x:l.x,y:l.y,tx:GR.tx,ty:GR.ty,moved:false};
+      if(D.k){var p=GR.pos[D.k]; D.px=p.x; D.py=p.y; p.drag=true}
+    });
+    svg.addEventListener("pointermove",function(e){
+      if(!pts[e.pointerId])return; pts[e.pointerId]=loc(e);
+      var ids=Object.keys(pts);
+      if(pinch&&ids.length===2){var a=pts[ids[0]],b=pts[ids[1]],d=Math.hypot(a.x-b.x,a.y-b.y)||1; grZoom(d/pinch.d,(a.x+b.x)/2,(a.y+b.y)/2); pinch.d=d; return}
+      if(!D)return; var l=loc(e), dx=l.x-D.x, dy=l.y-D.y;
+      if(!D.moved&&Math.abs(dx)+Math.abs(dy)<6)return; D.moved=true;
+      if(D.k){var p=GR.pos[D.k]; p.x=D.px+dx/GR.sc; p.y=D.py+dy/GR.sc; GR.alpha=Math.max(GR.alpha,.3)}
+      else{GR.tx=D.tx+dx; GR.ty=D.ty+dy}
+      grPaint();
+    });
+    function up(e){
+      delete pts[e.pointerId]; if(Object.keys(pts).length<2)pinch=null;
+      if(!D)return; var d=D; D=null;
+      if(d.k&&GR.pos[d.k])GR.pos[d.k].drag=false;
+      if(!d.moved){grSel(d.k&&d.k!==GR.sel?d.k:null); if(d.k)buzz(8)}
+    }
+    svg.addEventListener("pointerup",up); svg.addEventListener("pointercancel",up);
+    svg.addEventListener("wheel",function(e){e.preventDefault(); GR.touched=true; var l=loc(e); grZoom(e.deltaY<0?1.12:1/1.12,l.x,l.y)},{passive:false});
+  }
   // 내가 직접 연결한 말씀
   function hbLink(b,c){return "http://www.holybible.or.kr/"+(onDesktop()?"":"mobile/")+"B_GAE/cgi/bibleftxt.php?VR=GAE&VL="+(b+1)+"&CN="+c+"&CV=99"}
   function renderMyLinks(pn,n){
@@ -9454,7 +9688,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       li.querySelector(".xref").textContent=l.ref;
       if(ok)li.querySelector(".xgo").href=hbLink(r.book,r.chapter);
       if(have)li.querySelector(".xopen").dataset.id=have.id;
-      if(l.memo)li.querySelector(".xmemo").textContent=l.memo;
+      if(l.memo)li.querySelector(".xmemo").textContent=l.memo;   // 여러 줄 그대로 (.xmemo는 줄바꿈을 지킴)
       ul.appendChild(li);
     });
   }
