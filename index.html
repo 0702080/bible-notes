@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-16">
+<meta name="app-build" content="2026-10-22-17">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3032,7 +3032,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // → 다시 바꿈: PC(폭 900px 이상)에서는 무조건 칸반으로 연다 (2026-10-21 사용자 요청 세 번째). 휴대폰은 목록 그대로
   var boardOn=!!(window.matchMedia&&matchMedia("(min-width:900px)").matches);
   try{localStorage.setItem("bible-view",boardOn?"board":"list")}catch(e){}
-  var tdFold=false; try{tdFold=localStorage.getItem("bible-today-fold")==="1"}catch(e){}   // '오늘' 카드 접어 두기
+  var tdFold=true;   // '오늘' 카드는 앱을 열 때마다 접힌 채로 시작, 누르면 펼침 (2026-10-22 사용자 요청)
   var BCOLS=[{k:"new",t:"새로 담음",e:"🌱",c:"var(--muted)",tip:"아직 암송을 시작하지 않은 말씀"},{k:"doing",t:"외우는 중",e:"✏️",c:"var(--sky)",tip:"도장을 모으는 중"},{k:"due",t:"복습할 차례",e:"🔁",c:"var(--gold)",tip:"오늘 다시 떠올릴 말씀"},{k:"done",t:"다 외움",e:"🏅",c:"var(--green)",tip:"도장 4개를 다 받은 말씀"}];
   function boardCol(n){
     var c=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
@@ -8631,7 +8631,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var nd=new Date(); h.querySelector(".tddate").textContent=(nd.getMonth()+1)+"월 "+nd.getDate()+"일 ("+WD[nd.getDay()]+")";
     h.addEventListener("click",function(){
       if(filterText){bar.classList.toggle("fold");h.setAttribute("aria-expanded",String(!bar.classList.contains("fold")));return}   // 찾는 중에는 이번만 펼치기
-      tdFold=!tdFold; try{localStorage.setItem("bible-today-fold",tdFold?"1":"0")}catch(err){} renderReviewBar();
+      tdFold=!tdFold; renderReviewBar();
     });
     bar.appendChild(h);
     var sd=sayOfDay();
