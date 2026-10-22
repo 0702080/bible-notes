@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-19">
+<meta name="app-build" content="2026-10-22-20">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3232,7 +3232,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       return ab-bb||a.chapter-b.chapter||a.verse-b.verse||a.createdAt-b.createdAt;
     });
   }
-  function norm(t){return String(t||"").toLowerCase().replace(/\s+/g,"")}
+  // 키보드가 ㄹ+ㅁ을 겹받침 ㄻ으로 붙여도 초성 ㄹㅁ으로 찾음 (2026-10-22)
+  var JAMO2={"ㄳ":"ㄱㅅ","ㄵ":"ㄴㅈ","ㄶ":"ㄴㅎ","ㄺ":"ㄹㄱ","ㄻ":"ㄹㅁ","ㄼ":"ㄹㅂ","ㄽ":"ㄹㅅ","ㄾ":"ㄹㅌ","ㄿ":"ㄹㅍ","ㅀ":"ㄹㅎ","ㅄ":"ㅂㅅ"};
+  function norm(t){return String(t||"").toLowerCase().replace(/\s+/g,"").replace(/[ㄳㄵㄶㄺㄻㄼㄽㄾㄿㅀㅄ]/g,function(c){return JAMO2[c]})}
   /* 초성 검색: ㅅㅁ → 생명, 섞어서(생ㅁ)도 됨 */
   var CHO="ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ";
   function isCho(c){return CHO.indexOf(c)>=0}

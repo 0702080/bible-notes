@@ -997,8 +997,10 @@ function chosung(t){return Array.prototype.map.call(String(t),function(ch){
   var c=ch.charCodeAt(0);
   return (c>=0xAC00&&c<=0xD7A3)?CHO.charAt(Math.floor((c-0xAC00)/588)):ch;
 }).join("")}
+/* 키보드가 ㄹ+ㅁ을 겹받침 ㄻ으로 붙여 버려도 초성 ㄹㅁ으로 보고 찾음 (2026-10-22 사용자 요청) */
+var JAMO2={"ㄳ":"ㄱㅅ","ㄵ":"ㄴㅈ","ㄶ":"ㄴㅎ","ㄺ":"ㄹㄱ","ㄻ":"ㄹㅁ","ㄼ":"ㄹㅂ","ㄽ":"ㄹㅅ","ㄾ":"ㄹㅌ","ㄿ":"ㄹㅍ","ㅀ":"ㄹㅎ","ㅄ":"ㅂㅅ"};
 function bkHit(name,q){
-  var n=String(name).replace(/\s/g,""), w=String(q).replace(/\s/g,"");
+  var n=String(name).replace(/\s/g,""), w=String(q).replace(/\s/g,"").replace(/[ㄳㄵㄶㄺㄻㄼㄽㄾㄿㅀㅄ]/g,function(c){return JAMO2[c]});
   if(!w)return true;
   if(n.indexOf(w)>=0)return true;
   if(/^[ㄱ-ㅎ]+$/.test(w))return chosung(n).indexOf(w)>=0;
