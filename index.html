@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-8">
+<meta name="app-build" content="2026-10-22-9">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1876,8 +1876,10 @@ button:active{filter:brightness(1.15)}
 .ccbtn{height:48px;padding:0 18px;border:1px solid var(--rule);border-radius:24px;background:transparent;color:var(--muted);font-size:15px;font-weight:700;white-space:nowrap}
 .ccbtn.main{flex:1;min-width:150px;border:0;background:var(--gold);color:#17120A;font-size:16px}
 .ccres{text-align:center;padding:10px 0;font-family:var(--sans)}
+.ccvwrap.ccresult{width:100%}
+.ccvwrap.ccresult .ccvref{text-align:center}
 .ccr1{font-size:26px;font-weight:700;color:var(--ink);margin-bottom:12px}
-.ccstamps{justify-content:center;width:max-content;max-width:100%;margin:8px auto}
+.ccstamps,.ccres .srow.ccstamps{justify-content:center;width:max-content;max-width:100%;margin:8px auto!important}
 .ccr2{font-size:15px;color:var(--green);font-weight:700;margin-top:6px}
 .ccr3{font-size:15px;color:var(--sky);margin-top:12px}
 .ccr4{font-size:14px;color:var(--muted);margin-top:8px}
@@ -1953,7 +1955,7 @@ button:active{filter:brightness(1.15)}
 @media (max-width:899px){
   .ccfoot{width:92%;flex-wrap:nowrap;gap:8px}   /* 휴대폰: 아래 단추를 가로 한 줄로 (2026-10-21 사용자 요청) */
   .ccfoot .ccbtn,.ccfoot .ccbtn.main{flex:1 1 0;min-width:0;order:0;height:54px;padding:0 8px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .ccfoot .ccbtn.main{flex-grow:1.4}
+  .ccfoot .ccbtn.main{flex-grow:1;border:1px solid transparent}   /* 휴대폰: 아래 단추들 가로 폭을 똑같이 (2026-10-22 사용자 요청) */
 }
 .ccvwrap{width:fit-content;max-width:100%;margin:0 auto}   /* 말씀 덩어리는 화면 가운데, 글은 왼쪽 맞춤 (2026-10-21 사용자 요청) */
 .ccvref{cursor:pointer;margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
@@ -6733,7 +6735,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var vw=ccBox.querySelector(".ccvwrap"), vv=ccBox.querySelector(".ccverse"), ft=0;
         function fit(){
           vw.style.width="";
-          if(ccBox.hidden||(C&&C.edit)||!vv.firstChild)return;
+          var res=!!vv.querySelector(".ccres"); vw.classList.toggle("ccresult",res);   // 다 외운 화면은 구절 이름까지 가운데로
+          if(res||ccBox.hidden||(C&&C.edit)||!vv.firstChild)return;
           var rg=document.createRange(); rg.selectNodeContents(vv);
           var L=vv.getBoundingClientRect().left, R=0, rs=rg.getClientRects();
           for(var i=0;i<rs.length;i++)if(rs[i].width)R=Math.max(R,rs[i].right);
