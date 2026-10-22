@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-5">
+<meta name="app-build" content="2026-10-23-6">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2739,6 +2739,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 @media (hover:hover){.note .tab:hover{background:transparent;color:#D9D5E0}}
 .note .tab[aria-selected="true"]{background:transparent;color:var(--c);box-shadow:inset 0 -2px 0 var(--c)}
 .note .tab:focus:not(:focus-visible){outline:none}
+/* 카드 도구 줄: 글자 대신 예쁜 아이콘 (이름은 마우스를 올리면 보임, 2026-10-23 사용자 요청) */
+.note .focusrow{gap:4px 2px}
+.note .focusrow .useopen,.note .focusrow .vtopic,.note .focusrow .vxref,.note .focusrow .vctr,.note .focusrow .vrep,.note .focusrow .vrol,.note .focusrow .chapread.primary-read{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:34px;height:34px!important;padding:0 6px!important;border-radius:11px!important;font-size:0!important;color:#9D97AA;box-shadow:none!important}
+.note .focusrow .chapread.primary-read{font-size:12.5px!important;color:var(--orange);padding:0 10px 0 8px!important}
+.note .focusrow .useopen::before,.note .focusrow .vtopic::before,.note .focusrow .vxref::before,.note .focusrow .vctr::before,.note .focusrow .vrep::before,.note .focusrow .vrol::before,.note .focusrow .chapread.primary-read::before{
+  content:"";display:block!important;flex:0 0 auto;width:19px;height:19px;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
+.note .focusrow .chapread.primary-read{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 5.5c3-1.3 6-1.3 9 .7 3-2 6-2 9-.7v13c-3-1.3-6-1.3-9 .7-3-2-6-2-9-.7z'/%3E%3Cpath d='M12 6.2v13.5'/%3E%3C/svg%3E")}
+.note .focusrow .useopen{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18h6M10 21h4'/%3E%3Cpath d='M12 3a6 6 0 0 0-3.6 10.8c.7.5 1.1 1.3 1.1 2.2h5c0-.9.4-1.7 1.1-2.2A6 6 0 0 0 12 3z'/%3E%3C/svg%3E")}
+.note .focusrow .vtopic{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 3 7 21M17 3l-2 18M4 8.5h16M3 15.5h16'/%3E%3C/svg%3E")}
+.note .focusrow .vxref{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1'/%3E%3Cpath d='M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1'/%3E%3C/svg%3E")}
+.note .focusrow .vctr{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 3.5v17'/%3E%3Cpath d='M12 5.5a6.5 6.5 0 0 1 0 13' stroke-width='5' stroke-linecap='butt'/%3E%3C/svg%3E")}
+.note .focusrow .vrep{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 2.5 20.5 6 17 9.5'/%3E%3Cpath d='M3.5 11V9.5A3.5 3.5 0 0 1 7 6h13.5'/%3E%3Cpath d='M7 21.5 3.5 18 7 14.5'/%3E%3Cpath d='M20.5 13v1.5A3.5 3.5 0 0 1 17 18H3.5'/%3E%3C/svg%3E")}
+.note .focusrow .vrol{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5'/%3E%3Cpath d='M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.7.8 2.7 2.5 3 5.2'/%3E%3C/svg%3E")}
+.note .focusrow .vrep[data-n]:not([data-n=""])::after{content:attr(data-n);font-size:11px;font-weight:700}
+@media (hover:hover){.note .focusrow .useopen:hover,.note .focusrow .vtopic:hover,.note .focusrow .vxref:hover,.note .focusrow .vctr:hover,.note .focusrow .vrep:hover,.note .focusrow .vrol:hover,.note .focusrow .chapread.primary-read:hover{background:#1E1D24!important;color:#fff}}
+.note .focusrow .useopen[aria-expanded="true"],.note .focusrow .vxref[aria-expanded="true"],
+.note .focusrow .vctr[aria-pressed="true"],.note .focusrow .vrep[aria-pressed="true"],.note .focusrow .vrol[aria-pressed="true"]{background:color-mix(in srgb,var(--mint) 16%,transparent)!important;color:var(--mint)}
+
 .note .qbtns{gap:16px;margin-left:0}
 .note .qbtns .addbtn.s{height:28px;padding:0;border:0;background:transparent;font-size:13px}
 .note .qbtns .mpriv{height:28px;padding:0;border:0;border-radius:0;background:transparent;color:#8E889A;font-size:12.5px;font-weight:400}
@@ -3936,7 +3955,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       '<div class="ctlegend" hidden></div>'+
       '<div class="hits"></div>'+
       '<div class="editbox" hidden><input class="field eref" aria-label="성경 구절"><textarea class="field etext" aria-label="말씀"></textarea><div class="lmvbox" tabindex="-1" hidden></div><div class="lmvbar"><button type="button" class="lmvbtn">↕ 줄 옮기기</button><span class="lmvtip">PC: Alt + ↑↓</span></div><button type="button" class="small donedit">완료</button></div>'+
-      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false">언제 쓸까</button><button type="button" class="vtopic">주제 정하기</button><button type="button" class="vxref" aria-expanded="false">연결 말씀</button><button type="button" class="vctr" aria-pressed="false">대조</button><button type="button" class="vrep" aria-pressed="false">반복</button><button type="button" class="vrol" aria-pressed="false">역할</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
+      '<div class="focusrow"><button type="button" class="chapread primary-read" hidden></button><button type="button" class="useopen" aria-expanded="false" title="언제 쓸까">언제 쓸까</button><button type="button" class="vtopic" title="주제 정하기">주제 정하기</button><button type="button" class="vxref" aria-expanded="false" title="연결 말씀">연결 말씀</button><button type="button" class="vctr" aria-pressed="false" title="대조">대조</button><button type="button" class="vrep" aria-pressed="false" title="반복">반복</button><button type="button" class="vrol" aria-pressed="false" title="역할">역할</button><div class="topics"></div><a class="chapmain" hidden></a><a class="chapgae" hidden></a><span class="fpills"><button type="button" class="fbtn" data-f="S" aria-pressed="false">주어</button><button type="button" class="fbtn" data-f="V" aria-pressed="false">동사</button><button type="button" class="fbtn" data-f="O" aria-pressed="false">목적어</button><button type="button" class="fbtn pickb" data-f="P" aria-pressed="false">직접 고르기</button><button type="button" class="fselbold" hidden>드래그한 글자 진하게</button><button type="button" class="fclear" hidden>모두 지우기</button></span><span class="fmsg" aria-live="polite"></span></div>'+
       '<div class="xpanel" hidden></div>'+
       '<div class="usepanel" hidden></div>'+
       '<div class="mempanel" hidden></div>'+
@@ -4140,7 +4159,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var cg=el.querySelector(".chapgae");
     var cm=el.querySelector(".chapmain");
     if(cl){
-      cr.hidden=false; cr.textContent=n.chapter+(n.book===18?"편":"장")+" 전체 읽기"; cr.setAttribute("aria-label",chapLabel(n)+" 전체를 앱 안에서 읽기");
+      cr.hidden=false; cr.textContent=n.chapter+(n.book===18?"편":"장"); cr.title=n.chapter+(n.book===18?"편":"장")+" 전체 읽기"; cr.setAttribute("aria-label",chapLabel(n)+" 전체를 앱 안에서 읽기");
       cm.hidden=false; cm.href=cl.bs; cm.textContent="개역개정"; cm.setAttribute("aria-label",chapLabel(n)+" 전체를 대한성서공회 개역개정으로 읽기");
       cg.hidden=true; cm.hidden=true;
       var mg=el.querySelector(".mgae"); if(mg){mg.hidden=false;mg.href=cl.bs}
@@ -10282,7 +10301,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(ctb)ctb.setAttribute("aria-pressed",String(ctOn));
     if(rpb)rpb.setAttribute("aria-pressed",String(rpOn));
     if(rlb)rlb.setAttribute("aria-pressed",String(rlOnv));
-    if(rpb&&!rpOn)rpb.textContent="반복";
+    if(rpb&&!rpOn){rpb.textContent="반복";rpb.dataset.n=""}
     if(lgEl)lgEl.hidden=!(ctOn||rpOn||rlOnv);
     v.classList.remove("picking","has","vnum","vlines");
     if((ctOn||rpOn||rlOnv)&&!mode){   // 대조·비교 / 반복 / 역할 보기
@@ -10296,7 +10315,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         rres.items=rres.items.filter(function(x){return x.gi===rpIdx});
         rres.items.forEach(function(x){x.k=x.k+"  ("+(rpIdx+1)+"/"+rpTot+")"});
       }
-      if(rpb)rpb.textContent=(rpOn&&rpTot)?("반복 "+(rpIdx+1)+"/"+rpTot):"반복";
+      if(rpb){rpb.textContent=(rpOn&&rpTot)?("반복 "+(rpIdx+1)+"/"+rpTot):"반복"; rpb.dataset.n=(rpOn&&rpTot)?(rpIdx+1)+"/"+rpTot:""}
       var top=cres.marks.concat(rres.marks);
       var rlres=rlOnv?roleFind(n.text):{marks:[]};
       var rlm=rlres.marks.filter(function(m){return !top.some(function(t){return m.s<t.e&&t.s<m.e})});
