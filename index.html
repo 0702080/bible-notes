@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-22-5">
+<meta name="app-build" content="2026-10-22-6">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1502,11 +1502,15 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
   .bcol.lmdrag{opacity:.45}
   .blist .bch{cursor:grab} .blist .bcard{cursor:grab}
   body.lmmoving,body.lmmoving *{cursor:grabbing!important;user-select:none!important}
-  .lmghost{position:fixed;z-index:300;pointer-events:none;opacity:.85;overflow:hidden;transform:rotate(1.5deg);box-shadow:0 12px 30px rgba(0,0,0,.5);margin:0}
+  .lmghost,.bcard.lmghost,.bcol.lmghost{position:fixed!important;z-index:300;pointer-events:none;opacity:.95!important;overflow:hidden;transform:rotate(2deg) scale(1.03)!important;margin:0;animation:none!important;
+    background:#22212A!important;border:2px solid var(--gold)!important;box-shadow:0 18px 40px rgba(0,0,0,.6),0 0 0 4px color-mix(in srgb,var(--gold) 22%,transparent)!important}
+  .bcard.lmdrag{outline:2px dashed color-mix(in srgb,var(--gold) 60%,transparent);outline-offset:-2px}
+  .bcard.lmland{animation:lmland 2s ease-out!important}
+  @keyframes lmland{0%,35%{box-shadow:0 0 0 3px var(--gold),0 0 26px color-mix(in srgb,var(--gold) 55%,transparent);border-color:var(--gold)}100%{box-shadow:0 0 0 0 transparent}}
   .bcol.lmover{background:color-mix(in srgb,var(--violet) 10%,#141417);border-color:var(--violet)}
   .bcard.lmdrag{opacity:.35}
-  .bcard.lmbefore{box-shadow:0 -3px 0 0 var(--gold)}
-  .bcard.lmafter{box-shadow:0 3px 0 0 var(--gold)}
+  .bcard.lmbefore{box-shadow:0 -5px 0 0 var(--gold),0 -12px 18px -6px color-mix(in srgb,var(--gold) 60%,transparent)}
+  .bcard.lmafter{box-shadow:0 5px 0 0 var(--gold),0 12px 18px -6px color-mix(in srgb,var(--gold) 60%,transparent)}
   .viewseg{display:inline-flex;flex:0 0 auto;padding:3px;gap:2px;border:1px solid var(--rule);border-radius:19px;background:rgba(255,255,255,.03);white-space:nowrap}
   .viewseg button{display:inline-flex;flex:0 0 auto;white-space:nowrap;align-items:center;gap:6px;height:30px;padding:0 13px;border:0;border-radius:15px;background:transparent;color:var(--muted);font-size:13.5px;transition:background .2s,color .2s}
   .viewseg button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
@@ -10685,6 +10689,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(n.order!==o){n.order=o; ch=true} if(ch)scheduleSave(id,600)});
     if(sortMode!=="custom"){setSortMode("custom"); syncSortBtn()}
     render(); buzz(12);
+    // 옮겨진 자리를 바로 알아보게: 그 카드로 화면을 옮기고 금빛으로 반짝 (2026-10-22 사용자 요청)
+    var first=null;
+    movedIds.forEach(function(id){var c=$("board").querySelector('.bcard[data-id="'+id+'"]'); if(!c)return; if(!first)first=c; c.classList.remove("lmland"); void c.offsetWidth; c.classList.add("lmland"); setTimeout(function(){c.classList.remove("lmland")},2200)});
+    if(first)try{first.scrollIntoView({block:"nearest",inline:"nearest",behavior:"smooth"})}catch(e){first.scrollIntoView()}
   }
   // 브라우저 기본 끌기(HTML5 drag)는 PC에서 자주 끊겨서, 마우스 누르고 움직이는 것으로 직접 끎 (2026-10-21)
   var lmP=null;
