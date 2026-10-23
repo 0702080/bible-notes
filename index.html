@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-14">
+<meta name="app-build" content="2026-10-23-15">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1682,6 +1682,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 /* 내가 만든 칸 */
 .bcol.bcust{border-color:color-mix(in srgb,var(--gold) 30%,#38343F);background:color-mix(in srgb,var(--gold) 4%,#272530)}
 .bcol.bcust .bch b{color:var(--gold)}
+.bcol.bcust.lmland{animation:lmland 2s ease-out}
 .bcempty{margin:6px 4px;padding:22px 10px;border:1.5px dashed #3A3744;border-radius:12px;text-align:center;font-size:12.5px;color:var(--faint)}
 .bcdel{flex:0 0 auto;width:26px;height:26px;margin-left:2px;padding:0;border:0;border-radius:13px;background:transparent;color:var(--faint);font-size:0;display:grid;place-items:center}
 .bcdel::before{content:"×";font-size:17px;line-height:1}
@@ -9932,7 +9933,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!t){toast("주제를 적어 주세요");return}
     var made=0, tagged=0, now=Date.now(), minOrder=Infinity, chs=myChapters();
     notes.forEach(function(x){if(x.order!=null&&x.order<minOrder)minOrder=x.order});
-    function tag(x){if(x.topics.indexOf(t)<0){x.topics.push(t);tagged++;scheduleSave(x.id)}}
+    function tag(x){var ch=false; if(x.topics.indexOf(t)<0){x.topics.push(t);tagged++;ch=true} if(x.col!==t){x.col=t;ch=true} if(ch)scheduleSave(x.id)}   // 주제 이름의 칸반 칸에도 넣음
     tag(n);
     n.links.slice().reverse().forEach(function(l,i){
       var r=parseRef(l.ref); if(!(r.book>=0&&r.chapter>0))return;
@@ -9941,11 +9942,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var txt=String(l.memo||"").trim();
       if(!txt){var ch=chs[USFM[r.book]+"-"+r.chapter], vv=ch&&r.verse?ch.v.filter(function(x){return x.v===r.verse})[0]:null; if(vv)txt=vv.t}
       var nn=cleanNote({id:uid(),ref:l.ref,text:txt,book:r.book,chapter:r.chapter,verse:r.verse,meds:[{id:mid(),text:"",at:now}],qs:[],
-        order:isFinite(minOrder)?(minOrder-=1000):null,topics:[t],tw:{},createdAt:now+i});
+        order:isFinite(minOrder)?(minOrder-=1000):null,topics:[t],col:t,tw:{},createdAt:now+i});
       notes.set(nn.id,nn); scheduleSave(nn.id,0); made++;
     });
-    setTopics([t]); render();
-    toast(made?("말씀 "+made+"개를 새로 담고 #"+t+" 주제를 붙였어요"):("#"+t+" 주제를 붙였어요"));
+    var cs=myCols(); if(cs.indexOf(t)<0){cs.push(t);saveCols(cs)}
+    // PC는 칸반으로 가서 새 '#주제' 칸을 보여 주고, 휴대폰은 그 주제 말씀만 모아 보여 줌 (2026-10-23 사용자 요청)
+    soloId=null; soloFrom="";
+    if(boardWide()){setTopics([]); if(bMode!=="list"){bMode="list";try{localStorage.setItem("bible-board-mode","list")}catch(e){}} setBoard(true);
+      setTimeout(function(){var bd=$("board"),cl=bd&&bd.querySelector('.bcol[data-cc="'+t.replace(/"/g,'\\"')+'"]'); if(cl){cl.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"}); cl.classList.add("lmland"); setTimeout(function(){cl.classList.remove("lmland")},2200)}},120)}
+    else{setTopics([t]); render()}
+    toast((made?"말씀 "+made+"개를 새로 담고 ":"")+"'"+t+"' 칸에 모았어요");
     buzz([12,40,12]);
   }
   function addMyLink(card,n,f){
