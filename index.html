@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-19">
+<meta name="app-build" content="2026-10-24-20">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2652,6 +2652,27 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 @media (max-width:430px){.dlgsd{padding:0 8px;font-size:12px}.dlgh:has(.dlgsd){gap:4px}}
 .dlgsd input{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;cursor:pointer;color-scheme:dark}
 .dlgsd+.dlghgrip{margin-left:4px}
+@media (hover:hover) and (pointer:fine){.dlpick,.dlgsd input{pointer-events:none}}
+.dpop{position:fixed;z-index:400;width:272px;padding:12px;border:1px solid #34333A;border-radius:16px;background:#1A1920;box-shadow:0 16px 40px rgba(0,0,0,.6);color:var(--ink);font-size:13.5px;animation:dpin .16s ease-out}
+@keyframes dpin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.dph{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.dpt{border:0;background:transparent;color:var(--ink);font-size:15px;font-weight:700;padding:4px 8px;border-radius:8px;cursor:pointer}
+.dpnav{display:flex;gap:4px}
+.dpnav button{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:15px;background:transparent;color:var(--ink);font-size:18px;line-height:1;cursor:pointer}
+.dpg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+.dpw span{text-align:center;font-size:11.5px;color:var(--faint);padding:4px 0}
+.dpw span:first-child{color:#F28B82}
+.dpd{height:34px;border:0;border-radius:10px;background:transparent;color:var(--ink);font-size:13.5px;cursor:pointer;font-variant-numeric:tabular-nums}
+.dpd.out{color:#5A5962}
+.dpd.td{box-shadow:inset 0 0 0 1px var(--sky)}
+.dpd.on{background:var(--sky);color:#0B0B0D;font-weight:700}
+.dpd:disabled{opacity:.25;cursor:default}
+.dpm{grid-template-columns:repeat(4,1fr);gap:6px}
+.dpm .dpd{height:42px}
+.dpf{display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #2A2930}
+.dpf button{border:0;background:transparent;color:var(--sky);font-size:13px;padding:4px 8px;border-radius:8px;cursor:pointer}
+.dpx{color:var(--faint)!important}
+@media (hover:hover){.dpt:hover,.dpnav button:hover,.dpd:not(:disabled):not(.on):hover,.dpf button:hover{background:#2A2930}}
 @media (hover:hover){.dlgsd:hover{color:var(--ink)}}
 .dlgrp.dlgdrag .dlghgrip{cursor:grabbing;color:var(--gc,var(--gold))}
 .dlgchev{display:inline-block;width:7px;height:7px;margin-left:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .18s;opacity:.7}
@@ -7900,6 +7921,58 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   var dl=null, dlDay="", dlWEnd="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set(), dlmTap={id:"",t:0};
   try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
   function saveGFold(){try{localStorage.setItem("bible-daily-gfold",JSON.stringify(Array.from(dlGFold)))}catch(e){}}
+  // PC 달력 팝업: 브라우저 기본 달력은 모서리를 둥글게 못 해서 직접 그림 (휴대폰은 기본 달력, 2026-10-24 사용자 요청)
+  var DP_FINE=window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches;
+  function dpOpen(anchor,input,clear){
+    dpClose();
+    var max=input.max||"", sel=input.value||"", base=sel||max||dkey(Date.now());
+    var y=+base.slice(0,4), m=+base.slice(5,7)-1, mode="d";
+    var pop=document.createElement("div"); pop.className="dpop"; pop.setAttribute("role","dialog"); pop.setAttribute("aria-label","날짜 고르기");
+    document.body.appendChild(pop);
+    function pick(v){input.value=v; input.dispatchEvent(new Event("change",{bubbles:true})); dpClose()}
+    function draw(){
+      var h='<div class="dph"><button type="button" class="dpt">'+(mode==="d"?y+"년 "+(m+1)+"월":y+"년")+' ▾</button><span class="dpnav"><button type="button" class="dpp" aria-label="이전"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button><button type="button" class="dpn" aria-label="다음"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button></span></div>';
+      if(mode==="d"){
+        h+='<div class="dpg dpw">'+["일","월","화","수","목","금","토"].map(function(w){return "<span>"+w+"</span>"}).join("")+'</div><div class="dpg">';
+        var first=new Date(y,m,1,12), start=first.getTime()-first.getDay()*864e5, today=dkey(Date.now());
+        for(var i=0;i<42;i++){
+          var k=dkey(start+i*864e5), dd=+k.slice(8), out=+k.slice(5,7)-1!==m;
+          if(i===35&&out)break;
+          h+='<button type="button" data-k="'+k+'" class="dpd'+(out?" out":"")+(k===sel?" on":"")+(k===today?" td":"")+'"'+(max&&k>max?" disabled":"")+'>'+dd+'</button>';
+        }
+        h+='</div>';
+      }else{
+        h+='<div class="dpg dpm">';
+        for(var j=0;j<12;j++){var mk=y+"-"+String(j+1).padStart(2,"0"); h+='<button type="button" data-m="'+j+'" class="dpd'+(sel.slice(0,7)===mk?" on":"")+'"'+(max&&mk>max.slice(0,7)?" disabled":"")+'>'+(j+1)+'월</button>'}
+        h+='</div>';
+      }
+      h+='<div class="dpf">'+(clear?'<button type="button" class="dpx">지우기</button>':'<span></span>')+'<button type="button" class="dptd">오늘</button></div>';
+      pop.innerHTML=h;
+    }
+    draw();
+    pop.addEventListener("click",function(e){
+      e.stopPropagation();
+      var b=e.target.closest("button"); if(!b||b.disabled)return;
+      if(b.classList.contains("dpt")){mode=mode==="d"?"m":"d"; draw(); return}
+      if(b.classList.contains("dpp")||b.classList.contains("dpn")){var s=b.classList.contains("dpp")?-1:1; if(mode==="d"){m+=s; if(m<0){m=11;y--} if(m>11){m=0;y++}}else y+=s; draw(); return}
+      if(b.dataset.m){m=+b.dataset.m; mode="d"; draw(); return}
+      if(b.dataset.k){pick(b.dataset.k); return}
+      if(b.classList.contains("dptd")){pick(dkey(Date.now())); return}
+      if(b.classList.contains("dpx")){pick(""); return}
+    });
+    var r=anchor.getBoundingClientRect(), pw=pop.offsetWidth, ph=pop.offsetHeight;
+    var left=Math.max(8,Math.min(innerWidth-pw-8,r.left+r.width/2-pw/2)), top=r.bottom+6;
+    if(top+ph>innerHeight-8)top=Math.max(8,r.top-ph-6);
+    pop.style.left=left+"px"; pop.style.top=top+"px";
+    dpOpen.cur=pop;
+    setTimeout(function(){document.addEventListener("pointerdown",dpOut,true); document.addEventListener("keydown",dpKey,true)},0);
+  }
+  function dpOut(e){if(dpOpen.cur&&!dpOpen.cur.contains(e.target))dpClose()}
+  function dpKey(e){if(e.key==="Escape"){e.stopPropagation();dpClose()}}
+  function dpClose(){
+    if(dpOpen.cur){dpOpen.cur.remove(); dpOpen.cur=null}
+    document.removeEventListener("pointerdown",dpOut,true); document.removeEventListener("keydown",dpKey,true);
+  }
   // 날짜 위치 막대: 처음 기록한 날(적어도 30일 전)부터 오늘까지
   function dlRange(o,today){
     var a=dkey(Date.now()-29*864e5);
@@ -7963,6 +8036,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       // 날짜를 누르면 달력에서 바로 고르기 — 몇 달 전으로도 쉽게 (2026-10-24 사용자 요청)
       var dpk=dl.querySelector(".dlpick");
       dpk.addEventListener("click",function(){try{dpk.showPicker()}catch(err){}});
+      dl.querySelector(".dldatew").addEventListener("click",function(e){if(DP_FINE){e.preventDefault();dpOpen(this,dpk,false)}});
       dpk.addEventListener("change",function(){var v=dpk.value, t=dkey(Date.now()); if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return; if(v>t)v=t; if(v!==dlDay){dlDay=v;drawDaily()}});
       dl.querySelector(".dlprev").addEventListener("click",function(){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()-864e5);drawDaily()});
       dl.querySelector(".dlnext").addEventListener("click",function(){var t=dkey(Date.now());if(dlDay<t){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()+864e5);drawDaily()}});
@@ -8455,6 +8529,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           else st.textContent="📅 시작 날짜";
           var si2=document.createElement("input"); si2.type="date"; si2.value=gsd; si2.setAttribute("aria-label","'"+g.t+"' 시작 날짜");
           si2.addEventListener("click",function(){try{this.showPicker()}catch(err){}});
+          sl.addEventListener("click",function(e){if(DP_FINE){e.preventDefault();dpOpen(this,this.querySelector("input"),true)}});
           si2.addEventListener("change",(function(gg){return function(){
             var d=dailyData(); if(!d.gstart||typeof d.gstart!=="object")d.gstart={};
             if(/^\d{4}-\d{2}-\d{2}$/.test(this.value))d.gstart[gg]=this.value; else delete d.gstart[gg];
