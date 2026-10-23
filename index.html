@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-22">
+<meta name="app-build" content="2026-10-23-23">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7057,7 +7057,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",dict:null,edit:false,anim:true,seen:opt.seen||{},order:opt.order||1};
     ccBox.querySelector(".ccref").textContent=n.ref;
     ccBox.querySelector(".ccvref").textContent=n.ref;   // 말씀 바로 위에 구절 이름 (2026-10-21 사용자 요청)
-    var cn=ccBox.querySelector(".ccnum"); cn.hidden=C.order<2; cn.textContent=C.order+"번째";   // 밀어서 이어 외울 때 몇 번째 말씀인지
+    var cn=ccBox.querySelector(".ccnum"); cn.hidden=false; cn.textContent=C.order+"번째";   // 몇 번째 말씀인지 — 첫 말씀부터 늘 보임 (2026-10-23 사용자 요청)
     if(C.order>=2){cn.classList.remove("bump");void cn.offsetWidth;cn.classList.add("bump")}
     var wasOpen=!ccBox.hidden;
     ccBox.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
