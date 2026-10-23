@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-32">
+<meta name="app-build" content="2026-10-24-33">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2762,6 +2762,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .rmmake{width:100%;margin-top:14px}
 .rmtry,.rmclose{height:38px;padding:0 14px;margin:0 6px 0 0;border:1px solid #34333A;border-radius:19px;background:transparent;color:var(--muted);font-size:13.5px}
 .sayhvl{display:flex;align-items:flex-start;gap:8px;margin:8px 0;font-size:13px;line-height:1.5;color:var(--muted);cursor:pointer}
+.sayhvl[hidden]{display:none}
 .sayhvl input{width:18px;height:18px;margin-top:1px;accent-color:var(--gold);flex:0 0 auto}
 .sayhvtag{color:var(--gold)!important;border-color:color-mix(in srgb,var(--gold) 45%,transparent)!important}
 .saycard.hv{border-left-color:var(--gold)}
@@ -3039,6 +3040,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     <details class="menu" id="topMenu"><summary class="tbtn" aria-label="더보기">⋯</summary>
       <div class="pop">
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
+        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button>
         <button type="button" id="openMedBtn">📅 묵상 진도표</button>
         <button type="button" id="openMemBtn">🏅 암송 도장판</button>
         <button type="button" id="openProgBtn">✅ 실천 진도표</button>
@@ -9541,7 +9543,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   var say=null;
   function closeSay(){if(!say)return; say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
-  function openSay(focus){
+  // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 매시 00분에 나옴
+  var sayMode="s";
+  function openSay(focus,mode){
+    sayMode=mode==="v"?"v":"s";
     if(!say){
       say=document.createElement("div"); say.className="daily saysheet"; say.setAttribute("role","dialog"); say.setAttribute("aria-modal","true"); say.hidden=true;
       say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose">닫기</button></div>'+
@@ -9562,6 +9567,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&say&&!say.hidden)closeSay()});
     }
     sayEdit=focus==="new"?"new":"";
+    say.querySelector(".dltitle").textContent=sayMode==="v"?"📖 짧은 말씀 한 구절":"💬 믿음의 한 마디";
+    say.querySelector(".sayadd").textContent=sayMode==="v"?"+ 말씀 담기":"+ 한 마디 담기";
     say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawSay();
     if(sayEdit==="new"){var ta=say.querySelector(".sayt"); if(ta)setTimeout(function(){ta.focus()},40)}
@@ -9573,15 +9580,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(sayEdit){
       var cur=sayEdit==="new"?{t:"",who:"",topic:"",note:""}:(o.items.filter(function(x){return x.id===sayEdit})[0]||{t:"",who:"",topic:"",note:""});
       var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=600; ta.value=cur.t||"";
-      ta.placeholder="한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
+      ta.placeholder=sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
       var row=document.createElement("div"); row.className="sayrow2";
-      var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder="말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
+      var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="v"?"구절 (예: 로마서 12:21)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
       row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
       var hvl=document.createElement("label"); hvl.className="sayhvl";
       hvl.innerHTML='<input type="checkbox" class="sayhv"><span>⏰ 정각 말씀 — 매시 00분(12:00, 13:00 …)에 나와요. 말한 분 칸에 구절(예: 로마서 12:21)을 적어 주세요</span>';
-      hvl.querySelector("input").checked=!!cur.hv; form.appendChild(hvl);
+      hvl.querySelector("input").checked=sayMode==="v"; hvl.hidden=true; form.appendChild(hvl);
       var row2=document.createElement("div"); row2.className="sayrow2";
       var sel=document.createElement("select"); sel.className="field saynote"; sel.setAttribute("aria-label","붙일 말씀");
       var o0=document.createElement("option"); o0.value=""; o0.textContent="📖 말씀 없음"; sel.appendChild(o0);
@@ -9593,10 +9600,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       row2.appendChild(cn); row2.appendChild(sv); form.appendChild(row2);
     }
     list.textContent="";
-    var items=sayOrdered(o);
+    var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:!x.hv});
     if(!items.length&&!sayEdit){
       var em=document.createElement("p"); em.className="sayempty";
-      em.textContent="아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
+      em.textContent=sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 매시 00분에 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
       list.appendChild(em); return;
     }
     items.forEach(function(x){
@@ -9607,7 +9614,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var f=document.createElement("div"); f.className="sayf";
       if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
       if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
-      if(x.hv){var hvt=document.createElement("span"); hvt.className="saytag sayhvtag"; hvt.textContent="⏰ 정각 말씀"; f.appendChild(hvt); c.classList.add("hv")}
+      if(x.hv){var hvt=document.createElement("span"); hvt.className="saytag sayhvtag"; hvt.textContent="⏰ 매시 00분"; f.appendChild(hvt); c.classList.add("hv")}
       if(x.note&&notes.has(x.note)){
         var nb=document.createElement("button"); nb.type="button"; nb.className="saynotebtn"; nb.dataset.act="note"; nb.dataset.note=x.note;
         nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
@@ -9664,7 +9671,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var ids=[].slice.call(list.querySelectorAll(".saycard")).map(function(c){return c.dataset.id});
       var o=sayData(), old=sayOrdered(o).map(function(x){return x.id}).filter(function(id){return ids.indexOf(id)>=0});
       if(old.join()===ids.join())return;
-      o.ord=ids; o.ordAt=Date.now(); saveSay(o); renderReviewBar(); toast("순서를 바꿨어요");
+      o.ord=ids.concat((Array.isArray(o.ord)?o.ord:[]).filter(function(x){return ids.indexOf(x)<0})); o.ordAt=Date.now();   // 다른 코너(한 마디/말씀) 순서는 그대로 saveSay(o); renderReviewBar(); toast("순서를 바꿨어요");
     }
     list.addEventListener("pointerdown",function(e){
       if(sayEdit||e.button>0)return;
@@ -9915,7 +9922,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(sd.who){var w=document.createElement("small"); w.textContent="— "+sd.who; q.appendChild(w)}
     var pb=document.createElement("button"); pb.type="button"; pb.className="saypin"+(isPin?" on":""); pb.dataset.sid=sd.id;
     pb.textContent="📌"; pb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; pb.setAttribute("aria-label",pb.title); pb.setAttribute("aria-pressed",String(isPin));
-    q.addEventListener("click",function(){openSay()}); pb.addEventListener("click",function(){sayTogglePin(sd.id)});
+    q.addEventListener("click",function(){openSay(null,sd.hv?"v":"s")}); pb.addEventListener("click",function(){sayTogglePin(sd.id)});
     bs.appendChild(q); bs.appendChild(pb);
     if(next){q.classList.add("bsin"); setTimeout(function(){q.classList.remove("bsin")},700)}
   }
@@ -10439,6 +10446,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     body.appendChild(bg);
   }
   $("openSayBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay()});
+  $("openVerseBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"v")});
   $("openMedBtn").addEventListener("click",openMedProgress);
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
   $("openGraphBtn").addEventListener("click",function(){openGraph(null)});
