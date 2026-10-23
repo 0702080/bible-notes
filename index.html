@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-22">
+<meta name="app-build" content="2026-10-23-23">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1990,6 +1990,8 @@ button:active{filter:brightness(1.15)}
 .ccw.got{color:var(--bc);font-weight:600}
 .ccw.flip{animation:bwflip .42s cubic-bezier(.2,1.5,.4,1)}
 .ccres{animation:bqres .5s cubic-bezier(.2,1.5,.4,1)}
+.ccbody{position:relative}
+.ccbody>.ccnum{position:absolute;right:20px;top:0;z-index:2}
 .ccnum{align-self:center;padding:1px 8px;border-radius:9px;background:color-mix(in srgb,var(--violet) 18%,transparent);color:var(--violet);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
 .ccnum[hidden]{display:none}
 .ccnum.bump{animation:ccpop .55s cubic-bezier(.2,1.6,.4,1)}
@@ -6975,9 +6977,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
       ccBox=document.createElement("div"); ccBox.className="cch"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
-      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b><small class="ccnum" hidden></small></div></div>'+
+      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b></div></div>'+
         '<div class="ccsteps" aria-hidden="true"></div>'+
-        '<div class="ccbody"><div class="cctip"></div><div class="ccmid"><div class="ccvwrap"><div class="ccvref"></div><div class="ccverse"></div></div></div></div>'+
+        '<div class="ccbody"><small class="ccnum" hidden></small><div class="cctip"></div><div class="ccmid"><div class="ccvwrap"><div class="ccvref"></div><div class="ccverse"></div></div></div></div>'+
         '<div class="ccfoot"></div>';
       document.body.appendChild(ccBox);
       // 결과 화면에서 오른쪽 → 왼쪽으로 밀면 다음 암송 말씀
@@ -7190,7 +7192,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     ccDraw0();
     var mid=ccBox&&ccBox.querySelector(".ccmid"), tp=ccBox&&ccBox.querySelector(".cctip");
     if(mid&&tp)mid.style.paddingBottom=Math.round(tp.offsetHeight||0)+"px";
+    ccNumPlace(); clearTimeout(ccNumT); ccNumT=setTimeout(ccNumPlace,450);   // 밀려 들어오는 움직임이 끝난 뒤 한 번 더
   }
+  var ccNumT=0;
+  // "N번째"는 구절 이름 줄 높이, 화면 오른쪽 끝에 (떠올리기 단계 아래, 2026-10-23 사용자 요청)
+  function ccNumPlace(){
+    if(!ccBox||ccBox.hidden)return;
+    var cn=ccBox.querySelector(".ccnum"), rf=ccBox.querySelector(".ccvref"), bd=ccBox.querySelector(".ccbody"); if(!cn||!rf||!bd)return;
+    if(cn.hidden||!rf.offsetHeight){cn.style.top="";return}
+    var br=bd.getBoundingClientRect(), rr=rf.getBoundingClientRect();
+    cn.style.top=Math.round(rr.top-br.top+bd.scrollTop+(rr.height-(cn.offsetHeight||20))/2)+"px";
+  }
+  window.addEventListener("resize",function(){requestAnimationFrame(ccNumPlace)});
   function ccDraw0(){
     var n=notes.get(C.id); if(!n){closeCoach();return}
     if(!C.roles||C.rolesSrc!==n.text){C.roles=ccRoles(n);C.rolesSrc=n.text}
