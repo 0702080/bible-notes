@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-26">
+<meta name="app-build" content="2026-10-23-27">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2040,7 +2040,7 @@ button:active{filter:brightness(1.15)}
   .ccfoot .ccbtn,.ccfoot .ccbtn.main{flex:1 1 0;min-width:0;order:0;height:54px;padding:0 8px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ccfoot .ccbtn.main{flex-grow:1;border:1px solid transparent}   /* 휴대폰: 아래 단추들 가로 폭을 똑같이 (2026-10-22 사용자 요청) */
 }
-.ccvwrap{width:100%;max-width:560px;margin:0 auto}   /* 말씀은 짧든 길든 늘 같은 자리(왼쪽 줄)에서 시작 — 휴대폰은 왼쪽 맞춤, 넓은 화면은 560px 덩어리를 가운데 (2026-10-23 사용자 요청, 예전엔 글 길이만큼 가운데) */
+.ccvwrap{width:100%;max-width:560px;margin:0 auto;box-sizing:border-box}   /* 말씀은 짧든 길든 늘 같은 자리(왼쪽 줄)에서 시작 — 휴대폰은 왼쪽 맞춤, 넓은 화면은 560px 덩어리를 가운데 (2026-10-23 사용자 요청, 예전엔 글 길이만큼 가운데) */
 .ccvref{cursor:pointer;margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
 .cch .bqtitle .ccref{display:none}
 .ccw.ccpopx{animation:ccpopx .45s cubic-bezier(.2,1.8,.4,1)}
@@ -7194,6 +7194,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // "N번째"는 구절 이름 줄 높이, 화면 오른쪽 끝에 (떠올리기 단계 아래, 2026-10-23 사용자 요청)
   function ccNumPlace(){
     if(!ccBox||ccBox.hidden)return;
+    // 말씀(구절 이름·본문)의 왼쪽 끝을 아래 첫 단추(들려주기 등)의 왼쪽 끝 줄에 맞춤 (2026-10-23 사용자 요청)
+    var vw=ccBox.querySelector(".ccvwrap"), fb=ccBox.querySelector(".ccfoot button");
+    if(vw){
+      var res=vw.classList.contains("ccresult");
+      vw.style.paddingLeft="";
+      if(!res&&fb&&fb.offsetWidth){var dx=Math.round(fb.getBoundingClientRect().left-vw.getBoundingClientRect().left);if(dx>0&&dx<120)vw.style.paddingLeft=dx+"px"}
+    }
     var cn=ccBox.querySelector(".ccnum"), rf=ccBox.querySelector(".ccvref"), bd=ccBox.querySelector(".ccbody"); if(!cn||!rf||!bd)return;
     if(cn.hidden||!rf.offsetHeight){cn.style.top="";return}
     var br=bd.getBoundingClientRect(), rr=rf.getBoundingClientRect();
