@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-20">
+<meta name="app-build" content="2026-10-24-21">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2652,6 +2652,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 @media (max-width:430px){.dlgsd{padding:0 8px;font-size:12px}.dlgh:has(.dlgsd){gap:4px}}
 .dlgsd input{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;cursor:pointer;color-scheme:dark}
 .dlgsd+.dlghgrip{margin-left:4px}
+.dlactname{cursor:default}
+.dlacthint{margin:0;padding:4px 4px 2px;font-size:13px;color:var(--faint);line-height:1.5}
+.dlactcnt{margin-left:6px;font-size:11.5px;color:var(--faint);white-space:nowrap}
+.dlactref{max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (hover:hover) and (pointer:fine){.dlpick,.dlgsd input{pointer-events:none}}
 .dpop{position:fixed;z-index:400;width:272px;padding:12px;border:1px solid #34333A;border-radius:16px;background:#1A1920;box-shadow:0 16px 40px rgba(0,0,0,.6);color:var(--ink);font-size:13.5px;animation:dpin .16s ease-out}
 @keyframes dpin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
@@ -8140,6 +8144,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var rf=e.target.closest(".dlref");
         if(rf&&!dlEdit){e.stopPropagation(); openReader({book:+rf.dataset.b,chapter:+rf.dataset.c,verse:+rf.dataset.v||0}); return}   // 시편 91편 → 장 읽기
         var b=e.target.closest("button"); if(!b)return; var o=dailyData(), id=b.dataset.id;
+        if(b.classList.contains("dlactref")){closeDaily();openNoteFocus(b.dataset.nid);return}
+        if(b.classList.contains("dlactrow")){   // 말씀 실천 체크 = 그날 실천 도장
+          var an=notes.get(b.dataset.nid), aa=an&&(an.acts||[]).find(function(x){return x.id===b.dataset.aid}); if(!aa)return;
+          if(!Array.isArray(aa.stamps))aa.stamps=[];
+          var si=aa.stamps.indexOf(dlDay);
+          if(si>=0){aa.stamps.splice(si,1); if(aa.done&&aa.stamps.length<(aa.goal||21)){aa.done=false;aa.doneAt=0} buzz(8)}
+          else{
+            aa.stamps.push(dlDay); aa.stamps.sort(); buzz([12,40,18]);
+            var c3=aa.stamps.length;
+            if(c3>=(aa.goal||21)){aa.done=true;aa.doneAt=Date.now();toast((aa.goal||21)+"일 실천을 완주했어요! 축하해요");confetti(b)}
+            else toast(c3+"일째 실천 🌱");
+          }
+          render(); scheduleSave(an.id); drawDaily(); return;
+        }
         if(b.classList.contains("dlgdel")){   // 내가 만든 묶음 지우기 (항목도 함께)
           if(!b.dataset.sure){b.dataset.sure="1";b.textContent="묶음과 항목을 지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="묶음 지우기";b.classList.remove("sure")}},3000);return}
           var gg=b.dataset.g; o.groups=(o.groups||[]).filter(function(x){return x.g!==gg}); o.items=o.items.filter(function(it){return it.g!==gg}); saveDaily(o); drawDaily(); renderReviewBar(); return;
@@ -8295,7 +8313,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     list.addEventListener("pointerdown",function(e){
       if(G||D||(e.pointerType==="mouse"&&e.button!==0))return;
       var hd=e.target.closest(".dlgh"); if(!hd||e.target.closest(".dlgdel,.dlgpin,.dlgsd"))return;
-      var sec=hd.closest(".dlgrp"); if(!sec||sec.parentNode!==list)return;
+      var sec=hd.closest(".dlgrp"); if(!sec||sec.parentNode!==list||sec.classList.contains("dlacts"))return;
       if(e.target.closest(".dlghgrip")){e.preventDefault();try{e.target.closest(".dlghgrip").setPointerCapture(e.pointerId)}catch(err){}gstart(sec,e);return}
       GP={sec:sec,x:e.clientX,y:e.clientY,pid:e.pointerId,t:setTimeout(function(){
         if(!GP)return; var g=GP; GP=null; gstart(g.sec,{clientX:g.x,clientY:g.y,pointerId:g.pid});
@@ -8648,6 +8666,38 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         for(var mi=mseq.length-1;mi>=0;mi--)mseq[mi]();
       });
     });
+    // 🌱 말씀 실천: 카드 실천 탭에 적은 실천을 하루 돌아보기에서 날마다 점검 — 체크하면 실천 도장과 같은 기록 (2026-10-24 사용자 요청)
+    if(!dlEdit&&!fq){
+      var acs=[];
+      notes.forEach(function(n){(n.acts||[]).forEach(function(a){
+        if(!a.t.trim())return;
+        var has=(a.stamps||[]).indexOf(dlDay)>=0;
+        if(a.done&&!has)return;
+        acs.push({n:n,a:a,on:has});
+      })});
+      var asec=document.createElement("section"); asec.className="dlgrp dlacts"; asec.style.setProperty("--gc","var(--green)");
+      var ah=document.createElement("div"); ah.className="dlgh";
+      var at=document.createElement("span"); at.className="dlgname dlactname";
+      at.textContent="🌱 말씀 실천"+(acs.length?"  "+acs.filter(function(x){return x.on}).length+"/"+acs.length:"");
+      ah.appendChild(at); asec.appendChild(ah);
+      if(!acs.length){
+        var ap=document.createElement("p"); ap.className="dlacthint"; ap.textContent="말씀 카드의 ✓ 실천 탭에 '이 말씀으로 할 일'을 적으면 여기서 날마다 점검할 수 있어요.";
+        asec.appendChild(ap);
+      }
+      acs.forEach(function(x){
+        var row=document.createElement("div"); row.className="dlitem haspill"; row.style.setProperty("--gc","var(--green)");
+        var b=document.createElement("button"); b.type="button"; b.className="dlrow dlactrow"+(x.on?" on":""); b.dataset.nid=x.n.id; b.dataset.aid=x.a.id; b.setAttribute("aria-pressed",String(x.on));
+        b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
+        b.querySelector(".dlt").textContent=x.a.t;
+        var cnt=document.createElement("small"); cnt.className="dlactcnt"; cnt.textContent=" "+(x.a.stamps||[]).length+"/"+(x.a.goal||21)+"일"; b.querySelector(".dlt").appendChild(cnt);
+        row.appendChild(b);
+        var rb=document.createElement("button"); rb.type="button"; rb.className="dlauto dlactref"; rb.dataset.nid=x.n.id;
+        rb.textContent=(x.n.ref||"말씀")+" ›"; rb.title="이 말씀 카드 열기";
+        row.appendChild(rb);
+        asec.appendChild(row);
+      });
+      outer.insertBefore(asec,outer.firstChild);
+    }
     // 알약 단추 너비만큼 글자 자리를 비워 둠 (여러 줄로 접히는 항목도 단추 밑으로 들어가지 않게)
     Array.prototype.forEach.call(list.querySelectorAll(".dlitem .dlauto"),function(pl){
       var rw=pl.parentNode.querySelector(".dlrow"); if(!rw||!pl.offsetWidth)return;
