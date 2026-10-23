@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-21">
+<meta name="app-build" content="2026-10-23-22">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7266,9 +7266,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(a==="restart"){C.stage=0;C.shown=0;C.reads=0;C.round=0;C.grade="";C.dict=null;C.anim=true;ccDraw();return}
     if(a==="close"){closeCoach();return}
   }
-  function ccNextNote(){   // 다음 암송 말씀: 오늘 복습할 것 → 아직 외우는 중인 것 → 나머지 (목록 순서)
+  // 휴대폰: 화면에 진열된 차례 그대로 (지금 말씀 바로 다음 카드부터, 끝까지 가면 맨 앞으로) — 2026-10-23 사용자 요청
+  function ccShownOrder(){
+    var ids=Array.prototype.map.call(document.querySelectorAll("#list .note[data-id]"),function(el){return el.dataset.id});
+    var out=ids.map(function(id){return notes.get(id)}).filter(Boolean);
+    return out.length?out:sorted();
+  }
+  function ccNextNote(){   // 다음 암송 말씀 — 휴대폰은 진열 순서, PC 칸반은 오늘 복습할 것 → 외우는 중인 것 → 나머지
     if(!C)return null;
     var seen=Object.assign({},C.seen); seen[C.id]=1;
+    if(!(boardOn&&boardWide())){
+      var ord=ccShownOrder(), at=-1; ord.forEach(function(x,i){if(x.id===C.id)at=i});
+      var ring=at<0?ord:ord.slice(at+1).concat(ord.slice(0,at));
+      return ring.filter(function(x){return !seen[x.id]&&wordsOf(x.text||"").length})[0]||null;
+    }
     var list=sorted().filter(function(x){return !seen[x.id]&&wordsOf(x.text||"").length});
     var due=list.filter(function(x){var r=reviewInfo(x);return r&&r.due});
     var doing=list.filter(function(x){return !memDone(x)});
