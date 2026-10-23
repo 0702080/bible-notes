@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-30">
+<meta name="app-build" content="2026-10-24-31">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3542,7 +3542,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var mineCols=cus.map(function(c){return {c:c,part:items.filter(function(n){return n.col===c})}}).filter(function(x){return !filtering||x.part.length});
     box.classList.toggle("bsolo",items.length===1);   // 찾아서 딱 하나만 남으면 화면 가로 가운데에 (2026-10-22 사용자 요청)
     if(!items.length&&(filtering||!mineCols.length)){var nb=document.createElement("p");nb.className="bnohit";nb.textContent=filterText?"\u201c"+filterText+"\u201d이(가) 든 말씀이 없어요.":"담긴 말씀이 없어요.";box.appendChild(nb);return}
-    var w=box.clientWidth||document.documentElement.clientWidth||1200, room=Math.max(1,Math.floor((w+14)/284)-mineCols.length);
+    var w=box.clientWidth||document.documentElement.clientWidth||1200, room=Math.max(1,Math.floor((w+14)/284)-2);   // 내가 만든 칸이 늘어도 자동 칸 수는 그대로, 넘치면 오른쪽으로 (2026-10-24 사용자 요청)
     var cols=auto.length?Math.max(1,Math.min(auto.length,room)):0, per=cols?Math.ceil(auto.length/cols):0;
     // 새 칸 단추와 내가 만든 칸은 맨 왼쪽에 (2026-10-23 사용자 요청)
     if(!filtering){var ad=document.createElement("button"); ad.type="button"; ad.className="baddcol"; ad.innerHTML='<span>＋</span>새 칸'; ad.title="새 칸 만들기"; box.appendChild(ad)}
