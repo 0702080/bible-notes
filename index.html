@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-45">
+<meta name="app-build" content="2026-10-23-46">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -491,6 +491,7 @@ details.menu>summary::-webkit-details-marker{display:none}
 .tabs[data-active="e"]::before{transform:translateX(400%)}
 .tabs[data-active="r"]::before{transform:translateX(500%)}
 .tabs[data-active="p"]{--tabc:var(--orange)}
+.tabs[data-active="-"]::before{opacity:0}
 .tabs[data-active="e"]{--tabc:var(--gold)}
 .tabs[data-active="r"]{--tabc:var(--pink)}
 .tab{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 4px;margin:0;
@@ -5062,6 +5063,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var id=card.dataset.id, n=notes.get(id); if(!n)return;
     if(b.classList.contains("tab")){
       var prevTab=card.querySelector(".tabs").dataset.active, nt=b.dataset.tab;
+      if(nt==="p"&&prevTab==="p"){tabOf.set(id,"-");render();return}   // 기도 아이콘을 다시 누르면 기도 칸 숨기기 (한 번 더 누르면 다시 보임, 2026-10-23 사용자 요청)
       tabOf.set(id,nt); render();
       if(prevTab!==nt&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){   // 고른 탭 아이콘이 톡 튀고, 내용이 미끄러지듯 나타남
         var tc=cards.get(id), tb=tc&&tc.querySelector('.tab[data-tab="'+nt+'"]'), ic=tb&&tb.querySelector(".ic"), pn=tc&&tc.querySelector('.pane[data-pane="'+nt+'"]');
