@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-21">
+<meta name="app-build" content="2026-10-24-22">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -702,6 +702,20 @@ a.addbtn{display:inline-flex;align-items:center;text-decoration:none}
 .addbtn.gd{color:var(--gold)}
 .eintro{font-size:13.5px;color:var(--muted);margin:0 0 6px;line-height:1.6}
 .eintro[hidden]{display:none}
+.fruitbox{margin:0 0 14px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--pink) 30%,#2A2930);border-radius:12px;background:color-mix(in srgb,var(--pink) 6%,transparent)}
+.fruith{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:14px;color:var(--pink)}
+.fruith b{font-weight:700}
+.fruitn{font-size:12.5px;color:var(--muted)}
+.fruitrow{display:flex;gap:6px}
+.fruitin{flex:1;min-width:0;height:38px;font-size:14px}
+.fruitadd{flex:0 0 auto;height:38px;padding:0 14px;border:1px solid color-mix(in srgb,var(--pink) 55%,transparent);border-radius:10px;background:transparent;color:var(--pink);font-size:14px}
+.fruits{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto;scrollbar-width:none}
+.fruits:empty{display:none}
+.fruits li{display:flex;align-items:baseline;gap:8px;padding:5px 2px;border-top:1px dashed #2A2930;font-size:13.5px;line-height:1.5}
+.fruitd{flex:0 0 auto;font-size:11.5px;color:var(--faint)}
+.fruitt{flex:1;min-width:0;color:var(--ink)}
+.fruitdel{flex:0 0 auto;border:0;background:transparent;color:var(--faint);font-size:14px;padding:0 4px}
+.fruitdel.sure{color:var(--orange);font-size:12px}
 .essays{display:flex;flex-direction:column;gap:12px}
 .es{border:1px solid color-mix(in srgb,var(--gold) 30%,var(--rule));border-radius:14px;background:#101013;padding:14px 14px 10px}
 .etitle{width:100%;border:0;background:transparent;color:var(--gold);font-family:var(--serif);font-size:19px;font-weight:700;padding:2px 0 8px;border-bottom:1px solid var(--rule)}
@@ -3090,6 +3104,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
       prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),sh:x.sh?1:0}}):[],
+      fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
       rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0,d:/^\d{4}-\d{2}-\d{2}$/.test(n.rv.d||"")?n.rv.d:""}:null,
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
@@ -4207,6 +4222,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           '<div class="sugg"></div>'+
         '</div>'+
         '<div class="pane" data-pane="e" hidden>'+
+          '<div class="fruitbox"><div class="fruith"><b>🍇 이 말씀이 일한 순간</b><span class="fruitn"></span></div>'+
+            '<div class="fruitrow"><input class="field fruitin" maxlength="300" placeholder="오늘 이 말씀이 나를 붙잡은 순간 한 줄 (예: 화내려다 이 말씀이 떠올라 참았다)" aria-label="이 말씀이 일한 순간"><button type="button" class="fruitadd">담기</button></div>'+
+            '<ul class="fruits"></ul></div>'+
           '<div class="eintro">이 말씀이 내 삶에서 살아 움직인 순간을 이야기로 적어 보세요.</div>'+
           '<div class="qbtns" style="margin:0 0 10px -10px"><button type="button" class="addbtn gd adde">+ 새 경험 쓰기</button></div>'+
           '<div class="essays"></div>'+
@@ -4441,7 +4459,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var allFolded=roots.length&&roots.every(function(r){return qFold.has(r.id)});
     tools.querySelector(".qfoldall").textContent=allFolded?"모두 펼치기":"모두 접기";
     renderRes(el,n);
-    renderEssays(el,n);
+    renderEssays(el,n); renderFruits(el,n);
     renderActProg(el,n);
     var abox=el.querySelector(".acts"), ahave=new Map();
     Array.prototype.forEach.call(abox.children,function(c){ahave.set(c.dataset.aid,c)});
@@ -5370,6 +5388,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       addTomb(id); render();
       try{await backend.del(id);setStatus("노트를 삭제했어요.")}catch(err){setStatus("삭제하지 못했어요. 다시 시도해 주세요.")}
       return;
+    }
+    if(b.classList.contains("fruitadd")){
+      var fi=card.querySelector(".fruitin"), fv=fi&&fi.value.trim(); if(!fv){if(fi)fi.focus();return}
+      if(!n.fruits)n.fruits=[]; n.fruits.push({id:qid(),at:Date.now(),t:fv.slice(0,300)}); fi.value="";
+      tabOf.set(id,"e"); render(); scheduleSave(id); buzz([12,40,18]);
+      toast("🍇 "+n.fruits.length+"번째 열매를 담았어요"); return;
+    }
+    if(b.classList.contains("fruitdel")){
+      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
+      var fid=b.closest("li").dataset.fid; n.fruits=(n.fruits||[]).filter(function(x){return x.id!==fid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("adde")){
       tabOf.set(id,"e"); var ne={id:qid(),title:"",body:"",at:Date.now()}; n.essays.push(ne); render(); scheduleSave(id);
@@ -10403,6 +10431,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     GR.dots={};
     ks.forEach(function(k){
       var o=g.N[k], deg=Object.keys(g.adj[k]).length, r=o.t==="t"?5:Math.min(16,6+Math.sqrt(deg)*2.2);
+      var frn=o.t==="n"?(((notes.get(o.id)||{}).fruits)||[]).length:0; if(frn)r=Math.min(26,r+Math.sqrt(frn)*3);   // 🍇 열매가 많은 말씀은 점이 크게
       var el=document.createElementNS(SV,"g"); el.setAttribute("class","gd gd-"+(o.t==="x"&&o.text?"n gd-xn":o.t)); el.dataset.k=k;   // 본문이 있는 연결 구절은 담은 말씀처럼 색 점으로
       var c=document.createElementNS(SV,"circle"); c.setAttribute("r",r); el.appendChild(c);
       var tx=document.createElementNS(SV,"text"); tx.setAttribute("y",r+13); tx.textContent=o.ref.length>14?o.ref.slice(0,13)+"…":o.ref; el.appendChild(tx);
@@ -10712,6 +10741,24 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var d=document.createElement("article"); d.className="es"; d.dataset.eid=x.id;
     d.innerHTML='<button type="button" class="eread" aria-label="한 번 누르면 읽기, 두 번 누르면 고치기"><span class="ertitle"></span><span class="erbody"></span><span class="emeta"></span></button>';
     return d;
+  }
+  // 🍇 열매 기록: 한 줄씩 쌓이고, 연결 지도에서는 점이 커진다 (2026-10-24 사용자 요청)
+  document.addEventListener("keydown",function(e){   // 열매 칸에서 엔터 = 담기
+    if(e.key!=="Enter"||e.isComposing||e.keyCode===229||!e.target.classList||!e.target.classList.contains("fruitin"))return;
+    e.preventDefault(); var ab=e.target.parentNode.querySelector(".fruitadd"); if(ab)ab.click();
+  });
+  function renderFruits(el,n){
+    var box=el.querySelector(".fruits"); if(!box)return;
+    var fs=(n.fruits||[]).slice().sort(function(a,b){return b.at-a.at}), key=fs.map(function(f){return f.id+f.t}).join("|");
+    el.querySelector(".fruitn").textContent=fs.length?fs.length+"번":"";
+    if(box.dataset.k===key)return; box.dataset.k=key; box.textContent="";
+    fs.forEach(function(f){
+      var li=document.createElement("li"); li.dataset.fid=f.id;
+      var d=document.createElement("span"); d.className="fruitd"; d.textContent=dlabel(dkey(f.at)); li.appendChild(d);
+      var t=document.createElement("span"); t.className="fruitt"; t.textContent=f.t; li.appendChild(t);
+      var x=document.createElement("button"); x.type="button"; x.className="fruitdel"; x.textContent="×"; x.setAttribute("aria-label","이 기록 지우기"); li.appendChild(x);
+      box.appendChild(li);
+    });
   }
   function renderEssays(el,n){
     var box=el.querySelector(".essays"), have=new Map();
@@ -11450,6 +11497,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     m.prays=unionBy(older.prays,newer.prays,id);
     m.qs=unionBy(older.qs,newer.qs,id);
     m.essays=unionBy(older.essays,newer.essays,id);
+    m.fruits=unionBy(older.fruits||[],newer.fruits||[],id);
     var ld={}; [older.linkDel,newer.linkDel].forEach(function(o){if(o)Object.keys(o).forEach(function(k){if(!(ld[k]>=+o[k]))ld[k]=+o[k]})});
     m.linkDel=ld; m.links=linkAlive(unionBy(older.links,newer.links,id),ld);   // 지운 연결은 되살리지 않고, 같은 구절은 하나만
     m.vids=unionBy(older.vids,newer.vids,id);
