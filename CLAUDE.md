@@ -72,6 +72,14 @@
 - 칸반 칸 접기·펼치기 (`bible-board-fold`, 부드러운 폭 애니메이션)
 - PC 칸반 "＋ 새 칸": 내가 만든 칸(금빛). 카드가 들어간 칸 이름은 노트 `n.col`(cleanNote에 있음, 클라우드로 맞춰짐), 칸 목록·순서는 `bible-board-cols`(이 기기). `n.col`이 있는 카드는 자동 칸(말씀 1·2…)에서 빠짐. 이름 두 번 눌러 바꾸기, ×(한 번 더)로 칸만 지우기 (`myCols(`, `renderKanbanList(`)
 - `/* ---------- 백업 저장 / 불러오기` — JSON 백업
+- 🌱 하루 돌아보기 맨 위 "말씀 실천": 카드 실천(`n.acts`)을 날마다 체크 = 그날 실천 도장(`stamps`). 그 아래 "🤲 오늘 중보기도" (2026-10-24)
+- 🍇 열매 기록 `n.fruits` (경험 탭 맨 위, `renderFruits(`): 많을수록 연결 지도 점이 큼
+- 🏠 장소로 외우기 `openLoci(` — 말씀을 조각내 집 안 장소(`n.loci`)에 놓고 걷기 → 장소만 보고 떠올리기
+- 🤲 중보기도 명단 `openIntercede(` — 저장 `bible-intercede`, 클라우드 `__icp`(나만), 백업 `icp`. 하루 per명, 오래 못 한 사람부터 (`icPick(`)
+- 🙌 기도 응답 연표 `openAnswers(` — 카드 기도·한 줄 기도·중보기도에서 응답된 것만
+- ⏰ 말씀 알림 `openRemind(` — 캘린더용 .ics(매일 반복) 파일을 만들어 줌. 알림 주소 `?rv=1`로 열면 오늘 외울 말씀이 암송 코치로 (`remindPick(`)
+- 칸반: 하루 안에 담은 말씀은 첫 칸 맨 위("새로 담음"), 담으면 그 카드로 이동해 반짝임. 칸마다 맨 위·맨 아래 단추 (`bcJumpState(`)
+- 카카오 로그인 단추 `sbKakao(` — Supabase Auth에 카카오가 켜져 있을 때만 보임(`/auth/v1/settings`). 네이버는 Supabase 기본 제공이 아니라 없음
 
 ## 확인 방법
 - 로컬 실행: `python -m http.server 8000` 후 http://localhost:8000

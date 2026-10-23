@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-25">
+<meta name="app-build" content="2026-10-24-26">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2754,8 +2754,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .rmrow input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold)}
 .rmmake{width:100%;margin-top:14px}
 .rmtry,.rmclose{height:38px;padding:0 14px;margin:0 6px 0 0;border:1px solid #34333A;border-radius:19px;background:transparent;color:var(--muted);font-size:13.5px}
-@media (max-width:480px){.dlactref{max-width:34%;font-size:11.5px}}
 .dlactref{max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media (max-width:480px){.dlactref{max-width:34%;font-size:11.5px}}
 @media (hover:hover) and (pointer:fine){.dlpick,.dlgsd input{pointer-events:none}}
 .dpop{position:fixed;z-index:400;width:272px;padding:12px;border:1px solid #34333A;border-radius:16px;background:#1A1920;box-shadow:0 16px 40px rgba(0,0,0,.6);color:var(--ink);font-size:13.5px;animation:dpin .16s ease-out}
 @keyframes dpin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
@@ -2887,6 +2887,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 @keyframes spotin{0%{transform:translateY(-10px);opacity:.4}100%{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.note.spotin{animation:none}}
 /* GitHub 동기화 창 */
+.sbsocial{margin:4px 0 6px}
+.sbsocial[hidden]{display:none}
+.sbkakao{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;border:0;border-radius:12px;background:#FEE500;color:#191919;font-size:15.5px;font-weight:700}
+.sbor{margin:12px 0 4px;text-align:center;font-size:12.5px;color:var(--faint)}
 .ghsheet{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
 .ghsheet[hidden]{display:none}
 .ghbox{width:100%;max-width:520px;background:#141418;border:1px solid #2a2930;border-radius:18px 18px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px))}
@@ -12286,16 +12290,29 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       // 통독표에서 로그인 메일을 보냈으면 로그인 뒤 통독표로 돌아감 (30분 안)
       try{var nx=JSON.parse(localStorage.getItem("bible-login-next")||"null");if(nx&&nx.u&&Date.now()-nx.at<1800000){localStorage.removeItem("bible-login-next");location.replace(SB_SITE+nx.u);return}}catch(e){}
       sbMarkAll(); sbSync("login");
+      var viaOauth=false; try{viaOauth=!!sessionStorage.getItem("bible-oauth");sessionStorage.removeItem("bible-oauth")}catch(e){}
+      if(viaOauth){toast("카카오로 로그인했어요 ☁️");return}
       setTimeout(sbAfterLogin,700);   // 메일 링크로 들어온 김에 비밀번호 저장(또는 만들기 안내)
     }catch(e){toast("로그인하지 못했어요. 다시 시도해 주세요")}
   }
-  var sbBox=null, sbSentTo="";
+  var sbBox=null, sbSentTo="", sbExt=null;
+  // 카카오 로그인 (2026-10-24 사용자 요청): Supabase에 카카오가 켜져 있을 때만 단추가 보임. 한 번 로그인하면 새로 고침 토큰으로 계속 유지
+  function sbSocialCheck(){
+    var box=sbBox&&sbBox.querySelector(".sbsocial"); if(!box)return;
+    function show(){box.hidden=!(sbExt&&sbExt.kakao)}
+    if(sbExt){show();return}
+    fetch(SB_URL+"/auth/v1/settings",{headers:{apikey:SB_KEY}}).then(function(r){return r.json()}).then(function(j){sbExt=(j&&j.external)||{};show()}).catch(function(){});
+  }
+  function sbKakao(){
+    try{sessionStorage.setItem("bible-oauth","kakao")}catch(e){}
+    location.href=SB_URL+"/auth/v1/authorize?provider=kakao&redirect_to="+encodeURIComponent(SB_SITE);
+  }
   function openSb(pwFirst){
     if(!sbBox){
       sbBox=document.createElement("div"); sbBox.className="ghsheet"; sbBox.hidden=true; sbBox.setAttribute("role","dialog"); sbBox.setAttribute("aria-modal","true");
       sbBox.innerHTML='<div class="ghbox"><div class="ghhd"><b>☁️ 로그인 · 동기화</b><button type="button" class="ghclose sbclose">닫기</button></div>'+
         '<p class="ghtip">이메일로 한 번 로그인하면, 휴대폰이든 PC든 메모하는 즉시 저장되고 다른 기기에도 바로 나와요. 노트는 나만 볼 수 있어요.</p>'+
-        '<div class="sboff"><form class="sbpwform" autocomplete="on"><label class="ghl">이메일</label><input class="field sbmail" name="email" type="email" inputmode="email" autocomplete="username email" placeholder="me@example.com">'+
+        '<div class="sboff"><div class="sbsocial" hidden><button type="button" class="sbkakao"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#191919" d="M12 3.5C6.8 3.5 2.6 6.8 2.6 10.9c0 2.6 1.7 4.9 4.3 6.2l-1.1 4c-.1.3.3.6.6.4l4.7-3.1c.3 0 .6.1.9.1 5.2 0 9.4-3.3 9.4-7.4S17.2 3.5 12 3.5z"/></svg>카카오로 로그인</button><p class="sbor">또는 이메일로</p></div><form class="sbpwform" autocomplete="on"><label class="ghl">이메일</label><input class="field sbmail" name="email" type="email" inputmode="email" autocomplete="username email" placeholder="me@example.com">'+
         '<label class="ghl">비밀번호</label><input class="field sbpw" name="password" type="password" autocomplete="current-password" placeholder="비밀번호">'+
         '<button type="submit" class="ghconnect sbpwlogin">로그인</button>'+
         '<button type="button" class="ghnow sbsignup">📝 회원가입 (이 비밀번호 등록)</button></form>'+
@@ -12354,6 +12371,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(e.target===sbBox){closeSb();return}
         var b=e.target.closest("button"); if(!b)return;
         if(b.classList.contains("sbclose")){closeSb();return}
+        if(b.classList.contains("sbkakao")){sbKakao();return}
         if(b.classList.contains("sbnow")){sbSync("manual");return}
         if(b.classList.contains("sbout")){
           if(!b.dataset.sure){b.dataset.sure="1";b.textContent="한 번 더 누르면 로그아웃";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="로그아웃"}},3000);return}
@@ -12391,7 +12409,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       });
     }
     var rem=sbRemembered(), mi=sbBox.querySelector(".sbmail"); if(rem&&!mi.value)mi.value=rem;
-    drawSb(); sbBox.hidden=false;
+    drawSb(); sbBox.hidden=false; sbSocialCheck();
     var x=sbSession(); if(!x)setTimeout(function(){var m=sbBox.querySelector(".sbmail");if(m&&!m.value)m.focus();else{var pw=sbBox.querySelector(".sbpw");if(pw)pw.focus()}},80);
     var sp=sbBox.querySelector(".sbsetpw"); sp.classList.toggle("hl",!!(x&&pwFirst));
     if(x&&pwFirst)setTimeout(function(){var np=sbBox.querySelector(".sbnewpw");if(np){np.scrollIntoView({block:"center"});np.focus()}},120);
