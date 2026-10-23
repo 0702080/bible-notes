@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-20">
+<meta name="app-build" content="2026-10-23-21">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4754,6 +4754,46 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   });
   // 말씀 고치기: 말씀 글자 자리에 바로 편집 칸이 열림 (누른 곳에 커서)
   var vTap={id:"",t:0,timer:0}, vEditFrom={};
+  /* ---------- 세 번 빠르게 누르면 암송 화면 (휴대폰, 2026-10-23 사용자 요청) ----------
+     카드 위면 그 말씀, 카드 밖이면 화면 가운데에 보이는 말씀의 암송 코치를 엶.
+     앞의 두 누름이 한 일(펼치기·접기·고치기 기다림)은 되돌림 */
+  var TAP3_WAIT=300, tap3={n:0,t:0,x:0,y:0,card:"",wasOpen:false}, tap3Eat=0;
+  function tap3Blocked(t){
+    if(document.body.style.overflow==="hidden")return true;   // 다른 창이 떠 있음
+    if(Array.prototype.some.call(document.querySelectorAll('[role="dialog"]'),function(d){return d.getClientRects().length>0}))return true;   // 눈에 보이는 창
+    return !!(t.closest&&t.closest("button,a,input,textarea,select,summary,details,label,[contenteditable],.pop,.editbox,.vediting,.verse.picking,.verse.memv,.mempanel,.chip,.fab,#fab,header,.bar"));
+  }
+  function tap3Card(x,y,t){
+    var c=t.closest&&t.closest(".note"); if(c)return c;
+    var best=null, bd=1e9, cy=innerHeight/2;
+    document.querySelectorAll("#list .note").forEach(function(el){
+      var r=el.getBoundingClientRect(); if(r.bottom<0||r.top>innerHeight||!r.height)return;
+      var d=cy<r.top?r.top-cy:cy>r.bottom?cy-r.bottom:0; if(d<bd){bd=d;best=el}
+    });
+    return best;
+  }
+  document.addEventListener("pointerdown",function(e){
+    if(e.pointerType!=="touch")return;
+    var now=Date.now();
+    if(tap3.n&&(now-tap3.t>420||Math.abs(e.clientX-tap3.x)>45||Math.abs(e.clientY-tap3.y)>45))tap3.n=0;
+    if(!tap3.n&&tap3Blocked(e.target))return;
+    if(tap3.n&&tap3Blocked(e.target)){   // 첫 누름으로 카드가 펼쳐져 자리가 바뀌어도 이어서 셈 — 그 자리 단추는 눌리지 않게
+      if(document.body.style.overflow==="hidden"){tap3.n=0;return}
+      tap3Eat=now;
+    }
+    if(!tap3.n){var c0=tap3Card(e.clientX,e.clientY,e.target);tap3.card=c0?c0.dataset.id:"";tap3.wasOpen=!!(c0&&openIds.has(c0.dataset.id))}
+    tap3.n++; tap3.t=now; tap3.x=e.clientX; tap3.y=e.clientY;
+    if(tap3.n<3||!tap3.card)return;
+    tap3.n=0; tap3Eat=now;
+    clearTimeout(vTap.timer); vTap={id:"",t:0,timer:0};   // 기다리던 접기·고치기 취소
+    var id=tap3.card, n=notes.get(id); if(!n)return;
+    try{var sel=window.getSelection();if(sel)sel.removeAllRanges()}catch(err){}
+    if(openIds.has(id)!==tap3.wasOpen)toggleCard(id,tap3.wasOpen);
+    if(!memOpen.has(id)){memOpen.add(id);focusMode.delete(id);focusOpen.delete(id)}
+    buzz([15,40,15]); openCoach(n);
+  },true);
+  // 세 번째 누름이 만드는 클릭은 버림 (카드가 또 펼쳐지거나 접히지 않게)
+  document.addEventListener("click",function(e){if(tap3Eat&&Date.now()-tap3Eat<600){tap3Eat=0;e.stopPropagation();e.preventDefault()}},true);
   function verseOffset(v,x,y,text){
     try{
       var node=null, off=0;
@@ -4921,7 +4961,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(vtap&&(memView.get(tid)||memStep.has(tid)||vtap.classList.contains("memv")))return;
       if(vtap&&!tapCard.classList.contains("vediting")){
         var tnow=Date.now();
-        if(vTap.id===tid&&tnow-vTap.t<380){clearTimeout(vTap.timer);vTap={id:"",t:0,timer:0};enterVerseEdit(tid,e.clientX,e.clientY);return}
+        if(vTap.id===tid&&tnow-vTap.t<380){   // 두 번 누르면 고치기 — 세 번째 누름(암송 화면)을 잠깐 기다림
+          clearTimeout(vTap.timer); var ex=e.clientX, ey=e.clientY;
+          vTap={id:"",t:0,timer:setTimeout(function(){vTap.timer=0;enterVerseEdit(tid,ex,ey)},TAP3_WAIT)};
+          return;
+        }
         clearTimeout(vTap.timer); vTap={id:tid,t:tnow,timer:0};
         if(isOpen&&!e.target.closest(".body")){   // 펼친 카드는 두 번째 누름을 잠깐 기다렸다가 접음
           if(selInCard(tapCard))return;
