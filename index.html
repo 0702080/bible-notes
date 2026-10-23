@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-43">
+<meta name="app-build" content="2026-10-23-44">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3851,19 +3851,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var vv=window.visualViewport, vh=vv?vv.height:innerHeight, vtop=vv?vv.offsetTop:0;
       var card=cur.closest(".note"), hd=card&&card.querySelector(".chead"), hb=0;
       if(hd){var hr=hd.getBoundingClientRect(); if(getComputedStyle(hd).position==="sticky")hb=Math.max(0,Math.min(hr.height,hr.bottom-vtop))}
-      var pri=cur.closest(".pri"), ft=pri&&pri.querySelector(".pfoot"), fh=ft&&ft.offsetHeight?ft.offsetHeight+8:0;
-      var room=Math.round(vh-hb-12-fh-10);
-      cur.style.height=Math.max(140,room)+"px";
+      // 칸 아래 끝이 키보드 바로 위(10px 띄움)에 오게. 날짜·응답 줄은 적는 동안 키보드 아래로 감 (2026-10-23 사용자 요청)
+      var room=Math.round(vh-hb-12-10);
+      var hpx=Math.max(140,room)+"px"; if(cur.style.height!==hpx)cur.style.height=hpx;
       var y=cur.getBoundingClientRect().top-vtop, want=hb+12;
       if(Math.abs(y-want)>2)window.scrollBy(0,y-want);
     }
     document.addEventListener("focusin",function(e){
       var t=e.target; if(!t||t.tagName!=="TEXTAREA"||!(t.classList.contains("pt")||t.classList.contains("pan"))||!t.closest("#list .note .pri"))return;
       if(window.matchMedia&&matchMedia("(min-width:900px)").matches)return;
-      cur=t; t.classList.add("dlbig","ptbig"); setTimeout(fit,60); setTimeout(fit,350); setTimeout(fit,700);
+      cur=t; t.classList.add("dlbig","ptbig");
+      // 키보드가 올라오는 동안 화면 높이가 늦게 바뀌는 브라우저가 있어 2초 동안 자주 다시 맞춤
+      var n0=0; (function tick(){if(cur!==t)return; fit(); if(++n0<20)setTimeout(tick,100)})();
     });
     document.addEventListener("focusout",function(e){if(e.target===cur){var t=cur;cur=null;t.classList.remove("dlbig","ptbig");t.style.height="";grow(t)}});
-    if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){if(cur)fit()});
+    if(window.visualViewport){window.visualViewport.addEventListener("resize",function(){if(cur)fit()});window.visualViewport.addEventListener("scroll",function(){if(cur)fit()})}
     window.addEventListener("resize",function(){if(cur)fit()});
   })();
   var tabOf=new Map();
