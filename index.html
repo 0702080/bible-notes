@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-6">
+<meta name="app-build" content="2026-10-24-7">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2593,7 +2593,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlprog{display:flex;align-items:center;gap:8px;flex:1;min-width:0;margin:0}
 .dlcnt{font-size:15px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
 .dlbarw{flex:1;height:8px;border-radius:4px;background:#222126;overflow:hidden}
-.dlbarw i{display:block;height:100%;width:0;border-radius:4px;background:linear-gradient(90deg,var(--gold),var(--green));transition:width .35s}
+.dlbarw i{display:block;height:100%;width:0;border-radius:4px;background:var(--sky);transition:width .35s}   /* 한 가지 색으로 단순하게 (2026-10-24 사용자 요청) */
+.dlbarw{position:relative;cursor:default}
+.dlbtip{position:fixed;z-index:120;transform:translate(-50%,-100%);margin-top:-10px;padding:5px 10px;border-radius:8px;background:#26252D;border:1px solid #3A3944;color:var(--ink);font-size:12.5px;white-space:nowrap;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+.dlbtip[hidden]{display:none}
 .dlweek{display:flex;justify-content:space-between;gap:6px;margin:4px 0 6px;touch-action:pan-y;user-select:none;-webkit-user-select:none}
 /* 요일 줄 좌우로 끌어 날짜 옮기기 (2026-10-22 사용자 요청) */
 .dlweek{overflow:hidden;padding:3px 2px}
@@ -7842,6 +7845,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   var dl=null, dlDay="", dlWEnd="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set(), dlmTap={id:"",t:0};
   try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
   function saveGFold(){try{localStorage.setItem("bible-daily-gfold",JSON.stringify(Array.from(dlGFold)))}catch(e){}}
+  // 진행 막대에 마우스를 올리면 그 자리에 날짜와 진행을 작은 말풍선으로 (2026-10-24 사용자 요청)
+  document.addEventListener("pointermove",function(e){
+    if(e.pointerType!=="mouse")return;
+    var bw=e.target.closest&&e.target.closest(".dlbarw"), tip=document.getElementById("dlbtip");
+    if(!bw){if(tip)tip.hidden=true;return}
+    if(!tip){tip=document.createElement("div");tip.id="dlbtip";tip.className="dlbtip";document.body.appendChild(tip)}
+    var r=bw.getBoundingClientRect(); tip.textContent=bw.dataset.tip||""; tip.hidden=!tip.textContent;
+    tip.style.left=Math.max(r.left,Math.min(r.right,e.clientX))+"px"; tip.style.top=r.top+"px";
+  });
   function dayName(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"}
   function openDaily(day,focusId){
     if(!dl){
@@ -8283,6 +8295,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var tot=o.items.length, c=on.length;
     dl.querySelector(".dlcnt").textContent=c+" / "+tot;
     dl.querySelector(".dlbarw i").style.width=(tot?Math.round(c/tot*100):0)+"%";
+    dl.querySelector(".dlbarw").dataset.tip=dayName(dlDay)+" · "+c+" / "+tot+" ("+(tot?Math.round(c/tot*100):0)+"%)";
     var wk=dl.querySelector(".dlweek"); wk.textContent="";
     // 요일 줄 7칸: 고른 날이 늘 보이게 따라 움직인다 (끝은 오늘을 넘지 않음)
     if(!dlWEnd||dlWEnd>today)dlWEnd=today;
