@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-29">
+<meta name="app-build" content="2026-10-23-30">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7299,7 +7299,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccMeter(tip,C.round+1,anim?C.round:-1,"🙈");
       C.prevHide=ccWords(n.text,"hide",FR[C.round],C.seed,{anim:anim,prevHide:C.keepPrev?C.prevHide:null}); C.keepPrev=false;
       btn("한 번 더","again");
-      btn(C.round<2?"말했어요 → 더 가리기":"말했어요 →","next",true);
+      btn(C.round<2?"더 가리기 →":"떠올리기 →","next",true);   // 버튼 이름이 잘리지 않게 짧게 (2026-10-23 사용자 요청)
     }else if(C.stage===3){
       if(C.dict&&C.dict.on){ccDict(n,tip,btn);return}
       /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
