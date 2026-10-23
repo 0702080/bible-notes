@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-47">
+<meta name="app-build" content="2026-10-24-1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7885,6 +7885,38 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         // 적는 동안: 입력칸 밖을 끌어도 화면이 움직이지 않음 (입력칸 안의 글 넘기기·크기 손잡이는 그대로)
         dl.addEventListener("touchmove",function(e){if(cur&&!(e.target.closest&&e.target.closest("textarea")))e.preventDefault()},{passive:false});
         if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){if(cur)setTimeout(fit,30)});
+      })();
+      // 기록칸 글머리표 (2026-10-24 사용자 요청): 엔터 = 빈 줄 두고 새 항목 "* ", 시프트+엔터 = 같은 항목 다음 줄(들여쓰기),
+      //   내용 없는 "* " 에서 엔터 = 글머리표 지우고 목록 끝
+      (function(){
+        var shiftEnter=false;
+        function memoTa(t){return t&&t.tagName==="TEXTAREA"&&t.closest&&t.closest(".dlmemobox")}
+        function put(ta,a,b,txt){
+          ta.setRangeText(txt,a,b,"end");
+          ta.dispatchEvent(new Event("input",{bubbles:true}));
+        }
+        function onEnter(ta,shift){
+          var v=ta.value, a=ta.selectionStart, b=ta.selectionEnd;
+          var ls=v.lastIndexOf("\n",a-1)+1, line=v.slice(ls,a);
+          var inItem=false, lines=v.slice(0,a).split("\n");   // 지금 줄이 글머리 항목(또는 그 이어지는 줄) 안인지
+          for(var k=lines.length-1;k>=0;k--){if(/^\* /.test(lines[k])){inItem=true;break} if(/^  \S/.test(lines[k]))continue; break}
+          if(shift){put(ta,a,b,inItem?"\n  ":"\n");return}
+          if(/^\* \s*$/.test(line)){put(ta,ls,b,"");return}   // 빈 항목에서 엔터 → 목록 끝
+          if(line.trim()===""){put(ta,ls,b,"* ");return}   // 빈 줄이면 그 자리에 바로 "* "
+          put(ta,a,b,"\n\n* ");
+        }
+        var list=dl.querySelector(".dllist");
+        list.addEventListener("keydown",function(e){
+          if(e.key!=="Enter"||!memoTa(e.target))return;
+          shiftEnter=e.shiftKey;
+          if(e.isComposing||e.keyCode===229)return;   // 한글 조합 중이면 아래 beforeinput에서
+          e.preventDefault(); onEnter(e.target,e.shiftKey); shiftEnter=false;
+        });
+        list.addEventListener("beforeinput",function(e){
+          if(!memoTa(e.target))return;
+          if(e.inputType==="insertLineBreak"||e.inputType==="insertParagraph"){e.preventDefault(); onEnter(e.target,shiftEnter)}
+          shiftEnter=false;
+        });
       })();
       // 입력칸을 벗어나면 저장 (저장·취소 단추 없이)
       dl.querySelector(".dllist").addEventListener("focusout",function(e){
