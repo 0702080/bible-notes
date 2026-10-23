@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-30">
+<meta name="app-build" content="2026-10-23-31">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6151,6 +6151,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   var toastEl=null, toastT=0;
   function toast(msg){
     if(!toastEl){toastEl=document.createElement("div");toastEl.className="toast";toastEl.setAttribute("role","status");toastEl.setAttribute("aria-live","polite");document.body.appendChild(toastEl)}
+    // 암송 코치가 열려 있으면 아래 단추들 바로 위에 띄워 단추와 겹치지 않게 (2026-10-23 사용자 요청)
+    var ccf=document.querySelector(".cch:not([hidden]) .ccfoot"), ftop=ccf&&ccf.getBoundingClientRect().top;
+    toastEl.style.bottom=ftop>0?Math.round(innerHeight-ftop+12)+"px":"";
     toastEl.textContent=msg; toastEl.classList.remove("show"); void toastEl.offsetWidth; toastEl.classList.add("show");
     clearTimeout(toastT); toastT=setTimeout(function(){toastEl.classList.remove("show")},2200);
   }
