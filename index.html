@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-15">
+<meta name="app-build" content="2026-10-23-16">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3276,12 +3276,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!items.length&&(filtering||!mineCols.length)){var nb=document.createElement("p");nb.className="bnohit";nb.textContent=filterText?"\u201c"+filterText+"\u201d이(가) 든 말씀이 없어요.":"담긴 말씀이 없어요.";box.appendChild(nb);return}
     var w=box.clientWidth||document.documentElement.clientWidth||1200, room=Math.max(1,Math.floor((w+14)/284)-mineCols.length);
     var cols=auto.length?Math.max(1,Math.min(auto.length,room)):0, per=cols?Math.ceil(auto.length/cols):0;
+    // 새 칸 단추와 내가 만든 칸은 맨 왼쪽에 (2026-10-23 사용자 요청)
+    if(!filtering){var ad=document.createElement("button"); ad.type="button"; ad.className="baddcol"; ad.innerHTML='<span>＋</span>새 칸'; ad.title="새 칸 만들기"; box.appendChild(ad)}
+    mineCols.forEach(function(x,j){var cl=kbCol("C:"+x.c,x.c,"🗂️",x.part," bcust"); cl.dataset.cc=x.c; cl.dataset.ci=String(j); box.appendChild(cl)});
     for(var c=0;c<cols;c++){
       var part=auto.slice(c*per,(c+1)*per); if(!part.length)break;
       var cl=kbCol("L"+(c+1),bTitle({k:"L"+(c+1),t:"말씀 "+(c+1)}),"📖",part,""); cl.dataset.li=String(c); box.appendChild(cl);
     }
-    mineCols.forEach(function(x,j){var cl=kbCol("C:"+x.c,x.c,"🗂️",x.part," bcust"); cl.dataset.cc=x.c; cl.dataset.ci=String(j); box.appendChild(cl)});
-    if(!filtering){var ad=document.createElement("button"); ad.type="button"; ad.className="baddcol"; ad.innerHTML='<span>＋</span>새 칸'; ad.title="새 칸 만들기"; box.appendChild(ad)}
   }
   // 칸을 옮기면 도장·복습 상태를 그 칸에 맞게 바꿈. 지운 도장은 보관해 두었다가 다시 옮기면 되살림
   function kanbanMove(n,to){
@@ -9945,7 +9946,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         order:isFinite(minOrder)?(minOrder-=1000):null,topics:[t],col:t,tw:{},createdAt:now+i});
       notes.set(nn.id,nn); scheduleSave(nn.id,0); made++;
     });
-    var cs=myCols(); if(cs.indexOf(t)<0){cs.push(t);saveCols(cs)}
+    var cs=myCols(); if(cs.indexOf(t)<0){cs.unshift(t);saveCols(cs)}
     // PC는 칸반으로 가서 새 '#주제' 칸을 보여 주고, 휴대폰은 그 주제 말씀만 모아 보여 줌 (2026-10-23 사용자 요청)
     soloId=null; soloFrom="";
     if(boardWide()){setTopics([]); if(bMode!=="list"){bMode="list";try{localStorage.setItem("bible-board-mode","list")}catch(e){}} setBoard(true);
@@ -11431,11 +11432,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(bMode!=="list")return;
     var ad=e.target.closest(".baddcol");
     if(ad){
-      e.stopPropagation(); var nm=window.prompt("새 칸 이름을 적어 주세요 (예: 분노, 이번 주 암송)","");
+      e.stopPropagation(); var nm=window.prompt("새 칸 이름을 적어 주세요.\n이미 있는 주제 이름(예: 화, 분노, 노함)을 적으면 그 주제 말씀이 바로 이 칸에 모여요.","");
       if(nm===null)return; nm=String(nm).trim().slice(0,20); if(!nm){toast("칸 이름을 적어 주세요");return}
       var a=myCols(); if(a.indexOf(nm)>=0){toast("같은 이름의 칸이 있어요");return}
-      a.push(nm); saveCols(a); render(); toast("'"+nm+"' 칸을 만들었어요. 말씀 카드를 끌어다 넣어 보세요"); buzz(10);
-      setTimeout(function(){var b=$("board"); if(b)b.scrollLeft=b.scrollWidth},60); return;
+      a.unshift(nm); saveCols(a);
+      // 같은 이름의 주제(#)가 있으면 그 주제 말씀을 이 칸에 바로 모음
+      var tn=nm.replace(/^#+/,""), moved=0;
+      notes.forEach(function(n){if(!n.col&&(n.topics||[]).indexOf(tn)>=0){n.col=nm;scheduleSave(n.id);moved++}});
+      render(); toast(moved?("#"+tn+" 말씀 "+moved+"개를 '"+nm+"' 칸에 모았어요"):("'"+nm+"' 칸을 만들었어요. 말씀 카드를 끌어다 넣어 보세요")); buzz(10);
+      setTimeout(function(){var b=$("board"); if(b)b.scrollLeft=0},60); return;
     }
     var dl=e.target.closest(".bcdel");
     if(dl){
