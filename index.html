@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-36">
+<meta name="app-build" content="2026-10-24-37">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12623,7 +12623,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!lmP)return;
     if(!lmP.on){if(Math.abs(e.clientX-lmP.x)+Math.abs(e.clientY-lmP.y)<8)return;
       (lmP.ids||[]).forEach(function(x){if(kbFC[x])kbFreshSet(x,false)});   // 옮기기 시작하면 '새로 담음' 고정을 풂
-      paperSwish(false);   // 집어 들 때 '사락'
+      paperSwish(false);   // 카드가 떠서 움직이기 시작할 때만 '사락' (놓을 때는 소리 없음, 2026-10-24 사용자 요청)
       lmP.on=true; lmDrag=lmP; lmP.el.classList.add("lmdrag"); document.body.classList.add("lmmoving");
       var r=lmP.el.getBoundingClientRect(), g=lmP.el.cloneNode(true); g.classList.remove("lmdrag"); g.classList.add("lmghost");
       g.style.width=r.width+"px"; g.style.height=Math.min(r.height,lmP.type==="col"?260:r.height)+"px"; lmP.dx=lmP.x-r.left; lmP.dy=lmP.y-r.top;
@@ -12643,7 +12643,6 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var stop=function(ev){ev.stopPropagation();ev.preventDefault()}; document.addEventListener("click",stop,true); setTimeout(function(){document.removeEventListener("click",stop,true)},50);
     if(cancel)return;
     var t=lmTarget(e.clientX,e.clientY), cl=t.cl; if(!cl)return;
-    paperSwish(true);   // 내려놓을 때 작게
     var cards=Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id});
     var tcc=cl.dataset.cc||"";
     if(d.type==="col"&&(d.cc||tcc)){   // 내가 만든 칸은 어느 칸 사이로든 옮김 (놓은 칸의 왼쪽 반이면 그 앞, 오른쪽 반이면 그 뒤)
