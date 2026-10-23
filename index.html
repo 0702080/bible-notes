@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-38">
+<meta name="app-build" content="2026-10-23-39">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1046,6 +1046,7 @@ body.reorder .note .topics{display:none}
   padding:12px 18px;border-radius:22px;background:rgba(30,30,36,.95);border:1px solid #3a3942;color:var(--ink);font-size:14.5px;font-weight:500;text-align:center;
   box-shadow:0 12px 30px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s,transform .25s}
 .toast.show{opacity:1;transform:translate(-50%,0)}
+.toast{width:max-content;box-sizing:border-box}   /* 화면 가운데 기준이라 폭이 반으로 줄어 두 줄이 되던 것 → 한 줄로 (2026-10-23 사용자 요청) */
 /* closed card: show the whole verse, no "..." */
 .note:not(.open) .verse{display:block;-webkit-line-clamp:unset;-webkit-box-orient:initial;overflow:visible;white-space:pre-wrap}
 @media (min-width:700px){.note .verse{line-height:1.9}}   /* PC에서만 줄 사이를 살짝 더 */
