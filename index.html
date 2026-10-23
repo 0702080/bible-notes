@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-28">
+<meta name="app-build" content="2026-10-23-29">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4081,9 +4081,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   // 묵상 접기 (이 기기에 기억)
   // 묵상 칸은 기본으로 접혀 있고, 펼친 것만 기억한다
-  var medOpen2=new Set(); try{JSON.parse(localStorage.getItem("bible-notes-mopen")||"[]").forEach(function(x){medOpen2.add(String(x))})}catch(e){}
+  var medOpen2=new Set(); try{localStorage.removeItem("bible-notes-mopen")}catch(e){}   // 묵상 칸은 앱을 열 때마다 모두 접힌 채로 시작 (펼친 것을 기억하지 않음, 2026-10-23 사용자 요청)
   var medFold={has:function(id){return !medOpen2.has(id)},add:function(id){medOpen2.delete(id)},delete:function(id){medOpen2.add(id)}};
-  function saveMFold(){try{localStorage.setItem("bible-notes-mopen",JSON.stringify(Array.from(medOpen2).slice(-800)))}catch(e){}}
+  function saveMFold(){}
   function makeMed(m){
     var d=document.createElement("div");
     d.className="medi"; d.dataset.mid=m.id;
