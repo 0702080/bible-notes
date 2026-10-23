@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-27">
+<meta name="app-build" content="2026-10-23-28">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7200,6 +7200,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var res=vw.classList.contains("ccresult");
       vw.style.paddingLeft="";
       if(!res&&fb&&fb.offsetWidth){var dx=Math.round(fb.getBoundingClientRect().left-vw.getBoundingClientRect().left);if(dx>0&&dx<120)vw.style.paddingLeft=dx+"px"}
+    }
+    // 단계 줄(읽기…떠올리기): 1단계 동그라미 왼쪽 끝 = 말씀 왼쪽 줄, 4단계 오른쪽 끝 = 아래 마지막 단추 오른쪽 끝 (2026-10-23 사용자 요청)
+    var stp=ccBox.querySelector(".ccsteps"), fbs=ccBox.querySelectorAll(".ccfoot button"), lb=fbs[fbs.length-1];
+    if(stp&&fb&&lb&&fb.offsetWidth){
+      stp.style.width=""; stp.style.maxWidth=""; stp.style.marginLeft=""; stp.style.marginRight="";
+      var dts=stp.querySelectorAll(".ccst i");
+      if(dts.length>1){
+        var T=fb.getBoundingClientRect().left, R=lb.getBoundingClientRect().right, P=stp.parentElement.getBoundingClientRect().left;
+        for(var pass=0;pass<2;pass++){   // 한 번 놓고 재어서 한 번 더 바로잡음
+          var sr=stp.getBoundingClientRect(), d1=dts[0].getBoundingClientRect(), d4=dts[dts.length-1].getBoundingClientRect();
+          var W=sr.width+((R-d4.right)-(T-d1.left)), L=sr.left-P+(T-d1.left);
+          if(!(W>150))break;
+          stp.style.maxWidth="none"; stp.style.width=Math.round(W)+"px"; stp.style.marginLeft=Math.round(L)+"px"; stp.style.marginRight="0";
+        }
+      }
     }
     var cn=ccBox.querySelector(".ccnum"), rf=ccBox.querySelector(".ccvref"), bd=ccBox.querySelector(".ccbody"); if(!cn||!rf||!bd)return;
     if(cn.hidden||!rf.offsetHeight){cn.style.top="";return}
