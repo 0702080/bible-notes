@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-31">
+<meta name="app-build" content="2026-10-24-32">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1729,7 +1729,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .board4{display:flex;gap:14px;align-items:stretch;margin-top:8px;overflow-x:auto;overflow-y:hidden;height:calc(100vh - 165px);min-height:320px;padding-bottom:10px;overscroll-behavior-x:contain;cursor:grab}
 .board4.panning{cursor:grabbing;-webkit-user-select:none;user-select:none}
 .board4.find{justify-content:safe center}
-.board4>.bcol{flex:0 0 270px;min-width:270px;max-width:270px;display:flex;flex-direction:column;max-height:100%}   /* 칸이 하나뿐일 때 지나치게 넓어지지 않게 */
+.board4>.bcol{flex:0 0 var(--bcw,270px);min-width:var(--bcw,270px);max-width:var(--bcw,270px);display:flex;flex-direction:column;max-height:100%}   /* 칸이 하나뿐일 때 지나치게 넓어지지 않게 */
 .bclist{overflow-y:auto;overscroll-behavior-y:contain;flex:1 1 auto;min-height:0;scrollbar-width:none;-ms-overflow-style:none}
 .bclist::-webkit-scrollbar{display:none}
 .board4.bsolo{justify-content:center}
@@ -3388,10 +3388,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     ks.forEach(function(k){if(o.indexOf(k)<0)o.push(k)});
     return o.map(function(k){return L.filter(function(c){return c.k===k})[0]});
   }
+  // 칸이 화면보다 많으면 칸 너비를 줄여(270→최소 220px) 모두 한 화면에 (2026-10-24 사용자 요청)
+  function kbFit(box){
+    var cols=box.querySelectorAll(":scope>.bcol"), open=0, fixed=0, gap=14, n=0;
+    Array.prototype.forEach.call(cols,function(c){n++; if(c.classList.contains("bfold"))fixed+=54; else open++});
+    var ad=box.querySelector(":scope>.baddcol"); if(ad){fixed+=120;n++}
+    if(!open){box.style.removeProperty("--bcw");return}
+    var w=Math.floor((box.clientWidth-fixed-gap*Math.max(0,n-1)-4)/open);
+    if(w>=270)box.style.removeProperty("--bcw"); else box.style.setProperty("--bcw",Math.max(220,w)+"px");
+  }
+  window.addEventListener("resize",function(){var b=$("board"); if(b&&!b.hidden&&bMode==="list")kbFit(b)});
   function renderKanban(){
     var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
     box.textContent=""; box.classList.remove("bsolo");
-    if(bMode==="list"){renderKanbanList(box);return}
+    if(bMode==="list"){renderKanbanList(box);kbFit(box);return}
     var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
     sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
     var fresh=groups["new"];
@@ -3457,7 +3467,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     // 부드럽게: 안의 글이 먼저 사르르 사라지고 → 폭이 줄거나 늘고 → 새 모양이 사르르 (2026-10-22 사용자 요청)
     cl.dataset.anim="1"; cl.classList.add("bfade");
     setTimeout(function(){
-      cl.classList.toggle("bfold",on);
+      cl.classList.toggle("bfold",on); if(bMode==="list")kbFit($("board"));
       setTimeout(function(){cl.classList.remove("bfade"); setTimeout(function(){delete cl.dataset.anim},200)},on?260:330);
     },170);
   },true);
