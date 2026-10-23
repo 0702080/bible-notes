@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-29">
+<meta name="app-build" content="2026-10-23-22">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2051,7 +2051,8 @@ button:active{filter:brightness(1.15)}
    /* 휴대폰: 아래 단추 가로 폭 20% 줄이기 (2026-10-21 사용자 요청) */
 /* PC: 진행 줄과 단추를 화면 가운데 알맞은 크기로 (2026-10-18 사용자 요청) */
 @media (min-width:900px){
-  .ccsteps{width:100%;max-width:460px;margin:0 auto;padding:10px 0 2px}
+  .ccsteps{width:100%;max-width:680px;margin:0 auto;padding:10px 0 2px}   /* 진행 줄을 넉넉히 넓게 (2026-10-23 사용자 요청) */
+  .ccst{white-space:nowrap}
   .cctip{margin:4px 0 10px}
   .ccfoot{max-width:460px;justify-content:center;gap:10px;padding:10px 0 18px}
   .ccbtn{flex:0 0 auto;height:40px;padding:0 20px;border-radius:20px;font-size:14px}
@@ -7032,6 +7033,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
         var wt=String(w.dataset.w||w.textContent||"").trim();
         if(wt)sayWord(wt,true);   // 누를 때마다 그 낱말 소리 (2026-10-17 사용자 요청)
+        // 떠올리기: 한 소절씩 눌러 맨 끝 낱말까지 오면 암송 완료로 셈하고 다음 말씀(다음 번째)으로 (2026-10-23 사용자 요청)
+        var ws=ccBox.querySelectorAll(".ccverse .ccw");
+        if(C.stage===3&&!C.autoDone&&ws.length&&w===ws[ws.length-1]){
+          C.autoDone=1; var cid=C.id;
+          setTimeout(function(){
+            if(!C||C.id!==cid||ccBox.hidden)return;
+            var n1=notes.get(cid); if(!n1)return;
+            C.grade="g2"; C.stage=5; ccFinish(n1);
+            if(ccNextNote()){toast("✅ 암송 완료 · 다음 말씀으로"); ccGoNext()} else ccDraw();
+          },900);
+        }
         if(!w.classList.contains("hid")||w.classList.contains("peek")){buzz(18);return}   // 누를 때마다 진동 (2026-10-21 사용자 요청)
         w.classList.add("peek"); C.peek++; buzz([25,30,15]);
         ccBurst(w);   // 가린 낱말을 누르면 풍선 터지듯 '팡' (2026-10-21 사용자 요청)
@@ -7158,7 +7170,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     v.appendChild(wrap);
     btn("다시 써 보기","dretry");
-    btn("😊 다 기억났어요","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
+    btn("✅ 암송 완료","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
   }
   function ccEditForm(n,tip,btn){   // 상자 없이 말씀 자리에서 그대로 고친다 (2026-10-18 사용자 요청)
     var v=ccBox.querySelector(".ccverse");
@@ -7206,7 +7218,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(stp&&fb&&lb&&fb.offsetWidth){
       stp.style.width=""; stp.style.maxWidth=""; stp.style.marginLeft=""; stp.style.marginRight="";
       var dts=stp.querySelectorAll(".ccst i");
-      if(dts.length>1){
+      if(false&&dts.length>1){   // 진행 줄은 이제 말씀 폭에 맞추지 않고 넉넉한 폭(CSS max-width 680px)으로 가운데에 (2026-10-23 사용자 요청)
         var T=fb.getBoundingClientRect().left, R=lb.getBoundingClientRect().right, P=stp.parentElement.getBoundingClientRect().left;
         for(var pass=0;pass<2;pass++){   // 한 번 놓고 재어서 한 번 더 바로잡음
           var sr=stp.getBoundingClientRect(), d1=dts[0].getBoundingClientRect(), d4=dts[dts.length-1].getBoundingClientRect();
@@ -7266,7 +7278,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       btn("확인하기 👀","show",true);
     }else if(C.stage===4){
       ccWords(n.text,"got",0,C.seed);
-      btn("😊 다 기억났어요","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
+      btn("✅ 암송 완료","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
     }else{
       ccResult(n); return;
     }
@@ -7350,7 +7362,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(C.revealing)return; C.revealing=true; buzz(8);
     // 다음 화면의 고르기 버튼을 미리 (눌리지 않게) 깔아 두어 말씀 자리가 끝날 때 움직이지 않게
     var ft=ccBox.querySelector(".ccfoot"); ft.textContent="";
-    [["😊 다 기억났어요","g2",1]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(x[2]?" main":"");b.dataset.a=x[1];b.textContent=x[0];b.disabled=true;ft.appendChild(b)});
+    [["✅ 암송 완료","g2",1]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(x[2]?" main":"");b.dataset.a=x[1];b.textContent=x[0];b.disabled=true;ft.appendChild(b)});
     var n=notes.get(C.id), v=ccBox.querySelector(".ccverse"), still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
     if(!n){C.revealing=false;return}
     var cnt=wordsOf(n.text).length, step=still?0:Math.max(40,Math.min(110,1400/Math.max(1,cnt))), FADE=still?0:700;
