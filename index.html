@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-27">
+<meta name="app-build" content="2026-10-24-30">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2750,10 +2750,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .rmhow{margin-top:12px}
 .rmrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px dashed #26252C}
 .rmrow span{flex:1;font-size:15px}
+.rmg{flex:0 0 auto;height:38px;padding:0 12px;border:1px solid color-mix(in srgb,var(--sky) 55%,transparent);border-radius:10px;background:transparent;color:var(--sky);font-size:13px;white-space:nowrap}
+@media (max-width:430px){.rmrow{flex-wrap:wrap}.rmg{width:100%}}
+.rmnaver{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:44px;margin-top:10px;border:0;border-radius:12px;background:#03C75A;color:#fff;font-size:15px;font-weight:700}
+.rmnaver b{display:grid;place-items:center;width:20px;height:20px;border-radius:4px;background:#fff;color:#03C75A;font-size:13px;font-weight:900}
+.rmnhow{margin-top:8px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,#03C75A 10%,transparent);color:var(--ink)}
+.rmnhow[hidden]{display:none}
+.rmfile{margin-top:8px;height:40px;border:1px solid #34333A;border-radius:12px;background:transparent;color:var(--muted);font-size:13.5px}
 .rmrow input[type=time]{width:156px;height:38px;color-scheme:dark}
 .rmrow input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold)}
 .rmmake{width:100%;margin-top:14px}
 .rmtry,.rmclose{height:38px;padding:0 14px;margin:0 6px 0 0;border:1px solid #34333A;border-radius:19px;background:transparent;color:var(--muted);font-size:13.5px}
+.sayhvl{display:flex;align-items:flex-start;gap:8px;margin:8px 0;font-size:13px;line-height:1.5;color:var(--muted);cursor:pointer}
+.sayhvl input{width:18px;height:18px;margin-top:1px;accent-color:var(--gold);flex:0 0 auto}
+.sayhvtag{color:var(--gold)!important;border-color:color-mix(in srgb,var(--gold) 45%,transparent)!important}
+.saycard.hv{border-left-color:var(--gold)}
+.bsq.bshv{font-weight:700}
 .dlactref{max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:480px){.dlactref{max-width:34%;font-size:11.5px}}
 @media (hover:hover) and (pointer:fine){.dlpick,.dlgsd input{pointer-events:none}}
@@ -8160,16 +8172,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       rmv=document.createElement("div"); rmv.className="sheet rmsheet"; rmv.hidden=true;
       rmv.innerHTML='<div class="sheetback rmback"></div><section class="sheetpanel rmpanel" role="dialog" aria-modal="true" aria-label="말씀 알림">'+
         '<h2>⏰ 하루 세 번 말씀 꺼내기</h2>'+
-        '<p class="rmtip">아침·점심·저녁에 휴대폰 캘린더가 알려 줘요. 알림을 누르면 이 노트가 열리고, <b>오늘 외우는 말씀이 가린 채로</b> 암송 코치에 바로 떠요.</p>'+
+        '<p class="rmtip">아침·점심·저녁에 구글 캘린더가 휴대폰으로 알려 줘요. 알림을 누르면 이 노트가 열리고, <b>오늘 외우는 말씀이 가린 채로</b> 암송 코치에 바로 떠요.</p>'+
         '<div class="rmrows"></div>'+
-        '<button type="button" class="primary rmmake">📅 캘린더에 알림 넣기</button>'+
-        '<p class="rmhow">받은 파일(말씀알림.ics)을 열면 캘린더 앱이 일정을 추가할지 물어요. <b>추가</b>를 누르면 끝이에요. 시간을 바꾸려면 캘린더에서 예전 일정을 지우고 다시 넣어 주세요.</p>'+
+        '<p class="rmhow">시간마다 <b>구글 캘린더에 넣기</b>를 누르면 구글 캘린더가 새 창으로 열려요. <b>저장</b>을 누르면 매일 반복 알림이 생기고, 같은 구글 계정을 쓰는 갤럭시에서도 알림이 울려요. 시간을 바꾸려면 캘린더에서 예전 일정을 지우고 다시 넣어 주세요.</p>'+
+        '<button type="button" class="rmnaver"><b>N</b> 네이버 캘린더에 넣기</button>'+
+        '<p class="rmhow rmnhow" hidden>알림 파일(말씀알림.ics)을 받았고 네이버 캘린더를 새 창으로 열었어요. 네이버 캘린더의 <b>설정 → 일정 가져오기</b>에서 받은 파일을 고르면 매일 반복 알림이 들어가요. 네이버 캘린더 앱에서도 알림이 울려요.</p>'+
+        '<button type="button" class="rmmake rmfile">📄 파일(.ics)로 받기 — 삼성 캘린더 등</button>'+
         '<button type="button" class="rmtry">지금 한 번 열어 보기</button><button type="button" class="rmclose">닫기</button></section>';
       document.body.appendChild(rmv);
       rmv.addEventListener("click",function(e){
         if(e.target.closest(".rmback,.rmclose")){closeRemind();return}
         if(e.target.closest(".rmtry")){closeRemind();remindOpen();return}
         if(e.target.closest(".rmmake")){remindMake();return}
+        if(e.target.closest(".rmnaver")){remindMake(); window.open("https://calendar.naver.com/","_blank","noopener"); rmv.querySelector(".rmnhow").hidden=false; return}
+        var g=e.target.closest(".rmg"); if(g){e.preventDefault(); var rw=g.closest(".rmrow"); remindGoogle(rw.dataset.l,rw.querySelector("input[type=time]").value||"07:00"); return}
       });
       rmv.addEventListener("change",function(){
         var t=Array.prototype.map.call(rmv.querySelectorAll(".rmrow"),function(r){return {h:r.querySelector("input[type=time]").value||"07:00",on:r.querySelector("input[type=checkbox]").checked?1:0,l:r.dataset.l}});
@@ -8179,7 +8195,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var box=rmv.querySelector(".rmrows"); box.textContent="";
     rmTimes().forEach(function(t){
       var r=document.createElement("label"); r.className="rmrow"; r.dataset.l=t.l;
-      r.innerHTML='<input type="checkbox"><span></span><input type="time" class="field">';
+      r.innerHTML='<input type="checkbox"><span></span><input type="time" class="field"><button type="button" class="rmg">구글 캘린더에 넣기</button>';
       r.querySelector("input[type=checkbox]").checked=!!t.on; r.querySelector("span").textContent=t.l; r.querySelector("input[type=time]").value=t.h;
       box.appendChild(r);
     });
@@ -8202,6 +8218,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     a.href=URL.createObjectURL(blob); a.download="말씀알림.ics"; document.body.appendChild(a); a.click();
     setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},2000);
     toast("📅 알림 파일을 받았어요. 열어서 캘린더에 추가해 주세요");
+  }
+  function remindGoogle(label,hm){   // 구글 캘린더 '일정 만들기' 화면을 매일 반복으로 채워서 열기
+    var d=new Date(), ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+    var a=hm.replace(":","")+"00", e=new Date(2000,0,1,+hm.slice(0,2),+hm.slice(3,5)+5), b=String(e.getHours()).padStart(2,"0")+String(e.getMinutes()).padStart(2,"0")+"00";
+    var url=location.origin+location.pathname+"?rv=1";
+    var q="action=TEMPLATE&text="+encodeURIComponent("📖 "+label+" 말씀 꺼내기")+"&dates="+ymd+"T"+a+"/"+ymd+"T"+b+"&ctz=Asia/Seoul&recur="+encodeURIComponent("RRULE:FREQ=DAILY")+
+      "&details="+encodeURIComponent("오늘 외우는 말씀을 한 번 떠올려 보세요 → "+url);
+    window.open("https://calendar.google.com/calendar/render?"+q,"_blank","noopener");
   }
   function remindPick(){   // 알림으로 열 말씀: 오늘 복습 → 외우는 중 → 가장 최근에 담은 말씀
     var arr=Array.from(notes.values()).filter(function(n){return String(n.text||"").trim()});
@@ -9480,8 +9504,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // 오늘의 한 마디: 5분마다 바뀜. 📌 고정하면 그 한 마디가 하루(24시간) 동안 그대로 (2026-10-21 사용자 요청)
   var SAY_PIN="bible-say-pin";
   function sayPinned(){try{var o=JSON.parse(localStorage.getItem(SAY_PIN)||"null");if(o&&o.id&&Date.now()<+o.until)return o}catch(e){}return null}
+  // ⏰ 정각 말씀: 매시 00분(예: 12:00~12:00:59)에는 '정각 말씀'으로 담은 한 줄 말씀이 나옴 (2026-10-24 사용자 요청)
+  function sayHour(){
+    if(new Date().getMinutes()!==0)return null;
+    var hv=sayData().items.filter(function(x){return x.hv&&String(x.t||"").trim()}); if(!hv.length)return null;
+    return hv[Math.floor(Date.now()/3600000)%hv.length];
+  }
+  setTimeout(function(){   // 처음 한 번: 말씀해 주신 정각 말씀을 넣어 둠
+    var o=sayData(); if(o.seedHv)return; o.seedHv=1;
+    if(!o.items.some(function(x){return x.id==="hv-rom1221"}))o.items.push({id:"hv-rom1221",t:"악에게 지지 말고 선으로 악을 이기라",who:"로마서 12:21",topic:"",note:"",hv:1,at:Date.now()});
+    saveSay(o); renderReviewBar();
+  },1500);
   function sayOfDay(){
-    var items=sayData().items.filter(function(x){return String(x.t||"").trim()});
+    var hr=sayHour(); if(hr)return hr;
+    var items=sayData().items.filter(function(x){return !x.hv&&String(x.t||"").trim()});
     if(!items.length)return null;
     var pin=sayPinned(); if(pin){var pi=items.filter(function(x){return x.id===pin.id})[0]; if(pi)return pi}
     var k="s"+Math.floor(Date.now()/300000), h=0, i;
@@ -9533,6 +9569,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder="말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
       row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
+      var hvl=document.createElement("label"); hvl.className="sayhvl";
+      hvl.innerHTML='<input type="checkbox" class="sayhv"><span>⏰ 정각 말씀 — 매시 00분(12:00, 13:00 …)에 나와요. 말한 분 칸에 구절(예: 로마서 12:21)을 적어 주세요</span>';
+      hvl.querySelector("input").checked=!!cur.hv; form.appendChild(hvl);
       var row2=document.createElement("div"); row2.className="sayrow2";
       var sel=document.createElement("select"); sel.className="field saynote"; sel.setAttribute("aria-label","붙일 말씀");
       var o0=document.createElement("option"); o0.value=""; o0.textContent="📖 말씀 없음"; sel.appendChild(o0);
@@ -9558,6 +9597,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var f=document.createElement("div"); f.className="sayf";
       if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
       if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
+      if(x.hv){var hvt=document.createElement("span"); hvt.className="saytag sayhvtag"; hvt.textContent="⏰ 정각 말씀"; f.appendChild(hvt); c.classList.add("hv")}
       if(x.note&&notes.has(x.note)){
         var nb=document.createElement("button"); nb.type="button"; nb.className="saynotebtn"; nb.dataset.act="note"; nb.dataset.note=x.note;
         nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
@@ -9639,11 +9679,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(act==="save"){
       var t=say.querySelector(".sayt").value.trim();
       if(!t){toast("한 마디를 적어 주세요");return}
-      var o=sayData(), who=say.querySelector(".saywho").value.trim(), tp=say.querySelector(".saytopic").value.trim(), nt=say.querySelector(".saynote").value;
-      if(sayEdit==="new")o.items.unshift({id:"s"+Date.now().toString(36),t:t,who:who,topic:tp,note:nt,at:Date.now()});
+      var o=sayData(), who=say.querySelector(".saywho").value.trim(), tp=say.querySelector(".saytopic").value.trim(), nt=say.querySelector(".saynote").value, hv=say.querySelector(".sayhv").checked?1:0;
+      if(sayEdit==="new")o.items.unshift({id:"s"+Date.now().toString(36),t:t,who:who,topic:tp,note:nt,hv:hv,at:Date.now()});
       else{
         var it=o.items.filter(function(x){return x.id===sayEdit})[0];
-        if(it){it.t=t;it.who=who;it.topic=tp;it.note=nt;it.at=Date.now()}
+        if(it){it.t=t;it.who=who;it.topic=tp;it.note=nt;it.hv=hv;it.at=Date.now()}
       }
       saveSay(o); sayEdit=""; drawSay(); renderReviewBar(); toast("담았어요 💬");
       return;
@@ -9844,8 +9884,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // PC 칸반 맨 아래 한 줄: 몇 초마다 위로 스르륵 사라지고 다음 한 마디가 아래에서 올라옴 (📌 고정이면 그대로, 2026-10-24 사용자 요청)
   var BS={id:"",timer:0,busy:false,ci:0};
   var BS_COL=["#6FD09A","#6ECBF4","#F48FB6","#FFD36B","#B79CF2","#5FD3C4","#F59E7B"];   // 문장마다 산뜻한 색 (2026-10-24 사용자 요청)
-  function bsItems(){return sayData().items.filter(function(x){return String(x.t||"").trim()})}
+  function bsItems(){return sayData().items.filter(function(x){return !x.hv&&String(x.t||"").trim()})}
   function bsPick(next){
+    var hr=sayHour(); if(hr)return hr;
     var items=bsItems(); if(!items.length)return null;
     var pinned=sayPinned(); if(pinned){var pi=items.filter(function(x){return x.id===pinned.id})[0]; if(pi)return pi}
     var cur=-1; items.forEach(function(x,i){if(x.id===BS.id)cur=i});
@@ -9859,7 +9900,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
     var q=document.createElement("button"); q.type="button"; q.className="bsq"; q.title="믿음의 한 마디 모두 보기";
     if(next)BS.ci=(BS.ci+1)%BS_COL.length; q.style.setProperty("--bsc",BS_COL[BS.ci]);
-    q.textContent="💬  “"+String(sd.t).replace(/\s+/g," ")+"”";
+    q.textContent=(sd.hv?"📖  ":"💬  “")+String(sd.t).replace(/\s+/g," ")+(sd.hv?"":"”");
+    if(sd.hv){q.classList.add("bshv"); q.style.setProperty("--bsc","#FFD36B"); q.title="정각 말씀 (매시 00분)"}
     if(sd.who){var w=document.createElement("small"); w.textContent="— "+sd.who; q.appendChild(w)}
     var pb=document.createElement("button"); pb.type="button"; pb.className="saypin"+(isPin?" on":""); pb.dataset.sid=sd.id;
     pb.textContent="📌"; pb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; pb.setAttribute("aria-label",pb.title); pb.setAttribute("aria-pressed",String(isPin));
@@ -9869,13 +9911,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function bsRoll(){
     var bs=$("boardSay"); if(!bs||bs.hidden||BS.busy||document.hidden||!document.body.classList.contains("boardon"))return;
-    if(sayPinned()||bsItems().length<2)return;
-    if(bs.matches(":hover"))return;   // 마우스를 올려 읽는 중이면 기다림
+    var hr=sayHour();
+    if(hr){if(hr.id===BS.id)return}   // 정각 말씀을 보여 주는 동안은 그대로
+    else if(!sayData().items.some(function(x){return x.hv&&x.id===BS.id})){
+      if(sayPinned()||bsItems().length<2)return;
+      if(bs.matches(":hover"))return;   // 마우스를 올려 읽는 중이면 기다림
+    }
     var q=bs.querySelector(".bsq"); BS.busy=true;
     if(q)q.classList.add("bsout");
     setTimeout(function(){BS.busy=false; renderBoardSay(true)},(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)?0:450);
   }
   setInterval(bsRoll,12000);
+  setInterval(function(){var s0=new Date().getSeconds(); if(s0<5)bsRoll()},5000);   // 정각에 늦지 않게
   function renderReviewBar(){
     try{renderBoardSay()}catch(e){}
     var bar=$("reviewBar"); if(!bar)return;
