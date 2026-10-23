@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-33">
+<meta name="app-build" content="2026-10-23-34">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1791,6 +1791,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 button:active{filter:brightness(1.15)}
 /* tidy left accent bar: a neat pill inside the card, above the sticky header */
 .note::before,.note:not(.open)::before,.note.open::before{left:7px;width:3px;top:18px;bottom:18px;border-radius:3px;z-index:7}
+.note::before,.note:not(.open)::before,.note.open::before{display:none!important}   /* 카드 왼쪽 세로 줄 없앰 (2026-10-23 사용자 요청) */
 .note.open .chead.stuck ~ *{}
 /* ===== 가리기 전체 화면 ===== */
 .bquiz{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
