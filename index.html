@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-19">
+<meta name="app-build" content="2026-10-23-20">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2783,7 +2783,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .note .focusrow .vrep{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 2.5 20.5 6 17 9.5'/%3E%3Cpath d='M3.5 11V9.5A3.5 3.5 0 0 1 7 6h13.5'/%3E%3Cpath d='M7 21.5 3.5 18 7 14.5'/%3E%3Cpath d='M20.5 13v1.5A3.5 3.5 0 0 1 17 18H3.5'/%3E%3C/svg%3E")}
 .note .focusrow .vrol{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='9' cy='8' r='3.5'/%3E%3Cpath d='M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5'/%3E%3Cpath d='M16 4.6a3.5 3.5 0 0 1 0 6.8M18.5 14.8c1.7.8 2.7 2.5 3 5.2'/%3E%3C/svg%3E")}
 .note .focusrow .vrep[data-n]:not([data-n=""])::after{content:attr(data-n);font-size:11px;font-weight:700}
-@media (hover:hover){.note .focusrow .useopen:hover,.note .focusrow .vtopic:hover,.note .focusrow .vxref:hover,.note .focusrow .vctr:hover,.note .focusrow .vrep:hover,.note .focusrow .vrol:hover,.note .focusrow .chapread.primary-read:hover{background:#1E1D24!important;color:#fff}}
+@media (hover:hover){.note .focusrow .useopen:hover,.note .focusrow .vtopic:hover,.note .focusrow .vxref:hover,.note .focusrow .vctr:hover,.note .focusrow .vrep:hover,.note .focusrow .vrol:hover,.note .focusrow .chapread.primary-read:hover{background:#FFD54A!important;color:#141416!important}}   /* 마우스를 올리면 노란 바탕 (2026-10-23 사용자 요청) */
 .note .focusrow .useopen[aria-expanded="true"],.note .focusrow .vxref[aria-expanded="true"],
 .note .focusrow .vctr[aria-pressed="true"],.note .focusrow .vrep[aria-pressed="true"],.note .focusrow .vrol[aria-pressed="true"]{background:#FFD54A!important;color:#141416!important}   /* 켜진 아이콘은 노란 바탕 (2026-10-23 사용자 요청) */
 
@@ -4652,6 +4652,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     else himsg(hyEl,"붙여넣은 것이 사진이 아니에요. 이미지를 길게 눌러 '이미지 복사'를 한 뒤 다시 붙여넣어 주세요.");
   });
   // 연결 말씀: 구절 칸에서 엔터 → 메모 칸으로
+  // PC: 카드 도구 아이콘에 마우스를 올리면 짧게 '띡' (2026-10-23 사용자 요청)
+  var hovAC=null, hovAt=0;
+  function hoverTick(){
+    try{
+      var now=Date.now(); if(now-hovAt<60)return; hovAt=now;
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+      if(!hovAC)hovAC=new AC(); if(hovAC.state==="suspended")hovAC.resume();
+      var t=hovAC.currentTime, o=hovAC.createOscillator(), g=hovAC.createGain();
+      o.type="sine"; o.frequency.setValueAtTime(1760,t); o.frequency.exponentialRampToValueAtTime(2350,t+.04);
+      g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.12,t+.005); g.gain.exponentialRampToValueAtTime(.0001,t+.07);
+      o.connect(g); g.connect(hovAC.destination); o.start(t); o.stop(t+.08);
+    }catch(e){}
+  }
+  list.addEventListener("pointerover",function(e){
+    if(e.pointerType!=="mouse")return;
+    var b=e.target.closest&&e.target.closest(".note .focusrow .useopen,.note .focusrow .vtopic,.note .focusrow .vxref,.note .focusrow .vctr,.note .focusrow .vrep,.note .focusrow .vrol,.note .focusrow .chapread");
+    if(!b||(e.relatedTarget&&b.contains(e.relatedTarget)))return;
+    hoverTick();
+  });
   // 질문 칸: 엔터 → 바로 아래 답 칸으로, 시프트+엔터 → 질문 다음 줄 (2026-10-23 사용자 요청)
   (function(){
     var shiftEnter=false;
