@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-28">
+<meta name="app-build" content="2026-10-23-29">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1926,6 +1926,8 @@ button:active{filter:brightness(1.15)}
 .cch,.cch *{touch-action:pan-y}   /* 가로로 밀기는 앱이 받아서 다음 말씀으로 (안쪽 스크롤 칸에도) */
 .cch[hidden]{display:none}
 .ccsteps{display:flex;gap:4px;padding:12px 16px 4px}
+.ccsteps .ccst{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s}
+.ccsteps .ccst:active{transform:scale(.92)}
 .ccst{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;color:var(--faint)}
 .ccst i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12.5px;font-weight:700;border:1.5px solid #34333A;color:var(--faint)}
 .ccst.done i{background:var(--green);border-color:var(--green);color:#0E1A12}
@@ -6996,7 +6998,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!ccBox){
       ccBox=document.createElement("div"); ccBox.className="cch"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
       ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b></div></div>'+
-        '<div class="ccsteps" aria-hidden="true"></div>'+
+        '<div class="ccsteps" role="group" aria-label="연습 단계 (눌러서 그 단계로)"></div>'+
         '<div class="ccbody"><small class="ccnum" hidden></small><div class="cctip"></div><div class="ccmid"><div class="ccvwrap"><div class="ccvref"></div><div class="ccverse"></div></div></div></div>'+
         '<div class="ccfoot"></div>';
       document.body.appendChild(ccBox);
@@ -7019,6 +7021,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccBox.addEventListener("touchstart",function(e){tOn=false;if(!C||C.edit||C.revealing||e.touches.length!==1||e.target.closest("button,textarea,input,a,.ccfoot"))return;tx0=e.touches[0].clientX;ty0=e.touches[0].clientY;tOn=true},{passive:true});
       ccBox.addEventListener("touchend",function(e){if(!tOn||!C||C.edit)return;tOn=false;var t=e.changedTouches[0];ccSwipe(t.clientX-tx0,t.clientY-ty0)},{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
+      // 위 단계 줄(읽기·첫 글자·가리기·떠올리기)을 누르면 그 단계부터 연습 (2026-10-23 사용자 요청)
+      ccBox.querySelector(".ccsteps").addEventListener("click",function(e){
+        var d=e.target.closest(".ccst"); if(!d||!C||C.edit||C.revealing)return;
+        var i=+d.dataset.i; if(!(i>=0&&i<4))return;
+        if(i===C.stage&&!C.dict){buzz(8);return}
+        C.stage=i; C.shown=i; C.reads=0; C.round=0; C.grade=""; C.dict=null; C.autoDone=0; C.keepPrev=false; C.prevHide=null; C.seed=newSeed(); C.anim=true;
+        buzz([12,30,12]); ccDraw();
+      });
       // 문장 배치 고치기: 말씀을 꾹(0.8초) 누르면 열림. 연습 중 빠르게 두 번 눌러도 고치기로 넘어가지 않게 (2026-10-21 사용자 요청)
       var ccHold=0, ccHx=0, ccHy=0;
       ccBox.querySelector(".ccverse").addEventListener("pointerdown",function(e){
@@ -7061,7 +7071,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             if(!C||C.id!==cid||ccBox.hidden)return;
             var n1=notes.get(cid); if(!n1)return;
             C.grade="g2"; C.stage=5; ccFinish(n1);
-            if(ccNextNote()){toast("✅ 암송 완료 · 다음 말씀으로"); ccGoNext()} else ccDraw();
+            if(ccNextNote()){toast("✅ 암송 완료"); ccGoNext()} else ccDraw();
           },1300);
         }
         if(!w.classList.contains("hid")||w.classList.contains("peek")){buzz(18);return}   // 누를 때마다 진동 (2026-10-21 사용자 요청)
@@ -7265,7 +7275,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!C.roles||C.rolesSrc!==n.text){C.roles=ccRoles(n);C.rolesSrc=n.text}
     var st=ccBox.querySelector(".ccsteps"); st.textContent="";
     var prev=C.shown; C.shown=C.stage;
-    CC_STEPS.forEach(function(t,i){var dn=i<Math.min(C.stage,4);var d=document.createElement("span");d.className="ccst"+(dn?" done":i===C.stage?" now":"")+(dn&&i>=prev?" just":"");d.innerHTML='<i></i><span></span>';d.querySelector("i").textContent=dn?"✓":String(i+1);d.querySelector("span").textContent=t;st.appendChild(d)});
+    CC_STEPS.forEach(function(t,i){var dn=i<Math.min(C.stage,4);var d=document.createElement("span");d.className="ccst"+(dn?" done":i===C.stage?" now":"")+(dn&&i>=prev?" just":"");d.dataset.i=i;d.setAttribute("role","button");d.tabIndex=0;d.setAttribute("aria-label",t+" 단계로");d.innerHTML='<i></i><span></span>';d.querySelector("i").textContent=dn?"✓":String(i+1);d.querySelector("span").textContent=t;st.appendChild(d)});
     var tip=ccBox.querySelector(".cctip"), ft=ccBox.querySelector(".ccfoot"); ft.textContent=""; tip.textContent="";
     function btn(t,a,main){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(main?" main":"");b.dataset.a=a;b.textContent=t;ft.appendChild(b);return b}
     var anim=C.anim; C.anim=false;
