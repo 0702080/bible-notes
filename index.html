@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-22">
+<meta name="app-build" content="2026-10-24-23">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1613,6 +1613,23 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 .mchmem{display:inline-flex;align-items:baseline;gap:8px;height:38px;margin:10px 0 4px 8px;padding:0 14px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);border-radius:19px;background:color-mix(in srgb,var(--sky) 12%,transparent);color:var(--sky);line-height:36px;white-space:nowrap}
 .mchmem b{font-weight:400;-webkit-text-stroke:.3px currentColor;font-size:14.5px}
 .mchmem small{font-size:12px;color:var(--muted)}
+.mloci{border-color:color-mix(in srgb,var(--green) 55%,#34333A);background:color-mix(in srgb,var(--green) 12%,transparent);color:var(--green)}
+.lcrow{display:grid;grid-template-columns:26px minmax(90px,130px) 1fr;gap:8px 10px;align-items:start;padding:10px 0;border-bottom:1px dashed #26252C}
+.lcno{width:24px;height:24px;border-radius:12px;background:#1E1D23;color:var(--green);font-size:12.5px;font-weight:700;display:grid;place-items:center;margin-top:6px}
+.lcpin{height:36px;font-size:14px}
+.lctxt{font-size:15.5px;line-height:1.6;color:var(--ink);padding-top:5px}
+.lcpn{font-weight:400;color:var(--green);padding-top:5px;font-size:14px}
+.lcend.miss .lcno{background:color-mix(in srgb,var(--orange) 25%,#1E1D23);color:var(--orange)}
+.lcpath{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 18px}
+.lcdot{padding:4px 10px;border-radius:14px;border:1px solid #2A2930;font-size:12.5px;color:var(--faint)}
+.lcdot.past{color:var(--green);border-color:color-mix(in srgb,var(--green) 40%,transparent)}
+.lcdot.now{color:#0B0B0D;background:var(--green);border-color:var(--green);font-weight:700}
+.lccard{padding:26px 22px;border:1px solid color-mix(in srgb,var(--green) 35%,#2A2930);border-radius:18px;background:color-mix(in srgb,var(--green) 6%,#111014);text-align:center;animation:lcin .3s ease-out}
+@keyframes lcin{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+.lcplace{font-size:30px;font-weight:700;color:var(--green);margin-bottom:18px}
+.lcverse{font-size:20px;line-height:1.7;color:var(--ink);word-break:keep-all}
+.lcverse.hid{color:var(--muted);letter-spacing:2px}
+@media (max-width:480px){.lcrow{grid-template-columns:24px 1fr}.lcrow .lctxt{grid-column:2}.lcplace{font-size:26px}.lcverse{font-size:18px}}
 .rdpbar .rdchm{color:var(--sky)}
 /* PC 칸반 보드 */
 /* PC: 목록 / 칸반 보드 바꾸기 (두 칸 스위치), 상단 말씀 담기 */
@@ -3104,6 +3121,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
       prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),sh:x.sh?1:0}}):[],
+      loci:Array.isArray(n.loci)?n.loci.slice(0,8).map(function(x){return String(x||"").slice(0,20)}):[],   // 🏠 장소로 외우기의 장소 이름
       fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
       rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0,d:/^\d{4}-\d{2}-\d{2}$/.test(n.rv.d||"")?n.rv.d:""}:null,
@@ -5254,6 +5272,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     if(b.classList.contains("mreveal")){memView.set(id,"");memStep.delete(id);memPeek.delete(id);buzz(8);render();return}
     if(b.classList.contains("morder")){openOrderQuiz(n);return}
+    if(b.classList.contains("mloci")){openLoci(id);return}
     if(b.classList.contains("mchmem")){var cv=chVersesOf(n);if(cv)openChMem(chKeyOf(n),n.ref,cv);return}
     if(b.classList.contains("mcoach")){openCoach(n);return}
     if(b.classList.contains("mmoretg")){if(memMore.has(id))memMore.delete(id);else memMore.add(id);render();return}
@@ -7747,6 +7766,106 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       chMemSave(CM.key,r); CM.target=-1; CM.stage="end"; chmDraw(); return;
     }
   }
+  /* ---------- 🏠 장소로 외우기 (기억의 궁전, 2026-10-24 사용자 요청) ----------
+     말씀을 3~7조각으로 나눠 우리 집 장소에 하나씩 놓고, 장소를 차례로 걸으며 떠올린다. 장소 이름은 노트 n.loci */
+  var LOCI_DEF=["🚪 현관","🛋️ 거실","🍳 부엌","🛏️ 침실","🛁 욕실","🪟 베란다","📚 책상"];
+  function lociChunks(t){
+    t=String(t||"").replace(/\s+/g," ").trim(); if(!t)return [];
+    var parts=t.split(/(?<=[,.;:!?])\s+|\s+(?=\d{1,3}\.?\s)/).filter(Boolean), out=[];
+    parts.forEach(function(p){   // 너무 긴 조각은 가운데쯤 띄어쓰기에서 나눔
+      var q=[p];
+      while(q.length){var x=q.shift(); if(x.length<=34){out.push(x);continue}
+        var mid=Math.floor(x.length/2), a=x.lastIndexOf(" ",mid), b=x.indexOf(" ",mid), cut=(a<0?b:b<0?a:(mid-a<=b-mid?a:b));
+        if(cut<=0){out.push(x);continue} q.unshift(x.slice(0,cut),x.slice(cut+1))}
+    });
+    var m=[]; out.forEach(function(p){if(m.length&&(m[m.length-1].length<12||p.length<6))m[m.length-1]+=" "+p; else m.push(p)});
+    while(m.length>7){var bi=0,bl=1e9; for(var i=0;i<m.length-1;i++){var l=m[i].length+m[i+1].length; if(l<bl){bl=l;bi=i}} m.splice(bi,2,m[bi]+" "+m[bi+1])}
+    return m;
+  }
+  var lc=null, LC=null;
+  function openLoci(id){
+    var n=notes.get(id); if(!n)return;
+    var ch=lociChunks(n.text); if(ch.length<2){toast("말씀이 짧아서 장소로 나눌 조각이 없어요");return}
+    if(!lc){
+      lc=document.createElement("div"); lc.className="cch lci"; lc.setAttribute("role","dialog"); lc.setAttribute("aria-modal","true"); lc.hidden=true;
+      lc.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="lcref"></b><span class="lcstep"></span></div><div class="qbarbtns"><button type="button" class="lcclose">닫기</button></div></div>'+
+        '<div class="ccbody"><div class="cctip lctip"></div><div class="lcbody"></div></div><div class="ccfoot lcfoot"></div>';
+      document.body.appendChild(lc);
+      lc.querySelector(".lcclose").addEventListener("click",closeLoci);
+      lc.addEventListener("click",function(e){var b=e.target.closest("button[data-a]"); if(b)lciAct(b.dataset.a,b)});
+      lc.addEventListener("input",function(e){   // 장소 이름 고치기
+        var f=e.target.closest(".lcpin"); if(!f||!LC)return;
+        var nn=notes.get(LC.id); if(!nn)return;
+        var ps=LC.places.slice(); ps[+f.dataset.i]=f.value.slice(0,20); LC.places=ps;
+        nn.loci=ps.slice(); clearTimeout(LC.t); LC.t=setTimeout(function(){scheduleSave(nn.id)},500);
+      });
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&lc&&!lc.hidden)closeLoci()});
+    }
+    var ps=(n.loci&&n.loci.length?n.loci:[]).slice(0,ch.length);
+    while(ps.length<ch.length)ps.push(LOCI_DEF[ps.length%LOCI_DEF.length]);
+    LC={id:id,ch:ch,places:ps,stage:"set",i:0,ok:0,miss:[]};
+    lc.querySelector(".lcref").textContent=(n.ref||"말씀")+" · 장소로 외우기";
+    lc.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true; lciDraw();
+  }
+  function closeLoci(){if(!lc||lc.hidden)return; lc.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; LC=null; render()}
+  function lciDraw(){
+    var tip=lc.querySelector(".lctip"), body=lc.querySelector(".lcbody"), ft=lc.querySelector(".lcfoot"), st=lc.querySelector(".lcstep");
+    body.textContent=""; ft.textContent="";
+    function btn(t,a,main){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(main?" main":"");b.dataset.a=a;b.textContent=t;ft.appendChild(b)}
+    var N=LC.ch.length;
+    if(LC.stage==="set"){
+      st.textContent=N+"곳";
+      tip.innerHTML='<b>말씀을 우리 집 곳곳에 놓아 보세요</b><br>조각마다 장소를 하나씩 정하고, 그 자리에 말씀이 놓여 있는 모습을 눈으로 그려 보세요. 장소 이름은 눌러서 바꿀 수 있어요.';
+      LC.ch.forEach(function(c,i){
+        var r=document.createElement("div"); r.className="lcrow";
+        r.innerHTML='<span class="lcno"></span><input class="field lcpin" maxlength="20" aria-label="장소 이름"><span class="lctxt"></span>';
+        r.querySelector(".lcno").textContent=i+1; var f=r.querySelector(".lcpin"); f.value=LC.places[i]; f.dataset.i=i;
+        r.querySelector(".lctxt").textContent=c; body.appendChild(r);
+      });
+      btn("🚶 걸어가며 놓기","walk",true);
+    }else if(LC.stage==="walk"||LC.stage==="recall"){
+      var i=LC.i, rec=LC.stage==="recall";
+      st.textContent=(i+1)+" / "+N;
+      tip.innerHTML=rec?'<b>장소만 보고 떠올려 보세요</b><br>그 자리에 무엇이 놓여 있었나요? 소리 내어 말한 뒤 확인하세요.':'<b>천천히 걸으며 말씀을 내려놓아요</b><br>이 장소에 들어서는 모습을 떠올리고, 말씀을 소리 내어 읽으세요.';
+      var path=document.createElement("div"); path.className="lcpath";
+      LC.places.forEach(function(p,k){var d=document.createElement("span"); d.className="lcdot"+(k<i?" past":"")+(k===i?" now":""); d.textContent=p; path.appendChild(d)});
+      body.appendChild(path);
+      var card=document.createElement("div"); card.className="lccard";
+      var pl=document.createElement("div"); pl.className="lcplace"; pl.textContent=LC.places[i]; card.appendChild(pl);
+      var tx=document.createElement("div"); tx.className="lcverse"+(rec&&!LC.show?" hid":"");
+      tx.textContent=rec&&!LC.show?(LC.hint?chFirst(LC.ch[i]):circles(LC.ch[i])):LC.ch[i];
+      card.appendChild(tx); body.appendChild(card);
+      if(!rec){btn("← 앞으로","back"); btn(i<N-1?"다음 장소 →":"✓ 다 놓았어요","next",true)}
+      else if(!LC.show){btn(LC.hint?"힌트 숨기기":"첫 글자 힌트","hint"); btn("떠올렸어요 · 확인","show",true)}
+      else{btn("다시 볼래요","miss"); btn("맞았어요","ok",true)}
+    }else{   // 끝
+      st.textContent="끝";
+      var all=LC.ok===N;
+      tip.innerHTML=all?'<b>🏠 '+N+'곳 모두 떠올렸어요!</b><br>이제 장소를 차례로 떠올리며 말씀을 처음부터 끝까지 이어 말해 보세요.':'<b>'+N+'곳 중 '+LC.ok+'곳을 바로 떠올렸어요</b><br>막힌 장소를 한 번 더 걸어 보면 금방 자리 잡혀요.';
+      LC.places.forEach(function(p,k){
+        var r=document.createElement("div"); r.className="lcrow lcend"+(LC.miss.indexOf(k)>=0?" miss":"");
+        r.innerHTML='<span class="lcno"></span><b class="lcpn"></b><span class="lctxt"></span>';
+        r.querySelector(".lcno").textContent=k+1; r.querySelector(".lcpn").textContent=p; r.querySelector(".lctxt").textContent=LC.ch[k]; body.appendChild(r);
+      });
+      btn("장소 바꾸기","set"); btn("🔁 다시 떠올리기","recall0",true);
+    }
+  }
+  function lciAct(a){
+    if(!LC)return; var N=LC.ch.length; buzz(6);
+    if(a==="walk"){LC.stage="walk";LC.i=0}
+    else if(a==="set"){LC.stage="set"}
+    else if(a==="back"){if(LC.i>0)LC.i--}
+    else if(a==="next"){if(LC.i<N-1)LC.i++; else{LC.stage="recall";LC.i=0;LC.ok=0;LC.miss=[];LC.show=false;LC.hint=false}}
+    else if(a==="recall0"){LC.stage="recall";LC.i=0;LC.ok=0;LC.miss=[];LC.show=false;LC.hint=false}
+    else if(a==="hint"){LC.hint=!LC.hint}
+    else if(a==="show"){LC.show=true}
+    else if(a==="ok"||a==="miss"){
+      if(a==="ok")LC.ok++; else LC.miss.push(LC.i);
+      LC.show=false; LC.hint=false;
+      if(LC.i<N-1)LC.i++; else{LC.stage="end"; if(LC.ok===N){buzz([12,40,18]);toast("🏠 모든 장소를 떠올렸어요!")}}
+    }
+    lciDraw();
+  }
   function closeChMem(){if(!chm||chm.hidden)return; chm.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; try{window.speechSynthesis.cancel()}catch(e){} CM=null; render()}
 
   /* ---------- 듣기 (읽어 주기) ---------- */
@@ -10012,6 +10131,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(chv){var chb=document.createElement("button");chb.type="button";chb.className="mchmem";var chr=chMemRec(chKeyOf(n));
       chb.innerHTML='<b>🧠 한 장 암송</b><small></small>'; chb.querySelector("small").textContent=Math.min(chr.n,chv.length)+" / "+chv.length+"절";
       mtop.appendChild(chb)}
+    if(lociChunks(n.text).length>=2){var lcb=document.createElement("button");lcb.type="button";lcb.className="mchmem mloci";   // 🏠 장소로 외우기
+      lcb.innerHTML='<b>🏠 장소로 외우기</b><small></small>'; lcb.querySelector("small").textContent=lociChunks(n.text).length+"곳"; mtop.appendChild(lcb)}
     if(ri0){var nr=document.createElement("p");nr.className="mnext"+(ri0.due?" due":"");var dr=new Date(ri0.next);nr.textContent=ri0.due?"🔁 오늘 복습할 차례예요":"🔁 다음 복습 "+(dr.getMonth()+1)+"/"+dr.getDate()+" ("+ri0.gap+"일 간격)";panel.appendChild(nr)}
     var view0=memView.get(n.id)||"", mOpen=memMore.has(n.id)||!!view0||memStep.has(n.id);
     var mt=document.createElement("button"); mt.type="button"; mt.className="mmoretg"; mt.setAttribute("aria-expanded",String(mOpen));
