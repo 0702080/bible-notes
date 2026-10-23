@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-15">
+<meta name="app-build" content="2026-10-24-16">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3316,7 +3316,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div><button type="button" class="bcgo"></button>';
     var bref=n.ref||"구절 미입력", btxt=String(n.text||"").replace(/\s+/g," ").trim(), braw=String(n.text||""), bte=cd.querySelector(".bctext");
     if(filterText&&has(bref))markInto(cd.querySelector(".bcref b"),bref,filterText); else cd.querySelector(".bcref b").textContent=bref;
-    var bkx=n.book>=0?n.book:parseRef(n.ref).book; if(bkx>=0)cd.querySelector(".bcref").style.color=grBookColor(bkx);   // 구절 이름 = 성경 묶음 색 (말씀 연결 지도와 같은 색, 2026-10-24 사용자 요청)
+    if(ct)cd.querySelector(".bcref").style.color="var(--tc)";   // 구절 이름 = 주제 뜻 색 (분노=빨강, 화평=초록…, 2026-10-24 사용자 요청)
     if(filterText&&(has(btxt)||has(braw))){markInto(bte,braw,filterText);vLines(bte);bte.classList.add("full")}else bte.textContent=btxt;
     cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
     if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
@@ -5942,15 +5942,34 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     el.appendChild(document.createTextNode(text.slice(pos)));
     return true;
   }
-  var TPAL=["#B79CF2","#6ECBF4","#6FD09A","#E3BE72","#F48FB6","#5ED3C3","#F28B82","#9FB4FF","#C9A7F0","#8FD3A0"];
+  var TPAL=["#B79CF2","#6ECBF4","#6FD09A","#E3BE72","#F48FB6","#5ED3C3","#E0C3F5","#9FB4FF","#C9A7F0","#8FD3A0"];
   var tcolors={};
   function hashStr(t){var h=0;for(var i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))>>>0;return h}
   function computeTopicColors(){
     var names=allTopics().map(function(x){return x[0]}).sort(function(a,b){return a.localeCompare(b,"ko")});
     var used={}, out={};
-    names.forEach(function(t){var k=hashStr(t)%TPAL.length,g=0;while(used[k]&&g<TPAL.length){k=(k+1)%TPAL.length;g++}used[k]=1;out[t]=TPAL[k]});
+    names.forEach(function(t){var m=topicMeanColor(t); if(m)out[t]=m});   // 뜻이 있는 주제는 그 뜻의 색
+    names.forEach(function(t){if(out[t])return; var k=hashStr(t)%TPAL.length,g=0;while(used[k]&&g<TPAL.length){k=(k+1)%TPAL.length;g++}used[k]=1;out[t]=TPAL[k]});
     tcolors=out;
   }
+  // 주제 이름의 뜻으로 색 정하기 (2026-10-24 사용자 요청): 앞에 있는 것이 먼저
+  var TMEAN=[
+    [/화평|평안|평강|평화|화목|쉼/,"#6FD09A"],                       // 초록
+    [/분노|노함|노여|성냄|분을|(^|[\s,])화($|[\s,])|다툼|싸움/,"#F26B6B"],   // 빨강
+    [/사랑|긍휼|자비|용서/,"#F48FB6"],                              // 분홍
+    [/기쁨|기뻐|감사|찬양|찬송|즐거/,"#FFD36B"],                      // 노랑
+    [/믿음|신뢰|확신/,"#8FAAFF"],                              // 파랑
+    [/실천|행함|행동|순종|적용|결단|열매/,"#FF9E7A"],                  // 산호
+    [/소망|희망|약속|천국|영생/,"#6ECBF4"],                          // 하늘
+    [/위로|치유|회복|눈물|고난|환난/,"#5ED3C3"],                      // 청록
+    [/지혜|명철|경건|훈계|말씀|진리/,"#B6E36B"],                      // 연두
+    [/겸손|온유|착한|선한|선행|섬김|정직|바른/,"#9FE0C0"],              // 민트
+    [/죄|회개|유혹|욕심|교만|시기|정욕|악/,"#C98A5E"],                 // 갈색
+    [/두려움|두려워|염려|근심|걱정|불안/,"#C9A7F0"],                  // 연보라
+    [/빛|어둠|어두/,"#FFE9A3"],                                    // 연노랑
+    [/기도|간구|성령|하나님|예수|정체성|은혜/,"#B79CF2"]               // 보라
+  ];
+  function topicMeanColor(t){for(var i=0;i<TMEAN.length;i++)if(TMEAN[i][0].test(t))return TMEAN[i][1]; return ""}
   function topicColor(t){return tcolors[t]||"var(--violet)"}
   function cardTopic(n){var st=noteSelTopics(n);return st[0]||n.topics[0]||""}
   function renderTopicBar(){
