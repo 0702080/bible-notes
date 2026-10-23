@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-4">
+<meta name="app-build" content="2026-10-24-5">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1637,6 +1637,14 @@ body.boardon .board4{flex:1 1 auto;height:auto;min-height:0;padding-bottom:0;mar
 body.boardon .boardsay:not([hidden]){display:flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;height:40px;margin:0 -20px;padding:0 20px;border-top:1px solid #1f1e24;background:#0d0d10}
 .boardsay .bsq{flex:0 1 auto;min-width:0;max-width:min(1100px,90%);padding:4px 12px;border:0;border-radius:14px;background:transparent;color:color-mix(in srgb,var(--gold) 35%,var(--ink));font-family:var(--serif);font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .boardsay .bsq small{margin-left:10px;font-family:var(--sans);font-size:12px;color:var(--gold)}
+.boardsay{overflow:hidden}
+.boardsay .bsq{color:var(--green)!important}   /* 한 마디 글자는 초록 (2026-10-24 사용자 요청) */
+.boardsay .bsq small{color:color-mix(in srgb,var(--green) 70%,var(--muted))}
+.boardsay .bsq.bsout{animation:bsout .45s ease-in forwards}
+.boardsay .bsq.bsin{animation:bsin .6s cubic-bezier(.2,.8,.2,1)}
+@keyframes bsout{to{opacity:0;transform:translateY(-120%)}}
+@keyframes bsin{from{opacity:0;transform:translateY(120%)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.boardsay .bsq.bsout,.boardsay .bsq.bsin{animation:none}}
 @media (hover:hover){.boardsay .bsq:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
 .boardsay .saypin{position:static;flex:0 0 auto}
 body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!important}
@@ -9063,9 +9071,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     scheduleSave(n.id); render(); toast("묵상으로 담았어요 ✍️");
     closeMedq(); openNoteFocus(n.id,"m");
   }
-  function renderBoardSay(){   // PC 칸반에서는 '오늘' 카드가 숨으니, 같은 한 마디를 맨 아래 한 줄로
+  // PC 칸반 맨 아래 한 줄: 몇 초마다 위로 스르륵 사라지고 다음 한 마디가 아래에서 올라옴 (📌 고정이면 그대로, 2026-10-24 사용자 요청)
+  var BS={id:"",timer:0,busy:false};
+  function bsItems(){return sayData().items.filter(function(x){return String(x.t||"").trim()})}
+  function bsPick(next){
+    var items=bsItems(); if(!items.length)return null;
+    var pinned=sayPinned(); if(pinned){var pi=items.filter(function(x){return x.id===pinned.id})[0]; if(pi)return pi}
+    var cur=-1; items.forEach(function(x,i){if(x.id===BS.id)cur=i});
+    if(cur<0){var sd=sayOfDay(); return sd}
+    return next?items[(cur+1)%items.length]:items[cur];
+  }
+  function renderBoardSay(next){   // PC 칸반에서는 '오늘' 카드가 숨으니, 한 마디를 맨 아래 한 줄로
     var bs=$("boardSay"); if(!bs)return;
-    var sd=sayOfDay(); bs.hidden=!sd; bs.textContent=""; if(!sd)return;
+    var sd=bsPick(next); bs.hidden=!sd; bs.textContent=""; if(!sd)return;
+    BS.id=sd.id;
     var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
     var q=document.createElement("button"); q.type="button"; q.className="bsq"; q.title="믿음의 한 마디 모두 보기";
     q.textContent="💬  “"+String(sd.t).replace(/\s+/g," ")+"”";
@@ -9074,7 +9093,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     pb.textContent="📌"; pb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; pb.setAttribute("aria-label",pb.title); pb.setAttribute("aria-pressed",String(isPin));
     q.addEventListener("click",function(){openSay()}); pb.addEventListener("click",function(){sayTogglePin(sd.id)});
     bs.appendChild(q); bs.appendChild(pb);
+    if(next){q.classList.add("bsin"); setTimeout(function(){q.classList.remove("bsin")},700)}
   }
+  function bsRoll(){
+    var bs=$("boardSay"); if(!bs||bs.hidden||BS.busy||document.hidden||!document.body.classList.contains("boardon"))return;
+    if(sayPinned()||bsItems().length<2)return;
+    if(bs.matches(":hover"))return;   // 마우스를 올려 읽는 중이면 기다림
+    var q=bs.querySelector(".bsq"); BS.busy=true;
+    if(q)q.classList.add("bsout");
+    setTimeout(function(){BS.busy=false; renderBoardSay(true)},(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)?0:450);
+  }
+  setInterval(bsRoll,12000);
   function renderReviewBar(){
     try{renderBoardSay()}catch(e){}
     var bar=$("reviewBar"); if(!bar)return;
