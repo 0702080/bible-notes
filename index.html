@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-26">
+<meta name="app-build" content="2026-10-24-27">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3470,9 +3470,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     el.appendChild(document.createTextNode(t.slice(last)));
   }
+  var KBF="bible-kb-fresh", kbFC={};
+  function kbFresh(){var o={}; try{o=JSON.parse(localStorage.getItem(KBF)||"{}")||{}}catch(e){} var now=Date.now(), r={};
+    Object.keys(o).forEach(function(k){if(now-(+o[k]||0)<864e5&&notes.has(k))r[k]=+o[k]}); kbFC=r; return r}
+  function kbFreshSet(id,on){var o=kbFresh(); if(on)o[id]=Date.now(); else delete o[id]; kbFC=o; try{localStorage.setItem(KBF,JSON.stringify(o))}catch(e){}}
   function kbCard(n,i){
     var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0;
-    if(Date.now()-(n.createdAt||0)<864e5)cd.classList.add("bnew");   // 새로 담은 말씀 표시
+    if(kbFC[n.id])cd.classList.add("bnew");   // 새로 담은 말씀 표시
     var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)"); cd.style.animationDelay=(Math.min(i,12)*30)+"ms";
     var col=boardCol(n), mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
     cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
@@ -3520,8 +3524,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     box.classList.remove("find");
     var cus=myCols(), filtering=!!(filterText||topicSel.length);
     var auto=items.filter(function(n){return !n.col});
-    // 새로 담은 말씀(하루 안)은 첫 칸 맨 위에 (2026-10-24 사용자 요청)
-    var fresh=auto.filter(function(n){return Date.now()-(n.createdAt||0)<864e5}).sort(function(a,b){return b.createdAt-a.createdAt});
+    // '말씀 담기'로 막 담은 말씀은 첫 칸 맨 위에 — 하루 동안, 손으로 옮기면 그때부터는 옮긴 자리 (2026-10-24 사용자 요청)
+    var kf=kbFresh(), fresh=auto.filter(function(n){return kf[n.id]}).sort(function(a,b){return kf[b.id]-kf[a.id]});
     if(fresh.length)auto=fresh.concat(auto.filter(function(n){return fresh.indexOf(n)<0}));
     var mineCols=cus.map(function(c){return {c:c,part:items.filter(function(n){return n.col===c})}}).filter(function(x){return !filtering||x.part.length});
     box.classList.toggle("bsolo",items.length===1);   // 찾아서 딱 하나만 남으면 화면 가로 가운데에 (2026-10-22 사용자 요청)
@@ -4689,7 +4693,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!backend){setStatus("노트를 불러온 뒤에 추가할 수 있어요.");return null}
     var minOrder=Infinity; notes.forEach(function(x){if(x.order!=null&&x.order<minOrder)minOrder=x.order});
     var n=cleanNote({id:uid(),ref:item.ref,text:item.text,book:item.book,chapter:item.chapter,verse:item.verse,meds:[{id:mid(),text:"",at:Date.now()}],qs:[],order:isFinite(minOrder)?minOrder-1000:null,topics:item.topics||[],tw:item.tw||{},createdAt:Date.now()});
-    notes.set(n.id,n); openIds.add(n.id); render();
+    notes.set(n.id,n); openIds.add(n.id); kbFreshSet(n.id,true); render();
     scheduleSave(n.id,0); lastAdded=n.id;
     if($("addSheet").hidden){var el=cards.get(n.id); if(el)el.scrollIntoView({block:"nearest",behavior:"smooth"})}
     return n;
@@ -12538,6 +12542,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   document.addEventListener("pointermove",function(e){
     if(!lmP)return;
     if(!lmP.on){if(Math.abs(e.clientX-lmP.x)+Math.abs(e.clientY-lmP.y)<8)return;
+      (lmP.ids||[]).forEach(function(x){if(kbFC[x])kbFreshSet(x,false)});   // 옮기기 시작하면 '새로 담음' 고정을 풂
       lmP.on=true; lmDrag=lmP; lmP.el.classList.add("lmdrag"); document.body.classList.add("lmmoving");
       var r=lmP.el.getBoundingClientRect(), g=lmP.el.cloneNode(true); g.classList.remove("lmdrag"); g.classList.add("lmghost");
       g.style.width=r.width+"px"; g.style.height=Math.min(r.height,lmP.type==="col"?260:r.height)+"px"; lmP.dx=lmP.x-r.left; lmP.dy=lmP.y-r.top;
