@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-23">
+<meta name="app-build" content="2026-10-24-24">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1783,6 +1783,16 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 @media (hover:hover){.bcard:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--tc) 50%,#2A2930);box-shadow:0 10px 24px rgba(0,0,0,.45)}}
 .bcref{display:flex;align-items:center;gap:6px;color:var(--violet);font-size:13.5px}
 .bcref b{font-weight:400;-webkit-text-stroke:.3px currentColor}
+.bcard.bnew .bcref::after{content:"새로 담음";margin-left:auto;padding:1px 7px;border-radius:9px;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);font-size:11px;font-weight:700;-webkit-text-stroke:0}
+.bcard.bnew .bcpin{order:2}
+.bcard.bjust{animation:bjust 3s ease-out}
+@keyframes bjust{0%,40%{box-shadow:0 0 0 3px var(--gold),0 0 30px color-mix(in srgb,var(--gold) 60%,transparent);border-color:var(--gold)}100%{box-shadow:0 2px 6px rgba(0,0,0,.55)}}
+.bcol{position:relative}
+.bcjump{position:absolute;right:14px;bottom:14px;display:flex;flex-direction:column;gap:6px;z-index:5;pointer-events:none}
+.bcjump button{display:grid;place-items:center;width:34px;height:34px;border:1px solid #45414F;border-radius:17px;background:rgba(32,30,39,.92);color:var(--ink);box-shadow:0 4px 14px rgba(0,0,0,.5);opacity:0;transform:scale(.85);transition:opacity .18s,transform .18s;pointer-events:none;cursor:pointer}
+.bcol.canup .bcjt,.bcol.candown .bcjb{opacity:.85;transform:none;pointer-events:auto}
+@media (hover:hover){.bcjump button:hover{opacity:1;background:var(--gold);color:#17120A;border-color:var(--gold)}}
+.bcol.bfold .bcjump{display:none}
 .bvn{display:inline-block;margin-right:4px;font-size:.78em;font-weight:700;vertical-align:.12em;color:color-mix(in srgb,var(--tc,var(--violet)) 85%,#fff);opacity:.9}   /* 절 번호 */
 .bcpin{margin-left:auto;font-size:11px}
 .bctext{margin:6px 0 8px;font-size:14px;line-height:1.6;color:#E8C3A0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
@@ -3396,6 +3406,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function kbCard(n,i){
     var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0;
+    if(Date.now()-(n.createdAt||0)<864e5)cd.classList.add("bnew");   // 새로 담은 말씀 표시
     var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)"); cd.style.animationDelay=(Math.min(i,12)*30)+"ms";
     var col=boardCol(n), mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
     cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
@@ -3420,13 +3431,33 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var lst=document.createElement("div"); lst.className="bclist";
     part.forEach(function(n,i){lst.appendChild(kbCard(n,i))});
     if(!part.length){var em=document.createElement("p"); em.className="bcempty"; em.textContent="말씀 카드를 여기로 끌어다 놓으세요"; lst.appendChild(em)}
-    cl.appendChild(lst); return cl;
+    cl.appendChild(lst);
+    // 칸 맨 위·맨 아래로 바로 (2026-10-24 사용자 요청)
+    var jp=document.createElement("div"); jp.className="bcjump";
+    jp.innerHTML='<button type="button" class="bcjt" aria-label="이 칸 맨 위로" title="맨 위로"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5h12M12 19V9M7 13l5-5 5 5"/></svg></button>'+
+      '<button type="button" class="bcjb" aria-label="이 칸 맨 아래로" title="맨 아래로"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 19h12M12 5v10M7 11l5 5 5-5"/></svg></button>';
+    cl.appendChild(jp);
+    return cl;
   }
+  function bcJumpState(cl){
+    var l=cl&&cl.querySelector(".bclist"); if(!l)return;
+    cl.classList.toggle("canup",l.scrollTop>80); cl.classList.toggle("candown",l.scrollHeight-l.clientHeight-l.scrollTop>80);
+  }
+  $("board").addEventListener("scroll",function(e){var l=e.target; if(l.classList&&l.classList.contains("bclist"))bcJumpState(l.closest(".bcol"))},true);
+  $("board").addEventListener("mouseover",function(e){var cl=e.target.closest&&e.target.closest(".bcol"); if(cl&&cl!==bcJumpState.last){bcJumpState.last=cl; bcJumpState(cl)}});
+  $("board").addEventListener("click",function(e){
+    var b=e.target.closest(".bcjt,.bcjb"); if(!b)return; e.stopPropagation();
+    var l=b.closest(".bcol").querySelector(".bclist"); if(l)l.scrollTo({top:b.classList.contains("bcjt")?0:l.scrollHeight,behavior:"smooth"});
+  },true);
   function renderKanbanList(box){
     var items=sorted().filter(function(n){return visibleNote(n)});
     box.classList.remove("find");
     var cus=myCols(), filtering=!!(filterText||topicSel.length);
-    var auto=items.filter(function(n){return !n.col}), mineCols=cus.map(function(c){return {c:c,part:items.filter(function(n){return n.col===c})}}).filter(function(x){return !filtering||x.part.length});
+    var auto=items.filter(function(n){return !n.col});
+    // 새로 담은 말씀(하루 안)은 첫 칸 맨 위에 (2026-10-24 사용자 요청)
+    var fresh=auto.filter(function(n){return Date.now()-(n.createdAt||0)<864e5}).sort(function(a,b){return b.createdAt-a.createdAt});
+    if(fresh.length)auto=fresh.concat(auto.filter(function(n){return fresh.indexOf(n)<0}));
+    var mineCols=cus.map(function(c){return {c:c,part:items.filter(function(n){return n.col===c})}}).filter(function(x){return !filtering||x.part.length});
     box.classList.toggle("bsolo",items.length===1);   // 찾아서 딱 하나만 남으면 화면 가로 가운데에 (2026-10-22 사용자 요청)
     if(!items.length&&(filtering||!mineCols.length)){var nb=document.createElement("p");nb.className="bnohit";nb.textContent=filterText?"\u201c"+filterText+"\u201d이(가) 든 말씀이 없어요.":"담긴 말씀이 없어요.";box.appendChild(nb);return}
     var w=box.clientWidth||document.documentElement.clientWidth||1200, room=Math.max(1,Math.floor((w+14)/284)-mineCols.length);
@@ -4689,7 +4720,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function closeSheet(){
     $("addSheet").hidden=true; $("fab").hidden=reorderMode; document.body.style.overflow="";
-    if(lastAdded){var el=cards.get(lastAdded); lastAdded=null; if(el)setTimeout(function(){el.scrollIntoView({block:"start",behavior:"smooth"})},60)}
+    if(lastAdded){var la=lastAdded, el=cards.get(la); lastAdded=null;
+      if(boardOn)setTimeout(function(){   // 칸반: 담은 카드가 어느 칸 어디에 들어갔는지 보여 줌 (2026-10-24 사용자 요청)
+        var bc=$("board").querySelector('.bcard[data-id="'+la+'"]'); if(!bc)return;
+        var bl=bc.closest(".bclist"); if(bl)bl.scrollTo({top:Math.max(0,bc.offsetTop-bl.offsetTop-8),behavior:"smooth"});
+        bc.closest(".bcol").scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"});
+        bc.classList.remove("bjust"); void bc.offsetWidth; bc.classList.add("bjust"); setTimeout(function(){bc.classList.remove("bjust")},3200);
+        var ct=bc.closest(".bcol").querySelector(".bch b");
+        toast("📖 '"+(ct?ct.textContent.trim():"첫 칸")+"' 맨 위에 담았어요");
+      },150);
+      else if(el)setTimeout(function(){el.scrollIntoView({block:"start",behavior:"smooth"})},60)}
   }
   $("homeBtn").addEventListener("click",function(){   // 처음 화면으로: 찾기·주제·펼친 카드를 모두 되돌림
     if(typeof reorderMode!=="undefined"&&reorderMode)setReorder(false);
