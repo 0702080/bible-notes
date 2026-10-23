@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-35">
+<meta name="app-build" content="2026-10-24-36">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4987,6 +4987,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // 연결 말씀: 구절 칸에서 엔터 → 메모 칸으로
   // PC: 카드 도구 아이콘에 마우스를 올리면 짧게 '띡' (2026-10-23 사용자 요청)
   var hovAC=null, hovAt=0;
+  // 종이 스치는 소리 (칸반 카드 옮길 때, 2026-10-24 사용자 요청): 잡음을 짧게 걸러 '사락' 소리를 만든다
+  function paperSwish(soft){
+    try{
+      if(!(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches))return;   // PC에서만
+      var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
+      if(!hovAC)hovAC=new AC(); if(hovAC.state==="suspended")hovAC.resume();
+      var ac=hovAC, t=ac.currentTime, dur=soft?.16:.24, len=Math.floor(ac.sampleRate*dur), buf=ac.createBuffer(1,len,ac.sampleRate), d=buf.getChannelData(0);
+      for(var i=0;i<len;i++){var x=i/len; d[i]=(Math.random()*2-1)*Math.pow(Math.sin(Math.PI*x),1.6)*(0.6+0.4*Math.random())}
+      var src=ac.createBufferSource(); src.buffer=buf;
+      var bp=ac.createBiquadFilter(); bp.type="bandpass"; bp.Q.value=0.9;
+      bp.frequency.setValueAtTime(soft?2600:1800,t); bp.frequency.exponentialRampToValueAtTime(soft?1500:4200,t+dur);
+      var hp=ac.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=700;
+      var g=ac.createGain(); g.gain.value=soft?.10:.16;
+      src.connect(bp); bp.connect(hp); hp.connect(g); g.connect(ac.destination); src.start(t); src.stop(t+dur);
+    }catch(e){}
+  }
   function hoverTick(){
     try{
       var now=Date.now(); if(now-hovAt<60)return; hovAt=now;
@@ -12607,6 +12623,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!lmP)return;
     if(!lmP.on){if(Math.abs(e.clientX-lmP.x)+Math.abs(e.clientY-lmP.y)<8)return;
       (lmP.ids||[]).forEach(function(x){if(kbFC[x])kbFreshSet(x,false)});   // 옮기기 시작하면 '새로 담음' 고정을 풂
+      paperSwish(false);   // 집어 들 때 '사락'
       lmP.on=true; lmDrag=lmP; lmP.el.classList.add("lmdrag"); document.body.classList.add("lmmoving");
       var r=lmP.el.getBoundingClientRect(), g=lmP.el.cloneNode(true); g.classList.remove("lmdrag"); g.classList.add("lmghost");
       g.style.width=r.width+"px"; g.style.height=Math.min(r.height,lmP.type==="col"?260:r.height)+"px"; lmP.dx=lmP.x-r.left; lmP.dy=lmP.y-r.top;
@@ -12626,6 +12643,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var stop=function(ev){ev.stopPropagation();ev.preventDefault()}; document.addEventListener("click",stop,true); setTimeout(function(){document.removeEventListener("click",stop,true)},50);
     if(cancel)return;
     var t=lmTarget(e.clientX,e.clientY), cl=t.cl; if(!cl)return;
+    paperSwish(true);   // 내려놓을 때 작게
     var cards=Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id});
     var tcc=cl.dataset.cc||"";
     if(d.type==="col"&&(d.cc||tcc)){   // 내가 만든 칸은 어느 칸 사이로든 옮김 (놓은 칸의 왼쪽 반이면 그 앞, 오른쪽 반이면 그 뒤)
