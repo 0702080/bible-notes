@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-42">
+<meta name="app-build" content="2026-10-23-43">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -315,6 +315,7 @@ details.menu>summary::-webkit-details-marker{display:none}
 .prva b{font-size:12.5px;color:var(--gold)}
 .prva p{margin:2px 0 0;font-size:15.5px;line-height:1.75;color:var(--gold);white-space:pre-line;word-break:keep-all}
 .pri:not(.editing) .pt,.pri:not(.editing) .pans{display:none}
+.pri textarea.ptbig{resize:none;overflow-y:auto;overscroll-behavior:contain}
 .pans[hidden]{display:none}
 .pri.editing .prv{display:none}
 .phint{margin:8px 2px 0;font-size:11.5px;color:var(--faint)}
@@ -3842,6 +3843,29 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var r=t.getBoundingClientRect(); if(r.top<90||r.bottom>window.innerHeight-20)window.scrollBy(0,r.top-110);
   });
 
+  // 휴대폰: 카드 기도 칸(기도 제목·응답)에 적을 때는 키보드 위 남은 화면을 세로로 거의 다 쓰게 (2026-10-23 사용자 요청)
+  (function(){
+    var cur=null;
+    function fit(){
+      if(!cur||!cur.isConnected||document.activeElement!==cur)return;
+      var vv=window.visualViewport, vh=vv?vv.height:innerHeight, vtop=vv?vv.offsetTop:0;
+      var card=cur.closest(".note"), hd=card&&card.querySelector(".chead"), hb=0;
+      if(hd){var hr=hd.getBoundingClientRect(); if(getComputedStyle(hd).position==="sticky")hb=Math.max(0,Math.min(hr.height,hr.bottom-vtop))}
+      var pri=cur.closest(".pri"), ft=pri&&pri.querySelector(".pfoot"), fh=ft&&ft.offsetHeight?ft.offsetHeight+8:0;
+      var room=Math.round(vh-hb-12-fh-10);
+      cur.style.height=Math.max(140,room)+"px";
+      var y=cur.getBoundingClientRect().top-vtop, want=hb+12;
+      if(Math.abs(y-want)>2)window.scrollBy(0,y-want);
+    }
+    document.addEventListener("focusin",function(e){
+      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||!(t.classList.contains("pt")||t.classList.contains("pan"))||!t.closest("#list .note .pri"))return;
+      if(window.matchMedia&&matchMedia("(min-width:900px)").matches)return;
+      cur=t; t.classList.add("dlbig","ptbig"); setTimeout(fit,60); setTimeout(fit,350); setTimeout(fit,700);
+    });
+    document.addEventListener("focusout",function(e){if(e.target===cur){var t=cur;cur=null;t.classList.remove("dlbig","ptbig");t.style.height="";grow(t)}});
+    if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){if(cur)fit()});
+    window.addEventListener("resize",function(){if(cur)fit()});
+  })();
   var tabOf=new Map();
   /* ---------- 기도: 이 말씀으로 드리는 기도 제목, 응답되면 표시 ---------- */
   function renderPrays(el,n){
