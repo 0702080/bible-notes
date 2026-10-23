@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-34">
+<meta name="app-build" content="2026-10-23-35">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -251,10 +251,10 @@ details.menu>summary::-webkit-details-marker{display:none}
 @media (hover:none){.lmvtip{display:none}}
 .note.vediting .editbox .etext[hidden]{display:none}
 /* 고치기 칸의 말씀 글자가 보는 화면과 똑같은 자리에 오게: 구절 이름 칸은 아래로, 글자 들여쓰기 없음, 같은 색 (2026-10-23 사용자 요청) */
-.note.vediting{padding-top:14px!important}
+.note.vediting{padding-top:22px!important}   /* 구절 이름 위 여백 (2026-10-23 사용자 요청) */
 .note.vediting .chead .pinbtn{height:32px!important;width:32px;margin:-6px -8px -6px 0!important}
 .note.vediting .chead .ref{font-size:13.5px;line-height:1.4;margin-right:0}
-.note.vediting .editbox{display:flex;flex-direction:column;margin:4px 0 10px}
+.note.vediting .editbox{display:flex;flex-direction:column;margin:16px 0 10px}   /* 고치기 칸 테두리가 구절 이름에 붙지 않게 */
 .note.vediting .chead>:not(.ref):not(.pinbtn):not(.grip):not(.saved){display:none!important}   /* 머리 단추를 숨겨 "암송" 표시가 줄바꿈되지 않게 → 접힌 카드와 같은 높이 */
 .note.vediting .chead{position:static!important;margin:0!important;padding:0 0 2px!important;background:none!important;box-shadow:none!important;border-radius:0!important;align-items:flex-start!important;min-height:0!important;gap:6px!important}
 .note.vediting .editbox .etext{order:0;color:#E8C3A0;padding:8px 7px;margin:-9px -8px 0;width:calc(100% + 16px);overflow:hidden;resize:none}
