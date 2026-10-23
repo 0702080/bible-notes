@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-13">
+<meta name="app-build" content="2026-10-23-14">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1679,6 +1679,18 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcrn{min-width:90px;max-width:150px;height:24px;padding:0 6px;border:1px solid var(--violet);border-radius:6px;background:#141318;color:var(--ink);font-family:inherit;font-size:13.5px;font-weight:700}
 .bcn{margin-left:auto;min-width:24px;height:22px;padding:0 7px;border-radius:11px;background:color-mix(in srgb,var(--bc) 18%,transparent);color:var(--bc);font-size:12.5px;line-height:22px;text-align:center}
 .bclist{display:flex;flex-direction:column;gap:8px}
+/* 내가 만든 칸 */
+.bcol.bcust{border-color:color-mix(in srgb,var(--gold) 30%,#38343F);background:color-mix(in srgb,var(--gold) 4%,#272530)}
+.bcol.bcust .bch b{color:var(--gold)}
+.bcempty{margin:6px 4px;padding:22px 10px;border:1.5px dashed #3A3744;border-radius:12px;text-align:center;font-size:12.5px;color:var(--faint)}
+.bcdel{flex:0 0 auto;width:26px;height:26px;margin-left:2px;padding:0;border:0;border-radius:13px;background:transparent;color:var(--faint);font-size:0;display:grid;place-items:center}
+.bcdel::before{content:"×";font-size:17px;line-height:1}
+.bcdel.sure{width:auto;padding:0 10px;font-size:12px;background:color-mix(in srgb,#E5484D 22%,#1E1D24);color:#FFB4B4}
+.bcdel.sure::before{display:none}
+@media (hover:hover){.bcdel:hover{background:#34313D;color:var(--ink)}}
+.baddcol{flex:0 0 120px;align-self:flex-start;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:120px;margin:0;border:1.5px dashed #46424F;border-radius:16px;background:transparent;color:var(--muted);font-size:13.5px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.baddcol span{font-size:26px;line-height:1;font-weight:400}
+@media (hover:hover){.baddcol:hover{border-color:var(--gold);color:var(--gold);background:color-mix(in srgb,var(--gold) 6%,transparent)}}
 .bcfold{flex:0 0 auto;width:26px;height:26px;margin-left:2px;padding:0;border:0;border-radius:13px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
 .bcfold::before{content:"";width:7px;height:7px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateX(1px) rotate(45deg);transition:transform .3s}
 @media (hover:hover){.bcfold:hover{background:#34313D;color:var(--ink)}}
@@ -2973,6 +2985,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0,d:/^\d{4}-\d{2}-\d{2}$/.test(n.rv.d||"")?n.rv.d:""}:null,
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
+      col:String(n.col||"").trim().slice(0,20),   // PC 칸반에서 내가 만든 칸 이름 (비면 자동 칸)
       uses:Array.isArray(n.uses)?n.uses.filter(function(u){return u&&u.when}).slice(0,30).map(function(u){return {when:String(u.when),why:String(u.why||""),how:String(u.how||""),mine:!!u.mine}}):[],
       drill:Array.isArray(n.drill)?n.drill.filter(function(d){return d&&+d.at>0}).slice(-300).map(function(d){return {at:+d.at,ms:+d.ms||0,b:["best","fast","fire","done"].indexOf(d.b)>=0?d.b:"done"}}):[],
       mem:(n.mem&&Array.isArray(n.mem.s))?{s:(function(a){if(a.length>=5)a=[a[0],a[1],a[2],a[4]||a[3]];return [0,1,2,3].map(function(i){return +a[i]||0})})(n.mem.s),bak:Array.isArray(n.mem.bak)?[0,1,2,3].map(function(i){return +n.mem.bak[i]||0}):null}:{s:[0,0,0,0],bak:null},   // 예전 5단계(다음 날, 내일)는 4단계(내일) 하나로
@@ -3218,39 +3231,56 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       setTimeout(function(){cl.classList.remove("bfade"); setTimeout(function(){delete cl.dataset.anim},200)},on?260:330);
     },170);
   },true);
+  // 내가 만든 칸 (2026-10-23 사용자 요청): 칸 이름 목록은 이 기기에 기억, 카드가 어느 칸인지는 노트(n.col)에 저장돼 다른 기기도 같음
+  var CCOL_KEY="bible-board-cols";
+  function myCols(){
+    var a=[]; try{a=JSON.parse(localStorage.getItem(CCOL_KEY)||"[]")||[]}catch(e){a=[]}
+    notes.forEach(function(n){if(n.col&&a.indexOf(n.col)<0)a.push(n.col)});
+    return a;
+  }
+  function saveCols(a){try{localStorage.setItem(CCOL_KEY,JSON.stringify(a))}catch(e){}}
+  function kbCard(n,i){
+    var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0;
+    var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)"); cd.style.animationDelay=(Math.min(i,12)*30)+"ms";
+    var col=boardCol(n), mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
+    cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
+      '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div><button type="button" class="bcgo"></button>';
+    var bref=n.ref||"구절 미입력", btxt=String(n.text||"").replace(/\s+/g," ").trim(), braw=String(n.text||""), bte=cd.querySelector(".bctext");
+    if(filterText&&has(bref))markInto(cd.querySelector(".bcref b"),bref,filterText); else cd.querySelector(".bcref b").textContent=bref;
+    if(filterText&&(has(btxt)||has(braw))){markInto(bte,braw,filterText);vLines(bte);bte.classList.add("full")}else bte.textContent=btxt;
+    cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
+    if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
+    cd.querySelector(".bcgo").textContent=col==="due"?"🔁 복습하기":col==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
+    return cd;
+  }
+  function kbCol(key,title,emoji,part,extra){
+    var cl=document.createElement("section"); cl.className="bcol blist"+(extra||""); cl.style.setProperty("--bc","var(--violet)"); cl.dataset.k=key;
+    var h=document.createElement("div"); h.className="bch";
+    h.title="두 번 누르면 이름 바꾸기 · 좌우로 끌면 칸을 옮겨요";
+    h.innerHTML='<span class="bce"></span><b></b><span class="bcn"></span>'+(extra?'<button type="button" class="bcdel" aria-label="이 칸 지우기" title="칸 지우기 (말씀은 그대로)"></button>':'')+'<button type="button" class="bcfold" aria-label="이 칸 접기·펼치기" title="접기·펼치기"></button>';
+    h.querySelector(".bce").textContent=emoji; h.querySelector("b").textContent=title; h.querySelector(".bcn").textContent=part.length;
+    if(bFold[key]){cl.classList.add("bfold"); cl.title="눌러서 펼치기"}
+    cl.appendChild(h);
+    var lst=document.createElement("div"); lst.className="bclist";
+    part.forEach(function(n,i){lst.appendChild(kbCard(n,i))});
+    if(!part.length){var em=document.createElement("p"); em.className="bcempty"; em.textContent="말씀 카드를 여기로 끌어다 놓으세요"; lst.appendChild(em)}
+    cl.appendChild(lst); return cl;
+  }
   function renderKanbanList(box){
     var items=sorted().filter(function(n){return visibleNote(n)});
     box.classList.remove("find");
+    var cus=myCols(), filtering=!!(filterText||topicSel.length);
+    var auto=items.filter(function(n){return !n.col}), mineCols=cus.map(function(c){return {c:c,part:items.filter(function(n){return n.col===c})}}).filter(function(x){return !filtering||x.part.length});
     box.classList.toggle("bsolo",items.length===1);   // 찾아서 딱 하나만 남으면 화면 가로 가운데에 (2026-10-22 사용자 요청)
-    if(!items.length){var nb=document.createElement("p");nb.className="bnohit";nb.textContent=filterText?"\u201c"+filterText+"\u201d이(가) 든 말씀이 없어요.":"담긴 말씀이 없어요.";box.appendChild(nb);return}
-    var w=box.clientWidth||document.documentElement.clientWidth||1200, cols=Math.max(1,Math.min(items.length,Math.floor((w+14)/284)));
-    var per=Math.ceil(items.length/cols);
+    if(!items.length&&(filtering||!mineCols.length)){var nb=document.createElement("p");nb.className="bnohit";nb.textContent=filterText?"\u201c"+filterText+"\u201d이(가) 든 말씀이 없어요.":"담긴 말씀이 없어요.";box.appendChild(nb);return}
+    var w=box.clientWidth||document.documentElement.clientWidth||1200, room=Math.max(1,Math.floor((w+14)/284)-mineCols.length);
+    var cols=auto.length?Math.max(1,Math.min(auto.length,room)):0, per=cols?Math.ceil(auto.length/cols):0;
     for(var c=0;c<cols;c++){
-      var part=items.slice(c*per,(c+1)*per); if(!part.length)break;
-      var cl=document.createElement("section"); cl.className="bcol blist"; cl.style.setProperty("--bc","var(--violet)"); cl.dataset.k="L"+(c+1); cl.dataset.li=String(c);
-      var h=document.createElement("div"); h.className="bch";   // 칸 제목: 두 번 눌러 이름 바꾸기, 좌우로 끌면 칸 통째로 옮기기
-      h.title="두 번 누르면 이름 바꾸기 · 좌우로 끌면 이 칸의 말씀을 통째로 옮겨요";
-      h.innerHTML='<span class="bce">📖</span><b></b><span class="bcn"></span><button type="button" class="bcfold" aria-label="이 칸 접기·펼치기" title="접기·펼치기"></button>';
-      h.querySelector("b").textContent=bTitle({k:"L"+(c+1),t:"말씀 "+(c+1)}); h.querySelector(".bcn").textContent=part.length;
-      if(bFold["L"+(c+1)]){cl.classList.add("bfold"); cl.title="눌러서 펼치기"}
-      cl.appendChild(h);
-      var lst=document.createElement("div"); lst.className="bclist";
-      part.forEach(function(n,i){
-        var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0;
-        var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)"); cd.style.animationDelay=(Math.min(i,12)*30)+"ms";
-        var col=boardCol(n), mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
-        cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
-          '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div><button type="button" class="bcgo"></button>';
-        var bref=n.ref||"구절 미입력", btxt=String(n.text||"").replace(/\s+/g," ").trim(), braw=String(n.text||""), bte=cd.querySelector(".bctext");
-        if(filterText&&has(bref))markInto(cd.querySelector(".bcref b"),bref,filterText); else cd.querySelector(".bcref b").textContent=bref;
-        if(filterText&&(has(btxt)||has(braw))){markInto(bte,braw,filterText);vLines(bte);bte.classList.add("full")}else bte.textContent=btxt;
-        cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
-        if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
-        cd.querySelector(".bcgo").textContent=col==="due"?"🔁 복습하기":col==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
-        lst.appendChild(cd);
-      });
-      cl.appendChild(lst); box.appendChild(cl);
+      var part=auto.slice(c*per,(c+1)*per); if(!part.length)break;
+      var cl=kbCol("L"+(c+1),bTitle({k:"L"+(c+1),t:"말씀 "+(c+1)}),"📖",part,""); cl.dataset.li=String(c); box.appendChild(cl);
     }
+    mineCols.forEach(function(x,j){var cl=kbCol("C:"+x.c,x.c,"🗂️",x.part," bcust"); cl.dataset.cc=x.c; cl.dataset.ci=String(j); box.appendChild(cl)});
+    if(!filtering){var ad=document.createElement("button"); ad.type="button"; ad.className="baddcol"; ad.innerHTML='<span>＋</span>새 칸'; ad.title="새 칸 만들기"; box.appendChild(ad)}
   }
   // 칸을 옮기면 도장·복습 상태를 그 칸에 맞게 바꿈. 지운 도장은 보관해 두었다가 다시 옮기면 되살림
   function kanbanMove(n,to){
@@ -11290,7 +11320,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(e.target.closest("button,input,textarea,a"))return;
     var hd=e.target.closest(".bch"), cd=e.target.closest(".bcard"); if(!hd&&!cd)return;
     var cl=(hd||cd).closest(".bcol");
-    lmP={el:hd?cl:cd, type:hd?"col":"card", li:+cl.dataset.li, x:e.clientX, y:e.clientY, on:false,
+    lmP={el:hd?cl:cd, type:hd?"col":"card", li:+cl.dataset.li, cc:cl.dataset.cc||"", x:e.clientX, y:e.clientY, on:false,
       ids:hd?Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id}):[cd.dataset.id]};
   },true);
   document.addEventListener("pointermove",function(e){
@@ -11316,10 +11346,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(cancel)return;
     var t=lmTarget(e.clientX,e.clientY), cl=t.cl; if(!cl)return;
     var cards=Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id});
+    var tcc=cl.dataset.cc||"";
+    if(d.type==="col"&&(d.cc||tcc)){   // 내가 만든 칸끼리 자리 바꾸기
+      if(!(d.cc&&tcc)){toast("내가 만든 칸끼리만 자리를 바꿀 수 있어요");return}
+      if(d.cc===tcc)return;
+      var a=myCols(), from=a.indexOf(d.cc), to=a.indexOf(tcc); a.splice(to,0,a.splice(from,1)[0]); saveCols(a); render(); toast("칸 자리를 바꿨어요"); return;
+    }
+    if(d.type==="card"){   // 카드를 다른 칸으로: 내가 만든 칸이면 그 칸 이름을, 자동 칸이면 비움
+      d.ids.forEach(function(id){var x=notes.get(id); if(x&&x.col!==tcc){x.col=tcc;scheduleSave(id)}});
+      if(!cards.filter(function(x){return d.ids.indexOf(x)<0}).length){render();var lc=$("board").querySelector('.bcard[data-id="'+d.ids[0]+'"]');if(lc){lc.classList.add("lmland");setTimeout(function(){lc.classList.remove("lmland")},2200)}buzz(12);return}
+    }
     if(d.type==="col"){
       var li=+cl.dataset.li; if(li===d.li||!cards.length)return;
       // 칸 이름도 칸을 따라 옮김 (이름은 자리 L1, L2…에 붙어 있으므로 자리 이름을 같이 돌림, 2026-10-21 사용자 요청)
-      var nc=document.querySelectorAll("#board .bcol").length, nm=[];
+      var nc=document.querySelectorAll("#board .bcol:not(.bcust)").length, nm=[];
       for(var q=0;q<nc;q++)nm.push(bNames["L"+(q+1)]);
       nm.splice(li,0,nm.splice(d.li,1)[0]);
       nm.forEach(function(v,q){if(v)bNames["L"+(q+1)]=v; else delete bNames["L"+(q+1)]}); saveBNames();
@@ -11381,6 +11421,24 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     })});
   })();
   // 칸 이름 두 번 눌러 바꾸기
+  $("board").addEventListener("click",function(e){
+    if(bMode!=="list")return;
+    var ad=e.target.closest(".baddcol");
+    if(ad){
+      e.stopPropagation(); var nm=window.prompt("새 칸 이름을 적어 주세요 (예: 분노, 이번 주 암송)","");
+      if(nm===null)return; nm=String(nm).trim().slice(0,20); if(!nm){toast("칸 이름을 적어 주세요");return}
+      var a=myCols(); if(a.indexOf(nm)>=0){toast("같은 이름의 칸이 있어요");return}
+      a.push(nm); saveCols(a); render(); toast("'"+nm+"' 칸을 만들었어요. 말씀 카드를 끌어다 넣어 보세요"); buzz(10);
+      setTimeout(function(){var b=$("board"); if(b)b.scrollLeft=b.scrollWidth},60); return;
+    }
+    var dl=e.target.closest(".bcdel");
+    if(dl){
+      e.stopPropagation(); var cl=dl.closest(".bcol"), cc=cl&&cl.dataset.cc; if(!cc)return;
+      if(!dl.dataset.sure){dl.dataset.sure="1";dl.classList.add("sure");dl.textContent="한 번 더";setTimeout(function(){if(dl.isConnected){delete dl.dataset.sure;dl.classList.remove("sure");dl.textContent=""}},3000);return}
+      notes.forEach(function(n){if(n.col===cc){n.col="";scheduleSave(n.id)}});
+      saveCols(myCols().filter(function(x){return x!==cc})); delete bFold["C:"+cc]; saveBFold(); render(); toast("'"+cc+"' 칸을 지웠어요. 말씀은 그대로 있어요");
+    }
+  },true);
   $("board").addEventListener("dblclick",function(e){
     var hd=e.target.closest(".bch"); if(!hd||hd.querySelector(".bcrn")||e.target.closest(".bcfold")||hd.closest(".bfold"))return;
     var cl=hd.closest(".bcol"), k=cl&&cl.dataset.k; if(!k)return;
@@ -11392,6 +11450,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(!inp.isConnected)return;
       var v=inp.value.trim();
       inp.remove(); b.hidden=false; hd.draggable=bMode!=="list";
+      if(save&&v&&v!==was&&cl.dataset.cc){   // 내가 만든 칸
+        var a=myCols(); if(a.indexOf(v)>=0){toast("같은 이름의 칸이 있어요");b.textContent=was;return}
+        a=a.map(function(x){return x===was?v:x}); saveCols(a);
+        notes.forEach(function(n){if(n.col===was){n.col=v;scheduleSave(n.id)}});
+        if(bFold["C:"+was]){bFold["C:"+v]=1;delete bFold["C:"+was];saveBFold()}
+        render(); toast("칸 이름을 '"+v+"'으로 바꿨어요"); return;
+      }
       if(save&&v&&v!==was){bNames[k]=v; saveBNames(); b.textContent=v; toast("칸 이름을 '"+v+"'으로 바꿨어요")}
     }
     inp.addEventListener("keydown",function(ev){
