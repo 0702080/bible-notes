@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-10">
+<meta name="app-build" content="2026-10-24-11">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3946,7 +3946,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     prEdit.add(pid); render();
     var d=card.querySelector('.pri[data-pid="'+pid+'"]'); if(!d)return;
     d.querySelectorAll("textarea").forEach(grow);
-    var t=d.querySelector(".pt"); t.focus(); try{t.setSelectionRange(t.value.length,t.value.length)}catch(e){}
+    var t=d.querySelector(".pt"), cp=t.value.length;
+    if(!t.value.trim()){t.value=PRAY_TPL; t.dispatchEvent(new Event("input",{bubbles:true})); cp="하나님 아버지\n\n".length}   // 빈 기도는 기도문 틀로
+    t.focus(); try{t.setSelectionRange(cp,cp)}catch(e){}
   }
   /* ---------- 기도 읽기 모드: 적은 기도를 큰 글씨로 차분히 읽기 (한 말씀 또는 모든 말씀) ---------- */
   /* ---------- 한 줄 기도 (2026-10-15): 말씀 카드와 상관없이 짧게 적는 기도. 기도 모아 읽기 맨 위에서 적고, 거기서 함께 보임
@@ -5254,8 +5256,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.classList.contains("addm")||b.classList.contains("addq")||b.classList.contains("adda")){tabOf.set(id,b.classList.contains("addm")?"m":b.classList.contains("addq")?"q":"a")}
     if(b.classList.contains("pread")){openPrayRead(id);return}
     if(b.classList.contains("addp")){
-      tabOf.set(id,"p"); if(!n.prays)n.prays=[]; var np={id:qid(),t:"",at:Date.now(),ans:0,an:""}; n.prays.push(np); prEdit.add(np.id); render(); scheduleSave(id);
-      var pc=cards.get(id), pe=pc&&pc.querySelector('.pri[data-pid="'+np.id+'"] .pt'); if(pe)setTimeout(function(){pe.focus()},40);
+      tabOf.set(id,"p"); if(!n.prays)n.prays=[]; var np={id:qid(),t:PRAY_TPL,at:Date.now(),ans:0,an:""}; n.prays.push(np); prEdit.add(np.id); render(); scheduleSave(id);   // 기도문 틀로 시작 (2026-10-24 사용자 요청)
+      var pc=cards.get(id), pe=pc&&pc.querySelector('.pri[data-pid="'+np.id+'"] .pt'); if(pe)setTimeout(function(){grow(pe);pe.focus();var cp="하나님 아버지\n\n".length;try{pe.setSelectionRange(cp,cp)}catch(err){}},40);
       return;
     }
     if(b.classList.contains("pshare")){
