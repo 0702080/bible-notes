@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-35">
+<meta name="app-build" content="2026-10-23-36">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -242,7 +242,7 @@ details.menu>summary::-webkit-details-marker{display:none}
 .note.vediting .editbox .eref{height:34px;margin-bottom:6px;font-size:13.5px;color:var(--violet);font-weight:700}
 .note.vediting .editbox .etext{font-family:var(--serif);font-size:18px;line-height:1.75;color:var(--orange);word-break:keep-all;box-sizing:border-box;width:calc(100% + 2px);margin:0 -1px;padding:10px 0 10px 2.1em;background:#141418;border:1px dashed color-mix(in srgb,var(--orange) 50%,#34333A);border-radius:12px;caret-color:var(--hi)}
 @media (min-width:700px){.note.vediting .editbox .etext{line-height:1.9;word-spacing:.2em}}
-.note.vediting .editbox .etext:focus{outline:none;border-style:solid;box-shadow:0 0 0 3px color-mix(in srgb,var(--orange) 18%,transparent)}
+.note.vediting .editbox .etext:focus{outline:none;border-style:solid;box-shadow:none}   /* 바깥 두꺼운 빛 테두리 없앰 (2026-10-23 사용자 요청) */
 .note.vediting .editbox .donedit,.note.vediting .vedit{display:none}
 .lmvbar{display:none}
 .note.vediting .editbox .lmvbar:not([hidden]){display:flex;align-items:center;gap:10px;margin-top:8px}
