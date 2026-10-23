@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-12">
+<meta name="app-build" content="2026-10-23-13">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1410,6 +1410,15 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .grgo.grdel{color:#F28B82;border-color:#5A2E2E}
 .grgo.grdel.sure{background:#7A2222;color:#fff;border-color:#B33}
 .grgo{height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:#1E1D24;color:#D9D5E0;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;text-decoration:none;white-space:nowrap}
+.grih{gap:6px}
+.grgo.gri{width:38px;height:38px;padding:0;justify-content:center;border-radius:12px;border:1px solid #2E2D35;background:#1A1920;color:#C9C3D3;font-size:0;transition:background .15s,color .15s,border-color .15s}
+.grgo.gri::before{content:"";width:19px;height:19px;background:currentColor;-webkit-mask:var(--ico) center/contain no-repeat;mask:var(--ico) center/contain no-repeat}
+.gri-open{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='4' y='3.5' width='16' height='17' rx='3'/%3E%3Cpath d='M8 9h8M8 13h8M8 17h5'/%3E%3C/svg%3E")} .gri-ext{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 4h6v6'/%3E%3Cpath d='M20 4 11 13'/%3E%3Cpath d='M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4'/%3E%3C/svg%3E")} .gri-save{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4v11'/%3E%3Cpath d='m7.5 10.5 4.5 4.5 4.5-4.5'/%3E%3Cpath d='M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2'/%3E%3C/svg%3E")} .gri-center{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='7.5'/%3E%3Ccircle cx='12' cy='12' r='2.2'/%3E%3Cpath d='M12 2v3M12 19v3M2 12h3M19 12h3'/%3E%3C/svg%3E")} .gri-del{--ico:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 7h16'/%3E%3Cpath d='M9.5 7V4.5h5V7'/%3E%3Cpath d='M6.5 7l1 12.5a1.6 1.6 0 0 0 1.6 1.5h5.8a1.6 1.6 0 0 0 1.6-1.5l1-12.5'/%3E%3Cpath d='M10 11v6M14 11v6'/%3E%3C/svg%3E")}
+.grgo.gri-save{color:var(--mint);border-color:color-mix(in srgb,var(--mint) 40%,#2E2D35);background:color-mix(in srgb,var(--mint) 10%,#1A1920)}
+.grgo.gri-open{color:var(--violet);border-color:color-mix(in srgb,var(--violet) 40%,#2E2D35)}
+.grgo.gri-del{color:#E58A8A}
+.grgo.gri.sure{width:auto;padding:0 12px;font-size:12.5px;gap:6px;background:color-mix(in srgb,#E5484D 22%,#1A1920);border-color:#E5484D;color:#FFB4B4}
+@media (hover:hover){.grgo.gri:hover{background:#26252D;color:#fff}}
 .grtext{margin:8px 0 4px;font-family:var(--serif);font-size:15px;line-height:1.7;color:var(--orange);word-break:keep-all}
 .grtext.dim{font-family:var(--sans);font-size:13px;color:var(--muted)}
 .grnb{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -9794,12 +9803,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     GR.es.forEach(function(e,i){GR.lines[i].classList.toggle("on",!!k&&(e.a===k||e.b===k))});
     var inf=GR.ov.querySelector(".grinfo"); inf.hidden=!k; if(!k)return;
     var o=g.N[k], h='<div class="grih"><b class="grref"></b>';
-    if(o.t==="n")h+='<button type="button" class="grgo" data-act="open">카드 열기</button>';
-    if(o.t==="x"&&o.b>=0&&o.c>0)h+='<a class="grgo" target="_blank" rel="noopener">보기 ↗</a>';
-    if(o.t==="x"&&o.b>=0&&o.c>0&&o.v>0)h+='<button type="button" class="grgo" data-act="save">📥 카드로 담기</button>';
-    if(k!==GR.center&&o.t!=="t")h+='<button type="button" class="grgo" data-act="center">이 말씀 중심으로</button>';
+    // 아래 단추는 아이콘만 (마우스를 올리면 이름, 2026-10-23 사용자 요청)
+    if(o.t==="n")h+='<button type="button" class="grgo gri gri-open" data-act="open" title="카드 열기" aria-label="카드 열기"></button>';
+    if(o.t==="x"&&o.b>=0&&o.c>0)h+='<a class="grgo gri gri-ext" target="_blank" rel="noopener" title="성경에서 보기" aria-label="성경에서 보기"></a>';
+    if(o.t==="x"&&o.b>=0&&o.c>0&&o.v>0)h+='<button type="button" class="grgo gri gri-save" data-act="save" title="카드로 담기" aria-label="카드로 담기"></button>';
+    if(k!==GR.center&&o.t!=="t")h+='<button type="button" class="grgo gri gri-center" data-act="center" title="이 말씀 중심으로" aria-label="이 말씀 중심으로"></button>';
     if(o.t==="x"||(o.t==="n"&&Object.keys(nb).some(function(m){var e=g.E[k<m?k+"|"+m:m+"|"+k];return e&&e.kind==="l"})))
-      h+='<button type="button" class="grgo grdel" data-act="del">'+(o.t==="x"?"지우기":"연결 끊기")+'</button>';
+      h+='<button type="button" class="grgo gri gri-del grdel" data-act="del" title="'+(o.t==="x"?"지우기":"연결 끊기")+'" aria-label="'+(o.t==="x"?"지우기":"연결 끊기")+'"></button>';
     // 담지 않은 구절은 연결할 때 적어 둔 글(본문)을 보여 줌 (2026-10-23 사용자 요청)
     var xmemo=o.t==="x"?(o.text||""):"";
     h+='</div>'+(o.t==="n"||xmemo?'<p class="grtext"></p>':'')+(o.t==="x"&&!xmemo?'<p class="grtext dim">아직 본문을 적지 않은 구절이에요</p>':'');   // 아래 '이어진 말씀' 목록은 뺌 (2026-10-22 사용자 요청)
