@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-18">
+<meta name="app-build" content="2026-10-24-19">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2645,6 +2645,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlgpin{flex:0 0 auto;width:26px;height:26px;border:0;border-radius:13px;background:transparent;color:var(--faint);font-size:14px;line-height:1}
 .dlgpin.on{color:var(--gold)}
 .dlghgrip{margin-left:auto;flex:0 0 auto;width:28px;height:28px;display:grid;place-items:center;border:0;background:transparent;color:var(--faint);font-size:15px;line-height:1;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+.dlgsd{position:relative;margin-left:auto;flex:0 1 auto;min-width:0;display:inline-flex;align-items:center;height:26px;padding:0 10px;border:1px dashed #3A3944;border-radius:13px;font-size:12.5px;font-weight:400;color:var(--faint);white-space:nowrap;cursor:pointer}
+.dlgsd.on{border-style:solid;border-color:color-mix(in srgb,var(--gc,var(--gold)) 45%,transparent);background:color-mix(in srgb,var(--gc,var(--gold)) 10%,transparent);color:color-mix(in srgb,var(--gc,var(--gold)) 85%,#fff)}
+.dlgsd span{overflow:hidden;text-overflow:ellipsis}
+.dlgh:has(.dlgsd) .dlgname{white-space:nowrap;flex-shrink:0}
+@media (max-width:430px){.dlgsd{padding:0 8px;font-size:12px}.dlgh:has(.dlgsd){gap:4px}}
+.dlgsd input{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;cursor:pointer;color-scheme:dark}
+.dlgsd+.dlghgrip{margin-left:4px}
+@media (hover:hover){.dlgsd:hover{color:var(--ink)}}
 .dlgrp.dlgdrag .dlghgrip{cursor:grabbing;color:var(--gc,var(--gold))}
 .dlgchev{display:inline-block;width:7px;height:7px;margin-left:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translate(-2px,-2px);transition:transform .18s;opacity:.7}
 .dlgname[aria-expanded="true"] .dlgchev{transform:rotate(-135deg) translate(-2px,-2px)}
@@ -8212,7 +8220,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     list.addEventListener("pointerdown",function(e){
       if(G||D||(e.pointerType==="mouse"&&e.button!==0))return;
-      var hd=e.target.closest(".dlgh"); if(!hd||e.target.closest(".dlgdel,.dlgpin"))return;
+      var hd=e.target.closest(".dlgh"); if(!hd||e.target.closest(".dlgdel,.dlgpin,.dlgsd"))return;
       var sec=hd.closest(".dlgrp"); if(!sec||sec.parentNode!==list)return;
       if(e.target.closest(".dlghgrip")){e.preventDefault();try{e.target.closest(".dlghgrip").setPointerCapture(e.pointerId)}catch(err){}gstart(sec,e);return}
       GP={sec:sec,x:e.clientX,y:e.clientY,pid:e.pointerId,t:setTimeout(function(){
@@ -8437,6 +8445,23 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         pb.textContent=pin?"★":"☆"; pb.title=pin?"맨 위 고정 풀기":"즐겨찾기 — 맨 위에 고정";
         pb.setAttribute("aria-label","'"+g.t+"' 묶음 "+(pin?"고정 풀기":"맨 위에 고정")); pb.setAttribute("aria-pressed",String(pin));
         h.appendChild(pb);
+        // 작정기도 묶음: 시작 날짜와 며칠째인지 (2026-10-24 사용자 요청)
+        var gsd=(o.gstart&&o.gstart[g.g])||"";
+        if(gsd||/작정/.test(g.t)){
+          var sl=document.createElement("label"); sl.className="dlgsd"+(gsd?" on":""); sl.title="눌러서 시작 날짜 고르기";
+          var st=document.createElement("span");
+          if(gsd){var sdd=new Date(gsd+"T12:00:00"), dn=Math.round((new Date(today+"T12:00:00")-sdd)/864e5)+1;
+            st.textContent=(sdd.getFullYear()!==new Date().getFullYear()?String(sdd.getFullYear()).slice(2)+".":"")+(sdd.getMonth()+1)+"/"+sdd.getDate()+"~ "+(dn>0?dn+"일째":"D"+(dn-1))}
+          else st.textContent="📅 시작 날짜";
+          var si2=document.createElement("input"); si2.type="date"; si2.value=gsd; si2.setAttribute("aria-label","'"+g.t+"' 시작 날짜");
+          si2.addEventListener("click",function(){try{this.showPicker()}catch(err){}});
+          si2.addEventListener("change",(function(gg){return function(){
+            var d=dailyData(); if(!d.gstart||typeof d.gstart!=="object")d.gstart={};
+            if(/^\d{4}-\d{2}-\d{2}$/.test(this.value))d.gstart[gg]=this.value; else delete d.gstart[gg];
+            saveDaily(d); drawDaily();
+          }})(g.g));
+          sl.appendChild(st); sl.appendChild(si2); h.appendChild(sl);
+        }
         var hg=document.createElement("button"); hg.type="button"; hg.className="dlghgrip"; hg.dataset.g=g.g;
         hg.textContent="⠿"; hg.title="끌어서 묶음 차례 바꾸기 (꾹 눌러도 됩니다)";
         hg.setAttribute("aria-label","'"+g.t+"' 묶음 자리 옮기기"); h.appendChild(hg);
@@ -11258,6 +11283,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           // 묶음 차례와 ⭐ 고정도 함께 (이 기기에 없을 때만 받는다)
           if(Array.isArray(obj.daily.gorder)&&!Array.isArray(od.gorder))od.gorder=obj.daily.gorder.slice();
           if(Array.isArray(obj.daily.gpin)&&!Array.isArray(od.gpin))od.gpin=obj.daily.gpin.slice();
+          if(obj.daily.gstart&&typeof obj.daily.gstart==="object"){   // 작정기도 시작 날짜
+            if(!od.gstart||typeof od.gstart!=="object")od.gstart={};
+            Object.keys(obj.daily.gstart).forEach(function(g){if(!od.gstart[g])od.gstart[g]=obj.daily.gstart[g]});
+          }
           saveDaily(od); renderReviewBar()}
         if(obj&&obj.prays1)p1Merge(obj.prays1);
         if(obj&&obj.chapters&&typeof obj.chapters==="object"){var mc=myChapters();Object.keys(obj.chapters).forEach(function(k){var c=obj.chapters[k];if(c&&Array.isArray(c.v)&&(!mc[k]||(+c.at||0)>(+mc[k].at||0)))mc[k]=c});try{localStorage.setItem(MYCH,JSON.stringify(mc))}catch(e){}}
