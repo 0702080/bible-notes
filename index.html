@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-9">
+<meta name="app-build" content="2026-10-24-10">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7737,6 +7737,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   /* ---------- 하루 돌아보기 체크리스트 (이 기기에 저장, 백업에 함께 들어감) ---------- */
   var DAILY_KEY="bible-daily";
   var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도",c:"var(--violet)"},{g:"word",e:"📖",t:"말씀",c:"var(--orange)"},{g:"fruit",e:"🍇",t:"성령의 열매",c:"var(--green)"},{g:"sow",e:"🌱",t:"하나님 나라에 심기",c:"var(--sky)"},{g:"thanks",e:"💛",t:"감사·나눔",c:"var(--gold)"}];   // 묶음마다 색
+  var PRAY_TPL="하나님 아버지\n\n\n\n길이요 진리요 생명되신 나의 주\n예수님의 이름으로 기도 드립니다.\n아멘";   // 기도 항목 기록칸의 기도문 틀 (2026-10-24 사용자 요청)
   var DAILY_SOW=["돈을 하나님 나라를 위해 쓴 것이 있는가","시간을 하나님 나라를 위해 드렸는가","내 재능으로 누군가를 섬겼는가"];
   var DAILY_DEFAULT=[
     ["pray","대적 기도를 했는가"],["pray","필요한 것을 구하는 기도를 했는가"],["pray","버리는(내려놓는) 기도를 했는가"],["pray","회개 기도를 했는가"],["pray","누군가를 위해 중보 기도를 했는가"],
@@ -8028,7 +8029,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           dlMemoId=(dlMemoId===mid?"":mid); drawDaily();
           if(dlMemoId)setTimeout(function(){
             var ta=dl.querySelector('.dlmemobox[data-id="'+mid+'"] textarea');
-            if(ta){ta.focus();try{ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}ta.scrollIntoView({block:"center",behavior:"smooth"})}
+            if(ta){ta.focus();var cp=ta.dataset.tpl?"하나님 아버지\n\n".length:ta.value.length;try{ta.setSelectionRange(cp,cp)}catch(err){}ta.scrollIntoView({block:"center",behavior:"smooth"})}   // 기도문 틀이면 셋째 줄(빈 줄)에 커서
           },30);
         }
         if(b.classList.contains("dlmemop")){   // 적어 둔 글: 한 번은 읽기, 빠르게 두 번이면 고치기
@@ -8454,6 +8455,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             '<div class="dlmemofoot">'+(no>1?'':'<button type="button" class="dlmemoedit">✏️ 항목 글 고치기</button>')+'<button type="button" class="dlmemoclose">'+(no>1?'다 썼어요':'닫기')+'</button></div>';
           mx.querySelector(".dlmemoh span").textContent="📝 "+dayName(dlDay)+" 기록"+(no>1?" "+no:"");
           var ta=mx.querySelector("textarea"); ta.value=val; ta.setAttribute("aria-label",it.t+" 기록"+(no>1?" "+no:""));
+          // 기도 항목의 빈 기록칸은 기도문 틀로 시작 (글자를 적어야 저장됨, 2026-10-24 사용자 요청)
+          var gti=dlGroups(o).filter(function(g){return g.g===it.g})[0];
+          if(!val&&/기도/.test(it.t+" "+(gti?gti.t:""))){ta.value=PRAY_TPL;ta.dataset.tpl="1"}
           list.appendChild(mx);
         }
         function memoPrev(key,val,no){   // 기록마다 색을 살짝 달리해 한눈에 나뉘어 보이게 (2026-10-15 사용자 요청)
