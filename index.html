@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-13">
+<meta name="app-build" content="2026-10-24-15">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3316,6 +3316,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div><button type="button" class="bcgo"></button>';
     var bref=n.ref||"구절 미입력", btxt=String(n.text||"").replace(/\s+/g," ").trim(), braw=String(n.text||""), bte=cd.querySelector(".bctext");
     if(filterText&&has(bref))markInto(cd.querySelector(".bcref b"),bref,filterText); else cd.querySelector(".bcref b").textContent=bref;
+    var bkx=n.book>=0?n.book:parseRef(n.ref).book; if(bkx>=0)cd.querySelector(".bcref").style.color=grBookColor(bkx);   // 구절 이름 = 성경 묶음 색 (말씀 연결 지도와 같은 색, 2026-10-24 사용자 요청)
     if(filterText&&(has(btxt)||has(braw))){markInto(bte,braw,filterText);vLines(bte);bte.classList.add("full")}else bte.textContent=btxt;
     cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
     if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
