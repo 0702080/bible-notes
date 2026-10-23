@@ -1460,6 +1460,7 @@ async function cloudSync(pushOnly){
     }
     // 2) 내 진도 올리기 (친구 공개)
     var row={user_id:uid,id:CLOUD_ID,data:{c:"2"+toRuns(RB),at:meAt||Date.now(),n:myName,p:"2"+toRuns(PB),pat:pilAt,rr:RND.r,pr:RND.p,rat:rndAt},updated_at:Date.now(),deleted:false,visibility:"friends"};
+    if(TD2){try{if(sessionStorage.getItem(KP+"from")==="notes")localStorage.setItem(KP+"home","1"); if(localStorage.getItem(KP+"home"))row.data.home=1}catch(e){}}   // 묵상 노트 주인 표시 (아내 통독표에서는 이 사람을 친구 표에서 뺌)
     var pr=await fetch(SB_URL+"/rest/v1/notes?on_conflict=user_id,id",{method:"POST",headers:Object.assign(sbH(tok),{"Prefer":"resolution=merge-duplicates,return=minimal"}),body:JSON.stringify([row])});
     if(!pr.ok)throw new Error("up "+pr.status);
     if(!pushOnly){
@@ -1470,7 +1471,15 @@ async function cloudSync(pushOnly){
       if(ids.length){
         var pf=await sbGet(tok,"/rest/v1/profiles?select=id,name&id=in.("+ids.join(",")+")"), nm={}; pf.forEach(function(p){nm[p.id]=p.name});
         var rows=await sbGet(tok,"/rest/v1/notes?select=user_id,data,updated_at&id=eq."+encodeURIComponent(CLOUD_ID)+"&user_id=in.("+ids.join(",")+")&deleted=is.false");
-        rows.forEach(function(r){if(!r.data||!r.data.c)return;var bits=fromRuns(String(r.data.c).slice(1));if(bits)list.push({id:r.user_id,name:nm[r.user_id]||r.data.n||"친구",bits:bits,pbits:r.data.p?fromRuns(String(r.data.p).slice(1)):null,rounds:r.data.rr||{},prounds:r.data.pr||{},at:+r.data.at||+r.updated_at})});
+        // 아내용 통독표(tongdok/): 내 통독표(tongdok2/)로 옮겨 간 사람(그쪽 기록이 더 최근)은 친구 표에서 뺌 (2026-10-23 사용자 요청)
+        //  (묵상 노트 메뉴로 내 통독표를 여는 사람만 home 표시가 있음 — 아내처럼 두 통독표를 다 쓰는 사람은 빠지지 않음)
+        var moved={};
+        if(!TD2){try{
+          var r2=await sbGet(tok,"/rest/v1/notes?select=user_id,data&id=eq."+encodeURIComponent("s:tongdok2")+"&user_id=in.("+ids.join(",")+")&deleted=is.false");
+          r2.forEach(function(r){if(r.data&&r.data.home)moved[r.user_id]=1});
+        }catch(err){}}
+        ids=ids.filter(function(u){return !moved[u]});
+        rows.forEach(function(r){if(moved[r.user_id])return;if(!r.data||!r.data.c)return;var bits=fromRuns(String(r.data.c).slice(1));if(bits)list.push({id:r.user_id,name:nm[r.user_id]||r.data.n||"친구",bits:bits,pbits:r.data.p?fromRuns(String(r.data.p).slice(1)):null,rounds:r.data.rr||{},prounds:r.data.pr||{},at:+r.data.at||+r.updated_at})});
         cloudFriends=list; saveCF(); cloudState.noRows=ids.length>list.length?ids.filter(function(u){return !list.some(function(l){return l.id===u})}).map(function(u){return nm[u]||"친구"}):[];
       }else{cloudFriends=[];saveCF();cloudState.noRows=[]}
       cloudState.nFriends=ids.length;
