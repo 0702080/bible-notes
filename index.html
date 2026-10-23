@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-2">
+<meta name="app-build" content="2026-10-24-4">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -832,6 +832,12 @@ body.reorder .note .topics{display:none}
 .ctopicadd{height:28px;padding:0 10px;border:1px dashed var(--rule);border-radius:14px;background:transparent;color:var(--muted);font-size:12.5px}
 .tsref{margin:4px 0 6px;color:var(--violet);font-weight:700;font-size:14px}
 .tswrap{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+/* 주제 정하기: 아래 입력칸·완료는 고정, 위 #주제 칩만 스크롤 (스크롤바 숨김, 2026-10-24 사용자 요청) */
+#topicSheet.tspick .sheetpanel{display:flex;flex-direction:column;overflow:hidden}
+#topicSheet.tspick #tsBody{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+#topicSheet.tspick #tsBody>*{flex:0 0 auto}
+#topicSheet.tspick #tsBody>.tswrap{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:flex-start;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+#topicSheet.tspick .tswrap::-webkit-scrollbar{display:none}
 .tpick{height:34px;padding:0 13px;border:1px solid var(--rule);border-radius:17px;background:transparent;color:var(--ink);font-size:14px}
 .tpick[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:#141416;font-weight:700}
 .tpick[hidden]{display:none}
@@ -2803,7 +2809,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .note .tabs{background:transparent;border-radius:0;padding:0;margin:4px 0 12px;gap:0;border-bottom:1px solid #26252B}
 .note .tab{height:40px;border-radius:0;color:#7C7686;background:transparent}
 @media (hover:hover){.note .tab:hover{background:transparent;color:#D9D5E0}}
-.note .tab[aria-selected="true"]{background:transparent;color:var(--c);box-shadow:inset 0 -2px 0 var(--c)}
+.note .tab{border-radius:10px!important}
+.note .tab[aria-selected="true"]{background:color-mix(in srgb,var(--c) 10%,transparent);color:var(--c);box-shadow:inset 0 0 0 1.5px var(--c)}   /* 열린 탭은 모두 색 테두리 네모 (기도 아이콘처럼, 2026-10-24 사용자 요청). 다시 누르면 닫힘 */
+.note .tab:focus:not(:focus-visible){outline:none}
 .note .tab:focus:not(:focus-visible){outline:none}
 /* 카드 도구 줄: 글자 대신 예쁜 아이콘 (이름은 마우스를 올리면 보임, 2026-10-23 사용자 요청) */
 .note .focusrow{gap:4px 2px}
@@ -5990,12 +5998,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   var ts={mode:"",nid:"",results:[]};
   function openTS(title){$("tsTitle").textContent=title;$("topicSheet").hidden=false;$("fab").hidden=true;document.body.style.overflow="hidden"}
-  function closeTS(){$("topicSheet").hidden=true;$("fab").hidden=reorderMode;document.body.style.overflow="";ts.mode="";render()}
+  function closeTS(){$("topicSheet").classList.remove("tspick");$("topicSheet").hidden=true;$("fab").hidden=reorderMode;document.body.style.overflow="";ts.mode="";render()}
   $("tsClose").addEventListener("click",closeTS);
   $("tsBack").addEventListener("click",closeTS);
   function openPicker(nid){
     var n=notes.get(nid); if(!n)return;
-    ts.mode="pick"; ts.nid=nid; openTS("주제 정하기");
+    ts.mode="pick"; ts.nid=nid; openTS("주제 정하기"); $("topicSheet").classList.add("tspick");
     renderPicker();
     setTimeout(function(){var i=$("tsBody").querySelector(".tsnew");if(i)i.focus()},80);
   }
@@ -6024,7 +6032,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var nh=body.querySelector(".tsnohit"); if(nh){nh.hidden=!q||shown>0; nh.textContent="‘"+q+"’ 주제가 아직 없어요 · [추가]를 누르면 새로 만들어요"}
   });
   function openCollect(topic){
-    ts.mode="collect"; ts.results=[]; openTS("주제로 말씀 모으기");
+    ts.mode="collect"; ts.results=[]; $("topicSheet").classList.remove("tspick"); openTS("주제로 말씀 모으기");
     var body=$("tsBody"); body.innerHTML=
       '<p class="sheethint">주제를 적으면 그 주제를 잘 보여 주는 말씀을 찾아 드려요. 담은 말씀에는 주제가 자동으로 붙어요.</p>'+
       '<form class="tsrow tscollect" autocomplete="off"><input class="field tstopic" maxlength="20" placeholder="예: 두려움, 빛, 용서, 감사" aria-label="주제"><button type="submit" class="primary">찾기</button></form>'+
