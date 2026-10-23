@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-7">
+<meta name="app-build" content="2026-10-24-8">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2594,7 +2594,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlcnt{font-size:15px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;white-space:nowrap}
 .dlbarw{flex:1;height:8px;border-radius:4px;background:#222126;overflow:hidden}
 .dlbarw i{display:block;height:100%;width:0;border-radius:4px;background:var(--sky);transition:width .35s}   /* 한 가지 색으로 단순하게 (2026-10-24 사용자 요청) */
-.dlbarw{position:relative;cursor:default}
+.dlbarw{position:relative;cursor:pointer;height:10px!important}
+.dlbarw i{position:relative}
+.dlbarw i::after{content:"";position:absolute;right:-5px;top:50%;width:12px;height:12px;margin-top:-6px;border-radius:50%;background:var(--sky);box-shadow:0 0 0 3px color-mix(in srgb,var(--sky) 25%,transparent)}
+.dlbarw{overflow:visible!important}
 .dlbtip{position:fixed;z-index:120;transform:translate(-50%,-100%);margin-top:-10px;padding:5px 10px;border-radius:8px;background:#26252D;border:1px solid #3A3944;color:var(--ink);font-size:12.5px;white-space:nowrap;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.45)}
 .dlbtip[hidden]{display:none}
 .dlweek{display:flex;justify-content:space-between;gap:6px;margin:4px 0 6px;touch-action:pan-y;user-select:none;-webkit-user-select:none}
@@ -7845,14 +7848,31 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   var dl=null, dlDay="", dlWEnd="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set(), dlmTap={id:"",t:0};
   try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
   function saveGFold(){try{localStorage.setItem("bible-daily-gfold",JSON.stringify(Array.from(dlGFold)))}catch(e){}}
-  // 진행 막대에 마우스를 올리면 그 자리에 날짜와 진행을 작은 말풍선으로 (2026-10-24 사용자 요청)
+  // 날짜 위치 막대: 처음 기록한 날(적어도 30일 전)부터 오늘까지
+  function dlRange(o,today){
+    var a=dkey(Date.now()-29*864e5);
+    Object.keys(o.days||{}).concat(Object.keys(o.memo||{})).forEach(function(k){if(/^\d{4}-\d{2}-\d{2}$/.test(k)&&k<a&&(o.days[k]||[]).length+Object.keys((o.memo||{})[k]||{}).length)a=k});
+    if(dlDay&&dlDay<a)a=dlDay;
+    var n=Math.round((new Date(today+"T12:00:00")-new Date(a+"T12:00:00"))/864e5)+1;
+    return {a:a,n:Math.max(1,n)};
+  }
+  function dlBarDay(bw,x){   // 막대 위 x 위치의 날짜
+    var r=bw.getBoundingClientRect(), n=+bw.dataset.n||1, f=Math.max(0,Math.min(1,(x-r.left)/Math.max(1,r.width)));
+    return dkey(new Date(bw.dataset.a+"T12:00:00").getTime()+Math.round(f*(n-1))*864e5);
+  }
+  // 마우스를 올리면 그 위치의 날짜가 말풍선으로, 누르면 그날로 (2026-10-24 사용자 요청)
   document.addEventListener("pointermove",function(e){
     if(e.pointerType!=="mouse")return;
     var bw=e.target.closest&&e.target.closest(".dlbarw"), tip=document.getElementById("dlbtip");
-    if(!bw){if(tip)tip.hidden=true;return}
+    if(!bw||!bw.dataset.a){if(tip)tip.hidden=true;return}
     if(!tip){tip=document.createElement("div");tip.id="dlbtip";tip.className="dlbtip";document.body.appendChild(tip)}
-    var r=bw.getBoundingClientRect(); tip.textContent=bw.dataset.tip||""; tip.hidden=!tip.textContent;
+    var k=dlBarDay(bw,e.clientX), o=dailyData(), cnt=dailyChecked(o,k).length, r=bw.getBoundingClientRect();
+    tip.textContent=dayName(k)+(k===dkey(Date.now())?" · 오늘":"")+(cnt?" · ✓ "+cnt:""); tip.hidden=false;
     tip.style.left=Math.max(r.left,Math.min(r.right,e.clientX))+"px"; tip.style.top=r.top+"px";
+  });
+  document.addEventListener("click",function(e){
+    var bw=e.target.closest&&e.target.closest(".dlbarw"); if(!bw||!bw.dataset.a)return;
+    var k=dlBarDay(bw,e.clientX); if(k!==dlDay){dlDay=k; drawDaily()}
   });
   function dayName(k){var d=new Date(k+"T12:00:00");return (d.getMonth()+1)+"/"+d.getDate()+" ("+"일월화수목금토".charAt(d.getDay())+")"}
   function openDaily(day,focusId){
@@ -8294,8 +8314,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     dl.querySelector(".dlnext").disabled=dlDay>=today;
     var tot=o.items.length, c=on.length;
     dl.querySelector(".dlcnt").textContent=c+" / "+tot;
-    dl.querySelector(".dlbarw i").style.width=(tot?Math.round(c/tot*100):0)+"%";
-    dl.querySelector(".dlbarw").dataset.tip=dayName(dlDay)+" · "+c+" / "+tot+" ("+(tot?Math.round(c/tot*100):0)+"%)";
+    // 막대 = 날짜 위치 (왼쪽 끝 처음 기록한 날 ~ 오른쪽 끝 오늘, 2026-10-24 사용자 요청)
+    var rg=dlRange(o,today), bwd=dl.querySelector(".dlbarw");
+    var pos=Math.round((new Date(dlDay+"T12:00:00")-new Date(rg.a+"T12:00:00"))/864e5);
+    bwd.dataset.a=rg.a; bwd.dataset.n=String(rg.n);
+    bwd.querySelector("i").style.width=(rg.n>1?Math.max(0,Math.min(100,pos/(rg.n-1)*100)):100)+"%";
     var wk=dl.querySelector(".dlweek"); wk.textContent="";
     // 요일 줄 7칸: 고른 날이 늘 보이게 따라 움직인다 (끝은 오늘을 넘지 않음)
     if(!dlWEnd||dlWEnd>today)dlWEnd=today;
