@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-1">
+<meta name="app-build" content="2026-10-24-2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2691,6 +2691,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfsave{flex:0 0 auto;height:40px;padding:0 14px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:13.5px;font-weight:700}
 .dlfcancel{flex:0 0 auto;height:40px;padding:0 12px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
 .dlmemop{display:block;width:100%;height:auto;margin:0 0 6px;padding:7px 10px;border:0;border-left:2px solid color-mix(in srgb,var(--sky) 45%,transparent);background:transparent;color:var(--faint);font-size:16px;line-height:1.7;text-align:left;white-space:pre-wrap;word-break:break-word;font-family:inherit}
+.dlmemop .dlml{display:block;white-space:pre-wrap}
+.dlmemop .dlbul,.dlmemop .dlcont{padding-left:1.15em}
+.dlmemop .dlbul{text-indent:-1.15em}
+.dlmemop .dlbul i{display:inline-block;width:1.15em;text-indent:0;font-style:normal;opacity:.8}
+.dlmemop .dlblank{line-height:.9}
 .dlmemobox{margin:2px 0 10px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--sky) 35%,#232229);border-radius:12px;background:color-mix(in srgb,var(--sky) 7%,#121216)}
 .dlmemoh{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:700;color:var(--sky)}
 .dlmemosave{margin-left:auto;font-size:11px;font-weight:400;color:var(--faint)}
@@ -8377,6 +8382,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           hb.title=dayName(h.day)+" 기록 보기"; hb.setAttribute("aria-label",dayName(h.day)+" 기록 보기");
           list.appendChild(hb);
         });
+        // 기록을 볼 때 "* " 항목은 둘째 줄부터 글자 시작에 맞춰 들여씀 (2026-10-24 사용자 요청)
+        function dlMemoLines(el,val){
+          el.textContent="";
+          String(val||"").split("\n").forEach(function(L){
+            var d=document.createElement("span");
+            if(/^\s*[*•·-] /.test(L)){d.className="dlml dlbul"; var m=L.match(/^\s*([*•·-]) (.*)$/); var b=document.createElement("i"); b.textContent=m[1]; d.appendChild(b); d.appendChild(document.createTextNode(m[2]))}
+            else if(/^ {2,}\S/.test(L)){d.className="dlml dlcont"; d.textContent=L.replace(/^ +/,"")}
+            else if(!L.trim()){d.className="dlml dlblank"; d.textContent="\u00a0"}
+            else{d.className="dlml"; d.textContent=L}
+            el.appendChild(d);
+          });
+        }
         // 기록 칸 하나 (첫 기록이면 '항목 글 고치기'도 같이)
         function memoBox(key,val,no){
           var mx=document.createElement("div"); mx.className="dlmemobox"; mx.dataset.id=key; mx.dataset.day=dlDay;
@@ -8389,7 +8406,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         }
         function memoPrev(key,val,no){   // 기록마다 색을 살짝 달리해 한눈에 나뉘어 보이게 (2026-10-15 사용자 요청)
           var mp=document.createElement("button"); mp.type="button"; mp.className="dlmemop dlmemo mc"+((no-1)%4); mp.dataset.id=key;
-          mp.textContent=val;
+          dlMemoLines(mp,val);
           var at=o.mt&&o.mt[dlDay]&&o.mt[dlDay][key], dt=document.createElement("span"); dt.className="dlmemodt";   // 기록 아래 날짜(와 적은 시각)
           if(at){var hd=new Date(at), hh=hd.getHours(); dt.textContent=dayName(dlDay)+" · "+(hh<12?"오전 ":"오후 ")+((hh%12)||12)+":"+String(hd.getMinutes()).padStart(2,"0")}
           else dt.textContent=dayName(dlDay);
