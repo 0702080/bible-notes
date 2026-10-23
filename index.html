@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-17">
+<meta name="app-build" content="2026-10-23-18">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3240,6 +3240,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     return a;
   }
   function saveCols(a){try{localStorage.setItem(CCOL_KEY,JSON.stringify(a))}catch(e){}}
+  var CPOS_KEY="bible-board-colpos";   // 내가 만든 칸 자리: {칸 이름: 그 앞에 오는 자동 칸 수}
+  function colPos(){try{return JSON.parse(localStorage.getItem(CPOS_KEY)||"{}")||{}}catch(e){return {}}}
+  function saveColPos(o){try{localStorage.setItem(CPOS_KEY,JSON.stringify(o))}catch(e){}}
   function kbCard(n,i){
     var cd=document.createElement("article"); cd.className="bcard"; cd.dataset.id=n.id; cd.tabIndex=0;
     var ct=cardTopic(n); cd.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)"); cd.style.animationDelay=(Math.min(i,12)*30)+"ms";
@@ -3278,10 +3281,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var cols=auto.length?Math.max(1,Math.min(auto.length,room)):0, per=cols?Math.ceil(auto.length/cols):0;
     // 새 칸 단추와 내가 만든 칸은 맨 왼쪽에 (2026-10-23 사용자 요청)
     if(!filtering){var ad=document.createElement("button"); ad.type="button"; ad.className="baddcol"; ad.innerHTML='<span>＋</span>새 칸'; ad.title="새 칸 만들기"; box.appendChild(ad)}
-    mineCols.forEach(function(x,j){var cl=kbCol("C:"+x.c,x.c,"🗂️",x.part," bcust"); cl.dataset.cc=x.c; cl.dataset.ci=String(j); box.appendChild(cl)});
-    for(var c=0;c<cols;c++){
-      var part=auto.slice(c*per,(c+1)*per); if(!part.length)break;
+    // 내가 만든 칸은 끌어서 놓은 자리(앞에 오는 자동 칸 수)에 그림 (2026-10-23 사용자 요청)
+    var cpos=colPos(), nAuto=0;
+    for(var c=0;c<cols;c++){if(auto.slice(c*per,(c+1)*per).length)nAuto=c+1}
+    function putMine(slot){mineCols.forEach(function(x,j){var p=Math.min(+cpos[x.c]||0,nAuto); if(p!==slot)return; var cl=kbCol("C:"+x.c,x.c,"🗂️",x.part," bcust"); cl.dataset.cc=x.c; cl.dataset.ci=String(j); cl.dataset.pos=String(p); box.appendChild(cl)})}
+    putMine(0);
+    for(var c=0;c<nAuto;c++){
+      var part=auto.slice(c*per,(c+1)*per);
       var cl=kbCol("L"+(c+1),bTitle({k:"L"+(c+1),t:"말씀 "+(c+1)}),"📖",part,""); cl.dataset.li=String(c); box.appendChild(cl);
+      putMine(c+1);
     }
   }
   // 칸을 옮기면 도장·복습 상태를 그 칸에 맞게 바꿈. 지운 도장은 보관해 두었다가 다시 옮기면 되살림
@@ -11354,10 +11362,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var t=lmTarget(e.clientX,e.clientY), cl=t.cl; if(!cl)return;
     var cards=Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id});
     var tcc=cl.dataset.cc||"";
-    if(d.type==="col"&&(d.cc||tcc)){   // 내가 만든 칸끼리 자리 바꾸기
-      if(!(d.cc&&tcc)){toast("내가 만든 칸끼리만 자리를 바꿀 수 있어요");return}
+    if(d.type==="col"&&(d.cc||tcc)){   // 내가 만든 칸은 어느 칸 사이로든 옮김 (놓은 칸의 왼쪽 반이면 그 앞, 오른쪽 반이면 그 뒤)
+      if(!d.cc){toast("내가 만든 칸 사이로는 '말씀' 칸을 옮길 수 없어요");return}
       if(d.cc===tcc)return;
-      var a=myCols(), from=a.indexOf(d.cc), to=a.indexOf(tcc); a.splice(to,0,a.splice(from,1)[0]); saveCols(a); render(); toast("칸 자리를 바꿨어요"); return;
+      var rc=cl.getBoundingClientRect(), after=e.clientX>rc.left+rc.width/2, cp=colPos(), a=myCols();
+      if(tcc){
+        cp[d.cc]=+cl.dataset.pos||0;
+        a.splice(a.indexOf(d.cc),1); var ti=a.indexOf(tcc); a.splice(after?ti+1:ti,0,d.cc); saveCols(a);
+      }else{
+        var li=+cl.dataset.li; cp[d.cc]=after?li+1:li;
+        a.splice(a.indexOf(d.cc),1); a[after?"push":"unshift"](d.cc); saveCols(a);
+      }
+      saveColPos(cp); render();
+      var nc2=$("board").querySelector('.bcol[data-cc="'+d.cc.replace(/"/g,'\\"')+'"]'); if(nc2){nc2.classList.add("lmland");setTimeout(function(){nc2.classList.remove("lmland")},2200)}
+      buzz(12); return;
     }
     if(d.type==="card"){   // 카드를 다른 칸으로: 내가 만든 칸이면 그 칸 이름을, 자동 칸이면 비움
       d.ids.forEach(function(id){var x=notes.get(id); if(x&&x.col!==tcc){x.col=tcc;scheduleSave(id)}});
@@ -11447,7 +11465,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       e.stopPropagation(); var cl=dl.closest(".bcol"), cc=cl&&cl.dataset.cc; if(!cc)return;
       if(!dl.dataset.sure){dl.dataset.sure="1";dl.classList.add("sure");dl.textContent="한 번 더";setTimeout(function(){if(dl.isConnected){delete dl.dataset.sure;dl.classList.remove("sure");dl.textContent=""}},3000);return}
       notes.forEach(function(n){if(n.col===cc){n.col="";scheduleSave(n.id)}});
-      saveCols(myCols().filter(function(x){return x!==cc})); delete bFold["C:"+cc]; saveBFold(); render(); toast("'"+cc+"' 칸을 지웠어요. 말씀은 그대로 있어요");
+      saveCols(myCols().filter(function(x){return x!==cc})); delete bFold["C:"+cc]; saveBFold(); var cpd=colPos(); delete cpd[cc]; saveColPos(cpd); render(); toast("'"+cc+"' 칸을 지웠어요. 말씀은 그대로 있어요");
     }
   },true);
   $("board").addEventListener("dblclick",function(e){
@@ -11466,6 +11484,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         a=a.map(function(x){return x===was?v:x}); saveCols(a);
         notes.forEach(function(n){if(n.col===was){n.col=v;scheduleSave(n.id)}});
         if(bFold["C:"+was]){bFold["C:"+v]=1;delete bFold["C:"+was];saveBFold()}
+        var cpr=colPos(); if(was in cpr){cpr[v]=cpr[was];delete cpr[was];saveColPos(cpr)}
         render(); toast("칸 이름을 '"+v+"'으로 바꿨어요"); return;
       }
       if(save&&v&&v!==was){bNames[k]=v; saveBNames(); b.textContent=v; toast("칸 이름을 '"+v+"'으로 바꿨어요")}
