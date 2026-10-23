@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-25">
+<meta name="app-build" content="2026-10-23-26">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2762,7 +2762,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .note .focusrow .useopen[aria-expanded="true"],.note .focusrow .vedit[aria-expanded="true"],.note .focusrow .vxref[aria-expanded="true"],
 .note .focusrow .vctr[aria-pressed="true"],.note .focusrow .vrep[aria-pressed="true"],.note .focusrow .vrol[aria-pressed="true"]{background:transparent!important;color:var(--mint);box-shadow:inset 0 -2px 0 var(--mint)}
 .note .focusrow .ctopic{height:28px;padding:0;background:transparent;border:0;font-size:13px;font-weight:400;color:var(--tc,var(--violet));-webkit-text-stroke:0!important}
-.note .focusrow .ctopic.on{background:transparent;color:var(--tc,var(--violet));box-shadow:inset 0 -2px 0 var(--tc,var(--violet))}
+/* 주제 칩: 둥근 밑줄 대신 주제 색이 은은하게 깔린 알약 (2026-10-23 사용자 요청) */
+.note .focusrow .ctopic{height:26px!important;padding:0 10px!important;border:0;border-radius:13px!important;background:color-mix(in srgb,var(--tc,var(--violet)) 11%,transparent)!important;box-shadow:none!important;color:var(--tc,var(--violet));transition:background .15s,box-shadow .15s}
+@media (hover:hover){.note .focusrow .ctopic:hover{background:color-mix(in srgb,var(--tc,var(--violet)) 20%,transparent)!important}}
+.note .focusrow .ctopic.on{background:color-mix(in srgb,var(--tc,var(--violet)) 26%,transparent)!important;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--tc,var(--violet)) 65%,transparent)!important;color:color-mix(in srgb,var(--tc,var(--violet)) 70%,#fff)}
+.note .focusrow .topics:not([hidden]){gap:6px!important}
 .note .tabs{background:transparent;border-radius:0;padding:0;margin:4px 0 12px;gap:0;border-bottom:1px solid #26252B}
 .note .tab{height:40px;border-radius:0;color:#7C7686;background:transparent}
 @media (hover:hover){.note .tab:hover{background:transparent;color:#D9D5E0}}
