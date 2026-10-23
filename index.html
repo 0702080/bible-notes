@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-37">
+<meta name="app-build" content="2026-10-23-38">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10037,7 +10037,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     while((m=re.exec(x)))hits.push({at:m.index+m[1].length,v:+m[2]});
     var ok=hits.filter(function(h,i){return (hits[i+1]&&hits[i+1].v===h.v+1)||(hits[i-1]&&hits[i-1].v===h.v-1)});
     if(ok.length<2)return x;
-    for(var i=ok.length-1;i>=0;i--){var a=ok[i].at; if(a>0)x=x.slice(0,a).replace(/[ \n]+$/,"")+"\n"+x.slice(a)}
+    for(var i=ok.length-1;i>=0;i--){var a=ok[i].at; if(a>0)x=x.slice(0,a).replace(/[ \n]+$/,"")+"\n\n"+x.slice(a)}   // 절과 절 사이에 빈 줄 하나 (2026-10-23 사용자 요청)
     return x;
   }
   function grInfoClick(e){
