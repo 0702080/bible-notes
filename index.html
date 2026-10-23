@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-23-24">
+<meta name="app-build" content="2026-10-23-25">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2988,6 +2988,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
       prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),sh:x.sh?1:0}}):[],
+      mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
       rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0,d:/^\d{4}-\d{2}-\d{2}$/.test(n.rv.d||"")?n.rv.d:""}:null,
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
@@ -7040,13 +7041,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(C.stage===3&&!C.autoDone&&ws.length&&w===ws[ws.length-1]){
           C.autoDone=1; var cid=C.id;
           var cnb=ccBox.querySelector(".ccnum");   // 숫자는 누르는 즉시 하나 올려 보여 줌 (2026-10-23 사용자 요청)
-          if(cnb){cnb.hidden=false; cnb.textContent=(C.order+1)+"번째"; cnb.classList.remove("ccnumup"); void cnb.offsetWidth; cnb.classList.add("ccnumup"); ccBurst(cnb)}
+          var n0c=notes.get(cid); if(cnb&&n0c){cnb.hidden=false; cnb.textContent=(ccCount(n0c)+2)+"번째"; cnb.classList.remove("ccnumup"); void cnb.offsetWidth; cnb.classList.add("ccnumup"); ccBurst(cnb)}
           buzz([20,40,20]);
           setTimeout(function(){
             if(!C||C.id!==cid||ccBox.hidden)return;
             var n1=notes.get(cid); if(!n1)return;
             C.grade="g2"; C.stage=5; ccFinish(n1);
-            if(ccNextNote()){toast("✅ 암송 완료 · 다음 말씀으로"); ccGoNext()} else {C.order++; ccDraw()}
+            if(ccNextNote()){toast("✅ 암송 완료 · 다음 말씀으로"); ccGoNext()} else ccDraw();
           },1300);
         }
         if(!w.classList.contains("hid")||w.classList.contains("peek")){buzz(18);return}   // 누를 때마다 진동 (2026-10-21 사용자 요청)
@@ -7062,7 +7063,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",dict:null,edit:false,anim:true,seen:opt.seen||{},order:opt.order||1};
     ccBox.querySelector(".ccref").textContent=n.ref;
     ccBox.querySelector(".ccvref").textContent=n.ref;   // 말씀 바로 위에 구절 이름 (2026-10-21 사용자 요청)
-    var cn=ccBox.querySelector(".ccnum"); cn.hidden=false; cn.textContent=C.order+"번째";   // 몇 번째 말씀인지 — 첫 말씀부터 늘 보임 (2026-10-23 사용자 요청)
+    var cn=ccBox.querySelector(".ccnum"); cn.hidden=false; cn.textContent=(ccCount(n)+1)+"번째"; cn.title="이 말씀을 연습하는 횟수 (끝까지 하면 하나씩 쌓여요)";   // 이 말씀 연습 누적 횟수 — 다시 열어도 이어짐 (2026-10-23 사용자 요청)
     if(C.order>=2){cn.classList.remove("bump");void cn.offsetWidth;cn.classList.add("bump")}
     var wasOpen=!ccBox.hidden;
     ccBox.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
@@ -7385,8 +7386,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       },cnt*step+FADE);
     },still?0:260);
   }
+  // 이 말씀을 끝까지 연습한 누적 횟수 (예전 기록은 복습 기록 ok+miss로 이어 셈, 2026-10-23 사용자 요청)
+  function ccCount(n){return Math.max(+n.mcnt||0,((n.rv&&n.rv.ok)||0)+((n.rv&&n.rv.miss)||0))}
   function ccFinish(n){
     if(!n.mem)n.mem={s:[0,0,0,0]};
+    n.mcnt=ccCount(n)+1;
     var now=Date.now(), got=[];
     if(C.grade!=="g0"){
       var nxt=memNextStep(n);
@@ -10953,6 +10957,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(older.mem&&newer.mem&&Array.isArray(older.mem.s)){m.mem={s:(newer.mem.s||[0,0,0,0]).map(function(t,i){return t||older.mem.s[i]||0})}}
     if((older.drill||[]).length){var seen={};m.drill=(newer.drill||[]).concat(older.drill).filter(function(d){var k=d.at+"|"+d.b;if(seen[k])return false;seen[k]=1;return true}).sort(function(a,b){return a.at-b.at}).slice(-300)}
     m.topics=(newer.topics||[]).concat((older.topics||[]).filter(function(t){return (newer.topics||[]).indexOf(t)<0}));
+    m.mcnt=Math.max(+older.mcnt||0,+newer.mcnt||0);
     m.updatedAt=Math.max(older.updatedAt||0,newer.updatedAt||0);
     return cleanNote(m);
   }
