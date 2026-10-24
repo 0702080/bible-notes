@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-1">
+<meta name="app-build" content="2026-10-25-2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2835,6 +2835,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .bsq.bshv{font-weight:700}
 .dlactref{max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:480px){.dlactref{max-width:34%;font-size:11.5px}}
+/* 말씀 실천: 휴대폰에서는 말씀 알약을 칸 오른쪽 아래로 내려 제목이 가로로 넓게 (2026-10-25 사용자 요청) */
+@media (max-width:480px){.dlitem.haspill.dlactitem .dlrow{padding-right:12px;padding-bottom:42px}.dlactitem .dlactref{top:auto;bottom:10px;transform:none;max-width:calc(100% - 70px)}}
 @media (hover:hover) and (pointer:fine){.dlpick,.dlgsd input{pointer-events:none}}
 .dpop{position:fixed;z-index:400;width:272px;padding:12px;border:1px solid #34333A;border-radius:16px;background:#1A1920;box-shadow:0 16px 40px rgba(0,0,0,.6);color:var(--ink);font-size:13.5px;animation:dpin .16s ease-out}
 @keyframes dpin{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
@@ -9452,7 +9454,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         asec.appendChild(ap);
       }
       acs.forEach(function(x){
-        var row=document.createElement("div"); row.className="dlitem haspill"; row.style.setProperty("--gc","var(--green)");
+        var row=document.createElement("div"); row.className="dlitem haspill dlactitem"; row.style.setProperty("--gc","var(--green)");
         var b=document.createElement("button"); b.type="button"; b.className="dlrow dlactrow"+(x.on?" on":""); b.dataset.nid=x.n.id; b.dataset.aid=x.a.id; b.setAttribute("aria-pressed",String(x.on));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
         b.querySelector(".dlt").textContent=x.a.t;
@@ -9500,6 +9502,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     // 알약 단추 너비만큼 글자 자리를 비워 둠 (여러 줄로 접히는 항목도 단추 밑으로 들어가지 않게)
     Array.prototype.forEach.call(list.querySelectorAll(".dlitem .dlauto"),function(pl){
       var rw=pl.parentNode.querySelector(".dlrow"); if(!rw||!pl.offsetWidth)return;
+      if(pl.classList.contains("dlactref")&&innerWidth<=480){rw.style.paddingRight="";return}   // 알약이 아래 줄에 있으면 오른쪽을 비우지 않음
       var rr=rw.getBoundingClientRect(), pr=pl.getBoundingClientRect();
       rw.style.paddingRight=Math.max(10,Math.round(rr.right-pr.left)+10)+"px";
     });
