@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-67">
+<meta name="app-build" content="2026-10-24-68">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5105,6 +5105,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       src.connect(bp); bp.connect(hp); hp.connect(g); g.connect(ac.destination); src.start(t); src.stop(t+dur);
     }catch(e){}
   }
+  document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".viewseg button"); if(b)hoverTick()});   // 보기·순서 단추를 누르면 '띡' (2026-10-24 사용자 요청)
   function hoverTick(){
     try{
       var now=Date.now(); if(now-hovAt<60)return; hovAt=now;
