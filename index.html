@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-56">
+<meta name="app-build" content="2026-10-24-57">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9388,7 +9388,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
         var tt=b.querySelector(".dlt"); tt.textContent=x.name;
         var opn=dlIcOpen.has(x.id);
-        if(x.memo.trim()&&!opn){var sm=document.createElement("small"); sm.className="dlicmemo"; sm.textContent=x.memo.replace(/\s+/g," ").trim(); tt.appendChild(sm)}
+        // 접혀 있을 때는 제목만 (기도문 미리보기 없음, 2026-10-24 사용자 요청)
         row.appendChild(b);
         if(x.memo.trim()){   // 기도문 전체 펼쳐 보기 (2026-10-24 사용자 요청)
           var ob=document.createElement("button"); ob.type="button"; ob.className="dlauto dlicopen"+(opn?" on":""); ob.dataset.icid=x.id; ob.textContent=opn?"접기 ▴":"펼치기 ▾"; ob.setAttribute("aria-expanded",String(opn)); row.appendChild(ob);
