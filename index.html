@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-59">
+<meta name="app-build" content="2026-10-24-61">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -223,6 +223,14 @@ details.menu{position:relative}
 details.menu>summary{list-style:none;cursor:pointer}
 details.menu>summary::-webkit-details-marker{display:none}
 .pop{position:absolute;right:0;top:calc(100% + 6px);z-index:5;min-width:180px;background:var(--sheet);border:1px solid var(--rule);border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.menudim{display:none}
+#topMenu[open]>.menudim{display:block;position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.35);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);animation:mdim .18s ease-out}
+@keyframes mdim{from{opacity:0}to{opacity:1}}
+#topMenu[open]>summary{position:relative;z-index:81}
+#topMenu[open]>.pop{z-index:81}
+.pop>button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.pop.mnsorting>button{cursor:grabbing}
+.pop>button.mndrag{background:color-mix(in srgb,var(--violet) 22%,transparent)!important;outline:1px dashed color-mix(in srgb,var(--violet) 60%,transparent);outline-offset:-1px}
 .pop button{display:block;width:100%;text-align:left;height:40px;padding:0 12px;border:0;border-radius:8px;background:transparent;font-size:14.5px;color:var(--ink)}
 .pop button:hover{background:var(--paper)}
 .pop .danger-t{color:var(--pink)}
@@ -13684,6 +13692,58 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   $("icBtn").addEventListener("click",function(){$("topMenu").open=false;openIntercede()});
   $("ansBtn").addEventListener("click",function(){$("topMenu").open=false;openAnswers()});
   $("remindBtn").addEventListener("click",function(){$("topMenu").open=false;openRemind()});
+  // ⋯ 메뉴 항목을 끌어서 차례 바꾸기 (2026-10-24 사용자 요청): PC는 누른 채 끌기, 휴대폰은 꾹 누른 뒤 끌기. 차례는 이 기기에 기억
+  (function(){
+    var KEY="bible-menu-order", pop=document.querySelector("#topMenu .pop"); if(!pop)return;
+    // 메뉴가 열려 있는 동안 뒤 화면은 뿌옇게 (2026-10-24 사용자 요청)
+    var tm=$("topMenu"), dim=document.createElement("div"); dim.className="menudim"; tm.insertBefore(dim,pop);
+    dim.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();tm.open=false});
+    function apply(){
+      var ord=[]; try{ord=JSON.parse(localStorage.getItem(KEY)||"[]")||[]}catch(e){}
+      ord.forEach(function(id){var b=document.getElementById(id); if(b&&b.parentNode===pop)pop.appendChild(b)});
+      Array.prototype.forEach.call(pop.querySelectorAll(":scope>button"),function(b){if(ord.indexOf(b.id)<0)pop.appendChild(b)});   // 새로 생긴 항목은 맨 아래
+    }
+    try{if(localStorage.getItem(KEY))apply()}catch(e){}
+    var M=null, block=false;
+    pop.addEventListener("pointerdown",function(e){
+      var b=e.target.closest("button"); if(!b||b.parentNode!==pop||!b.id||(e.pointerType==="mouse"&&e.button!==0))return;
+      M={b:b,pid:e.pointerId,x:e.clientX,y:e.clientY,on:false,touch:e.pointerType!=="mouse",t:0};
+      if(M.touch)M.t=setTimeout(function(){if(M&&!M.on)start()},380);
+    });
+    function start(){
+      M.on=true; M.b.classList.add("mndrag"); pop.classList.add("mnsorting"); buzz(12);
+      try{M.b.setPointerCapture(M.pid)}catch(e){}
+    }
+    document.addEventListener("pointermove",function(e){
+      if(!M||e.pointerId!==M.pid)return;
+      var d=Math.abs(e.clientX-M.x)+Math.abs(e.clientY-M.y);
+      if(!M.on){
+        if(M.touch){if(d>10){clearTimeout(M.t);M=null}return}   // 휴대폰: 꾹 누르기 전에 움직이면 그냥 스크롤
+        if(d<6)return; start();
+      }
+      e.preventDefault();
+      var sibs=Array.prototype.filter.call(pop.querySelectorAll(":scope>button"),function(x){return x!==M.b&&!x.hidden});
+      for(var i=0;i<sibs.length;i++){
+        var r=sibs[i].getBoundingClientRect(), mid=r.top+r.height/2, before=M.b.compareDocumentPosition(sibs[i])&Node.DOCUMENT_POSITION_PRECEDING;
+        if(before&&e.clientY<mid){pop.insertBefore(M.b,sibs[i]);break}
+        if(!before&&e.clientY>mid)pop.insertBefore(M.b,sibs[i].nextSibling);
+      }
+    },{passive:false});
+    function end(e){
+      if(!M||e.pointerId!==M.pid)return; clearTimeout(M.t);
+      if(M.on){
+        M.b.classList.remove("mndrag"); pop.classList.remove("mnsorting");
+        var ids=Array.prototype.map.call(pop.querySelectorAll(":scope>button"),function(x){return x.id}).filter(Boolean);
+        try{localStorage.setItem(KEY,JSON.stringify(ids))}catch(err){}
+        block=true; setTimeout(function(){block=false},60); buzz(8);
+      }
+      M=null;
+    }
+    document.addEventListener("pointerup",end); document.addEventListener("pointercancel",end);
+    pop.addEventListener("click",function(e){if(block){e.stopPropagation();e.preventDefault()}},true);   // 끌고 난 뒤 눌림은 막음
+    pop.addEventListener("contextmenu",function(e){if(M&&M.touch)e.preventDefault()});
+  })();
+
   // 알림(캘린더)으로 열면 오늘 외울 말씀을 암송 코치로 (2026-10-24)
   if(/[?&]rv=1/.test(location.search)){
     try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
