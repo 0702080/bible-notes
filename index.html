@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-44">
+<meta name="app-build" content="2026-10-24-45">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1749,7 +1749,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.bcust{border-color:color-mix(in srgb,var(--gold) 30%,#38343F);background:color-mix(in srgb,var(--gold) 4%,#272530)}
 .bcol.bcust .bch b{color:var(--gold)}
 .bcol.bcust.lmland{animation:none}
-.bcaddin{display:block;width:calc(100% - 8px);margin:6px 4px 4px;height:38px;border:1.5px dashed color-mix(in srgb,var(--gold) 45%,#3A3744);border-radius:12px;background:transparent;color:var(--gold);font-size:13.5px;cursor:pointer;flex:0 0 auto}
+.bcaddin{display:block;width:calc(100% - 8px);margin:0 4px 10px;height:38px;border:1.5px dashed color-mix(in srgb,var(--gold) 45%,#3A3744);border-radius:12px;background:transparent;color:var(--gold);font-size:13.5px;cursor:pointer;flex:0 0 auto}
 @media (hover:hover){.bcaddin:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
 .kcppanel .primary{width:100%;margin:10px 0 4px}
 .kcphint{margin:10px 0 6px;font-size:13px;color:var(--muted)}
@@ -3550,7 +3550,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var lst=document.createElement("div"); lst.className="bclist";
     part.forEach(function(n,i){lst.appendChild(kbCard(n,i))});
     if(!part.length){var em=document.createElement("p"); em.className="bcempty"; em.textContent="말씀 카드를 여기로 끌어다 놓거나 아래 단추로 넣으세요"; lst.appendChild(em)}
-    if(/bcust/.test(extra||"")){var ai=document.createElement("button"); ai.type="button"; ai.className="bcaddin"; ai.textContent="＋ 말씀 넣기"; lst.appendChild(ai)}
+    if(/bcust/.test(extra||"")){var ai=document.createElement("button"); ai.type="button"; ai.className="bcaddin"; ai.textContent="＋ 말씀 넣기"; lst.insertBefore(ai,lst.firstChild)}   // 칸 맨 위에 (2026-10-24 사용자 요청)
     cl.appendChild(lst);
     // 칸 맨 위·맨 아래로 바로 (2026-10-24 사용자 요청)
     var jp=document.createElement("div"); jp.className="bcjump";
