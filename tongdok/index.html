@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-10-24-4">
+<meta name="app-build" content="td-2026-10-24-5">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1201,13 +1201,7 @@ function maybeCheer(bi,c){
 
 /* 달라진 만큼만 축하한다 */
 function checkMilestones(before,after,finishedBooks){
-  for(var i=0;i<finishedBooks.length;i++){
-    var bi=finishedBooks[i];
-    var pick=BOOK_BLESS[bi%BOOK_BLESS.length];
-    pushCel({icon:"✺",t:BOOKS[bi][0]+(rndOf(bi)?" "+(rndOf(bi)+1)+"회":"")+" 완독",
-      s:BOOKS[bi][1]+"장을 모두 읽었어요. 뱃지를 하나 모았어요.",
-      b:pick.b,r:pick.r});
-  }
+  // 책 한 권 완독 축하 창은 뺌 (2026-10-24 사용자 요청)
   for(var m=0;m<MILES.length;m++){
     var x=MILES[m];
     if(before<x.n&&after>=x.n){
