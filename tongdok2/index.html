@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-10-24-1">
+<meta name="app-build" content="td-2026-10-24-2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -603,7 +603,7 @@ try{var rj=JSON.parse(localStorage.getItem(RND_KEY)||"null");if(rj){RND={r:rj.r|
 function rounds(){return pMode?RND.p:RND.r}
 function rndOf(bi){return +rounds()[bi]||0}
 function storeRnd(){try{localStorage.setItem(RND_KEY,JSON.stringify({r:RND.r,p:RND.p,t:rndAt}))}catch(e){}}
-function saveRnd(){rndAt=Date.now();storeRnd();if(typeof cloudPush==="function")cloudPush()}
+function saveRnd(){rndAt=(typeof stamp==="function")?stamp(rndAt):Math.max(Date.now(),rndAt+1);storeRnd();if(typeof cloudPush==="function")cloudPush()}
 /* 회차 색 (2026-10-15 사용자 요청: 처음과 반복이 확실히 다르게, 여러 색으로)
    1회째는 기본색(통독 노랑 / 필사 보라), 2회째부터 10회째까지 모두 다른 색, 그 뒤로는 2회째 색부터 다시 */
 var RCOL_R=["#EE8467","#4FAE78","#6F8FE8","#A57BD8","#E46FA6","#2FB3A6","#4C5FB8","#8DBF3A","#D9534F"];
@@ -646,11 +646,14 @@ document.addEventListener("click",function(ev){
 
 /* ── 저장 ─────────────────────────────── */
 var meAt=0;   // 내 체크를 마지막으로 바꾼 시각 (여러 기기에서 맞출 때 더 최근 것을 씀)
+/* 바꾼 시각: 지금 시각과 '마지막으로 맞춘 시각+1' 중 큰 것. 시계가 앞선 다른 기기(PC 등)에서 올린 진도가 있어도
+   휴대폰에서 방금 바꾼 것이 늘 더 새것이 되어, 클라우드의 예전 진도로 되돌아가지 않음 (2026-10-24 사용자 요청: 3회째가 2회째로 돌아감) */
+function stamp(old){return Math.max(Date.now(),(+old||0)+1)}
 function storePil(){try{localStorage.setItem(PIL_KEY,JSON.stringify({b:toB64(PB),t:pilAt}))}catch(e){}}
 function save(){
-  if(pMode){pilAt=Date.now();storePil();if(typeof cloudPush==="function")cloudPush();return}
+  if(pMode){pilAt=stamp(pilAt);storePil();if(typeof cloudPush==="function")cloudPush();return}
   var b=toB64(me), old=null; try{old=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){}
-  if(!old||old.b!==b)meAt=Date.now();
+  if(!old||old.b!==b)meAt=stamp(meAt);
   try{localStorage.setItem(LS,JSON.stringify({n:myName,b:b,t:meAt}))}catch(e){}
   if(typeof cloudPush==="function")cloudPush();
 }
