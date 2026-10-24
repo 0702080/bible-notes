@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-2">
+<meta name="app-build" content="2026-10-25-3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2802,6 +2802,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .icbtns .icpray{min-width:150px;padding:0 20px;border-color:var(--sky);color:var(--sky);font-size:14px;font-weight:700}
 .icbtns .icpray.on{background:var(--sky);color:#0B0B0D}
 .icaddtop{height:34px;padding:0 14px;margin-right:8px;border:1px solid color-mix(in srgb,var(--sky) 55%,transparent);border-radius:17px;background:transparent;color:var(--sky);font-size:13.5px;white-space:nowrap}
+/* 중보기도 맨 위 줄: 제목·인원·단추가 한 줄로 (2026-10-25 사용자 요청) */
+.icv .bqbar{gap:8px;padding:12px 12px}.icv .bqtitle{gap:6px;flex:0 1 auto}.icv .bqbar b,.icv .iccnt,.icv .bqbar button{white-space:nowrap}
+.icv .qbarbtns{gap:6px;flex:none}.icv .icaddtop{margin-right:0;padding:0 12px}.icv .icclose{padding:0 14px}
+@media (max-width:380px){.icaddlong{display:none}}
 @media (hover:hover){.icaddtop:hover{background:color-mix(in srgb,var(--sky) 12%,transparent)}}
 .icform{display:flex;flex-direction:column;gap:8px;padding:12px;margin-bottom:10px;border:1px solid var(--sky);border-radius:14px;background:#121116}
 .icform select{height:40px}
@@ -8250,7 +8254,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function openIntercede(){
     if(!icv){
       icv=document.createElement("div"); icv.className="cch icv"; icv.setAttribute("role","dialog"); icv.setAttribute("aria-modal","true"); icv.hidden=true;
-      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🤲 중보기도</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icadd icaddtop">＋ 기도할 사람 넣기</button><button type="button" class="icclose">닫기</button></div></div>'+
+      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🤲 중보기도</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icadd icaddtop">＋ <span class="icaddlong">기도할 사람 </span>넣기</button><button type="button" class="icclose">닫기</button></div></div>'+
         '<div class="ccbody icbody"></div>';
       document.body.appendChild(icv);
       icv.querySelector(".icclose").addEventListener("click",closeIntercede);
