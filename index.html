@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-73">
+<meta name="app-build" content="2026-10-24-74">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1712,7 +1712,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 @media (min-width:900px){
   body.boardon .toolbar>*{flex:0 0 auto}   /* 단추 글자가 찌그러져 겹치지 않게 */
   /* 칸반 도구줄의 찾기 칸 (2026-10-17 사용자 요청) */
-  body.boardon .bfilter{display:block;flex:0 1 520px;min-width:72px;max-width:520px;margin-left:auto;margin-right:auto;height:32px;padding:0 14px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.04);color:var(--ink);font:inherit;font-size:13px}
+  body.boardon .bfilter{display:block;flex:1 1 520px;min-width:72px;max-width:520px;margin-left:auto;margin-right:auto;height:32px;padding:0 14px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.04);color:var(--ink);font:inherit;font-size:13px}
   body.boardon .bfilter::placeholder{color:var(--faint)}
   body.boardon .bfilter:focus{outline:none;border-color:color-mix(in srgb,var(--violet) 65%,var(--rule));background:rgba(255,255,255,.07)}
   /* 아래 손잡이를 끌어 높이를 바꿀 수 있다 (2026-10-17 사용자 요청) */
@@ -1728,7 +1728,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
   body.boardon .dlfgrip[hidden]{display:none}
   body.boardon .dlfgrip::before{content:"";width:54px;height:4px;border-radius:2px;background:#34333A;transition:background .15s,width .15s}
   body.boardon .dlfgrip:hover::before,body.boardon .dlfgrip.on::before{background:var(--sky);width:76px}
-  body.boardon .todaymini{display:flex;align-items:center;gap:6px;flex:0 1 auto;min-width:0;overflow-x:auto;scrollbar-width:none}
+  body.boardon .todaymini{display:flex;align-items:center;gap:6px;flex:0 0 auto;min-width:0;overflow:visible;scrollbar-width:none}   /* 작은 단추들은 줄어들어 가려지지 않게 — 좁으면 찾기 칸이 줄어듦 (2026-10-24 사용자 요청) */
   body.boardon .todaymini::-webkit-scrollbar{display:none}
   body.boardon .toolbar h2{flex:0 0 auto}
 }
