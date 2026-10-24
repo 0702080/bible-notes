@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-x2">
+<meta name="app-build" content="2026-10-24-38">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2730,18 +2730,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .icp.big{border-color:color-mix(in srgb,var(--sky) 35%,#2A2930);background:color-mix(in srgb,var(--sky) 5%,#111014)}
 .icp.ans{opacity:.7}
 .ictop{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
-.icname{font-size:16px;color:var(--ink)}
+.icname{font-size:16px;color:var(--gold)}
 .icmeta{font-size:12px;color:var(--faint);white-space:nowrap}
-.icmemo{margin:6px 0 0;font-size:14.5px;line-height:1.6;white-space:pre-wrap;color:var(--ink)}
+.icmemo{margin:14px 0 0;font-size:14.5px;line-height:1.6;white-space:pre-wrap;color:var(--ink)}
 .icverse{margin-top:8px;padding:6px 10px;border-left:2px solid var(--violet);font-size:13.5px;line-height:1.55;color:var(--muted)}
 .icverse b{display:block;font-weight:400;color:var(--violet);font-size:12.5px}
 .icbtns{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
 .icbtns button{height:34px;padding:0 12px;border:1px solid #34333A;border-radius:17px;background:transparent;color:var(--muted);font-size:13px}
-.icbtns .icpray{flex:1;border-color:var(--sky);color:var(--sky);font-size:14px;font-weight:700}
+.icbtns{align-items:center}
+.icbtns .icpray{min-width:150px;padding:0 20px;border-color:var(--sky);color:var(--sky);font-size:14px;font-weight:700}
 .icbtns .icpray.on{background:var(--sky);color:#0B0B0D}
 .icadd{width:100%;height:44px;margin-bottom:10px;border:1px dashed #3A3944;border-radius:12px;background:transparent;color:var(--sky);font-size:14px}
 .icform{display:flex;flex-direction:column;gap:8px;padding:12px;margin-bottom:10px;border:1px solid var(--sky);border-radius:14px;background:#121116}
 .icform select{height:40px}
+.icform .icfm{min-height:200px;resize:vertical;line-height:1.6}
 .icfbtn{display:flex;justify-content:space-between;align-items:center}
 .icfbtn button{height:36px;padding:0 14px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--muted);font-size:13.5px;margin-left:6px}
 .icfbtn .icok{border-color:var(--sky);background:var(--sky);color:#0B0B0D;font-weight:700}
@@ -8075,7 +8077,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!o||!Array.isArray(o.items))o={items:[],per:3,del:{}};
     if(!o.del||typeof o.del!=="object")o.del={};
     o.per=Math.max(1,Math.min(10,+o.per||3));
-    o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,30),memo:String(x.memo||"").slice(0,1000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
+    o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,30),memo:String(x.memo||"").slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
       log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,an:String(x.an||"").slice(0,1000)}});
     return o;
   }
@@ -8143,7 +8145,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function icForm(x){
     var f=document.createElement("div"); f.className="icform"; f.dataset.id=x?x.id:"";
     f.innerHTML='<input class="field icfn" maxlength="30" placeholder="이름 (예: 어머니, 김○○ 집사님)" aria-label="이름">'+
-      '<textarea class="field icfm" rows="3" maxlength="1000" placeholder="기도 제목 (예: 수술 회복, 믿음이 자라도록)" aria-label="기도 제목"></textarea>'+
+      '<textarea class="field icfm" rows="10" maxlength="8000" placeholder="기도 제목 (예: 수술 회복, 믿음이 자라도록)" aria-label="기도 제목"></textarea>'+
       '<select class="field icfv" aria-label="붙들 말씀">'+icNoteOpts(x?x.nid:"")+'</select>'+
       (x&&x.ans?'<textarea class="field icfa" rows="2" maxlength="1000" placeholder="어떻게 응답하셨는지" aria-label="응답"></textarea>':'')+
       '<div class="icfbtn">'+(x?'<button type="button" class="icdel">지우기</button>':'<span></span>')+'<span><button type="button" class="iccancel">취소</button><button type="button" class="icok">'+(x?"저장":"＋ 명단에 넣기")+'</button></span></div>';
