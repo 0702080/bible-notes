@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-37">
+<meta name="app-build" content="2026-10-24-x1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8747,6 +8747,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(b.classList.contains("dlghgrip"))return;   // 손잡이는 끌기 전용
         if(b.classList.contains("dlgname")){   // 한 번 누르면 접고 펼치기, 빠르게 두 번이면 이름 바꾸기
           var gg=b.dataset.g, nowT=Date.now();
+          if(/^__/.test(gg)){if(dlGFold.has(gg))dlGFold.delete(gg); else dlGFold.add(gg); saveGFold(); drawDaily(); return}   // 말씀 실천·중보기도: 누르면 접고 펼치기만 (2026-10-24 사용자 요청)
           if(dlgTap.g===gg&&nowT-dlgTap.t<450){
             if(dlGFold.has(gg))dlGFold.delete(gg); else dlGFold.add(gg);   // 첫 번째 누름으로 바뀐 접힘을 되돌림
             saveGFold(); dlgTap={g:"",t:0}; dlGEditId=gg; dlEditId=""; drawDaily(); return;
@@ -9223,10 +9224,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       })});
       var asec=document.createElement("section"); asec.className="dlgrp dlacts"; asec.style.setProperty("--gc","var(--green)");
       var ah=document.createElement("div"); ah.className="dlgh";
-      var at=document.createElement("span"); at.className="dlgname dlactname";
+      var at=document.createElement("button"); at.type="button"; at.className="dlgname dlactname"; at.dataset.g="__acts";
+      var aOpen=!dlGFold.has("__acts"); at.setAttribute("aria-expanded",String(aOpen)); at.setAttribute("aria-label","말씀 실천 "+(aOpen?"접기":"펼치기"));
       at.textContent="🌱 말씀 실천"+(acs.length?"  "+acs.filter(function(x){return x.on}).length+"/"+acs.length:"");
+      var ach=document.createElement("span"); ach.className="dlgchev"; ach.setAttribute("aria-hidden","true"); at.appendChild(ach);
       ah.appendChild(at); asec.appendChild(ah);
-      if(!acs.length){
+      if(!aOpen)acs=[], asec.dataset.fold="1";
+      if(!acs.length&&!asec.dataset.fold){
         var ap=document.createElement("p"); ap.className="dlacthint"; ap.textContent="말씀 카드의 ✓ 실천 탭에 '이 말씀으로 할 일'을 적으면 여기서 날마다 점검할 수 있어요.";
         asec.appendChild(ap);
       }
@@ -9249,12 +9253,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var ico=icData(), ipk=icPick(ico,dlDay);
       var isec=document.createElement("section"); isec.className="dlgrp dlacts dlic"; isec.style.setProperty("--gc","var(--sky)");
       var ih=document.createElement("div"); ih.className="dlgh";
-      var it2=document.createElement("span"); it2.className="dlgname dlactname";
+      var it2=document.createElement("button"); it2.type="button"; it2.className="dlgname dlactname"; it2.dataset.g="__ic";
+      var iOpen=!dlGFold.has("__ic"); it2.setAttribute("aria-expanded",String(iOpen)); it2.setAttribute("aria-label","오늘 중보기도 "+(iOpen?"접기":"펼치기"));
       it2.textContent="🤲 오늘 중보기도"+(ipk.length?"  "+ipk.filter(function(x){return x.log.indexOf(dlDay)>=0}).length+"/"+ipk.length:"");
+      var ich=document.createElement("span"); ich.className="dlgchev"; ich.setAttribute("aria-hidden","true"); it2.appendChild(ich);
       ih.appendChild(it2);
       var il=document.createElement("button"); il.type="button"; il.className="dlicall"; il.textContent=ico.items.length?"명단 "+ico.items.length+"명 ›":"명단 만들기 ›"; ih.appendChild(il);
       isec.appendChild(ih);
-      if(!ipk.length){var ip=document.createElement("p"); ip.className="dlacthint"; ip.textContent="기도해 줄 사람을 명단에 넣으면, 하루에 몇 명씩 오래 기도하지 못한 사람부터 여기에 보여 드려요."; isec.appendChild(ip)}
+      if(!iOpen){ipk=[]}
+      else if(!ipk.length){var ip=document.createElement("p"); ip.className="dlacthint"; ip.textContent="기도해 줄 사람을 명단에 넣으면, 하루에 몇 명씩 오래 기도하지 못한 사람부터 여기에 보여 드려요."; isec.appendChild(ip)}
       ipk.forEach(function(x){
         var on2=x.log.indexOf(dlDay)>=0;
         var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc","var(--sky)");
