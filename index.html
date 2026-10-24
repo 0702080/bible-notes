@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-47">
+<meta name="app-build" content="2026-10-24-48">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8152,13 +8152,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       icv.querySelector(".icclose").addEventListener("click",closeIntercede);
       icv.addEventListener("click",icClick);
       // 기도문을 두 번 누르면(휴대폰은 두 번 톡톡) 고치기 (2026-10-24 사용자 요청)
-      var icTap={id:"",t:0};
+      // 한 번 누르면 접힌 카드가 펼쳐지고, 두 번 누르면 펼치면서 고치기 (2026-10-24 사용자 요청)
+      var icTap={id:"",timer:0};
       icv.addEventListener("click",function(e){
         if(e.target.closest("button,input,textarea,select,.icform"))return;
-        var c=e.target.closest(".icp"); if(!c)return;
-        var now=Date.now();
-        if(icTap.id===c.dataset.id&&now-icTap.t<450){icTap={id:"",t:0}; icEdit=c.dataset.id; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfm"); if(f){f.focus(); try{f.setSelectionRange(f.value.length,f.value.length)}catch(err){}}},40); return}
-        icTap={id:c.dataset.id,t:now};
+        var c=e.target.closest(".icp"); if(!c)return; var id=c.dataset.id;
+        if(icTap.id===id&&icTap.timer){clearTimeout(icTap.timer); icTap={id:"",timer:0};
+          icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){}
+          icEdit=id; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfm"); if(f){f.focus(); try{f.setSelectionRange(f.value.length,f.value.length)}catch(err){}}},40); return}
+        clearTimeout(icTap.timer);
+        icTap={id:id,timer:setTimeout(function(){icTap={id:"",timer:0};
+          if(!icOpen[id]&&!(window.getSelection&&String(window.getSelection()).length)){icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){} icDraw()}
+        },300)};
       });
       icv.addEventListener("change",function(e){if(e.target.classList.contains("icper")){var o=icData();o.per=+e.target.value||3;o.perSet=1;icSave(o);icDraw()}});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&icv&&!icv.hidden)closeIntercede()});
@@ -8171,7 +8176,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     return '<option value="">붙들 말씀 (선택)</option>'+arr.map(function(n){return '<option value="'+n.id+'"'+(n.id===sel?" selected":"")+'>'+String(n.ref).replace(/[<&"]/g,"")+'</option>'}).join("");
   }
   function icPerson(x,today,big){
-    var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":""); d.dataset.id=x.id; d.title="두 번 누르면 고쳐요";
+    var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":""); d.dataset.id=x.id; d.title="한 번 누르면 펼치고, 두 번 누르면 고쳐요";
     var did=x.log.indexOf(today)>=0, last=icLastBefore(x,today);
     var op=!!icOpen[x.id]; if(op)d.classList.add("open");
     d.innerHTML='<button type="button" class="ictop icfold" aria-expanded="'+op+'" title="눌러서 '+(op?"접기":"펼치기")+'"><b class="icname"></b><span class="icmeta"></span><span class="icchev" aria-hidden="true"></span></button><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
