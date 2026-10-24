@@ -3,6 +3,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
+<meta name="app-build" content="td-2026-10-24-1">
+<script>
+/* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
+(function(){try{
+  if(!/^https?:$/.test(location.protocol)||!window.fetch)return;
+  var mine=document.querySelector('meta[name="app-build"]').content, last=0;
+  function check(){
+    if(Date.now()-last<60000)return; last=Date.now();
+    fetch(location.href.split("#")[0],{cache:"reload"}).then(function(r){return r.text()}).then(function(t){
+      var m=t.match(/name="app-build" content="([^"]+)"/); if(!m||m[1]===mine)return;
+      var k="bible-td-reloaded-"+m[1]; try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1")}catch(e){}
+      var a=document.activeElement; if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;
+      location.reload();
+    }).catch(function(){});
+  }
+  check();
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")check()});
+}catch(e){}})();
+</script>
 <meta name="theme-color" content="#2A211C">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
