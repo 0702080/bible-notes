@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-70">
+<meta name="app-build" content="2026-10-24-72">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2907,6 +2907,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dels.sure{font-size:11.5px;color:var(--pink)}
 .sermt{display:block;width:100%;box-sizing:border-box;min-height:92px;padding:9px 11px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:15.5px;line-height:1.7;resize:none;overflow:hidden}
 .sermt:focus{outline:none;border-color:var(--pink)}
+.sermt.sermbig{min-height:min(56vh,420px)}   /* 적을 때는 크게 (2026-10-24 사용자 요청) */
 .sermt::placeholder{color:var(--faint)}
 .sermempty{margin:0 0 8px;padding:10px 12px;border:1px dashed #2E2D34;border-radius:12px;font-size:12.5px;color:var(--faint);line-height:1.6}
 .dlgempty{margin:0 0 4px;padding:10px 12px;border:1px dashed #2E2D34;border-radius:12px;font-size:12.5px;color:var(--faint)}
@@ -5106,6 +5107,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }catch(e){}
   }
   document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".viewseg button"); if(b)hoverTick()});   // 보기·순서 단추를 누르면 '띡' (2026-10-24 사용자 요청)
+  // 설교 요약 칸은 적는 동안 크게 (2026-10-24 사용자 요청)
+  document.addEventListener("focusin",function(e){if(e.target.classList&&e.target.classList.contains("sermt"))e.target.classList.add("sermbig")});
+  document.addEventListener("focusout",function(e){if(e.target.classList&&e.target.classList.contains("sermt"))e.target.classList.remove("sermbig")});
   function hoverTick(){
     try{
       var now=Date.now(); if(now-hovAt<60)return; hovAt=now;
