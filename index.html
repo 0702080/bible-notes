@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-6">
+<meta name="app-build" content="2026-10-25-7">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -409,6 +409,8 @@ body.boardon #topicBar{padding-top:8px;padding-bottom:4px}   /* 주제 줄 위·
 .mendl.thx span{color:var(--gold)}
 .mendl.todo span{color:var(--sky)}
 .mendl small{font-size:12.5px;color:var(--muted)}
+/* 묵상 끝의 🙏 감사 칸과 결론 아래 질문 줄은 안 보이게 (2026-10-25 사용자 요청). 예전에 적어 둔 감사가 있으면 그 묵상에서만 보임 */
+.medi.nothx .mendl.thx,.medi.nothx .mthx{display:none}.mendl.todo small{display:none}
 .mthx,.mtodo{display:block;width:100%;box-sizing:border-box;min-height:44px;padding:8px 10px;border:1px solid #2A2930;border-radius:9px;background:#0E0E11;font:inherit;font-size:15px;line-height:1.65;resize:none;overflow:hidden}
 .mthx{color:var(--gold)}
 .mtodo{color:var(--sky)}
@@ -4685,7 +4687,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(fo){d.querySelector(".mpd").textContent=dateShort(m.at);d.querySelector(".mpt").textContent=(m.text||"").replace(/\s+/g," ").trim()||"(빈 묵상)"}
       d.querySelector(".mfold").textContent=fo?"펼치기":"접기";
       d.classList.toggle("pinned",!!m.pin); d.querySelector(".mpinm").textContent=m.pin?"📌 고정 풀기":"📌 맨 위에 고정";
-      setVal(d.querySelector(".med"),m.text); setVal(d.querySelector(".mthx"),m.thx||""); setVal(d.querySelector(".mtodo"),m.todo||"");
+      setVal(d.querySelector(".med"),m.text); setVal(d.querySelector(".mthx"),m.thx||""); d.classList.toggle("nothx",!String(m.thx||"").trim()); setVal(d.querySelector(".mtodo"),m.todo||"");
       var tb=d.querySelector(".mtoact"), ta=m.tact&&n.acts.some(function(a){return a.id===m.tact});
       tb.hidden=!(m.todo||"").trim(); tb.textContent=ta?"✓ 실천에 있어요":"실천으로 보내기"; tb.disabled=!!ta;
     });
