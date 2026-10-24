@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-49">
+<meta name="app-build" content="2026-10-24-50">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8163,7 +8163,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           icEdit=id; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfm"); if(f){f.focus(); try{f.setSelectionRange(f.value.length,f.value.length)}catch(err){}}},40); return}
         clearTimeout(icTap.timer);
         icTap={id:id,timer:setTimeout(function(){icTap={id:"",timer:0};
-          if(!icOpen[id]&&!(window.getSelection&&String(window.getSelection()).length)){icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){} icDraw()}
+          if(window.getSelection&&String(window.getSelection()).length)return;   // 글을 고르는 중이면 그대로
+          if(icOpen[id])delete icOpen[id]; else icOpen[id]=1;   // 한 번 누르면 펼치고, 펼친 것은 한 번 누르면 접음
+          try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){} icDraw();
         },300)};
       });
       icv.addEventListener("change",function(e){if(e.target.classList.contains("icper")){var o=icData();o.per=+e.target.value||3;o.perSet=1;icSave(o);icDraw()}});
@@ -8177,7 +8179,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     return '<option value="">붙들 말씀 (선택)</option>'+arr.map(function(n){return '<option value="'+n.id+'"'+(n.id===sel?" selected":"")+'>'+String(n.ref).replace(/[<&"]/g,"")+'</option>'}).join("");
   }
   function icPerson(x,today,big){
-    var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":""); d.dataset.id=x.id; d.title="한 번 누르면 펼치고, 두 번 누르면 고쳐요";
+    var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":""); d.dataset.id=x.id; d.title="한 번 누르면 펼치고 접어요 · 두 번 누르면 고쳐요";
     var did=x.log.indexOf(today)>=0, last=icLastBefore(x,today);
     var op=!!icOpen[x.id]; if(op)d.classList.add("open");
     d.innerHTML='<button type="button" class="ictop icfold" aria-expanded="'+op+'" title="눌러서 '+(op?"접기":"펼치기")+'"><b class="icname"></b><span class="icmeta"></span><span class="icchev" aria-hidden="true"></span></button><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
