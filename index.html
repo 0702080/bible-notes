@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-7">
+<meta name="app-build" content="2026-10-25-8">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -325,6 +325,7 @@ body.boardon #topicBar{padding-top:8px;padding-bottom:4px}   /* 주제 줄 위·
 .prva b{font-size:12.5px;color:var(--gold)}
 .prva p{margin:2px 0 0;font-size:15.5px;line-height:1.75;color:var(--gold);white-space:pre-line;word-break:keep-all}
 .pri:not(.editing) .pt,.pri:not(.editing) .pans{display:none}
+.medi textarea.ptbig{resize:none;overflow-y:auto;overscroll-behavior:contain}
 .pri textarea.ptbig{resize:none;overflow-y:auto;overscroll-behavior:contain}
 .pans[hidden]{display:none}
 .pri.editing .prv{display:none}
@@ -4200,7 +4201,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(Math.abs(y-want)>2)window.scrollBy(0,y-want);
     }
     document.addEventListener("focusin",function(e){
-      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||!(t.classList.contains("pt")||t.classList.contains("pan"))||!t.closest("#list .note .pri"))return;
+      // 묵상(.med)·결론(.mtodo)·감사(.mthx) 칸도 같이 크게 (2026-10-25 사용자 요청)
+      var t=e.target; if(!t||t.tagName!=="TEXTAREA")return;
+      var okP=(t.classList.contains("pt")||t.classList.contains("pan"))&&t.closest("#list .note .pri");
+      var okM=(t.classList.contains("med")||t.classList.contains("mtodo")||t.classList.contains("mthx"))&&t.closest("#list .note .medi");
+      if(!okP&&!okM)return;
       if(window.matchMedia&&matchMedia("(min-width:900px)").matches)return;
       cur=t; kbUp=false; t.classList.add("dlbig","ptbig");
       // 키보드가 올라오는 동안 화면 높이가 늦게 바뀌는 브라우저가 있어 2초 동안 자주 다시 맞춤
