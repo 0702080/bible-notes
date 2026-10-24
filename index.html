@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-54">
+<meta name="app-build" content="2026-10-24-55">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2706,6 +2706,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlacthint{margin:0;padding:4px 4px 2px;font-size:13px;color:var(--faint);line-height:1.5}
 .dlactcnt{margin-left:6px;font-size:11.5px;color:var(--faint);white-space:nowrap}
 /* 중보기도: 이름은 한 줄, 기도 제목(메모)은 그 아래 줄에 칸 안에서 두 줄까지 (2026-10-24 사용자 요청: 칸 밖으로 넘침) */
+.dlicopen{white-space:nowrap}
+.dlicopen.on{color:var(--sky);border-color:color-mix(in srgb,var(--sky) 55%,transparent)}
+.dlicfull{margin:-2px 0 8px 40px;padding:10px 12px;border-left:2px solid color-mix(in srgb,var(--sky) 55%,transparent);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--sky) 5%,transparent);white-space:pre-wrap;font-size:14px;line-height:1.7;color:var(--ink)}
 .dlicrow .dlt .dlicmemo{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:4px 0 0;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;font-size:12.5px;line-height:1.5;color:var(--faint)}
 .dlicall{margin-left:auto;border:0;background:transparent;color:var(--sky);font-size:12.5px;padding:4px 6px;border-radius:8px}
 /* 🙌 응답 연표 */
@@ -8572,6 +8575,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     o.items.forEach(function(it){if(it.auto==="thanks"&&on.indexOf(it.id)<0){if(th===null)th=thanksOn(day);if(th)on.push(it.id)}});
     return on.filter(function(id){return o.items.some(function(it){return it.id===id})});
   }
+  var dlIcOpen=new Set();   // 하루 돌아보기에서 기도문을 펼친 중보기도
   var dl=null, dlDay="", dlWEnd="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set(), dlmTap={id:"",t:0};
   try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
   function saveGFold(){try{localStorage.setItem("bible-daily-gfold",JSON.stringify(Array.from(dlGFold)))}catch(e){}}
@@ -8795,6 +8799,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(rf&&!dlEdit){e.stopPropagation(); openReader({book:+rf.dataset.b,chapter:+rf.dataset.c,verse:+rf.dataset.v||0}); return}   // 시편 91편 → 장 읽기
         var b=e.target.closest("button"); if(!b)return; var o=dailyData(), id=b.dataset.id;
         if(b.classList.contains("dlicall")){openIntercede();return}
+        if(b.classList.contains("dlicopen")){var oid=b.dataset.icid; if(dlIcOpen.has(oid))dlIcOpen.delete(oid); else dlIcOpen.add(oid); drawDaily(); return}
         if(b.classList.contains("dlicrow")){var icon=icToggle(b.dataset.icid,dlDay); buzz(icon?[12,40,18]:8); drawDaily(); return}
         if(b.classList.contains("dlactref")){closeDaily();openNoteFocus(b.dataset.nid);return}
         if(b.classList.contains("dlactrow")){   // 말씀 실천 체크 = 그날 실천 도장
@@ -9374,8 +9379,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var b=document.createElement("button"); b.type="button"; b.className="dlrow dlicrow"+(on2?" on":""); b.dataset.icid=x.id; b.setAttribute("aria-pressed",String(on2));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
         var tt=b.querySelector(".dlt"); tt.textContent=x.name;
-        if(x.memo.trim()){var sm=document.createElement("small"); sm.className="dlicmemo"; sm.textContent=x.memo.replace(/\s+/g," ").trim(); tt.appendChild(sm)}
-        row.appendChild(b); isec.appendChild(row);
+        var opn=dlIcOpen.has(x.id);
+        if(x.memo.trim()&&!opn){var sm=document.createElement("small"); sm.className="dlicmemo"; sm.textContent=x.memo.replace(/\s+/g," ").trim(); tt.appendChild(sm)}
+        row.appendChild(b);
+        if(x.memo.trim()){   // 기도문 전체 펼쳐 보기 (2026-10-24 사용자 요청)
+          var ob=document.createElement("button"); ob.type="button"; ob.className="dlauto dlicopen"+(opn?" on":""); ob.dataset.icid=x.id; ob.textContent=opn?"접기 ▴":"펼치기 ▾"; ob.setAttribute("aria-expanded",String(opn)); row.appendChild(ob);
+        }
+        isec.appendChild(row);
+        if(opn&&x.memo.trim()){var fm=document.createElement("div"); fm.className="dlicfull"; fm.textContent=x.memo.trim(); isec.appendChild(fm)}
       });
       var afterA=outer.querySelector(".dlacts:not(.dlic)");
       outer.insertBefore(isec,afterA?afterA.nextSibling:outer.firstChild);
