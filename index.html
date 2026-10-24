@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-38">
+<meta name="app-build" content="2026-10-24-39">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2729,7 +2729,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .icp{padding:12px 14px;margin-bottom:10px;border:1px solid #2A2930;border-radius:14px;background:#121116}
 .icp.big{border-color:color-mix(in srgb,var(--sky) 35%,#2A2930);background:color-mix(in srgb,var(--sky) 5%,#111014)}
 .icp.ans{opacity:.7}
-.ictop{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ictop{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:pointer;color:inherit;font:inherit}
+.icname{flex:1;min-width:0}
+.icchev{flex:0 0 auto;width:8px;height:8px;margin-left:4px;border-right:2px solid var(--faint);border-bottom:2px solid var(--faint);transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+.icp.open .icchev{transform:rotate(-135deg) translate(-2px,0)}
+.icp:not(.open) .icmemo{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.icp:not(.open) .icverse{display:none}
 .icname{font-size:16px;color:var(--gold)}
 .icmeta{font-size:12px;color:var(--faint);white-space:nowrap}
 .icmemo{margin:14px 0 0;font-size:14.5px;line-height:1.6;white-space:pre-wrap;color:var(--ink)}
@@ -8108,7 +8113,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var i=x.log.indexOf(day); if(i>=0)x.log.splice(i,1); else{x.log.push(day);x.log.sort()}
     icTouch(x); icSave(o); return i<0;
   }
-  var icv=null, icEdit="";
+  var icv=null, icEdit="", icOpen={};   // 펼친 카드 (기본은 접힘: 기도 제목 3줄만)
+  try{icOpen=JSON.parse(localStorage.getItem("bible-ic-open")||"{}")||{}}catch(e){}
   function openIntercede(){
     if(!icv){
       icv=document.createElement("div"); icv.className="cch icv"; icv.setAttribute("role","dialog"); icv.setAttribute("aria-modal","true"); icv.hidden=true;
@@ -8130,7 +8136,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function icPerson(x,today,big){
     var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":""); d.dataset.id=x.id;
     var did=x.log.indexOf(today)>=0, last=icLastBefore(x,today);
-    d.innerHTML='<div class="ictop"><b class="icname"></b><span class="icmeta"></span></div><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
+    var op=!!icOpen[x.id]; if(op)d.classList.add("open");
+    d.innerHTML='<button type="button" class="ictop icfold" aria-expanded="'+op+'" title="눌러서 '+(op?"접기":"펼치기")+'"><b class="icname"></b><span class="icmeta"></span><span class="icchev" aria-hidden="true"></span></button><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
     d.querySelector(".icname").textContent=x.name;
     d.querySelector(".icmeta").textContent=x.ans?"🙌 응답 "+dlabel(dkey(x.ans)):(x.log.length?x.log.length+"번 기도"+(last?" · 마지막 "+dlabel(last):""):"아직 기도 전");
     var mm=d.querySelector(".icmemo"); if(x.memo.trim())mm.textContent=x.memo; else mm.remove();
@@ -8157,7 +8164,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     icv.querySelector(".iccnt").textContent=o.items.length?o.items.length+"명":"";
     var pick=icPick(o,today), done=pick.filter(function(x){return x.log.indexOf(today)>=0}).length;
     var h=document.createElement("div"); h.className="ichead";
-    h.innerHTML='<b>오늘 기도할 사람</b><span class="icprog"></span><label class="icperl">하루 <select class="icper">'+[1,2,3,4,5,7,10].map(function(k){return '<option'+(k===o.per?" selected":"")+'>'+k+'</option>'}).join("")+'</select>명</label>';
+    h.innerHTML='<b>오늘 기도할 사람</b><span class="icprog"></span><label class="icperl" title="명단이 많을 때, 하루에 몇 명씩 돌아가며 보여 줄지 정해요 (오래 기도하지 못한 사람부터)">하루에 <select class="icper">'+[1,2,3,4,5,7,10].map(function(k){return '<option'+(k===o.per?" selected":"")+'>'+k+'</option>'}).join("")+'</select>명씩 돌아가며</label>';
     h.querySelector(".icprog").textContent=pick.length?done+" / "+pick.length:"";
     body.appendChild(h);
     if(!o.items.length){var e=document.createElement("p"); e.className="icempty"; e.textContent="기도해 줄 사람을 명단에 넣어 보세요. 하루에 몇 명씩, 오래 기도하지 못한 사람부터 차례로 보여 드려요."; body.appendChild(e)}
@@ -8175,6 +8182,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function icClick(e){
     var b=e.target.closest("button"); if(!b||!icv.contains(b)||b.classList.contains("icclose"))return;
     var card=b.closest("[data-id]"), id=card?card.dataset.id:"", o=icData(), today=dkey(Date.now()), x=o.items.find(function(y){return y.id===id});
+    if(b.classList.contains("icfold")){if(icOpen[id])delete icOpen[id]; else icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){} icDraw(); return}
     if(b.classList.contains("icpray")){var on=icToggle(id,today); buzz(on?[12,40,18]:8); if(on)toast("🙏 "+(x?x.name:"")+"을(를) 위해 기도했어요"); icDraw(); return}
     if(b.classList.contains("icadd")){icEdit="new"; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfn"); if(f)f.focus()},30); return}
     if(b.classList.contains("icedit")){icEdit=id; icDraw(); return}
