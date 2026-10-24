@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-78">
+<meta name="app-build" content="2026-10-24-79">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2946,6 +2946,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlmemobox textarea:focus{border-color:var(--sky);outline:none}
 .dlmemodim{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);animation:mdim .18s ease-out}
 .dlmemobox.dlfloat{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:301;width:min(820px,calc(100vw - 80px));max-height:88vh;overflow:auto;margin:0;padding:16px 18px;box-sizing:border-box;background:#141318;border-color:color-mix(in srgb,var(--sky) 45%,#2A2930);box-shadow:0 24px 60px rgba(0,0,0,.6);border-radius:16px}
+.dlmemobox textarea.dlessay{min-height:200px;line-height:1.8}
 .dlmemobox.dlfloat textarea{min-height:min(52vh,520px);font-size:16px;line-height:1.75}
 .dlmemobox textarea.dlbig{resize:vertical;overscroll-behavior:contain}
 .dlbody.dltyping{overflow:hidden}   /* 적는 동안에는 화면이 위아래로 끌려가지 않게 (2026-10-22 사용자 요청) */
@@ -8549,7 +8550,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function lastOpenId(){try{return localStorage.getItem("bible-last-open")||""}catch(e){return ""}}
   /* ---------- 하루 돌아보기 체크리스트 (이 기기에 저장, 백업에 함께 들어감) ---------- */
   var DAILY_KEY="bible-daily";
-  var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도",c:"var(--violet)"},{g:"word",e:"📖",t:"말씀",c:"var(--orange)"},{g:"fruit",e:"🍇",t:"성령의 열매",c:"var(--green)"},{g:"sow",e:"🌱",t:"하나님 나라에 심기",c:"var(--sky)"},{g:"thanks",e:"💛",t:"감사·나눔",c:"var(--gold)"}];   // 묶음마다 색
+  var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도",c:"var(--violet)"},{g:"word",e:"📖",t:"말씀",c:"var(--orange)"},{g:"fruit",e:"🍇",t:"성령의 열매",c:"var(--green)"},{g:"sow",e:"🌱",t:"하나님 나라에 심기",c:"var(--sky)"},{g:"thanks",e:"💛",t:"감사·나눔",c:"var(--gold)"},{g:"essay",e:"✍️",t:"오늘의 에세이",c:"var(--pink)"}];   // 묶음마다 색
   var PRAY_TPL="하나님 아버지\n\n\n\n길이요 진리요 생명 되신 나의 주\n예수님 이름으로 기도 합니다\n아멘";   // 빈 기록칸·카드 기도의 기도문 틀 (2026-10-24 사용자 요청)
   var DAILY_SOW=["돈을 하나님 나라를 위해 쓴 것이 있는가","시간을 하나님 나라를 위해 드렸는가","내 재능으로 누군가를 섬겼는가"];
   var DAILY_DEFAULT=[
@@ -8647,6 +8648,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!o.seeded.sow){
       o.seeded.sow=1;
       if(!o.items.some(function(it){return it.g==="sow"}))DAILY_SOW.forEach(function(t,i){o.items.push({id:"sow"+i,g:"sow",t:t})});
+      try{localStorage.setItem(DAILY_KEY,JSON.stringify(o))}catch(e){}
+    }
+    if(!o.seeded.essay){   // ✍️ 오늘의 에세이: 인상 깊게 보고 생각한 것을 자유롭게 (2026-10-24 사용자 요청)
+      o.seeded.essay=1;
+      if(!o.items.some(function(it){return it.g==="essay"}))o.items.push({id:"essay0",g:"essay",t:"오늘 인상 깊었던 것을 에세이로 적기"});
       try{localStorage.setItem(DAILY_KEY,JSON.stringify(o))}catch(e){}
     }
     return o;
@@ -9385,7 +9391,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           mx.querySelector(".dlmemoh span").textContent="📝 "+dayName(dlDay)+" 기록"+(no>1?" "+no:"");
           var ta=mx.querySelector("textarea"); ta.value=val; ta.setAttribute("aria-label",it.t+" 기록"+(no>1?" "+no:""));
           // 기도 항목의 빈 기록칸은 기도문 틀로 시작 (글자를 적어야 저장됨, 2026-10-24 사용자 요청)
-          if(!val){ta.value=PRAY_TPL;ta.dataset.tpl="1"}
+          if(it.g==="essay"){ta.placeholder="오늘 인상 깊게 보고, 듣고, 생각한 것을 자유롭게 적어 보세요. 제목이 떠오르면 첫 줄에 적어도 좋아요."; ta.classList.add("dlessay")}
+          else if(!val){ta.value=PRAY_TPL;ta.dataset.tpl="1"}
           // PC: 적는 동안은 기록 칸을 화면 가운데에 크게 띄움 (2026-10-24 사용자 요청)
           if(window.matchMedia&&matchMedia("(min-width:900px)").matches){
             mx.classList.add("dlfloat");
