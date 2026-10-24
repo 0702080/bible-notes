@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-58">
+<meta name="app-build" content="2026-10-24-59">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -761,13 +761,16 @@ html,body,button,input,textarea,select{font-family:"Binggrae","Noto Sans KR","Ap
 .fabplus{font-size:24px;line-height:1;font-weight:500;margin-top:-2px}
 .sheet{position:fixed;inset:0;z-index:45}
 .sheet[hidden]{display:none}
-.sheetback{position:absolute;inset:0;background:rgba(0,0,0,.6)}
+.sheetback{position:absolute;inset:0;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}   /* 뒤 화면은 뿌옇게 (2026-10-24 사용자 요청) */
 .sheetpanel{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--sheet);
   border-radius:20px 20px 0 0;border-top:1px solid var(--rule);padding:14px 18px calc(22px + env(safe-area-inset-bottom,0px));max-width:680px;margin:0 auto;box-shadow:0 -12px 40px rgba(0,0,0,.5)}
 /* PC: 말씀 담기 창을 크게, 화면 가운데에 (2026-10-24 사용자 요청) */
 @media (min-width:900px){
   #addSheet .sheetpanel{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:min(960px,calc(100vw - 80px));max-width:none;max-height:90vh;border-radius:20px;border:1px solid var(--rule);padding:22px 28px 26px}
   #addSheet .sheetpanel::before{display:none}
+  /* 주제·진도표 창도 화면 아래에 붙지 않고 위로 올려 가운데에 (2026-10-24 사용자 요청) */
+  #topicSheet .sheetpanel{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:min(760px,calc(100vw - 80px));max-width:none;max-height:86vh;border-radius:20px;border:1px solid var(--rule)}
+  #topicSheet .sheetpanel::before{display:none}
   #addSheet #mRef{font-size:17px;height:50px}
   #addSheet #mText{min-height:min(46vh,460px);font-size:17px;line-height:1.75}
 }
