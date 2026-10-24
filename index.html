@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-41">
+<meta name="app-build" content="2026-10-24-42">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2744,7 +2744,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .icp.big{border-color:color-mix(in srgb,var(--sky) 35%,#2A2930);background:color-mix(in srgb,var(--sky) 5%,#111014)}
 .icp.ans{opacity:.7}
 .ictop{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;padding:0;border:0;background:transparent;text-align:left;cursor:pointer;color:inherit;font:inherit}
-.icname{flex:1;min-width:0}
+.icname{flex:1;min-width:0;line-height:1.45;word-break:keep-all}
 .icchev{flex:0 0 auto;width:8px;height:8px;margin-left:4px;border-right:2px solid var(--faint);border-bottom:2px solid var(--faint);transform:rotate(45deg) translateY(-2px);transition:transform .2s}
 .icp.open .icchev{transform:rotate(-135deg) translate(-2px,0)}
 .icp:not(.open) .icmemo{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
@@ -8141,7 +8141,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!o||!Array.isArray(o.items))o={items:[],per:3,del:{}};
     if(!o.del||typeof o.del!=="object")o.del={};
     o.per=Math.max(1,Math.min(10,+o.per||3));
-    o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,30),memo:String(x.memo||"").slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
+    o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,100),memo:String(x.memo||"").slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
       log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,an:String(x.an||"").slice(0,1000)}});
     return o;
   }
@@ -8210,7 +8210,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function icForm(x){
     var f=document.createElement("div"); f.className="icform"; f.dataset.id=x?x.id:"";
-    f.innerHTML='<input class="field icfn" maxlength="30" placeholder="이름 (예: 어머니, 김○○ 집사님)" aria-label="이름">'+
+    f.innerHTML='<input class="field icfn" maxlength="100" placeholder="제목 (예: 어머니 무릎 회복, 김○○ 집사님 아들)" aria-label="이름">'+
       '<textarea class="field icfm" rows="10" maxlength="8000" placeholder="기도 제목 (예: 수술 회복, 믿음이 자라도록)" aria-label="기도 제목"></textarea>'+
       '<select class="field icfv" aria-label="붙들 말씀">'+icNoteOpts(x?x.nid:"")+'</select>'+
       (x&&x.ans?'<textarea class="field icfa" rows="2" maxlength="1000" placeholder="어떻게 응답하셨는지" aria-label="응답"></textarea>':'')+
