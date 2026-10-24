@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-77">
+<meta name="app-build" content="2026-10-24-78">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2944,6 +2944,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlmemosave{margin-left:auto;font-size:11px;font-weight:400;color:var(--faint)}
 .dlmemobox textarea{width:100%;box-sizing:border-box;min-height:96px;resize:vertical;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.6}
 .dlmemobox textarea:focus{border-color:var(--sky);outline:none}
+.dlmemodim{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);animation:mdim .18s ease-out}
+.dlmemobox.dlfloat{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:301;width:min(820px,calc(100vw - 80px));max-height:88vh;overflow:auto;margin:0;padding:16px 18px;box-sizing:border-box;background:#141318;border-color:color-mix(in srgb,var(--sky) 45%,#2A2930);box-shadow:0 24px 60px rgba(0,0,0,.6);border-radius:16px}
+.dlmemobox.dlfloat textarea{min-height:min(52vh,520px);font-size:16px;line-height:1.75}
 .dlmemobox textarea.dlbig{resize:vertical;overscroll-behavior:contain}
 .dlbody.dltyping{overflow:hidden}   /* 적는 동안에는 화면이 위아래로 끌려가지 않게 (2026-10-22 사용자 요청) */
 @media (min-width:900px){.dlmemobox textarea{min-height:calc(100vh - 230px)}}   /* PC: 적을 때는 모니터 세로로 길게 (2026-10-21 사용자 요청) */
@@ -9383,6 +9386,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           var ta=mx.querySelector("textarea"); ta.value=val; ta.setAttribute("aria-label",it.t+" 기록"+(no>1?" "+no:""));
           // 기도 항목의 빈 기록칸은 기도문 틀로 시작 (글자를 적어야 저장됨, 2026-10-24 사용자 요청)
           if(!val){ta.value=PRAY_TPL;ta.dataset.tpl="1"}
+          // PC: 적는 동안은 기록 칸을 화면 가운데에 크게 띄움 (2026-10-24 사용자 요청)
+          if(window.matchMedia&&matchMedia("(min-width:900px)").matches){
+            mx.classList.add("dlfloat");
+            var dm=document.createElement("div"); dm.className="dlmemodim"; dm.title="눌러서 닫기";
+            dm.addEventListener("click",function(ev){ev.stopPropagation(); dlMemoId=""; drawDaily()});
+            list.appendChild(dm);
+          }
           list.appendChild(mx);
         }
         function memoPrev(key,val,no){   // 기록마다 색을 살짝 달리해 한눈에 나뉘어 보이게 (2026-10-15 사용자 요청)
