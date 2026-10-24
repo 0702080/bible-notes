@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-68">
+<meta name="app-build" content="2026-10-24-69">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6562,7 +6562,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var t=e.target.closest&&e.target.closest("button,a,summary,label,[role=button],input[type=checkbox],.tchip,.hya,.bw,.rw.masked,.mw,.w,.dcell,.note .verse,.note .chead,.note .ref");
     if(!t||t.disabled)return;
     setTimeout(function(){if(Date.now()-lastBuzz>60)buzz(22)},0);
-    tick();
+    if(!t.closest(".viewseg"))tick();   // 보기·순서 단추는 더 또렷한 '띡'(hoverTick) 한 번만
   },true);
 
   /* ---------- PC에서 누를 때 '띡' 소리 (휴대폰은 진동) ---------- */
