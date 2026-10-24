@@ -1142,6 +1142,7 @@ document.addEventListener("click",function(ev){
   if(ev.target.closest(".fchips"))hint("친구 표는 보기만 할 수 있어요","내 체크는 바로 위 🙋 나 표에서 눌러 주세요");
 });
 function cheer(bi,c){
+  return;   // 장을 체크할 때 뜨던 격려 팝업 없앰 (2026-10-24 사용자 요청)
   var t=(c===1)
     ? ["«"+BOOKS[bi][0]+"»을 펼쳤어요. 첫 장에 좋은 만남이 있기를.","시편 119:18"]
     : CHEERS[(cheerTurn++)%CHEERS.length];
