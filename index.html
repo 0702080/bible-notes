@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-51">
+<meta name="app-build" content="2026-10-24-52">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2731,7 +2731,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .ichead{display:flex;align-items:center;gap:10px;margin:6px 0 10px}
 .ichead b{font-size:15px;color:var(--sky)}
 .icprog{font-size:13px;color:var(--muted)}
-.icperl{margin-left:auto;font-size:12.5px;color:var(--muted)}
+.icperl{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.icstep{display:inline-flex;align-items:center;height:30px;border:1px solid #34333A;border-radius:15px;background:#141318;overflow:hidden}
+.icstep b{min-width:22px;text-align:center;font-size:14px;color:var(--sky)}
+.icpm{width:30px;height:30px;border:0;background:transparent;color:var(--muted);font-size:16px;line-height:1;cursor:pointer}
+@media (hover:hover){.icpm:hover{color:var(--sky);background:color-mix(in srgb,var(--sky) 10%,transparent)}}
+.icv .icclose{height:34px;padding:0 16px;border:1px solid #34333A;border-radius:17px;background:transparent;color:var(--ink);font-size:13.5px}
+@media (hover:hover){.icv .icclose:hover{background:#1E1D23}}
 .icper{background:#16151B;color:var(--ink);border:1px solid #34333A;border-radius:8px;padding:2px 4px}
 .ichall{margin-top:24px;padding-top:14px;border-top:1px solid #222126}
 .ichall b{color:var(--muted)}
@@ -8252,7 +8258,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(icEdit==="new")body.appendChild(icForm(null));   // 새 사람은 맨 위에서 적기 (2026-10-24 사용자 요청: 넣기 단추는 위 제목줄에)
     var pick=icPick(o,today), done=pick.filter(function(x){return x.log.indexOf(today)>=0}).length;
     var h=document.createElement("div"); h.className="ichead";
-    h.innerHTML='<b>오늘 기도할 사람</b><span class="icprog"></span><label class="icperl" title="명단이 많을 때, 하루에 몇 명씩 돌아가며 보여 줄지 정해요 (오래 기도하지 못한 사람부터)">하루에 <select class="icper">'+[1,2,3,4,5,7,10].map(function(k){return '<option'+(k===o.per?" selected":"")+'>'+k+'</option>'}).join("")+'</select>명씩 돌아가며</label>';
+    h.innerHTML='<b>오늘 기도할 사람</b><span class="icprog"></span><span class="icperl" title="명단이 많을 때, 하루에 몇 명씩 돌아가며 보여 줄지 정해요 (오래 기도하지 못한 사람부터)">하루<span class="icstep"><button type="button" class="icpm" data-d="-1" aria-label="한 명 줄이기">−</button><b>'+o.per+'</b><button type="button" class="icpm" data-d="1" aria-label="한 명 늘리기">+</button></span>명씩</span>';
     h.querySelector(".icprog").textContent=pick.length?done+" / "+pick.length:"";
     body.appendChild(h);
     if(!o.items.length){var e=document.createElement("p"); e.className="icempty"; e.textContent="기도해 줄 사람을 명단에 넣어 보세요. 하루에 몇 명씩, 오래 기도하지 못한 사람부터 차례로 보여 드려요."; body.appendChild(e)}
@@ -8270,6 +8276,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var b=e.target.closest("button"); if(!b||!icv.contains(b)||b.classList.contains("icclose"))return;
     var card=b.closest("[data-id]"), id=card?card.dataset.id:"", o=icData(), today=dkey(Date.now()), x=o.items.find(function(y){return y.id===id});
     if(b.classList.contains("icfold")){if(icOpen[id])delete icOpen[id]; else icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){} icDraw(); return}
+    if(b.classList.contains("icpm")){o.per=Math.max(1,Math.min(10,(o.per||3)+(+b.dataset.d))); o.perSet=1; icSave(o); buzz(6); icDraw(); return}   // 하루 몇 명 (2026-10-24 다듬음)
     if(b.classList.contains("icpray")){var on=icToggle(id,today); buzz(on?[12,40,18]:8); if(on)toast("🙏 "+(x?x.name:"")+"을(를) 위해 기도했어요"); icDraw(); return}
     if(b.classList.contains("icadd")){icEdit="new"; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfn"); if(f)f.focus()},30); return}
     if(b.classList.contains("icedit")){icEdit=id; icDraw(); return}
