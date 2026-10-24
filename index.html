@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-61">
+<meta name="app-build" content="2026-10-24-62">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2014,6 +2014,8 @@ button:active{filter:brightness(1.15)}
 .mnext.mlast + .mnext{margin-top:2px}
 .oquiz{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .oquiz[hidden]{display:none}
+.ccmain{-webkit-user-select:none;user-select:none}   /* 암송 연습 중 마우스로 끌어도 글이 파랗게 잡히지 않게 (2026-10-24 사용자 요청) */
+.ccmain input,.ccmain textarea{-webkit-user-select:text;user-select:text}
 .cch{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .cch,.cch *{touch-action:pan-y}   /* 가로로 밀기는 앱이 받아서 다음 말씀으로 (안쪽 스크롤 칸에도) */
 .cch[hidden]{display:none}
@@ -7422,7 +7424,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     opt=opt||{}; if(!opt.nav)ccBack=[];
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
-      ccBox=document.createElement("div"); ccBox.className="cch"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
+      ccBox=document.createElement("div"); ccBox.className="cch ccmain"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
       ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b></div></div>'+
         '<div class="ccsteps" role="group" aria-label="연습 단계 (눌러서 그 단계로)"></div>'+
         '<div class="ccbody"><small class="ccnum" hidden></small><div class="cctip"></div><div class="ccmid"><div class="ccvwrap"><div class="ccvref"></div><div class="ccverse"></div></div></div></div>'+
