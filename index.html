@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-76">
+<meta name="app-build" content="2026-10-24-77">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5112,6 +5112,30 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // 설교 요약 칸은 적는 동안 크게 (2026-10-24 사용자 요청)
   document.addEventListener("focusin",function(e){if(e.target.classList&&e.target.classList.contains("sermt"))e.target.classList.add("sermbig")});
   document.addEventListener("focusout",function(e){if(e.target.classList&&e.target.classList.contains("sermt"))e.target.classList.remove("sermbig")});
+  // 글 칸에서 Alt+↑/↓ = 지금 줄(고른 여러 줄)을 위·아래로 옮기기 (2026-10-24 사용자 요청)
+  document.addEventListener("keydown",function(e){
+    if(!e.altKey||e.ctrlKey||e.metaKey||(e.key!=="ArrowUp"&&e.key!=="ArrowDown"))return;
+    var ta=e.target; if(!ta||ta.tagName!=="TEXTAREA"||ta.readOnly||ta.disabled)return;
+    var v=ta.value, a=ta.selectionStart, b=ta.selectionEnd;
+    var ls=v.lastIndexOf("\n",a-1)+1;                            // 고른 첫 줄 시작
+    var be=(b>a&&v.charAt(b-1)==="\n")?b-1:b;                     // 줄 끝에서 끝난 선택은 그 줄까지만
+    var le=v.indexOf("\n",be); if(le<0)le=v.length;               // 고른 마지막 줄 끝
+    var block=v.slice(ls,le), up=e.key==="ArrowUp";
+    e.preventDefault();
+    if(up){
+      if(ls===0)return;
+      var ps=v.lastIndexOf("\n",ls-2)+1, prev=v.slice(ps,ls-1);
+      ta.value=v.slice(0,ps)+block+"\n"+prev+v.slice(le);
+      var d=-(prev.length+1);
+    }else{
+      if(le>=v.length)return;
+      var ne=v.indexOf("\n",le+1); if(ne<0)ne=v.length; var next=v.slice(le+1,ne);
+      ta.value=v.slice(0,ls)+next+"\n"+block+v.slice(ne);
+      var d=next.length+1;
+    }
+    try{ta.setSelectionRange(a+d,b+d)}catch(err){}
+    ta.dispatchEvent(new Event("input",{bubbles:true}));   // 저장·높이 맞춤은 평소 입력처럼
+  },true);
   function hoverTick(){
     try{
       var now=Date.now(); if(now-hovAt<60)return; hovAt=now;
