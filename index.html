@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-66">
+<meta name="app-build" content="2026-10-24-67">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1672,6 +1672,13 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
   .viewseg button{display:inline-flex;flex:0 0 auto;white-space:nowrap;align-items:center;gap:6px;height:30px;padding:0 13px;border:0;border-radius:15px;background:transparent;color:var(--muted);font-size:13.5px;transition:background .2s,color .2s}
   .viewseg button svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
   .viewseg button[aria-pressed="true"]{background:var(--violet);color:#141416;-webkit-text-stroke:.3px currentColor}
+  /* 보기·순서 고르기 다듬기 (2026-10-24 사용자 요청): 바탕은 차분하게, 고른 쪽은 은은한 색 알약 */
+  .viewseg{padding:3px;gap:2px;border-color:#2C2B33;background:#141318;box-shadow:inset 0 1px 2px rgba(0,0,0,.35)}
+  .viewseg button{height:30px;padding:0 14px;border-radius:15px;font-weight:500;letter-spacing:-.1px}
+  .viewseg button svg{width:15px;height:15px;opacity:.85}
+  .viewseg button[aria-pressed="true"]{background:linear-gradient(180deg,color-mix(in srgb,var(--violet) 34%,#1C1B22),color-mix(in srgb,var(--violet) 22%,#16151B));color:color-mix(in srgb,var(--violet) 40%,#fff);-webkit-text-stroke:0;font-weight:700;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--violet) 55%,transparent),0 2px 8px color-mix(in srgb,var(--violet) 18%,transparent)}
+  .viewseg button[aria-pressed="true"] svg{opacity:1}
+  .bmodeseg button[aria-pressed="true"]{background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 30%,#1C1B22),color-mix(in srgb,var(--gold) 18%,#16151B));color:color-mix(in srgb,var(--gold) 55%,#fff);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 55%,transparent),0 2px 8px color-mix(in srgb,var(--gold) 15%,transparent)}
   @media (hover:hover){.viewseg button[aria-pressed="false"]:hover{color:var(--ink);background:#22212A}}
   .tadd{display:inline-flex;align-items:center;border-color:color-mix(in srgb,var(--gold) 55%,var(--rule));background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);-webkit-text-stroke:.3px currentColor}
   .fab{display:none!important}
@@ -3090,7 +3097,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     <input class="bfilter" id="bFilter" type="search" placeholder="🔍 말씀 · 묵상 · 기록에서 찾기 (초성도 돼요)" aria-label="말씀에서 찾기">
     <button class="tbtn tadd" id="topAdd" type="button">＋ 말씀 담기</button>
     <div class="viewseg" id="viewSeg" role="group" aria-label="보기 방식"><button type="button" data-v="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>목록</button><button type="button" data-v="board" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4" width="4.5" height="16" rx="1.2"/><rect x="9.75" y="4" width="4.5" height="11" rx="1.2"/><rect x="16" y="4" width="4.5" height="13.5" rx="1.2"/></svg>칸반 보드</button></div>
-    <div class="viewseg bmodeseg" id="bModeSeg" role="group" aria-label="칸반 순서" hidden><button type="button" data-m="list" aria-pressed="true">목록 순서</button><button type="button" data-m="stage" aria-pressed="false">암송 단계</button></div>
+    <div class="viewseg bmodeseg" id="bModeSeg" role="group" aria-label="칸반 순서" hidden><button type="button" data-m="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke-width="3"/></svg>목록 순서</button><button type="button" data-m="stage" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h5v-5h5V9h6"/><path d="M17 6l3 3-3 3"/></svg>암송 단계</button></div>
     <button class="tbtn" id="sortBtn" type="button" aria-label="정렬 바꾸기">최근순</button>
     
     <button class="tbtn" id="filterBtn" type="button" aria-label="노트에서 찾기" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
