@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-80">
+<meta name="app-build" content="2026-10-24-81">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2924,7 +2924,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 @media (min-width:760px){
   .daily{--dlw:1560px}
   .dllist{column-width:380px;column-gap:18px}
-  .dllist.dlsolo{columns:auto;column-width:auto;max-width:520px;margin-left:auto;margin-right:auto}
+  .dllist.dlsolo{columns:auto;column-width:auto;display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:0 18px}
+  .dllist.dlsolo>.dlgrp{width:380px;max-width:100%}
   .dlgrp{display:inline-block;width:100%;box-sizing:border-box;margin:0 0 16px;padding:10px 12px 8px;break-inside:avoid-column;-webkit-column-break-inside:avoid}
   .dlweek,.dladd,.dlnewg{max-width:608px;margin-left:auto;margin-right:auto}
   .dladd,.dlnewg{width:100%}
@@ -9505,7 +9506,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var sn=dl.querySelector(".dlsn"), sx=dl.querySelector(".dlsx");
     if(sn)sn.textContent=fq?(fcount?fcount+"개":"없어요"):"";
     if(sx)sx.hidden=!fq;
-    outer.classList.toggle("dlsolo",!!fq&&outer.querySelectorAll(":scope>.dlgrp").length===1);   // 찾아서 묶음 하나만 남으면 가운데에 (2026-10-24 사용자 요청)
+    outer.classList.toggle("dlsolo",!!fq);   // 찾아서 걸러진 묶음은 화면 가운데에 나란히 (2026-10-24 사용자 요청)
     if(fq&&!fcount){var nh=document.createElement("p");nh.className="dlnohit";nh.textContent="“"+fq+"”이(가) 든 묶음·항목·기록이 없어요.";outer.appendChild(nh)}
     dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit; dl.querySelector(".dltop").hidden=!dlEdit;
     var eb=dl.querySelector(".dledit"); eb.textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기"; eb.classList.toggle("on",dlEdit);
