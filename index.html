@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-4">
+<meta name="app-build" content="2026-10-25-5">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4188,7 +4188,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       // 칸 아래 끝이 키보드 바로 위(10px 띄움)에 오게. 날짜·응답 줄은 적는 동안 키보드 아래로 감 (2026-10-23 사용자 요청)
       var room=Math.round(vh-hb-12-10);
       var hpx=Math.max(140,room)+"px"; if(cur.style.height!==hpx)cur.style.height=hpx;
-      var y=cur.getBoundingClientRect().top-vtop, want=hb+12;
+      // 기도 칸 위 메뉴 줄(+ 기도·읽기 모드·친구 공개)이 카드 머리 밑에 반쯤 가려지지 않게: 첫 기도면 메뉴 줄까지 다 보이게, 아니면 칸만 (2026-10-25 사용자 요청)
+      var gap=4, pane=cur.closest(".pane"), qb=pane&&pane.querySelector(".qbtns"), fp=pane&&pane.querySelector(".pri");
+      if(qb&&qb.offsetParent&&fp===cur.closest(".pri")){gap=Math.round(cur.getBoundingClientRect().top-qb.getBoundingClientRect().top)+6; room-=gap-12; hpx=Math.max(140,room)+"px"; if(cur.style.height!==hpx)cur.style.height=hpx}
+      var y=cur.getBoundingClientRect().top-vtop, want=hb+gap;
       if(Math.abs(y-want)>2)window.scrollBy(0,y-want);
     }
     document.addEventListener("focusin",function(e){
