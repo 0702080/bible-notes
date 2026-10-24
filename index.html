@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-3">
+<meta name="app-build" content="2026-10-25-4">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2792,6 +2792,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .icp:not(.open) .icverse{display:none}
 .icname{font-size:16px;color:var(--gold)}
 .icmeta{font-size:12px;color:var(--faint);white-space:nowrap}
+/* 기도 제목을 가로로 넓게: 제목은 한 줄 전체, "1번 기도·마지막…"은 그 아래 줄로 (2026-10-25 사용자 요청) */
+.ictop{display:grid;grid-template-columns:1fr auto;column-gap:8px;row-gap:4px}.ictop .icname{grid-column:1;grid-row:1}.ictop .icchev{grid-column:2;grid-row:1;align-self:center}.ictop .icmeta{grid-column:1;grid-row:2;white-space:normal}.ictop .icmeta:empty{display:none}
 .icmemo{margin:14px 0 0;font-size:14.5px;line-height:1.6;white-space:pre-wrap;color:var(--ink)}
 .icverse{margin-top:8px;padding:6px 10px;border-left:2px solid var(--violet);font-size:13.5px;line-height:1.55;color:var(--muted)}
 .icverse b{display:block;font-weight:400;color:var(--violet);font-size:12.5px}
