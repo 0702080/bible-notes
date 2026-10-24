@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-5">
+<meta name="app-build" content="2026-10-25-6">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2953,6 +2953,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlmemoh{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:700;color:var(--sky)}
 .dlmemosave{margin-left:auto;font-size:11px;font-weight:400;color:var(--faint)}
 .dlmemobox textarea{width:100%;box-sizing:border-box;min-height:96px;resize:vertical;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.6}
+.dlmemorefs .dlmemoref::after{content:none}.dlmemorefs .dlmemoref::before{content:"📖 "}
+.dlmemorefs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.dlmemorefs .dlmemoref{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border:1px solid color-mix(in srgb,var(--sky) 50%,transparent);border-radius:16px;background:color-mix(in srgb,var(--sky) 10%,transparent);font-size:13.5px}
 .dlmemobox textarea:focus{border-color:var(--sky);outline:none}
 .dlmemodim{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.5);-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px);animation:mdim .18s ease-out}
 .dlmemobox.dlfloat{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:301;width:min(820px,calc(100vw - 80px));max-height:88vh;overflow:auto;margin:0;padding:16px 18px;box-sizing:border-box;background:#141318;border-color:color-mix(in srgb,var(--sky) 45%,#2A2930);box-shadow:0 24px 60px rgba(0,0,0,.6);border-radius:16px}
@@ -9403,6 +9406,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             '<div class="dlmemofoot">'+(no>1?'':'<button type="button" class="dlmemoedit">✏️ 항목 글 고치기</button>')+'<button type="button" class="dlmemoclose">'+(no>1?'다 썼어요':'닫기')+'</button></div>';
           mx.querySelector(".dlmemoh span").textContent="📝 "+dayName(dlDay)+" 기록"+(no>1?" "+no:"");
           var ta=mx.querySelector("textarea"); ta.value=val; ta.setAttribute("aria-label",it.t+" 기록"+(no>1?" "+no:""));
+          // 항목 글에 성경 구절이 있으면 기록 칸 위에 그 말씀 열기 단추 (2026-10-25 사용자 요청)
+          var rtmp=document.createElement("div"); dlRefInto(rtmp,it.t||""); var rfs=rtmp.querySelectorAll(".dlref");
+          if(rfs.length){var rb=document.createElement("div"); rb.className="dlmemorefs"; Array.prototype.forEach.call(rfs,function(r){r.classList.add("dlmemoref"); r.textContent=r.textContent+" 말씀 열기"; rb.appendChild(r)}); mx.insertBefore(rb,ta)}
           // 기도 항목의 빈 기록칸은 기도문 틀로 시작 (글자를 적어야 저장됨, 2026-10-24 사용자 요청)
           if(it.g==="essay"){ta.placeholder="오늘 인상 깊게 보고, 듣고, 생각한 것을 자유롭게 적어 보세요. 제목이 떠오르면 첫 줄에 적어도 좋아요."; ta.classList.add("dlessay")}
           else if(!val){ta.value=PRAY_TPL;ta.dataset.tpl="1"}
