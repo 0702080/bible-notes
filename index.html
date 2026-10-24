@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-74">
+<meta name="app-build" content="2026-10-24-75">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2595,6 +2595,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqtip{padding:7px 12px;border:1px dashed #34333A;border-radius:16px;background:transparent;color:var(--muted);font:inherit;font-size:12.5px}
 @media (hover:hover){.mqtip:hover{color:var(--ink);border-color:var(--gold)}}
 .mqadd{width:100%;height:42px;border:1px dashed color-mix(in srgb,var(--gold) 45%,#34333A);border-radius:14px;background:transparent;color:var(--gold);font:inherit;font-size:13.5px;font-weight:700}
+.mqfoot.mqfoottop{margin:-2px 0 4px}
 @media (hover:hover){.mqadd:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
 .mqsaved{margin-left:auto;flex:0 0 auto;font-size:11px;color:var(--faint)}
 .mqa{width:100%;box-sizing:border-box;min-height:60px;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.7;resize:none;overflow:hidden}
@@ -9989,7 +9990,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function mqAdd(q){
     var o=medqData(), day=o.days[mqDay]=o.days[mqDay]||{items:[]};
     var it={id:mid(),q:String(q||""),a:"",note:""};
-    day.items.push(it); saveMedq(o); drawMedq();
+    day.items.unshift(it); saveMedq(o); drawMedq();   // 새 질문은 맨 위에 (2026-10-24 사용자 요청)
     var el=mq.querySelector('.mqitem[data-id="'+it.id+'"]');
     var f=el&&el.querySelector(q?".mqa":".mqqt"); if(f){try{f.focus()}catch(e){} el.scrollIntoView({block:"center",behavior:"smooth"})}
   }
@@ -10070,19 +10071,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var p0=document.createElement("p"); p0.className="mqhint";
     p0.textContent="질문도 답도 내가 적어요. 말씀은 연결하고 싶을 때만 골라 주세요.";
     box.appendChild(p0);
-    var done=0;
-    day.items.forEach(function(it,i){box.appendChild(mqCard(it,i)); if(String(it.a||"").trim())done++});
+    var done=0; day.items.forEach(function(it){if(String(it.a||"").trim())done++});
+    // 질문 추가 단추와 답한 수는 맨 위에 (2026-10-24 사용자 요청)
+    var add=document.createElement("button"); add.type="button"; add.className="mqadd mqaddtop"; add.textContent="➕ 질문 추가";
+    box.appendChild(add);
+    var ft=document.createElement("div"); ft.className="mqfoot mqfoottop";
+    var cnt=document.createElement("span"); cnt.className="mqcnt";
+    cnt.textContent=day.items.length?done+" / "+day.items.length+" 답했어요":"아직 적은 질문이 없어요";
+    ft.appendChild(cnt); box.appendChild(ft);
+    day.items.forEach(function(it,i){box.appendChild(mqCard(it,i))});
     if(!day.items.length){
       var tp=document.createElement("div"); tp.className="mqtips";
       MEDQ_TIPS.forEach(function(q){var b=document.createElement("button");b.type="button";b.className="mqtip";b.textContent=q;tp.appendChild(b)});
       box.appendChild(tp);
     }
-    var add=document.createElement("button"); add.type="button"; add.className="mqadd"; add.textContent="➕ 질문 추가";
-    box.appendChild(add);
-    var ft=document.createElement("div"); ft.className="mqfoot";
-    var cnt=document.createElement("span"); cnt.className="mqcnt";
-    cnt.textContent=day.items.length?done+" / "+day.items.length+" 답했어요":"아직 적은 질문이 없어요";
-    ft.appendChild(cnt); box.appendChild(ft);
     setTimeout(function(){Array.prototype.forEach.call(box.querySelectorAll(".mqa,.mqqt"),grow)},0);
   }
   function medqToMed(id){   // 말씀을 연결해 둔 답만 그 말씀 묵상으로 옮겨 담기
