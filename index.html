@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-50">
+<meta name="app-build" content="2026-10-24-51">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2736,7 +2736,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .ichall{margin-top:24px;padding-top:14px;border-top:1px solid #222126}
 .ichall b{color:var(--muted)}
 .icp{padding:12px 14px;margin-bottom:10px;border:1px solid #2A2930;border-radius:14px;background:#121116}
-.icp{-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.icp{position:relative;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+.icp .ictop{padding-left:22px}
+.icgrip{position:absolute;left:6px;top:12px;width:18px;height:22px;display:grid;place-items:center;color:var(--faint);font-size:14px;cursor:grab;touch-action:none;z-index:2}
+@media (hover:hover){.icgrip:hover{color:var(--sky)}}
+.icp.icdragging{position:relative;z-index:5;opacity:.95;box-shadow:0 14px 34px rgba(0,0,0,.55);cursor:grabbing;transition:none}
+.icp.icdragging .icgrip{cursor:grabbing;color:var(--sky)}
 .icp .icmemo{-webkit-user-select:text;user-select:text}
 .icp.big{border-color:color-mix(in srgb,var(--sky) 35%,#2A2930);background:color-mix(in srgb,var(--sky) 5%,#111014)}
 .icp.ans{opacity:.7}
@@ -8112,7 +8117,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!o.del||typeof o.del!=="object")o.del={};
     o.per=Math.max(1,Math.min(10,+o.per||3));
     o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,100),memo:String(x.memo||"").slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
-      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,an:String(x.an||"").slice(0,1000)}});
+      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,an:String(x.an||"").slice(0,1000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
     return o;
   }
   function icSave(o){try{localStorage.setItem(IC_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__icp")}
@@ -8156,7 +8161,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       // 한 번 누르면 접힌 카드가 펼쳐지고, 두 번 누르면 펼치면서 고치기 (2026-10-24 사용자 요청)
       var icTap={id:"",timer:0};
       icv.addEventListener("click",function(e){
-        if(e.target.closest("button,input,textarea,select,.icform"))return;
+        if(e.target.closest("button,input,textarea,select,.icform,.icgrip"))return;
         var c=e.target.closest(".icp"); if(!c)return; var id=c.dataset.id;
         if(icTap.id===id&&icTap.timer){clearTimeout(icTap.timer); icTap={id:"",timer:0};
           icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){}
@@ -8173,6 +8178,40 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     icEdit=""; icv.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true; icDraw();
   }
+  // 기도 카드 끌어서 위아래로 옮기기: 오른쪽 위 ⠿를 잡고 끌기 (2026-10-24 사용자 요청)
+  var icDrag=null;
+  function icOrd(a,b){var oa=a.ord==null?1e12+a.at:a.ord, ob=b.ord==null?1e12+b.at:b.ord; return oa-ob}
+  document.addEventListener("pointerdown",function(e){
+    var g=e.target.closest&&e.target.closest(".icgrip"); if(!g||!icv||icv.hidden)return;
+    var c=g.closest(".icp"); if(!c)return;
+    e.preventDefault(); try{g.setPointerCapture(e.pointerId)}catch(err){}
+    var r=c.getBoundingClientRect();
+    icDrag={c:c,pid:e.pointerId,y0:e.clientY,dy:0}; c.classList.add("icdragging"); buzz(10);
+  });
+  document.addEventListener("pointermove",function(e){
+    if(!icDrag||e.pointerId!==icDrag.pid)return; e.preventDefault();
+    var c=icDrag.c, box=c.parentNode;
+    c.style.transform="translateY("+(e.clientY-icDrag.y0)+"px)";
+    var sibs=Array.prototype.filter.call(box.querySelectorAll(":scope>.icp"),function(x){return x!==c});
+    for(var i=0;i<sibs.length;i++){
+      var r=sibs[i].getBoundingClientRect(), mid=r.top+r.height/2;
+      var before=c.compareDocumentPosition(sibs[i])&Node.DOCUMENT_POSITION_PRECEDING;
+      if(before&&e.clientY<mid){var y0=c.getBoundingClientRect().top; box.insertBefore(c,sibs[i]); icDrag.y0+=c.getBoundingClientRect().top-y0; c.style.transform="translateY("+(e.clientY-icDrag.y0)+"px)"; break}
+      if(!before&&e.clientY>mid){var y1=c.getBoundingClientRect().top; box.insertBefore(c,sibs[i].nextSibling); icDrag.y0+=c.getBoundingClientRect().top-y1; c.style.transform="translateY("+(e.clientY-icDrag.y0)+"px)"}
+    }
+    var sc=icv.querySelector(".icbody"), br=sc.getBoundingClientRect();   // 끝에 닿으면 저절로 스크롤
+    if(e.clientY<br.top+40)sc.scrollTop-=12; else if(e.clientY>br.bottom-40)sc.scrollTop+=12;
+  },{passive:false});
+  function icDragEnd(e){
+    if(!icDrag||e.pointerId!==icDrag.pid)return;
+    var c=icDrag.c; icDrag=null; c.classList.remove("icdragging"); c.style.transform="";
+    var ids=Array.prototype.map.call(icv.querySelectorAll(".icbody .icp"),function(x){return x.dataset.id});
+    var o=icData(), ch=false;
+    ids.forEach(function(id,i){var x=o.items.find(function(y){return y.id===id}); if(x&&x.ord!==i*10){x.ord=i*10; icTouch(x); ch=true}});
+    if(ch){icSave(o); buzz(8)}
+    icDraw();
+  }
+  document.addEventListener("pointerup",icDragEnd); document.addEventListener("pointercancel",icDragEnd);
   function closeIntercede(){if(!icv||icv.hidden)return; icv.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; if(dl&&!dl.hidden)drawDaily()}
   function icNoteOpts(sel){
     var arr=sorted().filter(function(n){return n.ref});
@@ -8182,7 +8221,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":""); d.dataset.id=x.id; d.title="한 번 누르면 펼치고 접어요 · 두 번 누르면 고쳐요";
     var did=x.log.indexOf(today)>=0, last=icLastBefore(x,today);
     var op=!!icOpen[x.id]; if(op)d.classList.add("open");
+    var gp=document.createElement("span"); gp.className="icgrip"; gp.textContent="⠿"; gp.title="끌어서 위아래로 옮기기"; gp.setAttribute("aria-hidden","true");
     d.innerHTML='<button type="button" class="ictop icfold" aria-expanded="'+op+'" title="눌러서 '+(op?"접기":"펼치기")+'"><b class="icname"></b><span class="icmeta"></span><span class="icchev" aria-hidden="true"></span></button><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
+    d.insertBefore(gp,d.firstChild);
     d.querySelector(".icname").textContent=x.name;
     d.querySelector(".icmeta").textContent=x.ans?"🙌 응답 "+dlabel(dkey(x.ans)):(x.log.length?x.log.length+"번 기도"+(last?" · 마지막 "+dlabel(last):""):"아직 기도 전");
     var mm=d.querySelector(".icmemo"); if(x.memo.trim())mm.textContent=x.memo; else mm.remove();
@@ -8215,11 +8256,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     h.querySelector(".icprog").textContent=pick.length?done+" / "+pick.length:"";
     body.appendChild(h);
     if(!o.items.length){var e=document.createElement("p"); e.className="icempty"; e.textContent="기도해 줄 사람을 명단에 넣어 보세요. 하루에 몇 명씩, 오래 기도하지 못한 사람부터 차례로 보여 드려요."; body.appendChild(e)}
-    pick.forEach(function(x){body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,true))});
+    pick.slice().sort(icOrd).forEach(function(x){body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,true))});
     var pid0=pick.map(function(x){return x.id});
     if(o.items.some(function(x){return pid0.indexOf(x.id)<0})){var t=document.createElement("div"); t.className="ichead ichall"; t.innerHTML='<b>나머지 명단</b>'; body.appendChild(t)}   // 오늘 칸에 다 나오면 비어 있는 제목은 감춤
     var pid=pick.map(function(x){return x.id});
-    o.items.slice().sort(function(a,b){return (a.ans?1:0)-(b.ans?1:0)||a.at-b.at}).forEach(function(x){
+    o.items.slice().sort(function(a,b){return (a.ans?1:0)-(b.ans?1:0)||icOrd(a,b)}).forEach(function(x){
       if(pid.indexOf(x.id)>=0&&icEdit!==x.id)return;
       if(pid.indexOf(x.id)>=0)return;
       body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,false));
