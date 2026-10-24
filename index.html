@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-64">
+<meta name="app-build" content="2026-10-24-65">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2498,6 +2498,11 @@ button:active{filter:brightness(1.15)}
 .prdmeta{font-size:12px;color:var(--faint)}
 .prdtext{margin:8px 0 0;font-size:19px;line-height:1.85;color:color-mix(in srgb,var(--orange) 85%,var(--ink));white-space:pre-line;word-break:keep-all}
 .prdit.answered .prdtext{color:#C9C4D2}
+.prded{display:block;width:100%;box-sizing:border-box;min-height:160px;margin:6px 0 0;padding:10px 12px;border:1px solid color-mix(in srgb,var(--orange) 45%,#34333A);border-radius:10px;background:#141318;color:var(--ink);font:inherit;font-size:16px;line-height:1.7;resize:vertical}
+.prdedb{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+.prdedb button{height:34px;padding:0 14px;border:1px solid #34333A;border-radius:17px;background:transparent;color:var(--muted);font-size:13.5px}
+.prdedb .prdedok{border-color:var(--orange);background:var(--orange);color:#17120A;font-weight:700}
+.prdcard{cursor:default}
 .prdans{margin-top:12px;padding:10px 0 0 12px;border-left:2px solid var(--gold)}
 .prdans b{font-size:13px;color:var(--gold)}
 .prdans b span{font-weight:500;color:var(--faint);margin-left:4px}
@@ -4286,6 +4291,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       function p1Commit(ip){var id=ip.closest(".prdit").dataset.oid, o=p1Data(), x=o.items.find(function(y){return y.id===id});p1Edit="";
         if(x){var t=ip.value.trim();if(t&&t!==x.t){x.t=t;x.u=Date.now();p1Save(o)}} drawPrayRead()}
       prd.querySelector(".prdlist").addEventListener("keydown",function(e){var ip=e.target.closest(".p1ed");if(!ip)return;if(e.key==="Enter"){e.preventDefault();ip.blur()}else if(e.key==="Escape"){p1Edit="";drawPrayRead()}});
+      prd.querySelector(".prdlist").addEventListener("click",function(e){   // 말씀 카드 기도: 두 번 누르면 고치기
+        if(e.target.closest(".prdedok")){prdEdSave();return}
+        if(e.target.closest(".prdedno")){prdEd={nid:"",pid:""};drawPrayRead();return}
+        var a=e.target.closest(".prdcard"); if(!a||e.target.closest("button,textarea"))return;
+        var k=a.dataset.nid+"/"+a.dataset.pid, now=Date.now();
+        if(prdTap.k===k&&now-prdTap.t<450){prdTap={k:"",t:0}; if(prdEd.pid)prdEdSave(); prdEdOpen(a.dataset.nid,a.dataset.pid); return}
+        prdTap={k:k,t:now};
+      });
+      prd.querySelector(".prdlist").addEventListener("input",function(e){if(e.target.classList.contains("prded"))grow(e.target)});
+      prd.querySelector(".prdlist").addEventListener("keydown",function(e){if(!e.target.classList.contains("prded"))return; if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault();prdEdSave()} else if(e.key==="Escape"){e.stopPropagation();prdEd={nid:"",pid:""};drawPrayRead()}});
       prd.querySelector(".prdlist").addEventListener("focusout",function(e){var ip=e.target.closest&&e.target.closest(".p1ed");if(ip&&p1Edit)p1Commit(ip)});
       prd.querySelector(".prdlist").addEventListener("click",function(e){var b=e.target.closest(".prdgo");if(!b)return;var id=b.dataset.id;closePrayRead();tabOf.set(id,"p");openOne(id);render();var c=cards.get(id);if(c)setTimeout(function(){c.scrollIntoView({block:"start",behavior:"smooth"})},80)});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&prd&&!prd.hidden)closePrayRead()});
@@ -4310,6 +4325,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     return f;
   }
   function closePrayRead(){if(!prd)return; prd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
+  var prdEd={nid:"",pid:""}, prdTap={k:"",t:0};
+  function prdEdOpen(nid,pid){
+    prdEd={nid:nid,pid:pid}; drawPrayRead();
+    var t=prd.querySelector(".prded"); if(!t)return;
+    grow(t); t.focus(); var cp=t.value.indexOf(PRAY_TPL.slice(0,9))===0?9:t.value.length; try{t.setSelectionRange(cp,cp)}catch(e){}
+  }
+  function prdEdSave(){
+    var t=prd&&prd.querySelector(".prded"), n=notes.get(prdEd.nid), x=n&&(n.prays||[]).find(function(y){return y.id===prdEd.pid});
+    if(t&&x&&t.value!==x.t){x.t=t.value.slice(0,2000); scheduleSave(n.id); render(); toast("기도를 고쳤어요")}
+    prdEd={nid:"",pid:""}; drawPrayRead();
+  }
   function drawPrayRead(){
     var list=prd.querySelector(".prdlist"); list.textContent="";
     prd.querySelectorAll(".prdfil button").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.f===prdFilter))});
@@ -4345,10 +4371,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(prdNote)sec.querySelector(".prdgo").remove();
       var hd0=sec.querySelector(".prdhd"); hd0.insertBefore(prdFoldBtn(sec,n.id,ps.length),hd0.querySelector(".prdgo"));
       ps.forEach(function(x){
-        var a=document.createElement("article"); a.className="prdit"+(x.ans?" answered":"");
-        a.innerHTML='<div class="prdmeta"></div><p class="prdtext"></p>'+(x.ans?'<div class="prdans"><b>🙌 응답 <span></span></b><p></p></div>':'');
+        var a=document.createElement("article"); a.className="prdit prdcard"+(x.ans?" answered":""); a.dataset.nid=n.id; a.dataset.pid=x.id; a.title="두 번 누르면 고쳐요";
+        var ed=prdEd.nid===n.id&&prdEd.pid===x.id;   // 읽기 모드에서 바로 고치기 (2026-10-24 사용자 요청)
+        a.innerHTML='<div class="prdmeta"></div>'+(ed?'<textarea class="prded" aria-label="기도 고치기"></textarea><div class="prdedb"><button type="button" class="prdedno">취소</button><button type="button" class="prdedok">저장</button></div>':'<p class="prdtext"></p>')+(x.ans?'<div class="prdans"><b>🙌 응답 <span></span></b><p></p></div>':'');
         a.querySelector(".prdmeta").textContent=dateLabel(x.at)+(x.ans?"":"  ·  기다리는 기도");
-        a.querySelector(".prdtext").textContent=x.t;
+        if(ed)a.querySelector(".prded").value=x.t; else a.querySelector(".prdtext").textContent=x.t;
         if(x.ans){a.querySelector(".prdans span").textContent=dlabel(dkey(x.ans));var ap=a.querySelector(".prdans p");if((x.an||"").trim())ap.textContent=x.an;else ap.remove()}
         sec.appendChild(a);
       });
