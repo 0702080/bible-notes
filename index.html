@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-8">
+<meta name="app-build" content="2026-10-25-9">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8274,6 +8274,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       document.body.appendChild(icv);
       icv.querySelector(".icclose").addEventListener("click",closeIntercede);
       icv.addEventListener("click",icClick);
+      // 고치는 칸 밖을 누르면 저장 단추를 안 눌러도 저장하고 닫음 (2026-10-25 사용자 요청)
+      icv.addEventListener("click",function(e){
+        var f=icv.querySelector(".icform"); if(!f||f.contains(e.target))return;
+        icCommit(f); icEdit="";
+        setTimeout(function(){if(!icv.hidden&&icEdit===""&&icv.querySelector(".icform"))icDraw()},0);   // 누른 단추가 할 일을 먼저 하게 다음 차례에 다시 그림
+      },true);
       // 기도문을 두 번 누르면(휴대폰은 두 번 톡톡) 고치기 (2026-10-24 사용자 요청)
       // 한 번 누르면 접힌 카드가 펼쳐지고, 두 번 누르면 펼치면서 고치기 (2026-10-24 사용자 요청)
       var icTap={id:"",timer:0};
@@ -8329,7 +8335,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     icDraw();
   }
   document.addEventListener("pointerup",icDragEnd); document.addEventListener("pointercancel",icDragEnd);
-  function closeIntercede(){if(!icv||icv.hidden)return; icv.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; if(dl&&!dl.hidden)drawDaily()}
+  function closeIntercede(){if(!icv||icv.hidden)return; var cf=icv.querySelector(".icform"); if(cf){icCommit(cf); icEdit=""} icv.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; if(dl&&!dl.hidden)drawDaily()}
   function icNoteOpts(sel){
     var arr=sorted().filter(function(n){return n.ref});
     return '<option value="">붙들 말씀 (선택)</option>'+arr.map(function(n){return '<option value="'+n.id+'"'+(n.id===sel?" selected":"")+'>'+String(n.ref).replace(/[<&"]/g,"")+'</option>'}).join("");
@@ -8383,6 +8389,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,false));
     });
   }
+  // 고치는 칸의 글을 명단에 저장 (저장 단추·칸 밖 누르기·창 닫기 모두 여기로). 바뀐 게 없으면 그대로
+  function icCommit(f){
+    if(!f||!f.isConnected)return false;
+    var o=icData(), id=f.dataset.id, x=id?o.items.find(function(y){return y.id===id}):null;
+    var nm=f.querySelector(".icfn").value.trim(), memo=f.querySelector(".icfm").value.trim(), nid=f.querySelector(".icfv").value, fa=f.querySelector(".icfa");
+    if(x){
+      if(!nm)nm=x.name;   // 제목을 비우고 나가면 원래 제목 그대로
+      var an=fa?fa.value.trim():x.an;
+      if(x.name===nm&&x.memo===memo&&(x.nid||"")===nid&&x.an===an)return false;
+      x.name=nm; x.memo=memo; x.nid=nid; x.an=an; icTouch(x); icSave(o); toast("저장했어요"); return true;
+    }
+    if(!nm&&!memo)return false;   // 새 칸이 비어 있으면 그냥 닫음
+    if(!nm)nm=memo.split("\n")[0].slice(0,40);   // 제목 없이 기도 제목만 적었으면 첫 줄을 제목으로
+    o.items.push({id:qid(),name:nm,memo:memo,nid:nid,at:Date.now(),u:Date.now(),log:[],ans:0,an:""}); icSave(o); toast("명단에 넣었어요"); return true;
+  }
   function icClick(e){
     var b=e.target.closest("button"); if(!b||!icv.contains(b)||b.classList.contains("icclose"))return;
     var card=b.closest("[data-id]"), id=card?card.dataset.id:"", o=icData(), today=dkey(Date.now()), x=o.items.find(function(y){return y.id===id});
@@ -8398,11 +8419,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       o.items=o.items.filter(function(y){return y.id!==id}); o.del[id]=Date.now(); icSave(o); icEdit=""; icDraw(); return;
     }
     if(b.classList.contains("icok")){
-      var f=b.closest(".icform"), nm=f.querySelector(".icfn").value.trim(); if(!nm){f.querySelector(".icfn").focus(); toast("이름을 적어 주세요"); return}
-      var memo=f.querySelector(".icfm").value.trim(), nid=f.querySelector(".icfv").value, fa=f.querySelector(".icfa");
-      if(x){x.name=nm; x.memo=memo; x.nid=nid; if(fa)x.an=fa.value.trim(); icTouch(x)}
-      else o.items.push({id:qid(),name:nm,memo:memo,nid:nid,at:Date.now(),u:Date.now(),log:[],ans:0,an:""});
-      icSave(o); icEdit=""; icDraw(); return;
+      var f=b.closest(".icform"); if(!f.querySelector(".icfn").value.trim()){f.querySelector(".icfn").focus(); toast("이름을 적어 주세요"); return}
+      icCommit(f); icEdit=""; icDraw(); return;
     }
   }
   /* ---------- ⏰ 말씀 알림 (2026-10-24 사용자 요청) ----------
