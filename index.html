@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-48">
+<meta name="app-build" content="2026-10-24-49">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2757,7 +2757,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .icdate{margin-right:auto;font-size:12px;color:var(--faint)}
 .icbtns .icpray{min-width:150px;padding:0 20px;border-color:var(--sky);color:var(--sky);font-size:14px;font-weight:700}
 .icbtns .icpray.on{background:var(--sky);color:#0B0B0D}
-.icadd{width:100%;height:44px;margin-bottom:10px;border:1px dashed #3A3944;border-radius:12px;background:transparent;color:var(--sky);font-size:14px}
+.icaddtop{height:34px;padding:0 14px;margin-right:8px;border:1px solid color-mix(in srgb,var(--sky) 55%,transparent);border-radius:17px;background:transparent;color:var(--sky);font-size:13.5px;white-space:nowrap}
+@media (hover:hover){.icaddtop:hover{background:color-mix(in srgb,var(--sky) 12%,transparent)}}
 .icform{display:flex;flex-direction:column;gap:8px;padding:12px;margin-bottom:10px;border:1px solid var(--sky);border-radius:14px;background:#121116}
 .icform select{height:40px}
 .icform .icfm{min-height:200px;resize:vertical;line-height:1.6}
@@ -8146,7 +8147,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function openIntercede(){
     if(!icv){
       icv=document.createElement("div"); icv.className="cch icv"; icv.setAttribute("role","dialog"); icv.setAttribute("aria-modal","true"); icv.hidden=true;
-      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🤲 중보기도</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icclose">닫기</button></div></div>'+
+      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🤲 중보기도</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icadd icaddtop">＋ 기도할 사람 넣기</button><button type="button" class="icclose">닫기</button></div></div>'+
         '<div class="ccbody icbody"></div>';
       document.body.appendChild(icv);
       icv.querySelector(".icclose").addEventListener("click",closeIntercede);
@@ -8205,6 +8206,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function icDraw(){
     var o=icData(), today=dkey(Date.now()), body=icv.querySelector(".icbody"); body.textContent="";
     icv.querySelector(".iccnt").textContent=o.items.length?o.items.length+"명":"";
+    if(icEdit==="new")body.appendChild(icForm(null));   // 새 사람은 맨 위에서 적기 (2026-10-24 사용자 요청: 넣기 단추는 위 제목줄에)
     var pick=icPick(o,today), done=pick.filter(function(x){return x.log.indexOf(today)>=0}).length;
     var h=document.createElement("div"); h.className="ichead";
     h.innerHTML='<b>오늘 기도할 사람</b><span class="icprog"></span><label class="icperl" title="명단이 많을 때, 하루에 몇 명씩 돌아가며 보여 줄지 정해요 (오래 기도하지 못한 사람부터)">하루에 <select class="icper">'+[1,2,3,4,5,7,10].map(function(k){return '<option'+(k===o.per?" selected":"")+'>'+k+'</option>'}).join("")+'</select>명씩 돌아가며</label>';
@@ -8212,9 +8214,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     body.appendChild(h);
     if(!o.items.length){var e=document.createElement("p"); e.className="icempty"; e.textContent="기도해 줄 사람을 명단에 넣어 보세요. 하루에 몇 명씩, 오래 기도하지 못한 사람부터 차례로 보여 드려요."; body.appendChild(e)}
     pick.forEach(function(x){body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,true))});
-    var t=document.createElement("div"); t.className="ichead ichall"; t.innerHTML='<b>전체 명단</b>'; body.appendChild(t);
-    if(icEdit==="new")body.appendChild(icForm(null));
-    else{var ad=document.createElement("button"); ad.type="button"; ad.className="icadd"; ad.textContent="＋ 기도할 사람 넣기"; body.appendChild(ad)}
+    var pid0=pick.map(function(x){return x.id});
+    if(o.items.some(function(x){return pid0.indexOf(x.id)<0})){var t=document.createElement("div"); t.className="ichead ichall"; t.innerHTML='<b>나머지 명단</b>'; body.appendChild(t)}   // 오늘 칸에 다 나오면 비어 있는 제목은 감춤
     var pid=pick.map(function(x){return x.id});
     o.items.slice().sort(function(a,b){return (a.ans?1:0)-(b.ans?1:0)||a.at-b.at}).forEach(function(x){
       if(pid.indexOf(x.id)>=0&&icEdit!==x.id)return;
