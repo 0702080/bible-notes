@@ -44,6 +44,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .sum-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
 .sum-now{font-family:var(--sans);font-size:17px;font-weight:700}
 .sum-cnt{color:var(--muted);font-size:13.5px;font-variant-numeric:tabular-nums}
+.sum-cum{margin:8px 0 0;text-align:right;font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 .meter{height:10px;border-radius:5px;background:var(--rule);overflow:hidden;margin-top:10px;display:flex}
 .meter i{display:block;height:100%}
 .meter .me{background:var(--ring)}
@@ -451,6 +452,7 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
       <span class="sum-cnt" id="cnt"></span>
     </div>
     <div class="meter"><i class="both" id="mBoth"></i><i class="me" id="mMe"></i></div>
+    <p class="sum-cum" id="cumCnt" hidden></p>
     <div class="halves">
       <div class="half"><b>구약 39권</b><span id="otCnt"></span></div>
       <div class="half"><b>신약 27권</b><span id="ntCnt"></span></div>
@@ -742,6 +744,10 @@ function makeLink(){
 /* ── 세기 ─────────────────────────────── */
 function countRange(bits,from,to){var n=0;for(var i=from;i<to;i++)if(bits[i])n++;return n}
 function bookDone(bi){return countRange(me,OFF[bi],OFF[bi]+BOOKS[bi][1])}
+/* 진도 숫자: 다시 읽는 중인 책(회차 1 이상)은 이미 다 읽은 책이라 그대로 다 읽은 것으로 셈 → 다시 읽기를 시작해도 숫자가 줄지 않음 (2026-10-24 사용자 요청) */
+function covRange(from,to){var n=0;for(var bi=0;bi<BOOKS.length;bi++){var a=OFF[bi],t=BOOKS[bi][1];if(a<from||a>=to)continue;n+=rndOf(bi)?t:countRange(me,a,a+t)}return n}
+/* 누적: 지금까지 읽은 장을 다시 읽은 것까지 모두 더함 (끝낸 회차 × 장 수 + 지금 회차에 읽은 장) */
+function cumRange(from,to){var n=0;for(var bi=0;bi<BOOKS.length;bi++){var a=OFF[bi],t=BOOKS[bi][1];if(a<from||a>=to)continue;n+=rndOf(bi)*t+countRange(me,a,a+t)}return n}
 
 /* ── 그리기 ───────────────────────────── */
 function chipState(idx){return me[idx]?"me":""}   // 내 표에는 내 것만 (친구 것은 바로 아래 따로 그림)
@@ -857,9 +863,10 @@ function repaintBook(bi){
 }
 function renderSummary(){
   try{histSync()}catch(e){}
-  var mine=countRange(me,0,TOTAL);
+  var mine=covRange(0,TOTAL), cum=cumRange(0,TOTAL);
   var pctMe=mine/TOTAL*100;
   var VF=compare?viewFriends():[], F=VF.length===1?VF[0].bits:null;
+  $("cumCnt").hidden=true;
   if(VF.length>1){
     $("who").textContent="함께 보기 "+(VF.length+1)+"명";
     $("cnt").textContent=ME_LABEL+" "+mine+" · "+VF.map(function(f){return frLabel(f)+" "+countRange(f.bits,0,TOTAL)}).join(" · ")+"장";
@@ -871,16 +878,17 @@ function renderSummary(){
     $("who").textContent=(TD2?"나와 ":ME_LABEL+"와 ")+friendName;
     $("cnt").textContent=ME_LABEL+" "+mine+"장 · "+(friendName||"친구")+" "+(both+fo)+"장 · 함께 "+both+"장";
     $("mBoth").style.width=(both/TOTAL*100)+"%";
-    $("mMe").style.width=((mine-both)/TOTAL*100)+"%";
+    $("mMe").style.width=(Math.max(0,mine-both)/TOTAL*100)+"%";
   }else{
     $("who").textContent=(myName?myName+"의 ":"내 ")+(pMode?"필사":"진도");
     $("cnt").textContent=mine+" / "+TOTAL+"장 ("+Math.round(mine/TOTAL*100)+"%)";
+    $("cumCnt").hidden=cum===mine; $("cumCnt").textContent="다시 "+(pMode?"쓴":"읽은")+" 장까지 모두 "+cum.toLocaleString()+"장 "+(pMode?"썼어요":"읽었어요");
     $("mBoth").style.width="0%";
     $("mMe").style.width=pctMe+"%";
   }
   $("barCnt").textContent=mine.toLocaleString()+" / "+TOTAL.toLocaleString();
-  $("otCnt").textContent=countRange(me,0,OT_TOTAL)+" / "+OT_TOTAL+"장";
-  $("ntCnt").textContent=countRange(me,OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
+  $("otCnt").textContent=covRange(0,OT_TOTAL)+" / "+OT_TOTAL+"장";
+  $("ntCnt").textContent=covRange(OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
   $("legend").hidden=!VF.length;
   $("legend").innerHTML='<span><i style="background:'+(pMode?'var(--violet)':'#F2C94C')+'"></i>'+ME_LABEL+'</span>'+VF.map(function(f){return '<span><i style="background:'+f.col+'"></i>'+esc(frLabel(f))+'</span>'}).join("");
   $("btnCmp").hidden=!viewFriends().length;
