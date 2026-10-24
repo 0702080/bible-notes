@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-39">
+<meta name="app-build" content="2026-10-24-41">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1749,6 +1749,20 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.bcust{border-color:color-mix(in srgb,var(--gold) 30%,#38343F);background:color-mix(in srgb,var(--gold) 4%,#272530)}
 .bcol.bcust .bch b{color:var(--gold)}
 .bcol.bcust.lmland{animation:none}
+.bcaddin{display:block;width:calc(100% - 8px);margin:6px 4px 4px;height:38px;border:1.5px dashed color-mix(in srgb,var(--gold) 45%,#3A3744);border-radius:12px;background:transparent;color:var(--gold);font-size:13.5px;cursor:pointer;flex:0 0 auto}
+@media (hover:hover){.bcaddin:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
+.kcppanel .primary{width:100%;margin:10px 0 4px}
+.kcphint{margin:10px 0 6px;font-size:13px;color:var(--muted)}
+.kcpq{width:100%;margin-bottom:8px}
+.kcplist{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
+.kcpit{display:grid;grid-template-columns:22px auto 1fr;grid-template-rows:auto auto;column-gap:8px;align-items:center;width:100%;padding:8px 10px;border:1px solid #2A2930;border-radius:10px;background:#141318;color:var(--ink);text-align:left;font-size:13.5px;cursor:pointer}
+.kcpit b{color:var(--violet);font-weight:700;white-space:nowrap}
+.kcpt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.kcpit small{grid-column:2/4;font-size:11.5px;color:var(--faint)}
+.kcpit small:empty{display:none}
+.kcpck{grid-row:1/3;width:18px;height:18px;border:1.5px solid #4A4655;border-radius:5px}
+.kcpit.on{border-color:color-mix(in srgb,var(--gold) 55%,transparent);background:color-mix(in srgb,var(--gold) 7%,#141318)}
+.kcpit.on .kcpck{background:var(--gold);border-color:var(--gold);box-shadow:inset 0 0 0 3px #141318}
 .bcempty{margin:6px 4px;padding:22px 10px;border:1.5px dashed #3A3744;border-radius:12px;text-align:center;font-size:12.5px;color:var(--faint)}
 .bcdel{flex:0 0 auto;width:26px;height:26px;margin-left:2px;padding:0;border:0;border-radius:13px;background:transparent;color:var(--muted);font-size:0;display:grid;place-items:center}
 .bcdel::before{content:"";width:11px;height:11px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6 6 18'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6 6 18'/%3E%3C/svg%3E") center/contain no-repeat}   /* 가는 선 두 개로 반듯한 X (2026-10-23 사용자 요청) */
@@ -3532,7 +3546,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     cl.appendChild(h);
     var lst=document.createElement("div"); lst.className="bclist";
     part.forEach(function(n,i){lst.appendChild(kbCard(n,i))});
-    if(!part.length){var em=document.createElement("p"); em.className="bcempty"; em.textContent="말씀 카드를 여기로 끌어다 놓으세요"; lst.appendChild(em)}
+    if(!part.length){var em=document.createElement("p"); em.className="bcempty"; em.textContent="말씀 카드를 여기로 끌어다 놓거나 아래 단추로 넣으세요"; lst.appendChild(em)}
+    if(/bcust/.test(extra||"")){var ai=document.createElement("button"); ai.type="button"; ai.className="bcaddin"; ai.textContent="＋ 말씀 넣기"; lst.appendChild(ai)}
     cl.appendChild(lst);
     // 칸 맨 위·맨 아래로 바로 (2026-10-24 사용자 요청)
     var jp=document.createElement("div"); jp.className="bcjump";
@@ -3541,6 +3556,50 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     cl.appendChild(jp);
     return cl;
   }
+  // 내가 만든 칸에 말씀 넣기 (2026-10-24 사용자 요청): 담아 둔 말씀에서 고르기 또는 새 말씀 담기
+  var addToCol="", kcp=null, kcpCol="";
+  function openColPick(col){
+    kcpCol=col;
+    if(!kcp){
+      kcp=document.createElement("div"); kcp.className="sheet kcpsheet"; kcp.hidden=true;
+      kcp.innerHTML='<div class="sheetback kcpback"></div><section class="sheetpanel kcppanel" role="dialog" aria-modal="true" aria-label="칸에 말씀 넣기">'+
+        '<div class="sheethead"><b class="kcptitle"></b><button type="button" class="sheetclose kcpclose">닫기</button></div>'+
+        '<button type="button" class="primary kcpnew">＋ 새 말씀 담기</button>'+
+        '<p class="kcphint">또는 담아 둔 말씀에서 골라 넣기 (여러 개 눌러도 돼요)</p>'+
+        '<input class="field kcpq" type="search" placeholder="구절이나 말씀으로 찾기 (초성도 돼요)" aria-label="말씀 찾기">'+
+        '<div class="kcplist"></div></section>';
+      document.body.appendChild(kcp);
+      kcp.addEventListener("click",function(e){
+        if(e.target.closest(".kcpback,.kcpclose")){closeColPick();return}
+        if(e.target.closest(".kcpnew")){var c=kcpCol; closeColPick(); addToCol=c; openSheet(); return}
+        var it=e.target.closest(".kcpit"); if(!it)return;
+        var n=notes.get(it.dataset.id); if(!n)return;
+        n.col=n.col===kcpCol?"":kcpCol; scheduleSave(n.id); buzz(8);
+        kcpDraw(); render();
+      });
+      kcp.querySelector(".kcpq").addEventListener("input",kcpDraw);
+    }
+    kcp.querySelector(".kcptitle").textContent="📁 '"+col+"' 칸에 말씀 넣기";
+    kcp.querySelector(".kcpq").value="";
+    kcp.hidden=false; document.body.style.overflow="hidden"; kcpDraw();
+    setTimeout(function(){kcp.querySelector(".kcpq").focus()},60);
+  }
+  function closeColPick(){if(kcp){kcp.hidden=true; document.body.style.overflow=""}}
+  function kcpDraw(){
+    var q=kcp.querySelector(".kcpq").value.trim(), box=kcp.querySelector(".kcplist"); box.textContent="";
+    var arr=sorted().filter(function(n){return !q||matchAll(String(n.ref||""),q,true).length||matchAll(String(n.text||""),q,true).length});
+    arr.sort(function(a,b){return (b.col===kcpCol?1:0)-(a.col===kcpCol?1:0)});
+    arr.slice(0,80).forEach(function(n){
+      var b=document.createElement("button"); b.type="button"; b.className="kcpit"+(n.col===kcpCol?" on":""); b.dataset.id=n.id;
+      b.innerHTML='<span class="kcpck" aria-hidden="true"></span><b></b><span class="kcpt"></span><small></small>';
+      b.querySelector("b").textContent=n.ref||"구절 미입력";
+      b.querySelector(".kcpt").textContent=String(n.text||"").replace(/\s+/g," ").slice(0,60);
+      b.querySelector("small").textContent=n.col===kcpCol?"이 칸에 있음":n.col?"'"+n.col+"' 칸":"";
+      box.appendChild(b);
+    });
+    if(!arr.length){var p=document.createElement("p"); p.className="kcphint"; p.textContent="찾는 말씀이 없어요"; box.appendChild(p)}
+  }
+  $("board").addEventListener("click",function(e){var b=e.target.closest(".bcaddin"); if(!b)return; e.stopPropagation(); var cl=b.closest(".bcol"); if(cl&&cl.dataset.cc)openColPick(cl.dataset.cc)},true);
   function bcJumpState(cl){
     var l=cl&&cl.querySelector(".bclist"); if(!l)return;
     cl.classList.toggle("canup",l.scrollTop>80); cl.classList.toggle("candown",l.scrollHeight-l.clientHeight-l.scrollTop>80);
@@ -4724,8 +4783,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function addNote(item){
     if(!backend){setStatus("노트를 불러온 뒤에 추가할 수 있어요.");return null}
     var minOrder=Infinity; notes.forEach(function(x){if(x.order!=null&&x.order<minOrder)minOrder=x.order});
-    var n=cleanNote({id:uid(),ref:item.ref,text:item.text,book:item.book,chapter:item.chapter,verse:item.verse,meds:[{id:mid(),text:"",at:Date.now()}],qs:[],order:isFinite(minOrder)?minOrder-1000:null,topics:item.topics||[],tw:item.tw||{},createdAt:Date.now()});
-    notes.set(n.id,n); openIds.add(n.id); kbFreshSet(n.id,true); render();
+    var n=cleanNote({id:uid(),ref:item.ref,text:item.text,book:item.book,chapter:item.chapter,verse:item.verse,meds:[{id:mid(),text:"",at:Date.now()}],qs:[],order:isFinite(minOrder)?minOrder-1000:null,col:addToCol||"",topics:item.topics||[],tw:item.tw||{},createdAt:Date.now()});
+    notes.set(n.id,n); openIds.add(n.id); if(!addToCol)kbFreshSet(n.id,true); render();
     scheduleSave(n.id,0); lastAdded=n.id;
     if($("addSheet").hidden){var el=cards.get(n.id); if(el)el.scrollIntoView({block:"nearest",behavior:"smooth"})}
     return n;
@@ -4821,7 +4880,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     setTimeout(function(){ if(!$("searchArea").hidden)$("q").focus(); else $("mRef").focus(); },80);
   }
   function closeSheet(){
-    $("addSheet").hidden=true; $("fab").hidden=reorderMode; document.body.style.overflow="";
+    $("addSheet").hidden=true; $("fab").hidden=reorderMode; document.body.style.overflow=""; addToCol="";
     if(lastAdded){var la=lastAdded, el=cards.get(la); lastAdded=null;
       if(boardOn)setTimeout(function(){   // 칸반: 담은 카드가 어느 칸 어디에 들어갔는지 보여 줌 (2026-10-24 사용자 요청)
         var bc=$("board").querySelector('.bcard[data-id="'+la+'"]'); if(!bc)return;
@@ -4829,7 +4888,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         bc.closest(".bcol").scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"});
         bc.classList.remove("bjust"); void bc.offsetWidth; bc.classList.add("bjust"); setTimeout(function(){bc.classList.remove("bjust")},3200);
         var ct=bc.closest(".bcol").querySelector(".bch b");
-        toast("📖 '"+(ct?ct.textContent.trim():"첫 칸")+"' 맨 위에 담았어요");
+        toast("📖 '"+(ct?ct.textContent.trim():"첫 칸")+"' 칸에 담았어요");
       },150);
       else if(el)setTimeout(function(){el.scrollIntoView({block:"start",behavior:"smooth"})},60)}
   }
