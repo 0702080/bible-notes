@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-46">
+<meta name="app-build" content="2026-10-24-47">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -764,6 +764,13 @@ html,body,button,input,textarea,select{font-family:"Binggrae","Noto Sans KR","Ap
 .sheetback{position:absolute;inset:0;background:rgba(0,0,0,.6)}
 .sheetpanel{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--sheet);
   border-radius:20px 20px 0 0;border-top:1px solid var(--rule);padding:14px 18px calc(22px + env(safe-area-inset-bottom,0px));max-width:680px;margin:0 auto;box-shadow:0 -12px 40px rgba(0,0,0,.5)}
+/* PC: 말씀 담기 창을 크게, 화면 가운데에 (2026-10-24 사용자 요청) */
+@media (min-width:900px){
+  #addSheet .sheetpanel{left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);width:min(960px,calc(100vw - 80px));max-width:none;max-height:90vh;border-radius:20px;border:1px solid var(--rule);padding:22px 28px 26px}
+  #addSheet .sheetpanel::before{display:none}
+  #addSheet #mRef{font-size:17px;height:50px}
+  #addSheet #mText{min-height:min(46vh,460px);font-size:17px;line-height:1.75}
+}
 .sheetpanel::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--rule);margin:0 auto 12px}
 .sheethead{display:flex;justify-content:space-between;align-items:center}
 .sheethead b{font-size:18px}
