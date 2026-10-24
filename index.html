@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-x1">
+<meta name="app-build" content="2026-10-24-x2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2696,6 +2696,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlactname{cursor:default}
 .dlacthint{margin:0;padding:4px 4px 2px;font-size:13px;color:var(--faint);line-height:1.5}
 .dlactcnt{margin-left:6px;font-size:11.5px;color:var(--faint);white-space:nowrap}
+/* 중보기도: 이름은 한 줄, 기도 제목(메모)은 그 아래 줄에 칸 안에서 두 줄까지 (2026-10-24 사용자 요청: 칸 밖으로 넘침) */
+.dlicrow .dlt .dlicmemo{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:4px 0 0;white-space:normal;word-break:keep-all;overflow-wrap:anywhere;font-size:12.5px;line-height:1.5;color:var(--faint)}
 .dlicall{margin-left:auto;border:0;background:transparent;color:var(--sky);font-size:12.5px;padding:4px 6px;border-radius:8px}
 /* 🙌 응답 연표 */
 .anssum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 18px}
@@ -9268,7 +9270,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var b=document.createElement("button"); b.type="button"; b.className="dlrow dlicrow"+(on2?" on":""); b.dataset.icid=x.id; b.setAttribute("aria-pressed",String(on2));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
         var tt=b.querySelector(".dlt"); tt.textContent=x.name;
-        if(x.memo.trim()){var sm=document.createElement("small"); sm.className="dlactcnt"; sm.textContent=" "+x.memo.replace(/\s+/g," ").slice(0,40)+(x.memo.length>40?"…":""); tt.appendChild(sm)}
+        if(x.memo.trim()){var sm=document.createElement("small"); sm.className="dlicmemo"; sm.textContent=x.memo.replace(/\s+/g," ").trim(); tt.appendChild(sm)}
         row.appendChild(b); isec.appendChild(row);
       });
       var afterA=outer.querySelector(".dlacts:not(.dlic)");
