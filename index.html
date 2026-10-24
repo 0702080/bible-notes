@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-43">
+<meta name="app-build" content="2026-10-24-44">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2759,6 +2759,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .icbtns{display:flex;justify-content:flex-end;gap:6px;margin-top:10px}
 .icbtns button{height:34px;padding:0 12px;border:1px solid #34333A;border-radius:17px;background:transparent;color:var(--muted);font-size:13px}
 .icbtns{align-items:center}
+.icdate{margin-right:auto;font-size:12px;color:var(--faint)}
 .icbtns .icpray{min-width:150px;padding:0 20px;border-color:var(--sky);color:var(--sky);font-size:14px;font-weight:700}
 .icbtns .icpray.on{background:var(--sky);color:#0B0B0D}
 .icadd{width:100%;height:44px;margin-bottom:10px;border:1px dashed #3A3944;border-radius:12px;background:transparent;color:var(--sky);font-size:14px}
@@ -8213,6 +8214,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var mm=d.querySelector(".icmemo"); if(x.memo.trim())mm.textContent=x.memo; else mm.remove();
     var vn=x.nid&&notes.get(x.nid); if(vn){var v=d.querySelector(".icverse"); v.hidden=false; v.innerHTML='<b></b><span></span>'; v.querySelector("b").textContent="📖 "+vn.ref; v.querySelector("span").textContent=String(vn.text||"").replace(/\s+/g," ").slice(0,140)}
     var bt=d.querySelector(".icbtns");
+    var dt=document.createElement("span"); dt.className="icdate"; var ad=new Date(x.at);   // 기도를 적은 날 (2026-10-24 사용자 요청)
+    dt.textContent=(ad.getFullYear()!==new Date().getFullYear()?ad.getFullYear()+". ":"")+dayName(dkey(x.at))+" 적음"; bt.appendChild(dt);
     function B(cls,t){var b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=t; bt.appendChild(b); return b}
     if(big&&!x.ans)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
     if(!big)B("icans",x.ans?"응답 취소":"🙌 응답됐어요");
