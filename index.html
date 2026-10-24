@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-24-75">
+<meta name="app-build" content="2026-10-24-76">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9654,7 +9654,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var st=medStats(), didToday=!!st.days[today], lastMedNote=null, lastAt=0;
     all.forEach(function(n){(n.meds||[]).forEach(function(m){if(String(m.text||"").trim()&&(+m.at||0)>lastAt){lastAt=+m.at;lastMedNote=n}})});
     var target=notes.get(lastOpenId())||lastMedNote||all[0];
-    if(didToday)chip({icon:"✨",cls:"done",act:"medprog",title:"오늘 묵상 완료"+(st.streak>=2?"  ·  🔥 "+st.streak+"일 연속":"")+" · 눌러서 묵상 진도표"});
+    /* 오늘 묵상 완료 ✨ 단추는 뺌 (2026-10-24 사용자 요청) */ if(false&&didToday)chip({icon:"✨",cls:"done",act:"medprog",title:"오늘 묵상 완료"+(st.streak>=2?"  ·  🔥 "+st.streak+"일 연속":"")+" · 눌러서 묵상 진도표"});
     else if(target)chip({icon:"✍️",act:"med",id:target.id,title:"오늘 묵상 쓰기 — "+(target.ref||"")+(st.streak>=1?" (쓰면 🔥 "+(st.streak+1)+"일 연속)":"")});
     // ✅ 오늘 실천
     var acts=[];
