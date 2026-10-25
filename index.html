@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-9">
+<meta name="app-build" content="2026-10-25-10">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2738,6 +2738,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlactcnt{margin-left:6px;font-size:11.5px;color:var(--faint);white-space:nowrap}
 /* 중보기도: 이름은 한 줄, 기도 제목(메모)은 그 아래 줄에 칸 안에서 두 줄까지 (2026-10-24 사용자 요청: 칸 밖으로 넘침) */
 .dlicopen{white-space:nowrap}
+.dlicwrap{position:relative;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+.dlicwrap.dlicdragging{z-index:5;transition:none}.dlicwrap.dlicdragging .dlrow{box-shadow:0 10px 26px rgba(0,0,0,.55);border-color:var(--sky);transform:scale(1.02)}
 .dlicrow .dlbox{position:relative}
 .dlicopen.on{color:var(--sky);border-color:color-mix(in srgb,var(--sky) 55%,transparent)}
 /* 펼친 기도문: 왼쪽 줄이 체크 네모 가운데에서 내려오게 (2026-10-25 사용자 요청) */
@@ -8303,6 +8305,55 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   // 기도 카드 끌어서 위아래로 옮기기: 오른쪽 위 ⠿를 잡고 끌기 (2026-10-24 사용자 요청)
   var icDrag=null;
+  /* 하루 돌아보기 '오늘 중보기도': 칸을 꾹(0.35초) 눌렀다가 위아래로 끌어 순서 바꾸기 (2026-10-25 사용자 요청).
+     바꾼 순서는 중보기도 명단 순서(ord)에도 그대로 반영 */
+  var dlIcDragAt=0, dlIcD=null;
+  (function(){
+    function sibs(w){return Array.prototype.slice.call(w.parentNode.querySelectorAll(":scope>.dlicwrap"))}
+    function start(){
+      var d=dlIcD; if(!d||d.on)return; d.on=true; d.w.classList.add("dlicdragging"); buzz(12);
+    }
+    document.addEventListener("pointerdown",function(e){
+      if(dlIcD||(e.pointerType==="mouse"&&e.button!==0))return;
+      var w=e.target.closest&&e.target.closest(".dlicwrap"); if(!w||e.target.closest(".dlicfull"))return;
+      if(sibs(w).length<2)return;
+      dlIcD={w:w,pid:e.pointerId,x0:e.clientX,y0:e.clientY,y:e.clientY,on:false,t:0};
+      dlIcD.t=setTimeout(start,350);
+    });
+    function move(y){
+      var d=dlIcD, w=d.w; d.y=y;
+      w.style.transform="translateY("+(y-d.y0)+"px)";
+      var ss=sibs(w).filter(function(x){return x!==w});
+      for(var i=0;i<ss.length;i++){
+        var r=ss[i].getBoundingClientRect(), mid=r.top+r.height/2, before=w.compareDocumentPosition(ss[i])&Node.DOCUMENT_POSITION_PRECEDING;
+        if((before&&y<mid)||(!before&&y>mid)){
+          var t0=w.getBoundingClientRect().top; w.parentNode.insertBefore(w,before?ss[i]:ss[i].nextSibling);
+          d.y0+=w.getBoundingClientRect().top-t0; w.style.transform="translateY("+(y-d.y0)+"px)"; buzz(6); break;
+        }
+      }
+    }
+    document.addEventListener("pointermove",function(e){
+      var d=dlIcD; if(!d||e.pointerId!==d.pid)return;
+      if(!d.on){if(Math.abs(e.clientX-d.x0)>8||Math.abs(e.clientY-d.y0)>8){clearTimeout(d.t);dlIcD=null}return}   // 꾹 누르기 전에 움직이면 그냥 스크롤
+      e.preventDefault(); move(e.clientY);
+    },{passive:false});
+    document.addEventListener("touchmove",function(e){if(dlIcD&&dlIcD.on){e.preventDefault(); if(e.touches[0])move(e.touches[0].clientY)}},{passive:false});   // 끄는 동안 화면이 스크롤되지 않게
+    document.addEventListener("contextmenu",function(e){if(dlIcD&&e.target.closest&&e.target.closest(".dlicwrap"))e.preventDefault()});
+    function end(e){
+      var d=dlIcD; if(!d||(e.pointerId!=null&&e.pointerId!==d.pid&&e.type!=="touchend"))return;
+      clearTimeout(d.t); dlIcD=null; if(!d.on)return;
+      dlIcDragAt=Date.now(); d.w.classList.remove("dlicdragging"); d.w.style.transform="";
+      var mine=sibs(d.w).map(function(x){return x.dataset.icid});
+      var o=icData(), all=o.items.slice().sort(icOrd), slots=[];
+      all.forEach(function(x,i){if(mine.indexOf(x.id)>=0)slots.push(i)});   // 오늘 칸에 있던 자리끼리만 바꿈 (나머지 명단 순서는 그대로)
+      slots.forEach(function(si,k){all[si]=o.items.find(function(y){return y.id===mine[k]})});
+      var ch=false; all.forEach(function(x,i){if(x&&x.ord!==i*10){x.ord=i*10; icTouch(x); ch=true}});
+      if(ch){icSave(o); toast("순서를 바꿨어요")}
+      drawDaily();
+    }
+    document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(e){if(dlIcD&&dlIcD.on&&e.pointerId===dlIcD.pid)return; end(e)});
+    document.addEventListener("touchend",function(e){if(dlIcD&&dlIcD.on)end(e)});
+  })();
   function icOrd(a,b){var oa=a.ord==null?1e12+a.at:a.ord, ob=b.ord==null?1e12+b.at:b.ord; return oa-ob}
   document.addEventListener("pointerdown",function(e){
     var g=e.target.closest&&e.target.closest(".icgrip"); if(!g||!icv||icv.hidden)return;
@@ -8926,6 +8977,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var o=dailyData(); o.items.push({id:"d"+Date.now().toString(36),g:dl.querySelector(".dlg").value,t:t.slice(0,40)}); saveDaily(o); inp.value=""; drawDaily(); inp.focus();
       });
       dl.querySelector(".dllist").addEventListener("click",function(e){
+        if(Date.now()-dlIcDragAt<500&&e.target.closest(".dlicwrap")){e.stopPropagation();return}   // 끌어 옮긴 직후의 누름은 체크·펼치기로 보지 않음
         var rf=e.target.closest(".dlref");
         if(rf&&!dlEdit){e.stopPropagation(); openReader({book:+rf.dataset.b,chapter:+rf.dataset.c,verse:+rf.dataset.v||0}); return}   // 시편 91편 → 장 읽기
         var b=e.target.closest("button"); if(!b)return; var o=dailyData(), id=b.dataset.id;
@@ -9056,7 +9108,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     list.addEventListener("pointerdown",function(e){
       if(D||(e.pointerType==="mouse"&&e.button!==0))return;
       var gp=e.target.closest(".dlgrip"), row=e.target.closest(".dlitem");
-      if(!row||e.target.closest(".dldel,.dlref,.dlmemo,.dlauto"))return;
+      if(!row||e.target.closest(".dldel,.dlref,.dlmemo,.dlauto,.dlicwrap"))return;   // 중보기도 칸은 따로 끌기 (dlIcD)
       if(gp&&dlEdit){e.preventDefault();try{gp.setPointerCapture(e.pointerId)}catch(err){}start(row,e);return}
       P={row:row,x:e.clientX,y:e.clientY,pid:e.pointerId,t:setTimeout(function(){if(!P)return;var p=P;P=null;start(p.row,{clientY:p.y,pointerId:p.pid});try{list.setPointerCapture(p.pid)}catch(err){}},400)};
     });
@@ -9509,7 +9561,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     // 🤲 오늘 중보기도: 명단에서 그날 기도할 사람 (2026-10-24 사용자 요청)
     if(!dlEdit&&!fq){
-      var ico=icData(), ipk=icPick(ico,dlDay);
+      var ico=icData(), ipk=icPick(ico,dlDay).sort(icOrd);   // 명단 순서대로 (끌어서 바꿀 수 있음, 2026-10-25)
       var isec=document.createElement("section"); isec.className="dlgrp dlacts dlic"; isec.style.setProperty("--gc","var(--sky)");
       var ih=document.createElement("div"); ih.className="dlgh";
       var it2=document.createElement("button"); it2.type="button"; it2.className="dlgname dlactname"; it2.dataset.g="__ic";
@@ -9523,6 +9575,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       else if(!ipk.length){var ip=document.createElement("p"); ip.className="dlacthint"; ip.textContent="기도해 줄 사람을 명단에 넣으면, 하루에 몇 명씩 오래 기도하지 못한 사람부터 여기에 보여 드려요."; isec.appendChild(ip)}
       ipk.forEach(function(x){
         var on2=x.log.indexOf(dlDay)>=0;
+        var wrap=document.createElement("div"); wrap.className="dlicwrap"; wrap.dataset.icid=x.id;
         var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc","var(--sky)");
         var b=document.createElement("button"); b.type="button"; b.className="dlrow dlicrow"+(on2?" on":""); b.dataset.icid=x.id; b.setAttribute("aria-pressed",String(on2));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
@@ -9533,8 +9586,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(x.memo.trim()){   // 기도문 전체 펼쳐 보기 (2026-10-24 사용자 요청)
           var ob=document.createElement("button"); ob.type="button"; ob.className="dlauto dlicopen"+(opn?" on":""); ob.dataset.icid=x.id; ob.textContent=opn?"접기 ▴":"펼치기 ▾"; ob.setAttribute("aria-expanded",String(opn)); row.appendChild(ob);
         }
-        isec.appendChild(row);
-        if(opn&&x.memo.trim()){var fm=document.createElement("div"); fm.className="dlicfull"; fm.textContent=x.memo.trim(); isec.appendChild(fm)}
+        wrap.appendChild(row); isec.appendChild(wrap);
+        if(opn&&x.memo.trim()){var fm=document.createElement("div"); fm.className="dlicfull"; fm.textContent=x.memo.trim(); wrap.appendChild(fm)}
       });
       var afterA=outer.querySelector(".dlacts:not(.dlic)");
       outer.insertBefore(isec,afterA?afterA.nextSibling:outer.firstChild);
