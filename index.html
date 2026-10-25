@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-22">
+<meta name="app-build" content="2026-10-25-23">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2035,6 +2035,9 @@ button:active{filter:brightness(1.15)}
 .cch,.cch *{touch-action:pan-y}   /* 가로로 밀기는 앱이 받아서 다음 말씀으로 (안쪽 스크롤 칸에도) */
 .cch[hidden]{display:none}
 .ccsteps{display:flex;gap:4px;padding:12px 16px 4px}
+/* 휴대폰: 첫 단계(읽기) 동그라미 왼쪽 끝과 마지막(떠올리기) 오른쪽 끝을 아래 말씀·단추의 좌우 끝에 맞춤 (2026-10-25 사용자 요청)
+   네 칸이 같은 폭이라, 동그라미(26px) 가장자리가 32px(말씀·단추 끝)에 오도록: m=(8×(32+13)px-100%)/6 */
+@media (max-width:899px){.ccsteps{gap:0;padding:12px 0 4px;margin:0 calc((360px - 100%) / 6)}}
 .ccsteps .ccst{cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s}
 .ccsteps .ccst:active{transform:scale(.92)}
 .ccst{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;color:var(--faint)}
