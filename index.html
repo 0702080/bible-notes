@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-27">
+<meta name="app-build" content="2026-10-25-28">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1699,7 +1699,7 @@ body.boardon .wrap{max-width:none;padding-left:20px;padding-right:20px}
 body.boardon{height:100vh;overflow:hidden}
 body.boardon .wrap{height:100vh;display:flex;flex-direction:column;padding-bottom:0;box-sizing:border-box}
 body.boardon .top,body.boardon .toolbar,body.boardon .topicbar,body.boardon .filter{flex:0 0 auto}
-body.boardon .board4{flex:1 1 auto;height:auto;min-height:0;padding-bottom:0;margin-bottom:0}
+body.boardon .board4{flex:1 1 auto;height:auto;min-height:0;padding-bottom:12px;margin-bottom:0}   /* 칸 아래 여백 = 위 여백 12px (2026-10-25 사용자 요청) */
 /* PC 칸반 맨 아래 한 줄: 믿음의 한 마디 (2026-10-21 사용자 요청) */
 .boardsay{display:none}
 body.boardon .boardsay:not([hidden]){display:flex;align-items:center;justify-content:center;gap:6px;flex:0 0 auto;height:40px;margin:0 -20px;padding:0 20px;background:#0d0d10}
