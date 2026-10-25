@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-25">
+<meta name="app-build" content="2026-10-25-26">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9065,7 +9065,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       dl.querySelector(".dlclose").addEventListener("click",closeDaily);
       // 날짜를 누르면 달력에서 바로 고르기 — 몇 달 전으로도 쉽게 (2026-10-24 사용자 요청)
       var dpk=dl.querySelector(".dlpick");
-      dpk.addEventListener("click",function(){try{dpk.showPicker()}catch(err){}});
+      dpk.addEventListener("click",function(e){if(DP_FINE){e.preventDefault();return} try{dpk.showPicker()}catch(err){}});   // PC는 앱 달력만 (기본 달력이 겹쳐 뜨지 않게)
       dl.querySelector(".dldatew").addEventListener("click",function(e){if(DP_FINE){e.preventDefault();dpOpen(this,dpk,false)}});
       dpk.addEventListener("change",function(){var v=dpk.value, t=dkey(Date.now()); if(!/^\d{4}-\d{2}-\d{2}$/.test(v))return; if(v>t)v=t; if(v!==dlDay){dlDay=v;drawDaily()}});
       dl.querySelector(".dlprev").addEventListener("click",function(){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()-864e5);drawDaily()});
@@ -9583,7 +9583,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             st.textContent=(sdd.getFullYear()!==new Date().getFullYear()?String(sdd.getFullYear()).slice(2)+".":"")+(sdd.getMonth()+1)+"/"+sdd.getDate()+"~ "+(dn>0?dn+"일째":"D"+(dn-1))}
           else st.textContent="📅 시작 날짜";
           var si2=document.createElement("input"); si2.type="date"; si2.value=gsd; si2.setAttribute("aria-label","'"+g.t+"' 시작 날짜");
-          si2.addEventListener("click",function(){try{this.showPicker()}catch(err){}});
+          si2.addEventListener("click",function(e){if(DP_FINE){e.preventDefault();return} try{this.showPicker()}catch(err){}});
           sl.addEventListener("click",function(e){if(DP_FINE){e.preventDefault();dpOpen(this,this.querySelector("input"),true)}});
           si2.addEventListener("change",(function(gg){return function(){
             var d=dailyData(); if(!d.gstart||typeof d.gstart!=="object")d.gstart={};
@@ -10248,7 +10248,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(){if(sayDrag)end();clearTimeout(hold);pend=null});
     list.addEventListener("contextmenu",function(e){if(sayDrag||pend)e.preventDefault()});
   }
-  document.addEventListener("click",function(e){var i=e.target.closest&&e.target.closest(".sayhvtm"); if(i)try{i.showPicker()}catch(err){}});
+  document.addEventListener("click",function(e){var i=e.target.closest&&e.target.closest(".sayhvtm"); if(!i)return; if(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches){e.preventDefault();return} try{i.showPicker()}catch(err){}});
   // PC 시간 고르기 창: 크롬 기본 창은 모양을 못 바꿔서 직접 그림 (휴대폰은 기본 시계 판, 2026-10-25 사용자 요청)
   var TP=null;
   function tpOpen(anchor,input){
