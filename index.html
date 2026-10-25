@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-14">
+<meta name="app-build" content="2026-10-25-15">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3207,6 +3207,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         <button type="button" id="openMedBtn">📅 묵상 진도표</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="openProgBtn">✅ 실천 진도표</button>
+        <button type="button" id="openMedqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="openTongdokBtn">📖 성경 통독표</button>
         <button type="button" id="openGraphBtn"><svg class="grico" viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M12 4 4.5 18.5h15Z"/><path d="M12 4v9M4.5 18.5 12 13l7.5 5.5"/></g><g fill="currentColor"><circle cx="12" cy="4" r="2.6"/><circle cx="4.5" cy="18.5" r="2.6"/><circle cx="19.5" cy="18.5" r="2.6"/><circle cx="12" cy="13" r="2.2"/></g></svg> 말씀 연결 지도</button>
         <button type="button" id="prayReadBtn">🙏 기도 모아 읽기</button>
@@ -9991,9 +9992,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         title:fin?"친구 신청 "+fin+"개 — 확인하기":fct?"친구 "+fct+"명":"친구 맺기"});
     }
     // 📊 실천 진도표
-    chip({icon:"📝",act:"medq",cls:"main",title:"나의 묵상 질문 — 내가 묻고 내가 답해요"});
+    // 📝 나의 묵상 질문·📊 실천 진도표 단추는 칸반 위에서 뺌 — ⋯ 메뉴에서 열기 (2026-10-25 사용자 요청)
     // 한 주 돌아보기(📅) 단추는 칸반 위에서 뺌 (2026-10-25 사용자 요청)
-    if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))chip({icon:"📊",act:"prog",title:"실천 진도표 전체 보기"});
   }
   /* ---------- 믿음의 한 마디 (영적 리더들의 신앙 잠언) 2026-10-18 사용자 요청 ---------- */
   var SAY_KEY="bible-sayings", sayEdit="";
@@ -11235,6 +11235,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     body.appendChild(bg);
   }
   $("openSayBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay()});
+  $("openMedqBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openMedq()});
   $("openVerseBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"v")});
   $("openMedBtn").addEventListener("click",openMedProgress);
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
