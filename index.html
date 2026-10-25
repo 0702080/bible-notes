@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-1">
+<meta name="app-build" content="2026-10-25-2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2032,6 +2032,13 @@ button:active{filter:brightness(1.15)}
 .mnext.mlast + .mnext{margin-top:2px}
 .oquiz{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 .oquiz[hidden]{display:none}
+.micbtn{position:fixed;z-index:500;width:40px;height:40px;border-radius:20px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);background:#1B1A21;color:var(--sky);display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.45);cursor:pointer;padding:0}
+.micbtn[hidden]{display:none}
+.micbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
+.micbtn.on{background:#E5484D;border-color:#E5484D;color:#fff;animation:micpulse 1.2s ease-in-out infinite}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(229,72,77,.55)}50%{box-shadow:0 0 0 10px rgba(229,72,77,0)}}
+.micint{position:absolute;right:46px;bottom:6px;max-width:min(60vw,420px);padding:4px 10px;border-radius:10px;background:rgba(20,19,24,.92);color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+.micint:empty{display:none}
 .ccmain{-webkit-user-select:none;user-select:none}   /* 암송 연습 중 마우스로 끌어도 글이 파랗게 잡히지 않게 (2026-10-24 사용자 요청) */
 .ccmain input,.ccmain textarea{-webkit-user-select:text;user-select:text}
 .cch{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -5200,6 +5207,73 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     try{ta.setSelectionRange(a+d,b+d)}catch(err){}
     ta.dispatchEvent(new Event("input",{bubbles:true}));   // 저장·높이 맞춤은 평소 입력처럼
   },true);
+  /* ---------- 🎤 말로 적기 (2026-10-25 사용자 요청) ----------
+     글 칸을 누르면 오른쪽 아래에 🎤 단추가 떠요. 누르고 말하면 커서 자리에 글로 들어가고, 한 번 더 누르면 멈춰요.
+     암송 코치의 받아쓰기 칸에서 쓰면 '소리 내어 외우기 → 채점'이 돼요. (크롬의 음성 인식, 서버 없음) */
+  (function(){
+    var SR=window.SpeechRecognition||window.webkitSpeechRecognition; if(!SR)return;
+    var mic=document.createElement("button"); mic.type="button"; mic.className="micbtn"; mic.hidden=true;
+    mic.setAttribute("aria-label","말로 적기"); mic.title="말로 적기 (한 번 더 누르면 멈춤)";
+    mic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg><span class="micint"></span>';
+    document.body.appendChild(mic);
+    var ta=null, rec=null, on=false, base=0, interim="";
+    function place(){
+      if(!ta||!ta.isConnected){hide();return}
+      var r=ta.getBoundingClientRect();
+      if(r.bottom<0||r.top>innerHeight||!r.width){mic.hidden=true;return}
+      mic.hidden=false;
+      mic.style.left=Math.min(innerWidth-48,r.right-44)+"px";
+      mic.style.top=Math.max(4,Math.min(innerHeight-48,r.bottom-44))+"px";
+    }
+    function hide(){if(on)return; mic.hidden=true; ta=null}
+    document.addEventListener("focusin",function(e){
+      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||t.readOnly||t.disabled)return;
+      if(on&&t!==ta)stop();
+      ta=t; place();
+    });
+    document.addEventListener("focusout",function(e){if(e.target===ta&&!on)setTimeout(function(){if(document.activeElement!==ta)hide()},150)});
+    window.addEventListener("scroll",function(){if(ta)place()},true);
+    window.addEventListener("resize",function(){if(ta)place()});
+    mic.addEventListener("pointerdown",function(e){e.preventDefault()});   // 글 칸 커서를 잃지 않게
+    mic.addEventListener("click",function(e){e.stopPropagation(); if(on)stop(); else start()});
+    function put(text){   // 커서 자리에 끼워 넣고 저장되게
+      if(!ta||!text)return;
+      var v=ta.value, a=Math.min(base,v.length), pre=v.slice(0,a), post=v.slice(a);
+      var sp=(pre&&!/[\s\n]$/.test(pre))?" ":"";
+      ta.value=pre+sp+text+post; base=a+sp.length+text.length;
+      try{ta.setSelectionRange(base,base)}catch(err){}
+      ta.dispatchEvent(new Event("input",{bubbles:true}));
+    }
+    function start(){
+      if(!ta)return;
+      try{rec=new SR()}catch(err){toast("이 브라우저에서는 말로 적기를 쓸 수 없어요");return}
+      rec.lang="ko-KR"; rec.continuous=true; rec.interimResults=true;
+      base=ta.selectionStart==null?ta.value.length:ta.selectionStart; interim="";
+      rec.onresult=function(ev){
+        var fin=""; interim="";
+        for(var i=ev.resultIndex;i<ev.results.length;i++){var r=ev.results[i]; if(r.isFinal)fin+=r[0].transcript; else interim+=r[0].transcript}
+        if(fin)put(fin.trim());
+        mic.querySelector(".micint").textContent=interim;
+      };
+      rec.onerror=function(ev){
+        if(ev.error==="not-allowed"||ev.error==="service-not-allowed")toast("마이크를 쓸 수 있게 허락해 주세요 (주소창 왼쪽 자물쇠 → 마이크)");
+        else if(ev.error==="network")toast("말로 적기는 인터넷이 연결되어 있어야 해요");
+      };
+      rec.onend=function(){if(on){try{rec.start()}catch(err){stop()}}};   // 잠깐 쉬어도 이어 듣기
+      try{rec.start()}catch(err){return}
+      on=true; mic.classList.add("on"); buzz(12); toast("🎤 말씀하세요. 다 말하면 한 번 더 누르세요");
+      try{ta.focus()}catch(err){}
+    }
+    function stop(){
+      on=false; mic.classList.remove("on"); mic.querySelector(".micint").textContent="";
+      if(rec){rec.onend=null; try{rec.stop()}catch(err){} rec=null}
+      if(document.activeElement!==ta)hide();
+    }
+  })();
+  // 📴 오프라인에서도 열리게: 서비스 워커 (2026-10-25 사용자 요청)
+  if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){
+    window.addEventListener("load",function(){navigator.serviceWorker.register("sw.js").catch(function(){})});
+  }
   function hoverTick(){
     try{
       var now=Date.now(); if(now-hovAt<60)return; hovAt=now;
@@ -7762,7 +7836,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var v=ccBox.querySelector(".ccverse"); v.textContent=""; v.classList.remove("big","recall");
     var d=C.dict||{};
     if(!d.res){
-      tip.innerHTML="<b>✍️ 받아쓰기</b><br>기억나는 대로 적어 보세요. 조사(은·는·이·가)만 달라도 맞은 것으로 쳐요.";
+      tip.innerHTML="<b>✍️ 받아쓰기</b><br>기억나는 대로 적어 보세요. 조사(은·는·이·가)만 달라도 맞은 것으로 쳐요."+((window.SpeechRecognition||window.webkitSpeechRecognition)?"<br>🎤 칸 오른쪽 아래 마이크를 누르고 <b>소리 내어 외우면</b> 글로 들어가요. 다 외웠으면 채점하기!":"");
       var box=document.createElement("div"); box.className="ccdict";
       var ta=document.createElement("textarea"); ta.className="ccdta"; ta.placeholder="여기에 말씀을 적어 보세요";
       ta.value=d.text||""; box.appendChild(ta); v.appendChild(box);
