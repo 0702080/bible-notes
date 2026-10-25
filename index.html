@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-26">
+<meta name="app-build" content="2026-10-25-1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2102,7 +2102,7 @@ button:active{filter:brightness(1.15)}
 .ccmeter i.on{border:0;background:radial-gradient(circle at 35% 30%,#FFE7A8,var(--gold) 60%,#B8862F);color:#17120A;box-shadow:0 0 14px color-mix(in srgb,var(--gold) 45%,transparent)}
 .ccmeter i.on.just{animation:ccpop .55s cubic-bezier(.2,1.6,.4,1)}
 .ccw{display:inline-block;--bc:#6ECBF4}
-.ccw.r-act{--bc:#6FD09A}.ccw.r-div{--bc:#B79CF2}.ccw.r-obj{--bc:#6ECBF4}.ccw.r-sub{--bc:#F4A45E}.ccw.r-etc{--bc:#E6DFD2}
+.ccw.r-act{--bc:#6FD09A}.ccw.r-div{--bc:#B79CF2}.ccw.r-obj{--bc:#6ECBF4}.ccw.r-sub{--bc:#F4A45E}.ccw.r-etc{--bc:#E6DFD2}.ccw.r-adj{--bc:#F48FB6}
 .ccw.c0{--bc:#6ECBF4}.ccw.c1{--bc:#F48FB6}.ccw.c2{--bc:#6FD09A}.ccw.c3{--bc:#F4A45E}.ccw.c4{--bc:#B79CF2}
 .ccverse.recall{padding-top:18px}
 .ccw.hid{color:color-mix(in srgb,var(--bc) 85%,#fff);background:color-mix(in srgb,var(--bc) 15%,transparent);padding:0 4px;line-height:1.55;border-radius:8px;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--bc) 32%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--bc) 30%,transparent)}
@@ -7623,9 +7623,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
         if(C.paint){   // 🎨 색 고르기: 누를 때마다 주황→초록→하늘→보라→흰색 (2026-10-25 사용자 요청)
           var all=Array.prototype.slice.call(ccBox.querySelectorAll(".ccverse .ccw")), wi=all.indexOf(w), np=notes.get(C.id); if(wi<0||!np)return;
-          var ORD=["sub","act","obj","div","etc"], cur=C.roles[wi]||"etc", nx=ORD[(ORD.indexOf(cur)+1)%ORD.length];
+          var ORD=["sub","act","adj","obj","div","etc"], cur=C.roles[wi]||"etc", nx=ORD[(ORD.indexOf(cur)+1)%ORD.length];
           C.roles[wi]=nx; w.className=w.className.replace(/\br-[a-z]+/,"r-"+nx); if(!/\br-/.test(w.className))w.classList.add("r-"+nx);
-          var L={sub:"S",act:"V",obj:"O",div:"D",etc:"X"};
+          var L={sub:"S",act:"V",obj:"O",div:"D",etc:"X",adj:"A"};
           np.parse={src:np.text,labels:C.roles.map(function(r){return L[r]||"X"}),v:9,pf:1}; C.rolesSrc=np.text;
           scheduleSave(np.id); buzz(8); return;
         }
@@ -7693,18 +7693,23 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(/(이면|이라|이니|이요|이니라|이시라|이시니|이로다)$/.test(t)&&t.length>2)return "etc";   // 이름씨 + 이다
     if(/(다|라|니|고|며|면|서|지|여|사|매|되|소서|나니|도다|리라|니라|거니와|려니와|으며|으니|으나|는데|느니라|시니|시며|시고|하라|하자|할지니|할지어다)$/.test(t))return "act";
     if(t.length>=2&&/(하는|되는|시는|하신|하실|하던|있는|없는|않는|아니하는|하나니|할|될|한|된|간|온|준|본|받은|믿는|가는|오는|사는|아는|설|볼|갈|올)$/.test(t))return "act";
+    // '살리는'처럼 꾸미는 동사도 행동(초록) — 우리는·너희는 같은 대명사는 빼고 (2026-10-25 사용자 요청)
+    if(t.length>=3&&!/^(우리|너희|저희|그들|자기)는$/.test(t)&&/(리는|키는|치는|기는|히는|우는|추는|르는|드는|주는|두는|내는|지는|쓰는|트는|먹는|듣는|읽는|짓는|웃는|찾는|맺는|잃는|얻는|넣는|놓는|닦는|씻는|붙는|따르는|지키는|섬기는)$/.test(t))return "act";
     if(/(이|가|께서|은|는|도)$/.test(t))return "sub";
     return "etc";
   }
+  // 상태를 말하는 서술어(형용사)는 행동과 다른 색(분홍): 무익하니라, 선하다, 거룩하니 … (2026-10-25 사용자 요청)
+  var CC_ADJ=/^(무익|유익|선하|선한|악하|악한|의로|거룩|온전|복되|복있|좋|아름다|귀하|귀한|약하|강하|크|작|많|적|깊|높|낮|기쁘|슬프|가난|부요|겸손|온유|충성되|진실|참되|정직|어리석|미련|지혜로|평안|영원|헛되|옳|그르|같|다르|가깝|멀|새로|깨끗|더러|부족|넉넉|풍성|자비로|인자하|신실|완전|화평|즐거|외로|두려|무거|가벼|쉬|어려|형통)/;
+  function ccAdj(w,r){var t=w.replace(/[^가-힣A-Za-z0-9]/g,""); return r==="act"&&CC_ADJ.test(t)?"adj":r}
   function ccRoles(n){
     var ws=wordsOf(n.text||""), lab=parseOk(n)?n.parse.labels:null, man=lab&&n.parse.v===9;
-    var MAN={S:"sub",V:"act",O:"obj",D:"div",X:"etc"};
+    var MAN={S:"sub",V:"act",O:"obj",D:"div",X:"etc",A:"adj"};
     return ws.map(function(w,i){
       if(man&&MAN[lab[i]])return MAN[lab[i]];   // 🎨 색 고르기로 내가 정한 색
       var t=w.replace(/[^가-힣A-Za-z0-9]/g,"");
       if(CC_DIV.test(t))return "div";
-      if(lab){var r=lab[i];return r==="V"?"act":r==="O"?"obj":r==="S"?"sub":ccRoleOf(w)==="act"?"act":"etc"}
-      return ccRoleOf(w);
+      if(lab){var r=lab[i], ro=ccRoleOf(w); if(r==="S"&&ro==="act"&&/는$/.test(t))r="V"; return ccAdj(w,r==="V"?"act":r==="O"?"obj":r==="S"?"sub":ro==="act"?"act":"etc")}
+      return ccAdj(w,ccRoleOf(w));
     });
   }
   function ccMask(sp){   // 가린 낱말: 진짜 글자가 칸 너비를 잡고(안 보임), ○는 그 위에 겹쳐 보여 준다
@@ -12375,7 +12380,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var st=m[1], p=m[2];
         if(GOD.test(st))return "G";
         if(NOUNW.test(st)||/(함|심|음|기)$/.test(st))return "S";
-        if((p==="은"||p==="는")&&/(하|되|있|없|받|좋|굽|바르|작|크|많|키|믿|보|시|드리|섬기|르|살|찾|가|오|주|얻|알|듣|옳|높|깊|넓|같|는)$/.test(st))return "-";
+        if((p==="은"||p==="는")&&/(하|되|있|없|받|좋|굽|바르|작|크|많|키|믿|보|시|드리|섬기|르|살|찾|가|오|주|얻|알|듣|옳|높|깊|넓|같|는|리|치|기|히|우|추|드|두|내|지|쓰|트|맺|잃|넣|놓|닦|씻)$/.test(st))return "-";   // 살리는·지키는 … 꾸미는 동사 (2026-10-25)
         if(/(같이|많이|깊이|높이|길이)$/.test(x))return "-";
         if(p==="이"&&/(이시니라|이니라|이라|이니)$/.test(x))return "V";
         return "S";
