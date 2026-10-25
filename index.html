@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-16">
+<meta name="app-build" content="2026-10-25-17">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2602,6 +2602,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 @media (hover:hover){.mqadd:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
 .mqsaved{margin-left:auto;flex:0 0 auto;font-size:11px;color:var(--faint)}
 .mqitem{position:relative}
+.mqgut{position:absolute;z-index:6;width:52px;touch-action:none;-webkit-user-select:none;user-select:none;overflow:hidden;border-left:1px dashed color-mix(in srgb,var(--gold) 30%,transparent)}
+.mqgi{position:absolute;left:6px;right:6px;display:grid;place-items:center;min-height:22px;color:color-mix(in srgb,var(--gold) 75%,transparent);font-size:17px;pointer-events:none}
+.mqgi.on{color:#141416;background:var(--gold);border-radius:8px}
+.mqband{position:absolute;z-index:5;border-radius:8px;background:color-mix(in srgb,var(--gold) 16%,transparent);outline:1px solid color-mix(in srgb,var(--gold) 55%,transparent);pointer-events:none}
 .mqlh{position:absolute;z-index:6;width:44px;height:44px;padding:0;border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);border-radius:12px;background:color-mix(in srgb,var(--gold) 16%,#141416);color:var(--gold);font-size:20px;line-height:1;touch-action:none;-webkit-user-select:none;user-select:none}
 .mqlh.drag{background:var(--gold);color:#141416;box-shadow:0 8px 20px rgba(0,0,0,.5)}
 .mqsl{display:flex;flex-direction:column;gap:6px}
@@ -10126,67 +10130,77 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // 다른 기기에서 받아 와 다시 그릴 때, 지금 적고 있는 칸이 있으면 다 적고 나갈 때까지 미룸
   // (적는 중에 화면을 새로 그리면 키보드가 닫혀 입력이 끊기던 문제, 2026-10-25 사용자 요청)
   var mqLater=false, mqSort=new Set();
-  /* 답을 적는 중에 커서가 있는 줄 오른쪽에 ⠿ 손잡이가 떠서, 잡고 위아래로 끌면 그 줄(문장)이 통째로 옮겨짐.
-     키보드는 닫히지 않음 (2026-10-25 사용자 요청: 적는 칸 안에서 바로 문장 끌기) */
+  /* 답을 적는 칸 오른쪽에 줄(문장)마다 ⠿ 손잡이가 세로로 줄지어 뜸. 옮길 문장 옆 손잡이를 바로 잡고 위아래로 끌면 그 문장이 통째로 옮겨짐.
+     커서를 먼저 둘 필요 없음. 키보드는 닫히지 않음 (2026-10-25 사용자 요청: 한 줄 고르기가 어려움) */
   (function(){
-    var H=null, ta=null, D=null, mir=null;
-    function handle(){
-      if(!H){H=document.createElement("button"); H.type="button"; H.className="mqlh"; H.setAttribute("aria-label","이 문장 위아래로 옮기기"); H.textContent="⠿"; H.hidden=true}
-      return H;
+    var G=null, B=null, ta=null, D=null, mir=null;
+    function els(){
+      if(!G){G=document.createElement("div"); G.className="mqgut"; G.hidden=true; B=document.createElement("div"); B.className="mqband"; B.hidden=true}
     }
     function lines(t){return t.value.split("\n")}
-    function caretLine(t){return t.value.slice(0,t.selectionStart).split("\n").length-1}
     function tops(t){   // 줄(엔터로 나눈 문장)마다 칸 안 글 위치(위·높이)를 잼
-      if(!mir){mir=document.createElement("div"); mir.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal"; document.body.appendChild(mir)}
+      if(!mir){mir=document.createElement("div"); mir.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:anywhere;border:0;padding:0;box-sizing:content-box"; document.body.appendChild(mir)}
       var cs=getComputedStyle(t);
-      ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","paddingLeft","paddingRight","paddingTop","borderLeftWidth","borderRightWidth","boxSizing","wordBreak"].forEach(function(k){mir.style[k]=cs[k]});
-      mir.style.width=t.clientWidth+"px"; mir.style.borderStyle="solid"; mir.style.borderColor="transparent"; mir.style.borderTopWidth="0"; mir.style.boxSizing="content-box"; mir.style.width=(t.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight))+"px"; mir.style.borderLeftWidth="0"; mir.style.borderRightWidth="0"; mir.style.paddingLeft="0"; mir.style.paddingRight="0";
-      mir.textContent="";
-      var out=[];
-      lines(t).forEach(function(l,i){var sp=document.createElement("span"); sp.textContent=l||"\u200b"; mir.appendChild(sp); if(i<lines(t).length-1)mir.appendChild(document.createTextNode("\n"))});
-      var pt=parseFloat(cs.paddingTop)||0, bt=parseFloat(cs.borderTopWidth)||0, lh=parseFloat(cs.lineHeight)||22;
-      Array.prototype.forEach.call(mir.querySelectorAll("span"),function(sp){var rs=sp.getClientRects(), a=rs.length?rs[0].top:0, b=rs.length?rs[rs.length-1].bottom:lh, m=mir.getBoundingClientRect().top; out.push({top:bt+pt+a-m,h:Math.max(lh,b-a)})});
+      ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","wordBreak"].forEach(function(k){mir.style[k]=cs[k]});
+      mir.style.width=(t.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight))+"px";
+      mir.textContent=""; var ls=lines(t);
+      ls.forEach(function(l,i){var sp=document.createElement("span"); sp.textContent=l||"\u200b"; mir.appendChild(sp); if(i<ls.length-1)mir.appendChild(document.createTextNode("\n"))});
+      var pt=parseFloat(cs.paddingTop)||0, bt=parseFloat(cs.borderTopWidth)||0, lh=parseFloat(cs.lineHeight)||22, m=mir.getBoundingClientRect().top, out=[];
+      Array.prototype.forEach.call(mir.querySelectorAll("span"),function(sp){var rs=sp.getClientRects(), a=rs.length?rs[0].top:0, b=rs.length?rs[rs.length-1].bottom:a+lh; out.push({top:bt+pt+a-m,h:Math.max(lh,b-a)})});
       return out;
     }
-    function place(){
-      var h=handle();
-      if(!ta||!ta.isConnected||document.activeElement!==ta||lines(ta).length<2||D&&D.done){if(!D)h.hidden=true;return}
-      var it=ta.closest(".mqitem"); if(h.parentNode!==it)it.appendChild(h);
-      var k=D?D.k:caretLine(ta), tp=tops(ta)[k]; if(!tp){h.hidden=true;return}
-      var y=ta.offsetTop+tp.top-ta.scrollTop+tp.h/2;
-      if(y<ta.offsetTop+4||y>ta.offsetTop+ta.offsetHeight-4){if(!D){h.hidden=true;return}}
-      h.hidden=false; h.style.top=Math.round(y-22)+"px"; h.style.left=Math.round(ta.offsetLeft+ta.offsetWidth-50)+"px";
+    function lineAt(clientY){
+      var r=ta.getBoundingClientRect(), y=clientY-r.top+ta.scrollTop, ts=tops(ta), k=0;
+      for(var i=0;i<ts.length;i++){if(y<ts[i].top+ts[i].h){k=i;break} k=i}
+      return k;
     }
-    document.addEventListener("focusin",function(e){var t=e.target; if(t&&t.classList&&t.classList.contains("mqa")){ta=t; setTimeout(place,0)}});
-    document.addEventListener("focusout",function(e){if(e.target===ta&&!D){setTimeout(function(){if(document.activeElement!==ta&&H)H.hidden=true},50)}});
-    document.addEventListener("selectionchange",function(){if(ta&&document.activeElement===ta&&!D)place()});
-    document.addEventListener("input",function(e){if(e.target===ta&&!D)place()});
-    document.addEventListener("scroll",function(e){if(e.target===ta||(mq&&e.target&&e.target.classList&&e.target.classList.contains("dlbody")))place()},true);
-    window.addEventListener("resize",function(){setTimeout(place,50)}); if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){setTimeout(place,50)});
-    setInterval(function(){if(ta&&document.activeElement===ta&&!D)place()},400);   // 칸 크기가 바뀔 때도 따라가게
+    function band(k){
+      var tp=tops(ta)[k]; if(!tp){B.hidden=true;return}
+      B.hidden=false; B.style.top=Math.round(ta.offsetTop+tp.top-ta.scrollTop-2)+"px"; B.style.height=Math.round(tp.h+4)+"px";
+      B.style.left=ta.offsetLeft+"px"; B.style.width=ta.offsetWidth+"px";
+    }
+    function draw(){
+      els();
+      if(!ta||!ta.isConnected||document.activeElement!==ta||lines(ta).length<2){if(!D){G.hidden=true;B.hidden=true}return}
+      var it=ta.closest(".mqitem"); if(G.parentNode!==it){it.appendChild(B); it.appendChild(G)}
+      G.hidden=false; G.style.top=ta.offsetTop+"px"; G.style.height=ta.offsetHeight+"px"; G.style.left=(ta.offsetLeft+ta.offsetWidth-52)+"px";
+      var ts=tops(ta), html="";
+      ts.forEach(function(tp,i){
+        var y=tp.top-ta.scrollTop; if(y+tp.h<2||y>ta.offsetHeight-2)return;
+        if(!lines(ta)[i].trim())return;   // 빈 줄에는 손잡이 없음
+        html+='<span class="mqgi'+(D&&D.k===i?" on":"")+'" style="top:'+Math.round(y)+'px;height:'+Math.round(tp.h)+'px">⠿</span>';
+      });
+      G.innerHTML=html;
+      if(D)band(D.k); else B.hidden=true;
+    }
+    document.addEventListener("focusin",function(e){var t=e.target; if(t&&t.classList&&t.classList.contains("mqa")){ta=t; setTimeout(draw,0)}});
+    document.addEventListener("focusout",function(e){if(e.target===ta&&!D){setTimeout(function(){if(document.activeElement!==ta&&G){G.hidden=true;B.hidden=true}},50)}});
+    document.addEventListener("input",function(e){if(e.target===ta&&!D)draw()});
+    document.addEventListener("scroll",function(e){if(e.target===ta||(mq&&e.target&&e.target.classList&&e.target.classList.contains("dlbody")))draw()},true);
+    window.addEventListener("resize",function(){setTimeout(draw,50)}); if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){setTimeout(draw,50)});
+    setInterval(function(){if(ta&&document.activeElement===ta&&!D)draw()},500);   // 칸 크기가 바뀔 때도 따라가게
     document.addEventListener("pointerdown",function(e){
-      if(!H||e.target!==H)return;
-      e.preventDefault(); try{H.setPointerCapture(e.pointerId)}catch(err){}   // 눌러도 적는 칸에서 안 나가 키보드가 그대로
-      var k=caretLine(ta), col=ta.selectionStart-ta.value.split("\n").slice(0,k).join("\n").length-(k?1:0);
-      D={k:k,col:Math.max(0,col),pid:e.pointerId}; H.classList.add("drag"); buzz(10);
+      if(!G||!G.contains(e.target))return;
+      e.preventDefault(); try{G.setPointerCapture(e.pointerId)}catch(err){}   // 눌러도 적는 칸에서 안 나가 키보드가 그대로
+      var k=lineAt(e.clientY); if(!lines(ta)[k].trim())return;
+      D={k:k,pid:e.pointerId}; buzz(10); draw();
     });
     document.addEventListener("pointermove",function(e){
       if(!D||e.pointerId!==D.pid)return; e.preventDefault();
-      var r=ta.getBoundingClientRect(), y=e.clientY-r.top+ta.scrollTop, ts=tops(ta), to=D.k;
-      for(var i=0;i<ts.length;i++){if(y<ts[i].top+ts[i].h/2){to=i;break} to=i}
+      var r=ta.getBoundingClientRect();
       if(e.clientY<r.top+30)ta.scrollTop-=8; else if(e.clientY>r.bottom-30)ta.scrollTop+=8;   // 칸 끝에서는 칸 안이 저절로 스크롤
+      var to=lineAt(e.clientY);
       if(to!==D.k){
-        var ls=lines(ta), mv=ls.splice(D.k,1)[0]; ls.splice(to,0,mv); ta.value=ls.join("\n"); D.k=to;
-        var pos=ls.slice(0,to).join("\n").length+(to?1:0)+Math.min(D.col,mv.length); try{ta.setSelectionRange(pos,pos)}catch(err){}
-        buzz(5); D.changed=true;
+        var ls=lines(ta), mv=ls.splice(D.k,1)[0]; ls.splice(to,0,mv); ta.value=ls.join("\n"); D.k=to; D.changed=true; buzz(5);
       }
-      place(); H.style.top=Math.round(e.clientY-r.top+ta.offsetTop-22)+"px";
+      draw();
     },{passive:false});
     function end(e){
       if(!D||e.pointerId!==D.pid)return;
-      var ch=D.changed; D=null; H.classList.remove("drag");
+      var ch=D.changed, k=D.k; D=null;
       if(ch)ta.dispatchEvent(new Event("input",{bubbles:true}));   // 바뀐 순서 저장
-      try{ta.focus()}catch(err){} place();
+      var pos=lines(ta).slice(0,k+1).join("\n").length; try{ta.focus(); ta.setSelectionRange(pos,pos)}catch(err){}   // 커서는 옮긴 문장 끝에
+      draw();
     }
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",end);
   })();
