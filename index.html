@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-2">
+<meta name="app-build" content="2026-10-25-3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1730,7 +1730,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
   /* PC 칸반에서 찾을 때: 말씀 카드(칸반)가 먼저, 찾은 기록은 그 아래 (2026-10-22 사용자 요청) */
   body.boardon #board{order:1} body.boardon #dlFGrip{order:2;margin-top:6px} body.boardon #dlFind{order:3;resize:none} body.boardon #boardSay{order:4}
   body.boardon #dlFind{flex:0 0 auto;flex-direction:row;align-items:stretch;justify-content:safe center;gap:14px;height:170px;min-height:56px;max-height:70vh;overflow:auto;resize:vertical;margin-bottom:2px;padding:0 20px 4px}
-  body.boardon .dlfcol{flex:0 0 380px;max-width:380px;min-height:0}
+  body.boardon .dlfcol{flex:0 0 var(--bcw,270px);max-width:var(--bcw,270px);min-height:0}   /* 찾은 결과 칸 폭 = 칸반 칸 폭 (2026-10-25 사용자 요청) */
   body.boardon .dlfl{flex:1 1 auto;min-height:0;overflow-y:auto;scrollbar-width:none;padding-right:2px}
   body.boardon .dlfl::-webkit-scrollbar{display:none}
   body.boardon .dlfgrip{display:flex;align-items:center;justify-content:center;flex:0 0 auto;height:14px;margin:0 0 6px;cursor:ns-resize;touch-action:none}
@@ -3527,7 +3527,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var ad=box.querySelector(":scope>.baddcol"); if(ad){fixed+=120;n++}
     if(!open){box.style.removeProperty("--bcw");return}
     var w=Math.floor((box.clientWidth-fixed-gap*Math.max(0,n-1)-4)/open);
-    if(w>=270)box.style.removeProperty("--bcw"); else box.style.setProperty("--bcw",Math.max(220,w)+"px");
+    if(w>=270){box.style.removeProperty("--bcw");document.body.style.removeProperty("--bcw")} else {box.style.setProperty("--bcw",Math.max(220,w)+"px");document.body.style.setProperty("--bcw",Math.max(220,w)+"px")}   // 찾은 결과 칸도 같은 폭
   }
   window.addEventListener("resize",function(){var b=$("board"); if(b&&!b.hidden&&bMode==="list")kbFit(b)});
   function renderKanban(){
