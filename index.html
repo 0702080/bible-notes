@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-15">
+<meta name="app-build" content="2026-10-25-16">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2601,6 +2601,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqfoot.mqfoottop{margin:-2px 0 4px}
 @media (hover:hover){.mqadd:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
 .mqsaved{margin-left:auto;flex:0 0 auto;font-size:11px;color:var(--faint)}
+.mqitem{position:relative}
+.mqlh{position:absolute;z-index:6;width:44px;height:44px;padding:0;border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);border-radius:12px;background:color-mix(in srgb,var(--gold) 16%,#141416);color:var(--gold);font-size:20px;line-height:1;touch-action:none;-webkit-user-select:none;user-select:none}
+.mqlh.drag{background:var(--gold);color:#141416;box-shadow:0 8px 20px rgba(0,0,0,.5)}
 .mqsl{display:flex;flex-direction:column;gap:6px}
 .mqsr{display:flex;align-items:stretch;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);font-size:14.5px;line-height:1.6;color:var(--ink);-webkit-user-select:none;user-select:none}
 .mqsr.empty .mqst{color:var(--faint);font-size:12.5px}
@@ -2609,7 +2612,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqsr.drag{position:relative;z-index:5;border-color:var(--gold);box-shadow:0 10px 24px rgba(0,0,0,.55);background:#1C1B21}
 .mqsort{height:34px;padding:0 12px;border:1px solid color-mix(in srgb,var(--gold) 45%,#34333A);border-radius:17px;background:transparent;color:var(--gold);font-size:13px;white-space:nowrap}
 .mqsort.on{background:var(--gold);color:#141416;font-weight:700}
-.mqa.mqbig{overflow-y:auto;overscroll-behavior:contain;padding-bottom:12px}
+.mqa.mqbig{overflow-y:auto;overscroll-behavior:contain;padding-bottom:12px;padding-right:58px}   /* 오른쪽은 문장 손잡이 자리 */
 .mqa{width:100%;box-sizing:border-box;min-height:60px;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.7;resize:none;overflow:hidden}
 .mqa:focus{outline:none;border-color:var(--gold)}
 .mqa::placeholder{color:var(--faint)}
@@ -10123,6 +10126,70 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // 다른 기기에서 받아 와 다시 그릴 때, 지금 적고 있는 칸이 있으면 다 적고 나갈 때까지 미룸
   // (적는 중에 화면을 새로 그리면 키보드가 닫혀 입력이 끊기던 문제, 2026-10-25 사용자 요청)
   var mqLater=false, mqSort=new Set();
+  /* 답을 적는 중에 커서가 있는 줄 오른쪽에 ⠿ 손잡이가 떠서, 잡고 위아래로 끌면 그 줄(문장)이 통째로 옮겨짐.
+     키보드는 닫히지 않음 (2026-10-25 사용자 요청: 적는 칸 안에서 바로 문장 끌기) */
+  (function(){
+    var H=null, ta=null, D=null, mir=null;
+    function handle(){
+      if(!H){H=document.createElement("button"); H.type="button"; H.className="mqlh"; H.setAttribute("aria-label","이 문장 위아래로 옮기기"); H.textContent="⠿"; H.hidden=true}
+      return H;
+    }
+    function lines(t){return t.value.split("\n")}
+    function caretLine(t){return t.value.slice(0,t.selectionStart).split("\n").length-1}
+    function tops(t){   // 줄(엔터로 나눈 문장)마다 칸 안 글 위치(위·높이)를 잼
+      if(!mir){mir=document.createElement("div"); mir.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal"; document.body.appendChild(mir)}
+      var cs=getComputedStyle(t);
+      ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","paddingLeft","paddingRight","paddingTop","borderLeftWidth","borderRightWidth","boxSizing","wordBreak"].forEach(function(k){mir.style[k]=cs[k]});
+      mir.style.width=t.clientWidth+"px"; mir.style.borderStyle="solid"; mir.style.borderColor="transparent"; mir.style.borderTopWidth="0"; mir.style.boxSizing="content-box"; mir.style.width=(t.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight))+"px"; mir.style.borderLeftWidth="0"; mir.style.borderRightWidth="0"; mir.style.paddingLeft="0"; mir.style.paddingRight="0";
+      mir.textContent="";
+      var out=[];
+      lines(t).forEach(function(l,i){var sp=document.createElement("span"); sp.textContent=l||"\u200b"; mir.appendChild(sp); if(i<lines(t).length-1)mir.appendChild(document.createTextNode("\n"))});
+      var pt=parseFloat(cs.paddingTop)||0, bt=parseFloat(cs.borderTopWidth)||0, lh=parseFloat(cs.lineHeight)||22;
+      Array.prototype.forEach.call(mir.querySelectorAll("span"),function(sp){var rs=sp.getClientRects(), a=rs.length?rs[0].top:0, b=rs.length?rs[rs.length-1].bottom:lh, m=mir.getBoundingClientRect().top; out.push({top:bt+pt+a-m,h:Math.max(lh,b-a)})});
+      return out;
+    }
+    function place(){
+      var h=handle();
+      if(!ta||!ta.isConnected||document.activeElement!==ta||lines(ta).length<2||D&&D.done){if(!D)h.hidden=true;return}
+      var it=ta.closest(".mqitem"); if(h.parentNode!==it)it.appendChild(h);
+      var k=D?D.k:caretLine(ta), tp=tops(ta)[k]; if(!tp){h.hidden=true;return}
+      var y=ta.offsetTop+tp.top-ta.scrollTop+tp.h/2;
+      if(y<ta.offsetTop+4||y>ta.offsetTop+ta.offsetHeight-4){if(!D){h.hidden=true;return}}
+      h.hidden=false; h.style.top=Math.round(y-22)+"px"; h.style.left=Math.round(ta.offsetLeft+ta.offsetWidth-50)+"px";
+    }
+    document.addEventListener("focusin",function(e){var t=e.target; if(t&&t.classList&&t.classList.contains("mqa")){ta=t; setTimeout(place,0)}});
+    document.addEventListener("focusout",function(e){if(e.target===ta&&!D){setTimeout(function(){if(document.activeElement!==ta&&H)H.hidden=true},50)}});
+    document.addEventListener("selectionchange",function(){if(ta&&document.activeElement===ta&&!D)place()});
+    document.addEventListener("input",function(e){if(e.target===ta&&!D)place()});
+    document.addEventListener("scroll",function(e){if(e.target===ta||(mq&&e.target&&e.target.classList&&e.target.classList.contains("dlbody")))place()},true);
+    window.addEventListener("resize",function(){setTimeout(place,50)}); if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){setTimeout(place,50)});
+    setInterval(function(){if(ta&&document.activeElement===ta&&!D)place()},400);   // 칸 크기가 바뀔 때도 따라가게
+    document.addEventListener("pointerdown",function(e){
+      if(!H||e.target!==H)return;
+      e.preventDefault(); try{H.setPointerCapture(e.pointerId)}catch(err){}   // 눌러도 적는 칸에서 안 나가 키보드가 그대로
+      var k=caretLine(ta), col=ta.selectionStart-ta.value.split("\n").slice(0,k).join("\n").length-(k?1:0);
+      D={k:k,col:Math.max(0,col),pid:e.pointerId}; H.classList.add("drag"); buzz(10);
+    });
+    document.addEventListener("pointermove",function(e){
+      if(!D||e.pointerId!==D.pid)return; e.preventDefault();
+      var r=ta.getBoundingClientRect(), y=e.clientY-r.top+ta.scrollTop, ts=tops(ta), to=D.k;
+      for(var i=0;i<ts.length;i++){if(y<ts[i].top+ts[i].h/2){to=i;break} to=i}
+      if(e.clientY<r.top+30)ta.scrollTop-=8; else if(e.clientY>r.bottom-30)ta.scrollTop+=8;   // 칸 끝에서는 칸 안이 저절로 스크롤
+      if(to!==D.k){
+        var ls=lines(ta), mv=ls.splice(D.k,1)[0]; ls.splice(to,0,mv); ta.value=ls.join("\n"); D.k=to;
+        var pos=ls.slice(0,to).join("\n").length+(to?1:0)+Math.min(D.col,mv.length); try{ta.setSelectionRange(pos,pos)}catch(err){}
+        buzz(5); D.changed=true;
+      }
+      place(); H.style.top=Math.round(e.clientY-r.top+ta.offsetTop-22)+"px";
+    },{passive:false});
+    function end(e){
+      if(!D||e.pointerId!==D.pid)return;
+      var ch=D.changed; D=null; H.classList.remove("drag");
+      if(ch)ta.dispatchEvent(new Event("input",{bubbles:true}));   // 바뀐 순서 저장
+      try{ta.focus()}catch(err){} place();
+    }
+    document.addEventListener("pointerup",end); document.addEventListener("pointercancel",end);
+  })();
   // 문장 옮기기: 손잡이(⠿)를 잡으면 바로 끌림. 놓으면 그 순서로 답을 저장
   (function(){
     var D=null;
