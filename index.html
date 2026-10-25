@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-23">
+<meta name="app-build" content="2026-10-25-24">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -775,6 +775,9 @@ html,body,button,input,textarea,select{font-family:"Binggrae","Noto Sans KR","Ap
 .sheet{position:fixed;inset:0;z-index:45}
 .sheet[hidden]{display:none}
 .sheetback{position:absolute;inset:0;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}   /* 뒤 화면은 뿌옇게 (2026-10-24 사용자 요청) */
+#addSheet.mtbig .sheetpanel{bottom:auto;border-radius:0}
+#addSheet.mtbig #mText{resize:none;overflow-y:auto}
+#addSheet.mtbig .sheethint{display:none}
 .sheetpanel{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--sheet);
   border-radius:20px 20px 0 0;border-top:1px solid var(--rule);padding:14px 18px calc(22px + env(safe-area-inset-bottom,0px));max-width:680px;margin:0 auto;box-shadow:0 -12px 40px rgba(0,0,0,.5)}
 /* PC: 말씀 담기 창을 크게, 화면 가운데에 (2026-10-24 사용자 요청) */
@@ -10153,6 +10156,32 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   // 다른 기기에서 받아 와 다시 그릴 때, 지금 적고 있는 칸이 있으면 다 적고 나갈 때까지 미룸
   // (적는 중에 화면을 새로 그리면 키보드가 닫혀 입력이 끊기던 문제, 2026-10-25 사용자 요청)
+  // 휴대폰: '말씀 담기'의 말씀 칸을 누르면 창을 위로 꽉 채우고, 말씀 칸이 키보드 바로 위까지 커지게 (2026-10-25 사용자 요청)
+  (function(){
+    var cur=null;
+    function fit(){
+      if(!cur||document.activeElement!==cur)return;
+      var vv=window.visualViewport, vh=vv?vv.height:innerHeight, vtop=vv?vv.offsetTop:0;
+      var sh=$("addSheet"), pn=sh.querySelector(".sheetpanel");
+      pn.style.top=Math.round(vtop)+"px"; pn.style.height=Math.round(vh)+"px"; pn.style.maxHeight="none";
+      var lb=sh.querySelector('label[for="mRef"]'), dy=lb.getBoundingClientRect().top-(pn.getBoundingClientRect().top+8);
+      if(Math.abs(dy)>2)pn.scrollTop+=dy;   // 구절 칸부터 위에 보이게
+      var h=Math.max(140,Math.round(vtop+vh-cur.getBoundingClientRect().top-10))+"px";
+      if(cur.style.height!==h)cur.style.height=h;
+    }
+    document.addEventListener("focusin",function(e){
+      if(e.target.id!=="mText"||(window.matchMedia&&matchMedia("(min-width:900px)").matches))return;
+      cur=e.target; $("addSheet").classList.add("mtbig");
+      var n=0; (function tick(){if(cur!==e.target)return; fit(); if(++n<20)setTimeout(tick,100)})();
+    });
+    document.addEventListener("focusout",function(e){
+      if(e.target!==cur)return; cur=null;
+      var sh=$("addSheet"), pn=sh.querySelector(".sheetpanel"); sh.classList.remove("mtbig");
+      pn.style.top=""; pn.style.height=""; pn.style.maxHeight=""; e.target.style.height="";
+    });
+    if(window.visualViewport){window.visualViewport.addEventListener("resize",fit);window.visualViewport.addEventListener("scroll",fit)}
+    window.addEventListener("resize",fit);
+  })();
   var mqLater=false, mqSort=new Set();
   /* 답을 적는 칸 오른쪽에 줄(문장)마다 ⠿ 손잡이가 세로로 줄지어 뜸. 옮길 문장 옆 손잡이를 바로 잡고 위아래로 끌면 그 문장이 통째로 옮겨짐.
      커서를 먼저 둘 필요 없음. 키보드는 닫히지 않음 (2026-10-25 사용자 요청: 한 줄 고르기가 어려움) */
