@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-25">
+<meta name="app-build" content="2026-10-25-26">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2166,6 +2166,9 @@ button:active{filter:brightness(1.15)}
   .ccfoot .ccbtn.main{flex-grow:1;border:1px solid transparent}   /* 휴대폰: 아래 단추들 가로 폭을 똑같이 (2026-10-22 사용자 요청) */
 }
 .ccvwrap{width:100%;max-width:560px;margin:0 auto;box-sizing:border-box}   /* 말씀은 짧든 길든 늘 같은 자리(왼쪽 줄)에서 시작 — 휴대폰은 왼쪽 맞춤, 넓은 화면은 560px 덩어리를 가운데 (2026-10-23 사용자 요청, 예전엔 글 길이만큼 가운데) */
+.ccpaint{margin-left:auto;height:32px;padding:0 12px;border:1px solid #34333A;border-radius:16px;background:transparent;color:var(--muted);font-size:13px;white-space:nowrap}
+.ccpaint[aria-pressed="true"]{border-color:var(--gold);color:#141416;background:var(--gold);font-weight:700}
+.ccpainting .ccverse .ccw{cursor:pointer;outline:1px dashed color-mix(in srgb,var(--bc,#888) 60%,transparent);outline-offset:2px;border-radius:6px}
 .ccvref{cursor:pointer;margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
 .cch .bqtitle .ccref{display:none}
 .ccw.ccpopx{animation:ccpopx .45s cubic-bezier(.2,1.8,.4,1)}
@@ -7552,7 +7555,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
       ccBox=document.createElement("div"); ccBox.className="cch ccmain"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
-      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b></div></div>'+
+      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b></div><button type="button" class="ccpaint" aria-pressed="false" title="낱말 색 고르기">🎨 색</button></div>'+
         '<div class="ccsteps" role="group" aria-label="연습 단계 (눌러서 그 단계로)"></div>'+
         '<div class="ccbody"><small class="ccnum" hidden></small><div class="cctip"></div><div class="ccmid"><div class="ccvwrap"><div class="ccvref"></div><div class="ccverse"></div></div></div></div>'+
         '<div class="ccfoot"></div>';
@@ -7607,12 +7610,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(window.MutationObserver)new MutationObserver(later).observe(vv,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["class"]});
         window.addEventListener("resize",later);
       })();
+      ccBox.querySelector(".ccpaint").addEventListener("click",function(){
+        if(!C)return; C.paint=!C.paint; this.setAttribute("aria-pressed",String(C.paint)); this.textContent=C.paint?"✓ 색 다 골랐어요":"🎨 색";
+        ccBox.classList.toggle("ccpainting",C.paint);
+        if(C.paint){toast("낱말을 누를 때마다 색이 바뀌어요 (주황→초록→하늘→보라→흰색)"); ccWords(notes.get(C.id).text,"got",0,C.seed||1)} else ccDraw();
+      });
       ccBox.querySelector(".ccvref").addEventListener("click",function(){   // 구절 이름을 누르면 "잠언 11장 3절"처럼 한 번에 읽어 줌 (2026-10-21 사용자 요청)
         var n0=C&&notes.get(C.id); if(!n0||!n0.ref)return; buzz(18);
         sayWord(refSay(n0.ref),true);
       });
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 낱말을 누르면 소리로 들려주고, 가린 낱말은 톡 뒤집혀 잠깐 보인다
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
+        if(C.paint){   // 🎨 색 고르기: 누를 때마다 주황→초록→하늘→보라→흰색 (2026-10-25 사용자 요청)
+          var all=Array.prototype.slice.call(ccBox.querySelectorAll(".ccverse .ccw")), wi=all.indexOf(w), np=notes.get(C.id); if(wi<0||!np)return;
+          var ORD=["sub","act","obj","div","etc"], cur=C.roles[wi]||"etc", nx=ORD[(ORD.indexOf(cur)+1)%ORD.length];
+          C.roles[wi]=nx; w.className=w.className.replace(/\br-[a-z]+/,"r-"+nx); if(!/\br-/.test(w.className))w.classList.add("r-"+nx);
+          var L={sub:"S",act:"V",obj:"O",div:"D",etc:"X"};
+          np.parse={src:np.text,labels:C.roles.map(function(r){return L[r]||"X"}),v:9,pf:1}; C.rolesSrc=np.text;
+          scheduleSave(np.id); buzz(8); return;
+        }
         var wt=String(w.dataset.w||w.textContent||"").trim();
         if(wt)sayWord(wt,true);   // 누를 때마다 그 낱말 소리 (2026-10-17 사용자 요청)
         // 떠올리기: 한 소절씩 눌러 맨 끝 낱말까지 오면 암송 완료로 셈하고 다음 말씀(다음 번째)으로 (2026-10-23 사용자 요청)
@@ -7640,6 +7656,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     var done3=n.mem&&n.mem.s&&n.mem.s[0]&&n.mem.s[1]&&n.mem.s[2];
     C={id:n.id,stage:done3?3:0,shown:done3?3:0,reads:0,round:0,peek:0,t0:Date.now(),seed:newSeed(),grade:"",dict:null,edit:false,anim:true,seen:opt.seen||{},order:opt.order||1};
+    var cpb=ccBox.querySelector(".ccpaint"); if(cpb){cpb.setAttribute("aria-pressed","false"); cpb.textContent="🎨 색"} ccBox.classList.remove("ccpainting");
     ccBox.querySelector(".ccref").textContent=n.ref;
     ccBox.querySelector(".ccvref").textContent=n.ref;   // 말씀 바로 위에 구절 이름 (2026-10-21 사용자 요청)
     var cn=ccBox.querySelector(".ccnum"); cn.hidden=false; cn.textContent="암송 "+ccCount(n); cn.title="이 말씀을 끝까지 외운 횟수 (카드의 \"암송 N\"과 같은 숫자, 끝까지 하면 하나 올라요)";   // 카드 숫자와 똑같이 (2026-10-23 사용자 요청)   // 이 말씀 연습 누적 횟수 — 다시 열어도 이어짐 (2026-10-23 사용자 요청)
@@ -7680,8 +7697,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     return "etc";
   }
   function ccRoles(n){
-    var ws=wordsOf(n.text||""), lab=parseOk(n)?n.parse.labels:null;
+    var ws=wordsOf(n.text||""), lab=parseOk(n)?n.parse.labels:null, man=lab&&n.parse.v===9;
+    var MAN={S:"sub",V:"act",O:"obj",D:"div",X:"etc"};
     return ws.map(function(w,i){
+      if(man&&MAN[lab[i]])return MAN[lab[i]];   // 🎨 색 고르기로 내가 정한 색
       var t=w.replace(/[^가-힣A-Za-z0-9]/g,"");
       if(CC_DIV.test(t))return "div";
       if(lab){var r=lab[i];return r==="V"?"act":r==="O"?"obj":r==="S"?"sub":ccRoleOf(w)==="act"?"act":"etc"}
@@ -12017,7 +12036,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function parseOk(n){
     var ok=n.parse&&n.parse.src===n.text&&n.parse.labels.length===wordsOf(n.text).length;
-    if(ok&&!n.parse.pf){placeFix(n.text,n.parse.labels);n.parse.pf=1}
+    if(ok&&!n.parse.pf&&n.parse.v!==9){placeFix(n.text,n.parse.labels);n.parse.pf=1}   // v:9 = 내가 손으로 고른 색은 그대로
     return ok;
   }
   /* ---------- 대조·비교 보기 ----------
