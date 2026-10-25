@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-11">
+<meta name="app-build" content="2026-10-25-12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10109,8 +10109,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       o.days[d]=mine;
     });
     try{localStorage.setItem(MEDQ_KEY,JSON.stringify(o))}catch(e){}
-    if(mq&&!mq.hidden)drawMedq();
+    if(mq&&!mq.hidden)mqRedrawSoon();
   }
+  // 다른 기기에서 받아 와 다시 그릴 때, 지금 적고 있는 칸이 있으면 다 적고 나갈 때까지 미룸
+  // (적는 중에 화면을 새로 그리면 키보드가 닫혀 입력이 끊기던 문제, 2026-10-25 사용자 요청)
+  var mqLater=false;
+  function mqRedrawSoon(){
+    var a=document.activeElement;
+    if(mq&&a&&mq.contains(a)&&/^(TEXTAREA|INPUT|SELECT)$/.test(a.tagName)){mqLater=true; return}
+    mqLater=false; drawMedq();
+  }
+  document.addEventListener("focusout",function(e){
+    if(!mqLater||!mq||!mq.contains(e.target))return;
+    setTimeout(function(){if(mqLater&&!mq.hidden)mqRedrawSoon()},300);   // 다른 칸으로 옮겨 가면 계속 미룸
+  });
   var mq=null, mqDay="";
   function closeMedq(){if(!mq)return; mq.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; render()}
   function mqEdit(id,fn){   // 그 질문 한 개만 고쳐서 저장
