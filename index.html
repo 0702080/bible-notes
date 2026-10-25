@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-18">
+<meta name="app-build" content="2026-10-25-19">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1447,6 +1447,7 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 .grtools{display:flex;gap:6px;margin-left:auto}
 .grtools button{height:30px;padding:0 12px;border:1px solid #34333A;border-radius:15px;background:#17161b;color:var(--muted);font-size:12.5px;font-weight:700;white-space:nowrap}
 .grtools button[hidden]{display:none}
+.grtp{display:none!important}   /* #주제도 잇기 단추 숨김 (2026-10-25) */
 .grtp[aria-pressed="true"]{background:color-mix(in srgb,var(--mint) 16%,#17161b);border-color:color-mix(in srgb,var(--mint) 50%,#34333A);color:var(--mint)}
 .grwrap{position:relative;flex:1;min-height:0}
 .grsvg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
@@ -11419,7 +11420,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
      '#주제도 잇기'를 켜면 주제 점(민트)도 생겨 같은 주제 말씀끼리 이어짐.
      점을 누르면 이어진 말씀이 밝아짐(아래 목록은 뺌). 아래 칸 '지우기/연결 끊기'(한 번 더 눌러 확인)로 연결을 지움 (`grRemove(`). '이 말씀 중심으로'는 그 점에서 두 걸음 안의 말씀만 모아 봄 */
   var GR=null, grTopics=false;
-  try{grTopics=localStorage.getItem("bible-graph-topics")==="1"}catch(e){}
+  grTopics=false;   // #주제도 잇기 단추는 없앰 (2026-10-25 사용자 요청)
   function grLinkKey(l,r){   // 연결 하나가 지도에서 가리키는 점
     r=r||parseRef(l.ref); var have=r.book>=0&&r.chapter>0&&r.verse>0?myNoteAt(r.book,r.chapter,r.verse):null;
     return have?"n:"+have.id:"x:"+(r.book>=0&&r.chapter>0?r.book+"."+r.chapter+"."+(r.verse||0):String(l.ref).replace(/\s+/g,""));
@@ -11485,7 +11486,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     GR.ks=ks; GR.es=es;
     var em=ov.querySelector(".grempty"), lone=ks.length<=1&&!es.length;
     em.hidden=!lone||!!GR.center;   // 한 말씀만 있을 때의 안내 글은 뺌 (2026-10-22 사용자 요청)
-    if(lone)em.textContent="아직 연결한 말씀이 없어요. 말씀 카드의 '🔗 연결 말씀'에서 구절을 이어 보세요. 위의 '#주제도 잇기'를 켜면 같은 주제끼리도 이어져요.";
+    if(lone)em.textContent="아직 연결한 말씀이 없어요. 말씀 카드의 '🔗 연결 말씀'에서 구절을 이어 보세요.";
     // 자리: 이미 있던 점은 그 자리, 새 점은 이웃 곁에
     var P=GR.pos, live={};
     ks.forEach(function(k,i){
