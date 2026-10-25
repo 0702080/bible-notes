@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-10-25-1">
+<meta name="app-build" content="td-2026-10-25-2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -235,6 +235,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovw-body{padding:0 13px 14px}
 .ovw-body[hidden]{display:none}
 .ovw-h{margin:10px 0 8px;font-size:13px;font-weight:700;color:var(--muted)}
+.ovw-map+.ovw-h{margin-top:24px}   /* 구약·신약 지도 아래 다음 제목과 사이를 넉넉히 (2026-10-25 사용자 요청) */
 .ovw-map{display:grid;grid-template-columns:repeat(auto-fill,minmax(42px,1fr));gap:5px}
 .ovc{position:relative;justify-self:center;width:100%;max-width:46px;height:auto;aspect-ratio:1;padding:0;border:1px solid var(--rule);border-radius:50%;   /* 동그란 원 (2026-10-21 사용자 요청) */background:var(--blank);color:var(--muted);font-family:inherit;font-size:12px;overflow:hidden}
 .ovc i{position:absolute;left:0;right:0;bottom:0;height:calc(var(--f,0) * 100%);background:color-mix(in srgb,var(--ring) 55%,transparent)}
