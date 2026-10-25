@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-7">
+<meta name="app-build" content="2026-10-25-8">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2604,6 +2604,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqverse p{margin:6px 0 8px;font-family:var(--serif);font-size:15.5px;line-height:1.75;color:var(--ink);word-break:keep-all}
 .mqopen{height:28px;padding:0 12px;border:1px solid #34333A;border-radius:14px;background:transparent;color:var(--muted);font:inherit;font-size:12px}
 .mqitem{padding:12px 14px;border:1px solid #232229;border-radius:14px;background:#121216}
+.mqcgrip{flex:0 0 auto;width:16px;margin:2px -2px 0 -6px;color:var(--faint);font-size:14px;line-height:20px;text-align:center;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+@media (hover:hover){.mqcgrip:hover{color:var(--gold)}}
+.mqitem.mqdragging{position:relative;z-index:5;opacity:.96;box-shadow:0 14px 34px rgba(0,0,0,.55);transition:none}
+.mqitem.mqdragging .mqcgrip{cursor:grabbing;color:var(--gold)}
 .mqq{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:14px;color:var(--ink);word-break:keep-all}
 .mqq i{flex:0 0 auto;margin-top:5px;width:20px;height:20px;border-radius:10px;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);font-style:normal;font-size:11.5px;font-weight:700;display:grid;place-items:center}
 .mqqt{flex:1 1 auto;min-width:0;box-sizing:border-box;padding:4px 0;border:0;border-bottom:1px dashed #2E2D34;border-radius:0;background:transparent;color:var(--ink);font-family:inherit;font-size:14.5px;font-weight:700;line-height:1.6;resize:none;overflow:hidden}
@@ -5225,7 +5229,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var r=ta.getBoundingClientRect();
       if(r.bottom<0||r.top>innerHeight||!r.width){mic.hidden=true;return}
       mic.hidden=false;
-      mic.style.left=Math.min(innerWidth-48,r.right-44)+"px";
+      var gap=ta.classList.contains("mqa")?56:0;   // 묵상 질문 답 칸은 오른쪽에 문장 손잡이가 있어 그 왼쪽에
+      mic.style.left=Math.min(innerWidth-48,r.right-44-gap)+"px";
       mic.style.top=Math.max(4,Math.min(innerHeight-48,r.bottom-44))+"px";
     }
     function hide(){if(on)return; mic.hidden=true; ta=null}
@@ -10251,6 +10256,38 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var o=null; try{o=JSON.parse(localStorage.getItem(MEDQ_KEY)||"null")}catch(e){}
     return medqNorm(o);
   }
+  // 질문 카드 끌어서 위아래로 옮기기: 왼쪽 위 ⠿를 잡고 끌기 (2026-10-25 사용자 요청)
+  var mqDrag=null;
+  document.addEventListener("pointerdown",function(e){
+    var g=e.target.closest&&e.target.closest(".mqcgrip"); if(!g)return;
+    var c=g.closest(".mqitem"); if(!c)return;
+    e.preventDefault(); try{g.setPointerCapture(e.pointerId)}catch(err){}
+    mqDrag={c:c,pid:e.pointerId,y0:e.clientY}; c.classList.add("mqdragging"); buzz(10);
+  });
+  document.addEventListener("pointermove",function(e){
+    if(!mqDrag||e.pointerId!==mqDrag.pid)return; e.preventDefault();
+    var c=mqDrag.c, box=c.parentNode;
+    c.style.transform="translateY("+(e.clientY-mqDrag.y0)+"px)";
+    var sibs=Array.prototype.filter.call(box.querySelectorAll(":scope>.mqitem"),function(x){return x!==c});
+    for(var i=0;i<sibs.length;i++){
+      var r=sibs[i].getBoundingClientRect(), mid=r.top+r.height/2, before=c.compareDocumentPosition(sibs[i])&Node.DOCUMENT_POSITION_PRECEDING;
+      if(before&&e.clientY<mid){var y0=c.getBoundingClientRect().top; box.insertBefore(c,sibs[i]); mqDrag.y0+=c.getBoundingClientRect().top-y0; c.style.transform="translateY("+(e.clientY-mqDrag.y0)+"px)"; break}
+      if(!before&&e.clientY>mid){var y1=c.getBoundingClientRect().top; box.insertBefore(c,sibs[i].nextSibling); mqDrag.y0+=c.getBoundingClientRect().top-y1; c.style.transform="translateY("+(e.clientY-mqDrag.y0)+"px)"}
+    }
+    var sc=c.closest(".dlbody"); if(sc){var br=sc.getBoundingClientRect(); if(e.clientY<br.top+40)sc.scrollTop-=12; else if(e.clientY>br.bottom-40)sc.scrollTop+=12}
+  },{passive:false});
+  function mqDragEnd(e){
+    if(!mqDrag||e.pointerId!==mqDrag.pid)return;
+    var c=mqDrag.c; mqDrag=null; c.classList.remove("mqdragging"); c.style.transform="";
+    var ids=Array.prototype.map.call(c.parentNode.querySelectorAll(":scope>.mqitem"),function(x){return x.dataset.id});
+    var o=medqData(), day=o.days[mqDay]; if(!day)return;
+    var by={}; day.items.forEach(function(x){by[x.id]=x});
+    var nw=ids.map(function(id){return by[id]}).filter(Boolean);
+    day.items.forEach(function(x){if(nw.indexOf(x)<0)nw.push(x)});
+    if(nw.map(function(x){return x.id}).join()!==day.items.map(function(x){return x.id}).join()){day.items=nw; saveMedq(o); buzz(8)}
+    drawMedq();
+  }
+  document.addEventListener("pointerup",mqDragEnd); document.addEventListener("pointercancel",mqDragEnd);
   function saveMedq(o){
     try{localStorage.setItem(MEDQ_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")}
     if(typeof sbMark==="function")sbMark("__medq");
@@ -10511,6 +10548,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function mqCard(it,i){
     var c=document.createElement("div"); c.className="mqitem"; c.dataset.id=it.id;
     var h=document.createElement("div"); h.className="mqq";
+    var cg=document.createElement("span"); cg.className="mqcgrip"; cg.textContent="⠿"; cg.title="끌어서 질문 차례 바꾸기"; cg.setAttribute("aria-hidden","true"); h.appendChild(cg);
     var num=document.createElement("i"); num.textContent=String(i+1); h.appendChild(num);
     var qt=document.createElement("textarea"); qt.className="mqqt"; qt.rows=1; qt.value=it.q||"";
     qt.placeholder="내가 던지는 질문을 적어 보세요"; qt.setAttribute("aria-label","질문"); h.appendChild(qt);
