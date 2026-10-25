@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-11">
+<meta name="app-build" content="2026-10-25-12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2625,7 +2625,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 @media (hover:hover){.mqadd:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
 .mqsaved{margin-left:auto;flex:0 0 auto;font-size:11px;color:var(--faint)}
 .mqitem{position:relative}
-.mqgut{position:absolute;z-index:6;width:52px;touch-action:none;-webkit-user-select:none;user-select:none;overflow:hidden}   /* 손잡이 줄 왼쪽 점선은 없앰 (2026-10-25 사용자 요청) */
+.mqgut{position:absolute;z-index:6;width:38px;touch-action:none;-webkit-user-select:none;user-select:none;overflow:hidden}   /* 손잡이 줄 왼쪽 점선은 없앰 (2026-10-25 사용자 요청) */
 .mqgi{position:absolute;left:6px;right:6px;display:grid;place-items:center;min-height:22px;color:color-mix(in srgb,var(--gold) 75%,transparent);font-size:17px;pointer-events:none}
 .mqgi.on{color:#141416;background:var(--gold);border-radius:8px}
 .mqband{position:absolute;z-index:5;border-radius:8px;background:color-mix(in srgb,var(--gold) 16%,transparent);outline:1px solid color-mix(in srgb,var(--gold) 55%,transparent);pointer-events:none}
@@ -2639,7 +2639,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqsr.drag{position:relative;z-index:5;border-color:var(--gold);box-shadow:0 10px 24px rgba(0,0,0,.55);background:#1C1B21}
 .mqsort{height:34px;padding:0 12px;border:1px solid color-mix(in srgb,var(--gold) 45%,#34333A);border-radius:17px;background:transparent;color:var(--gold);font-size:13px;white-space:nowrap}
 .mqsort.on{background:var(--gold);color:#141416;font-weight:700}
-.mqa.mqbig{overflow-y:auto;overscroll-behavior:contain;padding-bottom:12px;padding-right:58px}   /* 오른쪽은 문장 손잡이 자리 */
+.mqa.mqbig{overflow-y:auto;overscroll-behavior:contain;padding-bottom:12px}
+.mqa{padding-left:40px!important}   /* 왼쪽은 문장 손잡이 자리 (2026-10-25 사용자 요청) */
 .mqa{width:100%;box-sizing:border-box;min-height:60px;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.7;resize:none;overflow:hidden}
 .mqa:focus{outline:none;border-color:var(--gold)}
 .mqa::placeholder{color:var(--faint)}
@@ -5245,8 +5246,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var r=ta.getBoundingClientRect();
       if(r.bottom<0||r.top>innerHeight||!r.width){mic.hidden=true;return}
       mic.hidden=false;
-      var gap=ta.classList.contains("mqa")?56:0;   // 묵상 질문 답 칸은 오른쪽에 문장 손잡이가 있어 그 왼쪽에
-      mic.style.left=Math.min(innerWidth-48,r.right-44-gap)+"px";
+      mic.style.left=Math.min(innerWidth-48,r.right-44)+"px";
       mic.style.top=Math.max(4,Math.min(innerHeight-48,r.bottom-44))+"px";
     }
     function hide(){if(on)return; mic.hidden=true; ta=null}
@@ -10429,7 +10429,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       els();
       if(!ta||!ta.isConnected||document.activeElement!==ta||lines(ta).length<2){if(!D){G.hidden=true;B.hidden=true}return}
       var it=ta.closest(".mqitem"); if(G.parentNode!==it){it.appendChild(B); it.appendChild(G)}
-      G.hidden=false; G.style.top=ta.offsetTop+"px"; G.style.height=ta.offsetHeight+"px"; G.style.left=(ta.offsetLeft+ta.offsetWidth-52)+"px";
+      G.hidden=false; G.style.top=ta.offsetTop+"px"; G.style.height=ta.offsetHeight+"px"; G.style.left=ta.offsetLeft+"px";   // 문장 손잡이는 왼쪽에 (2026-10-25 사용자 요청)
       var ts=tops(ta), html="";
       ts.forEach(function(tp,i){
         var y=tp.top-ta.scrollTop; if(y+tp.h<2||y>ta.offsetHeight-2)return;
