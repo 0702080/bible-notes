@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-16">
+<meta name="app-build" content="2026-10-25-17">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1748,6 +1748,11 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
   body.boardon .todaymini .tmchip.bad{background:linear-gradient(180deg,color-mix(in srgb,var(--pink) 26%,#1C1B22),color-mix(in srgb,var(--pink) 15%,#16151B));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pink) 45%,transparent)}
   body.boardon .todaymini .tmchip:not(.main):not(.done):not(.warn):not(.bad){background:linear-gradient(180deg,#24232B,#1B1A21);color:var(--ink);box-shadow:inset 0 0 0 1px #3A3944,0 1px 2px rgba(0,0,0,.4)}   /* 색 없는 단추도 확실히 단추처럼 (2026-10-25 사용자 요청) */
   body.boardon .todaymini{gap:4px}
+  /* 오른쪽 최근순·찾기·⋯ 단추도 같은 입체 단추로 (2026-10-25 사용자 요청) */
+  body.boardon .toolbar .tbtn{height:34px;border:0;background:linear-gradient(180deg,#24232B,#1B1A21);color:var(--ink);box-shadow:inset 0 0 0 1px #3A3944,0 1px 2px rgba(0,0,0,.4)}
+  @media (hover:hover){body.boardon .toolbar .tbtn:hover{filter:brightness(1.25)}}
+  body.boardon .toolbar .tbtn:active{transform:translateY(1px)}
+  body.boardon #topMenu[open]>summary.tbtn,body.boardon .toolbar .tbtn[aria-pressed="true"]{background:linear-gradient(180deg,color-mix(in srgb,var(--violet) 34%,#1C1B22),color-mix(in srgb,var(--violet) 22%,#16151B));color:color-mix(in srgb,var(--violet) 40%,#fff);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--violet) 55%,transparent)}
   @media (hover:hover){body.boardon .todaymini .tmchip:hover{filter:brightness(1.25);color:var(--ink)}}
   body.boardon .todaymini .tmchip:active{transform:translateY(1px)}
   body.boardon .toolbar h2{flex:0 0 auto}
