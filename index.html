@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-14">
+<meta name="app-build" content="2026-10-25-15">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2601,6 +2601,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqfoot.mqfoottop{margin:-2px 0 4px}
 @media (hover:hover){.mqadd:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
 .mqsaved{margin-left:auto;flex:0 0 auto;font-size:11px;color:var(--faint)}
+.mqsl{display:flex;flex-direction:column;gap:6px}
+.mqsr{display:flex;align-items:stretch;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);font-size:14.5px;line-height:1.6;color:var(--ink);-webkit-user-select:none;user-select:none}
+.mqsr.empty .mqst{color:var(--faint);font-size:12.5px}
+.mqst{flex:1;min-width:0;padding:9px 12px;white-space:pre-wrap;overflow-wrap:anywhere}
+.mqsg{flex:0 0 48px;display:grid;place-items:center;border-left:1px solid #2A2930;color:var(--gold);font-size:20px;touch-action:none;cursor:grab}
+.mqsr.drag{position:relative;z-index:5;border-color:var(--gold);box-shadow:0 10px 24px rgba(0,0,0,.55);background:#1C1B21}
+.mqsort{height:34px;padding:0 12px;border:1px solid color-mix(in srgb,var(--gold) 45%,#34333A);border-radius:17px;background:transparent;color:var(--gold);font-size:13px;white-space:nowrap}
+.mqsort.on{background:var(--gold);color:#141416;font-weight:700}
 .mqa.mqbig{overflow-y:auto;overscroll-behavior:contain;padding-bottom:12px}
 .mqa{width:100%;box-sizing:border-box;min-height:60px;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.7;resize:none;overflow:hidden}
 .mqa:focus{outline:none;border-color:var(--gold)}
@@ -10114,7 +10122,37 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   // 다른 기기에서 받아 와 다시 그릴 때, 지금 적고 있는 칸이 있으면 다 적고 나갈 때까지 미룸
   // (적는 중에 화면을 새로 그리면 키보드가 닫혀 입력이 끊기던 문제, 2026-10-25 사용자 요청)
-  var mqLater=false;
+  var mqLater=false, mqSort=new Set();
+  // 문장 옮기기: 손잡이(⠿)를 잡으면 바로 끌림. 놓으면 그 순서로 답을 저장
+  (function(){
+    var D=null;
+    document.addEventListener("pointerdown",function(e){
+      var g=e.target.closest&&e.target.closest(".mqsg"); if(!g||!mq||!mq.contains(g))return;
+      var r=g.closest(".mqsr"); e.preventDefault(); try{g.setPointerCapture(e.pointerId)}catch(err){}
+      D={r:r,pid:e.pointerId,y0:e.clientY}; r.classList.add("drag"); buzz(10);
+    });
+    document.addEventListener("pointermove",function(e){
+      if(!D||e.pointerId!==D.pid)return; e.preventDefault();
+      var r=D.r, box=r.parentNode, y=e.clientY;
+      r.style.transform="translateY("+(y-D.y0)+"px)";
+      var ss=Array.prototype.filter.call(box.children,function(x){return x!==r});
+      for(var i=0;i<ss.length;i++){
+        var q=ss[i].getBoundingClientRect(), mid=q.top+q.height/2, before=r.compareDocumentPosition(ss[i])&Node.DOCUMENT_POSITION_PRECEDING;
+        if((before&&y<mid)||(!before&&y>mid)){var t0=r.getBoundingClientRect().top; box.insertBefore(r,before?ss[i]:ss[i].nextSibling); D.y0+=r.getBoundingClientRect().top-t0; r.style.transform="translateY("+(y-D.y0)+"px)"; buzz(5); break}
+      }
+      var bd=mq.querySelector(".dlbody"), br=bd.getBoundingClientRect();   // 위아래 끝에 닿으면 저절로 스크롤
+      if(y<br.top+50)bd.scrollTop-=10; else if(y>br.bottom-50)bd.scrollTop+=10;
+    },{passive:false});
+    function end(e){
+      if(!D||e.pointerId!==D.pid)return;
+      var r=D.r; D=null; r.classList.remove("drag"); r.style.transform="";
+      var c=r.closest(".mqitem"), ta=c.querySelector(".mqa"), old=ta.value.split("\n");
+      var nv=Array.prototype.map.call(c.querySelectorAll(".mqsr"),function(x){return old[+x.dataset.k]}).join("\n");
+      if(nv!==ta.value){ta.value=nv; mqEdit(c.dataset.id,function(it){it.a=nv}); mqSaved(ta)}
+      Array.prototype.forEach.call(c.querySelectorAll(".mqsr"),function(x,k){x.dataset.k=k});
+    }
+    document.addEventListener("pointerup",end); document.addEventListener("pointercancel",end);
+  })();
   // 휴대폰: 답 칸(.mqa)에 적을 때는 질문은 보이게 두고, 답 칸이 키보드 위 남은 화면을 다 채우게 (2026-10-25 사용자 요청)
   (function(){
     var cur=null;
@@ -10198,6 +10236,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(b.classList.contains("mqtip")){mqAdd(b.textContent);return}
         var c=b.closest(".mqitem"), id=c?c.dataset.id:"";
         if(b.classList.contains("mqtomed")){medqToMed(id);return}
+        if(b.classList.contains("mqsort")){if(!mqSort.has(id)&&c.querySelector(".mqa").value.split("\n").length<2){toast("답이 두 줄 이상일 때 문장을 옮길 수 있어요");return} if(mqSort.has(id))mqSort.delete(id); else mqSort.add(id); drawMedq(); return}
         if(b.classList.contains("mqopen")){var nid=b.dataset.note; closeMedq(); openNoteFocus(nid,"m"); return}
         if(b.classList.contains("mqdel")){
           var o=medqData(), day=o.days[mqDay]||{items:[]}, it=null;
@@ -10226,7 +10265,20 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     c.appendChild(h);
     var ta=document.createElement("textarea"); ta.className="mqa"; ta.value=it.a||"";
     ta.placeholder="내 답을 적어 보세요"; ta.setAttribute("aria-label","답"); c.appendChild(ta);
+    var lines=String(it.a||"").split("\n");
+    if(mqSort.has(it.id)&&lines.length>1){   // ↕️ 문장 옮기기: 줄마다 오른쪽 손잡이를 잡고 위아래로 끌기 (2026-10-25 사용자 요청)
+      ta.hidden=true;
+      var sl=document.createElement("div"); sl.className="mqsl";
+      lines.forEach(function(t,k){
+        var r=document.createElement("div"); r.className="mqsr"+(t.trim()?"":" empty"); r.dataset.k=k;
+        var tx=document.createElement("span"); tx.className="mqst"; tx.textContent=t.trim()?t:"(빈 줄)"; r.appendChild(tx);
+        var g=document.createElement("span"); g.className="mqsg"; g.textContent="⠿"; g.setAttribute("aria-hidden","true"); r.appendChild(g);
+        sl.appendChild(r);
+      });
+      c.appendChild(sl);
+    }
     var f=document.createElement("div"); f.className="mqrow";
+    {var sb=document.createElement("button"); sb.type="button"; sb.className="mqsort"+(mqSort.has(it.id)?" on":""); sb.textContent=mqSort.has(it.id)?"✓ 다 옮겼어요":"↕️ 문장 옮기기"; f.appendChild(sb)}
     var sel=document.createElement("select"); sel.className="field mqlink"; sel.setAttribute("aria-label","말씀 연결 (안 해도 돼요)");
     var o0=document.createElement("option"); o0.value=""; o0.textContent="📖 말씀 연결 안 함"; sel.appendChild(o0);
     sorted().forEach(function(nn){var op=document.createElement("option");op.value=nn.id;op.textContent=nn.ref||"구절 미입력";sel.appendChild(op)});
