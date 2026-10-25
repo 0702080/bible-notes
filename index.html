@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-10">
+<meta name="app-build" content="2026-10-25-11">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3131,6 +3131,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
         <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button>
         <button type="button" id="openMedBtn">📅 묵상 진도표</button>
+        <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="openProgBtn">✅ 실천 진도표</button>
         <button type="button" id="openTongdokBtn">📖 성경 통독표</button>
         <button type="button" id="openGraphBtn"><svg class="grico" viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M12 4 4.5 18.5h15Z"/><path d="M12 4v9M4.5 18.5 12 13l7.5 5.5"/></g><g fill="currentColor"><circle cx="12" cy="4" r="2.6"/><circle cx="4.5" cy="18.5" r="2.6"/><circle cx="19.5" cy="18.5" r="2.6"/><circle cx="12" cy="13" r="2.2"/></g></svg> 말씀 연결 지도</button>
@@ -13875,6 +13876,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   $("openProgBtn").addEventListener("click",openProg);
   $("prayReadBtn").addEventListener("click",function(){$("topMenu").open=false;openPrayRead(null)});
   $("icBtn").addEventListener("click",function(){$("topMenu").open=false;openIntercede()});
+  $("medqBtn").addEventListener("click",function(){$("topMenu").open=false;openMedq()});   // 내가 묻고 내가 답하는 묵상 (⋯ 메뉴, 2026-10-25 사용자 요청)
   $("ansBtn").addEventListener("click",function(){$("topMenu").open=false;openAnswers()});
   $("remindBtn").addEventListener("click",function(){$("topMenu").open=false;openRemind()});
   // ⋯ 메뉴 항목을 끌어서 차례 바꾸기 (2026-10-24 사용자 요청): PC는 누른 채 끌기, 휴대폰은 꾹 누른 뒤 끌기. 차례는 이 기기에 기억
