@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-23">
+<meta name="app-build" content="2026-10-25-24">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2691,6 +2691,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .sayform[hidden]{display:none}
 .sayt{width:100%;box-sizing:border-box;min-height:96px;padding:12px 14px;border:1px solid #2A2930;border-radius:12px;background:var(--sheet);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.75;resize:vertical}
 .sayt:focus{outline:none;border-color:var(--gold)}
+.sayform .sayt{min-height:min(52vh,480px)}   /* 적는 동안은 세로로 넉넉하게 (2026-10-25 사용자 요청) */
 .sayrow2{display:flex;gap:8px;flex-wrap:wrap}
 .sayrow2 .field{flex:1 1 150px;min-width:0;height:40px;font-size:14px}
 .saysave{flex:0 0 auto;height:40px;padding:0 18px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:14px;font-weight:700}
@@ -10123,9 +10124,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function drawSay(){
     if(!say)return;
     var o=sayData(), form=say.querySelector(".sayform"), list=say.querySelector(".saylist");
-    form.textContent=""; form.hidden=!sayEdit;
+    // 적던 중에 화면이 다시 그려져도(동기화 등) 적던 글은 그대로 (2026-10-25 사용자 요청)
+    var keep=null, ft=form.querySelector(".sayt");
+    if(ft&&sayEdit&&form.dataset.ed===sayEdit){var q=function(c){var e=form.querySelector(c);return e?e.value:""}; keep={t:ft.value,who:q(".saywho"),topic:q(".saytopic"),note:q(".saynote"),focus:document.activeElement===ft,ss:ft.selectionStart,se:ft.selectionEnd}}
+    form.textContent=""; form.hidden=!sayEdit; form.dataset.ed=sayEdit||"";
     if(sayEdit){
       var cur=sayEdit==="new"?{t:"",who:"",topic:"",note:""}:(o.items.filter(function(x){return x.id===sayEdit})[0]||{t:"",who:"",topic:"",note:""});
+      if(keep)cur={t:keep.t,who:keep.who,topic:keep.topic,note:keep.note,hv:cur.hv};
       var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=600; ta.value=cur.t||"";
       ta.placeholder=sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
@@ -10146,6 +10151,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var cn=document.createElement("button"); cn.type="button"; cn.className="saycancel"; cn.dataset.act="cancel"; cn.textContent="취소";
       row2.appendChild(cn); row2.appendChild(sv); form.appendChild(row2);
     }
+    if(keep&&keep.focus){var nt=form.querySelector(".sayt"); if(nt){try{nt.focus({preventScroll:true}); nt.setSelectionRange(keep.ss,keep.se)}catch(e){}}}
     list.textContent="";
     var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:!x.hv});
     if(!items.length&&!sayEdit){
