@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-10">
+<meta name="app-build" content="2026-10-25-11">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9983,7 +9983,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     // 📊 실천 진도표
     chip({icon:"📝",act:"medq",cls:"main",title:"나의 묵상 질문 — 내가 묻고 내가 답해요"});
-    chip({icon:"📅",act:"week",title:"한 주 돌아보기 — 이번 주에 걸어온 길"});
+    // 한 주 돌아보기(📅) 단추는 칸반 위에서 뺌 (2026-10-25 사용자 요청)
     if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))chip({icon:"📊",act:"prog",title:"실천 진도표 전체 보기"});
   }
   /* ---------- 믿음의 한 마디 (영적 리더들의 신앙 잠언) 2026-10-18 사용자 요청 ---------- */
