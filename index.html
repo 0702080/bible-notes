@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-26">
+<meta name="app-build" content="2026-10-25-27">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1768,6 +1768,9 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .tmpb i{display:block;height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),var(--green))}
 .tmchip{display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;height:32px;padding:0 11px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
 .tmchip i{font-style:normal;font-size:14.5px;line-height:1}
+.tmchip i .tmck{display:block;width:17px;height:17px}
+.tmck circle{fill:#3FB37F}
+.tmck path{fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 .tmchip b{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
 .tmchip.main{border-color:color-mix(in srgb,var(--violet) 55%,var(--rule));background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet)}
 .tmchip.main b{color:var(--violet)}
@@ -9980,7 +9983,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(o.act){b.type="button";b.dataset.act=o.act;if(o.id)b.dataset.id=o.id}
       b.className="tmchip"+(o.cls?" "+o.cls:"");
       b.title=o.title; b.setAttribute("aria-label",o.title);
-      var ic=document.createElement("i"); ic.textContent=o.icon; ic.setAttribute("aria-hidden","true"); b.appendChild(ic);
+      var ic=document.createElement("i"); if(/^<svg/.test(o.icon))ic.innerHTML=o.icon; else ic.textContent=o.icon; ic.setAttribute("aria-hidden","true"); b.appendChild(ic);
       if(o.bar!=null){var w=document.createElement("span");w.className="tmbar";var f=document.createElement("i");f.style.width=o.bar+"%";w.appendChild(f);b.appendChild(w)}
       if(o.n){var t=document.createElement("b");t.textContent=o.n;b.appendChild(t)}
       bar.appendChild(b);
@@ -10002,7 +10005,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var acts=[];
     all.forEach(function(n){(n.acts||[]).forEach(function(a){if(a.t&&a.t.trim()&&!a.done&&(a.stamps||[]).length&&(a.stamps||[]).indexOf(today)<0)acts.push(n)})});
     var actNotes=acts.filter(function(n,i){return acts.indexOf(n)===i});
-    if(actNotes.length)chip({icon:"✅",act:"act",id:actNotes[0].id,n:actNotes.length,title:"오늘 실천 "+actNotes.length+"개 남았어요"});
+    if(actNotes.length)chip({icon:'<svg class="tmck" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M7.5 12.4l3 3 6-6.4"/></svg>',act:"act",id:actNotes[0].id,n:actNotes.length,title:"오늘 실천 "+actNotes.length+"개 남았어요"});
     // ☁️ 동기화
     var ss=sbSession(), sst=(typeof sbState==="object"&&sbState)||{}, gc=ghCfg(), gs=(typeof ghState==="object"&&ghState)||{};
     if(ss){
