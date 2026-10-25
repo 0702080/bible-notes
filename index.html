@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-22">
+<meta name="app-build" content="2026-10-25-23">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2051,6 +2051,8 @@ button:active{filter:brightness(1.15)}
 .oquiz[hidden]{display:none}
 .micbtn{position:fixed;z-index:500;width:40px;height:40px;border-radius:20px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);background:#1B1A21;color:var(--sky);display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.45);cursor:pointer;padding:0}
 .micbtn[hidden]{display:none}
+.micbtn{background:rgba(27,26,33,.88);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.dlmemobox textarea,.mqa,.sermt{scrollbar-width:thin;scrollbar-color:#3A3944 transparent}   /* 글 칸 스크롤바는 얇고 은은하게 (2026-10-25) */
 .micbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
 .micbtn.on{background:#E5484D;border-color:#E5484D;color:#fff;animation:micpulse 1.2s ease-in-out infinite}
 @keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(229,72,77,.55)}50%{box-shadow:0 0 0 10px rgba(229,72,77,0)}}
@@ -5278,8 +5280,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var r=ta.getBoundingClientRect();
       if(r.bottom<0||r.top>innerHeight||!r.width){mic.hidden=true;return}
       mic.hidden=false;
-      mic.style.left=Math.min(innerWidth-48,r.right-44)+"px";
-      mic.style.top=Math.max(4,Math.min(innerHeight-48,r.bottom-44))+"px";
+      var cs=getComputedStyle(ta), sbw=Math.max(0,ta.offsetWidth-ta.clientWidth-(parseFloat(cs.borderLeftWidth)||0)-(parseFloat(cs.borderRightWidth)||0));   // 스크롤바가 있으면 그 왼쪽에
+      mic.style.left=Math.min(innerWidth-48,r.right-46-sbw)+"px";
+      mic.style.top=Math.max(4,Math.min(innerHeight-48,r.bottom-48))+"px";
     }
     function hide(){if(on)return; mic.hidden=true; ta=null}
     document.addEventListener("focusin",function(e){
