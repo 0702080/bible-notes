@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-9">
+<meta name="app-build" content="2026-10-25-10">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2889,6 +2889,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .sayhvtag{position:relative;display:inline-flex;align-items:center;gap:4px;cursor:pointer;color:var(--gold)!important;border-color:color-mix(in srgb,var(--gold) 45%,transparent)!important}
 .sayhvtag.set{background:color-mix(in srgb,var(--gold) 16%,transparent)}
 .sayhvtm{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;cursor:pointer;color-scheme:dark}
+@media (hover:hover) and (pointer:fine){.sayhvtm{pointer-events:none}}
+.tpop{position:fixed;z-index:400;width:300px;padding:14px;border:1px solid #34333A;border-radius:18px;background:#1A1920;box-shadow:0 18px 44px rgba(0,0,0,.6);color:var(--ink);animation:dpin .16s ease-out}
+.tptop{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.tpbig{font-size:22px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums}
+.tpap{display:inline-flex;padding:3px;border-radius:16px;background:#121116;border:1px solid #2A2930}
+.tpap button{height:28px;padding:0 12px;border:0;border-radius:14px;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+.tpap button.on{background:color-mix(in srgb,var(--gold) 25%,#1C1B22);color:var(--gold);font-weight:700;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 50%,transparent)}
+.tplab{margin:6px 2px 6px;font-size:11.5px;color:var(--faint)}
+.tpgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px}
+.tpgrid button{height:34px;border:0;border-radius:10px;background:#141318;color:var(--ink);font-size:14px;font-variant-numeric:tabular-nums;cursor:pointer}
+.tpgrid button.on{background:var(--gold);color:#17120A;font-weight:700}
+@media (hover:hover){.tpgrid button:not(.on):hover,.tpap button:not(.on):hover{background:#2A2930}}
+.tpfoot{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid #2A2930}
+.tpfoot button{height:32px;padding:0 14px;border:1px solid #34333A;border-radius:16px;background:transparent;color:var(--muted);font-size:13px;margin-left:6px;cursor:pointer}
+.tpfoot .tpok{border-color:var(--gold);background:var(--gold);color:#17120A;font-weight:700}
+.tpfoot .tpx{margin-left:0;color:var(--faint)}
 .sayhvx{position:relative;z-index:1;border:0;background:transparent;color:var(--gold);font-size:13px;line-height:1;padding:0 0 0 4px;cursor:pointer}
 .saycard.hv{border-left-color:var(--gold)}
 .bsq.bshv{font-weight:700}
@@ -10193,6 +10209,46 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     list.addEventListener("contextmenu",function(e){if(sayDrag||pend)e.preventDefault()});
   }
   document.addEventListener("click",function(e){var i=e.target.closest&&e.target.closest(".sayhvtm"); if(i)try{i.showPicker()}catch(err){}});
+  // PC 시간 고르기 창: 크롬 기본 창은 모양을 못 바꿔서 직접 그림 (휴대폰은 기본 시계 판, 2026-10-25 사용자 요청)
+  var TP=null;
+  function tpOpen(anchor,input){
+    tpClose();
+    var v=/^\d\d:\d\d$/.test(input.value)?input.value:"07:00", h=+v.slice(0,2), m=+v.slice(3);
+    var st={pm:h>=12,h:(h%12)||12,m:m-m%5};
+    var pop=document.createElement("div"); pop.className="tpop"; pop.setAttribute("role","dialog"); pop.setAttribute("aria-label","시각 고르기");
+    document.body.appendChild(pop);
+    function val(){var hh=(st.h%12)+(st.pm?12:0); return String(hh).padStart(2,"0")+":"+String(st.m).padStart(2,"0")}
+    function draw(){
+      var h='<div class="tptop"><b class="tpbig">'+(st.pm?"오후":"오전")+' '+st.h+':'+String(st.m).padStart(2,"0")+'</b><span class="tpap"><button type="button" data-ap="am" class="'+(st.pm?"":"on")+'">오전</button><button type="button" data-ap="pm" class="'+(st.pm?"on":"")+'">오후</button></span></div>';
+      h+='<div class="tplab">시</div><div class="tpgrid">';
+      for(var i=1;i<=12;i++)h+='<button type="button" data-h="'+i+'" class="'+(i===st.h?"on":"")+'">'+i+'</button>';
+      h+='</div><div class="tplab">분</div><div class="tpgrid">';
+      for(var j=0;j<60;j+=5)h+='<button type="button" data-m="'+j+'" class="'+(j===st.m?"on":"")+'">'+String(j).padStart(2,"0")+'</button>';
+      h+='</div><div class="tpfoot">'+(input.value?'<button type="button" class="tpx">지우기</button>':'<span></span>')+'<span><button type="button" class="tpno">취소</button><button type="button" class="tpok">정하기</button></span></div>';
+      pop.innerHTML=h;
+    }
+    draw();
+    pop.addEventListener("click",function(e){
+      e.stopPropagation(); var b=e.target.closest("button"); if(!b)return;
+      if(b.dataset.ap){st.pm=b.dataset.ap==="pm"; draw(); return}
+      if(b.dataset.h){st.h=+b.dataset.h; draw(); return}
+      if(b.dataset.m!=null&&b.dataset.m!==""){st.m=+b.dataset.m; draw(); return}
+      if(b.classList.contains("tpno")){tpClose(); return}
+      if(b.classList.contains("tpok")||b.classList.contains("tpx")){input.value=b.classList.contains("tpx")?"":val(); input.dispatchEvent(new Event("change",{bubbles:true})); tpClose()}
+    });
+    var r=anchor.getBoundingClientRect(), pw=pop.offsetWidth, ph=pop.offsetHeight;
+    var left=Math.max(8,Math.min(innerWidth-pw-8,r.left)), top=r.bottom+6; if(top+ph>innerHeight-8)top=Math.max(8,r.top-ph-6);
+    pop.style.left=left+"px"; pop.style.top=top+"px";
+    TP=pop; setTimeout(function(){document.addEventListener("pointerdown",tpOut,true); document.addEventListener("keydown",tpKey,true)},0);
+  }
+  function tpOut(e){if(TP&&!TP.contains(e.target))tpClose()}
+  function tpKey(e){if(e.key==="Escape"){e.stopPropagation();tpClose()}}
+  function tpClose(){if(TP){TP.remove();TP=null} document.removeEventListener("pointerdown",tpOut,true); document.removeEventListener("keydown",tpKey,true)}
+  document.addEventListener("click",function(e){
+    var tag=e.target.closest&&e.target.closest(".sayhvtag"); if(!tag||e.target.closest(".sayhvx"))return;
+    if(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches){e.preventDefault(); tpOpen(tag,tag.querySelector(".sayhvtm"))}
+  },true);
+
   document.addEventListener("change",function(e){
     var i=e.target; if(!i.classList||!i.classList.contains("sayhvtm"))return;
     var o=sayData(), x=o.items.filter(function(y){return y.id===i.dataset.id})[0]; if(!x)return;
