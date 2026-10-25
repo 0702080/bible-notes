@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-5">
+<meta name="app-build" content="2026-10-25-6">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10000,11 +10000,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // 오늘의 한 마디: 5분마다 바뀜. 📌 고정하면 그 한 마디가 하루(24시간) 동안 그대로 (2026-10-21 사용자 요청)
   var SAY_PIN="bible-say-pin";
   function sayPinned(){try{var o=JSON.parse(localStorage.getItem(SAY_PIN)||"null");if(o&&o.id&&Date.now()<+o.until)return o}catch(e){}return null}
-  // ⏰ 정각 말씀: 매시 00분(예: 12:00~12:00:59)에는 '정각 말씀'으로 담은 한 줄 말씀이 나옴 (2026-10-24 사용자 요청)
+  // ⏰ 짧은 말씀: 10분마다(00·10·20·30·40·50분, 그 1분 동안 — 2026-10-25 사용자 요청으로 매시 00분에서 바꿈)에는 '정각 말씀'으로 담은 한 줄 말씀이 나옴 (2026-10-24 사용자 요청)
   function sayHour(){
-    if(new Date().getMinutes()!==0)return null;
+    if(new Date().getMinutes()%10!==0)return null;
     var hv=sayData().items.filter(function(x){return x.hv&&String(x.t||"").trim()}); if(!hv.length)return null;
-    return hv[Math.floor(Date.now()/3600000)%hv.length];
+    return hv[Math.floor(Date.now()/600000)%hv.length];   // 10분마다 다음 구절
   }
   setTimeout(function(){   // 처음 한 번: 말씀해 주신 정각 말씀을 넣어 둠
     var o=sayData(); if(o.seedHv)return; o.seedHv=1;
@@ -10027,7 +10027,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   var say=null;
   function closeSay(){if(!say)return; say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
-  // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 매시 00분에 나옴
+  // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 10분마다 나옴
   var sayMode="s";
   function openSay(focus,mode){
     sayMode=mode==="v"?"v":"s";
@@ -10071,7 +10071,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
       row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
       var hvl=document.createElement("label"); hvl.className="sayhvl";
-      hvl.innerHTML='<input type="checkbox" class="sayhv"><span>⏰ 정각 말씀 — 매시 00분(12:00, 13:00 …)에 나와요. 말한 분 칸에 구절(예: 로마서 12:21)을 적어 주세요</span>';
+      hvl.innerHTML='<input type="checkbox" class="sayhv"><span>⏰ 짧은 말씀 — 10분마다(12:00, 12:10, 12:20 …) 나와요. 말한 분 칸에 구절(예: 로마서 12:21)을 적어 주세요</span>';
       hvl.querySelector("input").checked=sayMode==="v"; hvl.hidden=true; form.appendChild(hvl);
       var row2=document.createElement("div"); row2.className="sayrow2";
       var sel=document.createElement("select"); sel.className="field saynote"; sel.setAttribute("aria-label","붙일 말씀");
@@ -10087,7 +10087,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:!x.hv});
     if(!items.length&&!sayEdit){
       var em=document.createElement("p"); em.className="sayempty";
-      em.textContent=sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 매시 00분에 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
+      em.textContent=sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 10분마다(00·10·20…분) 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
       list.appendChild(em); return;
     }
     items.forEach(function(x){
@@ -10098,7 +10098,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var f=document.createElement("div"); f.className="sayf";
       if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
       if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
-      if(x.hv){var hvt=document.createElement("span"); hvt.className="saytag sayhvtag"; hvt.textContent="⏰ 매시 00분"; f.appendChild(hvt); c.classList.add("hv")}
+      if(x.hv){var hvt=document.createElement("span"); hvt.className="saytag sayhvtag"; hvt.textContent="⏰ 10분마다"; f.appendChild(hvt); c.classList.add("hv")}
       if(x.note&&notes.has(x.note)){
         var nb=document.createElement("button"); nb.type="button"; nb.className="saynotebtn"; nb.dataset.act="note"; nb.dataset.note=x.note;
         nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
@@ -10582,7 +10582,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var q=document.createElement("button"); q.type="button"; q.className="bsq"; q.title="믿음의 한 마디 모두 보기";
     if(next)BS.ci=(BS.ci+1)%BS_COL.length; q.style.setProperty("--bsc",BS_COL[BS.ci]);
     q.textContent=(sd.hv?"📖  ":"💬  “")+String(sd.t).replace(/\s+/g," ")+(sd.hv?"":"”");
-    if(sd.hv){q.classList.add("bshv"); q.style.setProperty("--bsc","#FFD36B"); q.title="정각 말씀 (매시 00분)"}
+    if(sd.hv){q.classList.add("bshv"); q.style.setProperty("--bsc","#FFD36B"); q.title="짧은 말씀 (10분마다)"}
     if(sd.who){var w=document.createElement("small"); w.textContent="— "+sd.who; q.appendChild(w)}
     var pb=document.createElement("button"); pb.type="button"; pb.className="saypin"+(isPin?" on":""); pb.dataset.sid=sd.id;
     pb.textContent="📌"; pb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; pb.setAttribute("aria-label",pb.title); pb.setAttribute("aria-pressed",String(isPin));
