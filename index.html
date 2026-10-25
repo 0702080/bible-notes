@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-6">
+<meta name="app-build" content="2026-10-25-7">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2882,7 +2882,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .sayhvl{display:flex;align-items:flex-start;gap:8px;margin:8px 0;font-size:13px;line-height:1.5;color:var(--muted);cursor:pointer}
 .sayhvl[hidden]{display:none}
 .sayhvl input{width:18px;height:18px;margin-top:1px;accent-color:var(--gold);flex:0 0 auto}
-.sayhvtag{color:var(--gold)!important;border-color:color-mix(in srgb,var(--gold) 45%,transparent)!important}
+.sayhvtag{position:relative;display:inline-flex;align-items:center;gap:4px;cursor:pointer;color:var(--gold)!important;border-color:color-mix(in srgb,var(--gold) 45%,transparent)!important}
+.sayhvtag.set{background:color-mix(in srgb,var(--gold) 16%,transparent)}
+.sayhvtm{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;cursor:pointer;color-scheme:dark}
+.sayhvx{position:relative;z-index:1;border:0;background:transparent;color:var(--gold);font-size:13px;line-height:1;padding:0 0 0 4px;cursor:pointer}
 .saycard.hv{border-left-color:var(--gold)}
 .bsq.bshv{font-weight:700}
 .dlactref{max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -10002,9 +10005,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function sayPinned(){try{var o=JSON.parse(localStorage.getItem(SAY_PIN)||"null");if(o&&o.id&&Date.now()<+o.until)return o}catch(e){}return null}
   // ⏰ 짧은 말씀: 10분마다(00·10·20·30·40·50분, 그 1분 동안 — 2026-10-25 사용자 요청으로 매시 00분에서 바꿈)에는 '정각 말씀'으로 담은 한 줄 말씀이 나옴 (2026-10-24 사용자 요청)
   function sayHour(){
-    if(new Date().getMinutes()%10!==0)return null;
     var hv=sayData().items.filter(function(x){return x.hv&&String(x.t||"").trim()}); if(!hv.length)return null;
-    return hv[Math.floor(Date.now()/600000)%hv.length];   // 10분마다 다음 구절
+    // 시계로 시각을 정한 말씀: 매일 그 시각부터 3분 동안 (2026-10-25 사용자 요청)
+    var d=new Date(), now=d.getHours()*60+d.getMinutes();
+    for(var i=0;i<hv.length;i++){var tm=hv[i].tm; if(/^\d\d:\d\d$/.test(tm||"")){var m=(+tm.slice(0,2))*60+(+tm.slice(3)), df=(now-m+1440)%1440; if(df<3)return hv[i]}}
+    // 시각을 안 정한 말씀: 10분마다(00·10·20…분) 그 1분 동안 돌아가며
+    if(d.getMinutes()%10!==0)return null;
+    var free=hv.filter(function(x){return !x.tm}); if(!free.length)return null;
+    return free[Math.floor(Date.now()/600000)%free.length];
   }
   setTimeout(function(){   // 처음 한 번: 말씀해 주신 정각 말씀을 넣어 둠
     var o=sayData(); if(o.seedHv)return; o.seedHv=1;
@@ -10071,7 +10079,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
       row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
       var hvl=document.createElement("label"); hvl.className="sayhvl";
-      hvl.innerHTML='<input type="checkbox" class="sayhv"><span>⏰ 짧은 말씀 — 10분마다(12:00, 12:10, 12:20 …) 나와요. 말한 분 칸에 구절(예: 로마서 12:21)을 적어 주세요</span>';
+      hvl.innerHTML='<input type="checkbox" class="sayhv"><span>⏰ 짧은 말씀 — 10분마다(12:00, 12:10 …) 나와요. 담은 뒤 ⏰를 눌러 시각을 정하면 매일 그 시각에 나와요. 말한 분 칸에 구절(예: 로마서 12:21)을 적어 주세요</span>';
       hvl.querySelector("input").checked=sayMode==="v"; hvl.hidden=true; form.appendChild(hvl);
       var row2=document.createElement("div"); row2.className="sayrow2";
       var sel=document.createElement("select"); sel.className="field saynote"; sel.setAttribute("aria-label","붙일 말씀");
@@ -10098,7 +10106,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var f=document.createElement("div"); f.className="sayf";
       if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
       if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
-      if(x.hv){var hvt=document.createElement("span"); hvt.className="saytag sayhvtag"; hvt.textContent="⏰ 10분마다"; f.appendChild(hvt); c.classList.add("hv")}
+      if(x.hv){   // ⏰ 누르면 시계가 떠서 나올 시각을 정함 (비우면 10분마다)
+        var hvt=document.createElement("label"); hvt.className="saytag sayhvtag"+(x.tm?" set":""); hvt.title="눌러서 이 말씀이 나올 시각 정하기";
+        var hs=document.createElement("span"); hs.textContent=x.tm?"⏰ 매일 "+x.tm:"⏰ 10분마다 · 시각 정하기"; hvt.appendChild(hs);
+        var hi=document.createElement("input"); hi.type="time"; hi.className="sayhvtm"; hi.value=x.tm||""; hi.dataset.id=x.id; hi.setAttribute("aria-label","이 말씀이 나올 시각"); hvt.appendChild(hi);
+        if(x.tm){var hx=document.createElement("button"); hx.type="button"; hx.className="sayhvx"; hx.dataset.act="hvclear"; hx.textContent="×"; hx.title="시각 지우기 (10분마다로)"; hvt.appendChild(hx)}
+        f.appendChild(hvt); c.classList.add("hv");
+      }
       if(x.note&&notes.has(x.note)){
         var nb=document.createElement("button"); nb.type="button"; nb.className="saynotebtn"; nb.dataset.act="note"; nb.dataset.note=x.note;
         nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
@@ -10173,10 +10187,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(){if(sayDrag)end();clearTimeout(hold);pend=null});
     list.addEventListener("contextmenu",function(e){if(sayDrag||pend)e.preventDefault()});
   }
+  document.addEventListener("click",function(e){var i=e.target.closest&&e.target.closest(".sayhvtm"); if(i)try{i.showPicker()}catch(err){}});
+  document.addEventListener("change",function(e){
+    var i=e.target; if(!i.classList||!i.classList.contains("sayhvtm"))return;
+    var o=sayData(), x=o.items.filter(function(y){return y.id===i.dataset.id})[0]; if(!x)return;
+    x.tm=/^\d\d:\d\d$/.test(i.value)?i.value:""; x.at=Date.now(); saveSay(o); drawSay(); renderReviewBar();
+    toast(x.tm?"⏰ 매일 "+x.tm+"에 이 말씀이 나와요":"10분마다 돌아가며 나와요");
+  });
   function sayClick(e){
     var b=e.target.closest("button"); if(!b)return;
     var act=b.dataset.act||"", card=b.closest(".saycard"), id=card?card.dataset.id:"";
     if(act==="cancel"){sayEdit="";drawSay();return}
+    if(act==="hvclear"){e.preventDefault(); var oo=sayData(), xx=oo.items.filter(function(y){return y.id===id})[0]; if(xx){xx.tm="";xx.at=Date.now();saveSay(oo);drawSay();renderReviewBar();toast("10분마다 돌아가며 나와요")} return}
     if(act==="save"){
       var t=say.querySelector(".sayt").value.trim();
       if(!t){toast("한 마디를 적어 주세요");return}
