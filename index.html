@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-17">
+<meta name="app-build" content="2026-10-25-19">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2630,6 +2630,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqqt:focus{outline:none;border-bottom-color:#5FD3B4}
 .mqqt{color:#7FE3C6!important}   /* 질문 글씨는 민트색 (2026-10-25 사용자 요청) */
 .mqqt::placeholder{color:var(--faint);font-weight:400}
+.mqfold{flex:0 0 auto;width:24px;height:24px;margin-right:2px;border:1px solid #2E2D34;border-radius:12px;background:transparent;color:var(--faint);display:grid;place-items:center;cursor:pointer;padding:0}
+.mqfold::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(2px) rotate(-135deg);transition:transform .2s}
+.mqitem.mqfolded .mqfold::before{transform:translateY(-2px) rotate(45deg)}
+@media (hover:hover){.mqfold:hover{color:var(--ink);border-color:#45434E}}
+.mqitem.mqfolded .mqa,.mqitem.mqfolded .mqsl,.mqitem.mqfolded .mqrow{display:none!important}
+.mqitem.mqfolded .mqq{margin-bottom:4px}
+.mqpeek{margin:0 0 0 46px;font-size:13px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mqdel{flex:0 0 auto;height:24px;padding:0 8px;border:1px solid #2E2D34;border-radius:12px;background:transparent;color:var(--faint);font:inherit;font-size:11.5px;line-height:1}
 .mqdel.sure{color:var(--pink);border-color:color-mix(in srgb,var(--pink) 50%,#34333A)}
 .mqrow{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px}
@@ -2662,6 +2669,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqa:focus{outline:none;border-color:var(--gold)}
 .mqa::placeholder{color:var(--faint)}
 .mqhint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
+.mqbox>.mqhint,.mqbox>.mqfoottop{display:none}   /* 안내 문구·답한 수는 뺌 (2026-10-25 사용자 요청) */
 .mqfoot{display:flex;align-items:center;gap:10px;margin:2px 0 10px}
 .mqcnt{font-size:12.5px;color:var(--faint)}
 .mqtomed{margin-left:auto;height:32px;padding:0 14px;border:0;border-radius:16px;background:var(--gold);color:#141416;font:inherit;font-size:12.5px;font-weight:700}
@@ -10600,6 +10608,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(b.classList.contains("mqtip")){mqAdd(b.textContent);return}
         var c=b.closest(".mqitem"), id=c?c.dataset.id:"";
         if(b.classList.contains("mqtomed")){medqToMed(id);return}
+        if(b.classList.contains("mqfold")){if(mqFold.has(id))mqFold.delete(id); else mqFold.add(id); try{localStorage.setItem("bible-mq-fold",JSON.stringify(Array.from(mqFold)))}catch(err){} drawMedq(); return}
         if(b.classList.contains("mqsort")){if(!mqSort.has(id)&&c.querySelector(".mqa").value.split("\n").length<2){toast("답이 두 줄 이상일 때 문장을 옮길 수 있어요");return} if(mqSort.has(id))mqSort.delete(id); else mqSort.add(id); drawMedq(); return}
         if(b.classList.contains("mqopen")){var nid=b.dataset.note; closeMedq(); openNoteFocus(nid,"m"); return}
         if(b.classList.contains("mqdel")){
@@ -10618,6 +10627,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     mq.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawMedq();
   }
+  var mqFold=new Set(); try{(JSON.parse(localStorage.getItem("bible-mq-fold")||"[]")||[]).forEach(function(x){mqFold.add(x)})}catch(e){}
   function mqCard(it,i){
     var c=document.createElement("div"); c.className="mqitem"; c.dataset.id=it.id;
     var h=document.createElement("div"); h.className="mqq";
@@ -10626,8 +10636,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var qt=document.createElement("textarea"); qt.className="mqqt"; qt.rows=1; qt.value=it.q||"";
     qt.placeholder="내가 던지는 질문을 적어 보세요"; qt.setAttribute("aria-label","질문"); h.appendChild(qt);
     var sv=document.createElement("small"); sv.className="mqsaved"; h.appendChild(sv);
+    // 카드 접기·펼치기 (2026-10-25 사용자 요청): 접으면 질문만, 답은 첫 줄만 흐리게
+    var fd=mqFold.has(it.id); if(fd)c.classList.add("mqfolded");
+    var fb=document.createElement("button"); fb.type="button"; fb.className="mqfold"; fb.title=fd?"펼치기":"접기"; fb.setAttribute("aria-label",fb.title); fb.setAttribute("aria-expanded",String(!fd)); h.appendChild(fb);
     var del=document.createElement("button"); del.type="button"; del.className="mqdel"; del.title="이 질문 지우기"; del.setAttribute("aria-label","이 질문 지우기"); del.textContent="✕"; h.appendChild(del);
     c.appendChild(h);
+    if(fd){var pv=document.createElement("p"); pv.className="mqpeek"; var a1=String(it.a||"").trim(); pv.textContent=a1?a1.split("\n")[0]+(a1.indexOf("\n")>=0?" …":""):"아직 답이 없어요"; c.appendChild(pv)}
     var ta=document.createElement("textarea"); ta.className="mqa"; ta.value=it.a||"";
     ta.placeholder="내 답을 적어 보세요"; ta.setAttribute("aria-label","답"); c.appendChild(ta);
     var lines=String(it.a||"").split("\n");
