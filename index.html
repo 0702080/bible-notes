@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-13">
+<meta name="app-build" content="2026-10-25-14">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10120,11 +10120,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var cur=null;
     function fit(){
       if(!cur||!cur.isConnected||document.activeElement!==cur||!mq||mq.hidden)return;
-      var vv=window.visualViewport, vh=vv?vv.height:innerHeight;
+      var vv=window.visualViewport, vh=vv?vv.height:innerHeight, vtop=vv?vv.offsetTop:0, vbot=vtop+vh;   // 키보드가 화면을 가리기만 하는 브라우저(보이는 영역만 줄어듦)도 맞게
       var body=mq.querySelector(".dlbody"), fx=mq.querySelector(".dlfix"), it=cur.closest(".mqitem");
-      var topLine=fx?fx.getBoundingClientRect().bottom:0;
+      body.style.paddingBottom=Math.round(innerHeight)+"px";   // 마지막 질문도 위로 끝까지 올릴 수 있게 아래 여백을 잠시 크게
+      var topLine=Math.max(fx?fx.getBoundingClientRect().bottom:0,vtop);
       var dy=it.getBoundingClientRect().top-(topLine+6); if(Math.abs(dy)>2)body.scrollTop+=dy;   // 질문 카드 머리가 고정 줄 바로 아래로
-      var tt=cur.getBoundingClientRect().top, hpx=Math.max(140,Math.round(vh-tt-10))+"px";
+      var tt=cur.getBoundingClientRect().top, hpx=Math.max(140,Math.round(vbot-tt-10))+"px";
       if(cur.style.height!==hpx)cur.style.height=hpx;
     }
     document.addEventListener("focusin",function(e){
@@ -10133,8 +10134,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       cur=t; t.classList.add("dlbig","mqbig");
       var n=0; (function tick(){if(cur!==t)return; fit(); if(++n<20)setTimeout(tick,100)})();
     });
-    document.addEventListener("focusout",function(e){if(e.target===cur){var t=cur;cur=null;t.classList.remove("dlbig","mqbig");t.style.height="";grow(t)}});
-    if(window.visualViewport)window.visualViewport.addEventListener("resize",function(){if(cur)fit()});
+    document.addEventListener("focusout",function(e){if(e.target===cur){var t=cur;cur=null;t.classList.remove("dlbig","mqbig");t.style.height="";grow(t);var bd=mq&&mq.querySelector(".dlbody");if(bd)bd.style.paddingBottom=""}});
+    if(window.visualViewport){window.visualViewport.addEventListener("resize",function(){if(cur)fit()});window.visualViewport.addEventListener("scroll",function(){if(cur)fit()})}
     window.addEventListener("resize",function(){if(cur)fit()});
   })();
   function mqRedrawSoon(){
