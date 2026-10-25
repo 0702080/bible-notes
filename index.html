@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-24">
+<meta name="app-build" content="2026-10-25-25">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10171,13 +10171,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     document.addEventListener("focusin",function(e){
       if(e.target.id!=="mText"||(window.matchMedia&&matchMedia("(min-width:900px)").matches))return;
-      cur=e.target; $("addSheet").classList.add("mtbig");
+      cur=e.target; cur.classList.add("dlbig"); $("addSheet").classList.add("mtbig");   // dlbig: 적는 동안 글자 수에 맞춰 줄어들지 않게
       var n=0; (function tick(){if(cur!==e.target)return; fit(); if(++n<20)setTimeout(tick,100)})();
     });
     document.addEventListener("focusout",function(e){
       if(e.target!==cur)return; cur=null;
       var sh=$("addSheet"), pn=sh.querySelector(".sheetpanel"); sh.classList.remove("mtbig");
-      pn.style.top=""; pn.style.height=""; pn.style.maxHeight=""; e.target.style.height="";
+      pn.style.top=""; pn.style.height=""; pn.style.maxHeight=""; e.target.classList.remove("dlbig"); e.target.style.height=""; grow(e.target);
     });
     if(window.visualViewport){window.visualViewport.addEventListener("resize",fit);window.visualViewport.addEventListener("scroll",fit)}
     window.addEventListener("resize",fit);
