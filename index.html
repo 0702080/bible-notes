@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-4">
+<meta name="app-build" content="2026-10-25-5">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3568,7 +3568,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var bte=cd.querySelector(".bctext"), braw=String(n.text||"");
         if(filterText&&(has(btxt)||has(braw))){   // 찾은 말이 보이게 다 펼치고, 말씀 카드와 같은 절 배치로 (2026-10-17 사용자 요청)
           markInto(bte,braw,filterText); vLines(bte); bte.classList.add("full");
-        }else bte.textContent=btxt;
+        }else bcVerseNums(bte,btxt);   // 암송 단계 칸반도 절 번호를 같은 모양으로
         cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
         if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
         cd.querySelector(".bcgo").textContent=col.k==="due"?"🔁 복습하기":col.k==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
