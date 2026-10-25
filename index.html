@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-25-21">
+<meta name="app-build" content="2026-10-25-22">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1151,6 +1151,8 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .rdpbar{display:none;gap:8px;justify-content:center;flex-wrap:wrap;padding:10px 16px 14px;border-top:1px solid #222126}
 .reader.nosample .rdpbar{display:flex}
 .reader.nosample .rdhb,.reader.nosample .rdalt{display:none}
+.reader.nosample.noread .rdhb{display:block;margin:16px 16px 0;padding:16px 14px;font-size:16px;background:color-mix(in srgb,var(--orange) 10%,transparent)}
+.reader.nosample.noread .rdalt{display:block}
 .rdpbar button{height:38px;padding:0 14px;border:1px solid #34333A;border-radius:19px;background:transparent;color:var(--ink);font-size:13.5px;white-space:nowrap}
 .rdpbar .rdcard{border-color:color-mix(in srgb,var(--violet) 55%,#34333A);color:var(--violet);font-weight:700}
 .rdpbar .rdcard[hidden]{display:none}
@@ -11267,7 +11269,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       rd=document.createElement("div"); rd.className="reader"; rd.setAttribute("role","dialog"); rd.setAttribute("aria-modal","true");
       rd.innerHTML='<div class="rdbar"><div class="rdtitle"><b class="rdname"></b><span class="rdver">개역한글</span></div><div class="rdbtns"><a class="rdout" target="_blank" rel="noopener" title="새 탭에서 열기" aria-label="새 탭에서 열기">↗</a><button type="button" class="rdclose">닫기</button></div></div>'+
         '<a class="rdhb" target="_blank" rel="noopener">개역개정으로 보기 (대한성서공회) ↗</a>'+
-        '<p class="rdalt">안 열리면 <a class="rdhb2" target="_blank" rel="noopener">홀리바이블로 보기</a>를 길게 눌러 크롬에서 열어 주세요.</p>'+
+        '<p class="rdalt">안 열리면 <a class="rdhb2" target="_blank" rel="noopener">홀리바이블로 보기</a></p>'+
         '<div class="rdscroll"><ol class="rdlist"></ol><div class="rdmsg" aria-live="polite"></div>'+'</div>'+
         '<div class="rdpbar"><button type="button" class="rdchm" hidden>🧠 한 장 암송</button><button type="button" class="rdedit" hidden>✏️ 본문 고치기</button><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button><button type="button" class="rdcard" hidden>📌 이 장을 말씀 카드로 담기</button></div>'+
         '<div class="rdpform" hidden><p class="rdphint">성서공회나 홀리바이블에서 장 본문을 복사해 붙여 넣으세요. 절 번호(1, 2, 3 …)가 있으면 그대로 나누고, 없으면 한 줄을 한 절로 보고 번호를 붙여요. 이 기기에만 저장돼요.</p>'+
@@ -11771,10 +11773,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     rd.querySelector(".rdchm").hidden=!(saved&&saved.v&&saved.v.length>=2);
     var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1], cardBtn=rd.querySelector(".rdcard");
     cardBtn.hidden=!saved||!!myNoteAt(bk,ch,0);
+    rd.classList.toggle("noread",!saved);
     if(saved){msg.textContent="";drawReader(saved.v,+rd.dataset.hl);return}
     rd.querySelector(".rdlist").textContent="";
-    var pf=rd.querySelector(".rdpform"); if(pf.hidden){pf.hidden=false;setTimeout(function(){var t=pf.querySelector(".rdptext");if(t&&!t.value)t.focus()},120)}
-    msg.textContent="홀리바이블 탭에서 이 장 본문을 절 번호까지 복사한 뒤, 아래 [복사한 본문 붙여넣기]를 눌러 붙여 넣으세요. 한 번 저장하면 다음부터는 여기서 바로 읽을 수 있어요.";
+    // 아직 저장한 본문이 없으면: 바로 읽을 수 있는 큰 링크를 맨 위에 (붙여넣기 칸은 저절로 열지 않음, 2026-10-25 사용자 요청)
+    var nm=rd.querySelector(".rdname").textContent;
+    rd.querySelector(".rdhb").textContent="📖 "+nm+" 읽기 (대한성서공회 개역개정) ↗";
+    msg.textContent="위 단추를 누르면 새 탭에서 "+nm+"을(를) 바로 읽을 수 있어요. 본문을 복사해 아래 [붙여넣기]로 저장해 두면 다음부터는 이 창에서 바로 읽혀요.";
   }
   function closeReader(){if(!rd)return; if(rdCtl)rdCtl.abort(); rd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
   function drawReader(verses,hl){
