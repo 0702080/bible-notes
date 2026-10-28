@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-5">
+<meta name="app-build" content="2026-10-29-6">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3104,6 +3104,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dladd button{flex:0 0 auto;height:40px;padding:0 14px;border-radius:20px;white-space:nowrap}
 .dlbar .dltitle{flex:1;min-width:0}
 .dledit{flex:0 0 auto;height:36px;padding:0 14px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--muted);font-size:13px;white-space:nowrap}
+@media (max-width:430px){.dltitle{white-space:nowrap;font-size:15px!important}.dlbar .dledit{padding:0 9px!important;font-size:12px!important}}
+.dlfocus{max-width:560px;margin:8px auto 24px;display:flex;flex-direction:column;gap:12px}
+.dlfhd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px}
+.dlfhd b{font-size:18px;color:var(--gold)}
+.dlfhd span{font-size:13px;color:var(--green)}
+.dlfit{display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;column-gap:14px;align-items:center;width:100%;padding:18px 18px;border:1px solid color-mix(in srgb,var(--gc,var(--gold)) 40%,#2A2930);border-radius:18px;background:linear-gradient(180deg,color-mix(in srgb,var(--gc,var(--gold)) 10%,#17161C),#121116);color:var(--ink);text-align:left;cursor:pointer;transition:transform .15s,opacity .3s}
+.dlfit:active{transform:scale(.98)}
+.dlfck{grid-row:1/3;width:30px;height:30px;border:2px solid color-mix(in srgb,var(--gc,var(--gold)) 70%,transparent);border-radius:50%}
+.dlft{font-size:17px;line-height:1.5;font-weight:700}
+.dlfit small{font-size:12px;color:var(--faint)}
+.dlfit.done{opacity:.4}
+.dlfit.done .dlfck{background:var(--gc,var(--gold));border-color:var(--gc,var(--gold))}
+.dlfall{text-align:center;font-size:16px;color:var(--green);margin:18px 0}
+.dlffoot{display:flex;justify-content:center;gap:8px;margin-top:6px}
+.dlffoot button{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--muted);font-size:13px;cursor:pointer}
+.dllist.dlfocusing{column-width:auto;columns:auto;display:block}
 .dledit.on{color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,#34333A);background:color-mix(in srgb,var(--gold) 12%,transparent)}
 @media (max-width:420px){.dlbar{gap:6px;padding:12px max(12px,calc((100% - 608px) / 2))}.dltitle{font-size:16px}.dledit{padding:0 10px;font-size:12px}.dlclose{padding:0 12px;font-size:13.5px}}
 @media (max-width:400px){.dlg{max-width:96px}}
@@ -9081,7 +9097,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function openDaily(day,focusId){
     if(!dl){
       dl=document.createElement("div"); dl.className="daily"; dl.setAttribute("role","dialog"); dl.setAttribute("aria-modal","true"); dl.hidden=true;
-      dl.innerHTML='<div class="dlbar"><b class="dltitle">🌙 하루 돌아보기</b><button type="button" class="dledit">✏️ 항목 고치기</button><button type="button" class="dlclose">닫기</button></div>'+
+      dl.innerHTML='<div class="dlbar"><b class="dltitle">🌙 하루 돌아보기</b><button type="button" class="dledit dlfocusbtn">🎯 집중</button><button type="button" class="dledit">✏️ 항목 고치기</button><button type="button" class="dlclose">닫기</button></div>'+
         // 고치기 때 새 항목 · 새 묶음 칸은 제목 바로 아래 고정 (2026-10-17 사용자 요청)
         '<div class="dltop" hidden>'+
         '<form class="dladd" autocomplete="off" hidden><select class="field dlg" aria-label="묶음"></select><input class="field dlin" maxlength="40" placeholder="새 항목 (예: 먼저 인사했는가)" aria-label="새 항목"><button type="submit" class="primary">추가</button></form>'+
@@ -9119,7 +9135,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       dl.querySelector(".dlnext").addEventListener("click",function(){var t=dkey(Date.now());if(dlDay<t){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()+864e5);drawDaily()}});
       dl.querySelector(".dlweek").addEventListener("click",function(e){var b=e.target.closest(".dlw");if(b&&b.dataset.day&&b.dataset.day!==dlDay){dlDay=b.dataset.day;drawDaily()}});   // 요일 칸을 누르면 그날로
       dlWeekSwipe(dl.querySelector(".dlweek"));   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
-      dl.querySelector(".dledit").addEventListener("click",function(){dlEdit=!dlEdit;dlEditId="";dlGEditId="";dlMemoId="";drawDaily()});
+      dl.querySelector(".dlfocusbtn").addEventListener("click",function(){dlFocus=!dlFocus; dlFocusSkip=0; dlEdit=false; try{localStorage.setItem("bible-dl-focus",dlFocus?"1":"")}catch(err){} drawDaily()});
+      dl.querySelector(".dledit:not(.dlfocusbtn)").addEventListener("click",function(){dlEdit=!dlEdit;dlEditId="";dlGEditId="";dlMemoId="";drawDaily()});
       // 기록칸에 적으면 바로 저장
       dl.querySelector(".dllist").addEventListener("input",function(e){
         var ta=e.target; if(ta.tagName!=="TEXTAREA")return;
@@ -9227,6 +9244,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             drawDaily(); return;
           }
           var icon=icToggle(iid,dlDay); buzz(icon?[12,40,18]:8); drawDaily(); return}
+        if(b.classList.contains("dlfit")){   // 집중 칸: 누르면 했어요 체크
+          var fid=b.dataset.fid, dd=o.days[dlDay]||[]; if(dd.indexOf(fid)<0)dd.push(fid); o.days[dlDay]=dd; saveDaily(o);
+          b.classList.add("done"); buzz([12,40,18]); setTimeout(function(){drawDaily(); renderReviewBar()},380);
+          if(dailyChecked(o,dlDay).length===o.items.length){toast("오늘 하루를 다 돌아봤어요 🙌")}
+          return;
+        }
+        if(b.classList.contains("dlfnext")){dlFocusSkip+=3; drawDaily(); return}
+        if(b.classList.contains("dlfoff")){dlFocus=false; try{localStorage.setItem("bible-dl-focus","")}catch(err){} drawDaily(); return}
         if(b.classList.contains("dlactref")){closeDaily();openNoteFocus(b.dataset.nid);return}
         if(b.classList.contains("dlactrow")){   // 말씀 실천 체크 = 그날 실천 도장
           var an=notes.get(b.dataset.nid), aa=an&&(an.acts||[]).find(function(x){return x.id===b.dataset.aid}); if(!aa)return;
@@ -9541,6 +9566,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     wk.addEventListener("pointerup",end); wk.addEventListener("pointercancel",end);
     wk.addEventListener("click",function(e){if(eat){e.stopPropagation();e.preventDefault()}},true);
   }
+  var dlFocus=false, dlFocusSkip=0; try{dlFocus=localStorage.getItem("bible-dl-focus")==="1"}catch(e){}
   function drawDaily(){
     var o=dailyData(), on=dailyChecked(o,dlDay), today=dkey(Date.now());
     dl.querySelector(".dldate").textContent=(dlDay===today?"오늘 ":dlDay===dkey(Date.now()-864e5)?"어제 ":"")+dayName(dlDay);
@@ -9581,6 +9607,31 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       wk.appendChild(d);
     }
     var list=dl.querySelector(".dllist"), outer=list; list.textContent="";
+    var fbtn=dl.querySelector(".dlfocusbtn"); if(fbtn){fbtn.classList.toggle("on",dlFocus); fbtn.textContent=dlFocus?"🎯 집중 중":"🎯 집중"}
+    list.classList.toggle("dlfocusing",dlFocus&&!dlEdit&&!dlFind);
+    if(dlFocus&&!dlEdit&&!dlFind){   // 🎯 집중: 아직 안 한 것 중 세 가지만 크게
+      var gsF=dlSortGroups(o,dlGroups(o)), ordF=[];
+      gsF.forEach(function(g){o.items.forEach(function(it){if(it.g===g.g)ordF.push({it:it,g:g})})});
+      var todo=ordF.filter(function(x){return on.indexOf(x.it.id)<0}), doneN=ordF.length-todo.length;
+      var wrap=document.createElement("section"); wrap.className="dlfocus";
+      var hd=document.createElement("div"); hd.className="dlfhd";
+      hd.innerHTML='<b>오늘은 이것만 해 볼까요?</b><span></span>';
+      hd.querySelector("span").textContent=doneN?"오늘 "+doneN+"개 했어요 🙌":"";
+      wrap.appendChild(hd);
+      if(!todo.length){var al=document.createElement("p"); al.className="dlfall"; al.textContent="오늘 할 일을 모두 했어요. 잘하셨어요! 🙌"; wrap.appendChild(al)}
+      var st=todo.length?dlFocusSkip%todo.length:0, pick=todo.slice(st,st+3); if(pick.length<3)pick=pick.concat(todo.slice(0,Math.min(3-pick.length,st)));
+      pick.forEach(function(x){
+        var b=document.createElement("button"); b.type="button"; b.className="dlfit"; b.dataset.fid=x.it.id; b.style.setProperty("--gc",x.g.c);
+        b.innerHTML='<span class="dlfck" aria-hidden="true"></span><span class="dlft"></span><small></small>';
+        b.querySelector(".dlft").textContent=x.it.t; b.querySelector("small").textContent=x.g.e+" "+x.g.t;
+        wrap.appendChild(b);
+      });
+      var ft=document.createElement("div"); ft.className="dlffoot";
+      if(todo.length>3){var nx=document.createElement("button"); nx.type="button"; nx.className="dlfnext"; nx.textContent="다른 것 보기 ↻"; ft.appendChild(nx)}
+      var all=document.createElement("button"); all.type="button"; all.className="dlfoff"; all.textContent="전체 보기 ("+todo.length+"개 남음)"; ft.appendChild(all);
+      wrap.appendChild(ft); list.appendChild(wrap);
+      return;
+    }
     var fq=dlFind, fcount=0;
     var gs=dlSortGroups(o,dlGroups(o)), sel=dl.querySelector(".dlg"), keep=dlPickG||sel.value;
     sel.innerHTML=gs.map(function(g){return '<option value="'+g.g+'">'+g.e+' '+g.t.replace(/[<&"]/g,"")+'</option>'}).join(""); if(keep&&gs.some(function(g){return g.g===keep}))sel.value=keep; dlPickG="";
@@ -9854,7 +9905,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     outer.classList.toggle("dlsolo",!!fq);   // 찾아서 걸러진 묶음은 화면 가운데에 나란히 (2026-10-24 사용자 요청)
     if(fq&&!fcount){var nh=document.createElement("p");nh.className="dlnohit";nh.textContent="“"+fq+"”이(가) 든 묶음·항목·기록이 없어요.";outer.appendChild(nh)}
     dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit; dl.querySelector(".dltop").hidden=!dlEdit;
-    var eb=dl.querySelector(".dledit"); eb.textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기"; eb.classList.toggle("on",dlEdit);
+    var eb=dl.querySelector(".dledit:not(.dlfocusbtn)"); eb.textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기"; eb.classList.toggle("on",dlEdit);
   }
 
   // 체크 항목 글에 있는 성경 구절(예: 시편 91편, 요한복음 3장, 로마서 8:28)을 눌러서 읽을 수 있게
