@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-2">
+<meta name="app-build" content="2026-10-29-3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -717,6 +717,11 @@ a.addbtn{display:inline-flex;align-items:center;text-decoration:none}
 .addbtn.gd{color:var(--gold)}
 .eintro{font-size:13.5px;color:var(--muted);margin:0 0 6px;line-height:1.6}
 .eintro[hidden]{display:none}
+.frexpbox{margin-top:16px;padding-top:12px;border-top:1px dashed #2A2930}
+.frexph{margin-bottom:8px;font-size:13.5px;font-weight:700;color:var(--sky)}
+.frexp{margin:6px 0 10px;padding:10px 12px;border-left:2px solid color-mix(in srgb,var(--sky) 55%,transparent);border-radius:0 10px 10px 0;background:color-mix(in srgb,var(--sky) 5%,transparent)}
+.frext{display:block;margin-bottom:4px;color:var(--ink)}
+.frexb{margin:0;white-space:pre-wrap;font-size:14.5px;line-height:1.7;color:var(--ink)}
 .fruitbox{margin:0 0 14px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--pink) 30%,#2A2930);border-radius:12px;background:color-mix(in srgb,var(--pink) 6%,transparent)}
 .fruith{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:14px;color:var(--pink)}
 .fruith b{font-weight:700}
@@ -4618,6 +4623,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           '<div class="eintro">이 말씀이 내 삶에서 살아 움직인 순간을 이야기로 적어 보세요.</div>'+
           '<div class="qbtns" style="margin:0 0 10px -10px"><button type="button" class="addbtn gd adde">+ 새 경험 쓰기</button></div>'+
           '<div class="essays"></div>'+
+          '<div class="frexpbox" hidden></div>'+
         '</div>'+
         '<div class="pane" data-pane="r" hidden>'+
           '<div class="rsec"><div class="rtitle">설교 요약</div>'+
@@ -4849,7 +4855,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var allFolded=roots.length&&roots.every(function(r){return qFold.has(r.id)});
     tools.querySelector(".qfoldall").textContent=allFolded?"모두 펼치기":"모두 접기";
     renderRes(el,n);
-    renderEssays(el,n); renderFruits(el,n);
+    renderEssays(el,n); renderFruits(el,n); renderFriendExp(el,n);
     renderActProg(el,n);
     var abox=el.querySelector(".acts"), ahave=new Map();
     Array.prototype.forEach.call(abox.children,function(c){ahave.set(c.dataset.aid,c)});
@@ -12163,6 +12169,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(e.key!=="Enter"||e.isComposing||e.keyCode===229||!e.target.classList||!e.target.classList.contains("fruitin"))return;
     e.preventDefault(); var ab=e.target.parentNode.querySelector(".fruitadd"); if(ab)ab.click();
   });
+  function renderFriendExp(el,n){   // 경험 탭 아래: 같은 말씀에 친구들이 적은 경험·열매
+    var box=el.querySelector(".frexpbox"); if(!box)return;
+    var posts=friendPostsFor(n).filter(function(p){return (p.d.exps||[]).length||(p.d.fruits||[]).length});
+    var sig=JSON.stringify(posts.map(function(p){return [p.f.id,p.d.exps,p.d.fruits]})); if(box.dataset.sig===sig)return; box.dataset.sig=sig;
+    box.textContent=""; box.hidden=!posts.length; if(!posts.length)return;
+    box.appendChild(mk("div","frexph","👥 친구들의 경험 "+posts.length+"명"));
+    posts.forEach(function(p){box.appendChild(friendPost(p.f,{exps:p.d.exps,fruits:p.d.fruits},false))});
+  }
   function renderFruits(el,n){
     var box=el.querySelector(".fruits"); if(!box)return;
     var fs=(n.fruits||[]).slice().sort(function(a,b){return b.at-a.at}), key=fs.map(function(f){return f.id+f.t}).join("|");
@@ -13712,8 +13726,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       .map(function(m){return {text:String(m.text||""),thx:String(m.thx||""),todo:String(m.todo||""),at:+m.at||0}});
     var acts=(n.acts||[]).filter(function(a){return a.t&&a.t.trim()}).map(function(a){return {t:a.t,done:a.done?1:0,doneAt:+a.doneAt||0,days:(a.stamps||[]).length,goal:+a.goal||21}});
     var prays=(n.prays||[]).filter(function(x){return x.sh&&String(x.t||"").trim()}).map(function(x){return {t:x.t,at:+x.at||0,ans:+x.ans||0,an:String(x.an||"")}});
-    if(!meds.length&&!acts.length&&!prays.length)return null;
-    return {ref:n.ref,text:n.text,book:n.book,chapter:n.chapter,verse:n.verse,meds:meds,acts:acts,prays:prays};
+    var exps=(n.essays||[]).filter(function(x){return String(x.body||"").trim()||String(x.title||"").trim()}).map(function(x){return {title:String(x.title||""),body:String(x.body||"").slice(0,6000),at:+x.at||0}});
+    var fruits=(n.fruits||[]).filter(function(x){return String(x.t||"").trim()}).map(function(x){return {t:String(x.t),at:+x.at||0}});
+    if(!meds.length&&!acts.length&&!prays.length&&!exps.length&&!fruits.length)return null;
+    return {ref:n.ref,text:n.text,book:n.book,chapter:n.chapter,verse:n.verse,meds:meds,acts:acts,prays:prays,exps:exps,fruits:fruits};
   }
   function verseKey(o){return (typeof o.book==="number"&&o.book>=0&&+o.chapter)?o.book+":"+o.chapter+":"+(+o.verse||0):String(o.ref||"").replace(/\s+/g,"")}
   function friendPostsFor(n){
@@ -13742,6 +13758,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var ul=mk("ul","fracts");
       d.acts.forEach(function(a){var li=mk("li",a.done?"done":"",(a.done?"✓ ":"○ ")+a.t+(a.days?"  ·  "+a.days+"일 체크":""));ul.appendChild(li)});
       w.appendChild(mk("div","frlab2","실천")); w.appendChild(ul);
+    }
+    if((d.exps||[]).length){   // ✍️ 친구의 경험담
+      w.appendChild(mk("div","frlab2","경험"));
+      d.exps.slice().sort(function(a,b){return (b.at||0)-(a.at||0)}).forEach(function(x){
+        var c=mk("div","frexp"); if(String(x.title||"").trim())c.appendChild(mk("b","frext",x.title));
+        if(String(x.body||"").trim())c.appendChild(mk("p","frexb",x.body)); if(x.at)c.appendChild(mk("span","frdate",dateLabel(x.at))); w.appendChild(c);
+      });
+    }
+    if((d.fruits||[]).length){
+      w.appendChild(mk("div","frlab2","🍇 이 말씀이 일한 순간"));
+      var fu=mk("ul","fracts"); d.fruits.slice().sort(function(a,b){return (b.at||0)-(a.at||0)}).forEach(function(x){fu.appendChild(mk("li","",x.t+(x.at?"  ·  "+dlabel(dkey(x.at)):"")))}); w.appendChild(fu);
     }
     if((d.prays||[]).length){
       w.appendChild(mk("div","frlab2","나눈 기도"));
