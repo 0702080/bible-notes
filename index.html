@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-1">
+<meta name="app-build" content="2026-10-29-2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -865,6 +865,9 @@ body.reorder .note:not(.dragging){border-style:dashed;border-color:color-mix(in 
 .tchip{flex:0 0 auto;height:34px;padding:0 13px;border:1px solid var(--rule);border-radius:17px;background:rgba(255,255,255,.02);color:var(--muted);font-size:13.5px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .tchip.on{background:var(--violet);border-color:var(--violet);color:#141416;font-weight:700}
 .tchip .tcnt{font-size:11.5px;opacity:.8}
+.tchip.tmatch{border-color:var(--gold)!important;color:var(--gold)!important;background:color-mix(in srgb,var(--gold) 14%,transparent)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 35%,transparent),0 0 14px color-mix(in srgb,var(--gold) 30%,transparent)}
+.tchip.tmatch .tdot{background:var(--gold)!important}
+.tchip.tfoldbtn{color:var(--muted);border-style:dashed}
 .tchip.tcollect{border-style:dashed;color:var(--violet);border-color:color-mix(in srgb,var(--violet) 55%,var(--rule))}
 .topics{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .note:not(.open) .topics{display:none}
@@ -1723,6 +1726,14 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 @media (min-width:900px){
   body.boardon .toolbar>*{flex:0 0 auto}   /* 단추 글자가 찌그러져 겹치지 않게 */
   /* 칸반 도구줄의 찾기 칸 (2026-10-17 사용자 요청) */
+  .bfwrap{display:none}
+  body.boardon .bfwrap{display:block;position:relative;flex:1 1 520px;min-width:72px;max-width:520px;margin-left:auto;margin-right:auto}
+  body.boardon .bfwrap .bfilter{width:100%;max-width:none;margin:0;box-sizing:border-box}
+  body.boardon .bfwrap.has .bfilter{padding-left:36px}
+  .bfilter::-webkit-search-cancel-button{display:none;-webkit-appearance:none}
+  .bfx{position:absolute;left:6px;top:50%;transform:translateY(-50%);z-index:1;width:22px;height:22px;border:0;border-radius:11px;background:#34333A;color:var(--ink);font-size:11px;line-height:22px;padding:0;cursor:pointer}
+  .bfx[hidden]{display:none}
+  @media (hover:hover){.bfx:hover{background:var(--violet);color:#141416}}
   body.boardon .bfilter{display:block;flex:1 1 520px;min-width:72px;max-width:520px;margin-left:auto;margin-right:auto;height:32px;padding:0 14px;border:1px solid var(--rule);border-radius:16px;background:rgba(255,255,255,.04);color:var(--ink);font:inherit;font-size:13px}
   body.boardon .bfilter::placeholder{color:var(--faint)}
   body.boardon .bfilter:focus{outline:none;border-color:color-mix(in srgb,var(--violet) 65%,var(--rule));background:rgba(255,255,255,.07)}
@@ -1817,7 +1828,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .baddcol{flex:0 0 120px;align-self:flex-start;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:120px;margin:0;border:1.5px dashed #46424F;border-radius:16px;background:transparent;color:var(--muted);font-size:13.5px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
 .baddcol span{font-size:26px;line-height:1;font-weight:400}
 @media (hover:hover){.baddcol:hover{border-color:var(--gold);color:var(--gold);background:color-mix(in srgb,var(--gold) 6%,transparent)}}
-.bcfold{flex:0 0 auto;width:26px;height:26px;margin-left:2px;padding:0;border:0;border-radius:13px;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer}
+.bcfold{flex:0 0 auto;width:26px;height:26px;margin-left:2px;padding:0;border:0;border-radius:13px;background:#34313D;color:var(--ink);display:grid;place-items:center;cursor:pointer}
 .bcfold::before{content:"";width:7px;height:7px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateX(1px) rotate(45deg);transition:transform .3s}
 @media (hover:hover){.bcfold:hover{background:#34313D;color:var(--ink)}}
 .board4>.bcol{transition:flex-grow .42s cubic-bezier(.32,.72,0,1),flex-basis .42s cubic-bezier(.32,.72,0,1),min-width .42s cubic-bezier(.32,.72,0,1),max-width .42s cubic-bezier(.32,.72,0,1),padding .42s cubic-bezier(.32,.72,0,1),background .15s}
@@ -1854,7 +1865,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.bfold .bcjump{display:none}
 .bvn{display:inline-block;min-width:1.5em;margin-right:5px;padding:0 4px;box-sizing:border-box;border-radius:6px;background:color-mix(in srgb,var(--sky) 16%,transparent);color:var(--sky);font-size:.74em;font-weight:700;line-height:1.5;text-align:center;vertical-align:.14em}   /* 절 번호: 본문과 또렷이 구별되게 하늘색 작은 알약 (2026-10-25 사용자 요청) */
 .bcpin{margin-left:auto;font-size:11px}
-.bctext{margin:6px 0 8px;font-size:14px;line-height:1.6;color:#E8C3A0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+.bctext{white-space:pre-line;margin:6px 0 8px;font-size:14px;line-height:1.6;color:#E8C3A0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
 .bcfoot{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--faint)}
 .bcst{letter-spacing:1px}
 .bcnx{margin-left:auto}
@@ -3222,7 +3233,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   <div class="toolbar">
     <h2><button type="button" class="homebtn" id="homeBtn" aria-label="처음 화면으로">담은 말씀</button> <span id="count" style="color:var(--muted);font-size:15px;font-family:var(--sans);font-weight:400"></span></h2>
     <div class="todaymini" id="todayMini" aria-label="오늘 할 일"></div>
-    <input class="bfilter" id="bFilter" type="search" placeholder="🔍 말씀 · 묵상 · 기록에서 찾기 (초성도 돼요)" aria-label="말씀에서 찾기">
+    <span class="bfwrap"><button type="button" class="bfx" id="bFilterX" aria-label="찾기 지우기" title="지우기" hidden>✕</button><input class="bfilter" id="bFilter" type="search" placeholder="🔍 말씀 · 묵상 · 기록에서 찾기 (초성도 돼요)" aria-label="말씀에서 찾기"></span>
     <button class="tbtn tadd" id="topAdd" type="button">＋ 말씀 담기</button>
     <div class="viewseg" id="viewSeg" role="group" aria-label="보기 방식"><button type="button" data-v="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="2.2"/><rect x="3" y="13" width="18" height="7" rx="2.2"/><path d="M7 7.5h6M7 16.5h4"/></svg>목록</button><button type="button" data-v="board" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3.5" width="18" height="17" rx="3"/><path d="M7.5 7.5v8M12 7.5v4.5M16.5 7.5v6.5"/></svg>칸반 보드</button></div>
     <div class="viewseg bmodeseg" id="bModeSeg" role="group" aria-label="칸반 순서" hidden><button type="button" data-m="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4v15M2.5 16.5L5 19l2.5-2.5"/><path d="M11 6h10M11 12h7M11 18h4"/></svg>목록 순서</button><button type="button" data-m="stage" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-4M10 20v-7M15 20v-10"/><path d="M19.5 3.5l.9 1.9 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2-1.45-1.4 2-.3z" stroke-width="1.3" stroke-linejoin="round"/></svg>암송 단계</button></div>
@@ -3625,7 +3636,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
           '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div>'+
           '<button type="button" class="bcgo"></button>';
-        var bref=n.ref||"구절 미입력", btxt=String(n.text||"").replace(/\s+/g," ").trim();
+        var bref=n.ref||"구절 미입력", btxt=String(n.text||"").replace(/[ \t]+/g," ").replace(/ *\n[\s]*/g,"\n").trim();
         if(filterText&&has(bref))markInto(cd.querySelector(".bcref b"),bref,filterText);
         else cd.querySelector(".bcref b").textContent=bref;
         var bte=cd.querySelector(".bctext"), braw=String(n.text||"");
@@ -3698,7 +3709,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var col=boardCol(n), mc=(n.mem&&n.mem.s?n.mem.s:[]).filter(Boolean).length, ri=reviewInfo(n);
     cd.innerHTML='<div class="bcref"><b></b>'+(n.pinned?'<span class="bcpin">📌</span>':'')+'</div><p class="bctext"></p>'+
       '<div class="bcfoot"><span class="bcst"></span><span class="bcnx"></span></div><button type="button" class="bcgo"></button>';
-    var bref=n.ref||"구절 미입력", btxt=String(n.text||"").replace(/\s+/g," ").trim(), braw=String(n.text||""), bte=cd.querySelector(".bctext");
+    var bref=n.ref||"구절 미입력", btxt=String(n.text||"").replace(/[ \t]+/g," ").replace(/ *\n[\s]*/g,"\n").trim(), braw=String(n.text||""), bte=cd.querySelector(".bctext");   // 줄바꿈은 말씀 카드 그대로 (2026-10-29)
     if(filterText&&has(bref))markInto(cd.querySelector(".bcref b"),bref,filterText); else cd.querySelector(".bcref b").textContent=bref;
     if(ct)cd.querySelector(".bcref").style.color="var(--tc)";   // 구절 이름 = 주제 뜻 색 (분노=빨강, 화평=초록…, 2026-10-24 사용자 요청)
     if(filterText&&(has(btxt)||has(braw))){markInto(bte,braw,filterText);vLines(bte);bte.classList.add("full")}else bcVerseNums(bte,btxt);
@@ -6556,21 +6567,27 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function topicMeanColor(t){for(var i=0;i<TMEAN.length;i++)if(TMEAN[i][0].test(t))return TMEAN[i][1]; return ""}
   function topicColor(t){return tcolors[t]||"var(--violet)"}
   function cardTopic(n){var st=noteSelTopics(n);return st[0]||n.topics[0]||""}
+  var topicFold=false; try{topicFold=localStorage.getItem("bible-topic-fold")==="1"}catch(e){}
   function renderTopicBar(){
     computeTopicColors();
     var bar=$("topicBar"), ts=allTopics(); bar.textContent="";
     if(topicSel.some(function(t){return !ts.some(function(x){return x[0]===t})}))setTopics(topicSel.filter(function(t){return ts.some(function(x){return x[0]===t})}));
     if(ts.length){
       var all=document.createElement("button"); all.type="button"; all.className="tchip"+(topicSel.length?"":" on"); all.dataset.topic=""; all.textContent="전체"; bar.appendChild(all);
+      var tq=filterText?qInc:[], firstHit=null;
       ts.forEach(function(x){
-        var b=document.createElement("button"); b.type="button"; b.className="tchip"+(selHas(x[0])?" on":""); b.setAttribute("aria-pressed",String(selHas(x[0]))); b.dataset.topic=x[0];
+        var hitT=tq.length&&tq.some(function(q){return hit1(x[0],q)});
+        if(topicFold&&!selHas(x[0])&&!hitT)return;   // 접혀 있으면 고른 것·찾은 것만
+        var b=document.createElement("button"); b.type="button"; b.className="tchip"+(selHas(x[0])?" on":"")+(hitT?" tmatch":""); if(hitT&&!firstHit)firstHit=b; b.setAttribute("aria-pressed",String(selHas(x[0]))); b.dataset.topic=x[0];
         b.style.setProperty("--tc",topicColor(x[0]));
         var dot=document.createElement("span"); dot.className="tdot"; b.appendChild(dot);
         b.appendChild(document.createTextNode("#"+x[0])); var c=document.createElement("span"); c.className="tcnt"; c.textContent=x[1]; b.appendChild(c);
         bar.appendChild(b);
       });
     }
-    var add=document.createElement("button"); add.type="button"; add.className="tchip tcollect"; add.id="openCollect"; add.textContent="+ 주제로 모으기"; bar.appendChild(add);
+    var add=document.createElement("button"); add.type="button"; add.className="tchip tcollect"; add.id="openCollect"; add.textContent="+ 주제로 모으기"; if(!topicFold)bar.appendChild(add);
+    if(ts.length){var fb=document.createElement("button"); fb.type="button"; fb.className="tchip tfoldbtn"; fb.textContent=topicFold?"#주제 "+ts.length+"개 펼치기 ▾":"접기 ▴"; fb.title=topicFold?"주제를 모두 펼쳐요":"주제 줄을 접어요"; bar.insertBefore(fb,bar.children[1]||null)}   // #해시태그 줄 접기·펼치기 (2026-10-29)
+    if(typeof firstHit!=="undefined"&&firstHit)setTimeout(function(){try{firstHit.scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"})}catch(e){}},30);
   }
   function todayActClick(e){
     var spn=e.target.closest(".saypin"); if(spn){e.stopPropagation();sayTogglePin(spn.dataset.sid);return}
@@ -6603,7 +6620,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   $("reviewBar").addEventListener("click",todayActClick);
   $("todayMini").addEventListener("click",todayActClick);
+  // 검색란 앞쪽 ✕ (2026-10-29 사용자 요청)
+  (function(){
+    var f=$("bFilter"), x=$("bFilterX"); if(!f||!x)return;
+    function sync(){var on=!!f.value; x.hidden=!on; f.parentNode.classList.toggle("has",on)}
+    f.addEventListener("input",sync); setInterval(sync,800);
+    x.addEventListener("click",function(){f.value=""; f.dispatchEvent(new Event("input",{bubbles:true})); sync(); f.focus()});
+  })();
   $("topicBar").addEventListener("click",function(e){
+    if(e.target.closest(".tfoldbtn")){topicFold=!topicFold; try{localStorage.setItem("bible-topic-fold",topicFold?"1":"")}catch(err){} renderTopicBar(); return}
     var b=e.target.closest("button"); if(!b)return;
     if(b.id==="openCollect"){openCollect("");return}
     var addT=b.dataset.topic&&!selHas(b.dataset.topic); toggleTopic(b.dataset.topic||""); render();
