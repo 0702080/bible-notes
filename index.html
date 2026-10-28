@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-12">
+<meta name="app-build" content="2026-10-29-13">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8227,7 +8227,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       return;
     }
     var r=d.res, pc=Math.round((r.ok+r.near)/Math.max(1,r.total)*100);
-    tip.innerHTML="<b>✍️ 받아쓰기 결과</b><br><b class='ccsc'>"+(r.ok+r.near)+" / "+r.total+"</b> 낱말 ("+pc+"%)"+(r.near?" · 조사만 다른 것 "+r.near+"개":"")+
+    tip.innerHTML="<b>✍️ 받아쓰기 결과</b><br><b class='ccsc'>"+pc+"%</b>"+(r.near?" · 조사만 다른 것 "+r.near+"개":"")+
       (r.ref?(r.ref.ok?"<br>📖 구절 <b class='ccsc'>✓ 맞았어요</b>":r.ref.has?"<br>📖 구절 ✗ 정답은 <b></b>":"<br>📖 구절도 적어 보세요 (예: 마태복음 6:33)"):"");
     if(r.ref&&r.ref.has&&!r.ref.ok){var bs=tip.querySelectorAll("b"); bs[bs.length-1].textContent=n.ref||""}
     var wrap=document.createElement("div"); wrap.className="ccdres";
