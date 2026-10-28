@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-6">
+<meta name="app-build" content="2026-10-29-7">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1860,6 +1860,12 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 @media (hover:hover){.bcard:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--tc) 50%,#2A2930);box-shadow:0 10px 24px rgba(0,0,0,.45)}}
 .bcref{display:flex;align-items:center;gap:6px;color:var(--violet);font-size:13.5px}
 .bcref b{font-weight:400;-webkit-text-stroke:.3px currentColor}
+.bcard.bclone{border-style:dashed!important}
+.bcclonetag{margin-left:6px;padding:0 6px;border-radius:8px;background:color-mix(in srgb,var(--sky) 16%,transparent);color:var(--sky);font-size:11px;font-weight:700;-webkit-text-stroke:0;white-space:nowrap}
+.bcclx{position:absolute;right:8px;bottom:8px;z-index:2;height:22px;min-width:22px;padding:0 6px;border:1px solid #3A3944;border-radius:11px;background:#1B1A21;color:var(--muted);font-size:12px;line-height:20px;cursor:pointer}
+.bcclx.sure{color:var(--orange);border-color:color-mix(in srgb,var(--orange) 50%,transparent)}
+.lmghost.lmcopy{outline:2px dashed var(--sky)!important}
+.lmghost.lmcopy::after{content:"+ 복제";position:absolute;right:8px;top:8px;padding:2px 8px;border-radius:10px;background:var(--sky);color:#0B0B0D;font-size:12px;font-weight:700}
 .bcard.bnew .bcref::after{content:"새로 담음";margin-left:auto;padding:1px 7px;border-radius:9px;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold);font-size:11px;font-weight:700;-webkit-text-stroke:0}
 .bcard.bnew .bcpin{order:2}
 .bcard.bjust{animation:bjust 3s ease-out}
@@ -2081,6 +2087,10 @@ button:active{filter:brightness(1.15)}
 .micint{position:absolute;right:46px;bottom:6px;max-width:min(60vw,420px);padding:4px 10px;border-radius:10px;background:rgba(20,19,24,.92);color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .micint:empty{display:none}
 .ccvgap{display:block;height:.9em}
+.ccdlive{margin-top:14px;font-size:17px;line-height:1.9;word-break:keep-all}
+.ccdlive .dw.ok{color:#7FE3C6;font-weight:700}
+.ccdlive .dw.hide{color:#4A4855;letter-spacing:1px}
+.ccdpc{font-size:12.5px;color:var(--muted);margin-bottom:4px}
 .ccmain{-webkit-user-select:none;user-select:none}   /* 암송 연습 중 마우스로 끌어도 글이 파랗게 잡히지 않게 (2026-10-24 사용자 요청) */
 .ccmain input,.ccmain textarea{-webkit-user-select:text;user-select:text}
 .cch{position:fixed;inset:0;z-index:70;background:#0B0B0D;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -3742,6 +3752,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     cd.querySelector(".bcgo").textContent=col==="due"?"🔁 복습하기":col==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
     return cd;
   }
+  var KCL="bible-kb-clones";
+  function clData(){var o=null; try{o=JSON.parse(localStorage.getItem(KCL)||"null")}catch(e){} if(!o||!Array.isArray(o.items))o={items:[],del:{}}; if(!o.del||typeof o.del!=="object")o.del={};
+    o.items=o.items.filter(function(x){return x&&x.id&&x.src&&x.col}); return o}
+  function clSave(o){try{localStorage.setItem(KCL,JSON.stringify(o))}catch(e){} if(typeof sbMark==="function")sbMark("__clones")}
+  function clMerge(src){
+    if(!src||!Array.isArray(src.items))return false;
+    var o=clData(), ch=false;
+    Object.keys(src.del||{}).forEach(function(id){var t=+src.del[id]||0; if(!o.del[id]||o.del[id]<t){o.del[id]=t;ch=true}});
+    src.items.forEach(function(x){if(!x||!x.id)return; var i=o.items.findIndex(function(y){return y.id===x.id}); if(i<0){o.items.push(x);ch=true} else if((+x.u||0)>(+o.items[i].u||0)){o.items[i]=x;ch=true}});
+    var n0=o.items.length; o.items=o.items.filter(function(x){return !(o.del[x.id]&&o.del[x.id]>=(+x.u||+x.at||0))}); if(o.items.length!==n0)ch=true;
+    if(ch){try{localStorage.setItem(KCL,JSON.stringify(o))}catch(e){}}
+    return ch;
+  }
+  function clAdd(srcId,col){
+    var o=clData(), n=notes.get(srcId); if(!n||!col)return false;
+    if((n.col||"")===col)return "same";
+    if(o.items.some(function(x){return x.src===srcId&&x.col===col}))return "dup";
+    o.items.push({id:"c"+Date.now().toString(36)+Math.random().toString(36).slice(2,5),src:srcId,col:col,at:Date.now(),u:Date.now()}); clSave(o); return true;
+  }
   function kbCol(key,title,emoji,part,extra){
     var cl=document.createElement("section"); cl.className="bcol blist"+(extra||""); cl.style.setProperty("--bc","var(--violet)"); cl.dataset.k=key;
     var h=document.createElement("div"); h.className="bch";
@@ -3775,6 +3804,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     $("fab").click();   // 위 '말씀 담기'와 똑같이
   },true);
+  $("board").addEventListener("click",function(e){
+    var x=e.target.closest(".bcclx"); if(!x)return; e.stopPropagation(); e.preventDefault();
+    if(!x.dataset.sure){x.dataset.sure="1"; x.textContent="지울까요?"; x.classList.add("sure"); setTimeout(function(){if(x.isConnected){delete x.dataset.sure;x.textContent="×";x.classList.remove("sure")}},3000); return}
+    var cid=x.closest(".bcard").dataset.clone, o=clData(); o.items=o.items.filter(function(c){return c.id!==cid}); o.del[cid]=Date.now(); clSave(o); render(); toast("복제 카드를 지웠어요 (원본은 그대로)");
+  },true);
   function bcJumpState(cl){
     var l=cl&&cl.querySelector(".bclist"); if(!l)return;
     cl.classList.toggle("canup",l.scrollTop>80); cl.classList.toggle("candown",l.scrollHeight-l.clientHeight-l.scrollTop>80);
@@ -3803,7 +3837,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     // 내가 만든 칸은 끌어서 놓은 자리(앞에 오는 자동 칸 수)에 그림 (2026-10-23 사용자 요청)
     var cpos=colPos(), nAuto=0;
     for(var c=0;c<cols;c++){if(auto.slice(c*per,(c+1)*per).length)nAuto=c+1}
-    function putMine(slot){mineCols.forEach(function(x,j){var p=Math.min(+cpos[x.c]||0,nAuto); if(p!==slot)return; var cl=kbCol("C:"+x.c,x.c,"🗂️",x.part," bcust"); cl.dataset.cc=x.c; cl.dataset.ci=String(j); cl.dataset.pos=String(p); box.appendChild(cl)})}
+    var clo=clData();
+    function putMine(slot){mineCols.forEach(function(x,j){var p=Math.min(+cpos[x.c]||0,nAuto); if(p!==slot)return; var cl=kbCol("C:"+x.c,x.c,"🗂️",x.part," bcust"); cl.dataset.cc=x.c; cl.dataset.ci=String(j); cl.dataset.pos=String(p);
+      var cls=clo.items.filter(function(c){var sn=notes.get(c.src); return c.col===x.c&&sn&&visibleNote(sn)}), lst=cl.querySelector(".bclist");
+      if(cls.length&&lst){var em=lst.querySelector(".bcempty"); if(em)em.remove();
+        cls.forEach(function(c,k){var sn=notes.get(c.src), cd=kbCard(sn,x.part.length+k); cd.classList.add("bclone"); cd.dataset.clone=c.id;
+          var tag=document.createElement("span"); tag.className="bcclonetag"; tag.textContent="🔗 복제"; tag.title="원본과 연결된 복제 카드 (원본을 고치면 같이 바뀌어요)"; var rf=cd.querySelector(".bcref"); if(rf)rf.appendChild(tag);
+          var xb=document.createElement("button"); xb.type="button"; xb.className="bcclx"; xb.textContent="×"; xb.title="이 복제 카드만 지우기 (원본은 그대로)"; xb.setAttribute("aria-label",xb.title); cd.appendChild(xb);
+          lst.appendChild(cd)});
+        var bcn=cl.querySelector(".bcn"); if(bcn)bcn.textContent=x.part.length+cls.length}
+      box.appendChild(cl)})}
     putMine(0);
     for(var c=0;c<nAuto;c++){
       var part=auto.slice(c*per,(c+1)*per);
@@ -7961,8 +8004,19 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!d.res){
       tip.innerHTML="<b>✍️ 받아쓰기</b><br>기억나는 대로 적어 보세요. 조사(은·는·이·가)만 달라도 맞은 것으로 쳐요."+((window.SpeechRecognition||window.webkitSpeechRecognition)?"<br>🎤 칸 오른쪽 아래 마이크를 누르고 <b>소리 내어 외우면</b> 글로 들어가요. 다 외웠으면 채점하기!":"");
       var box=document.createElement("div"); box.className="ccdict";
-      var ta=document.createElement("textarea"); ta.className="ccdta"; ta.placeholder="여기에 말씀을 적어 보세요";
-      ta.value=d.text||""; box.appendChild(ta); v.appendChild(box);
+      var ta=document.createElement("textarea"); ta.className="ccdta"; ta.placeholder="여기에 말씀을 적어 보세요 (Ctrl+Enter = 채점)";
+      ta.value=d.text||""; box.appendChild(ta);
+      // 치는 대로 맞힌 낱말이 하나씩 드러남 (2026-10-29 사용자 요청: 타이핑하며 암송)
+      var live=document.createElement("div"); live.className="ccdlive"; box.appendChild(live); v.appendChild(box);
+      var drawLive=function(){
+        var r0=dictScore(n.text,ta.value), got=0; live.textContent="";
+        r0.rows.forEach(function(x,i){if(i)live.appendChild(document.createTextNode(" ")); var sp=document.createElement("span");
+          if(x.s==="ok"||x.s==="near"){sp.className="dw ok";sp.textContent=x.w;got++} else {sp.className="dw hide";sp.textContent=circles(x.w)} live.appendChild(sp)});
+        var pc=document.createElement("div"); pc.className="ccdpc"; pc.textContent=got+" / "+r0.total+" 낱말"; live.insertBefore(pc,live.firstChild);
+        if(C&&C.dict)C.dict.text=ta.value;
+      };
+      ta.addEventListener("input",drawLive); drawLive();
+      ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault(); var sb=ccBox.querySelector('[data-a="dscore"]'); if(sb)sb.click()}});
       setTimeout(function(){try{ta.focus()}catch(e){}},30);
       btn("← 돌아가기","dback"); btn("채점하기 ✓","dscore",true);
       return;
@@ -8080,7 +8134,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(C.dict&&C.dict.on){ccDict(n,tip,btn);return}
       /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
       ccWords(n.text,"none",0,C.seed);
-      /* 받아쓰기 단추는 PC에서도 뺌 (2026-10-22 사용자 요청) */
+      if(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches)btn("⌨️ 타이핑으로 외우기","dict");   // PC: 키보드로 쳐 가며 외우기 (2026-10-29 사용자 요청)
       btn("확인하기 👀","show",true);
     }else if(C.stage===4){
       ccWords(n.text,"got",0,C.seed);
@@ -12882,7 +12936,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   /* ---------- 백업 저장 / 불러오기 (claude.ai ↔ 내 GitHub 노트 옮기기) ---------- */
   function backupData(){
     flushAll();
-    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values()),chapters:myChapters(),daily:dailyData(),prays1:p1Data(),icp:icData()});
+    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values()),chapters:myChapters(),daily:dailyData(),prays1:p1Data(),icp:icData(),clones:clData()});
   }
   $("backupSave").addEventListener("click",function(){
     var d=new Date(), name="말씀묵상노트_백업_"+d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2)+".json", data=backupData();
@@ -12955,6 +13009,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           saveDaily(od); renderReviewBar()}
         if(obj&&obj.prays1)p1Merge(obj.prays1);
         if(obj&&obj.icp)icMerge(obj.icp);
+        if(obj&&obj.clones)clMerge(obj.clones);
         if(obj&&obj.chapters&&typeof obj.chapters==="object"){var mc=myChapters();Object.keys(obj.chapters).forEach(function(k){var c=obj.chapters[k];if(c&&Array.isArray(c.v)&&(!mc[k]||(+c.at||0)>(+mc[k].at||0)))mc[k]=c});try{localStorage.setItem(MYCH,JSON.stringify(mc))}catch(e){}}
         var added=0, updated=0, repush=[];
         arr.forEach(function(x){
@@ -13177,7 +13232,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     detail=String(detail||"").replace(/\s+/g," ").trim().slice(0,140);
     return {msg:what+" ("+r.status+(detail?": "+detail:"")+")",short:what+" "+r.status};
   }
-  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__icp");sbDirty.add("__sayings");sbDirty.add("__medq");sbDirty.add("__sort");try{localStorage.removeItem(SB_LAST)}catch(e){}}
+  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__icp");sbDirty.add("__clones");sbDirty.add("__sayings");sbDirty.add("__medq");sbDirty.add("__sort");try{localStorage.removeItem(SB_LAST)}catch(e){}}
   var SB_DIRTY="bible-sb-dirty";
   try{(JSON.parse(localStorage.getItem(SB_DIRTY)||"[]")||[]).forEach(function(id){sbDirty.add(String(id))})}catch(e){}
   function sbSaveDirty(){try{if(sbDirty.size)localStorage.setItem(SB_DIRTY,JSON.stringify(Array.from(sbDirty)));else localStorage.removeItem(SB_DIRTY)}catch(e){}}
@@ -13201,6 +13256,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(id==="__sort"){
           var so={m:sortMode,at:sortAt}, sojs=JSON.stringify(so);
           if(sbLastJson.__sort!==sojs){rows.push({user_id:uid,id:"__sort",data:so,updated_at:now,deleted:false});sbLastJson.__sort=sojs}
+          return;
+        }
+        if(id==="__clones"){
+          var cld=clData(), cljs=JSON.stringify(cld);
+          if(sbLastJson.__clones!==cljs){rows.push({user_id:uid,id:"__clones",data:cld,updated_at:now,deleted:false});sbLastJson.__clones=cljs}
           return;
         }
         if(id==="__icp"){
@@ -13253,6 +13313,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             }
             sbLastJson.__sort=JSON.stringify({m:sortMode,at:sortAt}); return;
           }
+          if(r.id==="__clones"){if(clMerge(r.data))setTimeout(render,0);sbLastJson.__clones=JSON.stringify(clData());return}
           if(r.id==="__icp"){if(icMerge(r.data)&&icv&&!icv.hidden)icDraw();sbLastJson.__icp=JSON.stringify(icData());return}
           if(r.id==="__prays1"){if(p1Merge(r.data)&&prd&&!prd.hidden)drawPrayRead();sbLastJson.__prays1=JSON.stringify(p1Data());return}
           if(r.id==="__medq"){sbLastJson.__medq=JSON.stringify(r.data);medqMerge(r.data);return}
@@ -13536,6 +13597,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(bMode!=="list"||!boardOn||e.button!==0)return;
     if(e.target.closest("button,input,textarea,a"))return;
     var hd=e.target.closest(".bch"), cd=e.target.closest(".bcard"); if(!hd&&!cd)return;
+    if(cd&&cd.dataset.clone)return;   // 복제 카드는 끌지 않음 (지우고 다시 Shift 끌기)
     var cl=(hd||cd).closest(".bcol");
     lmP={el:hd?cl:cd, type:hd?"col":"card", li:+cl.dataset.li, cc:cl.dataset.cc||"", x:e.clientX, y:e.clientY, on:false,
       ids:hd?Array.prototype.map.call(cl.querySelectorAll(".bcard"),function(x){return x.dataset.id}):[cd.dataset.id]};
@@ -13550,6 +13612,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       g.style.width=r.width+"px"; g.style.height=Math.min(r.height,lmP.type==="col"?260:r.height)+"px"; lmP.dx=lmP.x-r.left; lmP.dy=lmP.y-r.top;
       document.body.appendChild(g); lmP.g=g; buzz(10)}
     e.preventDefault();
+    lmP.shift=e.shiftKey; if(lmP.type==="card")lmP.g.classList.toggle("lmcopy",!!e.shiftKey);   // Shift = 복제 표시
     lmP.g.style.left=(e.clientX-lmP.dx)+"px"; lmP.g.style.top=(e.clientY-lmP.dy)+"px";
     document.querySelectorAll("#board .lmbefore,#board .lmafter,#board .lmover").forEach(function(x){x.classList.remove("lmbefore","lmafter","lmover")});
     var t=lmTarget(e.clientX,e.clientY); if(!t.cl)return;
@@ -13580,6 +13643,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       saveColPos(cp); render();
       var nc2=$("board").querySelector('.bcol[data-cc="'+d.cc.replace(/"/g,'\\"')+'"]'); if(nc2){nc2.classList.add("lmland");setTimeout(function(){nc2.classList.remove("lmland")},2200)}
       buzz(12); return;
+    }
+    if(d.type==="card"&&(e.shiftKey||d.shift)){   // Shift를 누른 채 놓으면 복제 (원본은 그대로, 2026-10-29 사용자 요청)
+      if(!tcc){toast("복제 카드는 내가 만든 칸에 놓을 수 있어요");return}
+      var made=0, why=""; d.ids.forEach(function(id){var r=clAdd(id,tcc); if(r===true)made++; else why=r});
+      render();
+      toast(made?"🔗 '"+tcc+"' 칸에 복제했어요 — 원본을 고치면 같이 바뀌어요":why==="same"?"원본이 이미 이 칸에 있어요":"이 칸에 이미 복제본이 있어요");
+      buzz(made?[12,40,18]:8); return;
     }
     if(d.type==="card"){   // 카드를 다른 칸으로: 내가 만든 칸이면 그 칸 이름을, 자동 칸이면 비움
       d.ids.forEach(function(id){var x=notes.get(id); if(x&&x.col!==tcc){x.col=tcc;scheduleSave(id)}});
