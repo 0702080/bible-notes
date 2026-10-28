@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-3">
+<meta name="app-build" content="2026-10-29-4">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -877,6 +877,8 @@ body.reorder .note:not(.dragging){border-style:dashed;border-color:color-mix(in 
 .topics{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .note:not(.open) .topics{display:none}
 body.reorder .note .topics{display:none}
+.ctfold{height:28px;padding:0 10px;border:1px dashed #3A3944;border-radius:14px;background:transparent;color:var(--muted);font-size:12.5px;cursor:pointer}
+@media (hover:hover){.ctfold:hover{color:var(--ink);border-color:#55535F}}
 .ctopic{height:28px;padding:0 10px;border:0;border-radius:14px;background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet);font-size:13px;font-weight:500}
 .ctopic.on{background:var(--violet);color:#141416}
 .ctopicadd{height:28px;padding:0 10px;border:1px dashed var(--rule);border-radius:14px;background:transparent;color:var(--muted);font-size:12.5px}
@@ -5844,6 +5846,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     if(b.classList.contains("apall")){openProg();return}
     if(b.classList.contains("ctopicadd")){openPicker(id);return}
+    if(b.classList.contains("ctfold")){if(ctOpen.has(id))ctOpen.delete(id); else ctOpen.add(id); try{localStorage.setItem("bible-ctopic-open",JSON.stringify(Array.from(ctOpen)))}catch(err){} renderCardTopics(card,n); return}
     if(b.classList.contains("ctopic")){toggleTopic(b.dataset.topic);render();return}
     if(b.classList.contains("hchev")||b.classList.contains("toggle")){toggleCard(id,!openIds.has(id));return}
     if(b.classList.contains("addm")||b.classList.contains("addq")||b.classList.contains("adda")){tabOf.set(id,b.classList.contains("addm")?"m":b.classList.contains("addq")?"q":"a")}
@@ -6640,12 +6643,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var addT=b.dataset.topic&&!selHas(b.dataset.topic); toggleTopic(b.dataset.topic||""); render();
     if(addT&&topicSel.length===1)window.scrollTo({top:Math.max(0,$("topicBar").getBoundingClientRect().top+window.scrollY-70),behavior:"smooth"});
   });
+  var ctOpen=new Set(); try{(JSON.parse(localStorage.getItem("bible-ctopic-open")||"[]")||[]).forEach(function(x){ctOpen.add(x)})}catch(e){}
   function renderCardTopics(el,n){
     var ct=cardTopic(n); el.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)");
     el.classList.toggle("fear",n.topics.some(function(t){return t.indexOf("경외")>=0}));   // 하나님 경외 주제 카드: 은은한 짙은 보라 배경
-    var box=el.querySelector(".topics"), key=n.topics.join("|")+"/"+topicSel.join("|")+"/"+n.topics.map(topicColor).join(",");
+    // 주제가 많으면 접어서 3개만 (+N 펼치기), 펼친 카드는 기억 (2026-10-29 사용자 요청)
+    var many=n.topics.length>4, open=ctOpen.has(n.id), shown=many&&!open?n.topics.slice(0,3):n.topics;
+    var box=el.querySelector(".topics"), key=n.topics.join("|")+"/"+topicSel.join("|")+"/"+n.topics.map(topicColor).join(",")+"/"+open;
     if(box.dataset.key===key)return; box.dataset.key=key; box.textContent="";
-    n.topics.forEach(function(t){var c=document.createElement("button");c.type="button";c.className="ctopic"+(selHas(t)?" on":"");c.dataset.topic=t;c.textContent="#"+t;c.style.setProperty("--tc",topicColor(t));box.appendChild(c)});
+    shown.forEach(function(t){var c=document.createElement("button");c.type="button";c.className="ctopic"+(selHas(t)?" on":"");c.dataset.topic=t;c.textContent="#"+t;c.style.setProperty("--tc",topicColor(t));box.appendChild(c)});
+    if(many){var fb=document.createElement("button"); fb.type="button"; fb.className="ctfold"; fb.textContent=open?"접기 ▴":"+"+(n.topics.length-3)+"개 ▾"; fb.title=open?"주제 접기":"주제 모두 보기"; box.appendChild(fb)}
     box.hidden=!n.topics.length;
   }
   var ts={mode:"",nid:"",results:[]};
