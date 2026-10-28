@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-11">
+<meta name="app-build" content="2026-10-29-12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2122,6 +2122,9 @@ button:active{filter:brightness(1.15)}
 .ccvgap{display:block;height:.9em}
 .ccdlive{margin:0 0 14px;font-size:17px;line-height:1.9;word-break:keep-all}
 .ccdref{font-size:14px;color:#4A4855;margin-bottom:2px}
+.ccdln.gap{height:.9em}
+.ccdlive.blink2{animation:ccdblink .45s ease-in-out 2}
+@keyframes ccdblink{0%,100%{opacity:1}50%{opacity:.15}}
 .ccdref.ok{color:#7FE3C6;font-weight:700}
 .ccdref.bad{color:var(--pink)}
 .ccdlive .dw.ok{color:#7FE3C6;font-weight:700}
@@ -8203,9 +8206,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var rr=document.createElement("div"); rr.className="ccdref"+(rf.ok?" ok":rf.has?" bad":"");
         rr.textContent=rf.ok?"✓ "+n.ref:rf.has?"✗ 구절이 달라요":"📖 "+circles(String(n.ref||""));
         live.appendChild(rr);
-        r0.rows.forEach(function(x,i){if(i)live.appendChild(document.createTextNode(" ")); var sp=document.createElement("span");
-          if(x.s==="ok"||x.s==="near"){sp.className="dw ok";sp.textContent=x.w;got++} else {sp.className="dw hide";sp.textContent=circles(x.w)} live.appendChild(sp)});
+        var ri=0;
+        String(n.text||"").split(String.fromCharCode(10)).forEach(function(ln){
+          var ws=wordsOf(ln), row=document.createElement("div"); row.className="ccdln";
+          if(!ws.length){row.classList.add("gap"); live.appendChild(row); return}
+          ws.forEach(function(w,k){var x=r0.rows[ri++]; if(!x)return; if(k)row.appendChild(document.createTextNode(" ")); var sp=document.createElement("span");
+            if(x.s==="ok"||x.s==="near"){sp.className="dw ok";sp.textContent=x.w;got++} else {sp.className="dw hide";sp.textContent=circles(x.w)} row.appendChild(sp)});
+          live.appendChild(row);
+        });
         var pc=document.createElement("div"); pc.className="ccdpc"; pc.textContent=got+" / "+r0.total+" 낱말"+(rf.ok?" · 구절 ✓":""); live.insertBefore(pc,live.firstChild);
+        var all=got===r0.total&&r0.total>0&&rf.ok;
+        if(all&&!live._all){live.classList.remove("blink2"); void live.offsetWidth; live.classList.add("blink2"); buzz([30,60,30])}
+        live._all=all;
         if(C&&C.dict)C.dict.text=ta.value;
       };
       ta.addEventListener("input",drawLive); drawLive();
