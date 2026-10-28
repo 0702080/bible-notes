@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-9">
+<meta name="app-build" content="2026-10-29-10">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -577,7 +577,19 @@ body.boardon .toolbar{border-bottom:0}   /* PC 칸반: 맨 위 단추 줄 아래
 .cbtx{font-family:var(--serif);font-size:14.5px;line-height:1.6;color:var(--ink)}
 .cbit small{font-size:12.5px;color:var(--muted)}
 .cbempty{margin:0;font-size:13px;color:var(--faint)}
-.note.cbflash{animation:cbfl 1.2s ease-out}
+.note.cbflash,.bcard.cbflash{animation:cbfl 1.2s ease-out}
+.bcard.flipped>:not(.cback):not(.bcflip){display:none!important}
+.bcard:not(.flipped)>.cback{display:none}
+.bcard.flipin{animation:cflip .32s ease-out}
+.bcard.flipped{cursor:default;border-color:color-mix(in srgb,var(--sky) 45%,#2A2930)}
+.bcard .cback{gap:6px}
+.bcard .cbhd b{font-size:14px}
+.bcard .cbit{padding:8px 10px;cursor:pointer}
+.bcard .cbtx{font-size:13.5px}
+.bcflip{position:absolute;top:6px;right:6px;z-index:2;width:26px;height:26px;padding:0;border:1px solid #34333A;border-radius:13px;background:#1E1D23;color:var(--sky);font-size:14px;line-height:24px;cursor:pointer;opacity:0;transition:opacity .15s}
+.bcard:hover .bcflip,.bcard.flipped .bcflip,.bcflip:focus-visible{opacity:1}
+@media (hover:none){.bcflip{opacity:.7}}
+.bcard>.bcref{padding-right:24px}
 @keyframes cbfl{0%,40%{box-shadow:0 0 0 2px var(--sky)}100%{box-shadow:0 0 0 0 transparent}}
 body{touch-action:manipulation}
 .hits{margin:-2px 0 8px}
@@ -3770,6 +3782,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     cd.querySelector(".bcst").textContent=["🗣️","🔤","🙈","🌤️"].map(function(e,k){return n.mem&&n.mem.s&&n.mem.s[k]?e:"·"}).join(" ");
     if(ri){var d=new Date(ri.next);cd.querySelector(".bcnx").textContent=ri.due?"오늘 복습":"다음 "+(d.getMonth()+1)+"/"+d.getDate()}
     cd.querySelector(".bcgo").textContent=col==="due"?"🔁 복습하기":col==="done"?"한 번 더 떠올리기":mc?"▶ 이어서 외우기":"▶ 암송 시작";
+    var fl=document.createElement("button"); fl.type="button"; fl.className="bcflip"; fl.title="뒷면 보기 (연결한 말씀 · 같은 주제)"; fl.setAttribute("aria-label","카드 뒤집기"); fl.textContent="↺"; cd.appendChild(fl);
+    if(typeof flipIds!=="undefined"&&flipIds.has(n.id)){cd.classList.add("flipped"); fillBack(cd,n)}
     return cd;
   }
   var KCL="bible-kb-clones";
@@ -5610,7 +5624,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function fillBack(card,n){
     var bk=card.querySelector(".cback"); if(!bk){bk=document.createElement("div"); bk.className="cback"; card.appendChild(bk)}
     bk.textContent="";
-    var hd=document.createElement("div"); hd.className="cbhd"; hd.innerHTML='<b></b><span>옆으로 밀면 앞면</span>'; hd.querySelector("b").textContent=(n.ref||"구절 미입력")+" · 뒷면"; bk.appendChild(hd);
+    var hd=document.createElement("div"); hd.className="cbhd"; hd.innerHTML='<b></b><span>'+(boardOn?"↺ 누르면 앞면":"옆으로 밀면 앞면")+'</span>'; hd.querySelector("b").textContent=(n.ref||"구절 미입력")+" · 뒷면"; bk.appendChild(hd);
     var byRef={}; notes.forEach(function(x){if(x.id!==n.id&&x.ref)byRef[linkKey(x.ref)]=x});
     function item(ref,txt,memo,id){
       var b=document.createElement(id?"button":"div"); if(id){b.type="button"; b.dataset.go=id} b.className="cbit";
@@ -5626,7 +5640,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var tps=n.topics||[], same=[];
     if(tps.length)notes.forEach(function(x){if(x.id!==n.id&&(x.topics||[]).some(function(t){return tps.indexOf(t)>=0}))same.push(x)});
     if(tps.length){
-      var s2=document.createElement("div"); s2.className="cbsec"; s2.textContent="#"+tps.join(" #")+" · 같은 주제 "+same.length; bk.appendChild(s2);
+      var s2=document.createElement("div"); s2.className="cbsec"; s2.textContent="📚 같은 주제 말씀 "+same.length; bk.appendChild(s2);
       same.slice(0,12).forEach(function(x){bk.appendChild(item(x.ref||"구절 미입력",x.text,"",x.id))});
       if(!same.length){var e2=document.createElement("p"); e2.className="cbempty"; e2.textContent="같은 주제를 붙인 다른 말씀이 아직 없어요."; bk.appendChild(e2)}
     }
@@ -5637,7 +5651,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(on){flipIds.add(id); fillBack(card,n)}else{flipIds.delete(id); var bk=card.querySelector(".cback"); if(bk)bk.remove()}
     card.classList.toggle("flipped",on);
     card.classList.remove("flipin"); void card.offsetWidth; card.classList.add("flipin");
-    buzz(12);
+    buzz([30,50,30]);
   }
   (function(){
     var L=$("list"), sw=null;
@@ -5653,6 +5667,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6&&Date.now()-d.t<800&&d.card.isConnected)flipCard(d.card);
     },{passive:true});
     L.addEventListener("touchcancel",function(){sw=null},{passive:true});
+    document.addEventListener("click",function(e){   // PC 칸반: ↺ 단추로 뒤집기, 뒷면 말씀을 누르면 그 카드로
+      if(!e.target.closest||!e.target.closest("#board"))return;
+      var fl=e.target.closest&&e.target.closest(".bcflip");
+      if(fl){e.stopPropagation(); e.preventDefault(); flipCard(fl.closest(".bcard")); return}
+      var card=e.target.closest&&e.target.closest(".bcard.flipped"); if(!card)return;
+      e.stopPropagation(); e.preventDefault();
+      var g=e.target.closest(".cbit[data-go]"); if(!g)return;
+      var to=document.querySelector('#board .bcard[data-id="'+g.dataset.go+'"]'); if(!to){toast("지금 칸반에 안 보이는 말씀이에요");return}
+      to.scrollIntoView({block:"center",inline:"center",behavior:"smooth"}); to.classList.remove("cbflash"); void to.offsetWidth; to.classList.add("cbflash");
+    },true);
     L.addEventListener("click",function(e){   // 뒷면에서는 펼치기 대신: 말씀을 누르면 그 카드로
       var card=e.target.closest&&e.target.closest(".note.flipped"); if(!card)return;
       e.stopPropagation(); e.preventDefault();
