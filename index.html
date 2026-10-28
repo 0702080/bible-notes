@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-7">
+<meta name="app-build" content="2026-10-29-8">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -558,6 +558,23 @@ body.boardon .toolbar{border-bottom:0}   /* PC 칸반: 맨 위 단추 줄 아래
 .note:not(.open){cursor:pointer}
 .note.open .chead,.note.open .verse:not(.picking),.note.open .trow{cursor:pointer}
 .note{-webkit-tap-highlight-color:transparent}
+.note.flipped>:not(.cback){display:none!important}
+.note:not(.flipped)>.cback{display:none}
+.note.flipin{animation:cflip .32s ease-out}
+@keyframes cflip{0%{transform:perspective(900px) rotateY(80deg);opacity:.3}100%{transform:none;opacity:1}}
+.note.flipped{border-color:color-mix(in srgb,var(--sky) 45%,#26252B)}
+.cback{display:flex;flex-direction:column;gap:8px}
+.cbhd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:2px}
+.cbhd b{font-size:16px;color:var(--gold)}
+.cbhd span{font-size:12px;color:var(--faint)}
+.cbsec{margin-top:6px;font-size:13px;font-weight:700;color:var(--sky)}
+.cbit{display:flex;flex-direction:column;gap:3px;width:100%;padding:10px 12px;border:1px solid #2E2D34;border-radius:12px;background:#17161B;color:var(--ink);text-align:left;font:inherit}
+.cbit b{font-size:14px;color:var(--orange)}
+.cbtx{font-family:var(--serif);font-size:14.5px;line-height:1.6;color:var(--ink)}
+.cbit small{font-size:12.5px;color:var(--muted)}
+.cbempty{margin:0;font-size:13px;color:var(--faint)}
+.note.cbflash{animation:cbfl 1.2s ease-out}
+@keyframes cbfl{0%,40%{box-shadow:0 0 0 2px var(--sky)}100%{box-shadow:0 0 0 0 transparent}}
 body{touch-action:manipulation}
 .hits{margin:-2px 0 8px}
 .hits:empty{display:none}
@@ -3281,7 +3298,6 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         <button type="button" id="openMedBtn">📅 묵상 진도표</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="openProgBtn">✅ 실천 진도표</button>
-        <button type="button" id="openMedqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="openTongdokBtn">📖 성경 통독표</button>
         <button type="button" id="openGraphBtn"><svg class="grico" viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M12 4 4.5 18.5h15Z"/><path d="M12 4v9M4.5 18.5 12 13l7.5 5.5"/></g><g fill="currentColor"><circle cx="12" cy="4" r="2.6"/><circle cx="4.5" cy="18.5" r="2.6"/><circle cx="19.5" cy="18.5" r="2.6"/><circle cx="12" cy="13" r="2.2"/></g></svg> 말씀 연결 지도</button>
         <button type="button" id="prayReadBtn">🙏 기도 모아 읽기</button>
@@ -4823,6 +4839,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     return d;
   }
   function updateCard(el,n){
+    if(typeof flipIds!=="undefined"&&flipIds.has(n.id))fillBack(el,n);
     markInto(el.querySelector(".ref"),n.ref||"구절 미입력",filterText&&has(n.ref)?filterText:"");
     // 오늘 적은 한 줄 기록 수를 실천 이름으로: "감사 5" (내일이 되면 다시 0부터, 오늘 안 적으면 안 보임)
     var tdk=dkey(Date.now()), refEl=el.querySelector(".ref");
@@ -5517,6 +5534,63 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   });
   // 말씀 고치기: 말씀 글자 자리에 바로 편집 칸이 열림 (누른 곳에 커서)
   var vTap={id:"",t:0,timer:0}, vEditFrom={};
+  /* ---------- 카드 뒤집기: 휴대폰에서 카드를 옆으로 쓱 밀면 뒷면(연결한 말씀·같은 주제 말씀), 다시 밀면 앞면 (2026-10-29 사용자 요청) ---------- */
+  var flipIds=new Set();
+  function fillBack(card,n){
+    var bk=card.querySelector(".cback"); if(!bk){bk=document.createElement("div"); bk.className="cback"; card.appendChild(bk)}
+    bk.textContent="";
+    var hd=document.createElement("div"); hd.className="cbhd"; hd.innerHTML='<b></b><span>옆으로 밀면 앞면</span>'; hd.querySelector("b").textContent=(n.ref||"구절 미입력")+" · 뒷면"; bk.appendChild(hd);
+    var byRef={}; notes.forEach(function(x){if(x.id!==n.id&&x.ref)byRef[linkKey(x.ref)]=x});
+    function item(ref,txt,memo,id){
+      var b=document.createElement(id?"button":"div"); if(id){b.type="button"; b.dataset.go=id} b.className="cbit";
+      var r=document.createElement("b"); r.textContent=ref; b.appendChild(r);
+      if(txt){var t=document.createElement("span"); t.className="cbtx"; t.textContent=txt.replace(/\s+/g," ").trim().slice(0,90); b.appendChild(t)}
+      if(memo&&String(memo).replace(/\s+/g,"")!==String(txt||"").replace(/\s+/g,"")){var m=document.createElement("small"); m.textContent=memo; b.appendChild(m)}
+      return b;
+    }
+    var links=n.links||[];
+    var s1=document.createElement("div"); s1.className="cbsec"; s1.textContent="🔗 연결한 말씀 "+links.length; bk.appendChild(s1);
+    if(!links.length){var e1=document.createElement("p"); e1.className="cbempty"; e1.textContent="아직 연결한 말씀이 없어요. 앞면 '연결 말씀' 칸에서 이을 수 있어요."; bk.appendChild(e1)}
+    links.forEach(function(l){var x=byRef[linkKey(l.ref)]; bk.appendChild(item(l.ref,x?x.text:"",l.memo,x?x.id:""))});
+    var tps=n.topics||[], same=[];
+    if(tps.length)notes.forEach(function(x){if(x.id!==n.id&&(x.topics||[]).some(function(t){return tps.indexOf(t)>=0}))same.push(x)});
+    if(tps.length){
+      var s2=document.createElement("div"); s2.className="cbsec"; s2.textContent="#"+tps.join(" #")+" · 같은 주제 "+same.length; bk.appendChild(s2);
+      same.slice(0,12).forEach(function(x){bk.appendChild(item(x.ref||"구절 미입력",x.text,"",x.id))});
+      if(!same.length){var e2=document.createElement("p"); e2.className="cbempty"; e2.textContent="같은 주제를 붙인 다른 말씀이 아직 없어요."; bk.appendChild(e2)}
+    }
+  }
+  function flipCard(card){
+    var id=card.dataset.id, n=notes.get(id); if(!n)return;
+    var on=!flipIds.has(id);
+    if(on){flipIds.add(id); fillBack(card,n)}else{flipIds.delete(id); var bk=card.querySelector(".cback"); if(bk)bk.remove()}
+    card.classList.toggle("flipped",on);
+    card.classList.remove("flipin"); void card.offsetWidth; card.classList.add("flipin");
+    buzz(12);
+  }
+  (function(){
+    var L=$("list"), sw=null;
+    function hscroll(t){for(var el=t;el&&el!==L;el=el.parentElement){if(el.scrollWidth>el.clientWidth+2){var ox=getComputedStyle(el).overflowX;if(ox==="auto"||ox==="scroll")return true}}return false}
+    L.addEventListener("touchstart",function(e){
+      sw=null; if(boardOn||e.touches.length!==1)return;
+      var t=e.target, card=t.closest&&t.closest(".note"); if(!card)return;
+      if(t.closest("textarea,input,select,[contenteditable],.editbox,.verse.picking,.verse.memv,.mempanel,.vediting")||hscroll(t))return;
+      sw={card:card,x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()};
+    },{passive:true});
+    L.addEventListener("touchend",function(e){
+      if(!sw)return; var d=sw; sw=null; var c=e.changedTouches[0], dx=c.clientX-d.x, dy=c.clientY-d.y;
+      if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.6&&Date.now()-d.t<800&&d.card.isConnected)flipCard(d.card);
+    },{passive:true});
+    L.addEventListener("touchcancel",function(){sw=null},{passive:true});
+    L.addEventListener("click",function(e){   // 뒷면에서는 펼치기 대신: 말씀을 누르면 그 카드로
+      var card=e.target.closest&&e.target.closest(".note.flipped"); if(!card)return;
+      e.stopPropagation(); e.preventDefault();
+      var g=e.target.closest(".cbit[data-go]"); if(!g)return;
+      var to=cards.get(g.dataset.go); if(!to||!to.isConnected){toast("지금 목록에 안 보이는 말씀이에요");return}
+      to.scrollIntoView({block:"center",behavior:"smooth"}); to.classList.remove("cbflash"); void to.offsetWidth; to.classList.add("cbflash");
+    },true);
+  })();
+
   /* ---------- 세 번 빠르게 누르면 암송 화면 (휴대폰, 2026-10-23 사용자 요청) ----------
      카드 위면 그 말씀, 카드 밖이면 화면 가운데에 보이는 말씀의 암송 코치를 엶.
      앞의 두 누름이 한 일(펼치기·접기·고치기 기다림)은 되돌림 */
@@ -11424,7 +11498,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     body.appendChild(bg);
   }
   $("openSayBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay()});
-  $("openMedqBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openMedq()});
+
   $("openVerseBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"v")});
   $("openMedBtn").addEventListener("click",openMedProgress);
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
