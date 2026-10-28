@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-8">
+<meta name="app-build" content="2026-10-29-9">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -271,6 +271,10 @@ body.boardon .toolbar{border-bottom:0}   /* PC 칸반: 맨 위 단추 줄 아래
 .note.vediting .chead{position:static!important;margin:0!important;padding:0 0 2px!important;background:none!important;box-shadow:none!important;border-radius:0!important;align-items:flex-start!important;min-height:0!important;gap:6px!important}
 .note.vediting .editbox .etext{order:0;color:#E8C3A0;padding:8px 7px;margin:-9px -4px 0 -8px;width:calc(100% + 12px);overflow:hidden;resize:none}
 .note.vediting .editbox .lmvbox{order:1}
+.editbox{position:relative}
+.editbox .etext.vgut{padding-left:calc(7px + 2.1em)!important}
+.etgut{position:absolute;width:0;height:0;pointer-events:none;z-index:1}
+.etgut span{position:absolute;left:0;width:1.5em;text-align:right;color:var(--faint);font-weight:400;white-space:nowrap}
 .note.vediting .editbox .eref{order:2;margin:10px 0 0}
 .note.vediting .editbox .lmvbar{order:3}
 .note.vediting .editbox .donedit{order:4}
@@ -4374,6 +4378,73 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     document.addEventListener("pointerup",done,true);
   },true);
   function setVal(el,v){if(document.activeElement!==el&&el.value!==v){el.value=v;grow(el)}}
+  /* 고치기 칸 절 번호 칸: 글 칸에는 번호를 뺀 문장만 두고, 번호는 왼쪽 칸에 줄마다 겹쳐 그림.
+     et._nums[i] = i번째 줄의 절 번호("22 ") 또는 "" — 고칠 때마다 줄을 맞춰 따라감 */
+  var ET_NUM=/^[ \t]*(\d{1,3})([.)]?)[ \t]+/;
+  function etText(et){
+    var L=et.value.split(String.fromCharCode(10)); if(!et._nums)return et.value;
+    return L.map(function(t,i){return (et._nums[i]||"")+t}).join(String.fromCharCode(10));
+  }
+  function etSet(et,v){
+    if(document.activeElement===et)return;
+    if(et._full===v&&et._nums!==undefined)return;
+    var L=String(v||"").split(String.fromCharCode(10)), numbered=(String(v||"").match(/^[ \t]*\d{1,3}[.)]?[ \t]/gm)||[]).length>=2;
+    if(numbered){
+      var nums=[]; L=L.map(function(t,i){var m=t.match(ET_NUM); if(m){nums[i]=m[1]+m[2]+" "; return t.slice(m[0].length)} nums[i]=""; return t.replace(/^[ \t　]+/,"")});
+      et._nums=nums;
+    }else et._nums=null;
+    et.value=L.join(String.fromCharCode(10)); et._prev=L; et._full=v; et.classList.toggle("vgut",!!et._nums);
+    grow(et); etGutter(et);
+  }
+  function etRemap(et){   // 줄이 바뀐 만큼 번호를 옮김: 같은 줄 → 앞부분이 같은 줄 → 뒷부분이 같은 줄
+    var O=et._prev||[], N=et.value.split(String.fromCharCode(10)), on=et._nums||[];
+    var p=0; while(p<O.length&&p<N.length&&O[p]===N[p])p++;
+    var q=0; while(q<O.length-p&&q<N.length-p&&O[O.length-1-q]===N[N.length-1-q])q++;
+    var nn=[], i, j;
+    for(i=0;i<p;i++)nn[i]=on[i]||"";
+    var Om=O.slice(p,O.length-q), Nm=N.slice(p,N.length-q), got=Nm.map(function(){return ""}), used={};
+    function pre(a,b){var k=0;while(k<a.length&&k<b.length&&a[k]===b[k])k++;return k}
+    function suf(a,b){var k=0;while(k<a.length&&k<b.length&&a[a.length-1-k]===b[b.length-1-k])k++;return k}
+    var want=[]; Om.forEach(function(t,k){if(on[p+k])want.push(k)});
+    [function(a,b){return a===b?1:0},pre,suf].forEach(function(f){
+      want=want.filter(function(k){
+        var best=-1, bs=0; for(j=0;j<Nm.length;j++){if(used[j])continue; var sc=f(Om[k],Nm[j]); if(sc>bs){bs=sc;best=j}}
+        if(best<0)return true; used[best]=1; got[best]=on[p+k]; return false;
+      });
+    });
+    want.forEach(function(k){var j0=Math.min(k,Nm.length-1); for(j=j0;j>=0;j--)if(!used[j]){used[j]=1;got[j]=on[p+k];return}});
+    got.forEach(function(x,k){nn[p+k]=x});
+    for(i=0;i<q;i++)nn[N.length-q+i]=on[O.length-q+i]||"";
+    // 줄 맨 앞에 "26 "처럼 적으면 새 절 번호로
+    var a=et.selectionStart, cut=0, pos=0, ch=false;
+    N=N.map(function(t,k){
+      var m=!nn[k]&&t.match(/^(\d{1,3})([.)]?)[ \t]+/);
+      if(m){nn[k]=m[1]+m[2]+" "; if(pos<a)cut+=Math.min(m[0].length,a-pos); ch=true; t=t.slice(m[0].length)}
+      pos+=t.length+(m?m[0].length:0)+1; return t;
+    });
+    if(ch){et.value=N.join(String.fromCharCode(10)); try{et.setSelectionRange(a-cut,a-cut)}catch(e){}}
+    et._nums=nn; et._prev=N;
+  }
+  function etInput(et){
+    if(!et._nums&&(et.value.match(/^[ 	]*\d{1,3}[.)]?[ 	]/gm)||[]).length>=2){et._nums=[]; et._prev=[]; et.classList.add("vgut")}   // 번호 붙은 말씀을 붙여 넣으면 번호 칸으로
+    if(et._nums)etRemap(et); else et._prev=et.value.split(String.fromCharCode(10));
+    var v=etText(et); et._full=v; etGutter(et); return v;
+  }
+  var etMir=null;
+  function etGutter(et){
+    var eb=et.parentNode, g=eb&&eb.querySelector(".etgut");
+    if(!et._nums||et.hidden||!et.offsetWidth){if(g)g.textContent="";return}
+    if(!g){g=document.createElement("div"); g.className="etgut"; g.setAttribute("aria-hidden","true"); eb.appendChild(g)}
+    var cs=getComputedStyle(et);
+    if(!etMir){etMir=document.createElement("div"); etMir.setAttribute("aria-hidden","true"); etMir.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;box-sizing:border-box"; document.body.appendChild(etMir)}
+    ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","wordSpacing","wordBreak","paddingLeft","paddingRight","paddingTop","borderLeftWidth","borderRightWidth","borderTopWidth","borderStyle"].forEach(function(k){etMir.style[k]=cs[k]});
+    etMir.style.width=et.offsetWidth+"px"; etMir.textContent="";
+    var L=et.value.split(String.fromCharCode(10)), rows=L.map(function(t){var d=document.createElement("div"); d.textContent=t||"\u200b"; etMir.appendChild(d); return d});
+    g.textContent="";
+    g.style.cssText="left:"+(et.offsetLeft+et.clientLeft+parseFloat(cs.paddingLeft)-parseFloat(cs.fontSize)*2.1)+"px;top:"+(et.offsetTop+et.clientTop-et.scrollTop)+"px;font-family:"+cs.fontFamily+";font-size:"+cs.fontSize+";line-height:"+cs.lineHeight;
+    rows.forEach(function(d,i){var x=et._nums[i]; if(!x)return; var sp=document.createElement("span"); sp.textContent=x.replace(/[ .)]+$/,""); sp.style.top=d.offsetTop+"px"; g.appendChild(sp)});
+  }
+  window.addEventListener("resize",function(){document.querySelectorAll(".editbox .etext.vgut").forEach(etGutter)});
   // PC: 기도 제목·응답 칸을 누르면 화면 세로로 크게 펼침 (오른쪽 아래 손잡이로 줄이고 늘리기도 그대로, 2026-10-23 사용자 요청)
   document.addEventListener("focusin",function(e){
     var t=e.target; if(!t||!t.classList||!(t.classList.contains("pt")||t.classList.contains("pan")))return;
@@ -4905,7 +4976,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     renderFriendBox(el,n);
     var mpv=el.querySelector(".mpriv"); if(mpv){mpv.textContent=n.priv?"🔒 나만 보기":"👥 친구 공개"; mpv.classList.toggle("on",!!n.priv); mpv.setAttribute("aria-pressed",String(!!n.priv)); mpv.title=n.priv?"이 말씀은 기도·묵상·실천 모두 나만 봐요 (누르면 친구 공개)":"친구가 이 말씀의 묵상·실천과 👥 표시한 기도를 볼 수 있어요 (누르면 나만 보기)"}
     setVal(el.querySelector(".eref"),n.ref);
-    setVal(el.querySelector(".etext"),n.text);
+    etSet(el.querySelector(".etext"),n.text);
     var box=el.querySelector(".qs"), have=new Map();
     Array.prototype.forEach.call(box.children,function(c){have.set(c.dataset.qid,c)});
     n.qs.forEach(function(q,i){
@@ -5251,7 +5322,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }else if(t.classList.contains("eref")){
       n.ref=t.value; var p=parseRef(t.value); n.book=p.book; n.chapter=p.chapter; n.verse=p.verse;
       card.querySelector(".ref").textContent=n.ref||"구절 미입력";
-    }else if(t.classList.contains("etext")){n.text=t.value;focusMode.delete(n.id);renderVerse(card,n)}
+    }else if(t.classList.contains("etext")){n.text=etInput(t);focusMode.delete(n.id);renderVerse(card,n)}
     else return;
     scheduleSave(n.id);
     syncCounts(card,n);
@@ -5652,10 +5723,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     try{window.getSelection().removeAllRanges()}catch(e){}
     card.classList.add("vediting");
     var ve=card.querySelector(".vedit"), eb=card.querySelector(".editbox");
-    eb.hidden=false; setVal(eb.querySelector(".eref"),n.ref); var et=eb.querySelector(".etext"); setVal(et,n.text);
+    eb.hidden=false; setVal(eb.querySelector(".eref"),n.ref); var et=eb.querySelector(".etext"); et._full=null; etSet(et,n.text);
     vEditFrom[id]=n.text+"|"+n.ref;
     setTimeout(function(){
-      grow(et); et.focus({preventScroll:true});
+      grow(et); etGutter(et); et.focus({preventScroll:true});
       var k=at>=0?at:et.value.length; try{et.setSelectionRange(k,k)}catch(e){}
       var r=et.getBoundingClientRect(); if(r.top<70||r.bottom>window.innerHeight-40)et.scrollIntoView({block:"center",behavior:"smooth"});
     },30);
@@ -5680,6 +5751,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   /* ---------- 말씀 고치기에서 줄 옮기기 (2026-10-22 사용자 요청)
      PC: 말씀 칸에서 Alt + 위/아래 화살표로 지금 줄(고른 줄들)을 위아래로
      휴대폰: [줄 옮기기]를 누르면 줄마다 손잡이가 생겨 끌어서 옮기거나 위아래 단추로 한 칸씩 */
+  list.addEventListener("keydown",function(e){
+    var et=e.target; if(e.key!=="Backspace"||!et.classList||!et.classList.contains("etext")||!et._nums)return;
+    var a=et.selectionStart; if(a!==et.selectionEnd)return;
+    var k=et.value.slice(0,a).split(String.fromCharCode(10)).length-1, ls=et.value.lastIndexOf(String.fromCharCode(10),a-1)+1;
+    if(a!==ls||!et._nums[k])return;
+    e.preventDefault(); et._nums[k]=""; et.dispatchEvent(new Event("input",{bubbles:true})); buzz(8);
+  });
   function lmvSet(et,lines){et.value=lines.join("\n"); et.dispatchEvent(new Event("input",{bubbles:true})); try{grow(et)}catch(e){}}
   list.addEventListener("keydown",function(e){
     var et=e.target; if(!et.classList||!et.classList.contains("etext")||!e.altKey||(e.key!=="ArrowUp"&&e.key!=="ArrowDown"))return;
@@ -5701,7 +5779,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     lines.forEach(function(t,i){
       var r=document.createElement("div"); r.className="lmvrow"+(t.trim()?"":" empty"); r.dataset.i=String(i);
       r.innerHTML='<span class="lmvgrip" aria-hidden="true">⠿</span><span class="lmvt"></span><button type="button" class="lmvup" aria-label="위로">▲</button><button type="button" class="lmvdn" aria-label="아래로">▼</button>';
-      r.querySelector(".lmvt").textContent=t.trim()?t:"(빈 줄)";
+      r.querySelector(".lmvt").textContent=t.trim()?((et._nums&&et._nums[i])||"")+t:"(빈 줄)";
       box.appendChild(r);
     });
     var d=document.createElement("div"); d.className="lmvfoot"; d.innerHTML='<span>⠿ 끌거나 ▲▼로 옮겨요</span><button type="button" class="lmvdone">다 옮겼어요</button>'; box.appendChild(d);
@@ -5709,7 +5787,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function lmvOpen(eb,on){
     var et=eb.querySelector(".etext"), box=eb.querySelector(".lmvbox"), bar=eb.querySelector(".lmvbar");
     box.hidden=!on; et.hidden=on; bar.hidden=on;
-    if(on){lmvDraw(eb); box.focus({preventScroll:true})} else {try{grow(et)}catch(e){} et.focus({preventScroll:true})}
+    if(on){lmvDraw(eb); box.focus({preventScroll:true})} else {try{grow(et)}catch(e){} etGutter(et); et.focus({preventScroll:true})}
   }
   function lmvMove(eb,from,to){
     var et=eb.querySelector(".etext"), lines=et.value.split("\n");
@@ -8076,7 +8154,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var v=ccBox.querySelector(".ccverse"); v.textContent=""; v.classList.remove("big","recall");
     var d=C.dict||{};
     if(!d.res){
-      tip.innerHTML="<b>✍️ 받아쓰기</b><br>기억나는 대로 적어 보세요. 조사(은·는·이·가)만 달라도 맞은 것으로 쳐요."+((window.SpeechRecognition||window.webkitSpeechRecognition)?"<br>🎤 칸 오른쪽 아래 마이크를 누르고 <b>소리 내어 외우면</b> 글로 들어가요. 다 외웠으면 채점하기!":"");
+      tip.innerHTML="";   // 안내 문구 없앰 (2026-10-29 사용자 요청)
       var box=document.createElement("div"); box.className="ccdict";
       var ta=document.createElement("textarea"); ta.className="ccdta"; ta.placeholder="여기에 말씀을 적어 보세요 (Ctrl+Enter = 채점)";
       ta.value=d.text||""; box.appendChild(ta);
