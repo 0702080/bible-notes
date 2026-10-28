@@ -6,7 +6,7 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png">
-<meta name="app-build" content="2026-10-29-10">
+<meta name="app-build" content="2026-10-29-11">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2120,7 +2120,10 @@ button:active{filter:brightness(1.15)}
 .micint{position:absolute;right:46px;bottom:6px;max-width:min(60vw,420px);padding:4px 10px;border-radius:10px;background:rgba(20,19,24,.92);color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
 .micint:empty{display:none}
 .ccvgap{display:block;height:.9em}
-.ccdlive{margin-top:14px;font-size:17px;line-height:1.9;word-break:keep-all}
+.ccdlive{margin:0 0 14px;font-size:17px;line-height:1.9;word-break:keep-all}
+.ccdref{font-size:14px;color:#4A4855;margin-bottom:2px}
+.ccdref.ok{color:#7FE3C6;font-weight:700}
+.ccdref.bad{color:var(--pink)}
 .ccdlive .dw.ok{color:#7FE3C6;font-weight:700}
 .ccdlive .dw.hide{color:#4A4855;letter-spacing:1px}
 .ccdpc{font-size:12.5px;color:var(--muted);margin-bottom:4px}
@@ -8174,6 +8177,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     return {rows:rows,ok:ok,near:near,total:E.length};
   }
+  var DREF_RE=/([가-힣]{1,8})\s*(\d{1,3})\s*(?:[:：.]|장)\s*(\d{1,3})(?:\s*절)?(?:\s*[-~～]\s*(\d{1,3})(?:\s*절)?)?/;
+  function dictRefParse(t){var m=String(t||"").match(DREF_RE); return m?{i:m.index,len:m[0].length,b:m[1],c:+m[2],v:+m[3],e:m[4]?+m[4]:0}:null}
+  function dictRef(n,typed){   // 적은 글 맨 앞이나 맨 끝의 구절 이름을 떼어 내고 맞는지 봄
+    var t=String(typed||""), lead=t.match(/^\s*/)[0].length, x=dictRefParse(t.slice(lead)), at=-1, len=0;
+    if(x&&x.i===0){at=lead;len=x.len}
+    else{var tail=t.replace(/\s+$/,""), m=tail.match(new RegExp("("+DREF_RE.source+")$")); if(m){x=dictRefParse(m[1]); at=tail.length-m[1].length; len=m[1].length}}
+    if(at<0||!x)return {text:t,has:false,ok:false};
+    var want=dictRefParse(n.ref), ok=false;
+    if(want){var wb=dictBare(want.b), tb=dictBare(x.b); ok=want.c===x.c&&want.v===x.v&&(!want.e||!x.e||want.e===x.e)&&(wb===tb||wb.indexOf(tb)===0||(tb.length>=1&&wb.charAt(0)===tb.charAt(0)&&tb.length<=2))}
+    return {text:t.slice(0,at)+" "+t.slice(at+len),has:true,ok:ok};
+  }
   function ccDict(n,tip,btn){
     var v=ccBox.querySelector(".ccverse"); v.textContent=""; v.classList.remove("big","recall");
     var d=C.dict||{};
@@ -8181,14 +8195,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       tip.innerHTML="";   // 안내 문구 없앰 (2026-10-29 사용자 요청)
       var box=document.createElement("div"); box.className="ccdict";
       var ta=document.createElement("textarea"); ta.className="ccdta"; ta.placeholder="여기에 말씀을 적어 보세요 (Ctrl+Enter = 채점)";
-      ta.value=d.text||""; box.appendChild(ta);
-      // 치는 대로 맞힌 낱말이 하나씩 드러남 (2026-10-29 사용자 요청: 타이핑하며 암송)
-      var live=document.createElement("div"); live.className="ccdlive"; box.appendChild(live); v.appendChild(box);
+      ta.value=d.text||"";
+      // 치는 대로 맞힌 낱말이 하나씩 드러남 (2026-10-29 사용자 요청: 타이핑하며 암송) — 가려진 말씀은 적는 칸 위에
+      var live=document.createElement("div"); live.className="ccdlive"; box.appendChild(live); box.appendChild(ta); v.appendChild(box);
       var drawLive=function(){
-        var r0=dictScore(n.text,ta.value), got=0; live.textContent="";
+        var rf=dictRef(n,ta.value), r0=dictScore(n.text,rf.text), got=0; live.textContent="";
+        var rr=document.createElement("div"); rr.className="ccdref"+(rf.ok?" ok":rf.has?" bad":"");
+        rr.textContent=rf.ok?"✓ "+n.ref:rf.has?"✗ 구절이 달라요":"📖 "+circles(String(n.ref||""));
+        live.appendChild(rr);
         r0.rows.forEach(function(x,i){if(i)live.appendChild(document.createTextNode(" ")); var sp=document.createElement("span");
           if(x.s==="ok"||x.s==="near"){sp.className="dw ok";sp.textContent=x.w;got++} else {sp.className="dw hide";sp.textContent=circles(x.w)} live.appendChild(sp)});
-        var pc=document.createElement("div"); pc.className="ccdpc"; pc.textContent=got+" / "+r0.total+" 낱말"; live.insertBefore(pc,live.firstChild);
+        var pc=document.createElement("div"); pc.className="ccdpc"; pc.textContent=got+" / "+r0.total+" 낱말"+(rf.ok?" · 구절 ✓":""); live.insertBefore(pc,live.firstChild);
         if(C&&C.dict)C.dict.text=ta.value;
       };
       ta.addEventListener("input",drawLive); drawLive();
@@ -8198,7 +8215,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       return;
     }
     var r=d.res, pc=Math.round((r.ok+r.near)/Math.max(1,r.total)*100);
-    tip.innerHTML="<b>✍️ 받아쓰기 결과</b><br><b class='ccsc'>"+(r.ok+r.near)+" / "+r.total+"</b> 낱말 ("+pc+"%)"+(r.near?" · 조사만 다른 것 "+r.near+"개":"");
+    tip.innerHTML="<b>✍️ 받아쓰기 결과</b><br><b class='ccsc'>"+(r.ok+r.near)+" / "+r.total+"</b> 낱말 ("+pc+"%)"+(r.near?" · 조사만 다른 것 "+r.near+"개":"")+
+      (r.ref?(r.ref.ok?"<br>📖 구절 <b class='ccsc'>✓ 맞았어요</b>":r.ref.has?"<br>📖 구절 ✗ 정답은 <b></b>":"<br>📖 구절도 적어 보세요 (예: 마태복음 6:33)"):"");
+    if(r.ref&&r.ref.has&&!r.ref.ok){var bs=tip.querySelectorAll("b"); bs[bs.length-1].textContent=n.ref||""}
     var wrap=document.createElement("div"); wrap.className="ccdres";
     r.rows.forEach(function(x,i){
       if(i){wrap.appendChild(document.createTextNode(" "))}
@@ -8343,7 +8362,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(a==="dback"){C.dict=null;ccDraw();return}
     if(a==="dscore"){
       var ta=ccBox.querySelector(".ccdta"), val=ta?ta.value:"";
-      C.dict={on:true,text:val,res:dictScore(n.text,val)}; buzz(8); ccDraw(); return;
+      var rf=dictRef(n,val), rs=dictScore(n.text,rf.text); rs.ref={has:rf.has,ok:rf.ok};
+      C.dict={on:true,text:val,res:rs}; buzz(8); ccDraw(); return;
     }
     if(a==="dretry"){C.dict={on:true,text:(C.dict&&C.dict.text)||"",res:null};ccDraw();return}
     if(a==="show"){ccReveal();return}
