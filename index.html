@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-48">
+<meta name="app-build" content="2026-10-29-49">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10035,11 +10035,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var ta=dlfSh.querySelector("textarea"), mv=dlMemoGet(o,dlDay,fid); ta.value=mv; delete ta.dataset.tpl; ta.classList.remove("dlessay");
     // 전체 보기의 기록 칸과 같은 형식: 에세이는 자유 글, 나머지 빈 칸은 기도문 틀로 시작 (2026-10-29 사용자 요청)
     if(it.g==="essay"){ta.placeholder="오늘 인상 깊게 보고, 듣고, 생각한 것을 자유롭게 적어 보세요. 제목이 떠오르면 첫 줄에 적어도 좋아요."; ta.classList.add("dlessay")}
-    else{ta.placeholder="구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)"; if(!mv){ta.value=PRAY_TPL.replace("\n\n\n\n","\n\n\n\n\n\n\n\n\n\n\n"); ta.dataset.tpl="1"}}   // 집중 기록 화면: 하나님 아버지 아래 빈 줄을 넉넉히 (2026-10-29 사용자 요청)
+    else{ta.placeholder="구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)"; if(!mv){ta.value=PRAY_TPL.replace("\n\n\n\n","\n\n\n\n\n\n\n\n\n\n"); ta.dataset.tpl="1"}}   // 집중 기록 화면: 하나님 아버지 아래 빈 줄을 넉넉히 (2026-10-29 사용자 요청)
     dlfSh.querySelector(".dlfssave").textContent="";
     dlfSh.hidden=false; dlfSh.style.top=""; dlfSh.style.height=""; dlfSh.style.bottom=""; if(dlfSh._fit)setTimeout(dlfSh._fit,0); dlfSh.classList.remove("dlfsin"); void dlfSh.offsetWidth; dlfSh.classList.add("dlfsin");
     try{history.pushState({dlfs:1},"");dlfHist=true}catch(e){dlfHist=false}
-    buzz(6); setTimeout(function(){try{ta.focus({preventScroll:true})}catch(e){ta.focus()} var cp=ta.dataset.tpl?ta.value.indexOf("길이요")-3:ta.value.length;   // 커서 줄과 '길이요' 사이 빈 줄 2개 (2026-10-29 사용자 요청)
+    buzz(6); setTimeout(function(){try{ta.focus({preventScroll:true})}catch(e){ta.focus()} var cp=ta.dataset.tpl?ta.value.indexOf("길이요")-2:ta.value.length;   // 커서 줄과 '길이요' 사이 빈 줄 1개 (2026-10-29 사용자 요청)
     try{ta.setSelectionRange(cp,cp)}catch(e){}},280);   // 기도문 틀이면 셋째 줄(빈 줄)에 커서 if(dlfSh._fit){setTimeout(dlfSh._fit,600);setTimeout(dlfSh._fit,1000)}
   }
   function dlFocusSheetClose(){
