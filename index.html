@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-22">
+<meta name="app-build" content="2026-10-29-23">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5655,7 +5655,6 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     var links=n.links||[];
     var s1=document.createElement("div"); s1.className="cbsec"; s1.textContent="🔗 연결한 말씀 "+links.length; bk.appendChild(s1);
-    if(!links.length){var e1=document.createElement("p"); e1.className="cbempty"; e1.textContent="아직 연결한 말씀이 없어요. 앞면 '연결 말씀' 칸에서 이을 수 있어요."; bk.appendChild(e1)}
     links.forEach(function(l){var x=byRef[linkKey(l.ref)]; bk.appendChild(item(l.ref,x?x.text:"",l.memo,x?x.id:""))});
     var tps=n.topics||[], same=[];
     if(tps.length)notes.forEach(function(x){if(x.id!==n.id&&(x.topics||[]).some(function(t){return tps.indexOf(t)>=0}))same.push(x)});
