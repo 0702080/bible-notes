@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=2">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<meta name="app-build" content="2026-10-29-15">
+<meta name="app-build" content="2026-10-29-16">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -11126,7 +11126,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     setTimeout(function(){BS.busy=false; renderBoardSay(true)},(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)?0:450);
   }
   setInterval(bsRoll,24000);   // 두 배 천천히 바뀜 (2026-10-29 사용자 요청)
-  setInterval(function(){var s0=new Date().getSeconds(); if(s0<5)bsRoll()},5000);   // 정각에 늦지 않게
+  setInterval(function(){var s0=new Date().getSeconds(), hr=s0<5&&sayHour(); if(hr&&hr.id!==BS.id)bsRoll()},5000);   // 정각에 늦지 않게
   function renderReviewBar(){
     try{renderBoardSay()}catch(e){}
     var bar=$("reviewBar"); if(!bar)return;
