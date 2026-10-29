@@ -2174,6 +2174,10 @@ button:active{filter:brightness(1.15)}
 .ccw.hid .ccm{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;letter-spacing:1px;white-space:nowrap;pointer-events:none}
 .ccw.hid.peek .ccg{visibility:visible}
 .ccw.hid.peek .ccm{display:none}
+.ccw.hid.ccnum .ccm{position:static;display:inline-flex}
+.ccw.hid.ccnum .ccg{position:absolute;left:0;right:0;top:0;bottom:0;text-align:center}
+.ccw.hid.ccnum.peek .ccg{position:static}
+.ccw.hid.ccnum.peek .ccm{display:none}
 .ccw.hid.peek{color:var(--hi);background:color-mix(in srgb,var(--gold) 15%,transparent);letter-spacing:0}
 .ccfoot{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid #1E1D23;max-width:720px;width:100%;margin:0 auto}
 .ccbtn{height:48px;padding:0 18px;border:1px solid var(--rule);border-radius:24px;background:transparent;color:var(--muted);font-size:15px;font-weight:700;white-space:nowrap}
@@ -8138,6 +8142,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(sp.dataset.f){var b=document.createElement("b");b.textContent=sp.dataset.f;m.appendChild(b);m.appendChild(document.createTextNode(sp.dataset.m))}
     else m.textContent=sp.dataset.m;
     sp.appendChild(g); sp.appendChild(m);
+    sp.classList.toggle("ccnum",/[0-9A-Za-z]/.test(g.textContent));   // 숫자·영문은 글자가 좁아 칸이 ○보다 작아짐 → ○가 칸 너비를 잡게 (2026-10-29 사용자 요청)
   }
   function ccWords(text,mode,frac,seed,opt){   // mode: all | first | hide(frac) | none | got(색 입혀 다 보기)
     opt=opt||{};
