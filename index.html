@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-23">
+<meta name="app-build" content="2026-10-29-24">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2283,10 +2283,10 @@ button:active{filter:brightness(1.15)}
 .ccpainting .ccverse .ccw{cursor:pointer;outline:1px dashed color-mix(in srgb,var(--bc,#888) 60%,transparent);outline-offset:2px;border-radius:6px}
 .ccvref{cursor:pointer;margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
 .cch .bqtitle .ccref{display:none}
-.ccw.ccpopx{animation:ccpopx .45s cubic-bezier(.2,1.8,.4,1)}
+.ccw.ccpopx{animation:ccpopx .75s cubic-bezier(.2,1.8,.4,1)}
 @keyframes ccpopx{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
 .ccburst{position:fixed;width:0;height:0;pointer-events:none;z-index:200}
-.ccburst i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;animation:ccbx .6s cubic-bezier(.15,.8,.3,1) forwards}
+.ccburst i{position:absolute;left:-4px;top:-4px;width:8px;height:8px;border-radius:50%;animation:ccbx .9s cubic-bezier(.15,.8,.3,1) forwards}   /* 0.3초 더 길게 (2026-10-29 사용자 요청) */
 @keyframes ccbx{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--x),var(--y)) scale(.3);opacity:0}}
    /* 휴대폰: 아래 단추 가로 폭 20% 줄이기 (2026-10-21 사용자 요청) */
 /* PC: 진행 줄과 단추를 화면 가운데 알맞은 크기로 (2026-10-18 사용자 요청) */
@@ -7756,7 +7756,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       for(var i=0;i<14;i++){var p=document.createElement("i"),a=Math.PI*2*i/14+Math.random()*.5,d=30+Math.random()*34;
         p.style.setProperty("--x",Math.cos(a)*d+"px"); p.style.setProperty("--y",Math.sin(a)*d+"px"); p.style.background=cols[i%cols.length];
         if(i%3===0)p.style.borderRadius="2px"; box.appendChild(p)}
-      document.body.appendChild(box); setTimeout(function(){box.remove()},700);
+      document.body.appendChild(box); setTimeout(function(){box.remove()},1000);
     }catch(e){}
   }
   function sparkle(el){
