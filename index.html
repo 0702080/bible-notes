@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-43">
+<meta name="app-build" content="2026-10-29-44">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -579,6 +579,14 @@ body.boardon .toolbar{border-bottom:0}   /* PC 칸반: 맨 위 단추 줄 아래
 .cbit small{font-size:12.5px;color:var(--muted)}
 .cbempty{margin:0;font-size:13px;color:var(--faint)}
 .note.cbflash,.bcard.cbflash{animation:cbfl 1.2s ease-out}
+/* 뒷면 말씀 → 그 카드로 바로 넘어가기 (2026-10-29 사용자 요청) */
+.cbjghost{position:fixed;z-index:400;pointer-events:none;transition:transform .23s cubic-bezier(.4,0,.8,.5),opacity .23s ease;transform-origin:center}
+.cbjghost>.cbit{width:100%;height:100%;box-sizing:border-box;margin:0;box-shadow:0 0 0 2px var(--gold),0 12px 40px rgba(0,0,0,.6)}
+.cbjghost.go{transform:scale(1.12);opacity:0}
+.cbjveil{position:fixed;inset:0;z-index:399;pointer-events:none;background:#0B0B0D;opacity:0;transition:opacity .22s ease}
+.cbjveil.on{opacity:.92}
+.note.cbjin,.bcard.cbjin{animation:cbjin .55s cubic-bezier(.2,1.3,.4,1),cbfl 1.2s ease-out}
+@keyframes cbjin{from{transform:scale(.9) translateY(18px);opacity:.2}to{transform:none;opacity:1}}
 .bcard.flipped>:not(.cback):not(.bcflip){display:none!important}
 .bcard:not(.flipped)>.cback{display:none}
 .bcard.flipin{animation:cflip .32s ease-out}
@@ -5713,6 +5721,29 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(!same.length){var e2=document.createElement("p"); e2.className="cbempty"; e2.textContent="같은 주제를 붙인 다른 말씀이 아직 없어요."; bk.appendChild(e2)}
     }
   }
+  // 뒷면 말씀을 누르면 스크롤 없이 바로 그 카드로: 누른 말씀이 앞으로 튀어나오며 화면이 잠깐 덮이고, 그 카드가 커지며 나타남 (2026-10-29 사용자 요청)
+  var cbjBusy=false;
+  function cbJump(from,to,opt){
+    if(cbjBusy)return; buzz(10);
+    var still=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;
+    function land(){
+      var top=to.getBoundingClientRect().top+window.scrollY-(opt.block==="start"?14:0);
+      if(opt.block==="start")window.scrollTo({top:Math.max(0,top),behavior:"instant"}); else to.scrollIntoView({block:opt.block,inline:opt.inline||"nearest",behavior:"instant"});
+      to.classList.remove("cbflash","cbjin"); void to.offsetWidth; to.classList.add("cbjin","cbflash");
+      setTimeout(function(){to.classList.remove("cbjin")},700);
+    }
+    if(still){land();return}
+    cbjBusy=true;
+    var r=from.getBoundingClientRect(), gh=document.createElement("div"); gh.className="cbjghost";
+    gh.style.left=r.left+"px"; gh.style.top=r.top+"px"; gh.style.width=r.width+"px"; gh.style.height=r.height+"px";
+    gh.appendChild(from.cloneNode(true)); document.body.appendChild(gh);
+    var veil=document.createElement("div"); veil.className="cbjveil"; document.body.appendChild(veil);
+    requestAnimationFrame(function(){gh.classList.add("go"); veil.classList.add("on")});
+    setTimeout(function(){
+      land(); veil.classList.remove("on"); gh.remove();
+      setTimeout(function(){veil.remove(); cbjBusy=false},260);
+    },230);
+  }
   function flipCard(card){
     var id=card.dataset.id, n=notes.get(id); if(!n)return;
     var on=!flipIds.has(id);
@@ -5743,14 +5774,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       e.stopPropagation(); e.preventDefault();
       var g=e.target.closest(".cbit[data-go]"); if(!g){flipCard(card);return}   // 뒷면 빈 곳을 누르면 앞면 (2026-10-29 사용자 요청)
       var to=document.querySelector('#board .bcard[data-id="'+g.dataset.go+'"]'); if(!to){toast("지금 칸반에 안 보이는 말씀이에요");return}
-      to.scrollIntoView({block:"center",inline:"center",behavior:"smooth"}); to.classList.remove("cbflash"); void to.offsetWidth; to.classList.add("cbflash");
+      cbJump(g,to,{block:"center",inline:"center"});
     },true);
     L.addEventListener("click",function(e){   // 뒷면에서는 펼치기 대신: 말씀을 누르면 그 카드로
       var card=e.target.closest&&e.target.closest(".note.flipped"); if(!card)return;
       e.stopPropagation(); e.preventDefault();
       var g=e.target.closest(".cbit[data-go]"); if(!g){flipCard(card);return}   // 뒷면 빈 곳을 누르면 앞면 (2026-10-29 사용자 요청)
       var to=cards.get(g.dataset.go); if(!to||!to.isConnected){toast("지금 목록에 안 보이는 말씀이에요");return}
-      to.scrollIntoView({block:"center",behavior:"smooth"}); to.classList.remove("cbflash"); void to.offsetWidth; to.classList.add("cbflash");
+      cbJump(g,to,{block:"start"});
     },true);
   })();
 
