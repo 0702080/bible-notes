@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-52">
+<meta name="app-build" content="2026-10-29-53">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10023,11 +10023,18 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       function fitVV(){
         if(!dlfSh||dlfSh.hidden||!vv)return;
         var kb=window.innerHeight-vv.height>120;
-        dlfSh.style.top=vv.offsetTop+"px"; dlfSh.style.height=Math.floor(vv.height-(kb?10:0))+"px";   // 키보드 위로 살짝 띄워 '했어요' 단추 아래가 안 가려지게 (2026-10-29 사용자 요청) dlfSh.style.bottom="auto";
         dlfSh.classList.toggle("dlfskb",kb);
+        dlfSh.style.top=vv.offsetTop+"px"; dlfSh.style.bottom="auto";
+        var h=Math.floor(vv.height-(kb?10:0)); dlfSh.style.height=h+"px";   // 키보드 위로 살짝 띄워 '했어요' 단추가 안 가려지게 (2026-10-29 사용자 요청)
         if(kb)window.scrollTo(0,window.scrollY);
+        // 그래도 단추 아래가 보이는 화면 밖으로 나가면 그만큼 더 줄임
+        var fb=dlfSh.querySelector(".dlfsdone"), lim=vv.offsetTop+vv.height-6;
+        if(fb){var over=fb.getBoundingClientRect().bottom-lim; if(over>0)dlfSh.style.height=Math.max(200,h-Math.ceil(over)-4)+"px"}
         var t2=dlfSh.querySelector("textarea"); if(kb&&t2&&t2.dataset.tpl&&document.activeElement===t2)t2.scrollTop=t2.scrollHeight;   // 틀만 있을 땐 맨 아래(아멘)까지 보이게
       }
+      // 키보드가 다 올라오는 동안(위 도구줄 포함) 1.5초 동안 계속 다시 맞춤
+      function fitBurst(){var n=0; clearInterval(dlfSh._bi); dlfSh._bi=setInterval(function(){fitVV(); if(++n>=12)clearInterval(dlfSh._bi)},130)}
+      dlfSh.querySelector("textarea").addEventListener("focus",fitBurst);
       if(vv){vv.addEventListener("resize",fitVV); vv.addEventListener("scroll",fitVV)}
       dlfSh._fit=fitVV;
     }
