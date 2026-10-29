@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-30">
+<meta name="app-build" content="2026-10-29-31">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8077,8 +8077,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var wt=String(w.dataset.w||w.textContent||"").trim();
         if(wt)sayWord(wt,true);   // 누를 때마다 그 낱말 소리 (2026-10-17 사용자 요청)
         // 떠올리기: 한 소절씩 눌러 맨 끝 낱말까지 오면 암송 완료로 셈하고 다음 말씀(다음 번째)으로 (2026-10-23 사용자 요청)
-        var ws=ccBox.querySelectorAll(".ccverse .ccw");
-        if(C.stage===3&&!C.autoDone&&ws.length&&w===ws[ws.length-1]){
+        // 낱말을 하나씩 다 눌러야(순서 상관없이 모두 한 번씩) 암송으로 셈 — 끝 낱말만 눌러서는 안 셈 (2026-10-29 사용자 요청)
+        var ws=ccBox.querySelectorAll(".ccverse .ccw"), wsi=Array.prototype.indexOf.call(ws,w), tk=C.seed+":"+C.stage;
+        if(C.tapKey!==tk){C.tapKey=tk;C.tapped={}}
+        if(wsi>=0)C.tapped[wsi]=1;
+        var allTap=ws.length>0&&Object.keys(C.tapped).length>=ws.length;
+        if(C.stage===3&&!C.autoDone&&allTap){
           C.autoDone=1; var cid=C.id;
           var cnb=ccBox.querySelector(".ccnum");   // 숫자는 누르는 즉시 하나 올려 보여 줌 (2026-10-23 사용자 요청)
           var n0c=notes.get(cid); if(cnb&&n0c){cnb.hidden=false; cnb.textContent="암송 "+(ccCount(n0c)+1); cnb.classList.remove("ccnumup"); void cnb.offsetWidth; cnb.classList.add("ccnumup"); ccBurst(cnb)}
