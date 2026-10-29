@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-3">
+<meta name="app-build" content="2026-10-30-4">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8370,7 +8370,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var slot=last+1, tail=W.slice(jj), ends=/\s$/.test(rf.text), bad=tail.length>(ends?0:1);
         while(slot<r0.rows.length&&(r0.rows[slot].s==="ok"||r0.rows[slot].s==="near"))slot++;
         var rr=document.createElement("div"); rr.className="ccdref"+(rf.ok?" ok":rf.has?" bad":"");
-        rr.textContent=rf.ok?"✓ "+n.ref:rf.has?"✗ 구절이 달라요":"📖 "+circles(String(n.ref||""));
+        rr.textContent=rf.ok?"✓ "+n.ref:rf.has?"✗ 구절이 달라요":circles(String(n.ref||""));
         live.appendChild(rr);
         var ri=0;
         String(n.text||"").split(String.fromCharCode(10)).forEach(function(ln){
