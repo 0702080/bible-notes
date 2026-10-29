@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-19">
+<meta name="app-build" content="2026-10-29-20">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5635,7 +5635,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function fillBack(card,n){
     var bk=card.querySelector(".cback"); if(!bk){bk=document.createElement("div"); bk.className="cback"; card.appendChild(bk)}
     bk.textContent="";
-    var hd=document.createElement("div"); hd.className="cbhd"; hd.innerHTML='<b></b><span>'+(boardOn?"↺ 누르면 앞면":"옆으로 밀면 앞면")+'</span>'; hd.querySelector("b").textContent=(n.ref||"구절 미입력")+" · 뒷면"; bk.appendChild(hd);
+    var hd=document.createElement("div"); hd.className="cbhd"; hd.innerHTML='<b></b><span>'+"누르면 앞면"+'</span>'; hd.querySelector("b").textContent=(n.ref||"구절 미입력")+" · 뒷면"; bk.appendChild(hd);
     var byRef={}; notes.forEach(function(x){if(x.id!==n.id&&x.ref)byRef[linkKey(x.ref)]=x});
     function item(ref,txt,memo,id){
       var b=document.createElement(id?"button":"div"); if(id){b.type="button"; b.dataset.go=id} b.className="cbit";
@@ -5684,14 +5684,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(fl){e.stopPropagation(); e.preventDefault(); flipCard(fl.closest(".bcard")); return}
       var card=e.target.closest&&e.target.closest(".bcard.flipped"); if(!card)return;
       e.stopPropagation(); e.preventDefault();
-      var g=e.target.closest(".cbit[data-go]"); if(!g)return;
+      var g=e.target.closest(".cbit[data-go]"); if(!g){flipCard(card);return}   // 뒷면 빈 곳을 누르면 앞면 (2026-10-29 사용자 요청)
       var to=document.querySelector('#board .bcard[data-id="'+g.dataset.go+'"]'); if(!to){toast("지금 칸반에 안 보이는 말씀이에요");return}
       to.scrollIntoView({block:"center",inline:"center",behavior:"smooth"}); to.classList.remove("cbflash"); void to.offsetWidth; to.classList.add("cbflash");
     },true);
     L.addEventListener("click",function(e){   // 뒷면에서는 펼치기 대신: 말씀을 누르면 그 카드로
       var card=e.target.closest&&e.target.closest(".note.flipped"); if(!card)return;
       e.stopPropagation(); e.preventDefault();
-      var g=e.target.closest(".cbit[data-go]"); if(!g)return;
+      var g=e.target.closest(".cbit[data-go]"); if(!g){flipCard(card);return}   // 뒷면 빈 곳을 누르면 앞면 (2026-10-29 사용자 요청)
       var to=cards.get(g.dataset.go); if(!to||!to.isConnected){toast("지금 목록에 안 보이는 말씀이에요");return}
       to.scrollIntoView({block:"center",behavior:"smooth"}); to.classList.remove("cbflash"); void to.offsetWidth; to.classList.add("cbflash");
     },true);
