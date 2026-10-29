@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-24">
+<meta name="app-build" content="2026-10-29-25">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8143,8 +8143,27 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   // 상태를 말하는 서술어(형용사)는 행동과 다른 색(분홍): 무익하니라, 선하다, 거룩하니 … (2026-10-25 사용자 요청)
   var CC_ADJ=/^(무익|유익|선하|선한|악하|악한|의로|거룩|온전|복되|복있|좋|아름다|귀하|귀한|약하|강하|크|작|많|적|깊|높|낮|기쁘|슬프|가난|부요|겸손|온유|충성되|진실|참되|정직|어리석|미련|지혜로|평안|영원|헛되|옳|그르|같|다르|가깝|멀|새로|깨끗|더러|부족|넉넉|풍성|자비로|인자하|신실|완전|화평|즐거|외로|두려|무거|가벼|쉬|어려|형통)/;
   function ccAdj(w,r){var t=w.replace(/[^가-힣A-Za-z0-9]/g,""); return r==="act"&&CC_ADJ.test(t)?"adj":r}
+  // 내가 해야 할 일(명령: 구하라·사랑하라·말라…)은 그 마디 전체를 초록으로 — "너희는 먼저 그의 나라와 그의 의를 구하라" (2026-10-29 사용자 요청)
+  //  하나님·예수님 같은 말은 보라 그대로, 앞의 이음말(그런즉·그러므로…)은 빼고
+  var CC_CMD_NOT=/(니라|리라|이라|로라|노라|더라|도라|시라|소라|거라라)$/;
+  var CC_CONJ=/^(그런즉|그러므로|그리하면|그러면|그러나|그런데|그리고|그리하여|이러므로|그러니|그러니까|또|또한|이제|이에|보라)$/;
+  var CC_CUT=/([,.;:!?，。]|면|니|고|며|매|서|즉|되|나|므로|거늘|어늘|도다|니라|리라|라|다)$/;
+  function ccCmd(ws,roles){
+    var bare=ws.map(function(w){return w.replace(/[^가-힣A-Za-z0-9]/g,"")});
+    for(var i=0;i<ws.length;i++){
+      var t=bare[i]; if(t.length<2||!/(라|어다|소서)$/.test(t)||CC_CMD_NOT.test(t))continue;
+      if(/^(보라)$/.test(t))continue;
+      var j=i; while(j>0&&!/^\d+$/.test(bare[j-1])&&!CC_CUT.test(ws[j-1].trim()))j--;
+      while(j<i&&CC_CONJ.test(bare[j]))j++;
+      for(var k=j;k<=i;k++)if(roles[k]!=="div")roles[k]="act";
+    }
+    return roles;
+  }
   function ccRoles(n){
     var ws=wordsOf(n.text||""), lab=parseOk(n)?n.parse.labels:null, man=lab&&n.parse.v===9;
+    var r0=ccRoles0(n,ws,lab,man); return man?r0:ccCmd(ws,r0);
+  }
+  function ccRoles0(n,ws,lab,man){
     var MAN={S:"sub",V:"act",O:"obj",D:"div",X:"etc",A:"adj"};
     return ws.map(function(w,i){
       if(man&&MAN[lab[i]])return MAN[lab[i]];   // 🎨 색 고르기로 내가 정한 색
