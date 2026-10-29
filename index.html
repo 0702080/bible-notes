@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-8">
+<meta name="app-build" content="2026-10-30-9">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10062,6 +10062,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var tip=dlfSh.querySelector(".dlfssave"); tip.textContent="저장됨"; clearTimeout(tip._t); tip._t=setTimeout(function(){tip.textContent=""},1400);
       });
       dlfSh.querySelector(".dlfsback").addEventListener("click",function(){dlFocusSheetClose()});
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dlfSh&&!dlfSh.hidden&&!e.isComposing){e.preventDefault();e.stopPropagation();dlFocusSheetClose()}},true);   // Esc = 돌아가기 (적은 글은 이미 저장됨, 2026-10-30 사용자 요청)
       dlfSh.querySelector(".dlfsdone").addEventListener("click",function(){
         var o2=dailyData(), d=dlfSh.dataset.day, id=dlfSh.dataset.id, dd=o2.days[d]||[];
         if(dd.indexOf(id)<0){dd.push(id); o2.days[d]=dd; saveDaily(o2); buzz([12,40,18]); if(dailyChecked(o2,d).length===o2.items.length)toast("오늘 하루를 다 돌아봤어요 🙌")}
