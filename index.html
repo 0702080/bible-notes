@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-2">
+<meta name="app-build" content="2026-10-30-3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2168,9 +2168,16 @@ button:active{filter:brightness(1.15)}
 .ccverse.ccediting{white-space:pre-wrap;outline:none;cursor:text;caret-color:var(--gold);color:var(--hi);min-width:280px}
 .ccverse{font-family:var(--serif);font-size:21px;line-height:2;color:var(--orange);word-break:keep-all}
 /* 받아쓰기 (2026-10-18 사용자 요청) */
-.ccdict{display:flex;flex-direction:column;gap:10px;width:100%}
-.ccdta{width:100%;box-sizing:border-box;min-height:150px;padding:14px 16px;border:1px solid color-mix(in srgb,var(--gold) 35%,#2E2D33);border-radius:14px;background:#101013;color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.9;resize:vertical}
-.ccdta:focus{outline:none;border-color:var(--gold)}
+.ccdict{position:relative;width:100%;box-sizing:border-box;min-height:120px;padding:14px 16px 16px;border:1px solid color-mix(in srgb,var(--gold) 35%,#2E2D33);border-radius:14px;background:#101013;cursor:text}
+.ccdict.on{border-color:var(--gold)}
+.ccdta{position:absolute;inset:0;width:100%;height:100%;box-sizing:border-box;margin:0;padding:14px 16px;border:0;border-radius:14px;background:transparent;color:transparent;caret-color:transparent;font-size:16px;resize:none;opacity:0;cursor:text}
+.ccdta:focus{outline:none}
+.ccdict .ccdlive{margin:0;pointer-events:none}
+.ccdlive .dw.cur{color:var(--ink);font-weight:400}
+.ccdlive .dw.cur.bad{color:var(--pink)}
+.ccdcaret{display:inline-block;width:2px;height:1.05em;margin:0 1px;vertical-align:-.15em;background:var(--gold);opacity:0}
+.ccdict.on .ccdcaret{animation:ccdcar 1s steps(1) infinite}
+@keyframes ccdcar{0%,50%{opacity:1}50.01%,100%{opacity:0}}
 .ccdres{font-family:var(--serif);font-size:20px;line-height:2;word-break:keep-all}
 .ccdres .dw.ok{color:var(--green)}
 .ccdres .dw.near{color:var(--hi);text-decoration:underline dotted 2px}
@@ -2208,7 +2215,7 @@ button:active{filter:brightness(1.15)}
 .ccr3{font-size:15px;color:var(--sky);margin-top:12px}
 .ccr4{font-size:14px;color:var(--muted);margin-top:8px}
 /* ===== 암송 코치: 색과 움직임 ===== */
-.cch .bqbar{justify-content:center;position:relative}
+.cch .bqbar{justify-content:center;position:relative;border-bottom:0}   /* 맨 위 가로줄 없앰 (2026-10-30 사용자 요청) */
 .ccst{position:relative}
 .ccst:not(:last-child)::after{content:"";position:absolute;top:12px;left:calc(50% + 17px);right:calc(-50% + 15px);height:2px;border-radius:1px;background:#2A2930;transition:background .4s}
 .ccst.done:not(:last-child)::after{background:linear-gradient(90deg,var(--green),color-mix(in srgb,var(--green) 55%,#2A2930))}
@@ -8346,12 +8353,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!d.res){
       tip.innerHTML="";   // 안내 문구 없앰 (2026-10-29 사용자 요청)
       var box=document.createElement("div"); box.className="ccdict";
-      var ta=document.createElement("textarea"); ta.className="ccdta"; ta.placeholder="여기에 말씀을 적어 보세요 (Ctrl+Enter = 채점)";
+      var ta=document.createElement("textarea"); ta.className="ccdta"; ta.setAttribute("aria-label","말씀을 외워 적기 (Ctrl+Enter = 채점)");
+      ta.spellcheck=false; ta.setAttribute("autocomplete","off"); ta.setAttribute("autocapitalize","off");
       ta.value=d.text||"";
-      // 치는 대로 맞힌 낱말이 하나씩 드러남 (2026-10-29 사용자 요청: 타이핑하며 암송) — 가려진 말씀은 적는 칸 위에
+      // 치는 대로 맞힌 낱말이 하나씩 드러남 — 가려진 말씀 위에 바로 적음 (한 칸, 2026-10-30 사용자 요청)
       var live=document.createElement("div"); live.className="ccdlive"; box.appendChild(live); box.appendChild(ta); v.appendChild(box);
+      var toEnd=function(){var L=ta.value.length; if(ta.selectionStart!==L||ta.selectionEnd!==L)try{ta.setSelectionRange(L,L)}catch(e){}};
+      ta.addEventListener("focus",function(){box.classList.add("on");setTimeout(toEnd,0)}); ta.addEventListener("blur",function(){box.classList.remove("on")});
+      ta.addEventListener("click",toEnd); ta.addEventListener("keyup",function(e){if(/^Arrow|Home|End/.test(e.key))toEnd()});
       var drawLive=function(){
         var rf=dictRef(n,ta.value), r0=dictScore(n.text,rf.text), got=0; live.textContent="";
+        // 지금 치고 있는 자리: 맞힌 마지막 낱말 다음 칸, 아직 맞지 않은 글은 그 자리에 보임
+        var W=wordsOf(rf.text), Wb=W.map(dictBare), E=wordsOf(n.text), jj=0, last=-1;
+        E.forEach(function(w,i){var b=dictBare(w), st=dictStem(w), k;
+          for(k=jj;k<Math.min(Wb.length,jj+3);k++)if(Wb[k]===b||(st&&dictStem(Wb[k])===st)){jj=k+1;last=i;return}});
+        var slot=last+1, tail=W.slice(jj), ends=/\s$/.test(rf.text), bad=tail.length>(ends?0:1);
+        while(slot<r0.rows.length&&(r0.rows[slot].s==="ok"||r0.rows[slot].s==="near"))slot++;
         var rr=document.createElement("div"); rr.className="ccdref"+(rf.ok?" ok":rf.has?" bad":"");
         rr.textContent=rf.ok?"✓ "+n.ref:rf.has?"✗ 구절이 달라요":"📖 "+circles(String(n.ref||""));
         live.appendChild(rr);
@@ -8359,8 +8376,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         String(n.text||"").split(String.fromCharCode(10)).forEach(function(ln){
           var ws=wordsOf(ln), row=document.createElement("div"); row.className="ccdln";
           if(!ws.length){row.classList.add("gap"); live.appendChild(row); return}
-          ws.forEach(function(w,k){var x=r0.rows[ri++]; if(!x)return; if(k)row.appendChild(document.createTextNode(" ")); var sp=document.createElement("span");
-            if(x.s==="ok"||x.s==="near"){sp.className="dw ok";sp.textContent=x.w;got++} else {sp.className="dw hide";sp.textContent=circles(x.w)} row.appendChild(sp)});
+          ws.forEach(function(w,k){var idx=ri, x=r0.rows[ri++]; if(!x)return; if(k)row.appendChild(document.createTextNode(" "));
+            if(idx===slot){   // 치는 자리
+              if(tail.length){var cu=document.createElement("span"); cu.className="dw cur"+(bad?" bad":""); cu.textContent=tail.join(" "); row.appendChild(cu)}
+              var cr=document.createElement("span"); cr.className="ccdcaret"; row.appendChild(cr);
+              if(tail.length&&bad)row.appendChild(document.createTextNode(" "));
+            }
+            var sp=document.createElement("span");
+            if(x.s==="ok"||x.s==="near"){sp.className="dw ok";sp.textContent=x.w;got++} else {sp.className="dw hide";sp.textContent=Array.from(circles(x.w)).slice(idx===slot&&!bad&&tail.length===1?Array.from(tail[0]).length:0).join("")} row.appendChild(sp)});   // 치는 중인 낱말은 남은 글자만 ○
           live.appendChild(row);
         });
         var all=got===r0.total&&r0.total>0&&rf.ok;
