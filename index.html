@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-53">
+<meta name="app-build" content="2026-10-29-54">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3091,7 +3091,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlref{color:var(--sky);font-weight:700;text-decoration:none;cursor:pointer;padding:2px 0}
 .dlref::after{content:" 📖";font-size:.85em;text-decoration:none}
 .dlrow.on .dlref{color:color-mix(in srgb,var(--sky) 70%,var(--muted))}
-.dlauto{position:absolute;top:50%;right:14px;transform:translateY(-50%);padding:4px 9px;border:1px solid color-mix(in srgb,var(--sky) 38%,transparent);border-radius:11px;background:color-mix(in srgb,var(--sky) 13%,transparent);color:var(--sky);font-size:10.5px;font-weight:700;white-space:nowrap;text-decoration:none}
+.dlauto{position:absolute;top:50%;right:10px;transform:translateY(-50%);padding:4px 9px;border:1px solid color-mix(in srgb,var(--sky) 38%,transparent);border-radius:11px;background:color-mix(in srgb,var(--sky) 13%,transparent);color:var(--sky);font-size:10.5px;font-weight:700;white-space:nowrap;text-decoration:none}
 .dlauto.off{border-color:#34333A;background:transparent;color:var(--faint)}
 .dlitem.hasauto .dlrow{padding-right:104px}
 .dlitem.haspill .dlrow{padding-right:82px}
@@ -10001,7 +10001,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var g=dlGroups(o).find(function(x){return x.g===it.g})||{e:"",t:"",c:""};
     if(!dlfSh){
       dlfSh=document.createElement("div"); dlfSh.className="dlfsheet"; dlfSh.hidden=true; dlfSh.setAttribute("role","dialog"); dlfSh.setAttribute("aria-modal","true");
-      dlfSh.innerHTML='<div class="dlfsbar"><button type="button" class="dlfsback" aria-label="닫기">‹ 돌아가기</button><b class="dlfsbt"></b><span class="dlfssave"></span></div>'+
+      dlfSh.innerHTML='<div class="dlfsbar"><button type="button" class="dlfsback" aria-label="닫기">← 돌아가기</button><b class="dlfsbt"></b><span class="dlfssave"></span></div>'+
         '<div class="dlfsbody"><small class="dlfsg"></small><h2 class="dlfst"></h2><div class="dlfsday"></div>'+
         '<textarea maxlength="8000" placeholder="오늘 어떻게 했는지 구체적으로 적어 보세요"></textarea></div>'+
         '<div class="dlfsfoot"><button type="button" class="dlfsdone">✓ 했어요</button></div>';
@@ -10231,7 +10231,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             pill.setAttribute("aria-label","한 줄 감사 쓰는 곳으로 가기");
           }else{       // 나머지 항목은 그날 기록 칸을 연다
             pill.className="dlauto dlmemo"+(hasMemo?"":" off"); pill.dataset.id=it.id;
-            pill.textContent="기록 ›"; pill.title=(hasMemo?"적어 둔 기록 보기":"구체적으로 적어 두기");
+            pill.textContent="기록";   // ›는 글꼴에 없어 빈칸으로 보여 뺌 — 글 자리 넓힘 (2026-10-29 사용자 요청) pill.title=(hasMemo?"적어 둔 기록 보기":"구체적으로 적어 두기");
             pill.setAttribute("aria-label",it.t+" 기록 "+(hasMemo?"보기":"적기"));
             pill.setAttribute("aria-expanded",String(dlMemoId===it.id));
           }
@@ -10401,7 +10401,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var rw=pl.parentNode.querySelector(".dlrow"); if(!rw||!pl.offsetWidth)return;
       if(pl.classList.contains("dlactref")&&innerWidth<=480){rw.style.paddingRight="";return}   // 알약이 아래 줄에 있으면 오른쪽을 비우지 않음
       var rr=rw.getBoundingClientRect(), pr=pl.getBoundingClientRect();
-      rw.style.paddingRight=Math.max(10,Math.round(rr.right-pr.left)+10)+"px";
+      rw.style.paddingRight=Math.max(10,Math.round(rr.right-pr.left)+6)+"px";
     });
     var sn=dl.querySelector(".dlsn"), sx=dl.querySelector(".dlsx");
     if(sn)sn.textContent=fq?(fcount?fcount+"개":"없어요"):"";
