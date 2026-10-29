@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-27">
+<meta name="app-build" content="2026-10-29-28">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2214,7 +2214,7 @@ button:active{filter:brightness(1.15)}
 .ccmeter i.on{border:0;background:radial-gradient(circle at 35% 30%,#FFE7A8,var(--gold) 60%,#B8862F);color:#17120A;box-shadow:0 0 14px color-mix(in srgb,var(--gold) 45%,transparent)}
 .ccmeter i.on.just{animation:ccpop .55s cubic-bezier(.2,1.6,.4,1)}
 .ccw{display:inline-block;--bc:#6ECBF4}
-.ccw.r-act{--bc:#6FD09A}.ccw.r-div{--bc:#B79CF2}.ccw.r-obj{--bc:#6ECBF4}.ccw.r-sub{--bc:#F4A45E}.ccw.r-etc{--bc:#E6DFD2}.ccw.r-adj{--bc:#F48FB6}.ccw.r-god{--bc:#8A62E6}
+.ccw.r-act{--bc:#6FD09A}.ccw.r-div{--bc:#B79CF2}.ccw.r-obj{--bc:#6ECBF4}.ccw.r-sub{--bc:#F4A45E}.ccw.r-etc{--bc:#E6DFD2}.ccw.r-adj{--bc:#F48FB6}.ccw.r-god{--bc:#8A62E6}.ccw.r-pri{--bc:#2E9A58}
 .ccw.c0{--bc:#6ECBF4}.ccw.c1{--bc:#F48FB6}.ccw.c2{--bc:#6FD09A}.ccw.c3{--bc:#F4A45E}.ccw.c4{--bc:#B79CF2}
 .ccverse.recall{padding-top:18px}
 .ccw.hid{color:color-mix(in srgb,var(--bc) 85%,#fff);background:color-mix(in srgb,var(--bc) 15%,transparent);padding:0 4px;line-height:1.55;border-radius:8px;box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--bc) 32%,transparent),inset 0 0 0 1px color-mix(in srgb,var(--bc) 30%,transparent)}
@@ -8065,9 +8065,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var w=e.target.closest(".ccw"); if(!w||!C||C.revealing)return;
         if(C.paint){   // 🎨 색 고르기: 누를 때마다 주황→초록→하늘→보라→흰색 (2026-10-25 사용자 요청)
           var all=Array.prototype.slice.call(ccBox.querySelectorAll(".ccverse .ccw")), wi=all.indexOf(w), np=notes.get(C.id); if(wi<0||!np)return;
-          var ORD=["sub","act","adj","obj","div","god","etc"], cur=C.roles[wi]||"etc", nx=ORD[(ORD.indexOf(cur)+1)%ORD.length];
+          var ORD=["sub","act","pri","adj","obj","div","god","etc"], cur=C.roles[wi]||"etc", nx=ORD[(ORD.indexOf(cur)+1)%ORD.length];
           C.roles[wi]=nx; w.className=w.className.replace(/\br-[a-z]+/,"r-"+nx); if(!/\br-/.test(w.className))w.classList.add("r-"+nx);
-          var L={sub:"S",act:"V",obj:"O",div:"D",etc:"X",adj:"A",god:"G"};
+          var L={sub:"S",act:"V",obj:"O",div:"D",etc:"X",adj:"A",god:"G",pri:"P"};
           np.parse={src:np.text,labels:C.roles.map(function(r){return L[r]||"X"}),v:9,pf:1}; C.rolesSrc=np.text;
           scheduleSave(np.id); buzz(8); return;
         }
@@ -8161,15 +8161,19 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function ccRoles(n){
     var ws=wordsOf(n.text||""), lab=parseOk(n)?n.parse.labels:null, man=lab&&n.parse.v===9;
-    var r0=ccRoles0(n,ws,lab,man); return man?r0:ccGod(ws,ccCmd(ws,r0));
+    var r0=ccRoles0(n,ws,lab,man); return man?r0:ccFirst(ws,ccGod(ws,ccCmd(ws,r0)));
   }
   // 하나님이 해 주시는 일(더하시리라·주시리라·인도하시니 …, 높임 '시'가 붙은 서술어)은 짙은 보라 — 내가 할 일(초록)과 구별 (2026-10-29 사용자 요청)
   var CC_GODV=/[가-힣](시(리|니|며|고|매|도|나|는|었|옵|면|기|지|어|여)|셨|신다|실지|실것|시던)/;
+  // 할 일 안의 '먼저'는 더 짙은 초록 — 무엇을 먼저 할지 눈에 띄게 (2026-10-29 사용자 요청)
+  function ccFirst(ws,roles){
+    return roles.map(function(r,i){return r==="act"&&ws[i].replace(/[^가-힣]/g,"")==="먼저"?"pri":r});
+  }
   function ccGod(ws,roles){
     return roles.map(function(r,i){var t=ws[i].replace(/[^가-힣A-Za-z0-9]/g,""); return (r==="act"||r==="etc")&&t.length>=3&&CC_GODV.test(t)?"god":r});
   }
   function ccRoles0(n,ws,lab,man){
-    var MAN={S:"sub",V:"act",O:"obj",D:"div",X:"etc",A:"adj",G:"god"};
+    var MAN={S:"sub",V:"act",O:"obj",D:"div",X:"etc",A:"adj",G:"god",P:"pri"};
     return ws.map(function(w,i){
       if(man&&MAN[lab[i]])return MAN[lab[i]];   // 🎨 색 고르기로 내가 정한 색
       var t=w.replace(/[^가-힣A-Za-z0-9]/g,"");
