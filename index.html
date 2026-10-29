@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-1">
+<meta name="app-build" content="2026-10-30-2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9591,6 +9591,31 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           if(Math.abs(dx)<60){its().forEach(function(el){el.style.transition="transform .3s cubic-bezier(.2,1.4,.4,1),opacity .3s"; el.style.transform=""; el.style.opacity=""}); return}   // 조금만 밀면 제자리로 톡
           dlFocusGo(dx<0?1:-1);
         },{passive:true});
+        // PC: 마우스로 좌우로 끌기, 터치패드 두 손가락 좌우 밀기 (2026-10-30 사용자 요청)
+        var M=null;
+        lst.addEventListener("pointerdown",function(e){
+          if(e.pointerType!=="mouse"||e.button!==0||!(e.target.closest&&e.target.closest(".dlfocus"))||e.target.closest(".dlffoot")||!lst.querySelector(".dlfnext")||dlFocusBusy)return;
+          M={x:e.clientX,y:e.clientY,dx:0,hz:false,pid:e.pointerId};
+        });
+        lst.addEventListener("pointermove",function(e){
+          if(!M||e.pointerId!==M.pid)return; var mx=e.clientX-M.x, my=e.clientY-M.y;
+          if(!M.hz){if(Math.abs(mx)>8&&Math.abs(mx)>Math.abs(my)*1.2){M.hz=true; try{lst.setPointerCapture(M.pid)}catch(err){} document.body.style.userSelect="none"} else if(Math.abs(my)>12){M=null;return} else return}
+          M.dx=mx; its().forEach(function(el,i){el.style.transition="none"; el.style.transform="translateX("+(mx*(1-i*.08))+"px) rotate("+(mx*.015)+"deg)"; el.style.opacity=String(Math.max(.35,1-Math.abs(mx)/420))});
+        });
+        function mEnd(e){
+          if(!M||(e&&e.pointerId!==M.pid))return; var m=M; M=null; document.body.style.userSelect=""; if(!m.hz)return;
+          eat=true; setTimeout(function(){eat=false},450);
+          if(Math.abs(m.dx)<60){its().forEach(function(el){el.style.transition="transform .3s cubic-bezier(.2,1.4,.4,1),opacity .3s"; el.style.transform=""; el.style.opacity=""}); return}
+          dlFocusGo(m.dx<0?1:-1);
+        }
+        lst.addEventListener("pointerup",mEnd); lst.addEventListener("pointercancel",mEnd);
+        var wx=0, wT=0, wLock=0;
+        lst.addEventListener("wheel",function(e){
+          if(!(e.target.closest&&e.target.closest(".dlfocus"))||!lst.querySelector(".dlfnext")||Math.abs(e.deltaX)<=Math.abs(e.deltaY))return;
+          e.preventDefault(); if(dlFocusBusy||Date.now()<wLock)return;
+          clearTimeout(wT); wT=setTimeout(function(){wx=0},180); wx+=e.deltaX;
+          if(Math.abs(wx)>70){var d=wx>0?1:-1; wx=0; wLock=Date.now()+650; dlFocusGo(d)}
+        },{passive:false});
         lst.addEventListener("click",function(e){if(eat){eat=false;e.stopPropagation();e.preventDefault()}},true);   // 밀고 손을 뗄 때 칸이 눌리지 않게
       })();
       // 기록칸 글머리표 (2026-10-24 사용자 요청, 같은 날 바꿈): 시프트+엔터 = 빈 줄 두고 새 항목 "* ", 엔터 = 그냥 다음 줄(항목 안이면 들여쓰기),
