@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-40">
+<meta name="app-build" content="2026-10-29-41">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3214,6 +3214,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfsfoot{display:flex;justify-content:center;width:100%;max-width:640px;margin:0 auto;padding:10px 20px 18px;box-sizing:border-box}
 .dlfsdone{flex:1;height:56px;border:0;border-radius:28px;background:var(--gc);color:#0B0B0D;font-size:17px;font-weight:800}
 .dlfsdone.on{background:transparent;border:1.5px solid var(--gc);color:var(--gc)}
+.dlfsheet.dlfskb .dlfsbody{padding-top:10px;gap:4px}
+.dlfsheet.dlfskb .dlfst{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dlfsheet.dlfskb .dlfsg,.dlfsheet.dlfskb .dlfsday{display:none}
+.dlfsheet.dlfskb textarea{min-height:80px}
+.dlfsheet.dlfskb .dlfsfoot{padding:6px 20px 8px}
+.dlfsheet.dlfskb .dlfsdone{height:44px;font-size:15px}
 .dlfit small{font-size:12px;color:var(--faint)}
 .dlfit.done{opacity:.4}
 .dlfit.done .dlfck{background:var(--gc,var(--gold));border-color:var(--gc,var(--gold))}
@@ -9972,6 +9978,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         dlFocusSheetClose(); renderReviewBar();
       });
       window.addEventListener("popstate",function(){if(dlfSh&&!dlfSh.hidden){dlfHist=false;dlFocusSheetClose()}});
+      // 키보드가 올라오면 화면을 키보드 위 남은 높이에 딱 맞춤 — 적는 칸이 키보드 밑으로 길게 내려가지 않게 (2026-10-29 사용자 요청)
+      var vv=window.visualViewport;
+      function fitVV(){
+        if(!dlfSh||dlfSh.hidden||!vv)return;
+        var kb=window.innerHeight-vv.height>120;
+        dlfSh.style.top=vv.offsetTop+"px"; dlfSh.style.height=vv.height+"px"; dlfSh.style.bottom="auto";
+        dlfSh.classList.toggle("dlfskb",kb);
+        if(kb)window.scrollTo(0,window.scrollY);
+      }
+      if(vv){vv.addEventListener("resize",fitVV); vv.addEventListener("scroll",fitVV)}
+      dlfSh._fit=fitVV;
     }
     dlfSh.dataset.id=fid; dlfSh.dataset.day=dlDay; dlfSh.style.setProperty("--gc",g.c||"var(--gold)");
     dlfSh.querySelector(".dlfsg").textContent=(g.e?g.e+" ":"")+(g.t||"");
@@ -9981,7 +9998,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     db.textContent=done?"✓ 오늘 했어요 · 닫기":"✓ 했어요"; db.classList.toggle("on",done);
     var ta=dlfSh.querySelector("textarea"); ta.value=dlMemoGet(o,dlDay,fid);
     dlfSh.querySelector(".dlfssave").textContent="";
-    dlfSh.hidden=false; dlfSh.classList.remove("dlfsin"); void dlfSh.offsetWidth; dlfSh.classList.add("dlfsin");
+    dlfSh.hidden=false; dlfSh.style.top=""; dlfSh.style.height=""; dlfSh.style.bottom=""; if(dlfSh._fit)setTimeout(dlfSh._fit,0); dlfSh.classList.remove("dlfsin"); void dlfSh.offsetWidth; dlfSh.classList.add("dlfsin");
     try{history.pushState({dlfs:1},"");dlfHist=true}catch(e){dlfHist=false}
     buzz(6); setTimeout(function(){try{ta.focus({preventScroll:true})}catch(e){ta.focus()}},280);
   }
