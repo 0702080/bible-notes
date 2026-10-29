@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-21">
+<meta name="app-build" content="2026-10-29-22">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8363,7 +8363,6 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             if(x.s==="ok"||x.s==="near"){sp.className="dw ok";sp.textContent=x.w;got++} else {sp.className="dw hide";sp.textContent=circles(x.w)} row.appendChild(sp)});
           live.appendChild(row);
         });
-        var pc=document.createElement("div"); pc.className="ccdpc"; pc.textContent=got+" / "+r0.total+" 낱말"+(rf.ok?" · 구절 ✓":""); live.insertBefore(pc,live.firstChild);
         var all=got===r0.total&&r0.total>0&&rf.ok;
         if(all&&!live._all){live.classList.remove("blink2"); void live.offsetWidth; live.classList.add("blink2"); buzz([30,60,30])}
         live._all=all;
