@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-41">
+<meta name="app-build" content="2026-10-29-42">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3197,7 +3197,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfck{grid-row:1/3;width:30px;height:30px;border:2px solid color-mix(in srgb,var(--gc,var(--gold)) 70%,transparent);border-radius:50%}
 .dlft{font-size:17px;line-height:1.5;font-weight:700}
 /* 🎯 집중 항목을 자세히 적는 화면 (2026-10-29 사용자 요청) */
-.dlfsheet{position:fixed;inset:0;z-index:150;display:flex;flex-direction:column;background:#0B0B0D;padding-bottom:env(safe-area-inset-bottom,0px)}
+.dlfsheet{position:fixed;inset:0;z-index:150;display:flex;flex-direction:column;box-sizing:border-box;overflow:hidden;background:#0B0B0D;padding-bottom:env(safe-area-inset-bottom,0px)}
 .dlfsheet[hidden]{display:none}
 .dlfsheet.dlfsin{animation:dlfsin .32s cubic-bezier(.2,1.1,.4,1)}
 @keyframes dlfsin{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
@@ -3214,7 +3214,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfsfoot{display:flex;justify-content:center;width:100%;max-width:640px;margin:0 auto;padding:10px 20px 18px;box-sizing:border-box}
 .dlfsdone{flex:1;height:56px;border:0;border-radius:28px;background:var(--gc);color:#0B0B0D;font-size:17px;font-weight:800}
 .dlfsdone.on{background:transparent;border:1.5px solid var(--gc);color:var(--gc)}
-.dlfsheet.dlfskb .dlfsbody{padding-top:10px;gap:4px}
+.dlfsheet.dlfskb{padding-bottom:0}
+.dlfsheet.dlfskb .dlfsbar{padding:6px 14px}
+.dlfsheet.dlfskb .dlfsback{height:34px;font-size:14px}
+.dlfsheet.dlfskb .dlfsbody{padding-top:8px;gap:4px}
+.dlfsheet .dlfsfoot{flex:none}
 .dlfsheet.dlfskb .dlfst{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dlfsheet.dlfskb .dlfsg,.dlfsheet.dlfskb .dlfsday{display:none}
 .dlfsheet.dlfskb textarea{min-height:80px}
@@ -9983,7 +9987,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       function fitVV(){
         if(!dlfSh||dlfSh.hidden||!vv)return;
         var kb=window.innerHeight-vv.height>120;
-        dlfSh.style.top=vv.offsetTop+"px"; dlfSh.style.height=vv.height+"px"; dlfSh.style.bottom="auto";
+        dlfSh.style.top=vv.offsetTop+"px"; dlfSh.style.height=Math.floor(vv.height)+"px"; dlfSh.style.bottom="auto";
         dlfSh.classList.toggle("dlfskb",kb);
         if(kb)window.scrollTo(0,window.scrollY);
       }
@@ -10000,7 +10004,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     dlfSh.querySelector(".dlfssave").textContent="";
     dlfSh.hidden=false; dlfSh.style.top=""; dlfSh.style.height=""; dlfSh.style.bottom=""; if(dlfSh._fit)setTimeout(dlfSh._fit,0); dlfSh.classList.remove("dlfsin"); void dlfSh.offsetWidth; dlfSh.classList.add("dlfsin");
     try{history.pushState({dlfs:1},"");dlfHist=true}catch(e){dlfHist=false}
-    buzz(6); setTimeout(function(){try{ta.focus({preventScroll:true})}catch(e){ta.focus()}},280);
+    buzz(6); setTimeout(function(){try{ta.focus({preventScroll:true})}catch(e){ta.focus()}},280); if(dlfSh._fit){setTimeout(dlfSh._fit,600);setTimeout(dlfSh._fit,1000)}
   }
   function dlFocusSheetClose(){
     if(!dlfSh||dlfSh.hidden)return; var ta=dlfSh.querySelector("textarea"); try{ta.blur()}catch(e){}
