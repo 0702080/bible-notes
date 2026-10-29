@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-54">
+<meta name="app-build" content="2026-10-29-55">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9509,7 +9509,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       dl.innerHTML='<div class="dlbar"><b class="dltitle">🌙 하루 돌아보기</b><button type="button" class="dledit dlfocusbtn">🎯 집중</button><button type="button" class="dledit">✏️ 항목 고치기</button><button type="button" class="dlclose">닫기</button></div>'+
         // 고치기 때 새 항목 · 새 묶음 칸은 제목 바로 아래 고정 (2026-10-17 사용자 요청)
         '<div class="dltop" hidden>'+
-        '<form class="dladd" autocomplete="off" hidden><select class="field dlg" aria-label="묶음"></select><input class="field dlin" maxlength="40" placeholder="새 항목 (예: 먼저 인사했는가)" aria-label="새 항목"><button type="submit" class="primary">추가</button></form>'+
+        '<form class="dladd" autocomplete="off" hidden><select class="field dlg" aria-label="묶음"></select><input class="field dlin" maxlength="120" placeholder="새 항목 (예: 먼저 인사했는가)" aria-label="새 항목"><button type="submit" class="primary">추가</button></form>'+
         '<form class="dlnewg" autocomplete="off" hidden><input class="field dlge" maxlength="4" placeholder="🙂" aria-label="묶음 이모지"><input class="field dlgn" maxlength="14" placeholder="새 묶음 이름 (예: 가정, 일터)" aria-label="새 묶음 이름"><button type="submit">+ 묶음</button></form>'+
         '</div>'+
         '<div class="dlfix"><div class="dlday"><button type="button" class="dlprev" aria-label="전날">◀</button><label class="dldatew" title="눌러서 날짜 고르기"><b class="dldate"></b><input type="date" class="dlpick" aria-label="날짜 고르기"></label><button type="button" class="dlnext" aria-label="다음 날">▶</button></div>'+
@@ -9655,7 +9655,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       });
       dl.querySelector(".dladd").addEventListener("submit",function(e){
         e.preventDefault(); var inp=dl.querySelector(".dlin"), t=inp.value.trim(); if(!t){inp.focus();return}
-        var o=dailyData(); o.items.push({id:"d"+Date.now().toString(36),g:dl.querySelector(".dlg").value,t:t.slice(0,40)}); saveDaily(o); inp.value=""; drawDaily(); inp.focus();
+        var o=dailyData(); o.items.push({id:"d"+Date.now().toString(36),g:dl.querySelector(".dlg").value,t:t.slice(0,120)}); saveDaily(o); inp.value=""; drawDaily(); inp.focus();
       });
       dl.querySelector(".dllist").addEventListener("click",function(e){
         if(Date.now()-dlIcDragAt<500&&e.target.closest(".dlicwrap")){e.stopPropagation();return}   // 끌어 옮긴 직후의 누름은 체크·펼치기로 보지 않음
@@ -9915,7 +9915,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function dlSaveItem(id,v){   // 항목 글: 비었거나 그대로면 그냥 닫기
     var o=dailyData(), it=o.items.filter(function(x){return x.id===id})[0];
     dlEditId="";
-    if(it&&v&&v!==it.t){it.t=v.slice(0,40); saveDaily(o); drawDaily(); renderReviewBar(); toast("고쳤어요"); return}
+    if(it&&v&&v!==it.t){it.t=v.slice(0,120);   // 항목 글 40자 → 120자 (2026-10-29 사용자 요청)
+     saveDaily(o); drawDaily(); renderReviewBar(); toast("고쳤어요"); return}
     drawDaily();
   }
   function dlSaveGroup(g,em,nm){   // 묶음 이름: 비었거나 그대로면 그냥 닫기
@@ -10205,7 +10206,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       its.forEach(function(it){
         if(dlEditId===it.id){   // 항목 글 고치기
           var ef=document.createElement("div"); ef.className="dlitform"; ef.dataset.id=it.id;
-          var ei2=document.createElement("input"); ei2.className="field dlted"; ei2.maxLength=40; ei2.value=it.t; ei2.setAttribute("aria-label","항목 글 고치기");
+          var ei2=document.createElement("input"); ei2.className="field dlted"; ei2.maxLength=120; ei2.value=it.t; ei2.setAttribute("aria-label","항목 글 고치기");
           ef.appendChild(ei2);
           var sel2=document.createElement("select"); sel2.className="field dlnotesel"; sel2.dataset.id=it.id;   // 이 항목에 붙일 말씀 (2026-10-18 사용자 요청)
           sel2.setAttribute("aria-label","이 항목에 붙일 말씀");
