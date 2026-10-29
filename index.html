@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-42">
+<meta name="app-build" content="2026-10-29-43">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5005,7 +5005,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     var mc=(n.drill||[]).filter(function(d){return dkey(d.at)===tdk}).length+((n.mem&&n.mem.s)||[]).filter(function(t){return t&&dkey(t)===tdk}).length;
     addCnt("암송",mc,"오늘 암송 연습 "+mc+"번");
-    order.forEach(function(w){if(w==="암송")return; var lc=document.createElement("span"); lc.className="logcnt"; lc.textContent=w+" "+cnt[w]; lc.title=tips[w].join(", "); refEl.appendChild(lc)});
+    if(false)order.forEach(function(w){if(w==="암송")return; var lc=document.createElement("span");   // 구절 이름 옆 실천 한 줄 수("선택일까 1" 등)는 안 보이게 (2026-10-29 사용자 요청)
+       lc.className="logcnt"; lc.textContent=w+" "+cnt[w]; lc.title=tips[w].join(", "); refEl.appendChild(lc)});
     // "암송 N" 표시를 한 번 누르면 암송 코치가 열림 (오늘 연습 전이면 숫자 없이 "암송"만, 2026-10-23 사용자 요청)
     // 숫자는 암송 코치의 "N번째"와 같은 누적 횟수 (끝까지 외운 횟수, 2026-10-23 사용자 요청)
     var mt=ccCount(n);
