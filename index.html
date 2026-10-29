@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-39">
+<meta name="app-build" content="2026-10-29-40">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3196,6 +3196,24 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfit:active{transform:scale(.98)}
 .dlfck{grid-row:1/3;width:30px;height:30px;border:2px solid color-mix(in srgb,var(--gc,var(--gold)) 70%,transparent);border-radius:50%}
 .dlft{font-size:17px;line-height:1.5;font-weight:700}
+/* 🎯 집중 항목을 자세히 적는 화면 (2026-10-29 사용자 요청) */
+.dlfsheet{position:fixed;inset:0;z-index:150;display:flex;flex-direction:column;background:#0B0B0D;padding-bottom:env(safe-area-inset-bottom,0px)}
+.dlfsheet[hidden]{display:none}
+.dlfsheet.dlfsin{animation:dlfsin .32s cubic-bezier(.2,1.1,.4,1)}
+@keyframes dlfsin{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.dlfsheet.dlfsin{animation:none}}
+.dlfsbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 8px;border-bottom:1px solid #1E1D24}
+.dlfsback{height:40px;padding:0 14px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--ink);font-size:15px}
+.dlfssave{font-size:13px;color:var(--green)}
+.dlfsbody{flex:1;display:flex;flex-direction:column;gap:8px;width:100%;max-width:640px;margin:0 auto;padding:18px 20px 10px;box-sizing:border-box;min-height:0}
+.dlfsg{font-size:13px;color:var(--faint)}
+.dlfst{margin:0;font-size:22px;line-height:1.45;font-weight:800;color:var(--ink)}
+.dlfsday{margin-top:6px;font-size:13px;color:color-mix(in srgb,var(--gc) 80%,#fff)}
+.dlfsheet textarea{flex:1;min-height:160px;width:100%;box-sizing:border-box;resize:none;padding:14px 16px;border:1px solid color-mix(in srgb,var(--gc) 40%,#2A2930);border-radius:16px;background:#141418;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.7}
+.dlfsheet textarea:focus{outline:none;border-color:color-mix(in srgb,var(--gc) 75%,#2A2930)}
+.dlfsfoot{display:flex;justify-content:center;width:100%;max-width:640px;margin:0 auto;padding:10px 20px 18px;box-sizing:border-box}
+.dlfsdone{flex:1;height:56px;border:0;border-radius:28px;background:var(--gc);color:#0B0B0D;font-size:17px;font-weight:800}
+.dlfsdone.on{background:transparent;border:1.5px solid var(--gc);color:var(--gc)}
 .dlfit small{font-size:12px;color:var(--faint)}
 .dlfit.done{opacity:.4}
 .dlfit.done .dlfck{background:var(--gc,var(--gold));border-color:var(--gc,var(--gold))}
@@ -9607,7 +9625,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             drawDaily(); return;
           }
           var icon=icToggle(iid,dlDay); buzz(icon?[12,40,18]:8); drawDaily(); return}
-        if(b.classList.contains("dlfit")){   // 집중 칸: 누르면 했어요 체크
+        if(b.classList.contains("dlfit")&&!e.target.closest(".dlfck")){dlFocusSheet(b.dataset.fid); return}   // 집중 칸 글을 누르면 자세히 적는 화면 (2026-10-29 사용자 요청)
+        if(b.classList.contains("dlfit")){   // 집중 칸 왼쪽 동그라미: 누르면 했어요 체크
           var fid=b.dataset.fid, dd=o.days[dlDay]||[]; if(dd.indexOf(fid)<0)dd.push(fid); o.days[dlDay]=dd; saveDaily(o);
           b.classList.add("done"); buzz([12,40,18]); setTimeout(function(){drawDaily(); renderReviewBar()},380);
           if(dailyChecked(o,dlDay).length===o.items.length){toast("오늘 하루를 다 돌아봤어요 🙌")}
@@ -9928,6 +9947,48 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }
     wk.addEventListener("pointerup",end); wk.addEventListener("pointercancel",end);
     wk.addEventListener("click",function(e){if(eat){e.stopPropagation();e.preventDefault()}},true);
+  }
+  // 🎯 집중: 항목 글을 누르면 그 항목을 자세히 적는 화면이 열림 — 적는 대로 그날 기록에 저장 (2026-10-29 사용자 요청)
+  var dlfSh=null, dlfHist=false;
+  function dlFocusSheet(fid){
+    var o=dailyData(), it=o.items.find(function(x){return x.id===fid}); if(!it)return;
+    var g=dlGroups(o).find(function(x){return x.g===it.g})||{e:"",t:"",c:""};
+    if(!dlfSh){
+      dlfSh=document.createElement("div"); dlfSh.className="dlfsheet"; dlfSh.hidden=true; dlfSh.setAttribute("role","dialog"); dlfSh.setAttribute("aria-modal","true");
+      dlfSh.innerHTML='<div class="dlfsbar"><button type="button" class="dlfsback" aria-label="닫기">‹ 돌아가기</button><span class="dlfssave"></span></div>'+
+        '<div class="dlfsbody"><small class="dlfsg"></small><h2 class="dlfst"></h2><div class="dlfsday"></div>'+
+        '<textarea maxlength="8000" placeholder="오늘 어떻게 했는지 구체적으로 적어 보세요"></textarea></div>'+
+        '<div class="dlfsfoot"><button type="button" class="dlfsdone">✓ 했어요</button></div>';
+      document.body.appendChild(dlfSh);
+      var ta0=dlfSh.querySelector("textarea");
+      ta0.addEventListener("input",function(){
+        var o2=dailyData(); dlMemoSet(o2,dlfSh.dataset.day,dlfSh.dataset.id,ta0.value); saveDaily(o2);
+        var tip=dlfSh.querySelector(".dlfssave"); tip.textContent="저장됨"; clearTimeout(tip._t); tip._t=setTimeout(function(){tip.textContent=""},1400);
+      });
+      dlfSh.querySelector(".dlfsback").addEventListener("click",function(){dlFocusSheetClose()});
+      dlfSh.querySelector(".dlfsdone").addEventListener("click",function(){
+        var o2=dailyData(), d=dlfSh.dataset.day, id=dlfSh.dataset.id, dd=o2.days[d]||[];
+        if(dd.indexOf(id)<0){dd.push(id); o2.days[d]=dd; saveDaily(o2); buzz([12,40,18]); if(dailyChecked(o2,d).length===o2.items.length)toast("오늘 하루를 다 돌아봤어요 🙌")}
+        dlFocusSheetClose(); renderReviewBar();
+      });
+      window.addEventListener("popstate",function(){if(dlfSh&&!dlfSh.hidden){dlfHist=false;dlFocusSheetClose()}});
+    }
+    dlfSh.dataset.id=fid; dlfSh.dataset.day=dlDay; dlfSh.style.setProperty("--gc",g.c||"var(--gold)");
+    dlfSh.querySelector(".dlfsg").textContent=(g.e?g.e+" ":"")+(g.t||"");
+    dlfSh.querySelector(".dlfst").textContent=it.t;
+    dlfSh.querySelector(".dlfsday").textContent="📝 "+dayName(dlDay)+" 기록";
+    var done=(o.days[dlDay]||[]).indexOf(fid)>=0, db=dlfSh.querySelector(".dlfsdone");
+    db.textContent=done?"✓ 오늘 했어요 · 닫기":"✓ 했어요"; db.classList.toggle("on",done);
+    var ta=dlfSh.querySelector("textarea"); ta.value=dlMemoGet(o,dlDay,fid);
+    dlfSh.querySelector(".dlfssave").textContent="";
+    dlfSh.hidden=false; dlfSh.classList.remove("dlfsin"); void dlfSh.offsetWidth; dlfSh.classList.add("dlfsin");
+    try{history.pushState({dlfs:1},"");dlfHist=true}catch(e){dlfHist=false}
+    buzz(6); setTimeout(function(){try{ta.focus({preventScroll:true})}catch(e){ta.focus()}},280);
+  }
+  function dlFocusSheetClose(){
+    if(!dlfSh||dlfSh.hidden)return; var ta=dlfSh.querySelector("textarea"); try{ta.blur()}catch(e){}
+    dlfSh.hidden=true; if(dlfHist){dlfHist=false;try{history.back()}catch(e){}}
+    if(dl&&!dl.hidden)drawDaily();
   }
   var dlFocusBusy=false;
   function dlFocusGo(dir){   // 🎯 집중 세 가지 넘기기: 지금 칸들이 밀려 나가고 새 칸들이 반대쪽에서 차례로 들어옴 (2026-10-29 사용자 요청)
