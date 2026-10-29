@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-50">
+<meta name="app-build" content="2026-10-29-51">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3213,6 +3213,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfsbar{display:flex;align-items:center;justify-content:space-between;padding:calc(10px + env(safe-area-inset-top,0px)) 14px 8px;border-bottom:1px solid #1E1D24}
 .dlfsback{height:40px;padding:0 14px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--ink);font-size:15px}
 .dlfssave{font-size:13px;color:var(--green)}
+.dlfsbt{display:none;flex:1;min-width:0;margin:0 10px;font-size:14.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dlfsheet.dlfskb .dlfsbt{display:block}
 .dlfsbody{flex:1;display:flex;flex-direction:column;gap:8px;width:100%;max-width:640px;margin:0 auto;padding:18px 20px 10px;box-sizing:border-box;min-height:0}
 .dlfsg{font-size:13px;color:var(--faint)}
 .dlfst{margin:0;font-size:22px;line-height:1.45;font-weight:800;color:var(--ink)}
@@ -3229,7 +3231,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfsheet .dlfsfoot{flex:none}
 .dlfsheet.dlfskb .dlfst{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dlfsheet.dlfskb .dlfsg,.dlfsheet.dlfskb .dlfsday{display:none}
-.dlfsheet.dlfskb textarea{min-height:80px}
+.dlfsheet.dlfskb textarea{min-height:80px;padding:10px 14px;line-height:1.55}   /* 키보드가 떠 있어도 기도문 틀 끝(아멘)까지 보이게 (2026-10-29 사용자 요청) */
+.dlfsheet.dlfskb .dlfst{display:none}
+.dlfsheet.dlfskb .dlfsbody{padding-top:6px}
 .dlfsheet.dlfskb .dlfsfoot{padding:6px 20px 8px}
 .dlfsheet.dlfskb .dlfsdone{height:44px;font-size:15px}
 .dlfit small{font-size:12px;color:var(--faint)}
@@ -9997,7 +10001,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var g=dlGroups(o).find(function(x){return x.g===it.g})||{e:"",t:"",c:""};
     if(!dlfSh){
       dlfSh=document.createElement("div"); dlfSh.className="dlfsheet"; dlfSh.hidden=true; dlfSh.setAttribute("role","dialog"); dlfSh.setAttribute("aria-modal","true");
-      dlfSh.innerHTML='<div class="dlfsbar"><button type="button" class="dlfsback" aria-label="닫기">‹ 돌아가기</button><span class="dlfssave"></span></div>'+
+      dlfSh.innerHTML='<div class="dlfsbar"><button type="button" class="dlfsback" aria-label="닫기">‹ 돌아가기</button><b class="dlfsbt"></b><span class="dlfssave"></span></div>'+
         '<div class="dlfsbody"><small class="dlfsg"></small><h2 class="dlfst"></h2><div class="dlfsday"></div>'+
         '<textarea maxlength="8000" placeholder="오늘 어떻게 했는지 구체적으로 적어 보세요"></textarea></div>'+
         '<div class="dlfsfoot"><button type="button" class="dlfsdone">✓ 했어요</button></div>';
@@ -10022,13 +10026,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         dlfSh.style.top=vv.offsetTop+"px"; dlfSh.style.height=Math.floor(vv.height)+"px"; dlfSh.style.bottom="auto";
         dlfSh.classList.toggle("dlfskb",kb);
         if(kb)window.scrollTo(0,window.scrollY);
+        var t2=dlfSh.querySelector("textarea"); if(kb&&t2&&t2.dataset.tpl&&document.activeElement===t2)t2.scrollTop=t2.scrollHeight;   // 틀만 있을 땐 맨 아래(아멘)까지 보이게
       }
       if(vv){vv.addEventListener("resize",fitVV); vv.addEventListener("scroll",fitVV)}
       dlfSh._fit=fitVV;
     }
     dlfSh.dataset.id=fid; dlfSh.dataset.day=dlDay; dlfSh.style.setProperty("--gc",g.c||"var(--gold)");
     dlfSh.querySelector(".dlfsg").textContent=(g.e?g.e+" ":"")+(g.t||"");
-    dlfSh.querySelector(".dlfst").textContent=it.t;
+    dlfSh.querySelector(".dlfst").textContent=it.t; dlfSh.querySelector(".dlfsbt").textContent=it.t;
     dlfSh.querySelector(".dlfsday").textContent="📝 "+dayName(dlDay)+" 기록";
     var done=(o.days[dlDay]||[]).indexOf(fid)>=0, db=dlfSh.querySelector(".dlfsdone");
     db.textContent=done?"✓ 오늘 했어요 · 닫기":"✓ 했어요"; db.classList.toggle("on",done);
