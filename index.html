@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-29-20">
+<meta name="app-build" content="2026-10-29-21">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3238,7 +3238,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfsheet.dlfskb .dlfsbody{padding-top:6px}
 .dlfsheet.dlfskb .dlfsfoot{padding:6px 20px 12px}
 .dlfsheet.dlfskb .dlfsdone{height:44px;font-size:15px}
-.dlfit small{font-size:12px;color:var(--faint)}
+.dlfit small{grid-row:1;grid-column:2;margin-bottom:3px;font-size:13.5px;font-weight:700;letter-spacing:.04em;color:var(--gc,var(--muted))}   /* 묶음 이름은 목록 머리와 같은 크기로 위에 (2026-10-29 사용자 요청) */
+.dlfit .dlft{grid-row:2;grid-column:2}
 .dlfit.done{opacity:.4}
 .dlfit.done .dlfck{background:var(--gc,var(--gold));border-color:var(--gc,var(--gold))}
 .dlfall{text-align:center;font-size:16px;color:var(--green);margin:18px 0}
@@ -10129,7 +10130,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var st=todo.length?((dlFocusSkip%todo.length)+todo.length)%todo.length:0, pick=todo.slice(st,st+3); if(pick.length<3)pick=pick.concat(todo.slice(0,Math.min(3-pick.length,st)));
       pick.forEach(function(x){
         var b=document.createElement("button"); b.type="button"; b.className="dlfit"; b.dataset.fid=x.it.id; b.style.setProperty("--gc",x.g.c);
-        b.innerHTML='<span class="dlfck" aria-hidden="true"></span><span class="dlft"></span><small></small>';
+        b.innerHTML='<span class="dlfck" aria-hidden="true"></span><small></small><span class="dlft"></span>';
         b.querySelector(".dlft").textContent=x.it.t; b.querySelector("small").textContent=x.g.e+" "+x.g.t;
         wrap.appendChild(b);
       });
