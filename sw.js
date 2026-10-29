@@ -2,7 +2,7 @@
    - 화면(HTML)은 인터넷이 되면 늘 새로 받아 오고, 안 되면 마지막으로 받아 둔 것을 보여 줌
    - 아이콘·글꼴 같은 파일은 받아 둔 것을 먼저 쓰고 뒤에서 새로 받아 둠
    - 로그인·동기화(Supabase)와 다른 사이트 요청은 건드리지 않음 */
-var CACHE = "bible-notes-v2";
+var CACHE = "bible-notes-v3";
 var CORE = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png", "./tongdok/", "./tongdok2/"];
 
 self.addEventListener("install", function (e) {
