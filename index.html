@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-recall-wait">
+<meta name="app-build" content="2026-10-30-recall-again">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8235,7 +8235,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             if(!C||C.id!==cid||ccBox.hidden)return;
             var n1=notes.get(cid); if(!n1)return;
             C.grade="g2"; C.stage=5; ccFinish(n1);
-            if(ccNextNote()){toast("✅ 암송 완료"); ccGoNext()} else ccDraw();
+            // 이번에 연 암송 코치에서 이미 한 번 끝낸 말씀을 다시 외웠으면 다음 말씀으로 넘어가지 않고 이 말씀 떠올리기를 한 번 더 (2026-10-30 사용자 요청)
+            var again=!!ccDoneIds[cid]; ccDoneIds[cid]=1;
+            if(again){toast("✅ 암송 완료"); C.stage=3; C.shown=3; C.reads=0; C.round=0; C.grade=""; C.dict=null; C.autoDone=0; C.tapKey=""; C.keepPrev=false; C.prevHide=null; C.seed=newSeed(); C.anim=true; C.t0=Date.now(); ccDraw()}
+            else if(ccNextNote()){toast("✅ 암송 완료"); ccGoNext()} else ccDraw();
           },3300);   // 마지막 낱말을 누른 뒤 2초 더 머묾 (2026-10-30 사용자 요청)
         }
         if(!w.classList.contains("hid")||w.classList.contains("peek")){buzz(18);return}   // 누를 때마다 진동 (2026-10-21 사용자 요청)
@@ -8260,7 +8263,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     // 브라우저 전체 화면은 쓰지 않음 (브라우저 안내 문구가 떠서, 사용자 요청). 주소창 없이 쓰려면 홈 화면 앱으로 염
     ccDraw();
   }
-  var ccHist=false, CC_COL=5, ccFs=false;
+  var ccHist=false, CC_COL=5, ccFs=false, ccDoneIds={};   // ccDoneIds: 이번에 연 암송 코치에서 떠올리기를 끝낸 말씀
   function ccFull(on){   // 암송할 때는 주소창까지 가리는 전체 화면
     var d=document, el=d.documentElement;
     try{
@@ -8700,7 +8703,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(C.grade==="g2"){buzz([14,50,22]);confetti(t1)}
   }
   function closeCoach(){
-    if(!ccBox||ccBox.hidden)return; ccBox.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode;
+    if(!ccBox||ccBox.hidden)return; ccBox.hidden=true; ccDoneIds={}; document.body.style.overflow=""; $("fab").hidden=reorderMode;
     ccFull(false);
     if(ccHist){ccHist=false;try{history.back()}catch(e){}}
     try{window.speechSynthesis.cancel()}catch(e){}
