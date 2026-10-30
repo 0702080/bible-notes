@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-sw6">
+<meta name="app-build" content="2026-10-30-editlines">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8477,6 +8477,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     btn("다시 써 보기","dretry");
     btn("암송 완료","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
   }
+  // 암송 화면에 지금 보이는 줄 배치(화면 폭에 맞춰 넘어간 줄 포함)를 줄바꿈 글로 만듦 — 고치기 칸을 같은 배치로 열려고 (2026-10-30 사용자 요청)
+  function ccShownLines(n){
+    try{
+      var v=ccBox.querySelector(".ccverse"), sp=v?Array.prototype.slice.call(v.querySelectorAll(".ccw")):[];
+      if(!sp.length||sp.length!==wordsOf(n.text||"").length)return "";
+      var lines=[], cur=[], top=null;
+      sp.forEach(function(x){
+        var t=Math.round(x.getBoundingClientRect().top), w=String(x.dataset.w||x.textContent||"").trim();
+        if(top!==null&&Math.abs(t-top)>8){lines.push(cur.join(" "));cur=[]}
+        top=t; cur.push(w);
+      });
+      if(cur.length)lines.push(cur.join(" "));
+      return lines.join("\n");
+    }catch(e){return ""}
+  }
   function ccEditForm(n,tip,btn){   // 상자 없이 말씀 자리에서 그대로 고친다 (2026-10-18 사용자 요청)
     var v=ccBox.querySelector(".ccverse");
     v.textContent=""; v.classList.remove("big","recall","vnum","vlines");
@@ -8486,7 +8501,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(v.contentEditable!=="plaintext-only")v.setAttribute("contenteditable","true");
     v.setAttribute("spellcheck","false");
     v.setAttribute("aria-label","말씀 본문 고치기");
-    v.textContent=String(n.text||"");
+    v.textContent=C.editPre||String(n.text||"");   // 암송 화면에 보이던 줄 배치 그대로 열기 (2026-10-30 사용자 요청)
     setTimeout(function(){
       try{
         v.focus();
@@ -8598,12 +8613,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccDraw();return}
     if(a==="again"){C.seed=newSeed();C.anim=true;buzz(6);ccDraw();return}
     if(a==="next"){buzz(8);C.anim=true;if(C.stage===2&&C.round<2){C.round++;C.keepPrev=true;ccDraw();return}C.stage++;ccDraw();return}
-    if(a==="eopen"){C.edit=true;C.dict=null;ccDraw();return}
+    if(a==="eopen"){C.editPre=ccShownLines(n);C.edit=true;C.dict=null;ccDraw();return}
     if(a==="ecancel"){C.edit=false;ccDraw();return}
     if(a==="esave"){
       var vEd=ccBox.querySelector(".ccverse");
       var nv=vEd?String(vEd.innerText||"").split(String.fromCharCode(160)).join(" ").split(String.fromCharCode(13)).join("").split(String.fromCharCode(10)).map(function(x){return x.replace(/\s+$/,"")}).join(String.fromCharCode(10)):"";
-      if(nv.trim()&&nv!==n.text){
+      if(nv.trim()&&nv!==n.text&&nv!==C.editPre){
         n.text=nv; if(typeof focusMode!=="undefined")focusMode.delete(n.id);
         scheduleSave(n.id); render(); toast("말씀을 고쳤어요");
       }
