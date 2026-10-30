@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-noscrollx">
+<meta name="app-build" content="2026-10-30-hiderand">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8219,7 +8219,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccBox.querySelector(".ccsteps").addEventListener("click",function(e){
         var d=e.target.closest(".ccst"); if(!d||!C||C.edit||C.revealing)return;
         var i=+d.dataset.i; if(!(i>=0&&i<4))return;
-        if(i===C.stage&&!C.dict){buzz(8);return}
+        if(i===C.stage&&!C.dict){if(i===2){C.seed=newSeed();C.anim=true;buzz([12,30,12]);ccDraw();return} buzz(8);return}   // 가리기 단계를 또 누르면 가린 자리를 새로 섞음 (2026-10-30)
         if(C.autoT){clearTimeout(C.autoT);C.autoT=0;var nq=notes.get(C.id);if(nq){C.grade="g2";ccFinish(nq)}ccDoneIds[C.id]=1}   // 끝낸 직후 단계 줄을 눌러 다시 연습해도 넘어가지 않게
         C.stage=i; C.shown=i; C.reads=0; C.round=0; C.grade=""; C.dict=null; C.autoDone=0; C.keepPrev=false; C.prevHide=null; C.seed=newSeed(); C.anim=true;
         buzz([12,30,12]); ccDraw();
@@ -8657,7 +8657,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(C.reads>=3){ccDraw();var lamp=ccBox.querySelector(".ccmeter i:last-child");setTimeout(function(){if(!C)return;C.stage=1;C.anim=true;toast("🗣️ 3번 읽었어요!");ccDraw()},lamp?520:0);return}
       ccDraw();return}
     if(a==="again"){C.seed=newSeed();C.anim=true;buzz(6);ccDraw();return}
-    if(a==="next"){buzz(8);C.anim=true;if(C.stage===2&&C.round<2){C.round++;C.keepPrev=true;ccDraw();return}C.stage++;ccDraw();return}
+    if(a==="next"){buzz(8);C.anim=true;if(C.stage===2&&C.round<2){C.round++;C.seed=newSeed();C.keepPrev=false;ccDraw();return}   // 더 가리기: 가릴 낱말을 매번 새로 무작위로 (2026-10-30 사용자 요청)C.stage++;ccDraw();return}
     if(a==="eopen"){C.editPre=ccShownLines(n);C.edit=true;C.dict=null;ccDraw();return}
     if(a==="ecancel"){C.edit=false;ccDraw();return}
     if(a==="esave"){
