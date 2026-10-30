@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-fix1">
+<meta name="app-build" content="2026-10-30-hidemore">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8219,9 +8219,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       ccBox.querySelector(".ccsteps").addEventListener("click",function(e){
         var d=e.target.closest(".ccst"); if(!d||!C||C.edit||C.revealing)return;
         var i=+d.dataset.i; if(!(i>=0&&i<4))return;
-        if(i===C.stage&&!C.dict){if(i===2){C.seed=newSeed();C.anim=true;buzz([12,30,12]);ccDraw();return} buzz(8);return}   // 가리기 단계를 또 누르면 가린 자리를 새로 섞음 (2026-10-30)
+        if(i===C.stage&&!C.dict){if(i===2){C.frac=ccMoreHide(notes.get(C.id));C.seed=newSeed();C.anim=true;buzz([12,30,12]);ccDraw();return} buzz(8);return}   // 가리기 단계를 또 누르면 가린 자리를 새로 섞음 (2026-10-30)
         if(C.autoT){clearTimeout(C.autoT);C.autoT=0;var nq=notes.get(C.id);if(nq){C.grade="g2";ccFinish(nq)}ccDoneIds[C.id]=1}   // 끝낸 직후 단계 줄을 눌러 다시 연습해도 넘어가지 않게
-        C.stage=i; C.shown=i; C.reads=0; C.round=0; C.grade=""; C.dict=null; C.autoDone=0; C.keepPrev=false; C.prevHide=null; C.seed=newSeed(); C.anim=true;
+        C.frac=null; C.stage=i; C.shown=i; C.reads=0; C.round=0; C.grade=""; C.dict=null; C.autoDone=0; C.keepPrev=false; C.prevHide=null; C.seed=newSeed(); C.anim=true;
         buzz([12,30,12]); ccDraw();
       });
       // 문장 배치 고치기: 말씀을 꾹(0.8초) 누르면 열림. 연습 중 빠르게 두 번 눌러도 고치기로 넘어가지 않게 (2026-10-21 사용자 요청)
@@ -8537,6 +8537,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       return lines.join("\n");
     }catch(e){return ""}
   }
+  function ccMoreHide(n){   // 지금보다 낱말 하나 이상 더 가리는 비율
+    var len=Math.max(1,wordsOf((n&&n.text)||"").length), f=C.frac==null?0.35:C.frac;
+    return Math.min(1,f+Math.max(0.1,1/len));
+  }
   function ccEditForm(n,tip,btn){   // 상자 없이 말씀 자리에서 그대로 고친다 (2026-10-18 사용자 요청)
     var v=ccBox.querySelector(".ccverse");
     v.textContent=""; v.classList.remove("big","recall","vnum","vlines");
@@ -8633,7 +8637,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var FR=[0.35,0.65,1];
       /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
       ccMeter(tip,C.round+1,anim?C.round:-1,"🙈");
-      C.prevHide=ccWords(n.text,"hide",FR[C.round],C.seed,{anim:anim,prevHide:C.keepPrev?C.prevHide:null}); C.keepPrev=false;
+      if(C.frac==null||C.frac<FR[C.round])C.frac=FR[C.round];   /* 가리기를 또 누를 때마다 조금씩 더 가림 (2026-10-30 사용자 요청) */
+      C.prevHide=ccWords(n.text,"hide",C.frac,C.seed,{anim:anim,prevHide:C.keepPrev?C.prevHide:null}); C.keepPrev=false;
       btn("한 번 더","again");
       btn(C.round<2?"더 가리기 →":"떠올리기 →","next",true);   // 버튼 이름이 잘리지 않게 짧게 (2026-10-23 사용자 요청)
     }else if(C.stage===3){
@@ -8656,8 +8661,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(C.reads>=3)return; C.reads++;C.justRead=true;buzz(8);
       if(C.reads>=3){ccDraw();var lamp=ccBox.querySelector(".ccmeter i:last-child");setTimeout(function(){if(!C)return;C.stage=1;C.anim=true;toast("🗣️ 3번 읽었어요!");ccDraw()},lamp?520:0);return}
       ccDraw();return}
-    if(a==="again"){C.seed=newSeed();C.anim=true;buzz(6);ccDraw();return}
-    if(a==="next"){buzz(8);C.anim=true;if(C.stage===2&&C.round<2){C.round++;C.seed=newSeed();C.keepPrev=false;ccDraw();return}   /* 더 가리기: 가릴 낱말을 매번 새로 무작위로 (2026-10-30 사용자 요청) */C.stage++;ccDraw();return}
+    if(a==="again"){if(C.stage===2)C.frac=ccMoreHide(n);C.seed=newSeed();C.anim=true;buzz(6);ccDraw();return}
+    if(a==="next"){buzz(8);C.anim=true;if(C.stage===2&&C.round<2){C.round++;C.frac=ccMoreHide(n);C.seed=newSeed();C.keepPrev=false;ccDraw();return}   /* 더 가리기: 가릴 낱말을 매번 새로 무작위로 (2026-10-30 사용자 요청) */C.stage++;ccDraw();return}
     if(a==="eopen"){C.editPre=ccShownLines(n);C.edit=true;C.dict=null;ccDraw();return}
     if(a==="ecancel"){C.edit=false;ccDraw();return}
     if(a==="esave"){
