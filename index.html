@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-recall-stay">
+<meta name="app-build" content="2026-10-30-okicon">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2254,6 +2254,10 @@ button:active{filter:brightness(1.15)}
 .ccfoot{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;padding:12px 16px calc(14px + env(safe-area-inset-bottom,0px));border-top:1px solid #1E1D23;max-width:720px;width:100%;margin:0 auto}
 .ccbtn{height:48px;padding:0 18px;border:1px solid var(--rule);border-radius:24px;background:transparent;color:var(--muted);font-size:15px;font-weight:700;white-space:nowrap}
 .ccbtn.main{flex:1;min-width:150px;border:0;background:var(--gold);color:#17120A;font-size:16px}
+/* 암송 완료 단추 앞 아이콘: 네모 ✅ 대신 둥근 바탕에 부드러운 체크 (2026-10-30 사용자 요청) */
+.ccbtn[data-a="g2"]{display:inline-flex;align-items:center;justify-content:center;gap:9px}
+.ccbtn[data-a="g2"]::before{content:"";flex:0 0 auto;width:24px;height:24px;border-radius:50%;background:#17120A url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.8 12.6l3.4 3.3 7-7.6' fill='none' stroke='%23E3BE72' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat;box-shadow:0 0 0 2px color-mix(in srgb,#17120A 12%,transparent)}
+.ccbtn[data-a="g2"]:disabled::before{opacity:.55}
 .ccres{text-align:center;padding:10px 0;font-family:var(--sans)}
 .ccvwrap.ccresult{width:100%}
 .ccvwrap.ccresult .ccvref{text-align:center}
@@ -8241,14 +8245,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           var again=!!ccDoneIds[cid];   // 이번에 연 암송 코치에서 이미 끝낸 말씀이면 다음 말씀으로 넘어가지 않음
           if(again){
             var na=notes.get(cid); if(na){C.grade="g2"; ccFinish(na)}
-            toast("✅ 암송 완료"); C.stage=3; C.grade=""; C.autoDone=0; C.t0=Date.now(); C.tapped={};
+            toast("✨ 암송 완료"); C.stage=3; C.grade=""; C.autoDone=0; C.t0=Date.now(); C.tapped={};
           }else{
             C.autoT=setTimeout(function(){
               C&&(C.autoT=0);
               if(!C||C.id!==cid||ccBox.hidden)return;
               var n1=notes.get(cid); if(!n1)return;
               C.grade="g2"; C.stage=5; ccFinish(n1); ccDoneIds[cid]=1;
-              if(ccNextNote()){toast("✅ 암송 완료"); ccGoNext()} else ccDraw();
+              if(ccNextNote()){toast("✨ 암송 완료"); ccGoNext()} else ccDraw();
             },3300);   // 마지막 낱말을 누른 뒤 2초 더 머묾 (2026-10-30 사용자 요청)
           }
         }
@@ -8471,7 +8475,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
     v.appendChild(wrap);
     btn("다시 써 보기","dretry");
-    btn("✅ 암송 완료","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
+    btn("암송 완료","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
   }
   function ccEditForm(n,tip,btn){   // 상자 없이 말씀 자리에서 그대로 고친다 (2026-10-18 사용자 요청)
     var v=ccBox.querySelector(".ccverse");
@@ -8580,7 +8584,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       btn("확인하기 👀","show",true);
     }else if(C.stage===4){
       ccWords(n.text,"got",0,C.seed);
-      btn("✅ 암송 완료","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
+      btn("암송 완료","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
     }else{
       ccResult(n); return;
     }
@@ -8665,7 +8669,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(C.revealing)return; C.revealing=true; buzz(8);
     // 다음 화면의 고르기 버튼을 미리 (눌리지 않게) 깔아 두어 말씀 자리가 끝날 때 움직이지 않게
     var ft=ccBox.querySelector(".ccfoot"); ft.textContent="";
-    [["✅ 암송 완료","g2",1]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(x[2]?" main":"");b.dataset.a=x[1];b.textContent=x[0];b.disabled=true;ft.appendChild(b)});
+    [["암송 완료","g2",1]].forEach(function(x){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(x[2]?" main":"");b.dataset.a=x[1];b.textContent=x[0];b.disabled=true;ft.appendChild(b)});
     var n=notes.get(C.id), v=ccBox.querySelector(".ccverse"), still=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
     if(!n){C.revealing=false;return}
     var cnt=wordsOf(n.text).length, step=still?0:Math.max(40,Math.min(110,1400/Math.max(1,cnt))), FADE=still?0:700;
