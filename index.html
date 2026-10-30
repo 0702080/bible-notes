@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-ans3">
+<meta name="app-build" content="2026-10-31-ans5">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3048,9 +3048,24 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .ansa{margin:8px 0 0;padding-left:10px;border-left:2px solid var(--gold);font-size:14.5px;line-height:1.6;color:color-mix(in srgb,var(--gold) 80%,#fff);white-space:pre-wrap}
 .ansfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px;padding-top:10px;border-top:1px solid #222127;font-size:12px;line-height:1.5;color:var(--faint)}
 .ansgo{border:0;background:transparent;color:var(--sky);font-size:12.5px;padding:2px 4px}
-.ansbtns{display:flex;gap:4px;flex-shrink:0}
-.ansundo{border:0;background:transparent;color:var(--faint);font-size:12.5px;padding:2px 4px;white-space:nowrap}
-.ansundo[data-sure]{color:var(--pink);font-weight:700}
+.ansbtns{display:flex;gap:6px;flex-shrink:0}
+.ansbtns button{height:28px;padding:0 12px;border-radius:14px;font-size:12px;font-weight:600;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.ansundo{border:1px solid #2E2D34;background:transparent;color:var(--muted)}
+.ansundo[data-sure]{border-color:color-mix(in srgb,var(--pink) 60%,transparent);background:color-mix(in srgb,var(--pink) 12%,transparent);color:var(--pink)}
+.ansbtns .ansgo{border:1px solid color-mix(in srgb,var(--sky) 35%,transparent);background:color-mix(in srgb,var(--sky) 10%,transparent);color:var(--sky);font-size:12px;padding:0 12px}
+.ansfrom{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cch.ansv .bqbar{justify-content:space-between}
+.ansclose{width:36px;height:36px;padding:0;border:1px solid #34333A;border-radius:50%;background:#16151A;color:var(--muted);font-size:15px;line-height:1;display:grid;place-items:center}
+.ansclose:hover{color:var(--ink);border-color:#4A4952}
+.anssearch{box-sizing:border-box;display:flex;align-items:center;gap:8px;height:42px;margin:0 0 6px;padding:0 14px;border:1px solid #2A2930;border-radius:21px;background:#121116;font-size:13px}
+.anssearch:focus-within{border-color:color-mix(in srgb,var(--gold) 55%,#2A2930)}
+.ansq{flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--ink);font-size:14.5px;outline:none}
+.ansq::placeholder{color:var(--faint)}
+.ansnone{margin:26px 0;text-align:center;color:var(--faint);font-size:13.5px}
+.ansit.long .anst{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;overflow:hidden;cursor:pointer}
+.ansit.long.open .anst{display:block;-webkit-line-clamp:unset}
+.ansmore{display:none;margin:6px 0 0;padding:2px 0;border:0;background:transparent;color:color-mix(in srgb,var(--gold) 80%,#fff);font-size:12.5px;font-weight:600}
+.ansit.long .ansmore{display:inline-block}
 .ansempty,.icempty{color:var(--muted);font-size:14px;line-height:1.6}
 /* 🤲 중보기도 */
 .ichead{display:flex;align-items:center;gap:10px;margin:6px 0 10px}
@@ -9122,11 +9137,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     else if(k==="p"){var o=p1Data(), x=o.items.find(function(y){return y.id===id}); if(x){x.ans=0; x.u=Date.now(); p1Save(o)}}
     else if(k==="i"){var o2=icData(), x2=o2.items.find(function(y){return y.id===id}); if(x2){x2.ans=0; icTouch(x2); icSave(o2)}}
   }
+  function ansFilter(){
+    var q=ans.querySelector(".ansq").value.trim().toLowerCase().replace(/\s+/g," "), shown=0, mon=null, monHit=false;
+    var fin=function(){if(mon)mon.hidden=!monHit};
+    Array.prototype.forEach.call(ans.querySelectorAll(".anslist>*"),function(el){
+      if(el.classList.contains("ansmon")){fin(); mon=el; monHit=false; return}
+      if(!el.classList.contains("ansit"))return;
+      var hit=!q||el.dataset.q.indexOf(q)>=0; el.hidden=!hit; if(hit){shown++;monHit=true}
+    }); fin();
+    ans.querySelector(".ansnone").hidden=!(q&&!shown);
+  }
   function openAnswers(){
     if(!ans){
       ans=document.createElement("div"); ans.className="cch ansv"; ans.setAttribute("role","dialog"); ans.setAttribute("aria-modal","true"); ans.hidden=true;
-      ans.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🙌 기도 응답 연표</b></div><div class="qbarbtns"><button type="button" class="ansclose">닫기</button></div></div>'+
-        '<div class="ccbody"><div class="anssum"></div><div class="anslist"></div></div>';
+      ans.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🙌 기도 응답 연표</b></div><div class="qbarbtns"><button type="button" class="ansclose" aria-label="닫기">✕</button></div></div>'+
+        '<div class="ccbody"><div class="anssum"></div><div class="anssearch"><span aria-hidden="true">🔍</span><input type="search" class="ansq" placeholder="기도 찾기 — 내용·응답·말씀" autocomplete="off"></div><div class="anslist"></div><p class="ansnone" hidden>찾는 기도가 없어요</p></div>';
       document.body.appendChild(ans);
       ans.querySelector(".ansclose").addEventListener("click",closeAnswers);
       ans.querySelector(".anslist").addEventListener("click",function(e){
@@ -9134,7 +9159,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var u=e.target.closest(".ansundo");
         if(u){if(!u.dataset.sure){u.dataset.sure="1";u.textContent="한 번 더 누르면 취소";setTimeout(function(){if(u.isConnected){delete u.dataset.sure;u.textContent="응답 취소"}},4000);return}
           ansUndo(u.dataset.k,u.dataset.id,u.dataset.nid); toast("응답 표시를 취소했어요 — 다시 기다리는 기도로"); openAnswers(); return}
+        // 긴 기도문은 접어 두고 눌러서 펼침 (2026-10-31 사용자 요청)
+        var mo=e.target.closest(".ansmore,.ansit.long .anst");
+        if(mo){var it2=mo.closest(".ansit"), op=it2.classList.toggle("open"); it2.querySelector(".ansmore").textContent=op?"접기 ⌃":"펼치기 ⌄"; return}
         var b=e.target.closest(".ansgo"); if(!b)return; closeAnswers(); openNoteFocus(b.dataset.nid,"p")});
+      ans.querySelector(".ansq").addEventListener("input",ansFilter);
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ans&&!ans.hidden)closeAnswers()});
     }
     var it=ansItems(), wait=0;
@@ -9157,12 +9186,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       e.querySelector(".anst").textContent=prayClean(x.t)||"(기도 내용 없음)";
       var ap=e.querySelector(".ansa"); if(String(x.an||"").trim())ap.textContent="🙌 "+x.an.trim(); else ap.remove();
       var fr=e.querySelector(".ansfrom"); fr.textContent=dlabel(dkey(x.at))+" 기도 · "+x.ref;
+      e.dataset.q=(prayClean(x.t)+" "+(x.an||"")+" "+x.ref).toLowerCase().replace(/\s+/g," ");
+      var mb=document.createElement("button"); mb.type="button"; mb.className="ansmore"; mb.textContent="펼치기 ⌄"; e.querySelector(".anst").after(mb);
       var un=document.createElement("button"); un.type="button"; un.className="ansundo"; un.textContent="응답 취소"; un.dataset.k=x.k; un.dataset.id=x.id; un.dataset.nid=x.nid||"";
       var fb=document.createElement("span"); fb.className="ansbtns"; fb.appendChild(un); e.querySelector(".ansfoot").appendChild(fb);
       if(x.nid){var g=document.createElement("button"); g.type="button"; g.className="ansgo"; g.dataset.nid=x.nid; g.textContent="말씀 보기 ›"; fb.appendChild(g)}
       list.appendChild(e);
     });
     ans.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+    Array.prototype.forEach.call(list.querySelectorAll(".anst"),function(t){var a=t.closest(".ansit"); a.classList.add("long"); if(t.scrollHeight<=t.clientHeight+4)a.classList.remove("long")});
+    ansFilter();
   }
   function closeAnswers(){if(!ans||ans.hidden)return; ans.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
   /* ---------- 🧠 스마트 말씀 (2026-10-30 사용자 요청) ----------
