@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-ics1">
+<meta name="app-build" content="2026-10-30-ics2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9685,7 +9685,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     ts.forEach(function(t,i){
       var hm=t.h.replace(":","")+"00";
       L.push("BEGIN:VEVENT","UID:bible-remind-"+i+"-"+Date.now()+"@bible-notes","DTSTAMP:"+stamp,"DTSTART:"+ymd+"T"+hm,"DURATION:PT5M","RRULE:FREQ=DAILY",
-        "SUMMARY:📖 "+t.l+" 말씀 꺼내기","DESCRIPTION:오늘 외우는 말씀을 한 번 떠올려 보세요 "+url,"URL:"+url,
+        "SUMMARY:"+t.l+" 말씀 꺼내기","DESCRIPTION:오늘 외우는 말씀을 한 번 떠올려 보세요 "+url,"URL:"+url,
         "BEGIN:VALARM","ACTION:DISPLAY","DESCRIPTION:말씀 꺼내기","TRIGGER:PT0M","END:VALARM","END:VEVENT");
     });
     L.push("END:VCALENDAR");
