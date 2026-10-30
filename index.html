@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-ans10">
+<meta name="app-build" content="2026-10-31-ans11">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3031,7 +3031,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlicall{margin-left:auto;border:0;background:transparent;color:var(--sky);font-size:12.5px;padding:4px 6px;border-radius:8px}
 /* 🙌 응답 연표 */
 .anssum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0 18px}
-.anssum div{padding:14px 8px 12px;border:1px solid #26252B;border-radius:16px;text-align:center;background:#121116}
+.anssum>*{padding:14px 8px 12px;border:1px solid #26252B;border-radius:16px;text-align:center;background:#121116;font:inherit;color:inherit}
+.anssum button{cursor:pointer;transition:border-color .15s,background .15s}
+.anssum button.on{border-color:color-mix(in srgb,var(--gold) 55%,#26252B);background:color-mix(in srgb,var(--gold) 8%,#121116)}
+.anssum button:not(.on) b{color:color-mix(in srgb,var(--gold) 70%,#888)}
+.ansbtns .ansmark{border:1px solid color-mix(in srgb,var(--gold) 50%,transparent);background:color-mix(in srgb,var(--gold) 12%,transparent);color:var(--gold)}
 .anssum b{display:block;font-size:24px;line-height:1.2;margin-bottom:4px;color:var(--gold)}
 .anssum span{font-size:12px;color:var(--muted)}
 .anslist{position:relative;padding-left:24px}
@@ -9152,6 +9156,19 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     icData().items.forEach(function(x){if(x.ans)out.push({t:x.memo||x.name+"을(를) 위한 기도",an:x.an,at:x.at,ans:x.ans,ref:"🤲 "+x.name,nid:"",k:"i",id:x.id})});
     return out.sort(function(a,b){return b.ans-a.ans});
   }
+  // 맨 위 칸을 눌러 응답된 기도 ↔ 기다리는 기도 목록으로 바꿈 (2026-10-31 사용자 요청)
+  var ansMode="ans";
+  function waitItems(){
+    var out=[];
+    notes.forEach(function(n){(n.prays||[]).forEach(function(x){if(!x.ans&&prayClean(x.t))out.push({t:x.t,at:x.at,ref:n.ref||"말씀",nid:n.id,k:"c",id:x.id})})});
+    p1Data().items.forEach(function(x){if(!x.ans&&String(x.t||"").trim())out.push({t:x.t,at:x.at,ref:"한 줄 기도",nid:"",k:"p",id:x.id})});
+    return out.sort(function(a,b){return b.at-a.at});
+  }
+  function ansMark(k,id,nid){
+    var now=Date.now();
+    if(k==="c"){var n=notes.find(function(m){return m.id===nid}), px=n&&(n.prays||[]).find(function(x){return x.id===id}); if(px){px.ans=now; render(); scheduleSave(nid)}}
+    else if(k==="p"){var o=p1Data(), x=o.items.find(function(y){return y.id===id}); if(x){x.ans=now; x.u=now; p1Save(o)}}
+  }
   function ansUndo(k,id,nid){
     if(k==="c"){var n=notes.find(function(m){return m.id===nid}), px=n&&(n.prays||[]).find(function(x){return x.id===id}); if(px){px.ans=0; render(); scheduleSave(nid)}}
     else if(k==="p"){var o=p1Data(), x=o.items.find(function(y){return y.id===id}); if(x){x.ans=0; x.u=Date.now(); p1Save(o)}}
@@ -9167,7 +9184,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     }); fin();
     ans.querySelector(".ansnone").hidden=!(q&&!shown);
   }
-  function openAnswers(){
+  function openAnswers(keep){
     if(!ans){
       ans=document.createElement("div"); ans.className="cch ansv"; ans.setAttribute("role","dialog"); ans.setAttribute("aria-modal","true"); ans.hidden=true;
       ans.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🙌 기도 응답 연표</b></div><div class="qbarbtns"><button type="button" class="ansclose" aria-label="닫기">✕</button></div></div>'+
@@ -9178,37 +9195,42 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         // 잘못 응답 표시한 기도는 여기서 바로 되돌림 — 한 번 더 눌러 확인 (2026-10-31 사용자 요청)
         var u=e.target.closest(".ansundo");
         if(u){if(!u.dataset.sure){u.dataset.sure="1";u.textContent="한 번 더 누르면 취소";setTimeout(function(){if(u.isConnected){delete u.dataset.sure;u.textContent="응답 취소"}},4000);return}
-          ansUndo(u.dataset.k,u.dataset.id,u.dataset.nid); toast("응답 표시를 취소했어요 — 다시 기다리는 기도로"); openAnswers(); return}
+          ansUndo(u.dataset.k,u.dataset.id,u.dataset.nid); toast("응답 표시를 취소했어요 — 다시 기다리는 기도로"); openAnswers(true); return}
+        var mk=e.target.closest(".ansmark");
+        if(mk){ansMark(mk.dataset.k,mk.dataset.id,mk.dataset.nid); toast("🙌 응답된 기도로 기록했어요"); buzz([12,40,18]); openAnswers(true); return}
         // 긴 기도문은 접어 두고 눌러서 펼침 (2026-10-31 사용자 요청)
         var mo=e.target.closest(".ansmore,.ansit.long .anst");
         if(mo){var it2=mo.closest(".ansit"), op=it2.classList.toggle("open"); it2.querySelector(".ansmore").textContent=op?"접기 ⌃":"전체 기도 펼치기 ⌄"; return}
         var b=e.target.closest(".ansgo"); if(!b)return; closeAnswers(); openNoteFocus(b.dataset.nid,"p")});
       ans.querySelector(".ansq").addEventListener("input",ansFilter);
+      ans.querySelector(".anssum").addEventListener("click",function(e){var t=e.target.closest("[data-m]"); if(!t||t.dataset.m===ansMode)return; ansMode=t.dataset.m; openAnswers(true); ans.querySelector(".ccbody").scrollTop=0});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ans&&!ans.hidden)closeAnswers()});
     }
-    var it=ansItems(), wait=0;
-    notes.forEach(function(n){(n.prays||[]).forEach(function(x){if(!x.ans&&prayClean(x.t))wait++})});
-    p1Data().items.forEach(function(x){if(!x.ans&&String(x.t||"").trim())wait++});
+    if(keep!==true)ansMode="ans";
+    var it=ansItems(), wl=waitItems(), wait=wl.length, W=ansMode==="wait";
     var days=it.map(function(x){return Math.max(0,Math.round((x.ans-x.at)/864e5))});
     var avg=days.length?Math.round(days.reduce(function(a,b){return a+b},0)/days.length):0;
-    ans.querySelector(".anssum").innerHTML='<div><b>'+it.length+'</b><span>응답된 기도</span></div><div><b>'+(it.length?avg+"일":"–")+'</b><span>평균 기다린 날</span></div><div><b>'+wait+'</b><span>기다리는 기도</span></div>';
+    ans.querySelector(".anssum").innerHTML='<button type="button" data-m="ans"'+(W?'':' class="on"')+'><b>'+it.length+'</b><span>응답된 기도</span></button><div><b>'+(it.length?avg+"일":"–")+'</b><span>평균 기다린 날</span></div><button type="button" data-m="wait"'+(W?' class="on"':'')+'><b>'+wait+'</b><span>기다리는 기도</span></button>';
+    ans.querySelector(".bqtitle b").textContent=W?"🙏 기다리는 기도":"🙌 기도 응답 연표";
     var list=ans.querySelector(".anslist"); list.textContent="";
-    if(!it.length){var p=document.createElement("p"); p.className="ansempty"; p.textContent="아직 응답 표시한 기도가 없어요. 카드 기도 탭이나 한 줄 기도에서 '🙌 응답됐어요'를 누르면 여기에 쌓여요."; list.appendChild(p)}
+    var now=Date.now(), rows=W?wl:it;
+    if(W&&!wl.length){var p0=document.createElement("p"); p0.className="ansempty"; p0.textContent="기다리는 기도가 없어요."; list.appendChild(p0)}
+    if(!W&&!it.length){var p=document.createElement("p"); p.className="ansempty"; p.textContent="아직 응답 표시한 기도가 없어요. 카드 기도 탭이나 한 줄 기도에서 '🙌 응답됐어요'를 누르면 여기에 쌓여요."; list.appendChild(p)}
     var lastM="";
-    it.forEach(function(x,i){
-      var d=new Date(x.ans), m=d.getFullYear()+"년 "+(d.getMonth()+1)+"월";
+    rows.forEach(function(x,i){
+      var d=new Date(W?x.at:x.ans), m=d.getFullYear()+"년 "+(d.getMonth()+1)+"월";
       if(m!==lastM){lastM=m; var h=document.createElement("div"); h.className="ansmon"; h.textContent=m; list.appendChild(h)}
       var e=document.createElement("article"); e.className="ansit";
-      var dd=days[i];
+      var dd=W?Math.max(0,Math.floor((now-x.at)/864e5)):days[i];
       e.innerHTML='<div class="ansdot"></div><div class="ansbox"><div class="anstop"><b class="ansday"></b><span class="answait"></span></div><p class="anst"></p><p class="ansa"></p><div class="ansfoot"><span class="ansfrom"></span></div></div>';
-      var ad=e.querySelector(".ansday"); ad.innerHTML='<span class="ansdd"></span><span class="ansdl">🙌 응답</span>'; ad.firstChild.textContent=(d.getMonth()+1)+"."+d.getDate();
-      e.querySelector(".answait").textContent=dd<1?"그날 바로":dd+"일 만에";
+      var ad=e.querySelector(".ansday"); ad.innerHTML='<span class="ansdd"></span><span class="ansdl">'+(W?"🙏 기도":"🙌 응답")+'</span>'; ad.firstChild.textContent=(d.getMonth()+1)+"."+d.getDate();
+      e.querySelector(".answait").textContent=W?(dd<1?"오늘":dd+"일째"):(dd<1?"그날 바로":dd+"일 만에");
       e.querySelector(".anst").textContent=prayClean(x.t)||"(기도 내용 없음)";
       var ap=e.querySelector(".ansa"); if(String(x.an||"").trim())ap.textContent="🙌 "+x.an.trim(); else ap.remove();
-      var fr=e.querySelector(".ansfrom"); fr.textContent=dlabel(dkey(x.at))+" 기도 · "+x.ref;
+      var fr=e.querySelector(".ansfrom"); fr.textContent=W?x.ref:dlabel(dkey(x.at))+" 기도 · "+x.ref;
       e.dataset.q=(prayClean(x.t)+" "+(x.an||"")+" "+x.ref).toLowerCase().replace(/\s+/g," ");
       var mb=document.createElement("button"); mb.type="button"; mb.className="ansmore"; mb.textContent="전체 기도 펼치기 ⌄"; e.querySelector(".anst").after(mb);
-      var un=document.createElement("button"); un.type="button"; un.className="ansundo"; un.textContent="응답 취소"; un.dataset.k=x.k; un.dataset.id=x.id; un.dataset.nid=x.nid||"";
+      var un=document.createElement("button"); un.type="button"; un.className=W?"ansmark":"ansundo"; un.textContent=W?"🙌 응답됐어요":"응답 취소"; un.dataset.k=x.k; un.dataset.id=x.id; un.dataset.nid=x.nid||"";
       var fb=document.createElement("span"); fb.className="ansbtns"; fb.appendChild(un); e.querySelector(".ansfoot").appendChild(fb);
       if(x.nid){var g=document.createElement("button"); g.type="button"; g.className="ansgo"; g.dataset.nid=x.nid; g.textContent="말씀 보기 ›"; fb.appendChild(g)}
       list.appendChild(e);
