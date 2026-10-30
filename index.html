@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-savefix">
+<meta name="app-build" content="2026-10-30-memopill">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10824,7 +10824,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             pill.className="dlauto"; pill.textContent="한 줄 감사 쓰기 ›";
             pill.setAttribute("aria-label","한 줄 감사 쓰는 곳으로 가기");
           }else{       // 나머지 항목은 그날 기록 칸을 연다
-            pill.className="dlauto dlmemo"+(hasMemo?"":" off"); pill.dataset.id=it.id;
+            pill.className="dlauto dlmemo";   /* 기록이 없어도 있는 것과 같은 색 (2026-10-30 사용자 요청) */ pill.dataset.id=it.id;
             pill.textContent="기록";   // ›는 글꼴에 없어 빈칸으로 보여 뺌 — 글 자리 넓힘 (2026-10-29 사용자 요청) pill.title=(hasMemo?"적어 둔 기록 보기":"구체적으로 적어 두기");
             pill.setAttribute("aria-label",it.t+" 기록 "+(hasMemo?"보기":"적기"));
             pill.setAttribute("aria-expanded",String(dlMemoId===it.id));
