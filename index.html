@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-numfx">
+<meta name="app-build" content="2026-10-30-numfx2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2320,17 +2320,17 @@ button:active{filter:brightness(1.15)}
 .ccbody>.ccnum{position:absolute;right:20px;top:0;z-index:2}
 /* 암송 숫자가 오를 때: 커지며 금빛으로 빛나고, 숫자가 위로 굴러 바뀌고, 빛 고리 두 겹 + "+1"이 떠오름 (2026-10-30 사용자 요청) */
 .ccnum.ccnumup{animation:ccnumup 1.5s cubic-bezier(.2,1.5,.4,1);overflow:visible}
-@keyframes ccnumup{0%{transform:scale(1)}18%{transform:scale(1.75) rotate(-4deg);background:#FFD54A;color:#141416;box-shadow:0 0 0 0 rgba(255,213,74,.7),0 0 26px 6px rgba(255,213,74,.55)}32%{transform:scale(1.5) rotate(3deg)}48%{transform:scale(1.62) rotate(0)}75%{background:#FFD54A;color:#141416;box-shadow:0 0 0 14px rgba(255,213,74,0),0 0 18px 2px rgba(255,213,74,.35)}100%{transform:scale(1)}}
+@keyframes ccnumup{0%{transform:scale(1)}22%{transform:scale(1.5) rotate(-2deg);background:#FFD54A;color:#141416;box-shadow:0 0 16px 3px rgba(255,213,74,.45)}40%{transform:scale(1.42) rotate(1deg)}55%{transform:scale(1.45) rotate(0)}75%{background:#FFD54A;color:#141416;box-shadow:0 0 10px 1px rgba(255,213,74,.25)}100%{transform:scale(1)}}
 .ccnum .ccroll{display:inline-block;position:relative;height:1.25em;line-height:1.25em;overflow:hidden;vertical-align:bottom}
 .ccnum .ccroll b{display:block;font-weight:inherit;animation:ccroll .55s cubic-bezier(.3,1.4,.5,1) .12s both}
 @keyframes ccroll{from{transform:translateY(0)}to{transform:translateY(-1.25em)}}
 .ccnum .ccring{position:absolute;inset:-2px;border-radius:12px;border:2px solid #FFD54A;pointer-events:none;animation:ccring .9s ease-out both}
-.ccnum .ccring.r2{animation-delay:.22s;border-color:#C8F560}
-@keyframes ccring{from{opacity:.95;transform:scale(1)}to{opacity:0;transform:scale(2.6,3.4)}}
+.ccnum .ccring.r2{display:none}
+@keyframes ccring{from{opacity:.7;transform:scale(1)}to{opacity:0;transform:scale(1.8,2.3)}}
 .ccnum .ccplus{position:absolute;left:50%;top:-4px;font-size:15px;font-weight:800;color:#FFD54A;text-shadow:0 0 10px rgba(255,213,74,.8),0 1px 0 #141416;pointer-events:none;white-space:nowrap;animation:ccplus 1.3s cubic-bezier(.2,.9,.3,1) both}
-@keyframes ccplus{0%{opacity:0;transform:translate(-50%,6px) scale(.6)}20%{opacity:1;transform:translate(-50%,-14px) scale(1.25)}100%{opacity:0;transform:translate(-50%,-46px) scale(1)}}
+@keyframes ccplus{0%{opacity:0;transform:translate(-50%,4px) scale(.7)}25%{opacity:1;transform:translate(-50%,-10px) scale(1.05)}100%{opacity:0;transform:translate(-50%,-32px) scale(.95)}}
 .ccnum .ccshine{position:absolute;inset:0;border-radius:9px;overflow:hidden;pointer-events:none}
-.ccnum .ccshine::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.85),transparent);animation:ccshine .7s ease-out .25s both}
+.ccnum .ccshine::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);animation:ccshine .7s ease-out .25s both}
 @keyframes ccshine{to{left:130%}}
 @media (prefers-reduced-motion:reduce){.ccnum.ccnumup,.ccnum .ccroll b,.ccnum .ccring,.ccnum .ccplus,.ccnum .ccshine::after{animation:none}.ccnum .ccring,.ccnum .ccplus{display:none}}
 .ccnum{align-self:center;padding:1px 8px;border-radius:9px;background:color-mix(in srgb,var(--violet) 18%,transparent);color:var(--violet);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
