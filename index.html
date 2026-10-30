@@ -8657,7 +8657,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(C.reads>=3){ccDraw();var lamp=ccBox.querySelector(".ccmeter i:last-child");setTimeout(function(){if(!C)return;C.stage=1;C.anim=true;toast("🗣️ 3번 읽었어요!");ccDraw()},lamp?520:0);return}
       ccDraw();return}
     if(a==="again"){C.seed=newSeed();C.anim=true;buzz(6);ccDraw();return}
-    if(a==="next"){buzz(8);C.anim=true;if(C.stage===2&&C.round<2){C.round++;C.seed=newSeed();C.keepPrev=false;ccDraw();return}   // 더 가리기: 가릴 낱말을 매번 새로 무작위로 (2026-10-30 사용자 요청)C.stage++;ccDraw();return}
+    if(a==="next"){buzz(8);C.anim=true;if(C.stage===2&&C.round<2){C.round++;C.seed=newSeed();C.keepPrev=false;ccDraw();return}   /* 더 가리기: 가릴 낱말을 매번 새로 무작위로 (2026-10-30 사용자 요청) */C.stage++;ccDraw();return}
     if(a==="eopen"){C.editPre=ccShownLines(n);C.edit=true;C.dict=null;ccDraw();return}
     if(a==="ecancel"){C.edit=false;ccDraw();return}
     if(a==="esave"){
