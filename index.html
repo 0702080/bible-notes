@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-linemove2">
+<meta name="app-build" content="2026-10-30-linegrip">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3323,14 +3323,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfsday{margin-top:6px;font-size:13px;color:color-mix(in srgb,var(--gc) 80%,#fff)}
 .dlfsheet textarea{flex:1;min-height:160px;width:100%;box-sizing:border-box;resize:none;padding:14px 16px;border:1px solid color-mix(in srgb,var(--gc) 40%,#2A2930);border-radius:16px;background:#141418;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.7}
 .dlfsheet textarea:focus{outline:none;border-color:color-mix(in srgb,var(--gc) 75%,#2A2930)}
-/* 줄 옮기기: 커서가 있는 줄을 ▲▼로 한 줄씩, ⇅를 잡고 끌면 끈 만큼 위아래로 (2026-10-30 사용자 요청) */
+/* 줄 옮기기: 줄 앞 ⠿를 잡고 위아래로 끌면 그 줄이 옮겨짐 (2026-10-30 사용자 요청) */
 .dlfsbody{position:relative}
-.dlfsheet textarea{padding-right:58px}
-.dlfsmv{position:absolute;right:30px;z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px;border-radius:22px;background:color-mix(in srgb,var(--gc) 10%,#1A1920);border:1px solid color-mix(in srgb,var(--gc) 35%,#2E2D35);box-shadow:0 6px 16px rgba(0,0,0,.45)}
-.dlfsmv button{width:34px;height:34px;border:0;border-radius:17px;background:transparent;color:color-mix(in srgb,var(--gc) 85%,#fff);font-size:15px;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;touch-action:none}
-.dlfsmv button:active{background:color-mix(in srgb,var(--gc) 22%,transparent)}
-.dlfsmv .dlfsgrip{height:46px;font-size:20px;cursor:ns-resize;background:color-mix(in srgb,var(--gc) 16%,transparent)}
-.dlfsmv.drag .dlfsgrip{background:var(--gc);color:#0B0B0D}
+.dlfsheet textarea{padding-left:40px}
+.dlfsgut{position:absolute;z-index:3;width:36px;overflow:hidden;pointer-events:none}
+.dlfsgut>div{position:absolute;left:0;right:0;top:0}
+.dlfsh{position:absolute;left:4px;width:30px;display:grid;place-items:center;color:color-mix(in srgb,var(--gc) 55%,#5A5964);font-size:17px;line-height:1;pointer-events:auto;touch-action:none;cursor:grab;-webkit-tap-highlight-color:transparent;border-radius:8px;user-select:none;-webkit-user-select:none}
+.dlfsh:active,.dlfsh.on{color:#0B0B0D;background:var(--gc)}
+.dlfsmirror{position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;word-wrap:break-word;overflow-wrap:break-word;box-sizing:border-box}
 .dlfsfoot{display:flex;justify-content:center;width:100%;max-width:640px;margin:0 auto;padding:10px 20px 18px;box-sizing:border-box}
 .dlfsdone{flex:1;height:56px;border:0;border-radius:28px;background:var(--gc);color:#0B0B0D;font-size:17px;font-weight:800}
 .dlfsdone.on{background:transparent;border:1.5px solid var(--gc);color:var(--gc)}
@@ -10506,7 +10506,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       dlfSh.innerHTML='<div class="dlfsbar"><button type="button" class="dlfsback" aria-label="닫기">← 돌아가기</button><b class="dlfsbt"></b><span class="dlfssave"></span></div>'+
         '<div class="dlfsbody"><small class="dlfsg"></small><h2 class="dlfst"></h2><div class="dlfsday"></div>'+
         '<textarea maxlength="8000" placeholder="오늘 어떻게 했는지 구체적으로 적어 보세요"></textarea>'+
-        '<div class="dlfsmv" role="group" aria-label="줄 옮기기"><button type="button" data-mv="-1" aria-label="이 줄 위로">▲</button><button type="button" class="dlfsgrip" aria-label="잡고 끌어서 줄 옮기기">⇅</button><button type="button" data-mv="1" aria-label="이 줄 아래로">▼</button></div></div>'+
+        '<div class="dlfsgut" aria-hidden="true"><div></div></div><div class="dlfsmirror" aria-hidden="true"></div></div>'+
         '<div class="dlfsfoot"><button type="button" class="dlfsdone">✓ 했어요</button></div>';
       document.body.appendChild(dlfSh);
       var ta0=dlfSh.querySelector("textarea");
@@ -10515,49 +10515,55 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var tip=dlfSh.querySelector(".dlfssave"); tip.textContent="저장됨"; clearTimeout(tip._t); tip._t=setTimeout(function(){tip.textContent=""},1400);
       });
       dlfSh.querySelector(".dlfsback").addEventListener("click",function(){dlFocusSheetClose()});
-      (function(){   // 줄 옮기기 (2026-10-30 사용자 요청)
-        var mv=dlfSh.querySelector(".dlfsmv");
-        function place(){mv.style.top=(ta0.offsetTop+12)+"px"}
-        dlfSh._mvPlace=place;
-        function lineRange(v,a,b){   // 선택(커서)이 걸친 줄들의 시작·끝 위치
-          var st=a>0?v.lastIndexOf("\n",a-1)+1:0;
-          var bb=(b>a&&v[b-1]==="\n")?b-1:b, en=v.indexOf("\n",bb); if(en<0)en=v.length;
-          return [st,en];
+      (function(){   // 줄 옮기기: 줄마다 앞에 ⠿ — 잡고 위아래로 끌면 그 줄이 따라 옮겨짐 (2026-10-30 사용자 요청)
+        var gut=dlfSh.querySelector(".dlfsgut"), inner=gut.firstChild, mir=dlfSh.querySelector(".dlfsmirror"), tops=[], lh=27, G=null;
+        function measure(){
+          var cs=getComputedStyle(ta0);
+          ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","paddingTop","paddingRight","paddingBottom","paddingLeft"].forEach(function(k){mir.style[k]=cs[k]});
+          mir.style.width=ta0.clientWidth+"px"; lh=parseFloat(cs.lineHeight)||27;
+          mir.textContent=""; var ls=ta0.value.split("\n");
+          ls.forEach(function(l){var d=document.createElement("div"); d.textContent=l||"​"; mir.appendChild(d)});
+          tops=Array.prototype.map.call(mir.children,function(d){return d.offsetTop});
+          gut.style.left=(ta0.offsetLeft+ta0.clientLeft)+"px"; gut.style.top=(ta0.offsetTop+ta0.clientTop)+"px"; gut.style.height=ta0.clientHeight+"px";
+          Array.prototype.slice.call(inner.children).forEach(function(c){if(!G||c!==G.h)c.remove()});   // 끄는 동안 잡은 손잡이는 그대로 두고 따라가게
+          if(G&&G.h){G.h.style.top=tops[G.i]+"px"; G.h.dataset.i=G.i}
+          ls.forEach(function(l,i){if(!l.trim()||(G&&G.h&&i===G.i))return; var h=document.createElement("span"); h.className="dlfsh"+(G&&G.i===i?" on":""); h.dataset.i=i; h.textContent="⠿"; h.style.top=tops[i]+"px"; h.style.height=lh+"px"; inner.appendChild(h)});
+          sync();
         }
-        function moveLine(dir){
-          var v=ta0.value, a=ta0.selectionStart, b=ta0.selectionEnd, r=lineRange(v,a,b), st=r[0], en=r[1], blk=v.slice(st,en), na, nb;
-          if(dir<0){if(st===0)return false; var ps=v.lastIndexOf("\n",st-2)+1, prev=v.slice(ps,st-1);
-            v=v.slice(0,ps)+blk+"\n"+prev+v.slice(en); na=a-(st-ps); nb=b-(st-ps)}
-          else{if(en>=v.length)return false; var ne=v.indexOf("\n",en+1); if(ne<0)ne=v.length; var next=v.slice(en+1,ne);
-            v=v.slice(0,st)+next+"\n"+blk+v.slice(ne); na=a+next.length+1; nb=b+next.length+1}
-          ta0.value=v; try{ta0.setSelectionRange(na,nb)}catch(e){}
+        function sync(){inner.style.transform="translateY("+(-ta0.scrollTop)+"px)"}
+        dlfSh._mvPlace=measure;
+        ta0.addEventListener("input",measure); ta0.addEventListener("scroll",sync,{passive:true});
+        window.addEventListener("resize",function(){if(dlfSh&&!dlfSh.hidden)measure()});
+        function lineStart(ls,i){var p=0; for(var k=0;k<i;k++)p+=ls[k].length+1; return p}
+        function moveTo(from,to){   // from 줄을 to 자리로
+          var ls=ta0.value.split("\n"); if(to<0||to>=ls.length||to===from)return from;
+          var l=ls.splice(from,1)[0]; ls.splice(to,0,l); ta0.value=ls.join("\n");
+          var st=lineStart(ls,to); try{ta0.setSelectionRange(st,st+l.length)}catch(e){}
           delete ta0.dataset.tpl; ta0.dispatchEvent(new Event("input",{bubbles:true}));
-          var lh=parseFloat(getComputedStyle(ta0).lineHeight)||27, ln=v.slice(0,na).split("\n").length-1, y=14+ln*lh;   // 옮긴 줄이 보이게
-          if(y<ta0.scrollTop+lh)ta0.scrollTop=Math.max(0,y-lh*2); else if(y>ta0.scrollTop+ta0.clientHeight-lh*2)ta0.scrollTop=y-ta0.clientHeight+lh*3;
-          return true;
+          return to;
         }
-        mv.addEventListener("pointerdown",function(e){e.preventDefault()});   // 눌러도 키보드가 내려가지 않게
-        mv.addEventListener("click",function(e){var b=e.target.closest("button[data-mv]"); if(!b)return; if(moveLine(+b.dataset.mv))buzz(8); else buzz(25)});
-        var grip=mv.querySelector(".dlfsgrip"), G=null;
-        grip.addEventListener("pointerdown",function(e){
-          e.preventDefault(); var v=ta0.value, r=lineRange(v,ta0.selectionStart,ta0.selectionEnd);
-          try{ta0.focus({preventScroll:true}); ta0.setSelectionRange(r[0],r[1])}catch(err){}   // 옮길 줄을 칠해 보여 줌
-          G={y:e.clientY,step:0,lh:parseFloat(getComputedStyle(ta0).lineHeight)||27,pid:e.pointerId};
-          try{grip.setPointerCapture(e.pointerId)}catch(err){} mv.classList.add("drag"); buzz(12);
+        function lineAt(y){   // 칸 안 y(스크롤 포함) 에 있는 줄 번호
+          var best=0; for(var k=0;k<tops.length;k++){if(tops[k]<=y)best=k; else break} return best;
+        }
+        gut.addEventListener("pointerdown",function(e){
+          var h=e.target.closest(".dlfsh"); if(!h)return; e.preventDefault(); e.stopPropagation();
+          var i=+h.dataset.i, ls=ta0.value.split("\n"), st=lineStart(ls,i);
+          try{ta0.focus({preventScroll:true}); ta0.setSelectionRange(st,st+ls[i].length)}catch(err){}   // 옮길 줄을 칠해 보여 줌
+          G={i:i,pid:e.pointerId,h:h}; h.classList.add("on"); try{h.setPointerCapture(e.pointerId)}catch(err){} buzz(12);
         });
-        grip.addEventListener("pointermove",function(e){
+        gut.addEventListener("pointermove",function(e){
           if(!G||e.pointerId!==G.pid)return; e.preventDefault();
-          var want=Math.trunc((e.clientY-G.y)/(G.lh*.9));
-          while(G.step<want){if(!moveLine(1))break; G.step++; buzz(6)}
-          while(G.step>want){if(!moveLine(-1))break; G.step--; buzz(6)}
+          var r=ta0.getBoundingClientRect(), y=e.clientY-r.top-ta0.clientTop+ta0.scrollTop;
+          if(e.clientY<r.top+lh)ta0.scrollTop-=8; else if(e.clientY>r.bottom-lh)ta0.scrollTop+=8;   // 끝에 닿으면 칸을 굴림
+          var to=lineAt(y); if(to!==G.i){G.i=moveTo(G.i,to); buzz(6); measure()}
         });
-        function gEnd(e){if(!G||(e&&e.pointerId!==G.pid))return; G=null; mv.classList.remove("drag")}
-        grip.addEventListener("pointerup",gEnd); grip.addEventListener("pointercancel",gEnd);
-        window.addEventListener("resize",function(){if(dlfSh&&!dlfSh.hidden)place()});
+        function gEnd(e){if(!G||(e&&e.pointerId!==G.pid))return; G=null; measure()}
+        gut.addEventListener("lostpointercapture",gEnd);
+        gut.addEventListener("pointerup",gEnd); gut.addEventListener("pointercancel",gEnd);
       })();
       (function(){   // 오른쪽 → 왼쪽으로 밀면 이전 화면으로 (2026-10-30 사용자 요청)
         var x0=0,y0=0,t0=0,on=false;
-        dlfSh.addEventListener("touchstart",function(e){on=e.touches.length===1&&!(e.target.closest&&e.target.closest(".dlfsmv,.micbtn")); if(on){x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now()}},{passive:true});
+        dlfSh.addEventListener("touchstart",function(e){on=e.touches.length===1&&!(e.target.closest&&e.target.closest(".dlfsgut,.micbtn")); if(on){x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now()}},{passive:true});
         dlfSh.addEventListener("touchend",function(e){
           if(!on)return; on=false; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
           if(dx<-90&&Math.abs(dx)>Math.abs(dy)*1.8&&Date.now()-t0<700){
