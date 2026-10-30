@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-okicon">
+<meta name="app-build" content="2026-10-30-noshow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8581,7 +8581,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
       ccWords(n.text,"none",0,C.seed);
       if(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches)btn("⌨️ 타이핑으로 외우기","dict");   // PC: 키보드로 쳐 가며 외우기 (2026-10-29 사용자 요청)
-      btn("확인하기 👀","show",true);
+      // 확인하기 단추는 뺌 — 낱말을 다 눌러 떠올리면 암송 완료 (2026-10-30 사용자 요청)
     }else if(C.stage===4){
       ccWords(n.text,"got",0,C.seed);
       btn("암송 완료","g2",true);   // 잘 모르겠어요·조금 틀렸어요 단추는 뺌 (2026-10-21 사용자 요청)
