@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-swipeback3">
+<meta name="app-build" content="2026-10-30-savefix">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10510,6 +10510,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         '<div class="dlfsfoot"><button type="button" class="dlfsdone">✓ 했어요</button></div>';
       document.body.appendChild(dlfSh);
       var ta0=dlfSh.querySelector("textarea");
+      function saveNow(){   // 지금 칸의 글을 바로 저장 (닫을 때·한글 조합이 끝날 때·칸에서 나갈 때도, 2026-10-30)
+        if(!dlfSh.dataset.id)return; if(ta0.dataset.tpl&&ta0.value===ta0.dataset.tplv)return;   // 손대지 않은 기도문 틀은 저장 안 함
+        var o2=dailyData(); if(dlMemoGet(o2,dlfSh.dataset.day,dlfSh.dataset.id)===ta0.value)return; dlMemoSet(o2,dlfSh.dataset.day,dlfSh.dataset.id,ta0.value); saveDaily(o2);
+      }
+      dlfSh._save=saveNow;
+      ta0.addEventListener("compositionend",function(){setTimeout(saveNow,0)});
+      ta0.addEventListener("blur",saveNow);
       ta0.addEventListener("input",function(){
         var o2=dailyData(); dlMemoSet(o2,dlfSh.dataset.day,dlfSh.dataset.id,ta0.value); saveDaily(o2);
         var tip=dlfSh.querySelector(".dlfssave"); tip.textContent="저장됨"; clearTimeout(tip._t); tip._t=setTimeout(function(){tip.textContent=""},1400);
@@ -10611,7 +10618,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var ta=dlfSh.querySelector("textarea"), mv=dlMemoGet(o,dlDay,fid); ta.value=mv; delete ta.dataset.tpl; ta.classList.remove("dlessay");
     // 전체 보기의 기록 칸과 같은 형식: 에세이는 자유 글, 나머지 빈 칸은 기도문 틀로 시작 (2026-10-29 사용자 요청)
     if(it.g==="essay"){ta.placeholder="오늘 인상 깊게 보고, 듣고, 생각한 것을 자유롭게 적어 보세요. 제목이 떠오르면 첫 줄에 적어도 좋아요."; ta.classList.add("dlessay")}
-    else{ta.placeholder="구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)"; if(!mv){ta.value=PRAY_TPL.replace("\n\n\n\n","\n\n\n\n\n\n\n\n\n"); ta.dataset.tpl="1"}}   // 집중 기록 화면: 하나님 아버지 아래 빈 줄을 넉넉히 (2026-10-29 사용자 요청)
+    else{ta.placeholder="구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)"; if(!mv){ta.value=PRAY_TPL.replace("\n\n\n\n","\n\n\n\n\n\n\n\n\n"); ta.dataset.tpl="1"; ta.dataset.tplv=ta.value}}   // 집중 기록 화면: 하나님 아버지 아래 빈 줄을 넉넉히 (2026-10-29 사용자 요청)
     dlfSh.querySelector(".dlfssave").textContent="";
     dlfSh.hidden=false; dlfSh.style.top=""; dlfSh.style.height=""; dlfSh.style.bottom=""; if(dlfSh._fit)setTimeout(dlfSh._fit,0); if(dlfSh._mvPlace)setTimeout(dlfSh._mvPlace,0); dlfSh.classList.remove("dlfsin"); void dlfSh.offsetWidth; dlfSh.classList.add("dlfsin");
     try{history.pushState({dlfs:1},"");dlfHist=true}catch(e){dlfHist=false}
@@ -10619,7 +10626,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     try{ta.setSelectionRange(cp,cp)}catch(e){}},280);   // 기도문 틀이면 셋째 줄(빈 줄)에 커서 if(dlfSh._fit){setTimeout(dlfSh._fit,600);setTimeout(dlfSh._fit,1000)}
   }
   function dlFocusSheetClose(){
-    if(!dlfSh||dlfSh.hidden)return; var ta=dlfSh.querySelector("textarea"); try{ta.blur()}catch(e){}
+    if(!dlfSh||dlfSh.hidden)return; var ta=dlfSh.querySelector("textarea"); try{if(dlfSh._save)dlfSh._save()}catch(e){} try{ta.blur()}catch(e){}
     dlfSh.hidden=true; if(dlfHist){dlfHist=false;try{history.back()}catch(e){}}
     if(dl&&!dl.hidden)drawDaily();
   }
