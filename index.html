@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-linegrip">
+<meta name="app-build" content="2026-10-30-swipeback2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3341,7 +3341,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfsheet .dlfsfoot{flex:none}
 .dlfsheet.dlfskb .dlfst{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dlfsheet.dlfskb .dlfsg,.dlfsheet.dlfskb .dlfsday{display:none}
-.dlfsheet.dlfskb textarea{min-height:80px;padding:10px 14px;line-height:1.55}   /* 키보드가 떠 있어도 기도문 틀 끝(아멘)까지 보이게 (2026-10-29 사용자 요청) */
+.dlfsheet.dlfskb textarea{min-height:80px;padding:10px 14px 10px 40px;line-height:1.55}   /* 키보드가 떠 있어도 기도문 틀 끝(아멘)까지 보이게 (2026-10-29 사용자 요청) */
 .dlfsheet.dlfskb .dlfst{display:none}
 .dlfsheet.dlfskb .dlfsbody{padding-top:6px}
 .dlfsheet.dlfskb .dlfsfoot{padding:6px 20px 12px}
@@ -10561,12 +10561,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         gut.addEventListener("lostpointercapture",gEnd);
         gut.addEventListener("pointerup",gEnd); gut.addEventListener("pointercancel",gEnd);
       })();
-      (function(){   // 오른쪽 → 왼쪽으로 밀면 이전 화면으로 (2026-10-30 사용자 요청)
+      (function(){   // 왼쪽 → 오른쪽으로 밀면 이전 화면으로 (2026-10-30 사용자 요청, 처음엔 반대 방향이었음)
         var x0=0,y0=0,t0=0,on=false;
         dlfSh.addEventListener("touchstart",function(e){on=e.touches.length===1&&!(e.target.closest&&e.target.closest(".dlfsgut,.micbtn")); if(on){x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now()}},{passive:true});
         dlfSh.addEventListener("touchend",function(e){
           if(!on)return; on=false; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
-          if(dx<-90&&Math.abs(dx)>Math.abs(dy)*1.8&&Date.now()-t0<700){
+          if(dx>90&&Math.abs(dx)>Math.abs(dy)*1.8&&Date.now()-t0<700){
             var ta=dlfSh.querySelector("textarea"); if(ta&&ta.selectionStart!==ta.selectionEnd&&document.activeElement===ta)return;   // 글자를 고르는 중이면 그대로
             buzz(8); dlFocusSheetClose();
           }
@@ -10584,7 +10584,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       function fitVV(){
         if(!dlfSh||dlfSh.hidden||!vv)return;
         var kb=window.innerHeight-vv.height>120;
-        dlfSh.classList.toggle("dlfskb",kb);
+        var kb0=dlfSh.classList.contains("dlfskb"); dlfSh.classList.toggle("dlfskb",kb); if(kb0!==kb&&dlfSh._mvPlace)setTimeout(dlfSh._mvPlace,0);
         dlfSh.style.top=vv.offsetTop+"px"; dlfSh.style.bottom="auto";
         var h=Math.floor(vv.height-(kb?10:0)); dlfSh.style.height=h+"px";   // 키보드 위로 살짝 띄워 '했어요' 단추가 안 가려지게 (2026-10-29 사용자 요청)
         if(kb)window.scrollTo(0,window.scrollY);
