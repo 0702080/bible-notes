@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-recall-again">
+<meta name="app-build" content="2026-10-30-recall-stay">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8173,6 +8173,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var d=e.target.closest(".ccst"); if(!d||!C||C.edit||C.revealing)return;
         var i=+d.dataset.i; if(!(i>=0&&i<4))return;
         if(i===C.stage&&!C.dict){buzz(8);return}
+        if(C.autoT){clearTimeout(C.autoT);C.autoT=0;var nq=notes.get(C.id);if(nq){C.grade="g2";ccFinish(nq)}ccDoneIds[C.id]=1}   // 끝낸 직후 단계 줄을 눌러 다시 연습해도 넘어가지 않게
         C.stage=i; C.shown=i; C.reads=0; C.round=0; C.grade=""; C.dict=null; C.autoDone=0; C.keepPrev=false; C.prevHide=null; C.seed=newSeed(); C.anim=true;
         buzz([12,30,12]); ccDraw();
       });
@@ -8223,6 +8224,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         // 떠올리기: 한 소절씩 눌러 맨 끝 낱말까지 오면 암송 완료로 셈하고 다음 말씀(다음 번째)으로 (2026-10-23 사용자 요청)
         // 낱말을 하나씩 다 눌러야(순서 상관없이 모두 한 번씩) 암송으로 셈 — 끝 낱말만 눌러서는 안 셈 (2026-10-29 사용자 요청)
         var ws=ccBox.querySelectorAll(".ccverse .ccw"), wsi=Array.prototype.indexOf.call(ws,w), tk=C.seed+":"+C.stage;
+        // 끝낸 뒤 기다리는 동안 낱말을 또 누르면(= 같은 구절 다시 연습) 다음 말씀으로 넘어가지 않고 그 자리에서 한 번 더 (2026-10-30 사용자 요청)
+        if(C.autoT){
+          clearTimeout(C.autoT); C.autoT=0;
+          var nf=notes.get(C.id); if(nf){C.grade="g2"; ccFinish(nf)}
+          ccDoneIds[C.id]=1; C.stage=3; C.grade=""; C.autoDone=0; C.t0=Date.now(); C.tapKey=tk; C.tapped={};
+        }
         if(C.tapKey!==tk){C.tapKey=tk;C.tapped={}}
         if(wsi>=0)C.tapped[wsi]=1;
         var allTap=ws.length>0&&Object.keys(C.tapped).length>=ws.length;
@@ -8231,15 +8238,19 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           var cnb=ccBox.querySelector(".ccnum");   // 숫자는 누르는 즉시 하나 올려 보여 줌 (2026-10-23 사용자 요청)
           var n0c=notes.get(cid); if(cnb&&n0c){cnb.hidden=false; cnb.textContent="암송 "+(ccCount(n0c)+1); cnb.classList.remove("ccnumup"); void cnb.offsetWidth; cnb.classList.add("ccnumup"); ccBurst(cnb)}
           buzz([20,40,20]);
-          setTimeout(function(){
-            if(!C||C.id!==cid||ccBox.hidden)return;
-            var n1=notes.get(cid); if(!n1)return;
-            C.grade="g2"; C.stage=5; ccFinish(n1);
-            // 이번에 연 암송 코치에서 이미 한 번 끝낸 말씀을 다시 외웠으면 다음 말씀으로 넘어가지 않고 이 말씀 떠올리기를 한 번 더 (2026-10-30 사용자 요청)
-            var again=!!ccDoneIds[cid]; ccDoneIds[cid]=1;
-            if(again){toast("✅ 암송 완료"); C.stage=3; C.shown=3; C.reads=0; C.round=0; C.grade=""; C.dict=null; C.autoDone=0; C.tapKey=""; C.keepPrev=false; C.prevHide=null; C.seed=newSeed(); C.anim=true; C.t0=Date.now(); ccDraw()}
-            else if(ccNextNote()){toast("✅ 암송 완료"); ccGoNext()} else ccDraw();
-          },3300);   // 마지막 낱말을 누른 뒤 2초 더 머묾 (2026-10-30 사용자 요청)
+          var again=!!ccDoneIds[cid];   // 이번에 연 암송 코치에서 이미 끝낸 말씀이면 다음 말씀으로 넘어가지 않음
+          if(again){
+            var na=notes.get(cid); if(na){C.grade="g2"; ccFinish(na)}
+            toast("✅ 암송 완료"); C.stage=3; C.grade=""; C.autoDone=0; C.t0=Date.now(); C.tapped={};
+          }else{
+            C.autoT=setTimeout(function(){
+              C&&(C.autoT=0);
+              if(!C||C.id!==cid||ccBox.hidden)return;
+              var n1=notes.get(cid); if(!n1)return;
+              C.grade="g2"; C.stage=5; ccFinish(n1); ccDoneIds[cid]=1;
+              if(ccNextNote()){toast("✅ 암송 완료"); ccGoNext()} else ccDraw();
+            },3300);   // 마지막 낱말을 누른 뒤 2초 더 머묾 (2026-10-30 사용자 요청)
+          }
         }
         if(!w.classList.contains("hid")||w.classList.contains("peek")){buzz(18);return}   // 누를 때마다 진동 (2026-10-21 사용자 요청)
         w.classList.add("peek"); C.peek++; buzz([25,30,15]);
@@ -8703,7 +8714,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(C.grade==="g2"){buzz([14,50,22]);confetti(t1)}
   }
   function closeCoach(){
-    if(!ccBox||ccBox.hidden)return; ccBox.hidden=true; ccDoneIds={}; document.body.style.overflow=""; $("fab").hidden=reorderMode;
+    if(!ccBox||ccBox.hidden)return; ccBox.hidden=true; ccDoneIds={}; if(C&&C.autoT){clearTimeout(C.autoT);C.autoT=0} document.body.style.overflow=""; $("fab").hidden=reorderMode;
     ccFull(false);
     if(ccHist){ccHist=false;try{history.back()}catch(e){}}
     try{window.speechSynthesis.cancel()}catch(e){}
