@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-ans5">
+<meta name="app-build" content="2026-10-31-ans7">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3057,7 +3057,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .cch.ansv .bqbar{justify-content:space-between}
 .ansclose{width:36px;height:36px;padding:0;border:1px solid #34333A;border-radius:50%;background:#16151A;color:var(--muted);font-size:15px;line-height:1;display:grid;place-items:center}
 .ansclose:hover{color:var(--ink);border-color:#4A4952}
-.anssearch{box-sizing:border-box;display:flex;align-items:center;gap:8px;height:42px;margin:0 0 6px;padding:0 14px;border:1px solid #2A2930;border-radius:21px;background:#121116;font-size:13px}
+.anssearch{flex-shrink:0;box-sizing:border-box;display:flex;align-items:center;gap:8px;height:42px;margin:0 0 6px;padding:0 14px;border:1px solid #2A2930;border-radius:21px;background:#121116;font-size:13px}
 .anssearch:focus-within{border-color:color-mix(in srgb,var(--gold) 55%,#2A2930)}
 .ansq{flex:1;min-width:0;height:100%;border:0;background:transparent;color:var(--ink);font-size:14.5px;outline:none}
 .ansq::placeholder{color:var(--faint)}
@@ -3065,7 +3065,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .ansit.long .anst{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;overflow:hidden;cursor:pointer}
 .ansit.long.open .anst{display:block;-webkit-line-clamp:unset}
 .ansmore{display:none;margin:6px 0 0;padding:2px 0;border:0;background:transparent;color:color-mix(in srgb,var(--gold) 80%,#fff);font-size:12.5px;font-weight:600}
-.ansit.long .ansmore{display:inline-block}
+.ansit.long .ansmore{display:inline-flex}
+/* 응답 연표 — 역사책 느낌 (2026-10-31 사용자 요청) */
+.anslist::before{width:2px;background:linear-gradient(var(--gold) 0%,color-mix(in srgb,var(--gold) 45%,transparent) 60%,transparent)}
+.ansdot{top:22px;left:-23px;width:10px;height:10px;border:0;background:var(--gold);box-shadow:0 0 0 3px #0B0B0D,0 0 0 5px color-mix(in srgb,var(--gold) 35%,transparent),0 0 14px color-mix(in srgb,var(--gold) 60%,transparent)}
+.ansbox{position:relative;overflow:hidden;padding:16px 18px 12px;border:1px solid color-mix(in srgb,var(--gold) 22%,#2A2930);background:radial-gradient(120% 70% at 0% 0%,color-mix(in srgb,var(--gold) 9%,transparent),transparent 60%),#131216;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.ansbox::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;background:linear-gradient(90deg,var(--gold),color-mix(in srgb,var(--gold) 0%,transparent) 70%)}
+.ansbox::after{content:"“";position:absolute;right:14px;top:44px;font-family:Georgia,serif;font-size:96px;line-height:1;color:color-mix(in srgb,var(--gold) 6%,transparent);pointer-events:none}
+.ansday{display:flex;align-items:baseline;gap:8px}
+.ansdd{font-size:22px;font-weight:800;letter-spacing:-.01em;color:var(--gold)}
+.ansdl{font-size:12px;font-weight:600;color:color-mix(in srgb,var(--gold) 70%,#fff)}
+.anst{position:relative;font-family:var(--serif);font-size:15.5px;line-height:1.8;color:#EDEAE2}
+.ansit.long:not(.open) .anst{-webkit-mask-image:linear-gradient(#000 60%,transparent);mask-image:linear-gradient(#000 60%,transparent)}
+.ansmore{align-items:center;gap:6px;height:30px;margin:10px 0 2px;padding:0 14px;border:1px solid color-mix(in srgb,var(--gold) 50%,transparent);border-radius:15px;background:color-mix(in srgb,var(--gold) 12%,transparent);color:var(--gold);font-size:12.5px;font-weight:700}
+.ansit.open .ansmore{background:transparent;color:color-mix(in srgb,var(--gold) 75%,#fff)}
+.ansmon{font-size:13px;padding:5px 14px;background:linear-gradient(#1D1B17,#141317);box-shadow:0 0 0 4px #0B0B0D}
 .ansempty,.icempty{color:var(--muted);font-size:14px;line-height:1.6}
 /* 🤲 중보기도 */
 .ichead{display:flex;align-items:center;gap:10px;margin:6px 0 10px}
@@ -9161,7 +9175,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           ansUndo(u.dataset.k,u.dataset.id,u.dataset.nid); toast("응답 표시를 취소했어요 — 다시 기다리는 기도로"); openAnswers(); return}
         // 긴 기도문은 접어 두고 눌러서 펼침 (2026-10-31 사용자 요청)
         var mo=e.target.closest(".ansmore,.ansit.long .anst");
-        if(mo){var it2=mo.closest(".ansit"), op=it2.classList.toggle("open"); it2.querySelector(".ansmore").textContent=op?"접기 ⌃":"펼치기 ⌄"; return}
+        if(mo){var it2=mo.closest(".ansit"), op=it2.classList.toggle("open"); it2.querySelector(".ansmore").textContent=op?"접기 ⌃":"전체 기도 펼치기 ⌄"; return}
         var b=e.target.closest(".ansgo"); if(!b)return; closeAnswers(); openNoteFocus(b.dataset.nid,"p")});
       ans.querySelector(".ansq").addEventListener("input",ansFilter);
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ans&&!ans.hidden)closeAnswers()});
@@ -9181,13 +9195,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var e=document.createElement("article"); e.className="ansit";
       var dd=days[i];
       e.innerHTML='<div class="ansdot"></div><div class="ansbox"><div class="anstop"><b class="ansday"></b><span class="answait"></span></div><p class="anst"></p><p class="ansa"></p><div class="ansfoot"><span class="ansfrom"></span></div></div>';
-      e.querySelector(".ansday").textContent=(d.getMonth()+1)+"/"+d.getDate()+" 응답";
+      var ad=e.querySelector(".ansday"); ad.innerHTML='<span class="ansdd"></span><span class="ansdl">🙌 응답</span>'; ad.firstChild.textContent=(d.getMonth()+1)+"."+d.getDate();
       e.querySelector(".answait").textContent=dd<1?"그날 바로":dd+"일 만에";
       e.querySelector(".anst").textContent=prayClean(x.t)||"(기도 내용 없음)";
       var ap=e.querySelector(".ansa"); if(String(x.an||"").trim())ap.textContent="🙌 "+x.an.trim(); else ap.remove();
       var fr=e.querySelector(".ansfrom"); fr.textContent=dlabel(dkey(x.at))+" 기도 · "+x.ref;
       e.dataset.q=(prayClean(x.t)+" "+(x.an||"")+" "+x.ref).toLowerCase().replace(/\s+/g," ");
-      var mb=document.createElement("button"); mb.type="button"; mb.className="ansmore"; mb.textContent="펼치기 ⌄"; e.querySelector(".anst").after(mb);
+      var mb=document.createElement("button"); mb.type="button"; mb.className="ansmore"; mb.textContent="전체 기도 펼치기 ⌄"; e.querySelector(".anst").after(mb);
       var un=document.createElement("button"); un.type="button"; un.className="ansundo"; un.textContent="응답 취소"; un.dataset.k=x.k; un.dataset.id=x.id; un.dataset.nid=x.nid||"";
       var fb=document.createElement("span"); fb.className="ansbtns"; fb.appendChild(un); e.querySelector(".ansfoot").appendChild(fb);
       if(x.nid){var g=document.createElement("button"); g.type="button"; g.className="ansgo"; g.dataset.nid=x.nid; g.textContent="말씀 보기 ›"; fb.appendChild(g)}
