@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-9">
+<meta name="app-build" content="2026-10-30-10">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2132,6 +2132,54 @@ button:active{filter:brightness(1.15)}
 .ccdlive{margin:0 0 14px;font-size:17px;line-height:1.9;word-break:keep-all}
 .ccdref{font-size:14px;color:#4A4855;margin-bottom:12px}
 .ccdln.gap{height:.9em}
+.smtabs{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 14px}
+.smtabs button{height:32px;padding:0 12px;border:1px solid #2E2D34;border-radius:16px;background:#141418;color:var(--muted);font-size:13px;white-space:nowrap}
+.smtabs button.on{border-color:var(--violet);background:color-mix(in srgb,var(--violet) 18%,#141418);color:var(--ink);font-weight:700}
+.smintro{margin:0 0 12px;font-size:13.5px;line-height:1.6;color:var(--muted)}
+.smempty{margin:18px 0;text-align:center;font-size:14px;line-height:1.7;color:var(--faint)}
+.smsec{margin:16px 0 8px;font-size:14px;font-weight:700;color:var(--gold)}
+.smit,.smchap,.smtwin{margin-bottom:10px;padding:12px 14px;border:1px solid #2A2930;border-radius:14px;background:#141418}
+.smit.hot{border-color:color-mix(in srgb,var(--orange) 55%,#2A2930)}
+.smith{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px}
+.smref{font-size:14.5px;color:var(--violet)}
+.smsub{font-size:12.5px;color:var(--faint);white-space:nowrap}
+.smit.hot .smsub{color:var(--orange);font-weight:700}
+.smtx{margin:2px 0 0;font-family:var(--serif);font-size:15px;line-height:1.65;color:#E8C3A0;word-break:keep-all}
+.smbtns{display:flex;gap:8px;margin-top:10px}
+.smgo,.smgo2,.smprim{height:32px;padding:0 14px;border-radius:16px;font-size:13px;font-weight:700;border:1px solid #34333A;background:transparent;color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.smgo{border-color:color-mix(in srgb,var(--green) 50%,#34333A);color:var(--green)}
+.smprim{height:40px;margin:4px 0 14px;padding:0 18px;border:0;background:var(--gold);color:#141416}
+.smdel{color:var(--pink)}
+.smweak{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.smwk,.smfr{padding:3px 10px;border-radius:12px;font-size:12.5px;background:color-mix(in srgb,var(--pink) 14%,#141418);color:var(--pink)}
+.smfr{background:color-mix(in srgb,var(--sky) 14%,#141418);color:var(--sky)}
+.smtw{display:block;width:100%;margin-top:8px;padding:10px 12px;border:1px solid #2E2D34;border-radius:12px;background:#101013;text-align:left;color:var(--ink)}
+.smdiff{color:var(--pink);font-weight:700}
+.smsitu{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.smsb{height:34px;padding:0 12px;border:1px solid #2E2D34;border-radius:17px;background:#141418;color:var(--muted);font-size:13.5px}
+.smsb.on{border-color:var(--gold);color:var(--gold);font-weight:700}
+.smdots{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.smdot{width:26px;height:26px;padding:0;border-radius:13px;display:grid;place-items:center;font-size:10.5px;color:#4A4855;background:#1C1B21;border:0}
+.smdot.on{background:var(--gold);color:#141416;font-weight:700;cursor:pointer}
+.smpick{display:flex;align-items:center;gap:10px;width:100%;margin-bottom:6px;padding:10px 12px;border:1px solid #2A2930;border-radius:12px;background:#141418;color:var(--ink);text-align:left}
+.smpick.on{border-color:var(--gold)}
+.smpk{flex:0 0 24px;height:24px;border-radius:12px;border:1px solid #3A3942;display:grid;place-items:center;font-size:12px;font-weight:700}
+.smpick.on .smpk{background:var(--gold);border-color:var(--gold);color:#141416}
+.smtx1{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;color:var(--faint)}
+.smplay{display:block;width:100%;margin-bottom:10px;padding:12px 14px;border:1px solid #2A2930;border-radius:14px;background:#141418;text-align:left;color:var(--ink)}
+.smplay .smhid{display:none;white-space:pre-line}
+.smplay.shown .smhid{display:block}
+.smplay.shown .smcirc{display:none}
+.smcirc{margin:4px 0 0;color:#4A4855;letter-spacing:1px;line-height:1.8}
+.smtl{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.smev{display:inline-flex;flex-direction:column;align-items:center;padding:5px 10px;border-radius:10px;background:#1C1B21;font-size:12.5px;color:var(--ink)}
+.smev small{font-size:11px;color:var(--faint)}
+.smarr{color:var(--faint);font-size:12px}
+.smsel{width:100%;height:40px;margin-bottom:10px;padding:0 10px;border:1px solid #2E2D34;border-radius:12px;background:#141418;color:var(--ink);font-size:14px}
+.smwp{display:block;width:min(260px,70%);margin:6px auto 12px;border-radius:18px;border:1px solid #2A2930}
+.smv a.smprim{display:flex;width:fit-content;margin:0 auto 8px}
+.cch.smv .bqbar{justify-content:space-between}
+.smclose{height:34px;padding:0 16px;border:1px solid #34333A;border-radius:17px;background:transparent;color:var(--ink);font-size:13.5px}
 .ccdlive.blink2{animation:ccdblink .45s ease-in-out 2}
 @keyframes ccdblink{0%,100%{opacity:1}50%{opacity:.15}}
 .ccdref.ok{color:#7FE3C6;font-weight:700}
@@ -3408,6 +3456,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         <button type="button" id="prayReadBtn">🙏 기도 모아 읽기</button>
         <button type="button" id="icBtn">🤲 중보기도 명단</button>
         <button type="button" id="ansBtn">🙌 기도 응답 연표</button>
+        <button type="button" id="smartBtn">🧠 스마트 말씀</button>
         <button type="button" id="remindBtn">⏰ 하루 세 번 말씀 알림</button>
         <button type="button" id="reorderBtn">↕️ 카드 순서 바꾸기</button>
         <button type="button" id="foldAll">📂 모두 펼치기</button>
@@ -8400,6 +8449,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     tip.innerHTML="<b>✍️ 받아쓰기 결과</b><br><b class='ccsc'>"+pc+"%</b>"+(r.near?" · 조사만 다른 것 "+r.near+"개":"")+
       (r.ref?(r.ref.ok?"<br>📖 구절 <b class='ccsc'>✓ 맞았어요</b>":r.ref.has?"<br>📖 구절 ✗ 정답은 <b></b>":"<br>📖 구절도 적어 보세요 (예: 마태복음 6:33)"):"");
     if(r.ref&&r.ref.has&&!r.ref.ok){var bs=tip.querySelectorAll("b"); bs[bs.length-1].textContent=n.ref||""}
+    var wk=weakTop(n.id,4,2); if(wk.length){tip.appendChild(document.createElement("br")); tip.appendChild(document.createTextNode("🎯 자주 틀리는 낱말: "+wk.join(", ")))}
     var wrap=document.createElement("div"); wrap.className="ccdres";
     r.rows.forEach(function(x,i){
       if(i){wrap.appendChild(document.createTextNode(" "))}
@@ -8545,7 +8595,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(a==="dback"){C.dict=null;ccDraw();return}
     if(a==="dscore"){
       var ta=ccBox.querySelector(".ccdta"), val=ta?ta.value:"";
-      var rf=dictRef(n,val), rs=dictScore(n.text,rf.text); rs.ref={has:rf.has,ok:rf.ok};
+      var rf=dictRef(n,val), rs=dictScore(n.text,rf.text); rs.ref={has:rf.has,ok:rf.ok}; weakAdd(n.id,rs.rows);
       C.dict={on:true,text:val,res:rs}; buzz(8); ccDraw(); return;
     }
     if(a==="dretry"){C.dict={on:true,text:(C.dict&&C.dict.text)||"",res:null};ccDraw();return}
@@ -8912,6 +8962,245 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     ans.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
   }
   function closeAnswers(){if(!ans||ans.hidden)return; ans.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
+  /* ---------- 🧠 스마트 말씀 (2026-10-30 사용자 요청) ----------
+     ⋯ 메뉴 한 창에 열 가지: 잊기 전에 · 약한 낱말 · 헷갈리는 짝 · 상황별 말씀 · 장 지도 · 말씀 묶음 · 이 날의 말씀 · 성장 기록 · 배경 그림 · 친구와 함께
+     약한 낱말(bible-weak)·말씀 묶음(bible-sets)은 이 기기에만 저장 */
+  var SMV=null, smTab="forget", smSetEdit="", smSetPlay="", smSitu=0, smWpId="", smWpMode="full", smWpTheme="dark";
+  var SM_TABS=[["forget","⏳ 잊기 전에"],["weak","🎯 약한 낱말"],["twin","👯 헷갈리는 짝"],["situ","🧭 상황별"],["chap","🗺️ 장 지도"],["sets","📚 묶음"],["day","📅 이 날"],["grow","🌱 성장 기록"],["wall","🖼️ 배경 그림"],["friend","👥 친구와"]];
+  var NL=String.fromCharCode(10);
+  function smEl(tag,cls,text){var e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e}
+  function weakData(){var o=null;try{o=JSON.parse(localStorage.getItem("bible-weak")||"null")}catch(e){} return o&&typeof o==="object"?o:{}}
+  function weakAdd(nid,rows){   // 채점할 때 틀린 낱말은 +1, 맞힌 낱말은 조금씩 덜어 냄
+    var o=weakData(), m=o[nid]||{}, last=-1; rows.forEach(function(x,i){if(x.s!=="miss")last=i});
+    rows.forEach(function(x,i){var b=dictBare(x.w); if(!b||i>last)return;   /* 아직 치지 않은 뒷부분은 셈하지 않음 */ if(x.s==="miss")m[b]=(m[b]||0)+1; else if(m[b]){m[b]=Math.max(0,m[b]-0.5); if(m[b]<0.5)delete m[b]}});
+    if(Object.keys(m).length)o[nid]=m; else delete o[nid];
+    try{localStorage.setItem("bible-weak",JSON.stringify(o))}catch(e){}
+  }
+  function weakTop(nid,k,min){var m=weakData()[nid]||{}; return Object.keys(m).filter(function(w){return m[w]>=(min||1)}).sort(function(a,b){return m[b]-m[a]}).slice(0,k||5)}
+  function setData(){var o=null;try{o=JSON.parse(localStorage.getItem("bible-sets")||"null")}catch(e){} if(!o||!Array.isArray(o.items))o={items:[]}; return o}
+  function setSave(o){try{localStorage.setItem("bible-sets",JSON.stringify(o))}catch(e){}}
+  function smDay0(){var t=new Date(); t.setHours(0,0,0,0); return t.getTime()}
+  function smRow(n,sub){   // 말씀 한 줄: 구절 · 본문 첫머리 · [외우기] [보기]
+    var r=smEl("div","smit"); r.dataset.nid=n.id;
+    var h=smEl("div","smith"); h.appendChild(smEl("b","smref",n.ref||"구절 미입력")); if(sub)h.appendChild(smEl("span","smsub",sub)); r.appendChild(h);
+    r.appendChild(smEl("p","smtx",String(n.text||"").replace(/\s+/g," ").trim().slice(0,90)));
+    var f=smEl("div","smbtns"); var b1=smEl("button","smgo","▶ 외우기"); b1.type="button"; b1.dataset.a="coach"; b1.dataset.nid=n.id; f.appendChild(b1);
+    var b2=smEl("button","smgo2","카드 보기"); b2.type="button"; b2.dataset.a="open"; b2.dataset.nid=n.id; f.appendChild(b2); r.appendChild(f);
+    return r;
+  }
+  function smIntro(B,t){B.appendChild(smEl("p","smintro",t))}
+  function smEmpty(B,t){B.appendChild(smEl("p","smempty",t))}
+  // 1 ⏳ 잊어버릴 것 같은 말씀 먼저
+  function smForget(B){
+    smIntro(B,"복습할 날이 많이 지났거나, 자주 틀린 말씀일수록 위에 와요. 위에서부터 하나씩 떠올려 보세요.");
+    var T=smDay0(), arr=[];
+    notes.forEach(function(n){var ri=reviewInfo(n); if(!ri)return; var over=Math.round((T-ri.next)/864e5), w=weakTop(n.id,9).length, miss=(n.rv&&n.rv.miss)||0;
+      arr.push({n:n,over:over,risk:over/Math.max(1,ri.gap)*3+w*0.4+miss*0.3})});
+    arr.sort(function(a,b){return b.risk-a.risk});
+    if(!arr.length){smEmpty(B,"아직 외우기 시작한 말씀이 없어요. 암송 코치로 한 번 외우면 여기서 챙겨 줘요.");return}
+    arr.slice(0,15).forEach(function(x,i){var r=smRow(x.n,x.over>0?x.over+"일 지남":x.over===0?"오늘 복습":(-x.over)+"일 뒤"); if(i<3&&x.over>=0)r.classList.add("hot"); B.appendChild(r)});
+  }
+  // 2 🎯 자주 틀리는 낱말
+  function smWeak(B){
+    smIntro(B,"타이핑 암송에서 채점할 때 틀린 낱말을 모아 둬요. 맞히면 조금씩 줄어들어요.");
+    var o=weakData(), ids=Object.keys(o).filter(function(id){return notes.has(id)&&weakTop(id,1).length});
+    ids.sort(function(a,b){function sum(id){var m=o[id];return Object.keys(m).reduce(function(s,k){return s+m[k]},0)} return sum(b)-sum(a)});
+    if(!ids.length){smEmpty(B,"아직 모인 낱말이 없어요. 암송 코치 → 떠올리기 → ⌨️ 타이핑으로 외우기에서 채점해 보세요.");return}
+    ids.forEach(function(id){var n=notes.get(id), r=smRow(n,""), w=smEl("div","smweak");
+      weakTop(id,8).forEach(function(x){w.appendChild(smEl("span","smwk",x+" ×"+Math.round(o[id][x])))}); r.insertBefore(w,r.querySelector(".smbtns")); B.appendChild(r)});
+  }
+  // 3 👯 글이 비슷해서 헷갈리는 말씀 짝
+  function smBig(t){var b=dictBare(t), o={}; for(var i=0;i<b.length-1;i++)o[b.substr(i,2)]=1; return o}
+  function smTwin(B){
+    smIntro(B,"글이 비슷한 말씀끼리 짝지어 보여 줘요. 서로 다른 낱말은 분홍색이에요.");
+    var arr=[]; notes.forEach(function(n){if(dictBare(n.text).length>=8)arr.push({n:n,g:smBig(n.text)})});
+    var pairs=[];
+    for(var i=0;i<arr.length;i++)for(var j=i+1;j<arr.length;j++){
+      var a=arr[i], b=arr[j]; if(verseKey(a.n)===verseKey(b.n))continue;
+      var ka=Object.keys(a.g), nb=Object.keys(b.g).length, inter=0; ka.forEach(function(k){if(b.g[k])inter++});
+      var jc=inter/Math.max(1,ka.length+nb-inter); if(jc>=0.3)pairs.push({a:a.n,b:b.n,jc:jc});
+    }
+    pairs.sort(function(x,y){return y.jc-x.jc});
+    if(!pairs.length){smEmpty(B,"헷갈릴 만큼 비슷한 말씀은 아직 없어요.");return}
+    pairs.slice(0,15).forEach(function(p){
+      var box=smEl("div","smtwin"); box.appendChild(smEl("div","smsub","비슷한 정도 "+Math.round(p.jc*100)+"%"));
+      [[p.a,p.b],[p.b,p.a]].forEach(function(ab){
+        var st={}; wordsOf(ab[1].text).forEach(function(w){st[dictStem(w)]=1});
+        var c=smEl("button","smtw"); c.type="button"; c.dataset.a="open"; c.dataset.nid=ab[0].id; c.appendChild(smEl("b","smref",ab[0].ref||""));
+        var tx=smEl("p","smtx"); wordsOf(ab[0].text).forEach(function(w,k){if(k)tx.appendChild(document.createTextNode(" ")); tx.appendChild(smEl("span",st[dictStem(w)]?"":"smdiff",w))});
+        c.appendChild(tx); box.appendChild(c);
+      });
+      B.appendChild(box);
+    });
+  }
+  // 4 🧭 이럴 때 꺼내는 말씀
+  var SM_SITU=[["😟","불안할 때",["불안","염려","두려","걱정","평안","평강","맡기","근심"]],["😤","화날 때",["분노","화","노하","온유","참","용서","오래 참"]],["🙏","감사할 때",["감사","기뻐","찬양","기쁨","찬송"]],["😮‍💨","지칠 때",["피곤","지치","힘","쉼","새 힘","능력","곤비","쉬게"]],["⚔️","유혹받을 때",["시험","유혹","죄","정결","거룩","대적"]],["🫂","외로울 때",["외로","함께","떠나지","버리지","사랑","위로"]],["🧭","결정할 때",["지혜","인도","길","뜻","분별","구하"]],["🤝","관계가 힘들 때",["사랑","용서","화목","화평","이웃","형제"]]];
+  function smSituB(B){
+    var bar=smEl("div","smsitu"); SM_SITU.forEach(function(x,i){var b=smEl("button","smsb"+(i===smSitu?" on":""),x[0]+" "+x[1]); b.type="button"; b.dataset.a="situ"; b.dataset.i=i; bar.appendChild(b)}); B.appendChild(bar);
+    var ks=SM_SITU[smSitu][2], arr=[];
+    notes.forEach(function(n){
+      var tp=(n.topics||[]).join(" "), hay=String(n.text||"")+" "+(n.acts||[]).map(function(a){return a.t}).join(" ")+" "+(n.meds||[]).map(function(m){return (m.text||"")+" "+(m.todo||"")}).join(" ");
+      var sc=0; ks.forEach(function(k){if(tp.indexOf(k)>=0)sc+=3; if(hay.indexOf(k)>=0)sc+=1});
+      if(sc)arr.push({n:n,sc:sc});
+    });
+    arr.sort(function(a,b){return b.sc-a.sc});
+    if(!arr.length){smEmpty(B,"이럴 때 붙들 말씀을 아직 못 찾았어요. 말씀에 #주제(예: #평안)를 붙이면 여기에 나와요.");return}
+    arr.slice(0,12).forEach(function(x){B.appendChild(smRow(x.n,""))});
+  }
+  // 5 🗺️ 장 지도: 같은 장에 담은 말씀을 한 줄 점으로
+  function smChap(B){
+    smIntro(B,"같은 장에 담은 절을 점으로 보여 줘요. 채운 점을 누르면 그 말씀이 열려요. (장 전체 절 수는 몰라서 담은 절까지만 보여요)");
+    var G={};
+    notes.forEach(function(n){var x=dictRefParse(n.ref); if(!x)return; var k=x.b+" "+x.c, g=G[k]||(G[k]={k:k,vs:{},n:0,bk:n.book,c:x.c}); g.n++;
+      var e=x.e&&x.e>=x.v?Math.min(x.e,x.v+80):x.v; for(var v=x.v;v<=e;v++)if(!g.vs[v])g.vs[v]=n.id});
+    var gs=Object.keys(G).map(function(k){return G[k]}).sort(function(a,b){return Object.keys(b.vs).length-Object.keys(a.vs).length||(a.bk-b.bk)||(a.c-b.c)});
+    if(!gs.length){smEmpty(B,"구절 이름(예: 요한복음 15:7)이 있는 말씀이 아직 없어요.");return}
+    gs.forEach(function(g){
+      var vs=Object.keys(g.vs).map(Number), mx=Math.max.apply(null,vs.concat([10]));
+      var r=smEl("div","smchap"); var h=smEl("div","smith"); h.appendChild(smEl("b","smref",g.k+"장")); h.appendChild(smEl("span","smsub",vs.length+"절 담음")); r.appendChild(h);
+      var d=smEl("div","smdots"); for(var v=1;v<=mx;v++){var id=g.vs[v]; var dt=smEl(id?"button":"span","smdot"+(id?" on":""),String(v)); if(id){dt.type="button";dt.dataset.a="open";dt.dataset.nid=id;dt.title=g.k+":"+v} d.appendChild(dt)}
+      r.appendChild(d); B.appendChild(r);
+    });
+  }
+  // 6 📚 말씀 묶음: 여러 말씀을 한 묶음으로 이어서 외우기
+  function smSets(B){
+    var o=setData();
+    if(smSetEdit){
+      var st=o.items.filter(function(x){return x.id===smSetEdit})[0]; if(!st){smSetEdit="";return smSets(B)}
+      smIntro(B,"'"+st.name+"'에 넣을 말씀을 고르세요. 고른 차례대로 이어 외워요.");
+      sorted().forEach(function(n){var on=st.ids.indexOf(n.id); var b=smEl("button","smpick"+(on>=0?" on":"")); b.type="button"; b.dataset.a="setpick"; b.dataset.nid=n.id;
+        b.appendChild(smEl("span","smpk",on>=0?String(on+1):"")); b.appendChild(smEl("b","smref",n.ref||"구절 미입력")); b.appendChild(smEl("span","smtx1",String(n.text||"").replace(/\s+/g," ").slice(0,40))); B.appendChild(b)});
+      var dn=smEl("button","smprim","✓ 다 골랐어요"); dn.type="button"; dn.dataset.a="setdone"; B.appendChild(dn); return;
+    }
+    if(smSetPlay){
+      var sp=o.items.filter(function(x){return x.id===smSetPlay})[0]; if(!sp){smSetPlay="";return smSets(B)}
+      var top=smEl("div","smith"); top.appendChild(smEl("b","smref","📚 "+sp.name)); var bk=smEl("button","smgo2","← 묶음 목록"); bk.type="button"; bk.dataset.a="setback"; top.appendChild(bk); B.appendChild(top);
+      smIntro(B,"구절만 보고 차례대로 떠올려 보세요. 칸을 누르면 말씀이 보였다 숨었다 해요.");
+      sp.ids.forEach(function(id,i){var n=notes.get(id); if(!n)return; var c=smEl("button","smplay"); c.type="button"; c.dataset.a="reveal";
+        c.appendChild(smEl("b","smref",(i+1)+". "+(n.ref||""))); c.appendChild(smEl("p","smtx smhid",String(n.text||""))); c.appendChild(smEl("p","smcirc",wordsOf(n.text).map(circles).join(" "))); B.appendChild(c)});
+      return;
+    }
+    smIntro(B,"'산상수훈', '새벽 말씀'처럼 여러 말씀을 묶어 차례대로 이어 외워요. (이 기기에 저장)");
+    var nb=smEl("button","smprim","＋ 새 묶음 만들기"); nb.type="button"; nb.dataset.a="setnew"; B.appendChild(nb);
+    if(!o.items.length){smEmpty(B,"아직 만든 묶음이 없어요.");return}
+    o.items.forEach(function(x){var r=smEl("div","smit"); var h=smEl("div","smith"); h.appendChild(smEl("b","smref","📚 "+x.name)); h.appendChild(smEl("span","smsub",x.ids.filter(function(id){return notes.has(id)}).length+"개")); r.appendChild(h);
+      r.appendChild(smEl("p","smtx",x.ids.map(function(id){var n=notes.get(id);return n?n.ref:""}).filter(Boolean).join(" · ")));
+      var f=smEl("div","smbtns"); [["▶ 이어 외우기","setplay","smgo"],["고르기","setedit","smgo2"],["지우기","setdel","smgo2 smdel"]].forEach(function(z){var b=smEl("button",z[2],z[0]); b.type="button"; b.dataset.a=z[1]; b.dataset.sid=x.id; f.appendChild(b)}); r.appendChild(f); B.appendChild(r)});
+  }
+  // 7 📅 이 날의 말씀: 1주·한 달·1년·2년 전 이맘때
+  function smDay(B){
+    var T=smDay0(), any=false;
+    [[7,"1주 전 오늘",0],[30,"한 달 전 오늘",1],[365,"1년 전 이맘때",3],[730,"2년 전 이맘때",3]].forEach(function(o){
+      var c=T-o[0]*864e5, w=o[2]*864e5+864e5/2; function near(t){return t&&Math.abs(t-(c+432e5))<=w}
+      var got=[]; notes.forEach(function(n){
+        if(near(n.createdAt))got.push({n:n,t:"이 말씀을 담았어요"});
+        (n.meds||[]).forEach(function(m){if(near(+m.at)&&String(m.text||"").trim())got.push({n:n,t:"묵상: "+String(m.text).replace(/\s+/g," ").slice(0,60)})});
+        (n.fruits||[]).forEach(function(f){if(near(+f.at))got.push({n:n,t:"🍇 "+f.t.slice(0,60)})});
+      });
+      if(!got.length)return; any=true;
+      B.appendChild(smEl("div","smsec",o[1]+" ("+dlabel(dkey(c))+")"));
+      got.slice(0,8).forEach(function(x){B.appendChild(smRow(x.n,x.t))});
+    });
+    if(!any)smEmpty(B,"1주 전·한 달 전·1년 전 이맘때 담거나 적은 말씀이 아직 없어요. 시간이 쌓이면 여기에 다시 찾아와요.");
+  }
+  // 8 🌱 말씀 성장 기록: 담음 → 외움 → 실천 → 열매
+  function smGrow(B){
+    smIntro(B,"한 말씀이 내 삶에서 자란 길이에요. 담은 날부터 다 외운 날, 실천을 시작한 날, 첫 열매까지.");
+    var arr=[];
+    notes.forEach(function(n){
+      var ev=[["📥 담음",n.createdAt]], s=(n.mem&&n.mem.s)||[];
+      var f0=s.filter(Boolean); if(f0.length)ev.push(["🗣️ 외우기 시작",Math.min.apply(null,f0)]); if(s[3])ev.push(["🌤️ 다 외움",s[3]]);
+      var st=[]; (n.acts||[]).forEach(function(a){(a.stamps||[]).forEach(function(d){st.push(d)})}); st.sort(); if(st.length)ev.push(["✅ 실천 시작",new Date(st[0]+"T12:00:00").getTime()]);
+      var fr=(n.fruits||[]).map(function(x){return +x.at}).filter(Boolean); if(fr.length)ev.push(["🍇 첫 열매",Math.min.apply(null,fr)]);
+      ev.sort(function(a,b){return a[1]-b[1]});
+      arr.push({n:n,ev:ev,c:ccCount(n)});
+    });
+    arr.sort(function(a,b){return b.ev.length-a.ev.length||b.c-a.c});
+    arr.slice(0,30).forEach(function(x){
+      var r=smEl("div","smit"); var h=smEl("div","smith"); h.appendChild(smEl("b","smref",x.n.ref||"구절 미입력")); if(x.c)h.appendChild(smEl("span","smsub","암송 "+x.c+"번")); r.appendChild(h);
+      var tl=smEl("div","smtl"); x.ev.forEach(function(e,i){if(i)tl.appendChild(smEl("span","smarr","→")); var c=smEl("span","smev"); c.appendChild(smEl("span","",e[0])); c.appendChild(smEl("small","",dlabel(dkey(e[1])))); tl.appendChild(c)});
+      r.appendChild(tl); r.dataset.nid=x.n.id; B.appendChild(r);
+    });
+  }
+  // 9 🖼️ 잠금 화면용 말씀 그림
+  function smWall(B){
+    smIntro(B,"오늘 외울 말씀을 휴대폰 배경 크기 그림으로 저장해요. 잠금 화면으로 쓰면 폰을 켤 때마다 복습돼요.");
+    var all=sorted().filter(function(n){return String(n.text||"").trim()}); if(!all.length){smEmpty(B,"말씀이 아직 없어요.");return}
+    if(!smWpId||!notes.has(smWpId))smWpId=all[0].id;
+    var sel=smEl("select","smsel"); all.forEach(function(n){var o=smEl("option","",n.ref||"구절 미입력"); o.value=n.id; if(n.id===smWpId)o.selected=true; sel.appendChild(o)}); sel.dataset.a="wpsel"; B.appendChild(sel);
+    var op=smEl("div","smsitu"); [["full","말씀 전체"],["first","첫 글자만"],["dark","어두운 바탕"],["light","밝은 바탕"]].forEach(function(z,i){var on=i<2?smWpMode===z[0]:smWpTheme===z[0]; var b=smEl("button","smsb"+(on?" on":""),z[1]); b.type="button"; b.dataset.a=i<2?"wpmode":"wptheme"; b.dataset.v=z[0]; op.appendChild(b)}); B.appendChild(op);
+    var n=notes.get(smWpId), W=1080, H=2340, cv=document.createElement("canvas"); cv.width=W; cv.height=H; var g=cv.getContext("2d"), dark=smWpTheme==="dark";
+    var grd=g.createLinearGradient(0,0,0,H); grd.addColorStop(0,dark?"#1B1830":"#FFFDF6"); grd.addColorStop(1,dark?"#0B0B0D":"#F3EAD8"); g.fillStyle=grd; g.fillRect(0,0,W,H);
+    var FF="Binggrae, 'Noto Sans KR', sans-serif", fs=66; g.font="700 "+fs+"px "+FF; g.textAlign="center"; g.textBaseline="middle";
+    var lines=[]; String(n.text||"").split(NL).forEach(function(ln){
+      var ws=wordsOf(ln); if(smWpMode==="first")ws=ws.map(function(w){var ch=Array.from(w);return ch[0]+(ch.length>1?"·".repeat(Math.min(3,ch.length-1)):"")});
+      if(!ws.length){lines.push("");return} var cur="";
+      ws.forEach(function(w){var t=cur?cur+" "+w:w; if(g.measureText(t).width>860&&cur){lines.push(cur);cur=w}else cur=t}); if(cur)lines.push(cur);
+    });
+    while(lines.length&&!lines[lines.length-1])lines.pop();
+    var lh=fs*1.6, y0=H*0.48-(lines.length*lh)/2;
+    g.fillStyle=dark?"#F6E3B4":"#3A3446"; lines.forEach(function(t,i){g.fillText(t,W/2,y0+i*lh+lh/2)});
+    g.font="700 46px "+FF; g.fillStyle=dark?"#B79CFF":"#7A5AD8"; g.fillText(n.ref||"",W/2,y0+lines.length*lh+90);
+    g.fillStyle=dark?"#FFD36B":"#E9B23C"; g.font="40px "+FF; g.fillText("✦",W/2,y0-80);
+    var url=cv.toDataURL("image/png"), im=smEl("img","smwp"); im.src=url; im.alt="말씀 배경 그림 미리 보기"; B.appendChild(im);
+    var a=smEl("a","smprim","📥 그림 저장"); a.href=url; a.download="말씀-"+String(n.ref||"").replace(/[\\/:*?"<>|\s]+/g,"_")+".png"; B.appendChild(a);
+    B.appendChild(smEl("p","smsub","저장한 그림을 휴대폰 설정 → 배경화면 → 잠금 화면으로 고르면 돼요."));
+  }
+  // 10 👥 친구와 함께 외우기
+  function smFriend(B){
+    if(!sbSession()){smEmpty(B,"로그인하고 친구를 맺으면, 같은 말씀을 친구가 몇 번 외웠는지 함께 보여요. (⋯ 메뉴 → 로그인 · 동기화)");return}
+    if(!frData||!frData.friends||!frData.friends.length){smEmpty(B,"친구 진도를 불러오는 중이거나 아직 친구가 없어요. ⋯ 메뉴 → 친구에서 친구를 맺어 보세요.");if(typeof frLoad==="function")try{frLoad()}catch(e){}return}
+    smIntro(B,"나와 같은 말씀을 외우는 친구예요. 서로 힘이 되어 주세요 🙌");
+    var T=smDay0(), any=false;
+    sorted().forEach(function(n){
+      var ps=friendPostsFor(n).filter(function(p){return +p.d.mc>0}); if(!ps.length)return; any=true;
+      var r=smRow(n,"나 암송 "+ccCount(n)+"번"), fw=smEl("div","smweak");
+      ps.forEach(function(p){var dd=+p.d.ma?Math.round((T-new Date(new Date(+p.d.ma).setHours(0,0,0,0)))/864e5):-1;
+        fw.appendChild(smEl("span","smfr",(p.f.emoji||"🙂")+" "+(p.f.name||"친구")+" "+p.d.mc+"번"+(dd===0?" · 오늘 외움 🙌":dd>0?" · "+dd+"일 전":"")))});
+      r.insertBefore(fw,r.querySelector(".smbtns")); B.appendChild(r);
+    });
+    var mine={}, others=[]; notes.forEach(function(n){mine[verseKey(n)]=1});
+    frData.friends.forEach(function(f){(f.notes||[]).forEach(function(d){if(+d.mc>0&&!mine[verseKey(d)])others.push({f:f,d:d})})});
+    if(others.length){B.appendChild(smEl("div","smsec","친구가 외우는 다른 말씀")); others.slice(0,20).forEach(function(x){var r=smEl("div","smit"); var h=smEl("div","smith"); h.appendChild(smEl("b","smref",x.d.ref||"")); h.appendChild(smEl("span","smsub",(x.f.emoji||"🙂")+" "+(x.f.name||"친구")+" "+x.d.mc+"번")); r.appendChild(h); r.appendChild(smEl("p","smtx",String(x.d.text||"").replace(/\s+/g," ").slice(0,90))); B.appendChild(r)})}
+    if(!any&&!others.length)smEmpty(B,"아직 친구와 겹치는 암송 말씀이 없어요. 친구가 앱을 새로 열면 암송 횟수가 함께 올라와요.");
+  }
+  function smDraw(){
+    if(!SMV)return; var tabs=SMV.querySelector(".smtabs"), B=SMV.querySelector(".smbody");
+    tabs.querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.t===smTab)});
+    B.textContent="";
+    ({forget:smForget,weak:smWeak,twin:smTwin,situ:smSituB,chap:smChap,sets:smSets,day:smDay,grow:smGrow,wall:smWall,friend:smFriend})[smTab](B);
+  }
+  function openSmart(tab){
+    if(!SMV){
+      SMV=document.createElement("div"); SMV.className="cch smv"; SMV.setAttribute("role","dialog"); SMV.setAttribute("aria-modal","true"); SMV.hidden=true;
+      SMV.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🧠 스마트 말씀</b></div><div class="qbarbtns"><button type="button" class="smclose">닫기</button></div></div><div class="ccbody"><div class="smtabs"></div><div class="smbody"></div></div>';
+      var tb=SMV.querySelector(".smtabs"); SM_TABS.forEach(function(t){var b=smEl("button","",t[1]); b.type="button"; b.dataset.t=t[0]; tb.appendChild(b)});
+      document.body.appendChild(SMV);
+      SMV.querySelector(".smclose").addEventListener("click",closeSmart);
+      tb.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; smTab=b.dataset.t; smSetEdit=""; smSetPlay=""; smDraw(); SMV.querySelector(".ccbody").scrollTop=0});
+      SMV.addEventListener("change",function(e){if(e.target.dataset.a==="wpsel"){smWpId=e.target.value;smDraw()}});
+      SMV.querySelector(".smbody").addEventListener("click",function(e){
+        var b=e.target.closest("[data-a]"); if(!b)return; var a=b.dataset.a, id=b.dataset.nid, o;
+        if(a==="coach"){var n=notes.get(id); if(n){closeSmart(); openCoach(n)} return}
+        if(a==="open"){if(notes.has(id)){closeSmart(); openNoteFocus(id)} return}
+        if(a==="situ"){smSitu=+b.dataset.i; smDraw(); return}
+        if(a==="wpmode"){smWpMode=b.dataset.v; smDraw(); return}
+        if(a==="wptheme"){smWpTheme=b.dataset.v; smDraw(); return}
+        if(a==="reveal"){b.classList.toggle("shown"); return}
+        if(a==="setnew"){var nm=window.prompt("묶음 이름 (예: 산상수훈, 새벽 말씀)",""); nm=String(nm||"").trim().slice(0,20); if(!nm)return; o=setData(); var x={id:"s"+Date.now().toString(36),name:nm,ids:[],at:Date.now()}; o.items.unshift(x); setSave(o); smSetEdit=x.id; smDraw(); return}
+        if(a==="setpick"){o=setData(); var st=o.items.filter(function(x){return x.id===smSetEdit})[0]; if(!st)return; var k=st.ids.indexOf(id); if(k>=0)st.ids.splice(k,1); else st.ids.push(id); setSave(o); var sc=SMV.querySelector(".ccbody").scrollTop; smDraw(); SMV.querySelector(".ccbody").scrollTop=sc; return}
+        if(a==="setdone"){smSetEdit=""; smDraw(); return}
+        if(a==="setedit"){smSetEdit=b.dataset.sid; smDraw(); return}
+        if(a==="setplay"){smSetPlay=b.dataset.sid; smDraw(); return}
+        if(a==="setback"){smSetPlay=""; smDraw(); return}
+        if(a==="setdel"){if(!b.dataset.sure){b.dataset.sure="1"; b.textContent="한 번 더"; return} o=setData(); o.items=o.items.filter(function(x){return x.id!==b.dataset.sid}); setSave(o); smDraw(); return}
+      });
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&SMV&&!SMV.hidden){if(smSetEdit||smSetPlay){smSetEdit="";smSetPlay="";smDraw()}else closeSmart()}});
+    }
+    if(tab)smTab=tab; smDraw(); SMV.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
+  }
+  function closeSmart(){if(!SMV||SMV.hidden)return; SMV.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
+
   /* ---------- 🤲 중보기도 명단 (2026-10-24 사용자 요청) ----------
      사람마다 기도 제목·붙든 말씀을 두고, 하루에 몇 명씩 돌아가며 기도한다 (오래 못 한 사람부터).
      저장 bible-intercede {items:[{id,name,memo,nid,at,u,log:[날짜],ans,an}],per,del:{id:시각}}, 클라우드 줄 "__icp" (나만 보기) */
@@ -14362,8 +14651,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var prays=(n.prays||[]).filter(function(x){return x.sh&&String(x.t||"").trim()}).map(function(x){return {t:x.t,at:+x.at||0,ans:+x.ans||0,an:String(x.an||"")}});
     var exps=(n.essays||[]).filter(function(x){return String(x.body||"").trim()||String(x.title||"").trim()}).map(function(x){return {title:String(x.title||""),body:String(x.body||"").slice(0,6000),at:+x.at||0}});
     var fruits=(n.fruits||[]).filter(function(x){return String(x.t||"").trim()}).map(function(x){return {t:String(x.t),at:+x.at||0}});
-    if(!meds.length&&!acts.length&&!prays.length&&!exps.length&&!fruits.length)return null;
-    return {ref:n.ref,text:n.text,book:n.book,chapter:n.chapter,verse:n.verse,meds:meds,acts:acts,prays:prays,exps:exps,fruits:fruits};
+    var mc=ccCount(n), ma=Math.max(memDays(n).last||0,(n.rv&&+n.rv.at)||0);   // 👥 친구와 함께 외우기 (2026-10-30)
+    if(!meds.length&&!acts.length&&!prays.length&&!exps.length&&!fruits.length&&!mc)return null;
+    return {ref:n.ref,text:n.text,book:n.book,chapter:n.chapter,verse:n.verse,meds:meds,acts:acts,prays:prays,exps:exps,fruits:fruits,mc:mc,ma:ma};
   }
   function verseKey(o){return (typeof o.book==="number"&&o.book>=0&&+o.chapter)?o.book+":"+o.chapter+":"+(+o.verse||0):String(o.ref||"").replace(/\s+/g,"")}
   function friendPostsFor(n){
@@ -15054,6 +15344,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   $("icBtn").addEventListener("click",function(){$("topMenu").open=false;openIntercede()});
   $("medqBtn").addEventListener("click",function(){$("topMenu").open=false;openMedq()});   // 내가 묻고 내가 답하는 묵상 (⋯ 메뉴, 2026-10-25 사용자 요청)
   $("ansBtn").addEventListener("click",function(){$("topMenu").open=false;openAnswers()});
+  $("smartBtn").addEventListener("click",function(){$("topMenu").open=false;openSmart()});
   $("remindBtn").addEventListener("click",function(){$("topMenu").open=false;openRemind()});
   // ⋯ 메뉴 항목을 끌어서 차례 바꾸기 (2026-10-24 사용자 요청): PC는 누른 채 끌기, 휴대폰은 꾹 누른 뒤 끌기. 차례는 이 기기에 기억
   (function(){
