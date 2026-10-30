@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-hidemore">
+<meta name="app-build" content="2026-10-30-dlgroupswipe">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3293,6 +3293,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfhd{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px}
 .dlfhd b{font-size:18px;color:var(--gold)}
 .dlfhd span{font-size:13px;color:var(--green)}
+/* 🎯 집중: 위아래로 밀면 다른 묶음 (2026-10-30 사용자 요청) */
+.dlfgrp{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-2px 0 2px;font-size:13px;color:var(--muted)}
+.dlfgrp b{color:var(--gc,var(--gold));font-size:14px}
+.dlfgrp i{font-style:normal;color:var(--faint);font-size:12px}
+.dlfocus.dlfinu .dlfit,.dlfocus.dlfinu .dlfgrp{animation:dlfinu .44s cubic-bezier(.2,1.3,.4,1) both;animation-delay:calc(var(--i,0)*60ms)}
+.dlfocus.dlfind .dlfit,.dlfocus.dlfind .dlfgrp{animation:dlfind .44s cubic-bezier(.2,1.3,.4,1) both;animation-delay:calc(var(--i,0)*60ms)}
+@keyframes dlfinu{from{transform:translateY(70px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+@keyframes dlfind{from{transform:translateY(-70px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.dlfocus.dlfinu .dlfit,.dlfocus.dlfind .dlfit,.dlfocus.dlfinu .dlfgrp,.dlfocus.dlfind .dlfgrp{animation:none}}
 .dlfit{display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;column-gap:14px;align-items:center;width:100%;padding:18px 18px;border:1px solid color-mix(in srgb,var(--gc,var(--gold)) 40%,#2A2930);border-radius:18px;background:color-mix(in srgb,var(--gc,var(--gold)) 7%,#121216);color:var(--ink);text-align:left;cursor:pointer;transition:transform .15s,opacity .3s}
 .dlfit:active{transform:scale(.98)}
 .dlfck{grid-row:1/3;width:30px;height:30px;border:2px solid color-mix(in srgb,var(--gc,var(--gold)) 70%,transparent);border-radius:50%}
@@ -10021,14 +10030,23 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       (function(){
         var lst=dl.querySelector(".dllist"), x0=0,y0=0,dx=0,on=false,hz=false,eat=false;
         function its(){return lst.querySelectorAll(".dlfocus .dlfit")}
-        lst.addEventListener("touchstart",function(e){on=!!(e.target.closest&&e.target.closest(".dlfocus"))&&e.touches.length===1&&!!lst.querySelector(".dlfnext")&&!dlFocusBusy; hz=false; dx=0; if(on){x0=e.touches[0].clientX;y0=e.touches[0].clientY}},{passive:true});
+        var vt=false, dy=0;
+        function canV(d){var sc=lst.scrollHeight>lst.clientHeight+4; if(!sc)return true; return d>0?lst.scrollTop<=0:lst.scrollTop+lst.clientHeight>=lst.scrollHeight-2}   // 스크롤이 있으면 맨 위·맨 아래에서만
+        function vItems(){return lst.querySelectorAll(".dlfocus .dlfit,.dlfocus .dlfgrp")}
+        lst.addEventListener("touchstart",function(e){on=!!(e.target.closest&&e.target.closest(".dlfocus"))&&e.touches.length===1&&!dlFocusBusy; hz=false; vt=false; dx=0; dy=0; if(on){x0=e.touches[0].clientX;y0=e.touches[0].clientY}},{passive:true});
         lst.addEventListener("touchmove",function(e){
-          if(!on)return; var t=e.touches[0]; dx=t.clientX-x0; var dy=t.clientY-y0;
-          if(!hz){if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.2)hz=true; else if(Math.abs(dy)>12){on=false;return} else return}
+          if(!on)return; var t=e.touches[0]; dx=t.clientX-x0; dy=t.clientY-y0;
+          if(vt){vItems().forEach(function(el){el.style.transition="none"; el.style.transform="translateY("+(dy*.45)+"px)"; el.style.opacity=String(Math.max(.4,1-Math.abs(dy)/400))}); return}
+          if(!hz){if(Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.2){if(!lst.querySelector(".dlfnext")){on=false;return} hz=true}
+            else if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)*1.2){if(lst.querySelector(".dlfgrp")&&canV(dy)){vt=true;return} on=false;return} else return}
           its().forEach(function(el,i){el.style.transition="none"; el.style.transform="translateX("+(dx*(1-i*.08))+"px) rotate("+(dx*.015)+"deg)"; el.style.opacity=String(Math.max(.35,1-Math.abs(dx)/420))});
         },{passive:true});
         lst.addEventListener("touchend",function(){
-          if(!on)return; on=false; if(!hz)return;
+          if(!on)return; on=false;
+          if(vt){vt=false; eat=true; setTimeout(function(){eat=false},450);
+            if(Math.abs(dy)<60||!dlFocusGroup(dy<0?1:-1))vItems().forEach(function(el){el.style.transition="transform .3s cubic-bezier(.2,1.4,.4,1),opacity .3s"; el.style.transform=""; el.style.opacity=""});
+            return}
+          if(!hz)return;
           eat=true; setTimeout(function(){eat=false},450);
           if(Math.abs(dx)<60){its().forEach(function(el){el.style.transition="transform .3s cubic-bezier(.2,1.4,.4,1),opacity .3s"; el.style.transform=""; el.style.opacity=""}); return}   // 조금만 밀면 제자리로 톡
           dlFocusGo(dx<0?1:-1);
@@ -10036,16 +10054,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         // PC: 마우스로 좌우로 끌기, 터치패드 두 손가락 좌우 밀기 (2026-10-30 사용자 요청)
         var M=null;
         lst.addEventListener("pointerdown",function(e){
-          if(e.pointerType!=="mouse"||e.button!==0||!(e.target.closest&&e.target.closest(".dlfocus"))||e.target.closest(".dlffoot")||!lst.querySelector(".dlfnext")||dlFocusBusy)return;
-          M={x:e.clientX,y:e.clientY,dx:0,hz:false,pid:e.pointerId};
+          if(e.pointerType!=="mouse"||e.button!==0||!(e.target.closest&&e.target.closest(".dlfocus"))||e.target.closest(".dlffoot")||dlFocusBusy)return;
+          M={x:e.clientX,y:e.clientY,dx:0,dy:0,hz:false,vt:false,pid:e.pointerId};
         });
         lst.addEventListener("pointermove",function(e){
           if(!M||e.pointerId!==M.pid)return; var mx=e.clientX-M.x, my=e.clientY-M.y;
-          if(!M.hz){if(Math.abs(mx)>8&&Math.abs(mx)>Math.abs(my)*1.2){M.hz=true; try{lst.setPointerCapture(M.pid)}catch(err){} document.body.style.userSelect="none"} else if(Math.abs(my)>12){M=null;return} else return}
+          if(M.vt){M.dy=my; vItems().forEach(function(el){el.style.transition="none"; el.style.transform="translateY("+(my*.45)+"px)"; el.style.opacity=String(Math.max(.4,1-Math.abs(my)/400))}); return}
+          if(!M.hz){if(Math.abs(mx)>8&&Math.abs(mx)>Math.abs(my)*1.2){if(!lst.querySelector(".dlfnext")){M=null;return} M.hz=true; try{lst.setPointerCapture(M.pid)}catch(err){} document.body.style.userSelect="none"}
+            else if(Math.abs(my)>12){if(lst.querySelector(".dlfgrp")){M.vt=true; M.dy=my; try{lst.setPointerCapture(M.pid)}catch(err){} document.body.style.userSelect="none"; return} M=null;return} else return}
           M.dx=mx; its().forEach(function(el,i){el.style.transition="none"; el.style.transform="translateX("+(mx*(1-i*.08))+"px) rotate("+(mx*.015)+"deg)"; el.style.opacity=String(Math.max(.35,1-Math.abs(mx)/420))});
         });
         function mEnd(e){
-          if(!M||(e&&e.pointerId!==M.pid))return; var m=M; M=null; document.body.style.userSelect=""; if(!m.hz)return;
+          if(!M||(e&&e.pointerId!==M.pid))return; var m=M; M=null; document.body.style.userSelect="";
+          if(m.vt){eat=true; setTimeout(function(){eat=false},450);
+            if(Math.abs(m.dy)<60||!dlFocusGroup(m.dy<0?1:-1))vItems().forEach(function(el){el.style.transition="transform .3s cubic-bezier(.2,1.4,.4,1),opacity .3s"; el.style.transform=""; el.style.opacity=""});
+            return}
+          if(!m.hz)return;
           eat=true; setTimeout(function(){eat=false},450);
           if(Math.abs(m.dx)<60){its().forEach(function(el){el.style.transition="transform .3s cubic-bezier(.2,1.4,.4,1),opacity .3s"; el.style.transform=""; el.style.opacity=""}); return}
           dlFocusGo(m.dx<0?1:-1);
@@ -10541,6 +10565,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     Array.prototype.forEach.call(old,function(el,i){el.style.transition="transform .24s cubic-bezier(.5,0,.8,.4) "+(i*.04)+"s,opacity .24s ease "+(i*.04)+"s"; el.style.transform="translateX("+(dir>0?"-115%":"115%")+") rotate("+(dir>0?-4:4)+"deg)"; el.style.opacity="0"});
     setTimeout(swap,240+old.length*40);
   }
+  var dlFocusTodo=[], dlFocusSt=0;
+  function dlFocusGroup(dir){   // 위로 밀면(dir 1) 다음 묶음, 아래로 밀면(dir -1) 앞 묶음의 첫 항목부터
+    var td=dlFocusTodo; if(dlFocusBusy||!td.length||!td[dlFocusSt])return false;
+    var fgs=[]; td.forEach(function(x){if(fgs.indexOf(x.g)<0)fgs.push(x.g)}); if(fgs.length<2)return false;
+    var gi=fgs.indexOf(td[dlFocusSt].g), ng=fgs[(gi+dir+fgs.length)%fgs.length], at=-1;
+    td.forEach(function(x,i){if(at<0&&x.g===ng)at=i});
+    var lst=dl&&dl.querySelector(".dllist"), old=lst?lst.querySelectorAll(".dlfocus .dlfit,.dlfocus .dlfgrp"):[];
+    var still=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;
+    function swap(){dlFocusSkip=at; drawDaily(); dlFocusBusy=false; if(still)return; var w=lst&&lst.querySelector(".dlfocus"); if(!w)return;
+      w.querySelectorAll(".dlfgrp,.dlfit").forEach(function(el,i){el.style.setProperty("--i",i)}); w.classList.add(dir>0?"dlfinu":"dlfind")}
+    buzz([10,30,10]); if(still||!old.length){swap();return true}
+    dlFocusBusy=true;
+    Array.prototype.forEach.call(old,function(el,i){el.style.transition="transform .22s cubic-bezier(.5,0,.8,.4) "+(i*.035)+"s,opacity .22s ease "+(i*.035)+"s"; el.style.transform="translateY("+(dir>0?"-80px":"80px")+") scale(.96)"; el.style.opacity="0"});
+    setTimeout(swap,220+old.length*35);
+    return true;
+  }
   var dlFocus=false, dlFocusSkip=0; try{dlFocus=localStorage.getItem("bible-dl-focus")==="1"}catch(e){}
   function drawDaily(){
     var o=dailyData(), on=dailyChecked(o,dlDay), today=dkey(Date.now());
@@ -10595,6 +10635,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       wrap.appendChild(hd);
       if(!todo.length){var al=document.createElement("p"); al.className="dlfall"; al.textContent="오늘 할 일을 모두 했어요. 잘하셨어요! 🙌"; wrap.appendChild(al)}
       var st=todo.length?((dlFocusSkip%todo.length)+todo.length)%todo.length:0, pick=todo.slice(st,st+3); if(pick.length<3)pick=pick.concat(todo.slice(0,Math.min(3-pick.length,st)));
+      dlFocusTodo=todo; dlFocusSt=st;
+      var fgs=[]; todo.forEach(function(x){if(fgs.indexOf(x.g)<0)fgs.push(x.g)});
+      if(fgs.length>1&&todo[st]){   // 지금 묶음 이름 + 위아래로 밀면 다른 묶음
+        var gi=fgs.indexOf(todo[st].g), gl=document.createElement("div"); gl.className="dlfgrp"; gl.style.setProperty("--gc",todo[st].g.c);
+        gl.innerHTML="<b></b><i></i>"; gl.querySelector("b").textContent=todo[st].g.e+" "+todo[st].g.t+"  "+(gi+1)+"/"+fgs.length;
+        gl.querySelector("i").textContent="↕ 위아래로 밀면 다른 묶음"; wrap.appendChild(gl);
+      }
       pick.forEach(function(x){
         var b=document.createElement("button"); b.type="button"; b.className="dlfit"; b.dataset.fid=x.it.id; b.style.setProperty("--gc",x.g.c);
         b.innerHTML='<span class="dlfck" aria-hidden="true"></span><small></small><span class="dlft"></span>';
