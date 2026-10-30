@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-swipeback2">
+<meta name="app-build" content="2026-10-30-swipeback3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10561,16 +10561,19 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         gut.addEventListener("lostpointercapture",gEnd);
         gut.addEventListener("pointerup",gEnd); gut.addEventListener("pointercancel",gEnd);
       })();
-      (function(){   // 왼쪽 → 오른쪽으로 밀면 이전 화면으로 (2026-10-30 사용자 요청, 처음엔 반대 방향이었음)
-        var x0=0,y0=0,t0=0,on=false;
-        dlfSh.addEventListener("touchstart",function(e){on=e.touches.length===1&&!(e.target.closest&&e.target.closest(".dlfsgut,.micbtn")); if(on){x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now()}},{passive:true});
-        dlfSh.addEventListener("touchend",function(e){
-          if(!on)return; on=false; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
-          if(dx>90&&Math.abs(dx)>Math.abs(dy)*1.8&&Date.now()-t0<700){
-            var ta=dlfSh.querySelector("textarea"); if(ta&&ta.selectionStart!==ta.selectionEnd&&document.activeElement===ta)return;   // 글자를 고르는 중이면 그대로
+      (function(){   // 왼쪽 → 오른쪽으로 밀면 이전 화면으로 (2026-10-30 사용자 요청) — 글 칸 위에서 밀어도 됨
+        var x0=0,y0=0,t0=0,lx=0,ly=0,on=false;
+        function go(){
+          if(!on)return; on=false; var dx=lx-x0, dy=ly-y0;
+          if(dx>80&&Math.abs(dx)>Math.abs(dy)*1.5&&Date.now()-t0<1200){
+            var ta=dlfSh.querySelector("textarea"); if(ta&&ta.selectionEnd-ta.selectionStart>1&&document.activeElement===ta)return;   // 글자를 길게 골라 둔 중이면 그대로
             buzz(8); dlFocusSheetClose();
           }
-        },{passive:true});
+        }
+        dlfSh.addEventListener("touchstart",function(e){on=e.touches.length===1&&!(e.target.closest&&e.target.closest(".dlfsgut,.micbtn")); if(on){x0=lx=e.touches[0].clientX;y0=ly=e.touches[0].clientY;t0=Date.now()}},{passive:true,capture:true});
+        dlfSh.addEventListener("touchmove",function(e){if(on&&e.touches[0]){lx=e.touches[0].clientX;ly=e.touches[0].clientY}},{passive:true,capture:true});
+        dlfSh.addEventListener("touchend",function(e){var t=e.changedTouches[0]; if(t){lx=t.clientX;ly=t.clientY} go()},{passive:true,capture:true});
+        dlfSh.addEventListener("touchcancel",go,{passive:true,capture:true});   // 글 칸이 손가락을 가져가도(커서 옮기기 등) 민 거리로 판단
       })();
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dlfSh&&!dlfSh.hidden&&!e.isComposing){e.preventDefault();e.stopPropagation();dlFocusSheetClose()}},true);   // Esc = 돌아가기 (적은 글은 이미 저장됨, 2026-10-30 사용자 요청)
       dlfSh.querySelector(".dlfsdone").addEventListener("click",function(){
