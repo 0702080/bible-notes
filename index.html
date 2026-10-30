@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-editlines">
+<meta name="app-build" content="2026-10-30-paintnum">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2357,6 +2357,7 @@ button:active{filter:brightness(1.15)}
 /* 🎨 색 고르기: 색상표를 바로 보여 주고, 고른 색을 낱말에 칠함 (2026-10-29 사용자 요청) */
 .ccpal{display:none;flex-wrap:wrap;gap:10px;margin-top:22px;padding:12px;border:1px solid #2A2932;border-radius:16px;background:#141418}
 .ccpainting .ccpal{display:flex}
+.ccpainting .ccnum{display:none!important}   /* 색 고르기 때는 "암송 N" 숨김 (2026-10-30 사용자 요청) */
 .ccpal button{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:52px;padding:6px 4px;border:0;border-radius:12px;background:transparent;color:var(--muted);font-size:12px}
 .ccpal button i{width:30px;height:30px;border-radius:50%;background:var(--bc);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
 .ccpal button.on{background:#25242C;color:var(--ink);font-weight:700}
