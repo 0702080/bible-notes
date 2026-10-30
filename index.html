@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-memopill">
+<meta name="app-build" content="2026-10-30-praytpl">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3672,7 +3672,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       serms:Array.isArray(n.serms)?n.serms.filter(function(x){return x&&x.id}).slice(0,100).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,4000),at:+x.at||Date.now()}}):[],
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,200)}}):[]}}):[],
-      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,2000),at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),sh:x.sh?1:0}}):[],
+      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){var tt=String(x.t||"").slice(0,2000); if(tt.indexOf("하나님 아버지\n")===0)tt="전능하신 나의 아버지 하나님"+tt.slice(7);   /* 예전 기도문 첫 줄을 새 첫 줄로 (2026-10-30) */ return {id:String(x.id),t:tt,at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),sh:x.sh?1:0}}):[],
       loci:Array.isArray(n.loci)?n.loci.slice(0,12).map(function(x){return String(x||"").slice(0,20)}):[],   // 🏠 장소로 외우기의 장소 이름
       fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
@@ -4745,7 +4745,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var d=card.querySelector('.pri[data-pid="'+pid+'"]'); if(!d)return;
     d.querySelectorAll("textarea").forEach(grow);
     var t=d.querySelector(".pt"), cp=t.value.length;
-    if(!t.value.trim()||t.value===PRAY_TPL){t.value=PRAY_TPL; cp="하나님 아버지\n\n".length}   // 빈 기도는 기도문 틀로
+    if(!t.value.trim()||t.value===PRAY_TPL){t.value=PRAY_TPL; cp=PRAY_HEAD.length}   // 빈 기도는 기도문 틀로
     t.focus(); try{t.setSelectionRange(cp,cp)}catch(e){}
   }
   /* ---------- 기도 읽기 모드: 적은 기도를 큰 글씨로 차분히 읽기 (한 말씀 또는 모든 말씀) ---------- */
@@ -4845,7 +4845,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function prdEdOpen(nid,pid){
     prdEd={nid:nid,pid:pid}; drawPrayRead();
     var t=prd.querySelector(".prded"); if(!t)return;
-    grow(t); t.focus(); var cp=t.value.indexOf(PRAY_TPL.slice(0,9))===0?9:t.value.length; try{t.setSelectionRange(cp,cp)}catch(e){}
+    grow(t); t.focus(); var cp=t.value.indexOf(PRAY_HEAD)===0?PRAY_HEAD.length:t.value.length; try{t.setSelectionRange(cp,cp)}catch(e){}
   }
   function prdEdSave(){
     var t=prd&&prd.querySelector(".prded"), n=notes.get(prdEd.nid), x=n&&(n.prays||[]).find(function(y){return y.id===prdEd.pid});
@@ -6304,7 +6304,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.classList.contains("pread")){openPrayRead(id);return}
     if(b.classList.contains("addp")){
       tabOf.set(id,"p"); if(!n.prays)n.prays=[]; var np={id:qid(),t:PRAY_TPL,at:Date.now(),ans:0,an:""}; n.prays.push(np); prEdit.add(np.id); render(); scheduleSave(id);   // 기도문 틀로 시작 (2026-10-24 사용자 요청)
-      var pc=cards.get(id), pe=pc&&pc.querySelector('.pri[data-pid="'+np.id+'"] .pt'); if(pe)setTimeout(function(){grow(pe);pe.focus();var cp="하나님 아버지\n\n".length;try{pe.setSelectionRange(cp,cp)}catch(err){}},40);
+      var pc=cards.get(id), pe=pc&&pc.querySelector('.pri[data-pid="'+np.id+'"] .pt'); if(pe)setTimeout(function(){grow(pe);pe.focus();var cp=PRAY_HEAD.length;try{pe.setSelectionRange(cp,cp)}catch(err){}},40);
       return;
     }
     if(b.classList.contains("pshare")){
@@ -9064,7 +9064,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   /* ---------- 🙌 기도 응답 연표 (2026-10-24 사용자 요청): 응답된 기도만 모아 언제 기도했고 며칠 만에 응답됐는지 ---------- */
   var ans=null;
   function prayClean(t){   // 기도문 틀(하나님 아버지 … 아멘)은 빼고 내가 적은 부분만
-    var tl=PRAY_TPL.split("\n").map(function(x){return x.trim()}).filter(Boolean);
+    var tl=PRAY_TPL.split("\n").map(function(x){return x.trim()}).filter(Boolean).concat(["하나님 아버지"]);   // 예전 틀 첫 줄도 빼기
     return String(t||"").split("\n").filter(function(l){return tl.indexOf(l.trim())<0}).join("\n").trim();
   }
   function ansItems(){
@@ -9766,7 +9766,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   /* ---------- 하루 돌아보기 체크리스트 (이 기기에 저장, 백업에 함께 들어감) ---------- */
   var DAILY_KEY="bible-daily";
   var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도",c:"var(--violet)"},{g:"word",e:"📖",t:"말씀",c:"var(--orange)"},{g:"fruit",e:"🍇",t:"성령의 열매",c:"var(--green)"},{g:"sow",e:"🌱",t:"하나님 나라에 심기",c:"var(--sky)"},{g:"thanks",e:"💛",t:"감사·나눔",c:"var(--gold)"},{g:"essay",e:"✍️",t:"오늘의 에세이",c:"var(--pink)"}];   // 묶음마다 색
-  var PRAY_TPL="하나님 아버지\n\n\n\n길이요 진리요 생명 되신 나의 주\n예수님 이름으로 기도 합니다\n아멘";   // 빈 기록칸·카드 기도의 기도문 틀 (2026-10-24 사용자 요청)
+  var PRAY_HEAD="전능하신 나의 아버지 하나님\n\n";   /* 기도문 첫 줄 (2026-10-30 사용자 요청, 전에는 "하나님 아버지") */
+  var PRAY_TPL="전능하신 나의 아버지 하나님\n\n\n\n길이요 진리요 생명 되신 나의 주\n예수님 이름으로 기도 합니다\n아멘";   // 빈 기록칸·카드 기도의 기도문 틀 (2026-10-24 사용자 요청)
   var DAILY_SOW=["돈을 하나님 나라를 위해 쓴 것이 있는가","시간을 하나님 나라를 위해 드렸는가","내 재능으로 누군가를 섬겼는가"];
   var DAILY_DEFAULT=[
     ["pray","대적 기도를 했는가"],["pray","필요한 것을 구하는 기도를 했는가"],["pray","버리는(내려놓는) 기도를 했는가"],["pray","회개 기도를 했는가"],["pray","누군가를 위해 중보 기도를 했는가"],
@@ -10214,7 +10215,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           dlMemoId=(dlMemoId===mid?"":mid); drawDaily();
           if(dlMemoId)setTimeout(function(){
             var ta=dl.querySelector('.dlmemobox[data-id="'+mid+'"] textarea');
-            if(ta){ta.focus();var cp=ta.dataset.tpl?"하나님 아버지\n\n".length:ta.value.length;try{ta.setSelectionRange(cp,cp)}catch(err){}ta.scrollIntoView({block:"center",behavior:"smooth"})}   // 기도문 틀이면 셋째 줄(빈 줄)에 커서
+            if(ta){ta.focus();var cp=ta.dataset.tpl?PRAY_HEAD.length:ta.value.length;try{ta.setSelectionRange(cp,cp)}catch(err){}ta.scrollIntoView({block:"center",behavior:"smooth"})}   // 기도문 틀이면 셋째 줄(빈 줄)에 커서
           },30);
         }
         if(b.classList.contains("dlmemop")){   // 적어 둔 글: 한 번은 읽기, 빠르게 두 번이면 고치기
