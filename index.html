@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-numfx2">
+<meta name="app-build" content="2026-10-30-colors15">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2299,7 +2299,7 @@ button:active{filter:brightness(1.15)}
 .ccmeter i.on{border:0;background:radial-gradient(circle at 35% 30%,#FFE7A8,var(--gold) 60%,#B8862F);color:#17120A;box-shadow:0 0 14px color-mix(in srgb,var(--gold) 45%,transparent)}
 .ccmeter i.on.just{animation:ccpop .55s cubic-bezier(.2,1.6,.4,1)}
 .ccw{display:inline-block;--bc:#6ECBF4}
-.ccw.r-act{--bc:#6FD09A}.ccw.r-div{--bc:#B79CF2}.ccw.r-obj{--bc:#6ECBF4}.ccw.r-sub{--bc:#F4A45E}.ccw.r-etc{--bc:#E6DFD2}.ccw.r-adj{--bc:#F48FB6}.ccw.r-god{--bc:#8A62E6}.ccw.r-pri{--bc:#1B6E3E}.ccw.r-yel{--bc:#F5D547}.ccw.r-red{--bc:#F26D6D}   /* 노랑·빨강 추가 (2026-10-29 사용자 요청) */
+.ccw.r-act{--bc:#6FD09A}.ccw.r-div{--bc:#B79CF2}.ccw.r-obj{--bc:#6ECBF4}.ccw.r-sub{--bc:#F4A45E}.ccw.r-etc{--bc:#E6DFD2}.ccw.r-adj{--bc:#F48FB6}.ccw.r-god{--bc:#8A62E6}.ccw.r-pri{--bc:#1B6E3E}.ccw.r-yel{--bc:#F5D547}.ccw.r-red{--bc:#F26D6D}.ccw.r-blu{--bc:#5B8DEF}.ccw.r-tea{--bc:#2EC4B6}.ccw.r-mag{--bc:#D65BC9}.ccw.r-brn{--bc:#C08A5B}.ccw.r-gry{--bc:#9A98A3}   /* 파랑·청록·자주·갈색·회색 추가 (2026-10-30 사용자 요청) */   /* 노랑·빨강 추가 (2026-10-29 사용자 요청) */
 /* '먼저': 글자는 짙은 초록, 테두리·바탕은 밝은 초록 (2026-10-29 사용자 요청) */
 /* '먼저': 바탕은 원래의 짙은 초록 반투명 그대로, 글자만 연두(라임)로 또렷하게 — 초록과 확실히 구분 (2026-10-29 사용자 요청) */
 .ccverse .ccw.r-pri.hid,.ccverse .ccw.r-pri.hid.peek,.ccverse.ccall .ccw.r-pri.hid,.ccverse .ccw.r-pri.got{color:#C8F560;-webkit-text-stroke:1.1px currentColor}
@@ -8180,7 +8180,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         '<div class="ccfoot"></div>';
       document.body.appendChild(ccBox);
       (function(){var pal=ccBox.querySelector(".ccpal");
-        [["sub","주황"],["act","초록"],["pri","먼저"],["obj","하늘"],["div","보라"],["god","진보라"],["adj","분홍"],["yel","노랑"],["red","빨강"],["etc","흰색"]].forEach(function(x){
+        [["sub","주황"],["act","초록"],["pri","먼저"],["obj","하늘"],["div","보라"],["god","진보라"],["adj","분홍"],["yel","노랑"],["red","빨강"],["blu","파랑"],["tea","청록"],["mag","자주"],["brn","갈색"],["gry","회색"],["etc","흰색"]].forEach(function(x){
           var b=document.createElement("button");b.type="button";b.className="ccw r-"+x[0];b.dataset.r=x[0];b.innerHTML="<i></i>";b.appendChild(document.createTextNode(x[1]));pal.appendChild(b)});
         pal.addEventListener("click",function(e){var b=e.target.closest("button");if(!b||!C)return;C.pc=b.dataset.r;palMark();buzz(6)});
       })();
@@ -8261,7 +8261,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           var all=Array.prototype.slice.call(ccBox.querySelectorAll(".ccverse .ccw")), wi=all.indexOf(w), np=notes.get(C.id); if(wi<0||!np)return;
           var cur=C.roles[wi]||"etc", nx=C.pc||"act"; if(nx===cur)nx="etc";   // 고른 색으로 칠함, 같은 색을 또 누르면 흰색으로 (2026-10-29 사용자 요청)
           C.roles[wi]=nx; w.className=w.className.replace(/\br-[a-z]+/,"r-"+nx); if(!/\br-/.test(w.className))w.classList.add("r-"+nx);
-          var L={sub:"S",act:"V",obj:"O",div:"D",etc:"X",adj:"A",god:"G",pri:"P",yel:"Y",red:"R"};
+          var L={sub:"S",act:"V",obj:"O",div:"D",etc:"X",adj:"A",god:"G",pri:"P",yel:"Y",red:"R",blu:"B",tea:"T",mag:"M",brn:"N",gry:"Z"};
           np.parse={src:np.text,labels:C.roles.map(function(r){return L[r]||"X"}),v:9,pf:1}; C.rolesSrc=np.text;
           scheduleSave(np.id); buzz(8); return;
         }
@@ -8384,7 +8384,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     return roles.map(function(r,i){var t=ws[i].replace(/[^가-힣A-Za-z0-9]/g,""); return (r==="act"||r==="etc")&&t.length>=3&&CC_GODV.test(t)?"god":r});
   }
   function ccRoles0(n,ws,lab,man){
-    var MAN={S:"sub",V:"act",O:"obj",D:"div",X:"etc",A:"adj",G:"god",P:"pri",Y:"yel",R:"red"};
+    var MAN={S:"sub",V:"act",O:"obj",D:"div",X:"etc",A:"adj",G:"god",P:"pri",Y:"yel",R:"red",B:"blu",T:"tea",M:"mag",N:"brn",Z:"gry"};
     return ws.map(function(w,i){
       if(man&&MAN[lab[i]])return MAN[lab[i]];   // 🎨 색 고르기로 내가 정한 색
       var t=w.replace(/[^가-힣A-Za-z0-9]/g,"");
