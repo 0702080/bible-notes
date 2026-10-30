@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-ans11">
+<meta name="app-build" content="2026-10-31-ans12">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9230,7 +9230,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var fr=e.querySelector(".ansfrom"); fr.textContent=W?x.ref:dlabel(dkey(x.at))+" 기도 · "+x.ref;
       e.dataset.q=(prayClean(x.t)+" "+(x.an||"")+" "+x.ref).toLowerCase().replace(/\s+/g," ");
       var mb=document.createElement("button"); mb.type="button"; mb.className="ansmore"; mb.textContent="전체 기도 펼치기 ⌄"; e.querySelector(".anst").after(mb);
-      var un=document.createElement("button"); un.type="button"; un.className=W?"ansmark":"ansundo"; un.textContent=W?"🙌 응답됐어요":"응답 취소"; un.dataset.k=x.k; un.dataset.id=x.id; un.dataset.nid=x.nid||"";
+      var un=document.createElement("button"); un.type="button"; un.className=W?"ansmark":"ansundo"; un.textContent=W?"🙌 이뤄주심에 감사":"응답 취소"; un.dataset.k=x.k; un.dataset.id=x.id; un.dataset.nid=x.nid||"";
       var fb=document.createElement("span"); fb.className="ansbtns"; fb.appendChild(un); e.querySelector(".ansfoot").appendChild(fb);
       if(x.nid){var g=document.createElement("button"); g.type="button"; g.className="ansgo"; g.dataset.nid=x.nid; g.textContent="말씀 보기 ›"; fb.appendChild(g)}
       list.appendChild(e);
