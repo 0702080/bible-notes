@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-dlgroupswipe">
+<meta name="app-build" content="2026-10-30-linemove2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3323,6 +3323,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfsday{margin-top:6px;font-size:13px;color:color-mix(in srgb,var(--gc) 80%,#fff)}
 .dlfsheet textarea{flex:1;min-height:160px;width:100%;box-sizing:border-box;resize:none;padding:14px 16px;border:1px solid color-mix(in srgb,var(--gc) 40%,#2A2930);border-radius:16px;background:#141418;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.7}
 .dlfsheet textarea:focus{outline:none;border-color:color-mix(in srgb,var(--gc) 75%,#2A2930)}
+/* 줄 옮기기: 커서가 있는 줄을 ▲▼로 한 줄씩, ⇅를 잡고 끌면 끈 만큼 위아래로 (2026-10-30 사용자 요청) */
+.dlfsbody{position:relative}
+.dlfsheet textarea{padding-right:58px}
+.dlfsmv{position:absolute;right:30px;z-index:3;display:flex;flex-direction:column;align-items:center;gap:4px;padding:5px;border-radius:22px;background:color-mix(in srgb,var(--gc) 10%,#1A1920);border:1px solid color-mix(in srgb,var(--gc) 35%,#2E2D35);box-shadow:0 6px 16px rgba(0,0,0,.45)}
+.dlfsmv button{width:34px;height:34px;border:0;border-radius:17px;background:transparent;color:color-mix(in srgb,var(--gc) 85%,#fff);font-size:15px;display:grid;place-items:center;-webkit-tap-highlight-color:transparent;touch-action:none}
+.dlfsmv button:active{background:color-mix(in srgb,var(--gc) 22%,transparent)}
+.dlfsmv .dlfsgrip{height:46px;font-size:20px;cursor:ns-resize;background:color-mix(in srgb,var(--gc) 16%,transparent)}
+.dlfsmv.drag .dlfsgrip{background:var(--gc);color:#0B0B0D}
 .dlfsfoot{display:flex;justify-content:center;width:100%;max-width:640px;margin:0 auto;padding:10px 20px 18px;box-sizing:border-box}
 .dlfsdone{flex:1;height:56px;border:0;border-radius:28px;background:var(--gc);color:#0B0B0D;font-size:17px;font-weight:800}
 .dlfsdone.on{background:transparent;border:1.5px solid var(--gc);color:var(--gc)}
@@ -10497,7 +10505,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       dlfSh=document.createElement("div"); dlfSh.className="dlfsheet"; dlfSh.hidden=true; dlfSh.setAttribute("role","dialog"); dlfSh.setAttribute("aria-modal","true");
       dlfSh.innerHTML='<div class="dlfsbar"><button type="button" class="dlfsback" aria-label="닫기">← 돌아가기</button><b class="dlfsbt"></b><span class="dlfssave"></span></div>'+
         '<div class="dlfsbody"><small class="dlfsg"></small><h2 class="dlfst"></h2><div class="dlfsday"></div>'+
-        '<textarea maxlength="8000" placeholder="오늘 어떻게 했는지 구체적으로 적어 보세요"></textarea></div>'+
+        '<textarea maxlength="8000" placeholder="오늘 어떻게 했는지 구체적으로 적어 보세요"></textarea>'+
+        '<div class="dlfsmv" role="group" aria-label="줄 옮기기"><button type="button" data-mv="-1" aria-label="이 줄 위로">▲</button><button type="button" class="dlfsgrip" aria-label="잡고 끌어서 줄 옮기기">⇅</button><button type="button" data-mv="1" aria-label="이 줄 아래로">▼</button></div></div>'+
         '<div class="dlfsfoot"><button type="button" class="dlfsdone">✓ 했어요</button></div>';
       document.body.appendChild(dlfSh);
       var ta0=dlfSh.querySelector("textarea");
@@ -10506,6 +10515,57 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var tip=dlfSh.querySelector(".dlfssave"); tip.textContent="저장됨"; clearTimeout(tip._t); tip._t=setTimeout(function(){tip.textContent=""},1400);
       });
       dlfSh.querySelector(".dlfsback").addEventListener("click",function(){dlFocusSheetClose()});
+      (function(){   // 줄 옮기기 (2026-10-30 사용자 요청)
+        var mv=dlfSh.querySelector(".dlfsmv");
+        function place(){mv.style.top=(ta0.offsetTop+12)+"px"}
+        dlfSh._mvPlace=place;
+        function lineRange(v,a,b){   // 선택(커서)이 걸친 줄들의 시작·끝 위치
+          var st=a>0?v.lastIndexOf("\n",a-1)+1:0;
+          var bb=(b>a&&v[b-1]==="\n")?b-1:b, en=v.indexOf("\n",bb); if(en<0)en=v.length;
+          return [st,en];
+        }
+        function moveLine(dir){
+          var v=ta0.value, a=ta0.selectionStart, b=ta0.selectionEnd, r=lineRange(v,a,b), st=r[0], en=r[1], blk=v.slice(st,en), na, nb;
+          if(dir<0){if(st===0)return false; var ps=v.lastIndexOf("\n",st-2)+1, prev=v.slice(ps,st-1);
+            v=v.slice(0,ps)+blk+"\n"+prev+v.slice(en); na=a-(st-ps); nb=b-(st-ps)}
+          else{if(en>=v.length)return false; var ne=v.indexOf("\n",en+1); if(ne<0)ne=v.length; var next=v.slice(en+1,ne);
+            v=v.slice(0,st)+next+"\n"+blk+v.slice(ne); na=a+next.length+1; nb=b+next.length+1}
+          ta0.value=v; try{ta0.setSelectionRange(na,nb)}catch(e){}
+          delete ta0.dataset.tpl; ta0.dispatchEvent(new Event("input",{bubbles:true}));
+          var lh=parseFloat(getComputedStyle(ta0).lineHeight)||27, ln=v.slice(0,na).split("\n").length-1, y=14+ln*lh;   // 옮긴 줄이 보이게
+          if(y<ta0.scrollTop+lh)ta0.scrollTop=Math.max(0,y-lh*2); else if(y>ta0.scrollTop+ta0.clientHeight-lh*2)ta0.scrollTop=y-ta0.clientHeight+lh*3;
+          return true;
+        }
+        mv.addEventListener("pointerdown",function(e){e.preventDefault()});   // 눌러도 키보드가 내려가지 않게
+        mv.addEventListener("click",function(e){var b=e.target.closest("button[data-mv]"); if(!b)return; if(moveLine(+b.dataset.mv))buzz(8); else buzz(25)});
+        var grip=mv.querySelector(".dlfsgrip"), G=null;
+        grip.addEventListener("pointerdown",function(e){
+          e.preventDefault(); var v=ta0.value, r=lineRange(v,ta0.selectionStart,ta0.selectionEnd);
+          try{ta0.focus({preventScroll:true}); ta0.setSelectionRange(r[0],r[1])}catch(err){}   // 옮길 줄을 칠해 보여 줌
+          G={y:e.clientY,step:0,lh:parseFloat(getComputedStyle(ta0).lineHeight)||27,pid:e.pointerId};
+          try{grip.setPointerCapture(e.pointerId)}catch(err){} mv.classList.add("drag"); buzz(12);
+        });
+        grip.addEventListener("pointermove",function(e){
+          if(!G||e.pointerId!==G.pid)return; e.preventDefault();
+          var want=Math.trunc((e.clientY-G.y)/(G.lh*.9));
+          while(G.step<want){if(!moveLine(1))break; G.step++; buzz(6)}
+          while(G.step>want){if(!moveLine(-1))break; G.step--; buzz(6)}
+        });
+        function gEnd(e){if(!G||(e&&e.pointerId!==G.pid))return; G=null; mv.classList.remove("drag")}
+        grip.addEventListener("pointerup",gEnd); grip.addEventListener("pointercancel",gEnd);
+        window.addEventListener("resize",function(){if(dlfSh&&!dlfSh.hidden)place()});
+      })();
+      (function(){   // 오른쪽 → 왼쪽으로 밀면 이전 화면으로 (2026-10-30 사용자 요청)
+        var x0=0,y0=0,t0=0,on=false;
+        dlfSh.addEventListener("touchstart",function(e){on=e.touches.length===1&&!(e.target.closest&&e.target.closest(".dlfsmv,.micbtn")); if(on){x0=e.touches[0].clientX;y0=e.touches[0].clientY;t0=Date.now()}},{passive:true});
+        dlfSh.addEventListener("touchend",function(e){
+          if(!on)return; on=false; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+          if(dx<-90&&Math.abs(dx)>Math.abs(dy)*1.8&&Date.now()-t0<700){
+            var ta=dlfSh.querySelector("textarea"); if(ta&&ta.selectionStart!==ta.selectionEnd&&document.activeElement===ta)return;   // 글자를 고르는 중이면 그대로
+            buzz(8); dlFocusSheetClose();
+          }
+        },{passive:true});
+      })();
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dlfSh&&!dlfSh.hidden&&!e.isComposing){e.preventDefault();e.stopPropagation();dlFocusSheetClose()}},true);   // Esc = 돌아가기 (적은 글은 이미 저장됨, 2026-10-30 사용자 요청)
       dlfSh.querySelector(".dlfsdone").addEventListener("click",function(){
         var o2=dailyData(), d=dlfSh.dataset.day, id=dlfSh.dataset.id, dd=o2.days[d]||[];
@@ -10525,7 +10585,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         // 그래도 단추 아래가 보이는 화면 밖으로 나가면 그만큼 더 줄임
         var fb=dlfSh.querySelector(".dlfsdone"), lim=vv.offsetTop+vv.height-6;
         if(fb){var over=fb.getBoundingClientRect().bottom-lim; if(over>0)dlfSh.style.height=Math.max(200,h-Math.ceil(over)-4)+"px"}
-        var t2=dlfSh.querySelector("textarea"); if(kb&&t2&&t2.dataset.tpl&&document.activeElement===t2)t2.scrollTop=t2.scrollHeight;   // 틀만 있을 땐 맨 아래(아멘)까지 보이게
+        var t2=dlfSh.querySelector("textarea"); if(kb&&t2&&t2.dataset.tpl&&document.activeElement===t2)t2.scrollTop=t2.scrollHeight; if(dlfSh._mvPlace)dlfSh._mvPlace();   // 틀만 있을 땐 맨 아래(아멘)까지 보이게
       }
       // 키보드가 다 올라오는 동안(위 도구줄 포함) 1.5초 동안 계속 다시 맞춤
       function fitBurst(){var n=0; clearInterval(dlfSh._bi); dlfSh._bi=setInterval(function(){fitVV(); if(++n>=12)clearInterval(dlfSh._bi)},130)}
@@ -10544,7 +10604,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(it.g==="essay"){ta.placeholder="오늘 인상 깊게 보고, 듣고, 생각한 것을 자유롭게 적어 보세요. 제목이 떠오르면 첫 줄에 적어도 좋아요."; ta.classList.add("dlessay")}
     else{ta.placeholder="구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)"; if(!mv){ta.value=PRAY_TPL.replace("\n\n\n\n","\n\n\n\n\n\n\n\n\n"); ta.dataset.tpl="1"}}   // 집중 기록 화면: 하나님 아버지 아래 빈 줄을 넉넉히 (2026-10-29 사용자 요청)
     dlfSh.querySelector(".dlfssave").textContent="";
-    dlfSh.hidden=false; dlfSh.style.top=""; dlfSh.style.height=""; dlfSh.style.bottom=""; if(dlfSh._fit)setTimeout(dlfSh._fit,0); dlfSh.classList.remove("dlfsin"); void dlfSh.offsetWidth; dlfSh.classList.add("dlfsin");
+    dlfSh.hidden=false; dlfSh.style.top=""; dlfSh.style.height=""; dlfSh.style.bottom=""; if(dlfSh._fit)setTimeout(dlfSh._fit,0); if(dlfSh._mvPlace)setTimeout(dlfSh._mvPlace,0); dlfSh.classList.remove("dlfsin"); void dlfSh.offsetWidth; dlfSh.classList.add("dlfsin");
     try{history.pushState({dlfs:1},"");dlfHist=true}catch(e){dlfHist=false}
     buzz(6); setTimeout(function(){try{ta.focus({preventScroll:true})}catch(e){ta.focus()} var cp=ta.dataset.tpl?ta.value.indexOf("길이요")-1:ta.value.length;   // 커서는 '길이요' 바로 윗줄 (2026-10-29 사용자 요청)
     try{ta.setSelectionRange(cp,cp)}catch(e){}},280);   // 기도문 틀이면 셋째 줄(빈 줄)에 커서 if(dlfSh._fit){setTimeout(dlfSh._fit,600);setTimeout(dlfSh._fit,1000)}
