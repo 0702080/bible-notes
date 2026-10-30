@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-blanklines">
+<meta name="app-build" content="2026-10-30-noscrollx">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2228,6 +2228,7 @@ button:active{filter:brightness(1.15)}
 .ccst.now i{width:32px;height:32px;margin-top:-3px;font-size:15px;background:color-mix(in srgb,var(--gold) 22%,transparent);border-width:2px}
 .ccst.now span{font-size:12.5px;-webkit-text-stroke:.35px currentColor}
 .ccbody{flex:1;overflow-y:auto;padding:10px 20px 16px;max-width:720px;width:100%;margin:0 auto}
+.cch .ccbody{overflow-x:hidden}   /* 암송 숫자 효과가 오른쪽으로 삐져나와 아래에 가로 스크롤 줄이 뜨던 것 막음 (2026-10-30 사용자 요청) */
 .cctip{margin:6px 0 16px;font-size:14.5px;line-height:1.6;color:var(--muted)}
 .cctip b{color:var(--ink);font-size:16px}
 .ccmid{flex:1 1 auto;min-height:0;display:grid;place-items:center;width:100%}   /* 말씀을 화면 한가운데로 (2026-10-18 사용자 요청) */
