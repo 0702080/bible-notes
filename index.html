@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-walk2">
+<meta name="app-build" content="2026-10-31-col3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -916,6 +916,24 @@ body.reorder .note:not(.dragging){border-style:dashed;border-color:color-mix(in 
 .cchip .ccnt{font-size:11px;padding:1px 6px;border-radius:8px;background:rgba(255,255,255,.06)}
 .cchip.on{border-color:var(--gold);background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold);font-weight:700}
 .cchip.on .ccnt{background:color-mix(in srgb,var(--gold) 25%,transparent)}
+.coldrop{position:fixed;left:10px;right:10px;top:calc(env(safe-area-inset-top,0px) + 8px);z-index:1000;padding:10px 10px 12px;border:1px solid color-mix(in srgb,var(--gold) 40%,#2A2930);border-radius:16px;background:#121116;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:cdin .18s ease-out;pointer-events:none}
+@keyframes cdin{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.coldrop .cdtip{font-size:12px;color:var(--muted);margin:0 2px 8px}
+.coldrop .cdrow{display:flex;flex-wrap:wrap;gap:8px}
+.coldrop .cchip{height:38px;padding:0 14px;font-size:13.5px;transition:transform .12s,background .12s,border-color .12s}
+.coldrop .cchip.cur{opacity:.4}
+.coldrop .cchip.over{transform:scale(1.1);border-color:var(--gold);background:color-mix(in srgb,var(--gold) 24%,transparent);color:var(--gold);font-weight:700;box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 25%,transparent),0 0 18px color-mix(in srgb,var(--gold) 45%,transparent)}
+.coldrop .cchip.hit{animation:cdhit .5s ease-out;background:var(--gold);color:#141416;border-color:var(--gold)}
+@keyframes cdhit{0%{transform:scale(1.1)}35%{transform:scale(1.25)}100%{transform:scale(1)}}
+.coldrop.out{animation:cdout .2s ease-in forwards}
+@keyframes cdout{to{opacity:0;transform:translateY(-14px)}}
+.coldrop .cdrow{min-height:38px}
+.note.dragging{transition:scale .16s ease,opacity .16s ease,box-shadow .16s}
+.note.dragging:not(.overdrop){scale:1.02}
+.note.dragging.overdrop{scale:.55;opacity:.7;box-shadow:0 10px 30px rgba(0,0,0,.6),0 0 0 2px var(--gold)}
+.note.colmoved{animation:colmoved .9s ease-out}
+@keyframes colmoved{0%{box-shadow:0 0 0 2px var(--gold),0 0 26px color-mix(in srgb,var(--gold) 55%,transparent)}100%{box-shadow:0 0 0 0 transparent}}
+.cchip.bump{animation:cdhit .6s ease-out;border-color:var(--gold);color:var(--gold)}
 @media (hover:hover) and (pointer:fine){.topicbar,.shelf{cursor:grab}.topicbar.dragging,.shelf.dragging{cursor:grabbing;user-select:none}.topicbar.dragging *,.shelf.dragging *{cursor:grabbing}}
 .tchip{flex:0 0 auto;height:34px;padding:0 13px;border:1px solid var(--rule);border-radius:17px;background:rgba(255,255,255,.02);color:var(--muted);font-size:13.5px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
 .tchip.on{background:var(--violet);border-color:var(--violet);color:#141416;font-weight:700}
@@ -15748,15 +15766,25 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(y<edge&&y<drag.startY-need)v=-Math.ceil((edge-y)/7);
       else if(y>h-edge&&y>drag.startY+need)v=Math.ceil((y-(h-edge))/7);
     }
+    if(colDrop&&colDrop.el.getBoundingClientRect().bottom+30>y)v=0;   // 떠 있는 칸 줄 근처에서는 화면이 밀리지 않게
     if(v){window.scrollBy(0,v); dragMove(y)}
     dragRAF=requestAnimationFrame(autoScroll);
   }
   function endDrag(cancel){
     if(!drag)return;
-    var el=drag.el; el.classList.remove("dragging"); el.style.transform=""; $("list").classList.remove("sorting");
+    var el=drag.el; el.classList.remove("dragging","overdrop"); el.style.transform=""; $("list").classList.remove("sorting");
     cancelAnimationFrame(dragRAF); document.body.style.userSelect="";
     try{drag.grip.releasePointerCapture(drag.pid)}catch(e){}
     var moved=drag.moved; drag=null;
+    var cd=colDrop; colDropClose(!!(cd&&cd.col!=null));
+    if(cd&&cd.col!=null){   // 칸 칩에 놓음 → 순서는 그대로, 칸만 바꿈
+      var cn=notes.get(cd.nid);
+      if(cn&&(cn.col||"")!==cd.col){cn.col=cd.col; scheduleSave(cn.id); toast(cd.col?"📁 '"+cd.col+"' 칸으로 옮겼어요":"칸에서 뺐어요"); buzz([20,40,20])}
+      render();
+      var ce=cards.get(cd.nid); if(ce&&!ce.hidden){ce.classList.remove("colmoved"); void ce.offsetWidth; ce.classList.add("colmoved"); setTimeout(function(){ce.classList.remove("colmoved")},900)}
+      var cb=$("colBar")&&$("colBar").querySelector('.cchip[data-col="'+(window.CSS&&CSS.escape?CSS.escape(cd.col):cd.col)+'"]'); if(cb&&cd.col){cb.classList.add("bump"); setTimeout(function(){cb.classList.remove("bump")},700)}
+      return;
+    }
     if(!cancel&&moved)commitOrder();
     render();
   }
@@ -15770,6 +15798,38 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     render();
   }
   var NODRAG=".agrip,.usepanel,.verse.memv,.mempanel,.verse.picking,.topics,button,a,input,textarea,select,label,summary,details,.pop,[contenteditable],.editbox,.verse.picking .w,.himgs,.sform,.fpills,.essays,.pastezone";
+  // 휴대폰: 카드를 꾹 눌러 끌면 맨 위에 칸 줄이 떠서, 칩에 놓으면 그 칸으로 옮김 (2026-10-31 사용자 요청)
+  var colDrop=null;
+  function colDropOpen(el){
+    colDropClose();
+    if(boardOn||reorderMode)return;
+    var cs=myCols(); if(!cs.length)return;
+    var n=notes.get(el.dataset.id); if(!n)return;
+    var d=document.createElement("div"); d.className="coldrop"; d.setAttribute("aria-hidden","true");
+    var t=document.createElement("div"); t.className="cdtip"; t.textContent="📁 칸에 놓으면 그 칸으로 옮겨요"; d.appendChild(t);
+    var row=document.createElement("div"); row.className="cdrow"; d.appendChild(row);
+    var mk=function(c,label){var b=document.createElement("span"); b.className="cchip"+((n.col||"")===c?" cur":""); b.dataset.col=c; b.textContent=label; row.appendChild(b)};
+    cs.forEach(function(c){mk(c,"📁 "+c)});
+    if(n.col)mk("","↩ 칸에서 빼기");
+    document.body.appendChild(d); colDrop={el:d,nid:n.id,col:null};
+  }
+  function colDropClose(done){
+    if(!colDrop)return; var d=colDrop.el; colDrop=null;
+    if(done){   // 놓은 칩이 반짝이고 "옮겼어요"를 보인 뒤 줄이 위로 사라짐
+      var b=d.querySelector(".cchip.over"); if(b){b.classList.add("hit"); b.textContent="✓ "+(b.dataset.col?"옮겼어요":"뺐어요")}
+      setTimeout(function(){d.classList.add("out"); setTimeout(function(){d.remove()},220)},520); return}
+    d.classList.add("out"); setTimeout(function(){d.remove()},180);
+  }
+  function colDropHit(x,y){
+    if(!colDrop)return false;
+    var hit=null;
+    Array.prototype.forEach.call(colDrop.el.querySelectorAll(".cchip"),function(b){var r=b.getBoundingClientRect(), on=!hit&&!b.classList.contains("cur")&&x>=r.left-4&&x<=r.right+4&&y>=r.top-10&&y<=r.bottom+10; b.classList.toggle("over",on); if(on)hit=b});
+    var was=colDrop.col; colDrop.col=hit?hit.dataset.col:null;
+    if(hit&&was!==colDrop.col)buzz(12);
+    if(drag)drag.el.classList.toggle("overdrop",!!hit);
+    var br=colDrop.el.getBoundingClientRect();
+    return !!hit||y<br.bottom+6;
+  }
   function startDrag(el,pid,clientY,capEl){
     var r=el.getBoundingClientRect();
     drag={el:el,grip:capEl||el,pid:pid,tx:0,grab:clientY-r.top,y:clientY,startY:clientY,moved:false,startIdx:Array.prototype.indexOf.call($("list").children,el)};
@@ -15777,6 +15837,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     try{var sel=window.getSelection&&window.getSelection(); if(sel)sel.removeAllRanges()}catch(err){}
     el.classList.add("dragging"); $("list").classList.add("sorting"); document.body.style.userSelect="none";
     if(!reorderMode)setStatus("위아래로 끌어서 옮기세요");
+    colDropOpen(el);
     if(navigator.vibrate)try{navigator.vibrate(15)}catch(err){}
     cancelAnimationFrame(dragRAF); dragRAF=requestAnimationFrame(autoScroll);
   }
@@ -15862,6 +15923,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(Math.abs(e.clientY-drag.startY)<(reorderMode?4:24)){drag.y=e.clientY;return}
       drag.moved=true;
     }
+    if(colDropHit(e.clientX,e.clientY)){   // 칸 줄 위: 카드만 손가락을 따라가고 목록 순서는 그대로
+      drag.y=e.clientY; var el0=drag.el, nat=el0.getBoundingClientRect().top-(drag.tx||0); drag.tx=e.clientY-drag.grab-nat; el0.style.transform="translateY("+drag.tx+"px)"; return}
     dragMove(e.clientY);
   });
   function finish(e){
