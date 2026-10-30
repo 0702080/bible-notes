@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-10">
+<meta name="app-build" content="2026-10-30-recall-wait">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8236,7 +8236,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
             var n1=notes.get(cid); if(!n1)return;
             C.grade="g2"; C.stage=5; ccFinish(n1);
             if(ccNextNote()){toast("✅ 암송 완료"); ccGoNext()} else ccDraw();
-          },1300);
+          },3300);   // 마지막 낱말을 누른 뒤 2초 더 머묾 (2026-10-30 사용자 요청)
         }
         if(!w.classList.contains("hid")||w.classList.contains("peek")){buzz(18);return}   // 누를 때마다 진동 (2026-10-21 사용자 요청)
         w.classList.add("peek"); C.peek++; buzz([25,30,15]);
