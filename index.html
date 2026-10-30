@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-noshow">
+<meta name="app-build" content="2026-10-30-sw6">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -15,7 +15,7 @@
   var mine=document.querySelector('meta[name="app-build"]').content, last=0;
   function check(){
     if(Date.now()-last<60000)return; last=Date.now();
-    fetch(location.href.split("#")[0],{cache:"reload"}).then(function(r){return r.text()}).then(function(t){
+    fetch(location.href.split("#")[0],{cache:"reload",headers:{"Accept":"text/html"}}).then(function(r){return r.text()}).then(function(t){
       var m=t.match(/name="app-build" content="([^"]+)"/); if(!m||m[1]===mine)return;
       var k="bible-reloaded-"+m[1]; try{if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1")}catch(e){}
       var a=document.activeElement; if(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))return;   // 글을 쓰는 중이면 다음에
