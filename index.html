@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-praytpl2">
+<meta name="app-build" content="2026-10-30-dlsearch">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2979,6 +2979,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlsearch input{flex:1;min-width:0;height:38px;padding:0 14px;border:1px solid #2A2930;border-radius:19px;background:var(--sheet);color:var(--ink);font:inherit;font-size:14px}
 .dlsearch input:focus{outline:none;border-color:var(--sky)}
 .dlsearch input::placeholder{color:var(--faint)}
+/* 찾기 칸을 눈에 띄게: 하늘색 테두리·돋보기·조금 더 크게 (2026-10-30 사용자 요청) */
+.dlsearch input{height:46px;padding:0 16px 0 44px;border:1.5px solid color-mix(in srgb,var(--sky) 55%,#2A2930);border-radius:23px;background:color-mix(in srgb,var(--sky) 9%,#141418) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236ECBF4' stroke-width='2.4' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M16 16l4.5 4.5'/%3E%3C/svg%3E") 15px center/20px no-repeat;font-size:15px;box-shadow:0 0 0 3px color-mix(in srgb,var(--sky) 8%,transparent),0 4px 14px rgba(0,0,0,.35)}
+.dlsearch input:focus{border-color:var(--sky);box-shadow:0 0 0 4px color-mix(in srgb,var(--sky) 22%,transparent)}
+.dlsearch input::placeholder{color:color-mix(in srgb,var(--sky) 55%,#8A8893)}
+.dlsearch input::-webkit-search-cancel-button{display:none}
 .dlsn{flex:0 0 auto;font-size:12px;color:var(--faint);white-space:nowrap}
 .dlsn:empty{display:none}
 .dlsx{flex:0 0 auto;height:32px;padding:0 12px;border:1px solid #34333A;border-radius:16px;background:transparent;color:var(--muted);font-size:12.5px;white-space:nowrap}
@@ -9983,7 +9988,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         '<div class="dlfix"><div class="dlday"><button type="button" class="dlprev" aria-label="전날">◀</button><label class="dldatew" title="눌러서 날짜 고르기"><b class="dldate"></b><input type="date" class="dlpick" aria-label="날짜 고르기"></label><button type="button" class="dlnext" aria-label="다음 날">▶</button></div>'+
         '<div class="dlprog"><span class="dlcnt"></span><span class="dlbarw"><i></i></span></div></div>'+
         '<div class="dlbody"><div class="dlweek" aria-label="최근 7일"></div>'+
-        '<div class="dlsearch"><input class="dlsin" type="search" placeholder="찾기 — 묶음 이름 · 항목 · 적어 둔 기록 (초성도 돼요)" aria-label="하루 돌아보기에서 찾기"><span class="dlsn"></span><button type="button" class="dlsx" hidden>지우기</button></div>'+
+        '<div class="dlsearch"><input class="dlsin" type="search" placeholder="묶음 · 항목 · 기록 찾기 (초성도 돼요)" aria-label="하루 돌아보기에서 찾기"><span class="dlsn"></span><button type="button" class="dlsx" hidden>지우기</button></div>'+
         '<div class="dllist"></div>'+
         '</div>';
       document.body.appendChild(dl);
