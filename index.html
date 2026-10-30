@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-noemptymed">
+<meta name="app-build" content="2026-10-30-praytpl2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4712,6 +4712,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var list=n.prays.slice().sort(function(a,b){return (a.ans?1:0)-(b.ans?1:0)||b.at-a.at});   // 응답 기다리는 기도 먼저, 최근 것 위
     if(!list.length&&!box.querySelector(".pempty")){box.innerHTML='<p class="pempty">이 말씀을 붙들고 드리는 기도를 적어 보세요. 응답되면 🙌 응답을 눌러 기록해요.</p>';return}
     var em=box.querySelector(".pempty"); if(em&&list.length)em.remove();
+    var pfx=false; n.prays.forEach(function(x){if(String(x.t||"").indexOf("하나님 아버지\n")===0){x.t="전능하신 나의 아버지 하나님"+x.t.slice(7);pfx=true}});   // 예전 기도문 첫 줄 → 새 첫 줄 (다른 기기·클라우드에서 온 것도, 2026-10-30)
+    if(pfx)setTimeout(function(){scheduleSave(n.id)},0);
     list.forEach(function(x,i){
       var d=have.get(x.id); have.delete(x.id);
       if(!d){
