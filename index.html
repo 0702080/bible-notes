@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-30-praytpl">
+<meta name="app-build" content="2026-10-30-noemptymed">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5165,6 +5165,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     el.querySelectorAll(".pane").forEach(function(p){p.hidden=p.dataset.pane!==tab});
     var mbox=el.querySelector(".meds"), mhave=new Map();
     Array.prototype.forEach.call(mbox.children,function(c){mhave.set(c.dataset.mid,c)});
+    // 내용이 하나도 없는 묵상은 접혀 있으면 아예 지움 — 적는 중(펼쳐져 있거나 글 칸에 커서)인 것은 그대로 (2026-10-30 사용자 요청)
+    var mEmpty=function(m){return !String(m.text||"").trim()&&!String(m.thx||"").trim()&&!String(m.todo||"").trim()};
+    var mGone=n.meds.filter(function(m){if(!mEmpty(m)||!medFold.has(m.id))return false; var dd=mhave.get(m.id); return !(dd&&dd.contains(document.activeElement))});
+    if(mGone.length){n.meds=n.meds.filter(function(m){return mGone.indexOf(m)<0}); mGone.forEach(function(m){medFold.delete(m.id)}); setTimeout(function(){scheduleSave(n.id)},0)}
     var chrono=n.meds.slice().sort(function(a,b){return a.at-b.at});
     medOrder(n.meds).forEach(function(m,i){
       var d=mhave.get(m.id); if(!d)d=makeMed(m); mhave.delete(m.id);
