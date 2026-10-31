@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-darkbtn">
+<meta name="app-build" content="2026-11-01-pastelbtn">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1804,6 +1804,16 @@ body.boardon{height:100vh;overflow:hidden}
 .tbtn{background:#141318}
 .topicbar .tchip:not(.on){background:#141318}
 .colbar .cchip{background:color-mix(in srgb,var(--gold) 6%,#141318)}
+/* 맨 위 내 순서·찾기·⋯ 와 #주제 펼치기 단추를 검정 대신 서로 다른 옅은 파스텔색으로 (2026-11-01 사용자 요청) */
+#sortBtn,body.boardon .toolbar #sortBtn{--pb:#D8CCF4}
+#filterBtn,body.boardon .toolbar #filterBtn{--pb:#C6EADB}
+#topMenu>summary.tbtn,body.boardon .toolbar #topMenu>summary.tbtn{--pb:#F5D3C2}
+.topicbar .tchip.tfoldbtn{--pb:#C9DDF4}
+#sortBtn,#filterBtn,#topMenu>summary.tbtn,.topicbar .tchip.tfoldbtn,
+body.boardon .toolbar #sortBtn,body.boardon .toolbar #filterBtn,body.boardon .toolbar #topMenu>summary.tbtn{background:var(--pb);color:#23202B;border:1px solid color-mix(in srgb,var(--pb) 70%,#000);box-shadow:0 1px 3px rgba(0,0,0,.35);font-weight:600}
+.topicbar .tchip.tfoldbtn{border-style:solid}
+#filterBtn[aria-pressed="true"],#topMenu[open]>summary.tbtn,
+body.boardon .toolbar #filterBtn[aria-pressed="true"],body.boardon #topMenu[open]>summary.tbtn{background:color-mix(in srgb,var(--pb) 82%,#000);color:#141218;box-shadow:0 0 0 2px color-mix(in srgb,var(--pb) 60%,transparent)}
 .colbar .cchip.on{background:color-mix(in srgb,var(--gold) 22%,#141318)}
 body.boardon #appbg{background:linear-gradient(rgba(10,10,13,.38),rgba(10,10,13,.38)),url(kanban-bg2.jpg) center/cover no-repeat,#0b0b0d}
 body.boardon .wrap{height:100vh;display:flex;flex-direction:column;padding-bottom:0;box-sizing:border-box}
