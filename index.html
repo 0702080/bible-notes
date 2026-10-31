@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-mic2">
+<meta name="app-build" content="2026-11-01-say1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3061,16 +3061,35 @@ textarea.lhpad{padding-left:28px!important}
 .srmbtns .srmdone{margin-left:auto;border:0;background:var(--sky);color:#0E1420;font-weight:700}
 .srmbtns .srmdel.armed{border-color:var(--pink);color:var(--pink)}
 /* 믿음의 한 마디 (2026-10-18 사용자 요청) */
-.saytoday{--sc:var(--gold);display:block;width:100%;margin:2px 0 8px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--sc) 32%,#232229);border-radius:14px;background:color-mix(in srgb,var(--sc) 10%,transparent);color:var(--ink);font:inherit;text-align:left}
-.saytoday .sayq1{display:block;font-family:var(--serif);font-size:15px;line-height:1.7;color:color-mix(in srgb,var(--sc) 35%,var(--ink));word-break:keep-all}
+.saytoday{--sc:var(--gold);position:relative;display:block;width:100%;margin:2px 0 8px;padding:14px 16px 16px;border:1px solid color-mix(in srgb,var(--sc) 42%,#232229);border-radius:18px;overflow:hidden;isolation:isolate;
+  background:radial-gradient(120% 90% at 0% 0%,color-mix(in srgb,var(--sc) 26%,transparent),transparent 60%),radial-gradient(90% 80% at 100% 100%,color-mix(in srgb,var(--sc) 14%,transparent),transparent 65%),linear-gradient(160deg,#1d1b22,#141318);
+  box-shadow:inset 0 1px 0 color-mix(in srgb,var(--sc) 30%,transparent),0 6px 22px -10px color-mix(in srgb,var(--sc) 55%,transparent);color:var(--ink);font:inherit;text-align:left;transition:border-color .6s,box-shadow .6s}
+/* 큰 따옴표 장식 + 빛줄기 (2026-11-01 사용자 요청) */
+.saytoday::before{content:"\201C";position:absolute;left:6px;top:-14px;z-index:-1;font-family:Georgia,"Times New Roman",serif;font-size:96px;line-height:1;color:color-mix(in srgb,var(--sc) 22%,transparent);pointer-events:none;transition:color .6s}
+.saytoday::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 35%,color-mix(in srgb,var(--sc) 16%,transparent) 50%,transparent 65%);transform:translateX(-120%);animation:saySheen 7s ease-in-out infinite;pointer-events:none}
+@keyframes saySheen{0%,55%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
+.saytoday .saylbl{display:flex;align-items:center;gap:6px;margin:0 0 6px 2px;font-size:11px;letter-spacing:.14em;color:color-mix(in srgb,var(--sc) 85%,var(--ink));opacity:.9}
+.saytoday .saylbl::before{content:"\2726";font-size:10px;animation:sayStar 3s ease-in-out infinite}
+@keyframes sayStar{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
+.saytoday .sayq1{display:block;padding-left:2px;font-family:var(--serif);font-size:17px;line-height:1.7;color:color-mix(in srgb,var(--sc) 30%,var(--ink));word-break:keep-all;text-shadow:0 0 18px color-mix(in srgb,var(--sc) 35%,transparent)}
+.saytoday .sayq1 .sw{display:inline-block;white-space:pre}
+.saytoday.sayin .sayq1 .sw{animation:sayWordIn .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 55ms)}
+@keyframes sayWordIn{from{opacity:0;transform:translateY(9px);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
+.saytoday.sayout .sayq1,.saytoday.sayout .sayw1{transition:opacity .35s,transform .35s,filter .35s;opacity:0;transform:translateY(-8px);filter:blur(4px)}
+.saytoday .saytm{position:absolute;left:16px;right:16px;bottom:7px;height:2px;border-radius:2px;background:color-mix(in srgb,var(--sc) 14%,transparent);overflow:hidden}
+.saytoday .saytm i{display:block;height:100%;width:100%;background:color-mix(in srgb,var(--sc) 70%,transparent);transform-origin:left;transform:scaleX(0)}
+.saytoday.sayrun .saytm i{animation:sayTm var(--sayms,20000ms) linear both}
+@keyframes sayTm{to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.saytoday::after,.saytoday .saylbl::before,.saytoday.sayin .sayq1 .sw{animation:none}.saytoday.sayout .sayq1,.saytoday.sayout .sayw1{transition:none}}
 .saywrap{position:relative}
 .reviewbar.fold .saytoday{margin-bottom:0}.reviewbar.fold{padding-bottom:12px!important}   /* 오늘 카드 아래 여백을 좌우 여백과 같게 (2026-10-31 사용자 요청) */
 .saywrap .saytoday{padding-right:40px}
+.saywrap .saypin{top:8px;right:8px;z-index:2}
 .saypin{position:absolute;top:6px;right:6px;width:30px;height:30px;padding:0;border:0;border-radius:15px;background:transparent;font-size:14px;line-height:30px;opacity:.35;filter:grayscale(1);transition:opacity .15s,filter .15s,background .15s}
 .saypin.on{opacity:1;filter:none;background:color-mix(in srgb,var(--gold) 16%,transparent)}
 @media (hover:hover){.saypin:hover{opacity:.9;filter:none}}
-.saytoday .sayw1{display:block;margin-top:4px;font-size:12px;color:var(--sc);text-align:right}
-@media (hover:hover){.saytoday:hover{background:color-mix(in srgb,var(--sc) 16%,transparent)}}
+.saytoday .sayw1{display:block;margin-top:6px;font-size:12px;color:var(--sc);text-align:right}
+@media (hover:hover){.saytoday:hover{border-color:color-mix(in srgb,var(--sc) 65%,#232229)}}
 .saybox{max-width:640px;margin:0 auto}
 /* PC: 담기·닫기 단추를 카드 줄 왼쪽 끝 위로, 제목은 오른쪽 끝 (2026-10-31 사용자 요청) */
 @media (min-width:900px){
@@ -12531,6 +12550,61 @@ body.carddrag #reviewBar{display:none!important}
     for(i=0;i<k.length;i++)h=(h*31+k.charCodeAt(i))>>>0;
     return items[h%items.length];
   }
+  /* ✦ 오늘 카드의 한 마디: 빛나는 카드 + 낱말이 하나씩 떠오르며 20초마다 다음 한 마디로 (📌 고정·정각 말씀이면 그대로), 옆으로 밀면 넘김 (2026-11-01 사용자 요청) */
+  var ST={id:"",ms:20000,busy:false,at:0};
+  function sayTodayList(){return sayData().items.filter(function(x){return !x.hv&&String(x.t||"").trim()})}
+  function sayTodayLocked(){return !!(sayHour()||sayPinned())}
+  function sayTodayPick(){
+    if(sayTodayLocked())return sayOfDay();
+    if(ST.id){var f=sayTodayList().filter(function(x){return x.id===ST.id})[0]; if(f)return f}
+    return sayOfDay();
+  }
+  function sayTodayFill(sb,pb,sd,anim){
+    if(anim||sd.id!==ST.id)ST.at=Date.now(); ST.id=sd.id;   // 다른 이유로 다시 그려도 시간은 이어서
+    if(!sd.hv)sayPaint(sb,sd); else sb.style.setProperty("--sc","#FFD36B");
+    sb.textContent="";
+    var lb=document.createElement("span"); lb.className="saylbl"; lb.textContent=sd.hv?"짧은 말씀":"오늘의 한 마디"; sb.appendChild(lb);
+    var q=document.createElement("span"); q.className="sayq1";
+    String(sd.t).replace(/\s+/g," ").trim().split(" ").forEach(function(w,i,a){
+      var sp=document.createElement("span"); sp.className="sw"; sp.style.setProperty("--i",Math.min(i,24)); sp.textContent=w+(i<a.length-1?" ":""); q.appendChild(sp);
+    });
+    sb.appendChild(q);
+    if(sd.who){var w2=document.createElement("span"); w2.className="sayw1"; w2.textContent="— "+sd.who; sb.appendChild(w2)}
+    var locked=sayTodayLocked(), many=sayTodayList().length>1;
+    if(!locked&&many){var tm=document.createElement("span"); tm.className="saytm"; tm.setAttribute("aria-hidden","true"); tm.appendChild(document.createElement("i")); sb.appendChild(tm); sb.style.setProperty("--sayms",ST.ms+"ms"); tm.firstChild.style.animationDelay=(-Math.min(ST.ms,Date.now()-ST.at))+"ms"}
+    sb.classList.remove("sayout","sayin","sayrun"); void sb.offsetWidth;
+    if(anim)sb.classList.add("sayin");
+    if(!locked&&many)sb.classList.add("sayrun");
+    if(pb){var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
+      pb.dataset.sid=sd.id; pb.classList.toggle("on",isPin);
+      pb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; pb.setAttribute("aria-label",pb.title); pb.setAttribute("aria-pressed",String(isPin))}
+  }
+  function sayTodayNext(dir){
+    var sb=document.querySelector(".saywrap .saytoday"); if(!sb||ST.busy)return;
+    if(sayTodayLocked())return;
+    var its=sayTodayList(); if(its.length<2)return;
+    var i=-1; its.forEach(function(x,k){if(x.id===ST.id)i=k});
+    var nx=its[(i<0?0:i+(dir<0?its.length-1:1))%its.length];
+    var rm=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+    ST.busy=true; sb.classList.remove("sayrun"); sb.classList.add("sayout");
+    setTimeout(function(){ST.busy=false; if(!sb.isConnected)return; sayTodayFill(sb,sb.parentNode.querySelector(".saypin"),nx,!rm)},rm?0:380);
+  }
+  function saySwipeInit(w){
+    var x0=0,y0=0,on=false;
+    w.addEventListener("touchstart",function(e){if(e.touches.length!==1)return; x0=e.touches[0].clientX; y0=e.touches[0].clientY; on=true},{passive:true});
+    w.addEventListener("touchend",function(e){
+      if(!on)return; on=false; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+      if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.5){
+        if(sayTodayLocked()){toast("📌 고정된 한 마디예요");return}
+        e.preventDefault(); buzz(8); sayTodayNext(dx<0?1:-1);
+      }
+    });
+  }
+  setInterval(function(){
+    if(document.hidden||ST.busy)return;
+    var sb=document.querySelector(".saywrap .saytoday"); if(!sb||!sb.offsetParent)return;
+    if(Date.now()-ST.at>=ST.ms-200)sayTodayNext(1);
+  },1000);
   function sayTogglePin(id){
     var cur=sayPinned();
     try{if(cur&&cur.id===id)localStorage.removeItem(SAY_PIN);else localStorage.setItem(SAY_PIN,JSON.stringify({id:id,until:Date.now()+864e5}))}catch(e){}
@@ -13388,7 +13462,7 @@ body.carddrag #reviewBar{display:none!important}
     bar.appendChild(h);
     var dlDoneNow=!folded&&big.some(function(r){return r.done});   // 접었을 때는 A가 안 보이니 B를 보여 줌   // 하루 돌아보기 ✓ 완료가 뜨면 '오늘의 한 걸음'과 한 마디는 숨김 (2026-10-31 사용자 요청)
     if(!dlDoneNow)try{drawStep(bar)}catch(e){}
-    var sd=dlDoneNow?null:sayOfDay();
+    var sd=dlDoneNow?null:sayTodayPick();
     if(sd){   // 오늘의 한 마디 (2026-10-18 사용자 요청)
       var swrap=document.createElement("div"); swrap.className="saywrap";
       var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
@@ -13396,10 +13470,9 @@ body.carddrag #reviewBar{display:none!important}
       spb.textContent="📌"; spb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; spb.setAttribute("aria-label",spb.title); spb.setAttribute("aria-pressed",String(isPin));
       var sb2=document.createElement("button"); sb2.type="button"; sb2.className="saytoday"; sb2.dataset.act="say"; if(!sd.hv)sayPaint(sb2,sd);
       sb2.setAttribute("aria-label","오늘의 한 마디 — 믿음의 한 마디 보기");
-      var q2=document.createElement("span"); q2.className="sayq1"; q2.textContent="\u201c"+String(sd.t).replace(/\s+/g," ")+"\u201d";
-      sb2.appendChild(q2);
-      if(sd.who){var w2=document.createElement("span"); w2.className="sayw1"; w2.textContent="— "+sd.who; sb2.appendChild(w2)}
+      sayTodayFill(sb2,spb,sd,false);
       swrap.appendChild(sb2); swrap.appendChild(spb); bar.appendChild(swrap);
+      saySwipeInit(swrap);
     }
     function drawRow(r){
       if(r.big){   // 하루 돌아보기: 눈에 잘 띄게 한 줄 전체를 큰 버튼으로 (2026-10-15 사용자 요청)
