@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-kbtint">
+<meta name="app-build" content="2026-11-01-kbpal">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1912,6 +1912,14 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.bcust .bch b{color:var(--gold)}
 .bcol.btint,.bcol.btint.bcust{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 16%,#24222B),color-mix(in srgb,var(--bc) 7%,#201E26) 260px);border-color:color-mix(in srgb,var(--bc) 34%,#38343F)}
 .bcol.btint .bch b,.bcol.btint.bcust .bch b{color:var(--bc)}
+.bcol.btint .bch .bce{cursor:pointer;border-radius:8px;padding:2px 3px;margin:-2px -3px}
+.bcol.btint .bch .bce:hover{background:color-mix(in srgb,var(--bc) 22%,transparent)}
+.bcpal{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:-2px 2px 10px;padding:9px 10px;border-radius:12px;background:#17161B;border:1px solid color-mix(in srgb,var(--bc) 35%,#2E2C35);animation:bcpalin .16s ease-out}
+.bcpal button{width:26px;height:26px;padding:0;border-radius:50%;border:2px solid transparent;background:var(--sw);box-shadow:inset 0 0 0 2px #17161B}
+.bcpal button.on{border-color:#fff}
+.bcpal button.auto{width:auto;height:26px;padding:0 10px;border-radius:13px;border:1px solid #3A3842;background:transparent;box-shadow:none;color:var(--muted);font-family:inherit;font-size:12px}
+.bcpal button.auto.on{border-color:var(--ink);color:var(--ink)}
+@keyframes bcpalin{from{opacity:0;transform:translateY(-4px)}}
 .bcol.btint .bcaddin{border-color:color-mix(in srgb,var(--bc) 40%,transparent)}
 .bcol.bcust.lmland{animation:none}
 .bcaddin{display:block;width:100%;margin:8px 0 0;box-sizing:border-box;height:38px;border:1.5px dashed color-mix(in srgb,var(--gold) 45%,#3A3744);border-radius:12px;background:transparent;color:var(--gold);font-size:13.5px;cursor:pointer;flex:0 0 auto}
@@ -4442,9 +4450,38 @@ body.carddrag #reviewBar{display:none!important}
   },true);
   // 칸반 칸마다 다른 바탕색 — 놓인 차례대로 보라·하늘·초록·금·분홍·주황 (2026-11-01 사용자 요청)
   var KBCOL=["var(--violet)","var(--sky)","var(--green)","var(--gold)","var(--pink)","var(--orange)"];
+  // 칸 머리 아이콘(📖·🗂️)을 누르면 이 색들 중에서 직접 고름, "자동"은 차례 색 (2026-11-01 사용자 요청). 저장 bible-board-tint {칸 키: 색 번호}
+  var KBT_KEY="bible-board-tint";
+  function kbTintMap(){try{return JSON.parse(localStorage.getItem(KBT_KEY)||"{}")||{}}catch(e){return {}}}
   function kbTint(box){
-    Array.prototype.forEach.call(box.querySelectorAll(":scope>.bcol"),function(c,i){c.style.setProperty("--bc",KBCOL[i%KBCOL.length]); c.classList.add("btint")});
+    var m=kbTintMap();
+    Array.prototype.forEach.call(box.querySelectorAll(":scope>.bcol"),function(c,i){
+      var k=c.dataset.k, j=(k&&m[k]!=null&&KBCOL[m[k]])?+m[k]:i%KBCOL.length;
+      c.style.setProperty("--bc",KBCOL[j]); c.classList.add("btint");
+      var e=c.querySelector(".bch .bce"); if(e){e.title="눌러서 칸 색 바꾸기"; e.setAttribute("role","button")}
+    });
   }
+  function kbPalClose(){document.querySelectorAll("#board .bcpal").forEach(function(x){x.remove()})}
+  $("board").addEventListener("click",function(e){
+    if(bMode!=="list")return;
+    var sw=e.target.closest(".bcpal button");
+    if(sw){
+      e.stopPropagation(); e.preventDefault();
+      var cl=sw.closest(".bcol"), k=cl&&cl.dataset.k, m=kbTintMap(); if(!k)return;
+      if(sw.dataset.c==="")delete m[k]; else m[k]=+sw.dataset.c;
+      try{localStorage.setItem(KBT_KEY,JSON.stringify(m))}catch(err){}
+      kbPalClose(); kbTint($("board")); return;
+    }
+    if(e.target.closest(".bcpal")){e.stopPropagation();return}
+    var ic=e.target.closest(".bch .bce");
+    if(!ic||ic.closest(".bfold")){kbPalClose();return}
+    e.stopPropagation(); e.preventDefault();
+    var col=ic.closest(".bcol"), open=col.querySelector(".bcpal"); kbPalClose(); if(open)return;
+    var cur=kbTintMap()[col.dataset.k], p=document.createElement("div"); p.className="bcpal";
+    p.innerHTML=KBCOL.map(function(c,i){return '<button type="button" data-c="'+i+'" style="--sw:'+c+'"'+(cur===i?' class="on"':'')+' aria-label="색 '+(i+1)+'"></button>'}).join("")+
+      '<button type="button" data-c="" class="auto'+(cur==null?' on':'')+'">자동</button>';
+    col.querySelector(".bch").insertAdjacentElement("afterend",p);
+  },true);
   function renderKanbanList(box){
     var items=sorted().filter(function(n){return visibleNote(n)});
     box.classList.remove("find");
