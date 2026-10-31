@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-nonaver">
+<meta name="app-build" content="2026-10-31-mqfit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12865,13 +12865,16 @@ body.carddrag #reviewBar{display:none!important}
       var dy=it.getBoundingClientRect().top-(topLine+6); if(Math.abs(dy)>2)body.scrollTop+=dy;   // 질문 카드 머리가 고정 줄 바로 아래로
       var tt=cur.getBoundingClientRect().top, hpx=Math.max(140,Math.round(vbot-tt-10))+"px";
       if(cur.style.height!==hpx)cur.style.height=hpx;
+      // 칸 아래 끝이 키보드 바로 위 10px에 오는지 한 번 더 재서 맞춤 (키보드 밑으로 들어가던 문제, 2026-10-31 사용자 요청)
+      var over=cur.getBoundingClientRect().bottom-(vbot-10); if(Math.abs(over)>1)cur.style.height=Math.max(140,Math.round(cur.offsetHeight-over))+"px";
     }
     document.addEventListener("focusin",function(e){
       var t=e.target; if(!t||!t.classList||!t.classList.contains("mqa")||!mq||!mq.contains(t))return;
       if(window.matchMedia&&matchMedia("(min-width:900px)").matches)return;
       cur=t; t.classList.add("dlbig","mqbig");
-      var n=0; (function tick(){if(cur!==t)return; fit(); if(++n<20)setTimeout(tick,100)})();
+      var n=0; (function tick(){if(cur!==t)return; fit(); if(++n<30)setTimeout(tick,100)})();
     });
+    document.addEventListener("input",function(e){if(e.target===cur)fit()});
     document.addEventListener("focusout",function(e){if(e.target===cur){var t=cur;cur=null;t.classList.remove("dlbig","mqbig");t.style.height="";grow(t);var bd=mq&&mq.querySelector(".dlbody");if(bd)bd.style.paddingBottom=""}});
     if(window.visualViewport){window.visualViewport.addEventListener("resize",function(){if(cur)fit()});window.visualViewport.addEventListener("scroll",function(){if(cur)fit()})}
     window.addEventListener("resize",function(){if(cur)fit()});
@@ -12886,7 +12889,7 @@ body.carddrag #reviewBar{display:none!important}
     setTimeout(function(){if(mqLater&&!mq.hidden)mqRedrawSoon()},300);   // 다른 칸으로 옮겨 가면 계속 미룸
   });
   var mq=null, mqDay="";
-  function closeMedq(){if(!mq)return; mq.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; render()}
+  function closeMedq(){if(!mq)return; var a=document.activeElement; if(a&&mq.contains(a)&&a.blur)a.blur(); mq.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; render()}
   function mqEdit(id,fn){   // 그 질문 한 개만 고쳐서 저장
     var o=medqData(), day=o.days[mqDay]=o.days[mqDay]||{items:[]};
     for(var i=0;i<day.items.length;i++)if(day.items[i].id===id){fn(day.items[i],day,i);saveMedq(o);return true}
@@ -12925,6 +12928,15 @@ body.carddrag #reviewBar{display:none!important}
         if(t.classList.contains("mqqt")){mqEdit(id,function(it){it.q=t.value});mqSaved(t);grow(t)}
         else if(t.classList.contains("mqa")){mqEdit(id,function(it){it.a=t.value});mqSaved(t);grow(t);mqCount()}
       });
+      // 칸에서 나가거나(다른 곳 누르기·키보드 내리기) 한글 조합이 끝나면 적던 글을 그대로 한 번 더 저장 (2026-10-31 사용자 요청)
+      var mqKeep=function(t){
+        var c=t&&t.closest&&t.closest(".mqitem"); if(!c)return;
+        if(t.classList.contains("mqqt"))mqEdit(c.dataset.id,function(it){it.q=t.value});
+        else if(t.classList.contains("mqa"))mqEdit(c.dataset.id,function(it){it.a=t.value});
+      };
+      mq.querySelector(".mqbox").addEventListener("focusout",function(e){mqKeep(e.target)});
+      mq.querySelector(".mqbox").addEventListener("compositionend",function(e){mqKeep(e.target)});
+      document.addEventListener("visibilitychange",function(){if(document.hidden&&mq&&mq.contains(document.activeElement))mqKeep(document.activeElement)});
       mq.querySelector(".mqbox").addEventListener("change",function(e){
         var t=e.target; if(!t.classList.contains("mqlink"))return;
         var c=t.closest(".mqitem"); if(!c)return;
