@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-kbbg">
+<meta name="app-build" content="2026-11-01-kbbg2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1798,8 +1798,7 @@ body.boardon .wrap{max-width:none;padding-left:20px;padding-right:20px}
 /* 칸반에서는 화면을 꽉 채운다: 머리 줄은 늘 제자리, 가로 스크롤바 밑 빈 자리 없음 (2026-10-17 사용자 요청) */
 body.boardon{height:100vh;overflow:hidden}
 /* 칸반 배경: 은행나무 길 사진을 뿌옇게 흐려서 (2026-11-01 사용자 요청) */
-body.boardon::before{content:"";position:fixed;inset:-60px;z-index:-1;pointer-events:none;background:url(kanban-bg.jpg) center/cover no-repeat;filter:blur(18px) brightness(.42) saturate(.85)}
-body.boardon::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:rgba(10,10,13,.35)}
+body.boardon{background:linear-gradient(rgba(10,10,13,.38),rgba(10,10,13,.38)),url(kanban-bg2.jpg) center/cover no-repeat fixed,#0b0b0d}   /* 미리 흐리게 만든 사진을 바탕에 바로 깔기 — 덧그리기(::before)는 가려질 수 있어서 (2026-11-01) */
 body.boardon .wrap{height:100vh;display:flex;flex-direction:column;padding-bottom:0;box-sizing:border-box}
 body.boardon .top,body.boardon .toolbar,body.boardon .topicbar,body.boardon .filter{flex:0 0 auto}
 body.boardon .board4{flex:1 1 auto;height:auto;min-height:0;padding-bottom:12px;margin-bottom:0}   /* 칸 아래 여백 = 위 여백 12px (2026-10-25 사용자 요청) */
@@ -6160,6 +6159,17 @@ body.carddrag #reviewBar{display:none!important}
   });
   list.addEventListener("focusout",function(e){
     var card=e.target.closest&&e.target.closest(".note"); if(card)flushNow(card.dataset.id);
+  });
+  // 빈 SOAP 묵상은 칸을 나가면 목록에서 뺌 (2026-11-01 사용자 요청)
+  list.addEventListener("focusout",function(e){
+    var t=e.target; if(!t.classList||!t.classList.contains("med"))return;
+    var it=t.closest(".medi"), card=t.closest(".note"); if(!it||!card)return;
+    setTimeout(function(){
+      if(it.isConnected&&it.contains(document.activeElement))return;
+      var n=notes.get(card.dataset.id); if(!n||!n.meds)return;
+      var m=n.meds.find(function(x){return x.id===it.dataset.mid}); if(!m||!soapEmpty(m.text))return;
+      n.meds=n.meds.filter(function(x){return x!==m}); render(); scheduleSave(n.id);
+    },200);
   });
   list.addEventListener("click",function(e){
     var im=e.target.closest(".himgimg"); if(im){e.stopPropagation();openViewer(im.src,im.alt)}
@@ -10985,6 +10995,10 @@ body.carddrag #reviewBar{display:none!important}
   var DAILY_GROUPS=[{g:"pray",e:"🙏",t:"기도",c:"var(--violet)"},{g:"word",e:"📖",t:"말씀",c:"var(--orange)"},{g:"fruit",e:"🍇",t:"성령의 열매",c:"var(--green)"},{g:"sow",e:"🌱",t:"하나님 나라에 심기",c:"var(--sky)"},{g:"thanks",e:"💛",t:"감사·나눔",c:"var(--gold)"},{g:"essay",e:"✍️",t:"오늘의 에세이",c:"var(--pink)"}];   // 묶음마다 색
   // 📝 SOAP 묵상 틀: 말씀(S)·관찰(O)·적용(A)·기도(P) (2026-10-31 사용자 요청)
   var SOAP_TPL="📖 S 말씀 — \n\n🔍 O 관찰 — \n\n🌱 A 적용 — \n\n🙏 P 기도 — \n";
+  function soapEmpty(t){   // SOAP 틀 글자만 있고 적은 내용이 없으면 true (2026-11-01 사용자 요청)
+    t=String(t||""); if(t.indexOf("S 말씀")<0)return false;
+    return !t.split("\n").map(function(l){return l.replace(/^\s*(📖\s*)?S\s*말씀|^\s*(🔍\s*)?O\s*관찰|^\s*(🌱\s*)?A\s*적용|^\s*(🙏\s*)?P\s*기도/,"").replace(/^\s*[—:\-–]\s*/,"").trim()}).join("");
+  }
   var PRAY_HEAD="전능하신 나의 아버지 하나님\n\n";   /* 기도문 첫 줄 (2026-10-30 사용자 요청, 전에는 "하나님 아버지") */
   var PRAY_TPL="전능하신 나의 아버지 하나님\n\n\n\n길이요 진리요 생명 되신 나의 주\n예수님 이름으로 기도 합니다\n아멘";   // 빈 기록칸·카드 기도의 기도문 틀 (2026-10-24 사용자 요청)
   var DAILY_SOW=["돈을 하나님 나라를 위해 쓴 것이 있는가","시간을 하나님 나라를 위해 드렸는가","내 재능으로 누군가를 섬겼는가"];
