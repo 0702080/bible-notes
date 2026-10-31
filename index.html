@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-novoice">
+<meta name="app-build" content="2026-10-31-grad2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8979,7 +8979,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(nxt===3&&!n.mem.s[3]){n.mem.s[3]=now;got.push(3)}
     }
     var cur=(n.rv&&n.rv.gap)||(reviewInfo(n)||{}).gap||1, ok=C.grade==="g2";
-    n.rv=rvNext(n,ok,cur); if(rvNext.fresh)setTimeout(function(){toast("🎓 졸업! 이제 한 달에 한 번만 만나요")},600);
+    n.rv=rvNext(n,ok,cur,false);   // 암송 코치 연습으로는 졸업하지 않음 — 졸업 알림이 연습할 때마다 뜨던 것 (2026-10-31 사용자 요청)
     recordDrill(n.id,now-C.t0,wordsOf(n.text).length,false);
     C.got=got; scheduleSave(n.id);
   }
@@ -10047,10 +10047,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function firstLetters(t){return tokens(t).map(function(w){if(/^\s+$/.test(w))return w;var a=Array.from(w),out="",first=true;a.forEach(function(ch){if(/[가-힣A-Za-z0-9]/.test(ch)){out+=first?ch:"○";first=false}else out+=ch});return out}).join("")}
   function nextGap(cur){for(var i=0;i<REVIEW_GAP.length;i++)if(REVIEW_GAP[i]>cur)return REVIEW_GAP[i];return Math.min(180,Math.round(cur*2))}
   // 🎓 졸업: 기억났어요로 간격이 7일에 닿으면 졸업 → 한 달에 한 번만 복습. 헷갈리면 다시 외우는 중으로 (2026-10-31 사용자 요청)
-  function rvNext(n,ok,cur){
+  function rvNext(n,ok,cur,canGrad){
     var o=n.rv||{}, g=ok?nextGap(cur):1, grad=ok&&o.grad?o.grad:0;
     rvNext.fresh=false;
-    if(ok&&!grad&&g>=7){g=Math.max(g,30); grad=Date.now(); rvNext.fresh=true}
+    if(canGrad&&ok&&!grad&&g>=7){g=Math.max(g,30); grad=Date.now(); rvNext.fresh=true}
     return {at:Date.now(),gap:g,ok:(o.ok||0)+(ok?1:0),miss:(o.miss||0)+(ok?0:1),grad:grad};
   }
   function isGrad(n){return !!(n.rv&&n.rv.grad)}
@@ -10076,7 +10076,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(k==="say"){if(typeof sayWord==="function"&&canSpeak){try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(n.text);u.lang="ko-KR";u.rate=.9;window.speechSynthesis.speak(u)}catch(err){}}return}
         if(k==="ok"||k==="miss"){
           var cur=(n.rv&&n.rv.gap)||(reviewInfo(n)||{}).gap||1, ok=k==="ok";
-          n.rv=rvNext(n,ok,cur);
+          n.rv=rvNext(n,ok,cur,!!(reviewInfo(n)||{}).due);   // 복습할 날에 떠올려 기억났을 때만 졸업
           scheduleSave(n.id); ok?rqDone.ok++:rqDone.miss++;
           toast(rvNext.fresh?"🎓 졸업! 이제 한 달에 한 번만 만나요":ok?"🙂 "+n.rv.gap+"일 뒤에 다시 만나요":"😅 내일 다시 복습해요"); buzz(ok?[12,40,18]:15);
           rqI++; rqStage=0; drawRecall(); return;
