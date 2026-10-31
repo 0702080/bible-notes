@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-grad3">
+<meta name="app-build" content="2026-10-31-step3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12338,7 +12338,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var box=document.createElement("div"); box.className="tdstep"+(cnt>=tot?" alldone":"");
     var hd=document.createElement("div"); hd.className="tsh";
     hd.innerHTML='<b></b><span class="tsn"></span>';
-    hd.querySelector("b").textContent=cnt>=tot?"🌿 오늘의 한 걸음 완료":"🌅 오늘의 한 걸음";
+    hd.querySelector("b").textContent=cnt>=tot?"오늘의 한 걸음 완료 ✓":"오늘의 한 걸음";   // 앞 아이콘은 뺌 (2026-10-31 사용자 요청)
     hd.querySelector(".tsn").textContent=cnt+" / "+tot; box.appendChild(hd);
     function row(icon,label,sub,done,btns){
       var r=document.createElement("div"); r.className="tsrow"+(done?" done":"");
