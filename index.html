@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-walk1">
+<meta name="app-build" content="2026-10-31-walk2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2457,7 +2457,13 @@ button:active{filter:brightness(1.15)}
 .wkseg{display:flex;padding:3px;border-radius:999px;background:#0B0B0D;border:1px solid #232229}
 .wkopt button{height:30px;padding:0 12px;border:0;border-radius:999px;background:transparent;color:var(--muted);font-size:13px;white-space:nowrap;transition:background .15s,color .15s}
 .wkopt button.on{background:color-mix(in srgb,var(--gold) 20%,#1A1915);color:var(--gold);font-weight:700;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--gold) 45%,transparent)}
-@media (prefers-reduced-motion:reduce){.wkring.beat{animation:none}}
+.wkstat span.me{background:color-mix(in srgb,var(--pink) 14%,transparent);color:var(--pink)}
+.wkvr{display:flex;align-items:center;gap:6px}
+.wkopt button.wkrec{width:34px;height:34px;padding:0;border-radius:50%;border:1px solid #34333A;background:#16151A;color:#E05A5A;font-size:14px}
+.wkopt button.wkrec.has{border-color:color-mix(in srgb,#E05A5A 50%,#34333A)}
+.wkopt button.wkrec.rec{background:#E05A5A;color:#fff;animation:wkrec 1s ease-in-out infinite}
+@keyframes wkrec{50%{box-shadow:0 0 0 6px color-mix(in srgb,#E05A5A 25%,transparent)}}
+@media (prefers-reduced-motion:reduce){.wkring.beat,.wkopt button.wkrec.rec{animation:none}}
 .wktip{max-width:460px;margin:8px 0 0;font-size:13px;line-height:1.6;color:var(--faint)}
 .wklock{position:fixed;inset:0;z-index:5;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;touch-action:none;user-select:none;-webkit-user-select:none}
 .wklock[hidden]{display:none}
@@ -9006,7 +9012,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
      화면을 켜 둔 채 주머니에 넣고 걸으면, 걸음마다 말씀을 한 낱말(또는 한 글자)씩 이어폰으로 들려줌.
      웹앱은 화면이 꺼지면 걸음 센서를 못 읽어서 화면 꺼짐 방지(Wake Lock) + 어두운 잠금 화면으로 씀 */
   var WK=null, wkBox=null;
-  function wkPref(){var o={};try{o=JSON.parse(localStorage.getItem("bible-walk")||"{}")||{}}catch(e){} return {u:o.u==="c"?"c":"w",nx:o.nx?1:0,s:o.s==="hi"||o.s==="lo"?o.s:"md"}}
+  function wkPref(){var o={};try{o=JSON.parse(localStorage.getItem("bible-walk")||"{}")||{}}catch(e){} return {u:o.u==="c"?"c":"w",nx:o.nx?1:0,s:o.s==="hi"||o.s==="lo"?o.s:"md",v:o.v==="me"?"me":"tts"}}
   function wkSavePref(p){try{localStorage.setItem("bible-walk",JSON.stringify(p))}catch(e){}}
   function wkTokens(n,u){
     var t=String(n.text||"");
@@ -9024,6 +9030,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         '<div class="ccbody wkbody"><div class="wkref"></div><div class="wkring"><div class="wkword"></div><div class="wkprog"></div></div><div class="wkstat"></div><div class="wkline"></div>'+
         '<div class="wkset"><div class="wkopt"><span>한 걸음에</span><div class="wkseg"><button type="button" data-u="w">한 낱말</button><button type="button" data-u="c">한 글자</button></div></div>'+
         '<div class="wkopt"><span>끝나면</span><div class="wkseg"><button type="button" data-nx="0">🔁 반복</button><button type="button" data-nx="1">➡️ 다음 말씀</button></div></div>'+
+        '<div class="wkopt"><span>목소리</span><div class="wkvr"><div class="wkseg"><button type="button" data-v="tts">🤖 기계</button><button type="button" data-v="me">🎙️ 내 목소리</button></div><button type="button" class="wkrec" aria-label="내 목소리로 녹음">●</button></div></div>'+
         '<div class="wkopt"><span>걸음 감지</span><div class="wkseg"><button type="button" data-s="hi">예민</button><button type="button" data-s="md">보통</button><button type="button" data-s="lo">둔감</button></div></div></div>'+
         '</div>'+
         '<div class="ccfoot"><button type="button" class="ccbtn wkstep">👣 한 걸음</button><button type="button" class="ccbtn main wkgo">▶ 시작</button></div>'+
@@ -9033,7 +9040,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       wkBox.querySelector(".wkstep").addEventListener("click",function(){wkStep()});
       wkBox.querySelector(".wkgo").addEventListener("click",function(){WK.run?wkStop():wkStart()});
       wkBox.querySelectorAll(".wkopt button").forEach(function(b){b.addEventListener("click",function(){
-        var p=wkPref(); if(b.dataset.u){p.u=b.dataset.u; WK.toks=wkTokens(notes.get(WK.id),p.u); WK.i=0} if(b.dataset.nx)p.nx=+b.dataset.nx; if(b.dataset.s)p.s=b.dataset.s;
+        if(b.classList.contains("wkrec")){wkRecToggle(b);return}
+        var p=wkPref(); if(b.dataset.v){p.v=b.dataset.v; wkAudioStop(); if(p.v==="me"&&!WK.rec)toast("● 를 눌러 말씀을 읽어 녹음해 주세요")}
+        if(b.dataset.u){p.u=b.dataset.u; WK.toks=wkTokens(notes.get(WK.id),p.u); WK.i=0} if(b.dataset.nx)p.nx=+b.dataset.nx; if(b.dataset.s)p.s=b.dataset.s;
         wkSavePref(p); wkDraw();
       })});
       var lk=wkBox.querySelector(".wklock"), ht=0;
@@ -9046,8 +9055,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       window.addEventListener("devicemotion",wkMotion);
     }
     var p=wkPref();
-    WK={id:n.id,toks:wkTokens(n,p.u),i:0,run:false,steps:0,base:9.8,arm:true,last:0,lock:null,rounds:0};
-    wkBox.hidden=false; document.body.style.overflow="hidden"; wkDraw();
+    WK={id:n.id,toks:wkTokens(n,p.u),i:0,run:false,steps:0,base:9.8,arm:true,last:0,lock:null,rounds:0,rec:null};
+    wkBox.hidden=false; document.body.style.overflow="hidden"; wkDraw(); wkLoadRec();
   }
   function wkDraw(){
     if(!WK)return; var n=notes.get(WK.id)||{}, p=wkPref();
@@ -9061,21 +9070,63 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     wkBox.querySelector(".wkprog").textContent=WK.i+" / "+WK.toks.length;
     var st=wkBox.querySelector(".wkstat"); st.innerHTML='<span>👣 <b></b>걸음</span>'+(WK.rounds?'<span>🔁 <b></b>번 들었어요</span>':'');
     st.querySelectorAll("b")[0].textContent=WK.steps; if(WK.rounds)st.querySelectorAll("b")[1].textContent=WK.rounds;
-    wkBox.querySelectorAll(".wkopt button").forEach(function(b){b.classList.toggle("on",!!((b.dataset.u&&b.dataset.u===p.u)||(b.dataset.nx!=null&&+b.dataset.nx===p.nx)||(b.dataset.s&&b.dataset.s===p.s)))});
+    if(wkMine())st.insertAdjacentHTML("beforeend",'<span class="me">🎙️ 내 목소리</span>');
+    wkBox.querySelector(".wkrec").classList.toggle("has",!!WK.rec);
+    wkBox.querySelectorAll(".wkopt button").forEach(function(b){b.classList.toggle("on",!!((b.dataset.v&&b.dataset.v===p.v)||(b.dataset.u&&b.dataset.u===p.u)||(b.dataset.nx!=null&&+b.dataset.nx===p.nx)||(b.dataset.s&&b.dataset.s===p.s)))});
     wkBox.querySelector(".wkgo").textContent=WK.run?"■ 멈춤":"▶ 시작";
     wkBox.querySelector(".wklref").textContent=n.ref||""; wkBox.querySelector(".wklword").textContent=WK.i?cur:"";
   }
   function wkStep(){   // 한 걸음 = 다음 낱말(글자) 하나
     if(!WK)return; var n=notes.get(WK.id); if(!n)return;
     WK.steps++;
+    if(wkMine()){wkVoiceStep(); wkBeat(); return}
     if(WK.i>=WK.toks.length){   // 다 들었으면: 구절 이름 → 반복 또는 다음 말씀
-      WK.rounds++; var p=wkPref();
-      if(p.nx){var ord=(typeof ccShownOrder==="function"?ccShownOrder():sorted()).filter(function(x){return wordsOf(x.text||"").length}), at=-1; ord.forEach(function(x,k){if(x.id===WK.id)at=k});
-        var nx=ord[(at+1)%Math.max(1,ord.length)]; if(nx&&nx.id!==WK.id){WK.id=nx.id; WK.toks=wkTokens(nx,p.u); WK.rounds=0}}
-      WK.i=0; wkSay(refSay((notes.get(WK.id)||{}).ref||""),1.05); buzz(30); wkDraw(); return;
+      wkRound(); wkSay(refSay((notes.get(WK.id)||{}).ref||""),1.05); return;
     }
-    var t=WK.toks[WK.i++]; wkSay(t); wkDraw();
-    var rg=wkBox.querySelector(".wkring"); rg.classList.remove("beat"); void rg.offsetWidth; rg.classList.add("beat");   // 걸음마다 원이 톡
+    var t=WK.toks[WK.i++]; wkSay(t); wkDraw(); wkBeat();
+  }
+  function wkBeat(){var rg=wkBox.querySelector(".wkring"); rg.classList.remove("beat"); void rg.offsetWidth; rg.classList.add("beat")}   // 걸음마다 원이 톡
+  function wkRound(){   // 한 번 다 들음 → 반복 또는 다음 말씀
+    WK.rounds++; var p=wkPref(), moved=false;
+    if(p.nx){var ord=(typeof ccShownOrder==="function"?ccShownOrder():sorted()).filter(function(x){return wordsOf(x.text||"").length}), at=-1; ord.forEach(function(x,k){if(x.id===WK.id)at=k});
+      var nx=ord[(at+1)%Math.max(1,ord.length)]; if(nx&&nx.id!==WK.id){WK.id=nx.id; WK.toks=wkTokens(nx,p.u); WK.rounds=0; moved=true}}
+    WK.i=0; buzz(30); if(moved)wkLoadRec(); wkDraw();
+  }
+  /* 🎙️ 내 목소리로 걷기: 암송 코치 녹음(bible-voice)과 같은 녹음. 걷는 동안 이어서 재생, 1.6초 걸음이 없으면 멈춤 (2026-10-31 사용자 요청) */
+  function wkMine(){return !!(WK&&WK.rec&&wkPref().v==="me")}
+  function wkLoadRec(){if(!WK)return; var id=WK.id; WK.rec=null; wkAudioStop(); cvGet(id).then(function(b){if(WK&&WK.id===id){WK.rec=b; wkDraw()}})}
+  function wkAudioStop(){if(!WK)return; if(WK.au){try{WK.au.pause()}catch(e){} WK.au=null} if(WK.url){URL.revokeObjectURL(WK.url); WK.url=""} clearInterval(WK.tick); WK.tick=0}
+  function wkVoiceStep(){
+    WK.lastStep=Date.now();
+    if(!WK.au){
+      WK.url=URL.createObjectURL(WK.rec); var au=WK.au=new Audio(WK.url);
+      au.onended=function(){if(!WK||WK.au!==au)return; wkAudioStop(); wkRound()};
+    }
+    if(WK.au.paused)WK.au.play().catch(function(){});
+    if(!WK.tick)WK.tick=setInterval(function(){
+      if(!WK||!WK.au)return; var au=WK.au;
+      if(Date.now()-WK.lastStep>1600&&!au.paused)au.pause();
+      var d=au.duration; if(d&&isFinite(d)){var ni=Math.min(WK.toks.length,Math.round(au.currentTime/d*WK.toks.length)); if(ni!==WK.i){WK.i=ni; wkDraw()}}
+    },250);
+    wkDraw();
+  }
+  var wkRecR=null;
+  function wkRecToggle(btn){
+    if(wkRecR&&wkRecR.state==="recording"){try{wkRecR.stop()}catch(e){} return}
+    if(!navigator.mediaDevices||!window.MediaRecorder){toast("이 브라우저에서는 녹음을 할 수 없어요");return}
+    if(WK.run)wkStop(); wkAudioStop(); try{window.speechSynthesis.cancel()}catch(e){}
+    var id=WK.id;
+    navigator.mediaDevices.getUserMedia({audio:true}).then(function(stream){
+      var ch=[], r=new MediaRecorder(stream); wkRecR=r;
+      r.ondataavailable=function(ev){if(ev.data&&ev.data.size)ch.push(ev.data)};
+      r.onstop=function(){
+        stream.getTracks().forEach(function(t){t.stop()}); wkRecR=null; btn.classList.remove("rec");
+        if(!ch.length){toast("녹음된 소리가 없어요");return}
+        var blob=new Blob(ch,{type:r.mimeType||"audio/webm"});
+        cvPut(id,blob).then(function(){var p=wkPref(); p.v="me"; wkSavePref(p); if(WK&&WK.id===id)WK.rec=blob; toast("🎙️ 내 목소리로 저장했어요 · ▶ 시작하고 걸어 보세요"); wkDraw()}).catch(function(){toast("녹음을 저장하지 못했어요")});
+      };
+      r.start(); btn.classList.add("rec"); buzz(20); toast("● 녹음 중 — 말씀을 다 읽고 ● 를 다시 누르세요");
+    }).catch(function(){toast("마이크를 쓸 수 없어요")});
   }
   function wkMotion(e){   // 흔들림 크기의 봉우리 하나 = 한 걸음
     if(!WK||!WK.run)return; var a=e.accelerationIncludingGravity; if(!a||a.x==null)return;
@@ -9086,12 +9137,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   function wkWake(){try{if(navigator.wakeLock&&WK&&WK.run)navigator.wakeLock.request("screen").then(function(l){WK.lock=l}).catch(function(){})}catch(e){}}
   function wkStart(){
-    var go=function(){WK.run=true; WK.arm=true; wkWake(); wkBox.querySelector(".wklock").hidden=false; wkSay("시작합니다",1.1); wkDraw()};
+    var go=function(){WK.run=true; WK.arm=true; wkWake(); wkBox.querySelector(".wklock").hidden=false; if(wkMine())wkVoiceStep(); else wkSay("시작합니다",1.1); wkDraw()};
     if(window.DeviceMotionEvent&&typeof DeviceMotionEvent.requestPermission==="function"){DeviceMotionEvent.requestPermission().then(function(r){if(r!=="granted")toast("움직임 센서를 허용해야 걸음을 느껴요 · 👣 한 걸음으로도 들을 수 있어요"); go()}).catch(go)}
     else{if(!("ondevicemotion" in window))toast("이 기기에서는 걸음을 느낄 수 없어요 · 👣 한 걸음으로 들어 보세요"); go()}
   }
-  function wkStop(){if(!WK)return; WK.run=false; try{if(WK.lock)WK.lock.release()}catch(e){} WK.lock=null; try{window.speechSynthesis.cancel()}catch(e){} wkBox.querySelector(".wklock").hidden=true; wkDraw()}
-  function closeWalk(){if(!wkBox||wkBox.hidden)return; wkStop(); wkBox.hidden=true; document.body.style.overflow=ccBox&&!ccBox.hidden?"hidden":""; WK=null}
+  function wkStop(){if(!WK)return; WK.run=false; wkAudioStop(); try{if(WK.lock)WK.lock.release()}catch(e){} WK.lock=null; try{window.speechSynthesis.cancel()}catch(e){} wkBox.querySelector(".wklock").hidden=true; wkDraw()}
+  function closeWalk(){if(!wkBox||wkBox.hidden)return; if(wkRecR&&wkRecR.state==="recording"){try{wkRecR.stop()}catch(e){}} wkStop(); wkBox.hidden=true; document.body.style.overflow=ccBox&&!ccBox.hidden?"hidden":""; WK=null}
   /* ---------- 🎙️ 내 목소리로 녹음해 듣기 (2026-10-31 사용자 요청) ----------
      말씀마다 녹음 하나, 이 기기의 IndexedDB(bible-voice)에만 저장 — 클라우드로는 안 올림 */
   var cvDB=null, cvRec=null, cvAudio=null, cvURL="";
