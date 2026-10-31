@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-wkref">
+<meta name="app-build" content="2026-11-01-edge">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -16125,13 +16125,31 @@ body.carddrag #reviewBar{display:none!important}
     e.preventDefault();
     lmP.shift=e.shiftKey; if(lmP.type==="card")lmP.g.classList.toggle("lmcopy",!!e.shiftKey);   // Shift = 복제 표시
     lmP.g.style.left=(e.clientX-lmP.dx)+"px"; lmP.g.style.top=(e.clientY-lmP.dy)+"px";
+    lmP.cx=e.clientX; lmP.cy=e.clientY; lmEdge();
     document.querySelectorAll("#board .lmbefore,#board .lmafter,#board .lmover").forEach(function(x){x.classList.remove("lmbefore","lmafter","lmover")});
     var t=lmTarget(e.clientX,e.clientY); if(!t.cl)return;
     if(lmP.type==="col"){if(+t.cl.dataset.li!==lmP.li)t.cl.classList.add("lmover");return}
     if(t.cd&&t.cd.dataset.id!==lmP.ids[0]){var cr=t.cd.getBoundingClientRect(); t.cd.classList.add(e.clientY<cr.top+cr.height/2?"lmbefore":"lmafter")}
     else if(!t.cd)t.cl.classList.add("lmover");
   });
+  // 끄는 중 칸반 왼쪽·오른쪽 끝에 가까이 가면 그쪽으로 저절로 넘어감 — 화면 밖 칸으로도 옮길 수 있게 (2026-11-01 사용자 요청)
+  var lmEdgeT=0;
+  function lmEdge(){
+    if(lmEdgeT)return;
+    var step=function(){
+      lmEdgeT=0; if(!lmP||!lmP.on)return;
+      var bd=$("board"), r=bd.getBoundingClientRect(), z=90, v=0;
+      if(lmP.cx>r.right-z)v=Math.min(1,(lmP.cx-(r.right-z))/z); else if(lmP.cx<r.left+z)v=-Math.min(1,((r.left+z)-lmP.cx)/z);
+      if(!v)return;
+      var l0=bd.scrollLeft; bd.scrollLeft+=Math.round(v*22); if(bd.scrollLeft===l0)return;
+      document.querySelectorAll("#board .lmover").forEach(function(x){x.classList.remove("lmover")});
+      var t=lmTarget(lmP.cx,lmP.cy); if(t.cl&&lmP.type==="col"&&+t.cl.dataset.li!==lmP.li)t.cl.classList.add("lmover");
+      lmEdgeT=setTimeout(step,16);
+    };
+    lmEdgeT=setTimeout(step,16);
+  }
   function lmEnd(e,cancel){
+    if(lmEdgeT){clearTimeout(lmEdgeT);lmEdgeT=0}
     var d=lmP; lmP=null; lmDrag=null; if(!d||!d.on)return;
     if(d.g)d.g.remove(); document.body.classList.remove("lmmoving"); lmClear();
     // 끌고 난 뒤 따라오는 click(카드 열기)은 한 번 막음
