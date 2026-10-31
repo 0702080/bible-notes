@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-kbbg2">
+<meta name="app-build" content="2026-11-01-appbg">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1798,7 +1798,8 @@ body.boardon .wrap{max-width:none;padding-left:20px;padding-right:20px}
 /* 칸반에서는 화면을 꽉 채운다: 머리 줄은 늘 제자리, 가로 스크롤바 밑 빈 자리 없음 (2026-10-17 사용자 요청) */
 body.boardon{height:100vh;overflow:hidden}
 /* 칸반 배경: 은행나무 길 사진을 뿌옇게 흐려서 (2026-11-01 사용자 요청) */
-body.boardon{background:linear-gradient(rgba(10,10,13,.38),rgba(10,10,13,.38)),url(kanban-bg2.jpg) center/cover no-repeat fixed,#0b0b0d}   /* 미리 흐리게 만든 사진을 바탕에 바로 깔기 — 덧그리기(::before)는 가려질 수 있어서 (2026-11-01) */
+#appbg{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:-1;pointer-events:none;background:linear-gradient(rgba(10,10,13,.5),rgba(10,10,13,.5)),url(kanban-bg2.jpg) center/cover no-repeat,#0b0b0d}   /* 뿌연 은행나무 길 배경 — 휴대폰·칸반 모두 (2026-11-01 사용자 요청) */
+body.boardon #appbg{background:linear-gradient(rgba(10,10,13,.38),rgba(10,10,13,.38)),url(kanban-bg2.jpg) center/cover no-repeat,#0b0b0d}
 body.boardon .wrap{height:100vh;display:flex;flex-direction:column;padding-bottom:0;box-sizing:border-box}
 body.boardon .top,body.boardon .toolbar,body.boardon .topicbar,body.boardon .filter{flex:0 0 auto}
 body.boardon .board4{flex:1 1 auto;height:auto;min-height:0;padding-bottom:12px;margin-bottom:0}   /* 칸 아래 여백 = 위 여백 12px (2026-10-25 사용자 요청) */
@@ -3909,7 +3910,7 @@ body.carddrag #reviewBar{display:none!important}
 .note .qbtns .mpriv.on{background:transparent;color:var(--gold)}
 </style>
 </head>
-<body>
+<body><div id="appbg" aria-hidden="true"></div>
 <main class="wrap">
   <header class="top">
     <h1 class="sr-only">말씀 묵상 노트</h1>
