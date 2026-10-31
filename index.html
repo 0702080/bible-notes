@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-walkswipe">
+<meta name="app-build" content="2026-10-31-dlcal">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3107,6 +3107,44 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlfindhit b{margin-right:6px;color:var(--sky);font-weight:700}
 .dlnohit{margin:18px auto;max-width:608px;padding:14px;border:1px dashed #2E2D34;border-radius:12px;color:var(--faint);font-size:13px;text-align:center}
 @media (max-width:420px){.dlfix{gap:8px;padding:8px 12px}.dlday{gap:6px}.dldate{font-size:14px;min-width:96px}.dlday button{width:28px;height:28px;font-size:12px}.dlcnt{font-size:13.5px}}
+/* 📅 하루 돌아보기 위쪽 달력 (2026-10-31 사용자 요청) */
+.dlcal{display:none}
+.daily.dlhascal .dlfix>.dlday,.daily.dlhascal .dlfix>.dlprog,.daily.dlhascal .dlweek{display:none}
+.daily.dlhascal .dlfix{display:block;padding-top:6px;padding-bottom:8px}
+.daily.dlhascal .dlcal{display:block}
+.dlch{display:flex;align-items:center;gap:4px;margin-bottom:6px}
+.dlcm{width:30px;height:30px;border-radius:50%;border:1px solid #2A2930;background:transparent;color:var(--ink);font-size:18px;line-height:1;display:grid;place-items:center;cursor:pointer;padding:0}
+.dlcm:disabled{opacity:.3;cursor:default}
+.dlcmt{border:0;background:transparent;color:var(--ink);font:inherit;font-size:16px;font-weight:700;padding:4px 6px;cursor:pointer;white-space:nowrap}
+.dlcsum{margin-left:auto;display:flex;align-items:baseline;gap:6px;font-size:13px;color:var(--muted);white-space:nowrap}
+.dlcsum b{font-weight:600;color:var(--ink)}
+.dlcsum em{font-style:normal;color:var(--faint)}
+.dlcsum.ok em{color:var(--gold);font-weight:700}
+.dlcfold{width:30px;height:30px;border-radius:50%;border:0;background:#1A1920;color:var(--muted);font-size:12px;cursor:pointer;margin-left:2px;padding:0}
+.dlcdow,.dlcg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dlcdow span{text-align:center;font-size:11px;color:var(--faint);padding-bottom:2px}
+.dlcdow span:first-child{color:color-mix(in srgb,var(--pink) 70%,var(--faint))}
+.dlcdow span:last-child{color:color-mix(in srgb,var(--sky) 70%,var(--faint))}
+.dlcd{position:relative;height:40px;border-radius:10px;border:0;padding:0;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  background:color-mix(in srgb,var(--gold) calc(var(--f,0) * 85%),#16151B);color:var(--ink);transition:box-shadow .15s,transform .1s}
+.dlcd.dlce{background:transparent;cursor:default}
+.dlcd b{font-size:13.5px;font-weight:600;line-height:1}
+.dlcd i{font-style:normal;font-size:9.5px;font-weight:700;line-height:1;min-height:9.5px;color:color-mix(in srgb,var(--ink) 70%,transparent)}
+.dlcd.hi b,.dlcd.hi i{color:#141416}
+.dlcd.ok:not(.hi) i{color:var(--gold)}
+.dlcd.sun:not(.hi) b{color:color-mix(in srgb,var(--pink) 75%,var(--ink))}
+.dlcd.sat:not(.hi) b{color:color-mix(in srgb,var(--sky) 75%,var(--ink))}
+.dlcd.today b{font-weight:800}
+.dlcd.today:not(.hi) b{color:var(--sky)}
+.dlcd.cur{box-shadow:0 0 0 2px var(--gold),0 0 12px rgba(232,192,106,.35)}
+.dlcd:disabled{opacity:.28;cursor:default}
+.dlcd:not(:disabled):active{transform:scale(.94)}
+.dlcg.dlcin-l{animation:dlcinl .25s ease-out}
+.dlcg.dlcin-r{animation:dlcinr .25s ease-out}
+@keyframes dlcinl{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+@keyframes dlcinr{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.dlcg.dlcin-l,.dlcg.dlcin-r{animation:none}}
+@media (max-width:420px){.dlcd{height:36px;border-radius:9px}.dlcdow,.dlcg{gap:3px}.dlcmt{font-size:15px}.dlcsum{font-size:12.5px}}
 .dlw{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 0;border:0;background:transparent;font:inherit;cursor:pointer}
 .dlw i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;color:#141416;background:color-mix(in srgb,var(--gold) calc(var(--f) * 100%),#1c1b21)}
 .dlw b{font-size:11px;color:var(--faint);font-weight:500}
@@ -10443,7 +10481,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         '<form class="dlnewg" autocomplete="off" hidden><input class="field dlge" maxlength="4" placeholder="🙂" aria-label="묶음 이모지"><input class="field dlgn" maxlength="14" placeholder="새 묶음 이름 (예: 가정, 일터)" aria-label="새 묶음 이름"><button type="submit">+ 묶음</button></form>'+
         '</div>'+
         '<div class="dlfix"><div class="dlday"><button type="button" class="dlprev" aria-label="전날">◀</button><label class="dldatew" title="눌러서 날짜 고르기"><b class="dldate"></b><input type="date" class="dlpick" aria-label="날짜 고르기"></label><button type="button" class="dlnext" aria-label="다음 날">▶</button></div>'+
-        '<div class="dlprog"><span class="dlcnt"></span><span class="dlbarw"><i></i></span></div></div>'+
+        '<div class="dlprog"><span class="dlcnt"></span><span class="dlbarw"><i></i></span></div>'+
+        // 📅 달력: 위쪽을 달력 모양으로 (2026-10-31 사용자 요청)
+        '<div class="dlcal"><div class="dlch"><button type="button" class="dlcm" data-m="-1" aria-label="지난달">‹</button><button type="button" class="dlcmt" title="눌러서 오늘로"></button><button type="button" class="dlcm" data-m="1" aria-label="다음 달">›</button><span class="dlcsum"></span><button type="button" class="dlcfold" aria-label="달력 접기"></button></div>'+
+        '<div class="dlcdow"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="dlcg"></div></div></div>'+
         '<div class="dlbody"><div class="dlweek" aria-label="최근 7일"></div>'+
         '<div class="dlsearch"><input class="dlsin" type="search" placeholder="묶음 · 항목 · 기록 찾기 (초성도 돼요)" aria-label="하루 돌아보기에서 찾기"><span class="dlsn"></span><button type="button" class="dlsx" hidden>지우기</button></div>'+
         '<div class="dllist"></div>'+
@@ -10473,7 +10514,23 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       dl.querySelector(".dlprev").addEventListener("click",function(){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()-864e5);drawDaily()});
       dl.querySelector(".dlnext").addEventListener("click",function(){var t=dkey(Date.now());if(dlDay<t){dlDay=dkey(new Date(dlDay+"T12:00:00").getTime()+864e5);drawDaily()}});
       dl.querySelector(".dlweek").addEventListener("click",function(e){var b=e.target.closest(".dlw");if(b&&b.dataset.day&&b.dataset.day!==dlDay){dlDay=b.dataset.day;drawDaily()}});   // 요일 칸을 누르면 그날로
-      dlWeekSwipe(dl.querySelector(".dlweek"));   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
+      dlWeekSwipe(dl.querySelector(".dlweek"));
+      dl.classList.add("dlhascal");
+      (function(){   // 📅 달력 조작: 날 누르기, 달 넘기기(‹ › 또는 좌우로 밀기), 제목 누르면 오늘, 접기
+        var cal=dl.querySelector(".dlcal"), g=cal.querySelector(".dlcg");
+        cal.addEventListener("click",function(e){
+          var c=e.target.closest(".dlcd"); if(c&&c.dataset.day&&!c.disabled){if(c.dataset.day!==dlDay){dlDay=c.dataset.day; dlCalM=""; drawDaily()} return}
+          var m=e.target.closest(".dlcm"); if(m&&!m.disabled){dlCalShift(+m.dataset.m); return}
+          if(e.target.closest(".dlcmt")){var t=dkey(Date.now()); dlCalM=""; if(dlDay!==t){dlDay=t} drawDaily(); return}
+          if(e.target.closest(".dlcfold")){dlCalFold=!dlCalFold; try{localStorage.setItem("bible-dl-calfold",dlCalFold?"1":"0")}catch(err){} drawDaily()}
+        });
+        var sx=null, sy=0;
+        g.addEventListener("pointerdown",function(e){sx=e.clientX; sy=e.clientY});
+        g.addEventListener("pointerup",function(e){if(sx==null)return; var dx=e.clientX-sx, dy=e.clientY-sy; sx=null; if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){dlCalShift(dx<0?1:-1); dlCalEat=Date.now()}});
+        g.addEventListener("pointercancel",function(){sx=null});
+        g.addEventListener("click",function(e){if(Date.now()-dlCalEat<350){e.stopPropagation(); e.preventDefault()}},true);
+        g.style.touchAction="pan-y";
+      })();   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
       dl.querySelector(".dlfocusbtn").addEventListener("click",function(){dlFocus=!dlFocus; dlFocusSkip=0; dlEdit=false; try{localStorage.setItem("bible-dl-focus",dlFocus?"1":"")}catch(err){} drawDaily()});
       dl.querySelector(".dledit:not(.dlfocusbtn)").addEventListener("click",function(){dlEdit=!dlEdit;dlEditId="";dlGEditId="";dlMemoId="";drawDaily()});
       // 기록칸에 적으면 바로 저장
@@ -10742,7 +10799,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&dl&&!dl.hidden)closeDaily()});
       dlDragInit(dl.querySelector(".dllist"));
     }
-    dlDay=(day&&/^\d{4}-\d{2}-\d{2}$/.test(day))?day:dkey(Date.now()); dlWEnd="";
+    dlDay=(day&&/^\d{4}-\d{2}-\d{2}$/.test(day))?day:dkey(Date.now()); dlWEnd=""; dlCalM="";
     dlEdit=false; dlEditId=""; dlGEditId=""; dlMemoId="";
     dlFind=""; var si0=dl.querySelector(".dlsin"); if(si0)si0.value="";
     if(focusId){   // 찾기에서 들어오면 그 항목의 기록을 펼쳐 둔다
@@ -11129,6 +11186,42 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     return true;
   }
   var dlFocus=false, dlFocusSkip=0; try{dlFocus=localStorage.getItem("bible-dl-focus")==="1"}catch(e){}
+  var dlCalM="", dlCalEat=0, dlCalFold=false; try{dlCalFold=localStorage.getItem("bible-dl-calfold")==="1"}catch(e){}
+  function dlCalShift(n){   // 달 넘기기: 보는 달만 바뀌고, 고른 날은 그대로 (이번 달 너머는 못 감)
+    var base=dlCalM||dlDay.slice(0,7), d=new Date(base+"-01T12:00:00"); d.setMonth(d.getMonth()+n);
+    var k=dkey(d.getTime()).slice(0,7); if(k>dkey(Date.now()).slice(0,7))return;
+    dlCalM=k===dlDay.slice(0,7)?"":k; buzz(8); drawDaily();
+    var g=dl.querySelector(".dlcg"); if(g){g.classList.remove("dlcin-l","dlcin-r"); void g.offsetWidth; g.classList.add(n>0?"dlcin-l":"dlcin-r")}
+  }
+  function dlCalDraw(o,tot,today){
+    var cal=dl.querySelector(".dlcal"); if(!cal)return;
+    var mk=dlCalM||dlDay.slice(0,7), y=+mk.slice(0,4), m=+mk.slice(5,7);
+    var fold=dlCalFold&&!dlCalM;
+    cal.classList.toggle("fold",fold);
+    cal.querySelector(".dlcmt").textContent=y+"년 "+m+"월";
+    cal.querySelector('.dlcm[data-m="1"]').disabled=mk>=today.slice(0,7);
+    var cc0=dailyChecked(o,dlDay).length;
+    cal.querySelector(".dlcsum").innerHTML='<b></b><em></em>';
+    cal.querySelector(".dlcsum b").textContent=(dlDay===today?"오늘":dayName(dlDay));
+    cal.querySelector(".dlcsum em").textContent=(cc0?"✓ ":"")+cc0+"/"+tot;
+    cal.querySelector(".dlcsum").classList.toggle("ok",cc0>0);
+    var fb=cal.querySelector(".dlcfold"); fb.textContent=fold?"▾":"▴"; fb.setAttribute("aria-label",fold?"달력 펼치기":"달력 접기");
+    var g=cal.querySelector(".dlcg"); g.textContent="";
+    var first=new Date(y,m-1,1,12), lead=first.getDay(), days=new Date(y,m,0).getDate();
+    var cells=[]; for(var i=0;i<lead;i++)cells.push(null); for(var dd=1;dd<=days;dd++)cells.push(mk+"-"+("0"+dd).slice(-2)); while(cells.length%7)cells.push(null);
+    var rows=[]; for(var r=0;r<cells.length;r+=7)rows.push(cells.slice(r,r+7));
+    if(fold){var fr=rows.filter(function(rw){return rw.indexOf(dlDay)>=0})[0]; if(fr)rows=[fr]}
+    rows.forEach(function(rw){rw.forEach(function(k,ci){
+      if(!k){var e=document.createElement("span"); e.className="dlcd dlce"; g.appendChild(e); return}
+      var cc=dailyChecked(o,k).length, b=document.createElement("button"); b.type="button"; b.dataset.day=k;
+      b.className="dlcd"+(k===dlDay?" cur":"")+(k===today?" today":"")+(cc?" ok":"")+(ci===0?" sun":ci===6?" sat":"");
+      var fr=tot?Math.min(1,cc/Math.max(1,Math.min(tot,10))):0; if(fr>=.5)b.classList.add("hi");   // 10개 하면 가장 진하게, 반 넘으면 글자를 어둡게
+      b.disabled=k>today; b.style.setProperty("--f",fr);
+      b.innerHTML='<b></b><i></i>'; b.querySelector("b").textContent=+k.slice(8); b.querySelector("i").textContent=cc||"";
+      b.setAttribute("aria-label",dayName(k)+(cc?", "+cc+"개 함":""));
+      g.appendChild(b);
+    })});
+  }
   function drawDaily(){
     var o=dailyData(), on=dailyChecked(o,dlDay), today=dkey(Date.now());
     dl.querySelector(".dldate").textContent=(dlDay===today?"오늘 ":dlDay===dkey(Date.now()-864e5)?"어제 ":"")+dayName(dlDay);
@@ -11168,6 +11261,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       d.querySelector("i").style.setProperty("--f",tot?(cc/tot):0); d.querySelector("i").textContent=cc||"";
       wk.appendChild(d);
     }
+    try{dlCalDraw(o,tot,today)}catch(e){}
     var list=dl.querySelector(".dllist"), outer=list; list.textContent="";
     var fbtn=dl.querySelector(".dlfocusbtn"); if(fbtn){fbtn.classList.toggle("on",dlFocus); fbtn.textContent=dlFocus?"🎯 집중 중":"🎯 집중"}
     list.classList.toggle("dlfocusing",dlFocus&&!dlEdit&&!dlFind);
