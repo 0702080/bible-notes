@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-kbline">
+<meta name="app-build" content="2026-11-01-kbflip">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1919,6 +1919,23 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcpal button.on{border-color:#fff}
 .bcpal button.auto{width:auto;height:26px;padding:0 10px;border-radius:13px;border:1px solid #3A3842;background:transparent;box-shadow:none;color:var(--muted);font-family:inherit;font-size:12px}
 .bcpal button.auto.on{border-color:var(--ink);color:var(--ink)}
+.bcol.bflipable .bclist,.bcol.bflipable .bcback{cursor:pointer}
+.bcol.bflipout{transform:perspective(1400px) rotateY(90deg);transition:transform .17s ease-in!important}
+.bcol.bflipin{animation:bflipin .26s cubic-bezier(.2,.8,.3,1.15)}
+@keyframes bflipin{from{transform:perspective(1400px) rotateY(-90deg)}}
+.bcback{display:none}
+.bcol.bback>.bclist,.bcol.bback>.bcjump{display:none}
+.bcol.bback>.bcback{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:none}
+.bcol.bback{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 24%,#201E26),color-mix(in srgb,var(--bc) 10%,#1C1A21) 320px)}
+.bcbkh{margin:0 2px 4px;color:var(--bc);font-size:13.5px;font-weight:700}
+.bcbkh em{font-style:normal;font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
+.bcbk{padding:9px 11px;border-radius:11px;background:#16151A;border:1px solid color-mix(in srgb,var(--bc) 14%,#26252B);display:flex;flex-direction:column;gap:2px}
+.bcbk b{color:color-mix(in srgb,var(--bc) 75%,#fff);font-size:13.5px;font-weight:700}
+.bcbk span{color:var(--muted);font-size:13px;line-height:1.45}
+.bcbk.has{opacity:.55}
+.bcbk.has b::after{content:" ✓";color:var(--green)}
+.bcbkf{margin:6px 2px 2px;color:var(--muted);font-size:11.5px;text-align:center}
+@media (prefers-reduced-motion:reduce){.bcol.bflipout,.bcol.bflipin{transform:none;animation:none}}
 @keyframes bcpalin{from{opacity:0;transform:translateY(-4px)}}
 .bcol.btint .bcaddin{border-color:color-mix(in srgb,var(--bc) 40%,transparent)}
 .bcol.bcust.lmland{animation:none}
@@ -4268,7 +4285,7 @@ body.carddrag #reviewBar{display:none!important}
   function renderKanban(){
     var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
     box.textContent=""; box.classList.remove("bsolo");
-    if(bMode==="list"){renderKanbanList(box);kbTint(box);kbFit(box);return}
+    if(bMode==="list"){renderKanbanList(box);kbTint(box);kbBackPrep(box);kbFit(box);return}
     var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
     sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
     var fresh=groups["new"];
@@ -4461,6 +4478,106 @@ body.carddrag #reviewBar{display:none!important}
       var e=c.querySelector(".bch .bce"); if(e){e.title="눌러서 칸 색 바꾸기"; e.setAttribute("role","button")}
     });
   }
+  /* 칸 뒤집기 (2026-11-01 사용자 요청): 이름에 '기도'가 든 내가 만든 칸은 누르면 휙 뒤집혀 뒷면에 기도에 관한 다른 말씀 목록이 보임.
+     카드 자세히 보기는 두 번 누르기. 뒷면은 구절 이름과 내 말로 쓴 짧은 뜻만 (본문은 넣지 않음 — 저작권) */
+  var KB_BACK={"기도":[
+    ["데살로니가전서 5:16-18","항상 기뻐하고, 쉬지 말고 기도하고, 범사에 감사하라"],
+    ["빌립보서 4:6-7","염려 대신 감사로 구하면 하나님의 평강이 마음을 지키심"],
+    ["골로새서 4:2","기도를 계속하고 감사함으로 깨어 있으라"],
+    ["로마서 12:12","소망 중에 즐거워하고 환난 중에 참고 기도에 힘쓰라"],
+    ["에베소서 6:18","모든 때에 성령 안에서 모든 성도를 위해 기도"],
+    ["베드로전서 4:7","마지막이 가까우니 정신 차리고 기도하라"],
+    ["사무엘상 12:23","너희를 위한 기도를 쉬는 것은 죄"],
+    ["마태복음 7:7-11","구하라, 찾으라, 두드리라 — 좋은 것을 주시는 아버지"],
+    ["마가복음 11:24","기도하고 구한 것은 받은 줄로 믿으라"],
+    ["요한복음 14:13-14","내 이름으로 구하면 내가 행하리라"],
+    ["요한복음 15:7","내 안에 거하면 구하는 대로 이루리라"],
+    ["요한복음 16:23-24","구하라, 받아서 기쁨이 충만하리라"],
+    ["요한일서 5:14-15","그의 뜻대로 구하면 들으심"],
+    ["예레미야 33:3","부르짖으라, 크고 은밀한 일을 보이리라"],
+    ["예레미야 29:12-13","온 마음으로 찾으면 만나리라"],
+    ["이사야 65:24","부르기 전에 응답하시고 말하는 중에 들으심"],
+    ["시편 50:15","환난 날에 나를 부르라, 건지리라"],
+    ["시편 91:15","부르면 응답하고 환난 때 함께하리라"],
+    ["시편 145:18-19","진실하게 부르는 자에게 가까이 하심"],
+    ["마태복음 6:5-8","보이려 말고 골방에서 은밀히"],
+    ["마태복음 6:9-13","주기도문"],
+    ["야고보서 1:5-6","지혜가 부족하면 의심 없이 믿음으로 구하라"],
+    ["야고보서 4:2-3","구하지 않아서, 잘못 구해서 받지 못함"],
+    ["히브리서 4:16","은혜의 보좌 앞에 담대히 나아가라"],
+    ["누가복음 18:9-14","바리새인과 세리의 기도"],
+    ["시편 62:8","시시로 그를 의지하고 마음을 토하라"],
+    ["시편 66:18","마음에 죄악을 품으면 듣지 않으심"],
+    ["잠언 15:29","의인의 기도를 들으심"],
+    ["베드로전서 5:7","염려를 다 주께 맡기라"],
+    ["누가복음 18:1-8","항상 기도하고 낙심하지 말라 (과부 비유)"],
+    ["누가복음 11:5-13","한밤중 친구 비유, 성령을 주심"],
+    ["마태복음 26:41","시험에 들지 않게 깨어 기도하라"],
+    ["야고보서 5:16-18","의인의 간구는 역사하는 힘이 큼 (엘리야)"],
+    ["마태복음 18:19-20","두 사람이 합심하여 구하면"],
+    ["사도행전 1:14","마음을 같이하여 기도에 힘씀"],
+    ["사도행전 4:31","빌기를 다하매 모인 곳이 진동"],
+    ["사도행전 12:5","교회가 베드로를 위해 간절히 기도"],
+    ["디모데전서 2:1-2","모든 사람과 임금들을 위해"],
+    ["야고보서 5:14-15","병든 자를 위한 믿음의 기도"],
+    ["역대하 7:14","겸비하여 기도하면 땅을 고치리라"],
+    ["로마서 8:26-27","성령이 말할 수 없는 탄식으로 간구하심"],
+    ["유다서 1:20","성령으로 기도하며 믿음 위에 서라"],
+    ["마가복음 1:35","새벽 한적한 곳에서 기도하신 예수님"],
+    ["누가복음 22:39-46","겟세마네 — 내 원대로 마시고"],
+    ["요한복음 17:1-26","예수님의 중보기도"],
+    ["사무엘상 1:10-18","마음을 쏟아 기도한 한나"],
+    ["역대상 4:10","야베스의 기도"],
+    ["열왕기하 20:1-6","울며 기도한 히스기야, 15년 더"],
+    ["느헤미야 1:4-11","금식하며 기도한 느헤미야"],
+    ["다니엘 6:10","하루 세 번 무릎 꿇은 다니엘"],
+    ["다니엘 9:3-19","다니엘의 회개 기도"],
+    ["요나 2:1-10","물고기 뱃속의 기도"],
+    ["사도행전 16:25","한밤중 옥중의 기도와 찬송"],
+    ["시편 5:3","아침에 기도하고 바라보리라"],
+    ["시편 55:17","저녁과 아침과 정오에"],
+    ["시편 141:2","내 기도가 분향함같이"],
+    ["요한계시록 8:3-4","성도의 기도가 향연과 함께 올라감"]
+  ]};
+  var kbBackOn={}, kbTapT=0, kbTapCard=null;
+  function kbBackList(cc){var k=Object.keys(KB_BACK).filter(function(t){return String(cc||"").indexOf(t)>=0})[0]; return k?KB_BACK[k]:null}
+  function kbBackHas(r){   // 내 말씀 카드에 이미 있는 구절인가
+    var m=String(r).match(/^([가-힣]+)\s*(\d+):(\d+)(?:-(\d+))?/); if(!m)return false;
+    var b=bookIndex(m[1]), c=+m[2], v1=+m[3], v2=+(m[4]||m[3]), hit=false;
+    notes.forEach(function(n){if(!hit&&n.book===b&&n.chapter===c&&n.verse>=v1&&n.verse<=v2)hit=true});
+    return hit;
+  }
+  function kbBackPrep(box){
+    Array.prototype.forEach.call(box.querySelectorAll(":scope>.bcol.bcust"),function(cl){
+      var ls=kbBackList(cl.dataset.cc); if(!ls)return;
+      cl.classList.add("bflipable"); cl.classList.toggle("bback",!!kbBackOn[cl.dataset.k]);
+      var bk=document.createElement("div"); bk.className="bcback";
+      var have=0, rows=ls.map(function(x){var h=kbBackHas(x[0]); if(h)have++;
+        return '<div class="bcbk'+(h?' has':'')+'"><b></b><span></span></div>'});
+      bk.innerHTML='<p class="bcbkh">🔄 기도에 관한 다른 말씀 <em></em></p>'+rows.join("")+'<p class="bcbkf">누르면 앞면으로 · 본문은 직접 담아 주세요</p>';
+      bk.querySelector(".bcbkh em").textContent=ls.length+"곳"+(have?" · ✓ "+have+" 담음":"");
+      var it=bk.querySelectorAll(".bcbk"); ls.forEach(function(x,i){it[i].querySelector("b").textContent=x[0]; it[i].querySelector("span").textContent=x[1]});
+      cl.insertBefore(bk,cl.querySelector(".bcjump"));
+    });
+  }
+  function kbFlip(cl){
+    var k=cl.dataset.k; kbBackOn[k]=!kbBackOn[k]; buzz(8);
+    if(matchMedia("(prefers-reduced-motion: reduce)").matches){cl.classList.toggle("bback",kbBackOn[k]);return}
+    cl.classList.remove("bflipin"); cl.classList.add("bflipout");
+    setTimeout(function(){cl.classList.remove("bflipout"); cl.classList.toggle("bback",kbBackOn[k]); void cl.offsetWidth; cl.classList.add("bflipin");
+      setTimeout(function(){cl.classList.remove("bflipin")},260)},170);
+  }
+  // 한 번 누르면 뒤집기, 두 번 누르면(카드 위) 자세히 보기
+  $("board").addEventListener("click",function(e){
+    if(bMode!=="list")return;
+    var cl=e.target.closest(".bcol.bflipable"); if(!cl||cl.classList.contains("bfold"))return;
+    if(e.target.closest("button,input,textarea,a,.bch,.bcpal"))return;
+    e.stopPropagation(); e.preventDefault();
+    var cd=cl.classList.contains("bback")?null:e.target.closest(".bcard");
+    if(kbTapT&&cd&&kbTapCard===cd){clearTimeout(kbTapT); kbTapT=0; kbTapCard=null; boardOpen(cd.dataset.id); return}
+    if(kbTapT){clearTimeout(kbTapT)}
+    kbTapCard=cd; kbTapT=setTimeout(function(){kbTapT=0; kbTapCard=null; if(cl.isConnected)kbFlip(cl)},cd?280:0);
+  },true);
   function kbPalClose(){document.querySelectorAll("#board .bcpal").forEach(function(x){x.remove()})}
   $("board").addEventListener("click",function(e){
     if(bMode!=="list")return;
