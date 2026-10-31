@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-vseg1">
+<meta name="app-build" content="2026-10-31-vseg3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9175,13 +9175,34 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var st=0; while(st<nF&&sm[st]<th)st++; var ed=nF-1; while(ed>st&&sm[ed]<th)ed--;
     if(ed-st<5){st=0;ed=nF-1}
     var W=words.map(vWeight), tot=W.reduce(function(x,y){return x+y},0)||1, bnd=[st], acc=0, span=ed-st, avg=span/Math.max(1,words.length);
+    // 조용한 골짜기들(쉼) 가운데 낱말 수만큼 경계를 고름: 낱말 길이가 글자 수 비율에 가깝고, 경계가 조용할수록 좋음
+    var n=words.length, cand=[st];
+    for(f=st+3;f<=ed-3;f++){var mn=true; for(j=f-3;j<=f+3;j++)if(sm[j]<sm[f]){mn=false;break} if(mn&&f-cand[cand.length-1]>2)cand.push(f)}
+    cand.push(ed);
+    var m=cand.length;
+    if(n>1&&m-1>=n){
+      var E=W.map(function(w){return Math.max(3,span*w/tot)}), INF=1e18, dp=new Float64Array(m).fill(INF), bk=[];
+      var bc=function(c){return c===m-1?0:4*sm[cand[c]]/(hi||1)}, lc=function(d,e){var r=(d-e)/e; return r*r};
+      for(var c=1;c<m;c++)dp[c]=lc(cand[c]-st,E[0])+bc(c);
+      for(var i=1;i<n;i++){
+        var nd=new Float64Array(m).fill(INF), b=new Int32Array(m).fill(-1), mx=E[i]*3+30;
+        for(c=i+1;c<m;c++){var bcC=bc(c); for(var pp=c-1;pp>=i;pp--){var d=cand[c]-cand[pp]; if(d>mx)break; if(dp[pp]>=INF)continue; var v=dp[pp]+lc(d,E[i])+bcC; if(v<nd[c]){nd[c]=v;b[c]=pp}}}
+        bk.push(b); dp=nd;
+      }
+      if(dp[m-1]<INF){
+        var path=[m-1]; for(i=n-2;i>=0;i--)path.unshift(bk[i][path[0]]);
+        if(path.every(function(x){return x>=0})){bnd=[st].concat(path.map(function(x){return cand[x]})); words=[]; var dpScore=dp[m-1]/n}
+      }
+    }
     for(var i=0;i<words.length-1;i++){
       acc+=W[i]; var ideal=st+span*acc/tot, rad=Math.max(4,Math.round(avg*0.45)), best=Math.round(ideal), bv=Infinity;
       for(var q=Math.round(ideal-rad);q<=Math.round(ideal+rad);q++){if(q<=bnd[bnd.length-1]+2||q>=ed)continue; var v=sm[q]*(1+Math.abs(q-ideal)/rad*0.6); if(v<bv){bv=v;best=q}}
       bnd.push(Math.max(bnd[bnd.length-1]+1,best));
     }
-    bnd.push(ed);
-    var out=[]; for(i=0;i<words.length;i++)out.push([Math.max(0,(bnd[i]-2)*0.01),Math.min(buf.duration,(bnd[i+1]+3)*0.01)]);
+    if(words.length)bnd.push(ed);
+    var out=[], sc=0; for(i=0;i<bnd.length-1;i++)out.push([Math.max(0,(bnd[i]-2)*0.01),Math.min(buf.duration,(bnd[i+1]+3)*0.01)]);
+    for(i=1;i<bnd.length-1;i++)sc+=sm[bnd[i]]/(hi||1);
+    out.score=typeof dpScore==="number"?dpScore:bnd.length>2?sc/(bnd.length-2):1;   // 경계가 조용한 곳에 잘 떨어졌을수록 작음
     return out;
   }
   function vPrep(id){   // 이 말씀의 녹음을 미리 풀어 둠 (없으면 아무 일 없음)
@@ -9191,7 +9212,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(!b){vSeg.delete(id);return}
       var ac=vAC(); if(!ac){return}
       return b.arrayBuffer().then(function(ab){return new Promise(function(res,rej){ac.decodeAudioData(ab,res,rej)})}).then(function(buf){
-        var ws=wordsOf(n.text||""); vSeg.set(id,{buf:buf,seg:vSplit(buf,ws),src:n.text});
+        // 구절 이름(요한복음 사장 십사절)을 앞이나 뒤에 읽었을 수도 있어서 넷 다 맞춰 보고 경계가 가장 조용한 쪽을 고름 (2026-10-31 사용자 요청)
+        var ws=wordsOf(n.text||""), rw=refSay(n.ref||"").split(/\s+/).filter(Boolean), best=null;
+        [[0,0],[1,0],[1,1],[0,1]].forEach(function(h){
+          if((h[0]||h[1])&&!rw.length)return;
+          var sg=vSplit(buf,(h[0]?rw:[]).concat(ws,h[1]?rw:[])), k=h[0]?rw.length:0; if(h[0]||h[1])sg.score*=0.8;   // 구절 이름은 읽는 사람이 많아 조금 더 믿어 줌
+          if(!best||sg.score<best.score)best={score:sg.score,seg:sg.slice(k,k+ws.length)};
+        });
+        vSeg.set(id,{buf:buf,seg:best.seg,src:n.text});
       });
     }).catch(function(){vSeg.delete(id)});
   }
