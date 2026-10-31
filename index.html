@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-cv1">
+<meta name="app-build" content="2026-10-31-vseg1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8499,7 +8499,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           scheduleSave(np.id); buzz(8); return;
         }
         var wt=String(w.dataset.w||w.textContent||"").trim();
-        if(wt)sayWord(wt,true);   // 누를 때마다 그 낱말 소리 (2026-10-17 사용자 요청)
+        var wAll=ccBox.querySelectorAll(".ccverse .ccw"), wIx=Array.prototype.indexOf.call(wAll,w);
+        if(wt&&!vWord(C.id,wIx))sayWord(wt,true);   // 누를 때마다 그 낱말 소리 — 녹음이 있으면 내 목소리로 (2026-10-31 사용자 요청)
         // 떠올리기: 한 소절씩 눌러 맨 끝 낱말까지 오면 암송 완료로 셈하고 다음 말씀(다음 번째)으로 (2026-10-23 사용자 요청)
         // 낱말을 하나씩 다 눌러야(순서 상관없이 모두 한 번씩) 암송으로 셈 — 끝 낱말만 눌러서는 안 셈 (2026-10-29 사용자 요청)
         var ws=ccBox.querySelectorAll(".ccverse .ccw"), wsi=Array.prototype.indexOf.call(ws,w), tk=C.seed+":"+C.stage;
@@ -8546,6 +8547,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     ccBox.querySelector(".ccref").textContent=n.ref;
     if(typeof cvSync==="function")cvSync();
     ccBox.querySelector(".ccvref").textContent=n.ref;   // 말씀 바로 위에 구절 이름 (2026-10-21 사용자 요청)
+    try{vPrep(n.id)}catch(e){}
     var cn=ccBox.querySelector(".ccnum"); cn.hidden=false; cn.textContent="암송 "+ccCount(n); cn.title="이 말씀을 끝까지 외운 횟수 (카드의 \"암송 N\"과 같은 숫자, 끝까지 하면 하나 올라요)";   // 카드 숫자와 똑같이 (2026-10-23 사용자 요청)   // 이 말씀 연습 누적 횟수 — 다시 열어도 이어짐 (2026-10-23 사용자 요청)
     if(C.order>=2){cn.classList.remove("bump");void cn.offsetWidth;cn.classList.add("bump")}
     var wasOpen=!ccBox.hidden;
@@ -9160,7 +9162,51 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     });
   }
   function cvGet(id){return cvOpen().then(function(db){return new Promise(function(res){var r=db.transaction("v").objectStore("v").get(id); r.onsuccess=function(){res(r.result||null)}; r.onerror=function(){res(null)}})}).catch(function(){return null})}
-  function cvPut(id,blob){return cvOpen().then(function(db){return new Promise(function(res,rej){var t=db.transaction("v","readwrite"); if(blob)t.objectStore("v").put(blob,id); else t.objectStore("v").delete(id); t.oncomplete=function(){res()}; t.onerror=function(){rej(t.error)}})})}
+  function cvPut(id,blob){vSeg.delete(id); return cvOpen().then(function(db){return new Promise(function(res,rej){var t=db.transaction("v","readwrite"); if(blob)t.objectStore("v").put(blob,id); else t.objectStore("v").delete(id); t.oncomplete=function(){res()}; t.onerror=function(){rej(t.error)}})})}
+  /* 🎙️ 낱말 하나만 내 목소리로: 녹음을 글자 수 비율로 나누고, 그 근처에서 소리가 가장 작아지는 곳(띄어 읽은 곳)에 경계를 맞춤 (2026-10-31 사용자 요청) */
+  var vSeg=new Map(), vCtx=null, vSrc=null;
+  function vAC(){if(!vCtx){var A=window.AudioContext||window.webkitAudioContext; if(A)vCtx=new A()} return vCtx}
+  function vWeight(w){var h=(w.match(/[가-힣]/g)||[]).length, d=(w.match(/[0-9]/g)||[]).length, l=(w.match(/[A-Za-z]/g)||[]).length; return h+l*0.4+d*0.15+0.01}
+  function vSplit(buf,words){
+    var ch=buf.getChannelData(0), sr=buf.sampleRate, F=Math.round(sr*0.01), nF=Math.floor(ch.length/F), en=new Float32Array(nF);
+    for(var f=0;f<nF;f++){var sum=0; for(var k=f*F;k<(f+1)*F;k++)sum+=ch[k]*ch[k]; en[f]=Math.sqrt(sum/F)}
+    var sm=new Float32Array(nF); for(f=0;f<nF;f++){var a=0,c=0; for(var j=Math.max(0,f-2);j<=Math.min(nF-1,f+2);j++){a+=en[j];c++} sm[f]=a/c}   // 50ms로 고르게
+    var so=Array.from(sm).sort(function(x,y){return x-y}), lo=so[Math.floor(nF*0.15)]||0, hi=so[Math.floor(nF*0.95)]||0, th=lo+(hi-lo)*0.12;
+    var st=0; while(st<nF&&sm[st]<th)st++; var ed=nF-1; while(ed>st&&sm[ed]<th)ed--;
+    if(ed-st<5){st=0;ed=nF-1}
+    var W=words.map(vWeight), tot=W.reduce(function(x,y){return x+y},0)||1, bnd=[st], acc=0, span=ed-st, avg=span/Math.max(1,words.length);
+    for(var i=0;i<words.length-1;i++){
+      acc+=W[i]; var ideal=st+span*acc/tot, rad=Math.max(4,Math.round(avg*0.45)), best=Math.round(ideal), bv=Infinity;
+      for(var q=Math.round(ideal-rad);q<=Math.round(ideal+rad);q++){if(q<=bnd[bnd.length-1]+2||q>=ed)continue; var v=sm[q]*(1+Math.abs(q-ideal)/rad*0.6); if(v<bv){bv=v;best=q}}
+      bnd.push(Math.max(bnd[bnd.length-1]+1,best));
+    }
+    bnd.push(ed);
+    var out=[]; for(i=0;i<words.length;i++)out.push([Math.max(0,(bnd[i]-2)*0.01),Math.min(buf.duration,(bnd[i+1]+3)*0.01)]);
+    return out;
+  }
+  function vPrep(id){   // 이 말씀의 녹음을 미리 풀어 둠 (없으면 아무 일 없음)
+    var n=notes.get(id); if(!n||vSeg.has(id))return;
+    vSeg.set(id,null);
+    cvGet(id).then(function(b){
+      if(!b){vSeg.delete(id);return}
+      var ac=vAC(); if(!ac){return}
+      return b.arrayBuffer().then(function(ab){return new Promise(function(res,rej){ac.decodeAudioData(ab,res,rej)})}).then(function(buf){
+        var ws=wordsOf(n.text||""); vSeg.set(id,{buf:buf,seg:vSplit(buf,ws),src:n.text});
+      });
+    }).catch(function(){vSeg.delete(id)});
+  }
+  function vWord(id,i){   // 낱말 i를 내 목소리로 — 들려줬으면 true (녹음이 없거나 아직 못 풀었으면 false → 기계 목소리)
+    var v=vSeg.get(id), n=notes.get(id); if(!n)return false; if(!v){if(!vSeg.has(id))vPrep(id); return false}
+    if(v.src!==n.text){vSeg.delete(id); vPrep(id); return false}
+    var g=v.seg[i]; if(!g)return false;
+    var ac=vAC(); if(!ac)return false;
+    try{if(ac.state==="suspended")ac.resume(); if(vSrc)try{vSrc.stop()}catch(e){} window.speechSynthesis&&window.speechSynthesis.cancel();
+      var sN=ac.createBufferSource(), gn=ac.createGain(), t0=ac.currentTime+0.01, d=Math.max(0.12,g[1]-g[0]);
+      gn.gain.setValueAtTime(0,t0); gn.gain.linearRampToValueAtTime(1,t0+0.02); gn.gain.setValueAtTime(1,t0+d-0.04); gn.gain.linearRampToValueAtTime(0,t0+d);   // 끊기는 소리 없게 살짝 부드럽게
+      sN.buffer=v.buf; sN.connect(gn); gn.connect(ac.destination); sN.start(t0,g[0],d); vSrc=sN;
+    }catch(e){return false}
+    return true;
+  }
   function cvStopPlay(){if(cvAudio){try{cvAudio.pause()}catch(e){} cvAudio=null} if(cvURL){URL.revokeObjectURL(cvURL);cvURL=""} var p=ccBox&&ccBox.querySelector(".cvplay"); if(p){p.classList.remove("on");p.textContent="▶ 듣기"}}
   function cvStopRec(){if(cvRec&&cvRec.state==="recording"){try{cvRec.stop()}catch(e){}}}
   function cvMsg(t){if(t)toast(t)}   // 안내 문장 줄은 없앰 — 꼭 필요한 말만 잠깐 (2026-10-31 사용자 요청)
