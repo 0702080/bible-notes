@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-saylines">
+<meta name="app-build" content="2026-11-01-saylines2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12742,7 +12742,7 @@ body.carddrag #reviewBar{display:none!important}
     return items[h%items.length];
   }
   /* ✦ 오늘 카드의 한 마디: 빛나는 카드 + 낱말이 하나씩 떠오르며 20초마다 다음 한 마디로 (📌 고정·정각 말씀이면 그대로), 옆으로 밀면 넘김 (2026-11-01 사용자 요청) */
-  var ST={id:"",ms:20000,busy:false,at:0,edit:false,lpAt:0,tapT:0};
+  var ST={id:"",ms:20000,busy:false,at:0,edit:false,lpAt:0,tapT:0,pendRR:false};
   function sayTodayList(){return sayData().items.filter(function(x){return !x.hv&&String(x.t||"").trim()})}
   function sayTodayLocked(){return !!(sayHour()||sayPinned())}
   function sayTodayPick(){
@@ -12805,12 +12805,13 @@ body.carddrag #reviewBar{display:none!important}
       if(save&&x&&v&&v!==sayLines(x.t)){x.t=v; x.at=Date.now(); saveSay(cur); toast("고쳤어요 ✏️"); it=x}
       else if(save&&!v)toast("비워 두면 고치지 않아요");
       ta.remove(); q.style.visibility=""; q.style.whiteSpace=""; sb.classList.remove("sayed"); ST.at=Date.now();
-      if(sb.isConnected)sayTodayFill(sb,w.querySelector(".saypin"),x||it,false);
+      if(ST.pendRR){ST.pendRR=false; renderReviewBar()}
+      else if(sb.isConnected)sayTodayFill(sb,w.querySelector(".saypin"),x||it,false);
       try{renderBoardSay()}catch(e){}
     }
     ta.addEventListener("input",fit);
     ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault(); ta.blur()} else if(e.key==="Escape"){e.preventDefault(); finish(false)}});   // 엔터 = 줄 나누기
-    ta.addEventListener("blur",function(){finish(true)});
+    ta.addEventListener("blur",function(){setTimeout(function(){if(document.activeElement!==ta)finish(true)},0)});
     toast("엔터로 줄을 나누고, 바깥을 누르면 저장돼요");
   }
   function saySwipeInit(w){
@@ -13640,6 +13641,7 @@ body.carddrag #reviewBar{display:none!important}
     renderReviewBar();
   }
   function renderReviewBar(){
+    if(typeof ST!=="undefined"&&ST.edit){ST.pendRR=true; return}   // 한 마디를 고치는 동안 다시 그리면 글 칸이 사라져서 미룸 (2026-11-01)
     try{renderBoardSay()}catch(e){}
     var bar=$("reviewBar"); if(!bar)return;
     bar.textContent="";
