@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-vseg4">
+<meta name="app-build" content="2026-10-31-refalign2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8805,7 +8805,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     ccDraw0();
     var mid=ccBox&&ccBox.querySelector(".ccmid"), tp=ccBox&&ccBox.querySelector(".cctip");
     if(mid&&tp)mid.style.paddingBottom=Math.round(tp.offsetHeight||0)+"px";
-    ccNumPlace(); clearTimeout(ccNumT); ccNumT=setTimeout(ccNumPlace,450);   // 밀려 들어오는 움직임이 끝난 뒤 한 번 더
+    ccNumPlace(); clearTimeout(ccNumT); ccNumT=setTimeout(function(){ccNumPlace(); ccNumT=setTimeout(ccNumPlace,600)},450);   // 밀려 들어오는 움직임이 끝난 뒤 한 번 더
   }
   var ccNumT=0;
   // "N번째"는 구절 이름 줄 높이, 화면 오른쪽 끝에 (떠올리기 단계 아래, 2026-10-23 사용자 요청)
@@ -8833,6 +8833,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         }
       }
     }
+    // 구절 이름 글자를 말씀 첫 글자와 같은 세로줄에 (가린 칸은 안쪽 여백만큼 글자가 들어가 있음, 2026-10-31 사용자 요청)
+    var rfx=ccBox.querySelector(".ccvref"), fw=ccBox.querySelector(".ccverse .ccw");
+    if(rfx){rfx.style.paddingLeft=""; if(fw&&rfx.offsetWidth){
+      var fr=fw.getBoundingClientRect(), sc=fw.offsetWidth?fr.width/fw.offsetWidth:1, fcs=getComputedStyle(fw);   // 가린 칸은 조금 작게(scale) 그려져서 보이는 자리로 잼
+      var d=Math.round(fr.left+((parseFloat(fcs.paddingLeft)||0)+(parseFloat(fcs.borderLeftWidth)||0))*sc-rfx.getBoundingClientRect().left);
+      if(d>0&&d<24)rfx.style.paddingLeft=d+"px";
+    }}
     var cn=ccBox.querySelector(".ccnum"), rf=ccBox.querySelector(".ccvref"), bd=ccBox.querySelector(".ccbody"); if(!cn||!rf||!bd)return;
     if(cn.hidden||!rf.offsetHeight){cn.style.top="";return}
     var br=bd.getBoundingClientRect(), rr=rf.getBoundingClientRect();
@@ -9243,7 +9250,6 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var id=C.id, mic=ccBox.querySelector(".ccmic"), pl=ccBox.querySelector(".cvplay"), dl=ccBox.querySelector(".cvdel");
     cvGet(id).then(function(b){
       if(!C||C.id!==id)return; mic.classList.toggle("has",!!b); pl.disabled=!b; dl.disabled=!b;
-      if(!b)cvMsg("● 녹음을 누르고 말씀을 읽은 뒤 한 번 더 누르면 저장돼요");
     });
   }
   function cvInit(){
