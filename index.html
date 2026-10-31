@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-sermon5">
+<meta name="app-build" content="2026-10-31-linegrip">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2992,6 +2992,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqfoot{display:flex;align-items:center;gap:10px;margin:2px 0 10px}
 .mqcnt{font-size:12.5px;color:var(--faint)}
 .mqtomed{margin-left:auto;height:32px;padding:0 14px;border:0;border-radius:16px;background:var(--gold);color:#141416;font:inherit;font-size:12.5px;font-weight:700}
+/* ⠿ 글 칸 줄 옮기기 (2026-10-31 사용자 요청) */
+.lhlayer{position:fixed;inset:0;z-index:490;pointer-events:none}
+.lhlayer[hidden]{display:none}
+.lhgrip{position:fixed;width:24px;height:28px;display:grid;place-items:center;border-radius:6px;color:var(--sky);font-size:16px;line-height:1;opacity:.55;pointer-events:auto;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.lhgrip.on{opacity:1;background:color-mix(in srgb,var(--sky) 22%,transparent);cursor:grabbing}
+.lhlayer.dragging .lhgrip:not(.on){opacity:.25}
+textarea.lhpad{padding-left:28px!important}
+.lhmirror{position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;padding:0;border:0;box-sizing:content-box;overflow:hidden;height:auto}
 /* 🎤 설교 메모 (2026-10-31 사용자 요청) */
 .srmtop{display:flex;gap:8px;align-items:center;margin:2px 0 12px}
 .srmq{flex:1;min-width:0;height:40px;padding:0 14px;border:1px solid #2A2930;border-radius:20px;background:var(--sheet);color:var(--ink);font:inherit;font-size:14px}
@@ -5954,6 +5962,91 @@ body.carddrag #reviewBar{display:none!important}
     try{ta.setSelectionRange(a+d,b+d)}catch(err){}
     ta.dispatchEvent(new Event("input",{bubbles:true}));   // 저장·높이 맞춤은 평소 입력처럼
   },true);
+  /* ---------- ⠿ 글 칸 줄 옮기기 (2026-10-31 사용자 요청) ----------
+     모든 여러 줄 글 칸(textarea)에서 적는 동안 줄(문장)마다 앞에 ⠿가 떠요. 잡고 위아래로 끌면 그 줄이 옮겨지고,
+     평소 입력처럼 input 이벤트를 보내 각 칸의 저장이 그대로 일어나요. 칸 왼쪽에 자리가 없으면 칸 안쪽 여백을 늘려 그 자리에 둠 */
+  (function(){
+    var layer=document.createElement("div"); layer.className="lhlayer"; layer.hidden=true; document.body.appendChild(layer);
+    var mirror=document.createElement("div"); mirror.className="lhmirror"; mirror.setAttribute("aria-hidden","true"); document.body.appendChild(mirror);
+    var ta=null, geo=[], drag=null, raf=0;
+    var COPY=["fontFamily","fontSize","fontWeight","fontStyle","fontVariant","letterSpacing","lineHeight","wordBreak","wordSpacing","textIndent","textTransform","tabSize","overflowWrap","wordWrap","whiteSpace"];
+    function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&t.offsetParent!==null}
+    function measure(){
+      var cs=getComputedStyle(ta);
+      COPY.forEach(function(k){mirror.style[k]=cs[k]});
+      if(cs.whiteSpace==="normal"||cs.whiteSpace==="nowrap")mirror.style.whiteSpace="pre-wrap";
+      var pl=parseFloat(cs.paddingLeft)||0, pr=parseFloat(cs.paddingRight)||0;
+      mirror.style.width=Math.max(10,ta.clientWidth-pl-pr)+"px";
+      mirror.textContent="";
+      var lines=ta.value.split("\n");
+      lines.forEach(function(t){var d=document.createElement("div"); d.textContent=t||"​"; mirror.appendChild(d)});
+      var lh=parseFloat(cs.lineHeight); if(!isFinite(lh))lh=(parseFloat(cs.fontSize)||16)*1.5;
+      geo=[].map.call(mirror.children,function(d,i){return {i:i,top:d.offsetTop,h:d.offsetHeight,lh:Math.min(lh,d.offsetHeight),empty:!lines[i].trim()}});
+      return {cs:cs,lines:lines};
+    }
+    function draw(){
+      raf=0;
+      if(!ta||!ta.isConnected||document.activeElement!==ta&&!drag){hide();return}
+      var m=measure(), lines=m.lines, cs=m.cs;
+      var real=lines.filter(function(t){return t.trim()}).length;
+      if(real<2&&!drag){layer.hidden=true; layer.textContent=""; ta.classList.remove("lhpad"); return}
+      var r=ta.getBoundingClientRect();
+      // 칸 왼쪽 바깥에 자리가 있으면 거기에, 없으면 칸 안쪽 여백을 늘림
+      var outside=r.left>=26&&!ta.classList.contains("lhpad");
+      if(!outside&&!ta.classList.contains("lhpad")){ta.classList.add("lhpad"); m=measure(); cs=m.cs; r=ta.getBoundingClientRect()}
+      var bt=parseFloat(cs.borderTopWidth)||0, pt=parseFloat(cs.paddingTop)||0, bl=parseFloat(cs.borderLeftWidth)||0;
+      var x=outside?r.left-25:r.left+bl+2;
+      layer.textContent=""; layer.hidden=false;
+      geo.forEach(function(g){
+        if(g.empty&&!(drag&&drag.i===g.i))return;
+        var y=r.top+bt+pt+g.top-ta.scrollTop+g.lh/2;
+        if(y<r.top+4||y>r.bottom-4)return;   // 칸 밖으로 굴러간 줄은 숨김
+        var h=document.createElement("span"); h.className="lhgrip"+(drag&&drag.i===g.i?" on":""); h.textContent="⠿"; h.dataset.i=g.i;
+        h.style.left=x+"px"; h.style.top=(y-14)+"px"; layer.appendChild(h);
+      });
+    }
+    function sched(){if(!raf)raf=requestAnimationFrame(draw)}
+    function hide(){if(drag)return; layer.hidden=true; layer.textContent=""; if(ta)ta.classList.remove("lhpad"); ta=null}
+    document.addEventListener("focusin",function(e){var t=e.target; if(ok(t)){if(ta&&ta!==t)ta.classList.remove("lhpad"); ta=t; sched()} else if(ta&&!drag){hide()}});
+    document.addEventListener("focusout",function(e){if(e.target===ta&&!drag)setTimeout(function(){if(document.activeElement!==ta&&!drag)hide()},120)});
+    document.addEventListener("input",function(e){if(e.target===ta)sched()},true);
+    document.addEventListener("selectionchange",function(){if(ta)sched()});
+    window.addEventListener("scroll",function(){if(ta)sched()},true);
+    window.addEventListener("resize",function(){if(ta)sched()});
+    if(window.ResizeObserver){var ro=new ResizeObserver(function(){if(ta)sched()}); document.addEventListener("focusin",function(e){if(ok(e.target)){ro.disconnect(); ro.observe(e.target)}})}
+    function mid(g){var r=ta.getBoundingClientRect(), cs=getComputedStyle(ta); return r.top+(parseFloat(cs.borderTopWidth)||0)+(parseFloat(cs.paddingTop)||0)+g.top-ta.scrollTop+g.h/2}
+    function moveTo(y){
+      var lines=ta.value.split("\n"), cur=drag.i, best=cur, bd=1e9;
+      geo.forEach(function(g){var d=Math.abs(mid(g)-y); if(d<bd){bd=d;best=g.i}});
+      if(best===cur)return;
+      var ln=lines.splice(cur,1)[0]; lines.splice(best,0,ln);
+      ta.value=lines.join("\n"); drag.i=best; drag.moved=true;
+      var at=lines.slice(0,best).join("\n").length+(best?1:0)+ln.length;
+      try{ta.setSelectionRange(at,at)}catch(err){}
+      ta.dispatchEvent(new Event("input",{bubbles:true}));   // 저장·높이 맞춤은 평소 입력처럼
+      buzz(5); measure(); draw();
+    }
+    function tick(){   // 칸이 스크롤되면 위·아래 끝에서 저절로 굴러감
+      if(!drag)return;
+      var r=ta.getBoundingClientRect(), y=drag.y, sp=0;
+      if(ta.scrollHeight>ta.clientHeight+2){if(y<r.top+30)sp=-8; else if(y>r.bottom-30)sp=8}
+      if(sp){ta.scrollTop+=sp; moveTo(y)}
+      drag.raf=requestAnimationFrame(tick);
+    }
+    layer.addEventListener("pointerdown",function(e){
+      var h=e.target.closest(".lhgrip"); if(!h||!ta)return;
+      e.preventDefault(); e.stopPropagation();   // 글 칸 커서·키보드를 잃지 않게
+      drag={i:+h.dataset.i,y:e.clientY,moved:false,pid:e.pointerId,raf:0};
+      try{layer.setPointerCapture(e.pointerId)}catch(err){}
+      layer.classList.add("dragging"); buzz(12); draw();
+      drag.raf=requestAnimationFrame(tick);
+    });
+    layer.addEventListener("pointermove",function(e){if(!drag)return; drag.y=e.clientY; moveTo(e.clientY)});
+    function end(){if(!drag)return; cancelAnimationFrame(drag.raf); drag=null; layer.classList.remove("dragging"); if(ta){try{ta.focus({preventScroll:true})}catch(err){} ta.dispatchEvent(new Event("change",{bubbles:true}))} sched()}
+    layer.addEventListener("pointerup",end); layer.addEventListener("pointercancel",end);
+    layer.addEventListener("touchmove",function(e){if(drag)e.preventDefault()},{passive:false});
+    layer.addEventListener("mousedown",function(e){e.preventDefault()});
+  })();
   /* ---------- 🎤 말로 적기 (2026-10-25 사용자 요청) ----------
      글 칸을 누르면 오른쪽 아래에 🎤 단추가 떠요. 누르고 말하면 커서 자리에 글로 들어가고, 한 번 더 누르면 멈춰요.
      암송 코치의 받아쓰기 칸에서 쓰면 '소리 내어 외우기 → 채점'이 돼요. (크롬의 음성 인식, 서버 없음) */
