@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-step3">
+<meta name="app-build" content="2026-10-31-step4">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2760,6 +2760,8 @@ button:active{filter:brightness(1.15)}
 .tdstep.alldone .tsh b{color:var(--green)}
 .tsn{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
 .tsrow{display:flex;align-items:center;gap:8px;min-height:40px}
+.tsrow[data-nid]{cursor:pointer}
+.tsrow[data-nid] .tss{text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--ink) 25%,transparent);text-underline-offset:3px}
 .tsi{flex:0 0 28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#1c1b21;font-size:15px}
 .tsrow.done .tsi{background:color-mix(in srgb,var(--green) 30%,#1c1b21);color:var(--green);font-weight:700}
 .tsm{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
@@ -7238,6 +7240,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function todayActClick(e){
     var spn=e.target.closest(".saypin"); if(spn){e.stopPropagation();sayTogglePin(spn.dataset.sid);return}
     var sayb=e.target.closest(".saytoday"); if(sayb){openSay();return}
+    var tsr=e.target.closest(".tsrow[data-nid]"); if(tsr&&!e.target.closest("button")){var tn=notes.get(tsr.dataset.nid); if(tn)openCoach(tn); return}
     var b=e.target.closest(".rvchip,.tmchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
     if(b.dataset.act==="prog"){openProg();return}
@@ -7250,7 +7253,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.dataset.act==="sbsync"){sbSync("manual");return}
     if(b.dataset.act==="sblogin"){openSb();return}
     if(b.dataset.act==="rvall"){openRecall();return}
-    if(b.dataset.act==="stepmem"){var sn=notes.get(b.dataset.id); if(sn)openRecall([sn]); return}
+    if(b.dataset.act==="stepmem"){var sn=notes.get(b.dataset.id); if(sn)openCoach(sn); return}   // 그 말씀 암송 화면으로 (2026-10-31 사용자 요청)
     if(b.dataset.act==="stepact"){stepAct();return}
     if(b.dataset.act==="stepswap"){weekStepSwap(); buzz(8); renderReviewBar(); return}
     var id=b.dataset.id, act=b.dataset.act||"mem"; if(!id)return; setTopics([]);
@@ -12340,15 +12343,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     hd.innerHTML='<b></b><span class="tsn"></span>';
     hd.querySelector("b").textContent=cnt>=tot?"오늘의 한 걸음 완료 ✓":"오늘의 한 걸음";   // 앞 아이콘은 뺌 (2026-10-31 사용자 요청)
     hd.querySelector(".tsn").textContent=cnt+" / "+tot; box.appendChild(hd);
-    function row(icon,label,sub,done,btns){
-      var r=document.createElement("div"); r.className="tsrow"+(done?" done":"");
+    function row(icon,label,sub,done,btns,nid){
+      var r=document.createElement("div"); r.className="tsrow"+(done?" done":""); if(nid)r.dataset.nid=nid;
       r.innerHTML='<span class="tsi" aria-hidden="true"></span><span class="tsm"><span class="tsl"></span><span class="tss"></span></span>';
       r.querySelector(".tsi").textContent=done?"✓":icon; r.querySelector(".tsl").textContent=label; r.querySelector(".tss").textContent=sub;
       btns.forEach(function(x){var b=document.createElement("button"); b.type="button"; b.className="rvchip "+x.c; b.dataset.id=x.id||""; b.dataset.act=x.act; b.textContent=x.t; if(x.l)b.setAttribute("aria-label",x.l); r.appendChild(b)});
       box.appendChild(r);
     }
-    if(vd)row("📖","말씀 하나 떠올리기",vd.ref+(isGrad(vd)?" · 🎓":"")+" · 오늘 떠올렸어요",true,vn&&due.length?[{c:"tsmore",act:"stepmem",id:vn.id,t:"하나 더"}]:[]);
-    else if(vn)row("📖","말씀 하나 떠올리기",vn.ref+" · 30초",false,[{c:"tsgo",act:"stepmem",id:vn.id,t:"떠올리기"}]);
+    if(vd)row("📖","말씀 하나 떠올리기",vd.ref+(isGrad(vd)?" · 🎓":"")+" · 오늘 떠올렸어요",true,vn&&due.length?[{c:"tsmore",act:"stepmem",id:vn.id,t:"하나 더"}]:[],vd.id);
+    else if(vn)row("📖","말씀 하나 떠올리기",vn.ref+" · 30초",false,[{c:"tsgo",act:"stepmem",id:vn.id,t:"떠올리기"}],vn.id);
     if(ws){
       var g=dlGroups(o).filter(function(x){return x.g===ws.g})[0];
       row((g&&g.e)||"🌱","이번 주 실천",ws.t,ad,[{c:ad?"tsmore":"tsgo",act:"stepact",t:ad?"했어요 ✓":"했어요",l:ad?"오늘 체크 풀기":"오늘 했어요"},{c:"tsswap",act:"stepswap",t:"↻",l:"이번 주 실천을 다른 것으로 바꾸기"}]);
