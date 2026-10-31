@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-refpill">
+<meta name="app-build" content="2026-11-01-refpress">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2525,6 +2525,15 @@ button:active{filter:brightness(1.15)}
 .ccmain textarea,.ccmain input,.ccmain [contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 .ccvref{cursor:pointer;margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
 .ccvwrap:not(.ccresult)>.ccvref{display:table;padding:1px 10px;border-radius:11px;background:color-mix(in srgb,var(--violet) 18%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--violet) 38%,transparent)}   /* 구절 이름도 오른쪽 "암송 N"처럼 둥근 사각형 (2026-11-01 사용자 요청) */
+/* 누름 효과: 누르는 동안 쑥 들어가고, 놓으면 통 튀며 빛이 퍼짐 (2026-11-01 사용자 요청) */
+.ccvwrap:not(.ccresult)>.ccvref{position:relative;transition:transform .12s,background .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--violet) 38%,transparent),0 3px 0 color-mix(in srgb,var(--violet) 30%,#0B0B0D)}
+.ccvwrap:not(.ccresult)>.ccvref:active{transform:translateY(2px) scale(.95);background:color-mix(in srgb,var(--violet) 32%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--violet) 60%,transparent),0 1px 0 color-mix(in srgb,var(--violet) 30%,#0B0B0D)}
+.ccvref.rfhit{animation:rfhit .45s cubic-bezier(.2,1.5,.4,1)}
+@keyframes rfhit{0%{transform:scale(.94)}55%{transform:scale(1.08);background:color-mix(in srgb,var(--violet) 36%,transparent)}100%{transform:none}}
+.ccvref.rfhit::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:0 0 0 0 color-mix(in srgb,var(--violet) 60%,transparent);animation:rfring .6s ease-out both;pointer-events:none}
+@keyframes rfring{to{box-shadow:0 0 0 12px transparent}}
+@media (hover:hover){.ccvwrap:not(.ccresult)>.ccvref:hover{background:color-mix(in srgb,var(--violet) 26%,transparent)}}
+@media (prefers-reduced-motion:reduce){.ccvref.rfhit,.ccvref.rfhit::after{animation:none}}
 .cch .bqtitle .ccref{display:none}
 .ccw.ccpopx{animation:ccpopx .75s cubic-bezier(.2,1.8,.4,1)}
 @keyframes ccpopx{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
@@ -8983,6 +8992,7 @@ body.carddrag #reviewBar{display:none!important}
       });
       ccBox.querySelector(".ccvref").addEventListener("click",function(){   // 구절 이름을 누르면 "잠언 11장 3절"처럼 한 번에 읽어 줌 (2026-10-21 사용자 요청)
         var n0=C&&notes.get(C.id); if(!n0||!n0.ref)return; buzz(18);
+        var rfb=this; rfb.classList.remove("rfhit"); void rfb.offsetWidth; rfb.classList.add("rfhit"); clearTimeout(rfb._rfT); rfb._rfT=setTimeout(function(){rfb.classList.remove("rfhit")},650);
         sayWord(refSay(n0.ref),true);
       });
       ccBox.querySelector(".ccverse").addEventListener("click",function(e){   // 낱말을 누르면 소리로 들려주고, 가린 낱말은 톡 뒤집혀 잠깐 보인다
