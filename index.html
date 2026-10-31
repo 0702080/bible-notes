@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-ccnumlime">
+<meta name="app-build" content="2026-10-31-ccnumtier">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2472,6 +2472,15 @@ button:active{filter:brightness(1.15)}
 .ccpal{display:none;flex-wrap:wrap;gap:10px;margin-top:22px;padding:12px;border:1px solid #2A2932;border-radius:16px;background:#141418}
 .ccpainting .ccpal{display:flex}
 .ccbody>.ccnum{color:#C8F56A;background:color-mix(in srgb,#C8F56A 16%,transparent)}   /* 암송 코치 "암송 N" 밝은 연두색 (2026-10-31 사용자 요청) */
+.ccbody>.ccnum[data-tier="1"]{background:#1D4ED8}
+.ccbody>.ccnum[data-tier="2"]{background:#6D28D9}
+.ccbody>.ccnum[data-tier="3"]{background:#BE185D}
+.ccbody>.ccnum[data-tier="4"]{background:#C2410C}
+.ccbody>.ccnum[data-tier="5"]{background:#0F766E}
+.ccbody>.ccnum[data-tier="6"]{background:#B91C1C}
+.ccbody>.ccnum[data-tier="7"]{background:#0369A1}
+.ccbody>.ccnum[data-tier="8"]{background:#A16207}
+.ccbody>.ccnum[data-tier="9"]{background:#3F3F46;box-shadow:inset 0 0 0 1px var(--gold)}
 .ccpainting .ccnum{display:none!important}   /* 색 고르기 때는 "암송 N" 숨김 (2026-10-30 사용자 요청) */
 .ccpal button{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:52px;padding:6px 4px;border:0;border-radius:12px;background:transparent;color:var(--muted);font-size:12px}
 .ccpal button i{width:30px;height:30px;border-radius:50%;background:var(--bc);box-shadow:inset 0 0 0 1px rgba(255,255,255,.15)}
@@ -8148,11 +8157,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     bq.querySelector(".bqcnt").textContent=bqState.shown+" / "+bqState.total;
     bq.querySelector(".bqprog i").style.width=(bqState.total?bqState.shown/bqState.total*100:0)+"%";
   }
+  // 암송 코치 "암송 N": 100마다 배경색이 바뀜(100·200…900), 1000부터는 000·001…처럼 세 자리로 다시 (2026-10-31 사용자 요청)
+  function ccNumTxt(c){return c>=1000?("00"+(c%1000)).slice(-3):String(c)}
+  function ccNumTier(el,c){el.dataset.tier=String(Math.floor((c%1000)/100))}
   function ccNumUp(el,from,to){   // "암송 N" 숫자 오르는 효과 (2026-10-30 사용자 요청)
-    el.hidden=false; el.textContent="암송 ";
+    el.hidden=false; el.textContent="암송 "; ccNumTier(el,to); from=ccNumTxt(from); to=ccNumTxt(to);
     var r=document.createElement("span"); r.className="ccroll";
     var a=document.createElement("b"); a.textContent=from; var b=document.createElement("b"); b.textContent=to;
-    var w=document.createElement("b"); w.style.visibility="hidden"; w.style.height="0"; w.style.animation="none"; w.textContent=String(Math.max(from,to));
+    var w=document.createElement("b"); w.style.visibility="hidden"; w.style.height="0"; w.style.animation="none"; w.textContent=from.length>to.length?from:to;
     r.appendChild(a); r.appendChild(b); r.appendChild(w); el.appendChild(r);
     ["ccshine","ccring","ccring r2","ccplus"].forEach(function(c){var x=document.createElement("span"); x.className=c; if(c==="ccplus")x.textContent="+1"; el.appendChild(x)});
     el.classList.remove("ccnumup"); void el.offsetWidth; el.classList.add("ccnumup"); ccBurst(el);
@@ -8537,7 +8549,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var cpb=ccBox.querySelector(".ccpaint"); if(cpb){cpb.setAttribute("aria-pressed","false"); cpb.textContent="🎨 색"} ccBox.classList.remove("ccpainting");
     ccBox.querySelector(".ccref").textContent=n.ref;
     ccBox.querySelector(".ccvref").textContent=n.ref;   // 말씀 바로 위에 구절 이름 (2026-10-21 사용자 요청)
-    var cn=ccBox.querySelector(".ccnum"); cn.hidden=false; cn.textContent="암송 "+ccCount(n); cn.title="이 말씀을 끝까지 외운 횟수 (카드의 \"암송 N\"과 같은 숫자, 끝까지 하면 하나 올라요)";   // 카드 숫자와 똑같이 (2026-10-23 사용자 요청)   // 이 말씀 연습 누적 횟수 — 다시 열어도 이어짐 (2026-10-23 사용자 요청)
+    var cn=ccBox.querySelector(".ccnum"); cn.hidden=false; cn.textContent="암송 "+ccNumTxt(ccCount(n)); ccNumTier(cn,ccCount(n)); cn.title="이 말씀을 끝까지 외운 횟수 (카드의 \"암송 N\"과 같은 숫자, 끝까지 하면 하나 올라요)";   // 카드 숫자와 똑같이 (2026-10-23 사용자 요청)   // 이 말씀 연습 누적 횟수 — 다시 열어도 이어짐 (2026-10-23 사용자 요청)
     if(C.order>=2){cn.classList.remove("bump");void cn.offsetWidth;cn.classList.add("bump")}
     var wasOpen=!ccBox.hidden;
     ccBox.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
