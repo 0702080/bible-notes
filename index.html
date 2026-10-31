@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-saynotm">
+<meta name="app-build" content="2026-11-01-sayflat">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3092,12 +3092,8 @@ textarea.lhpad{padding-left:28px!important}
 .srmbtns .srmdel.armed{border-color:var(--pink);color:var(--pink)}
 /* 믿음의 한 마디 (2026-10-18 사용자 요청) */
 .saytoday{--sc:var(--gold);position:relative;display:block;width:100%;margin:2px 0 8px;padding:14px 16px 16px;border:1px solid color-mix(in srgb,var(--sc) 42%,#232229);border-radius:18px;overflow:hidden;isolation:isolate;
-  background:radial-gradient(120% 90% at 0% 0%,color-mix(in srgb,var(--sc) 26%,transparent),transparent 60%),radial-gradient(90% 80% at 100% 100%,color-mix(in srgb,var(--sc) 14%,transparent),transparent 65%),linear-gradient(160deg,#1d1b22,#141318);
+  background:color-mix(in srgb,var(--sc) 12%,#151419);   /* 단색 배경 (2026-11-01 사용자 요청) */
   box-shadow:inset 0 1px 0 color-mix(in srgb,var(--sc) 30%,transparent),0 6px 22px -10px color-mix(in srgb,var(--sc) 55%,transparent);color:var(--ink);font:inherit;text-align:left;transition:border-color .6s,box-shadow .6s}
-/* 큰 따옴표 장식 + 빛줄기 (2026-11-01 사용자 요청) */
-.saytoday::before{content:"\201C";position:absolute;left:6px;top:-14px;z-index:-1;font-family:Georgia,"Times New Roman",serif;font-size:96px;line-height:1;color:color-mix(in srgb,var(--sc) 22%,transparent);pointer-events:none;transition:color .6s}
-.saytoday::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(105deg,transparent 35%,color-mix(in srgb,var(--sc) 16%,transparent) 50%,transparent 65%);transform:translateX(-120%);animation:saySheen 7s ease-in-out infinite;pointer-events:none}
-@keyframes saySheen{0%,55%{transform:translateX(-120%)}85%,100%{transform:translateX(120%)}}
 .saytoday .saylbl{display:flex;align-items:center;gap:6px;margin:0 0 6px 2px;font-size:11px;letter-spacing:.14em;color:color-mix(in srgb,var(--sc) 85%,var(--ink));opacity:.9}
 .saytoday .saylbl::before{content:"\2726";font-size:10px;animation:sayStar 3s ease-in-out infinite}
 @keyframes sayStar{0%,100%{opacity:.45;transform:scale(.85)}50%{opacity:1;transform:scale(1.15)}}
@@ -3106,7 +3102,7 @@ textarea.lhpad{padding-left:28px!important}
 .saytoday.sayin .sayq1 .sw{animation:sayWordIn .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 55ms)}
 @keyframes sayWordIn{from{opacity:0;transform:translateY(9px);filter:blur(5px)}to{opacity:1;transform:none;filter:none}}
 .saytoday.sayout .sayq1,.saytoday.sayout .sayw1{transition:opacity .35s,transform .35s,filter .35s;opacity:0;transform:translateY(-8px);filter:blur(4px)}
-@media (prefers-reduced-motion:reduce){.saytoday::after,.saytoday .saylbl::before,.saytoday.sayin .sayq1 .sw{animation:none}.saytoday.sayout .sayq1,.saytoday.sayout .sayw1{transition:none}}
+@media (prefers-reduced-motion:reduce){.saytoday .saylbl::before,.saytoday.sayin .sayq1 .sw{animation:none}.saytoday.sayout .sayq1,.saytoday.sayout .sayw1{transition:none}}
 .saywrap{position:relative}
 .reviewbar.fold .saytoday{margin-bottom:0}.reviewbar.fold{padding-bottom:12px!important}   /* 오늘 카드 아래 여백을 좌우 여백과 같게 (2026-10-31 사용자 요청) */
 .saywrap .saytoday{padding-right:40px}
