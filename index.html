@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-tdbigfit">
+<meta name="app-build" content="2026-10-31-dlnoline">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3110,7 +3110,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 /* 📅 하루 돌아보기 위쪽 달력 (2026-10-31 사용자 요청) */
 .dlcal{display:none}
 .daily.dlhascal .dlfix>.dlday,.daily.dlhascal .dlfix>.dlprog,.daily.dlhascal .dlweek{display:none}
-.daily.dlhascal .dlfix{display:block;padding-top:6px;padding-bottom:8px}
+.daily.dlhascal .dlfix{display:block;padding-top:6px;padding-bottom:8px;border-bottom:0}
+.daily.dlhascal>.dlbar{border-bottom:0}   /* 달력 위아래 가로줄 없앰 (2026-10-31 사용자 요청) */
 .daily.dlhascal .dlcal{display:block}
 .dlch{display:flex;align-items:center;gap:2px;margin:0 0 8px}
 .dlcm{width:32px;height:32px;border-radius:50%;border:0;background:transparent;color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0}
