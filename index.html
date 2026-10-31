@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-walkhint">
+<meta name="app-build" content="2026-10-31-stepswap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12419,7 +12419,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       btns.forEach(function(x){var b=document.createElement("button"); b.type="button"; b.className="rvchip "+x.c; b.dataset.id=x.id||""; b.dataset.act=x.act; b.textContent=x.t; if(x.l)b.setAttribute("aria-label",x.l); r.appendChild(b)});
       box.appendChild(r);
     }
-    if(vd)row("📖","말씀 하나 떠올리기",vd.ref+(isGrad(vd)?" · 🎓":"")+" · 오늘 떠올렸어요",true,vn&&due.length?[{c:"tsmore",act:"stepmem",id:vn.id,t:"하나 더"}]:[],vd.id);
+    if(vd)row("📖","말씀 하나 떠올리기",vd.ref+(isGrad(vd)?" · 🎓":""),true,vn&&due.length?[{c:"tsswap",act:"stepmem",id:vn.id,t:"↻",l:"말씀 하나 더 떠올리기"}]:[],vd.id);   // "오늘 떠올렸어요"·"하나 더" 글자 대신 ↻ (2026-10-31 사용자 요청)
     else if(vn)row("📖","말씀 하나 떠올리기",vn.ref+" · 30초",false,[{c:"tsgo",act:"stepmem",id:vn.id,t:"떠올리기"}],vn.id);
     if(ws){
       var g=dlGroups(o).filter(function(x){return x.g===ws.g})[0];
