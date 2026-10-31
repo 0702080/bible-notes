@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-ccnumsize">
+<meta name="app-build" content="2026-10-31-ccnumline">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8835,7 +8835,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     // 가운데를 4단계(떠올리기) 동그라미의 세로 가운데 줄에 맞춤 (2026-10-23 사용자 요청)
     var dots=ccBox.querySelectorAll(".ccsteps .ccst i"), last=dots[dots.length-1];
     if(last&&last.offsetWidth){
-      var lr=last.getBoundingClientRect(), w=cn.offsetWidth||50, L=Math.round(lr.left+lr.width/2-br.left-w/2);
+      var lr=last.getBoundingClientRect(), w=cn.offsetWidth||50, L=Math.round(lr.right-br.left-w);   // 오른쪽 끝을 4단계 동그라미 오른쪽 끝 세로줄에 맞춤 (2026-10-31 사용자 요청)
       L=Math.min(L,bd.clientWidth-w-4); cn.style.left=Math.max(4,L)+"px"; cn.style.right="auto";
     }
   }
