@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-draghide">
+<meta name="app-build" content="2026-10-31-dlhidestep">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12687,8 +12687,9 @@ body.carddrag #reviewBar{display:none!important}
       tdFold=!tdFold; renderReviewBar();
     });
     bar.appendChild(h);
-    try{drawStep(bar)}catch(e){}
-    var sd=sayOfDay();
+    var dlDoneNow=big.some(function(r){return r.done});   // 하루 돌아보기 ✓ 완료가 뜨면 '오늘의 한 걸음'과 한 마디는 숨김 (2026-10-31 사용자 요청)
+    if(!dlDoneNow)try{drawStep(bar)}catch(e){}
+    var sd=dlDoneNow?null:sayOfDay();
     if(sd){   // 오늘의 한 마디 (2026-10-18 사용자 요청)
       var swrap=document.createElement("div"); swrap.className="saywrap";
       var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
