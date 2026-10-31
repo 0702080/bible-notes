@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-tdbottom">
+<meta name="app-build" content="2026-10-31-lhgrip2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6069,7 +6069,7 @@ body.carddrag #reviewBar{display:none!important}
       var x=outside?r.left-25:r.left+bl+2;
       if(outside){   // 칸 왼쪽 바깥 여백(감싼 상자 안쪽 끝 ~ 칸 왼쪽)의 가로 가운데에 맞춤 (2026-10-31 사용자 요청)
         for(var pe=ta.parentElement;pe&&pe!==document.body;pe=pe.parentElement){
-          var pr=pe.getBoundingClientRect(); if(pr.left<r.left-1){var pl=pr.left+(parseFloat(getComputedStyle(pe).borderLeftWidth)||0), gw=r.left-pl; if(gw>=24&&gw<=90)x=pl+gw/2-12; break}
+          var pr=pe.getBoundingClientRect(); if(pr.left<r.left-1){var pl=pr.left+(parseFloat(getComputedStyle(pe).borderLeftWidth)||0), gw=r.left-pl; if(gw>=6&&gw<=90)x=pl+gw/2-12; break}   // 좁은 여백(14px 남짓)도 가운데로
         }
       }
       layer.textContent=""; layer.hidden=false;
