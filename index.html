@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-sermon">
+<meta name="app-build" content="2026-10-31-sermon2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3011,8 +3011,16 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .srmform input,.srmform select{height:42px;padding:0 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font:inherit;font-size:14.5px;box-sizing:border-box;width:100%}
 .srmform input.srmtitle{font-size:16.5px;font-weight:700}
 .srmform textarea{width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid #2A2930;border-radius:12px;background:var(--sheet);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.8;resize:vertical}
-.srmform .srmbody{min-height:min(48vh,460px)}
-.srmform .srmapply{min-height:90px;border-color:color-mix(in srgb,var(--green) 35%,#2A2930)}
+.srmform .srmbody{min-height:min(42vh,420px)}
+.srmfoot{flex:0 0 auto;border-top:1px solid #222128;background:#0B0B0D;padding:8px max(16px,calc((100% - var(--dlw,608px)) / 2)) 10px;box-shadow:0 -10px 24px rgba(0,0,0,.5)}
+.srmfoot[hidden]{display:none}
+.srmfin{display:flex;flex-direction:column;gap:6px}
+.srmfoot textarea{width:100%;box-sizing:border-box;height:64px;min-height:44px;max-height:30vh;padding:10px 14px;border:1px solid color-mix(in srgb,var(--green) 35%,#2A2930);border-radius:12px;background:var(--sheet);color:var(--ink);font-family:var(--serif);font-size:15.5px;line-height:1.6;resize:vertical}
+.srmfoot textarea:focus{outline:none;border-color:var(--green)}
+.srmfoot .srmlab{display:flex;margin:0 2px}
+.srmfoot .srmsaved{margin-left:auto;min-height:0}
+.srmfoot .srmbtns{margin-top:0}
+.srmfoot .srmbtns button{height:38px}
 .srmform input:focus,.srmform textarea:focus,.srmform select:focus{outline:none;border-color:var(--sky)}
 .srmlab{margin:6px 2px -2px;font-size:12.5px;color:var(--muted)}
 .srmlab.ap{color:var(--green)}
@@ -9916,18 +9924,18 @@ body.carddrag #reviewBar{display:none!important}
   function openSermon(){
     if(!srm){
       srm=document.createElement("div"); srm.className="daily srmsheet"; srm.setAttribute("role","dialog"); srm.setAttribute("aria-modal","true"); srm.hidden=true;
-      srm.innerHTML='<div class="dlbar"><b class="dltitle">🎤 설교 메모</b><button type="button" class="dlclose srmnew">+ 새 메모</button><button type="button" class="dlclose srmclose">닫기</button></div><div class="dlbody srmbox"></div>';
+      srm.innerHTML='<div class="dlbar"><b class="dltitle">🎤 설교 메모</b><button type="button" class="dlclose srmnew">+ 새 메모</button><button type="button" class="dlclose srmclose">닫기</button></div><div class="dlbody srmbox"></div><div class="srmfoot" hidden></div>';
       document.body.appendChild(srm);
       srm.querySelector(".srmclose").addEventListener("click",function(){if(srmEdit){srmCommit();srmEdit="";srmDraw()}else closeSermon()});
       srm.querySelector(".srmnew").addEventListener("click",srmNew);
       srm.addEventListener("click",srmClick);
       srm.addEventListener("input",function(e){
         if(e.target.classList.contains("srmq")){srmQ=e.target.value;srmDrawList();return}
-        if(!e.target.closest(".srmform"))return;
+        if(!e.target.closest(".srmform,.srmfoot"))return;
         clearTimeout(srmTimer); var sv=srm.querySelector(".srmsaved"); if(sv)sv.textContent="적는 중…";
         srmTimer=setTimeout(function(){srmCommit(); var s2=srm.querySelector(".srmsaved"); if(s2)s2.textContent="저장됨 ✓"},600);
       });
-      srm.addEventListener("change",function(e){if(e.target.closest(".srmform"))srmCommit()});
+      srm.addEventListener("change",function(e){if(e.target.closest(".srmform,.srmfoot"))srmCommit()});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&srm&&!srm.hidden){if(srmEdit){srmCommit();srmEdit="";srmDraw()}else closeSermon()}});
       document.addEventListener("visibilitychange",function(){if(document.hidden&&srm&&!srm.hidden&&srmEdit)srmCommit()});   // 화면을 끄거나 다른 앱으로 가도 적은 것은 남음
     }
@@ -9947,7 +9955,7 @@ body.carddrag #reviewBar{display:none!important}
     clearTimeout(srmTimer);
     var f=srm&&srm.querySelector(".srmform"); if(!f)return;
     var o=srmData(), x=o.items.find(function(y){return y.id===f.dataset.id}); if(!x)return;
-    var v=function(c){var e=f.querySelector(c);return e?e.value:""};
+    var v=function(c){var e=srm.querySelector(c);return e?e.value:""};   // 적용 칸은 아래 고정 칸(.srmfoot)에 있음
     var nx={d:v(".srmdate")||x.d,who:v(".srmwho").trim(),title:v(".srmtitle"),ref:v(".srmrefin").trim(),nid:v(".srmnote"),body:v(".srmbody"),apply:v(".srmapply")};
     var same=Object.keys(nx).every(function(k){return nx[k]===x[k]}); if(same)return;
     Object.keys(nx).forEach(function(k){x[k]=nx[k]}); x.u=Date.now(); srmSave(o);
@@ -9970,7 +9978,7 @@ body.carddrag #reviewBar{display:none!important}
     if(b.classList.contains("srmopen")){var nid=b.dataset.nid; srmCommit(); closeSermon(); if(notes.has(nid))openNoteFocus(nid); return}
   }
   function srmDraw(){
-    var box=srm.querySelector(".srmbox"); box.textContent="";
+    var box=srm.querySelector(".srmbox"), foot=srm.querySelector(".srmfoot"); box.textContent=""; foot.textContent=""; foot.hidden=!srmEdit;
     srm.querySelector(".srmnew").hidden=!!srmEdit;
     srm.querySelector(".srmclose").textContent=srmEdit?"목록":"닫기";
     if(srmEdit){
@@ -9980,15 +9988,16 @@ body.carddrag #reviewBar{display:none!important}
         '<input class="srmtitle" maxlength="200" placeholder="설교 제목" aria-label="설교 제목">'+
         '<div class="srmrow"><input class="srmrefin" maxlength="120" placeholder="본문 (예: 요한복음 15:1-8)" aria-label="본문"><select class="srmnote" aria-label="내 말씀 카드와 잇기"></select></div>'+
         '<div class="srmlab">📝 설교 메모</div><textarea class="srmbody" placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
-        '<div class="srmlab ap">💡 나의 적용 · 결단</div><textarea class="srmapply" placeholder="이번 주에 이렇게 살아 보겠습니다" aria-label="나의 적용"></textarea>'+
-        '<div class="srmsaved" aria-live="polite"></div>'+
-        '<div class="srmbtns"><button type="button" class="srmdel">지우기</button><button type="button" class="srmopen" hidden>📖 말씀 카드 보기</button><button type="button" class="srmdone">다 적었어요</button></div>';
+        '';
+      // 💡 나의 적용과 단추들은 화면 아래에 고정 (2026-10-31 사용자 요청)
+      foot.innerHTML='<div class="srmfin"><div class="srmlab ap">💡 나의 적용 · 결단<span class="srmsaved" aria-live="polite"></span></div><textarea class="srmapply" placeholder="이번 주에 이렇게 살아 보겠습니다" aria-label="나의 적용"></textarea>'+
+        '<div class="srmbtns"><button type="button" class="srmdel">지우기</button><button type="button" class="srmopen" hidden>📖 말씀 카드 보기</button><button type="button" class="srmdone">다 적었어요</button></div></div>';
       f.querySelector(".srmdate").value=x.d; f.querySelector(".srmwho").value=x.who; f.querySelector(".srmtitle").value=x.title;
-      f.querySelector(".srmrefin").value=x.ref; f.querySelector(".srmbody").value=x.body; f.querySelector(".srmapply").value=x.apply;
+      f.querySelector(".srmrefin").value=x.ref; f.querySelector(".srmbody").value=x.body; foot.querySelector(".srmapply").value=x.apply;
       var sel=f.querySelector(".srmnote"), o0=document.createElement("option"); o0.value=""; o0.textContent="📖 내 말씀 카드 잇기 (선택)"; sel.appendChild(o0);
       sorted().filter(function(n){return n.ref}).forEach(function(n){var op=document.createElement("option");op.value=n.id;op.textContent=n.ref;sel.appendChild(op)});
       sel.value=x.nid&&notes.has(x.nid)?x.nid:"";
-      var ob=f.querySelector(".srmopen"); if(sel.value){ob.hidden=false; ob.dataset.nid=sel.value}
+      var ob=foot.querySelector(".srmopen"); if(sel.value){ob.hidden=false; ob.dataset.nid=sel.value}
       sel.addEventListener("change",function(){ob.hidden=!sel.value; ob.dataset.nid=sel.value; var ri=f.querySelector(".srmrefin"); if(sel.value&&!ri.value.trim())ri.value=notes.get(sel.value).ref||""});
       box.appendChild(f); return;
     }
