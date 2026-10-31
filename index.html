@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-walk2">
+<meta name="app-build" content="2026-10-31-walk3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2446,10 +2446,14 @@ button:active{filter:brightness(1.15)}
 .wkstat{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .wkstat span{padding:4px 12px;border-radius:999px;background:color-mix(in srgb,var(--green) 12%,transparent);color:var(--green);font-size:13px}
 .wkstat b{font-variant-numeric:tabular-nums}
-.wkline{max-width:560px;width:100%;box-sizing:border-box;padding:14px 16px;border-radius:16px;background:#121115;border:1px solid #1F1E24;font-size:15.5px;line-height:1.85;color:#55535E;word-break:keep-all}
-.wkline span{transition:color .2s}
-.wkline span.on{color:var(--ink)}
-.wkline span.now{color:var(--gold);font-weight:700}
+/* 말씀 카드: 은은한 보라빛 바탕에 라벤더 글씨, 들은 곳은 아이보리, 지금 낱말은 금빛 (2026-10-31 사용자 요청) */
+.wkline{max-width:560px;width:100%;box-sizing:border-box;padding:16px 18px;border-radius:18px;
+  background:linear-gradient(155deg,color-mix(in srgb,var(--violet) 16%,#141219) 0%,#121016 60%,color-mix(in srgb,var(--gold) 6%,#121016) 100%);
+  border:1px solid color-mix(in srgb,var(--violet) 28%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--violet) 18%,transparent),0 6px 24px rgba(0,0,0,.35);
+  font-size:15.5px;line-height:1.9;color:color-mix(in srgb,var(--violet) 45%,#7C7988);word-break:keep-all}
+.wkline span{transition:color .25s,text-shadow .25s}
+.wkline span.on{color:#F3EBDD}
+.wkline span.now{color:var(--gold);font-weight:700;text-shadow:0 0 14px color-mix(in srgb,var(--gold) 45%,transparent)}
 .wkset{width:100%;max-width:560px;box-sizing:border-box;display:flex;flex-direction:column;padding:4px 14px;border-radius:16px;background:#121115;border:1px solid #1F1E24}
 .wkopt{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px}
 .wkopt+.wkopt{border-top:1px solid #1C1B21}
