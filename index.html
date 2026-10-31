@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-dlnoline">
+<meta name="app-build" content="2026-10-31-stepvswap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7328,6 +7328,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.dataset.act==="stepmem"){var sn=notes.get(b.dataset.id); if(sn)openCoach(sn); return}   // 그 말씀 암송 화면으로 (2026-10-31 사용자 요청)
     if(b.dataset.act==="stepact"){stepAct();return}
     if(b.dataset.act==="stepswap"){weekStepSwap(); buzz(8); renderReviewBar(); return}
+    if(b.dataset.act==="stepvswap"){stepVerseSwap(b.dataset.id); buzz(8); renderReviewBar(); return}
     var id=b.dataset.id, act=b.dataset.act||"mem"; if(!id)return; setTopics([]);
     if(boardOn){   // 칸반에서 눌렀으면: 그 말씀 하나만 펼치고, '전체 보기'로 칸반에 바로 돌아가게 (2026-10-17 사용자 요청)
       boardOn=false; applyBoard();   // 설정은 칸반 그대로
@@ -12576,6 +12577,22 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     try{localStorage.setItem("bible-week-step",JSON.stringify({w:weekKey(),id:nx.id}))}catch(e){}
   }
   function stepVerseDone(){var t0=new Date(); t0.setHours(0,0,0,0); var hit=null; notes.forEach(function(n){if(n.rv&&n.rv.at>=t0.getTime()&&(!hit||n.rv.at>hit.rv.at))hit=n}); return hit}
+  function stepDoneToday(n){var t0=new Date(); t0.setHours(0,0,0,0); return !!(n&&n.rv&&n.rv.at>=t0.getTime())}
+  function stepVerseList(){   // ↻로 돌아볼 말씀 차례: 오늘 복습 → 나머지(목록 순서)
+    var d=dueAll(), ids=new Set(d.map(function(n){return n.id}));
+    return d.concat(sorted().filter(function(n){return !ids.has(n.id)&&wordsOf(n.text||"").length}));
+  }
+  function stepVerseCur(vd,vn){
+    var p=null; try{p=JSON.parse(localStorage.getItem("bible-step-verse")||"null")}catch(e){}
+    if(p&&p.d===dkey(Date.now())){var n=notes.get(p.id); if(n)return n}
+    return vd||vn||null;
+  }
+  function stepVerseSwap(curId){
+    var ls=stepVerseList(); if(!ls.length)return;
+    var i=-1; ls.forEach(function(n,k){if(n.id===curId)i=k});
+    var nx=ls[(i+1)%ls.length]; if(!nx)return;
+    try{localStorage.setItem("bible-step-verse",JSON.stringify({d:dkey(Date.now()),id:nx.id}))}catch(e){}
+  }
   function drawStep(bar){
     if(!notes.size)return;
     var o=dailyData(), today=dkey(Date.now()), ws=weekStep(o), vd=stepVerseDone(), due=dueAll(), vn=due[0]||(vd?null:remindPick());
@@ -12592,8 +12609,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       btns.forEach(function(x){var b=document.createElement("button"); b.type="button"; b.className="rvchip "+x.c; b.dataset.id=x.id||""; b.dataset.act=x.act; b.textContent=x.t; if(x.l)b.setAttribute("aria-label",x.l); r.appendChild(b)});
       box.appendChild(r);
     }
-    if(vd)row("📖","",vd.ref+(isGrad(vd)?" · 🎓":""),true,vn&&due.length?[{c:"tsswap",act:"stepmem",id:vn.id,t:"↻",l:"말씀 하나 더 떠올리기"}]:[],vd.id);   // "오늘 떠올렸어요"·"하나 더" 글자 대신 ↻ (2026-10-31 사용자 요청)
-    else if(vn)row("📖","",vn.ref+" · 30초",false,[{c:"tsgo",act:"stepmem",id:vn.id,t:"떠올리기"}],vn.id);
+    // ↻ = 다음 말씀으로 바꿔 보여 줌 (복습 차례 → 나머지 목록 순서, 2026-10-31 사용자 요청). 누르면 그 말씀이 이 줄에 남음(오늘만)
+    var sv=stepVerseCur(vd,vn);
+    if(sv){
+      var svDone=stepDoneToday(sv), swp={c:"tsswap",act:"stepvswap",id:sv.id,t:"↻",l:"다음 말씀으로 바꾸기"};
+      if(svDone)row("📖","",sv.ref+(isGrad(sv)?" · 🎓":""),true,[swp],sv.id);
+      else row("📖","",sv.ref+" · 30초",false,[{c:"tsgo",act:"stepmem",id:sv.id,t:"떠올리기"},swp],sv.id);
+    }
     if(ws){
       var g=dlGroups(o).filter(function(x){return x.g===ws.g})[0];
       row((g&&g.e)||"🌱","이번 주 실천",ws.t,ad,[{c:ad?"tsmore":"tsgo",act:"stepact",t:ad?"했어요 ✓":"했어요",l:ad?"오늘 체크 풀기":"오늘 했어요"},{c:"tsswap",act:"stepswap",t:"↻",l:"이번 주 실천을 다른 것으로 바꾸기"}],"",ws.id);
