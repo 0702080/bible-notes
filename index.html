@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-stepback">
+<meta name="app-build" content="2026-10-31-stepback2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7251,7 +7251,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var spn=e.target.closest(".saypin"); if(spn){e.stopPropagation();sayTogglePin(spn.dataset.sid);return}
     var sayb=e.target.closest(".saytoday"); if(sayb){openSay();return}
     var tsr=e.target.closest(".tsrow[data-nid]"); if(tsr&&!e.target.closest("button")){var tn=notes.get(tsr.dataset.nid); if(tn)openCoach(tn); return}
-    var tsw=e.target.closest(".tsrow[data-wid]"); if(tsw&&!e.target.closest("button")){openDaily(); dlFocusSheet(tsw.dataset.wid); if(dlfSh&&!dlfSh.hidden)dlfFromStep=true; return}   // 이번 주 실천을 누르면 그 항목 적는 화면 (2026-10-31 사용자 요청)
+    var tsw=e.target.closest(".tsrow[data-wid]"); if(tsw&&!e.target.closest("button")){openDaily(); dlFocusSheet(tsw.dataset.wid,true); return}   // 이번 주 실천을 누르면 그 항목 적는 화면 (2026-10-31 사용자 요청)
     var b=e.target.closest(".rvchip,.tmchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
     if(b.dataset.act==="prog"){openProg();return}
@@ -10925,8 +10925,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   // 🎯 집중: 항목 글을 누르면 그 항목을 자세히 적는 화면이 열림 — 적는 대로 그날 기록에 저장 (2026-10-29 사용자 요청)
   var dlfSh=null, dlfHist=false, dlfFromStep=false;   // 오늘의 한 걸음에서 열었으면 닫을 때 그 화면으로 바로 (2026-10-31 사용자 요청)
-  function dlFocusSheet(fid){
+  function dlFocusSheet(fid,fromStep){
     var o=dailyData(), it=o.items.find(function(x){return x.id===fid}); if(!it)return;
+    dlfFromStep=!!fromStep;
     var g=dlGroups(o).find(function(x){return x.g===it.g})||{e:"",t:"",c:""};
     if(!dlfSh){
       dlfSh=document.createElement("div"); dlfSh.className="dlfsheet"; dlfSh.hidden=true; dlfSh.setAttribute("role","dialog"); dlfSh.setAttribute("aria-modal","true");
