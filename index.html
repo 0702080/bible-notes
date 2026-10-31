@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-saydbl">
+<meta name="app-build" content="2026-11-01-saylines">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12756,8 +12756,12 @@ body.carddrag #reviewBar{display:none!important}
     sb.textContent="";
     var lb=document.createElement("span"); lb.className="saylbl"; lb.textContent=sd.hv?"짧은 말씀":"오늘의 한 마디"; sb.appendChild(lb);
     var q=document.createElement("span"); q.className="sayq1";
-    String(sd.t).replace(/\s+/g," ").trim().split(" ").forEach(function(w,i,a){
-      var sp=document.createElement("span"); sp.className="sw"; sp.style.setProperty("--i",Math.min(i,24)); sp.textContent=w+(i<a.length-1?" ":""); q.appendChild(sp);
+    var wi=0;   // 내가 나눈 줄(엔터)은 그대로 보여 줌 (2026-11-01 사용자 요청)
+    sayLines(sd.t).split("\n").forEach(function(ln,li){
+      if(li)q.appendChild(document.createElement("br"));
+      ln.split(" ").forEach(function(w,i,a){
+        var sp=document.createElement("span"); sp.className="sw"; sp.style.setProperty("--i",Math.min(wi++,24)); sp.textContent=w+(i<a.length-1?" ":""); q.appendChild(sp);
+      });
     });
     sb.appendChild(q);
     if(sd.who){var w2=document.createElement("span"); w2.className="sayw1"; w2.textContent="— "+sd.who; sb.appendChild(w2)}
@@ -12778,32 +12782,36 @@ body.carddrag #reviewBar{display:none!important}
     ST.busy=true; sb.classList.add("sayout");
     setTimeout(function(){ST.busy=false; if(!sb.isConnected)return; sayTodayFill(sb,sb.parentNode.querySelector(".saypin"),nx,!rm)},rm?0:380);
   }
+  function sayLines(t){   // 줄마다 빈칸을 하나로, 빈 줄은 하나까지만
+    return String(t||"").replace(/\r/g,"").split("\n").map(function(l){return l.replace(/[ \t\u00a0]+/g," ").trim()}).join("\n").replace(/\n{3,}/g,"\n\n").trim();
+  }
   function sayInlineEdit(sb){   // 보이는 글자 그대로(같은 자리·크기·줄바꿈) 고치는 칸을 위에 겹침
     var q=sb.querySelector(".sayq1"), w=sb.parentNode; if(!q||!w||ST.edit)return;
     var o=sayData(), it=o.items.filter(function(x){return x.id===ST.id})[0]; if(!it)return;
     ST.edit=true; buzz(25);
     q.querySelectorAll(".sw").forEach(function(x){x.style.animation="none"});
     var cs=getComputedStyle(q), wr=w.getBoundingClientRect(), qr=q.getBoundingClientRect();
-    var ta=document.createElement("textarea"); ta.className="sayeta"; ta.value=String(it.t).replace(/\s+/g," ").trim(); ta.setAttribute("aria-label","한 마디 고치기 (엔터 = 저장)");
+    var ta=document.createElement("textarea"); ta.className="sayeta"; ta.value=sayLines(it.t); ta.setAttribute("aria-label","한 마디 고치기 (엔터 = 줄 나누기, 바깥 누르기 = 저장)");
     ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","wordBreak","color","textShadow","webkitTextStroke","paddingLeft","paddingRight","paddingTop","paddingBottom"].forEach(function(k){try{ta.style[k]=cs[k]}catch(e){}});
     ta.style.left=Math.round(qr.left-wr.left)+"px"; ta.style.top=Math.round(qr.top-wr.top)+"px"; ta.style.width=Math.round(qr.width)+"px"; ta.style.height=Math.round(qr.height)+"px";
     ta.style.setProperty("--sc",getComputedStyle(sb).getPropertyValue("--sc")); q.style.visibility="hidden"; sb.classList.add("sayed"); w.appendChild(ta);
-    function fit(){q.textContent=ta.value||" "; ta.style.height="0"; ta.style.height=Math.max(q.offsetHeight,ta.scrollHeight)+"px"}
+    q.style.whiteSpace="pre-wrap";
+    function fit(){q.textContent=(ta.value||" ")+(/\n$/.test(ta.value)?" ":""); ta.style.height="0"; ta.style.height=Math.max(q.offsetHeight,ta.scrollHeight)+"px"}
     fit(); ta.focus(); try{var L=ta.value.length; ta.setSelectionRange(L,L)}catch(e){}
     var done=false;
     function finish(save){
       if(done)return; done=true; ST.edit=false;
-      var v=ta.value.replace(/\s+/g," ").trim(), cur=sayData(), x=cur.items.filter(function(y){return y.id===it.id})[0];
-      if(save&&x&&v&&v!==String(x.t).replace(/\s+/g," ").trim()){x.t=v; x.at=Date.now(); saveSay(cur); toast("고쳤어요 ✏️"); it=x}
+      var v=sayLines(ta.value), cur=sayData(), x=cur.items.filter(function(y){return y.id===it.id})[0];
+      if(save&&x&&v&&v!==sayLines(x.t)){x.t=v; x.at=Date.now(); saveSay(cur); toast("고쳤어요 ✏️"); it=x}
       else if(save&&!v)toast("비워 두면 고치지 않아요");
-      ta.remove(); q.style.visibility=""; sb.classList.remove("sayed"); ST.at=Date.now();
+      ta.remove(); q.style.visibility=""; q.style.whiteSpace=""; sb.classList.remove("sayed"); ST.at=Date.now();
       if(sb.isConnected)sayTodayFill(sb,w.querySelector(".saypin"),x||it,false);
       try{renderBoardSay()}catch(e){}
     }
     ta.addEventListener("input",fit);
-    ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.isComposing){e.preventDefault(); ta.blur()} else if(e.key==="Escape"){e.preventDefault(); finish(false)}});
+    ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault(); ta.blur()} else if(e.key==="Escape"){e.preventDefault(); finish(false)}});   // 엔터 = 줄 나누기
     ta.addEventListener("blur",function(){finish(true)});
-    toast("고친 뒤 바깥을 누르면 저장돼요");
+    toast("엔터로 줄을 나누고, 바깥을 누르면 저장돼요");
   }
   function saySwipeInit(w){
     var x0=0,y0=0,on=false,lpT=0;
