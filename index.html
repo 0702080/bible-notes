@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-walkstep">
+<meta name="app-build" content="2026-10-31-walkpocket">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2434,7 +2434,7 @@ button:active{filter:brightness(1.15)}
 .wkmeter i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;background:var(--green);transition:width .09s linear}
 .wkmeter em{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--gold);left:62%}
 .wklm{opacity:.35}
-.wksens{max-width:420px;margin:0 auto;font-size:13px;line-height:1.55;color:var(--orange)}
+.wksens{white-space:pre-line;max-width:420px;margin:0 auto;font-size:13px;line-height:1.55;color:var(--orange)}
 .wksens:empty{display:none}
 .wkstat{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .wkstat span{padding:4px 12px;border-radius:999px;background:color-mix(in srgb,var(--green) 12%,transparent);color:var(--green);font-size:13px}
@@ -9010,11 +9010,17 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
      화면을 켜 둔 채 주머니에 넣고 걸으면, 걸음마다 말씀을 한 낱말(또는 한 글자)씩 이어폰으로 들려줌.
      웹앱은 화면이 꺼지면 걸음 센서를 못 읽어서 화면 꺼짐 방지(Wake Lock) + 어두운 잠금 화면으로 씀 */
   var WK=null, wkBox=null;
-  function wkPref(){var o={};try{o=JSON.parse(localStorage.getItem("bible-walk")||"{}")||{}}catch(e){} return {u:o.u==="c"?"c":"w",nx:o.nx?1:0,s:o.s==="hi"||o.s==="lo"?o.s:"md"}}
+  function wkPref(){var o={};try{o=JSON.parse(localStorage.getItem("bible-walk")||"{}")||{}}catch(e){} return {u:o.u==="c"||o.u==="w"?o.u:"l",nx:o.nx?1:0,s:o.s==="hi"||o.s==="lo"?o.s:"md"}}
   function wkSavePref(p){try{localStorage.setItem("bible-walk",JSON.stringify(p))}catch(e){}}
   function wkTokens(n,u){
     var t=String(n.text||"");
     if(u==="c")return Array.from(t.replace(/[^가-힣A-Za-z0-9]/g,""));
+    if(u==="l"){   // 한 소절: 줄 나눔 그대로, 한 줄이면 쉼표·마침표로, 그래도 길면 2~3낱말씩 (2026-10-31 사용자 요청)
+      var ls=t.split(/\n+/).map(function(x){return x.replace(/^\s*\d{1,3}\.?\s*/,"").trim()}).filter(Boolean), out=[];
+      if(ls.length<2)ls=t.replace(/\s+/g," ").split(/(?<=[,.;:!?])\s+/).filter(Boolean);
+      ls.forEach(function(l){var w=wordsOf(l); if(w.length<=4){out.push(l);return} for(var k=0;k<w.length;k+=3){var c=w.slice(k,k+3); if(w.length-k-3===1){c=w.slice(k);k=w.length} out.push(c.join(" "))}});
+      return out.map(function(x){return x.replace(/[^가-힣A-Za-z0-9\s]/g," ").replace(/\s+/g," ").trim()}).filter(Boolean);
+    }
     return wordsOf(t).filter(function(w){return !/^\d{1,3}\.?$/.test(w)}).map(function(w){return w.replace(/[^가-힣A-Za-z0-9]/g,"")}).filter(Boolean);
   }
   function wkSay(t,rate){
@@ -9028,12 +9034,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       wkBox=document.createElement("div"); wkBox.className="cch wkv"; wkBox.hidden=true; wkBox.setAttribute("role","dialog"); wkBox.setAttribute("aria-modal","true");
       wkBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🚶 걷기 암송</b></div><button type="button" class="wkclose" aria-label="닫기">✕</button></div>'+
         '<div class="ccbody wkbody"><div class="wkref"></div><div class="wkring"><div class="wkword"></div><div class="wkprog"></div></div><div class="wkstat"></div><div class="wkmeter" aria-hidden="true"><i></i><em></em></div><div class="wksens"></div><div class="wkline"></div>'+
-        '<div class="wkset"><div class="wkopt"><span>한 걸음에</span><div class="wkseg"><button type="button" data-u="w">한 낱말</button><button type="button" data-u="c">한 글자</button></div></div>'+
+        '<div class="wkset"><div class="wkopt"><span>한 걸음에</span><div class="wkseg"><button type="button" data-u="l">한 소절</button><button type="button" data-u="w">한 낱말</button><button type="button" data-u="c">한 글자</button></div></div>'+
         '<div class="wkopt"><span>끝나면</span><div class="wkseg"><button type="button" data-nx="0">🔁 반복</button><button type="button" data-nx="1">➡️ 다음 말씀</button></div></div>'+
         '<div class="wkopt"><span>걸음 감지</span><div class="wkseg"><button type="button" data-s="hi">예민</button><button type="button" data-s="md">보통</button><button type="button" data-s="lo">둔감</button></div></div></div>'+
         '</div>'+
         '<div class="ccfoot"><button type="button" class="ccbtn wkstep">👣 한 걸음</button><button type="button" class="ccbtn main wkgo">▶ 시작</button></div>'+
-        '<div class="wklock" hidden><div class="wklref"></div><div class="wklword"></div><div class="wkmeter wklm" aria-hidden="true"><i></i><em></em></div><div class="wklhint">꾹 눌러 잠금 풀기</div></div>';
+        '<div class="wklock" hidden><div class="wklref"></div><div class="wklword"></div><div class="wkmeter wklm" aria-hidden="true"><i></i><em></em></div><div class="wklhint">위로 길게 밀어 잠금 풀기</div></div>';
       document.body.appendChild(wkBox);
       wkBox.querySelector(".wkclose").addEventListener("click",closeWalk);
       wkBox.querySelector(".wkstep").addEventListener("click",function(){wkStep()});
@@ -9043,11 +9049,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         wkSavePref(p); wkDraw();
       })});
       var lk=wkBox.querySelector(".wklock"), ht=0;
-      lk.addEventListener("pointerdown",function(e){e.preventDefault(); clearTimeout(ht); ht=setTimeout(function(){lk.hidden=true; buzz([20,40,20])},900)});
-      ["pointerup","pointercancel","pointerleave"].forEach(function(ev){lk.addEventListener(ev,function(){clearTimeout(ht)})});
+      // 주머니 속에서 옷감에 눌려 풀리지 않게: 화면 아래에서 위로 길게(화면 절반 이상) 밀어야 풀림 (2026-10-31)
+      var uy=null;
+      lk.addEventListener("pointerdown",function(e){e.preventDefault(); uy=e.clientY});
+      lk.addEventListener("pointerup",function(e){if(uy!=null&&uy-e.clientY>window.innerHeight*0.45){lk.hidden=true; buzz([20,40,20])} uy=null});
+      lk.addEventListener("pointercancel",function(){uy=null});
       document.addEventListener("visibilitychange",function(){
         if(!WK||!WK.run)return;
-        if(document.visibilityState==="visible")wkWake(); else toast("화면이 꺼지면 걸음을 못 느껴요");
+        if(document.visibilityState==="visible")wkWake(); else{toast("화면이 꺼지면 걸음을 못 느껴요"); WK.hid=(WK.hid||0)+1}
       });
       window.addEventListener("devicemotion",wkMotion);
     }
@@ -9061,7 +9070,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var cur=WK.toks[Math.max(0,WK.i-1)]||"";
     wkBox.querySelector(".wkword").textContent=WK.i?cur:"…";
     var ln=wkBox.querySelector(".wkline"); ln.textContent="";
-    WK.toks.forEach(function(t,k){var s=document.createElement("span"); s.textContent=t; if(k<WK.i)s.className="on"; if(k===WK.i-1)s.className="on now"; ln.appendChild(s); if(p.u==="w")ln.appendChild(document.createTextNode(" "))});
+    WK.toks.forEach(function(t,k){var s=document.createElement("span"); s.textContent=t; if(k<WK.i)s.className="on"; if(k===WK.i-1)s.className="on now"; ln.appendChild(s); if(p.u!=="c")ln.appendChild(document.createTextNode(" "))});
     var tl=WK.toks.length||1, rg=wkBox.querySelector(".wkring");
     rg.style.setProperty("--p",Math.min(1,WK.i/tl)); rg.classList.toggle("run",!!WK.run);
     wkBox.querySelector(".wkprog").textContent=WK.i+" / "+WK.toks.length;
@@ -9103,7 +9112,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(now-(WK.mt||0)>90){WK.mt=now; var w=Math.min(100,sm/(hi*1.6)*100)+"%", t=Math.min(100,1/1.6*100)+"%";
       wkBox.querySelectorAll(".wkmeter").forEach(function(el){el.firstChild.style.width=w; el.lastChild.style.left=t})}
   }
-  function wkWake(){try{if(navigator.wakeLock&&WK&&WK.run)navigator.wakeLock.request("screen").then(function(l){WK.lock=l}).catch(function(){})}catch(e){}}
+  function wkWake(){
+    if(!WK||!WK.run)return;
+    if(!navigator.wakeLock){WK.noWake=1; return}
+    try{navigator.wakeLock.request("screen").then(function(l){WK.lock=l; WK.noWake=0}).catch(function(){WK.noWake=1})}catch(e){WK.noWake=1}
+  }
   function wkStart(){
     var go=function(){WK.run=true; WK.arm=true; WK.ev=0; WK.sm=0; wkWake(); wkBox.querySelector(".wklock").hidden=false; wkSay("시작합니다",1.1); wkDraw();
       var sn=wkBox.querySelector(".wksens"); sn.textContent="";
@@ -9111,7 +9124,13 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(!WK||!WK.run||WK.ev)return; wkBox.querySelector(".wklock").hidden=true;
         sn.textContent="⚠️ 움직임 센서 신호가 안 와요. 브라우저가 막고 있을 수 있어요 — 주소창 왼쪽 아이콘 → 사이트 설정 → '동작 센서(움직임 센서)' 허용 후 다시 시작해 주세요. Brave는 방패(🦁) 보호를 이 사이트만 끄면 돼요.";
         toast("움직임 센서 신호가 안 와요"); buzz([40,60,40]);
+        wkSay("움직임 센서가 막혀 있어요. 휴대폰을 꺼내 화면의 안내를 봐 주세요",1.05);   // 주머니 속이라 귀로 알려 줌
       },2500);
+      setTimeout(function(){
+        if(!WK||!WK.run||!WK.noWake)return;
+        var sn2=wkBox.querySelector(".wksens"); sn2.textContent=(sn2.textContent?sn2.textContent+"\n":"")+"⚠️ 이 브라우저는 화면 꺼짐을 막지 못해요. 휴대폰 설정 → 디스플레이 → 화면 자동 꺼짐 시간을 10분으로 늘려 주세요.";
+        wkSay("화면이 꺼지면 멈춰요. 화면 자동 꺼짐 시간을 늘려 주세요",1.05);
+      },3500);
     };
     if(window.DeviceMotionEvent&&typeof DeviceMotionEvent.requestPermission==="function"){DeviceMotionEvent.requestPermission().then(function(r){if(r!=="granted")toast("움직임 센서를 허용해야 걸음을 느껴요 · 👣 한 걸음으로도 들을 수 있어요"); go()}).catch(go)}
     else{if(!("ondevicemotion" in window))toast("이 기기에서는 걸음을 느낄 수 없어요 · 👣 한 걸음으로 들어 보세요"); go()}
