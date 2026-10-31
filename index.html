@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-dlsrch2">
+<meta name="app-build" content="2026-10-31-dlalign2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10961,11 +10961,15 @@ body.carddrag #reviewBar{display:none!important}
         var se=dl.querySelector(".dlsearch"), bar=dl.querySelector(".dlbar"), body=dl.querySelector(".dlbody");
         function place(){
           var pc=window.innerWidth>=900; if(pc&&se.parentNode!==bar)bar.insertBefore(se,bar.children[1]); else if(!pc&&se.parentNode===bar)body.insertBefore(se,body.querySelector(".dllist"));
-          if(!pc){se.style.width="";return}
+          var cal=dl.querySelector(".dlcal");
+          if(!pc){se.style.width=""; if(cal)cal.style.maxWidth=""; return}
+          // 찾기 칸·달력 폭을 아래 가운데 묶음 줄 폭에 맞춤 (석 달 달력은 묶음 전체 폭) (2026-10-31 사용자 요청)
+          var L=dl.querySelector(".dllist"), W=L?L.clientWidth:0, n=Math.max(1,Math.floor((W+18)/398)), cw=n>1?(W-(n-1)*18)/n:Math.min(540,W), w=n%2?cw:Math.min(540,W);
+          if(W&&cal)cal.style.maxWidth=(cal.classList.contains("dlcal3")?W:w)+"px";
           // 화면 가로 가운데에 두고, 왼쪽 제목·오른쪽 단추와 겹치지 않는 만큼만 넓게
           var br=bar.getBoundingClientRect(), mid=br.left+br.width/2, rg=document.createRange(), bl=bar.querySelector(".dledit").getBoundingClientRect();
           rg.selectNodeContents(bar.querySelector(".dltitle")); var tr=rg.getBoundingClientRect();   // 제목 칸은 늘어나 있어서 글자 끝을 잼
-          if(!br.width)return; se.style.width=Math.max(200,Math.min(520,2*Math.min(mid-tr.right,bl.left-mid)-32))+"px";
+          if(!br.width)return; se.style.width=Math.max(200,Math.min(W?w:520,2*Math.min(mid-tr.right,bl.left-mid)-32))+"px";
         }
         place(); window.addEventListener("resize",place); dl._dlsPlace=place;
       })();
@@ -11688,13 +11692,13 @@ body.carddrag #reviewBar{display:none!important}
     cal.querySelector(".dlcsum em").textContent=(cc0?"✓ ":"")+cc0+"/"+tot;
     cal.querySelector(".dlcsum").classList.toggle("ok",cc0>0);
     var fb=cal.querySelector(".dlcfold"); fb.textContent=fold?"▾":"▴"; fb.setAttribute("aria-label",fold?"달력 펼치기":"달력 접기");
-    // PC(900px 이상)는 석 달(보는 달과 앞의 두 달)을 나란히 (2026-10-31 사용자 요청)
+    // PC(900px 이상)는 석 달을 나란히 — 보는 달이 늘 가운데(앞 달·보는 달·다음 달) (2026-10-31 사용자 요청)
     var three=window.innerWidth>=900&&!fold, c3=cal.querySelector(".dlc3");
     cal.classList.toggle("dlcal3",three);
     if(!c3){c3=document.createElement("div"); c3.className="dlc3"; cal.appendChild(c3)}
     c3.textContent="";
     if(three){
-      var ms=[-2,-1,0].map(function(n){var d=new Date(y,m-1+n,1,12); return {y:d.getFullYear(),m:d.getMonth()+1}});
+      var ms=[-1,0,1].map(function(n){var d=new Date(y,m-1+n,1,12); return {y:d.getFullYear(),m:d.getMonth()+1}});
       cal.querySelector(".dlcmt").textContent=ms[0].y===ms[2].y?ms[0].y+"년 "+ms[0].m+"월 – "+ms[2].m+"월":ms[0].y+"년 "+ms[0].m+"월 – "+ms[2].y+"년 "+ms[2].m+"월";
       var dow=cal.querySelector(".dlcdow").outerHTML;
       ms.forEach(function(q,i){
@@ -11703,9 +11707,11 @@ body.carddrag #reviewBar{display:none!important}
         mo.querySelector(".dlcmh").textContent=(i===0||q.m===1?q.y+"년 ":"")+q.m+"월";
         c3.appendChild(mo); dlCalFill(mo.querySelector(".dlcg"),k,false,o,tot,today);
       });
+      if(dl._dlsPlace)dl._dlsPlace();
       return;
     }
     dlCalFill(cal.querySelector(".dlcg"),mk,fold,o,tot,today);
+    if(dl._dlsPlace)dl._dlsPlace();
   }
   function dlCalFill(g,mk,fold,o,tot,today){
     var y=+mk.slice(0,4), m=+mk.slice(5,7); g.textContent="";
