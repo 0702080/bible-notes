@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-vseg3">
+<meta name="app-build" content="2026-10-31-vseg4">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9213,7 +9213,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       var ac=vAC(); if(!ac){return}
       return b.arrayBuffer().then(function(ab){return new Promise(function(res,rej){ac.decodeAudioData(ab,res,rej)})}).then(function(buf){
         // 구절 이름(요한복음 사장 십사절)을 앞이나 뒤에 읽었을 수도 있어서 넷 다 맞춰 보고 경계가 가장 조용한 쪽을 고름 (2026-10-31 사용자 요청)
-        var ws=wordsOf(n.text||""), rw=refSay(n.ref||"").split(/\s+/).filter(Boolean), best=null;
+        var ws=wordsOf(n.text||""), rw=refSay(n.ref||"").replace(/\s+/g,""), best=null; rw=rw?[rw]:[];   // 구절 이름은 붙여 읽는 일이 많아 한 덩어리로 (2026-10-31)
         [[0,0],[1,0],[1,1],[0,1]].forEach(function(h){
           if((h[0]||h[1])&&!rw.length)return;
           var sg=vSplit(buf,(h[0]?rw:[]).concat(ws,h[1]?rw:[])), k=h[0]?rw.length:0; if(h[0]||h[1])sg.score*=0.8;   // 구절 이름은 읽는 사람이 많아 조금 더 믿어 줌
