@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-edge">
+<meta name="app-build" content="2026-11-01-kbtint">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1910,6 +1910,9 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 /* 내가 만든 칸 */
 .bcol.bcust{border-color:color-mix(in srgb,var(--gold) 30%,#38343F);background:color-mix(in srgb,var(--gold) 4%,#272530)}
 .bcol.bcust .bch b{color:var(--gold)}
+.bcol.btint,.bcol.btint.bcust{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 16%,#24222B),color-mix(in srgb,var(--bc) 7%,#201E26) 260px);border-color:color-mix(in srgb,var(--bc) 34%,#38343F)}
+.bcol.btint .bch b,.bcol.btint.bcust .bch b{color:var(--bc)}
+.bcol.btint .bcaddin{border-color:color-mix(in srgb,var(--bc) 40%,transparent)}
 .bcol.bcust.lmland{animation:none}
 .bcaddin{display:block;width:100%;margin:8px 0 0;box-sizing:border-box;height:38px;border:1.5px dashed color-mix(in srgb,var(--gold) 45%,#3A3744);border-radius:12px;background:transparent;color:var(--gold);font-size:13.5px;cursor:pointer;flex:0 0 auto}
 @media (hover:hover){.bcaddin:hover{background:color-mix(in srgb,var(--gold) 10%,transparent)}}
@@ -4257,7 +4260,7 @@ body.carddrag #reviewBar{display:none!important}
   function renderKanban(){
     var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
     box.textContent=""; box.classList.remove("bsolo");
-    if(bMode==="list"){renderKanbanList(box);kbFit(box);return}
+    if(bMode==="list"){renderKanbanList(box);kbTint(box);kbFit(box);return}
     var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
     sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
     var fresh=groups["new"];
@@ -4437,6 +4440,11 @@ body.carddrag #reviewBar{display:none!important}
     var b=e.target.closest(".bcjt,.bcjb"); if(!b)return; e.stopPropagation();
     var l=b.closest(".bcol").querySelector(".bclist"); if(l)l.scrollTo({top:b.classList.contains("bcjt")?0:l.scrollHeight,behavior:"smooth"});
   },true);
+  // 칸반 칸마다 다른 바탕색 — 놓인 차례대로 보라·하늘·초록·금·분홍·주황 (2026-11-01 사용자 요청)
+  var KBCOL=["var(--violet)","var(--sky)","var(--green)","var(--gold)","var(--pink)","var(--orange)"];
+  function kbTint(box){
+    Array.prototype.forEach.call(box.querySelectorAll(":scope>.bcol"),function(c,i){c.style.setProperty("--bc",KBCOL[i%KBCOL.length]); c.classList.add("btint")});
+  }
   function renderKanbanList(box){
     var items=sorted().filter(function(n){return visibleNote(n)});
     box.classList.remove("find");
