@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-stepswap2">
+<meta name="app-build" content="2026-10-31-stepback">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7251,7 +7251,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var spn=e.target.closest(".saypin"); if(spn){e.stopPropagation();sayTogglePin(spn.dataset.sid);return}
     var sayb=e.target.closest(".saytoday"); if(sayb){openSay();return}
     var tsr=e.target.closest(".tsrow[data-nid]"); if(tsr&&!e.target.closest("button")){var tn=notes.get(tsr.dataset.nid); if(tn)openCoach(tn); return}
-    var tsw=e.target.closest(".tsrow[data-wid]"); if(tsw&&!e.target.closest("button")){openDaily(); dlFocusSheet(tsw.dataset.wid); return}   // 이번 주 실천을 누르면 그 항목 적는 화면 (2026-10-31 사용자 요청)
+    var tsw=e.target.closest(".tsrow[data-wid]"); if(tsw&&!e.target.closest("button")){openDaily(); dlFocusSheet(tsw.dataset.wid); if(dlfSh&&!dlfSh.hidden)dlfFromStep=true; return}   // 이번 주 실천을 누르면 그 항목 적는 화면 (2026-10-31 사용자 요청)
     var b=e.target.closest(".rvchip,.tmchip"); if(!b)return;
     if(b.dataset.act==="daily"){openDaily();return}
     if(b.dataset.act==="prog"){openProg();return}
@@ -10924,7 +10924,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     wk.addEventListener("click",function(e){if(eat){e.stopPropagation();e.preventDefault()}},true);
   }
   // 🎯 집중: 항목 글을 누르면 그 항목을 자세히 적는 화면이 열림 — 적는 대로 그날 기록에 저장 (2026-10-29 사용자 요청)
-  var dlfSh=null, dlfHist=false;
+  var dlfSh=null, dlfHist=false, dlfFromStep=false;   // 오늘의 한 걸음에서 열었으면 닫을 때 그 화면으로 바로 (2026-10-31 사용자 요청)
   function dlFocusSheet(fid){
     var o=dailyData(), it=o.items.find(function(x){return x.id===fid}); if(!it)return;
     var g=dlGroups(o).find(function(x){return x.g===it.g})||{e:"",t:"",c:""};
@@ -11055,6 +11055,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function dlFocusSheetClose(){
     if(!dlfSh||dlfSh.hidden)return; var ta=dlfSh.querySelector("textarea"); try{if(dlfSh._save)dlfSh._save()}catch(e){} try{ta.blur()}catch(e){}
     dlfSh.hidden=true; if(dlfHist){dlfHist=false;try{history.back()}catch(e){}}
+    if(dlfFromStep){dlfFromStep=false; if(dl&&!dl.hidden)closeDaily(); return}
     if(dl&&!dl.hidden)drawDaily();
   }
   var dlFocusBusy=false;
