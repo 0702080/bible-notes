@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-saypin">
+<meta name="app-build" content="2026-11-01-sayedit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3114,6 +3114,10 @@ textarea.lhpad{padding-left:28px!important}
 .reviewbar.fold .saytoday{margin-bottom:0}.reviewbar.fold{padding-bottom:12px!important}   /* 오늘 카드 아래 여백을 좌우 여백과 같게 (2026-10-31 사용자 요청) */
 .saywrap .saytoday{padding-right:40px}
 .saywrap .saypin{top:8px;right:8px;z-index:2}
+/* 길게 눌러 그 자리에서 고치기 (2026-11-01 사용자 요청) */
+.saywrap textarea.sayeta{position:absolute;z-index:3;margin:0;box-sizing:border-box;border:0;border-radius:0;outline:none;background:transparent;resize:none;overflow:hidden;box-shadow:none;min-height:0;caret-color:var(--sc,var(--gold));white-space:pre-wrap}
+.saytoday.sayed{border-color:color-mix(in srgb,var(--sc) 80%,#232229)}
+.saytoday.sayed .saylbl::after{content:"· 고치는 중";margin-left:4px;opacity:.8}
 /* 말씀 카드와 같은 핀 그림 (2026-11-01 사용자 요청) */
 .saypin.saypinsvg{filter:none;opacity:.55;background:transparent;color:var(--faint);display:grid;place-items:center;font-size:0}
 .saypin.saypinsvg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;transform:rotate(35deg)}
@@ -6261,7 +6265,7 @@ body.carddrag #reviewBar{display:none!important}
     var mirror=document.createElement("div"); mirror.className="lhmirror"; mirror.setAttribute("aria-hidden","true"); document.body.appendChild(mirror);
     var ta=null, geo=[], drag=null, raf=0;
     var COPY=["fontFamily","fontSize","fontWeight","fontStyle","fontVariant","letterSpacing","lineHeight","wordBreak","wordSpacing","textIndent","textTransform","tabSize","overflowWrap","wordWrap","whiteSpace"];
-    function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&!t.classList.contains("mqa")&&t.offsetParent!==null}   // 묵상 질문 답 칸은 자기 손잡이(.mqgut)가 있어 뺌 (2026-11-01)
+    function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&!t.classList.contains("mqa")&&!t.classList.contains("sayeta")&&t.offsetParent!==null}   // 묵상 질문 답 칸은 자기 손잡이(.mqgut)가 있어 뺌 (2026-11-01)
     function measure(){
       var cs=getComputedStyle(ta);
       COPY.forEach(function(k){mirror.style[k]=cs[k]});
@@ -6371,7 +6375,7 @@ body.carddrag #reviewBar{display:none!important}
     }
     function hide(){if(on)return; mic.hidden=true; ta=null}
     document.addEventListener("focusin",function(e){
-      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||t.readOnly||t.disabled)return;
+      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||t.readOnly||t.disabled||t.classList.contains("sayeta"))return;   // 오늘의 한 마디 고치기 칸은 글자를 가려서 뺌
       if(on&&t!==ta)stop();
       ta=t; place();
     });
@@ -7761,7 +7765,7 @@ body.carddrag #reviewBar{display:none!important}
   }
   function todayActClick(e){
     var spn=e.target.closest(".saypin"); if(spn){e.stopPropagation();sayTogglePin(spn.dataset.sid);return}
-    var sayb=e.target.closest(".saytoday"); if(sayb){openSay();return}
+    var sayb=e.target.closest(".saytoday"); if(sayb){if(typeof ST!=="undefined"&&(ST.edit||Date.now()-ST.lpAt<800))return; openSay();return}
     if(Date.now()-tsSwipeAt<450)return;   // 옆으로 민 끝에 생기는 누름은 무시
     var tsr=e.target.closest(".tsrow[data-nid]"); if(tsr&&!e.target.closest("button")){var tn=notes.get(tsr.dataset.nid); if(tn)openCoach(tn); return}
     var tsw=e.target.closest(".tsrow[data-wid]"); if(tsw&&!e.target.closest("button")){openDaily(); dlFocusSheet(tsw.dataset.wid,true); return}   // 이번 주 실천을 누르면 그 항목 적는 화면 (2026-10-31 사용자 요청)
@@ -12734,7 +12738,7 @@ body.carddrag #reviewBar{display:none!important}
     return items[h%items.length];
   }
   /* ✦ 오늘 카드의 한 마디: 빛나는 카드 + 낱말이 하나씩 떠오르며 20초마다 다음 한 마디로 (📌 고정·정각 말씀이면 그대로), 옆으로 밀면 넘김 (2026-11-01 사용자 요청) */
-  var ST={id:"",ms:20000,busy:false,at:0};
+  var ST={id:"",ms:20000,busy:false,at:0,edit:false,lpAt:0};
   function sayTodayList(){return sayData().items.filter(function(x){return !x.hv&&String(x.t||"").trim()})}
   function sayTodayLocked(){return !!(sayHour()||sayPinned())}
   function sayTodayPick(){
@@ -12761,7 +12765,7 @@ body.carddrag #reviewBar{display:none!important}
       pb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; pb.setAttribute("aria-label",pb.title); pb.setAttribute("aria-pressed",String(isPin))}
   }
   function sayTodayNext(dir){
-    var sb=document.querySelector(".saywrap .saytoday"); if(!sb||ST.busy)return;
+    var sb=document.querySelector(".saywrap .saytoday"); if(!sb||ST.busy||ST.edit)return;
     if(sayTodayLocked())return;
     var its=sayTodayList(); if(its.length<2)return;
     var i=-1; its.forEach(function(x,k){if(x.id===ST.id)i=k});
@@ -12770,11 +12774,49 @@ body.carddrag #reviewBar{display:none!important}
     ST.busy=true; sb.classList.add("sayout");
     setTimeout(function(){ST.busy=false; if(!sb.isConnected)return; sayTodayFill(sb,sb.parentNode.querySelector(".saypin"),nx,!rm)},rm?0:380);
   }
+  function sayInlineEdit(sb){   // 보이는 글자 그대로(같은 자리·크기·줄바꿈) 고치는 칸을 위에 겹침
+    var q=sb.querySelector(".sayq1"), w=sb.parentNode; if(!q||!w||ST.edit)return;
+    var o=sayData(), it=o.items.filter(function(x){return x.id===ST.id})[0]; if(!it)return;
+    ST.edit=true; buzz(25);
+    q.querySelectorAll(".sw").forEach(function(x){x.style.animation="none"});
+    var cs=getComputedStyle(q), wr=w.getBoundingClientRect(), qr=q.getBoundingClientRect();
+    var ta=document.createElement("textarea"); ta.className="sayeta"; ta.value=String(it.t).replace(/\s+/g," ").trim(); ta.setAttribute("aria-label","한 마디 고치기 (엔터 = 저장)");
+    ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","wordBreak","color","textShadow","webkitTextStroke","paddingLeft","paddingRight","paddingTop","paddingBottom"].forEach(function(k){try{ta.style[k]=cs[k]}catch(e){}});
+    ta.style.left=Math.round(qr.left-wr.left)+"px"; ta.style.top=Math.round(qr.top-wr.top)+"px"; ta.style.width=Math.round(qr.width)+"px"; ta.style.height=Math.round(qr.height)+"px";
+    ta.style.setProperty("--sc",getComputedStyle(sb).getPropertyValue("--sc")); q.style.visibility="hidden"; sb.classList.add("sayed"); w.appendChild(ta);
+    function fit(){q.textContent=ta.value||" "; ta.style.height="0"; ta.style.height=Math.max(q.offsetHeight,ta.scrollHeight)+"px"}
+    fit(); ta.focus(); try{var L=ta.value.length; ta.setSelectionRange(L,L)}catch(e){}
+    var done=false;
+    function finish(save){
+      if(done)return; done=true; ST.edit=false;
+      var v=ta.value.replace(/\s+/g," ").trim(), cur=sayData(), x=cur.items.filter(function(y){return y.id===it.id})[0];
+      if(save&&x&&v&&v!==String(x.t).replace(/\s+/g," ").trim()){x.t=v; x.at=Date.now(); saveSay(cur); toast("고쳤어요 ✏️"); it=x}
+      else if(save&&!v)toast("비워 두면 고치지 않아요");
+      ta.remove(); q.style.visibility=""; sb.classList.remove("sayed"); ST.at=Date.now();
+      if(sb.isConnected)sayTodayFill(sb,w.querySelector(".saypin"),x||it,false);
+      try{renderBoardSay()}catch(e){}
+    }
+    ta.addEventListener("input",fit);
+    ta.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.isComposing){e.preventDefault(); ta.blur()} else if(e.key==="Escape"){e.preventDefault(); finish(false)}});
+    ta.addEventListener("blur",function(){finish(true)});
+    toast("고친 뒤 바깥을 누르면 저장돼요");
+  }
   function saySwipeInit(w){
-    var x0=0,y0=0,on=false;
-    w.addEventListener("touchstart",function(e){if(e.touches.length!==1)return; x0=e.touches[0].clientX; y0=e.touches[0].clientY; on=true},{passive:true});
+    var x0=0,y0=0,on=false,lpT=0;
+    function lpClear(){clearTimeout(lpT); lpT=0}
+    // 길게 누르면(0.5초) 그 자리에서 고치기 (2026-11-01 사용자 요청)
+    w.addEventListener("pointerdown",function(e){
+      if(ST.edit||e.target.closest(".saypin"))return; if(e.pointerType==="mouse"&&e.button!==0)return;
+      var px=e.clientX, py=e.clientY; lpClear();
+      lpT=setTimeout(function(){lpT=0; on=false; ST.lpAt=Date.now(); var sb=w.querySelector(".saytoday"); if(sb)sayInlineEdit(sb)},500);
+      w._lpXY=[px,py];
+    });
+    w.addEventListener("pointermove",function(e){if(lpT&&w._lpXY&&Math.abs(e.clientX-w._lpXY[0])+Math.abs(e.clientY-w._lpXY[1])>10)lpClear()});
+    ["pointerup","pointercancel","pointerleave"].forEach(function(ev){w.addEventListener(ev,lpClear)});
+    w.addEventListener("contextmenu",function(e){if(e.target.closest(".saytoday"))e.preventDefault()});
+    w.addEventListener("touchstart",function(e){if(e.touches.length!==1||ST.edit)return; x0=e.touches[0].clientX; y0=e.touches[0].clientY; on=true},{passive:true});
     w.addEventListener("touchend",function(e){
-      if(!on)return; on=false; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+      if(!on||ST.edit)return; on=false; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
       if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.5){
         if(sayTodayLocked()){toast("📌 고정된 한 마디예요");return}
         e.preventDefault(); buzz(8); sayTodayNext(dx<0?1:-1);
@@ -12782,7 +12824,7 @@ body.carddrag #reviewBar{display:none!important}
     });
   }
   setInterval(function(){
-    if(document.hidden||ST.busy)return;
+    if(document.hidden||ST.busy||ST.edit)return;
     var sb=document.querySelector(".saywrap .saytoday"); if(!sb||!sb.offsetParent)return;
     if(Date.now()-ST.at>=ST.ms-200)sayTodayNext(1);
   },1000);
