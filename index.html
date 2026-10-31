@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-saybar">
+<meta name="app-build" content="2026-10-31-nomedmenu">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3846,7 +3846,6 @@ body.carddrag #reviewBar{display:none!important}
       <div class="pop">
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
         <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button>
-        <button type="button" id="openMedBtn">📅 묵상 진도표</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="openProgBtn">✅ 실천 진도표</button>
         <button type="button" id="openTongdokBtn">📖 성경 통독표</button>
@@ -13690,7 +13689,7 @@ body.carddrag #reviewBar{display:none!important}
   $("openSayBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay()});
 
   $("openVerseBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"v")});
-  $("openMedBtn").addEventListener("click",openMedProgress);
+  /* ⋯ 메뉴의 "묵상 진도표"는 뺌 (2026-10-31 사용자 요청) — 카드 묵상 칸의 진도 단추로는 열림 */
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
   $("openGraphBtn").addEventListener("click",function(){openGraph(null)});
   $("openTongdokBtn").addEventListener("click",function(){location.href="tongdok2/?from=notes"   /* 내 통독표는 tongdok2 (아내용 tongdok과 따로, 2026-10-22) */});
