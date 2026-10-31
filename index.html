@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-col3">
+<meta name="app-build" content="2026-10-31-step1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2743,6 +2743,23 @@ button:active{filter:brightness(1.15)}
 .tdbig.done .tbt,.tdbig.done .tbgo{color:var(--green)}
 .tdbig.done .tbbar i{background:var(--green)}
 .reviewbar.fold .tdbig{display:none}
+.tdstep{display:flex;flex-direction:column;gap:6px;width:100%;box-sizing:border-box;min-width:0;margin:4px 0 2px;padding:10px 12px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--gold) 55%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 14%,#141318),#111014)}
+.tdstep.alldone{border-color:color-mix(in srgb,var(--green) 65%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--green) 14%,#141318),#111014);box-shadow:0 0 18px color-mix(in srgb,var(--green) 18%,transparent)}
+.tsh{display:flex;align-items:baseline;gap:8px}
+.tsh b{font-size:14.5px;color:var(--gold)}
+.tdstep.alldone .tsh b{color:var(--green)}
+.tsn{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.tsrow{display:flex;align-items:center;gap:8px;min-height:40px}
+.tsi{flex:0 0 28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#1c1b21;font-size:15px}
+.tsrow.done .tsi{background:color-mix(in srgb,var(--green) 30%,#1c1b21);color:var(--green);font-weight:700}
+.tsm{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.tsl{font-size:11.5px;color:var(--muted)}
+.tss{font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tsrow.done .tss{color:color-mix(in srgb,var(--green) 80%,var(--ink))}
+.rvchip.tsgo{flex:0 0 auto;height:34px;padding:0 14px;border-radius:17px;border:0;background:var(--gold);color:#141416;font-weight:700;font-size:13.5px}
+.rvchip.tsmore{flex:0 0 auto;height:32px;padding:0 12px;border-radius:16px;border:1px solid color-mix(in srgb,var(--green) 55%,transparent);background:transparent;color:var(--green);font-size:13px}
+.rvchip.tsswap{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;border:1px solid var(--rule);background:transparent;color:var(--muted);font-size:15px}
+.dlw.ok b{color:var(--green)}
 .tdsep{height:1px;margin:4px 0 2px;background:color-mix(in srgb,var(--gold) 20%,var(--rule))}
 .rvchip.main{background:var(--gold);color:#141416}
 /* 오늘 카드 줄의 버튼을 손가락으로 누르기 쉽게 크게 (2026-10-15 사용자 요청) */
@@ -3786,7 +3803,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       loci:Array.isArray(n.loci)?n.loci.slice(0,12).map(function(x){return String(x||"").slice(0,20)}):[],   // 🏠 장소로 외우기의 장소 이름
       fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
-      rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0,d:/^\d{4}-\d{2}-\d{2}$/.test(n.rv.d||"")?n.rv.d:""}:null,
+      rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0,d:/^\d{4}-\d{2}-\d{2}$/.test(n.rv.d||"")?n.rv.d:"",grad:+n.rv.grad||0}:null,
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
       col:String(n.col||"").trim().slice(0,20),   // PC 칸반에서 내가 만든 칸 이름 (비면 자동 칸)
@@ -5290,7 +5307,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     // 숫자는 암송 코치의 "N번째"와 같은 누적 횟수 (끝까지 외운 횟수, 2026-10-23 사용자 요청)
     var mt=ccCount(n);
     var lm=document.createElement("button"); lm.type="button"; lm.className="logcnt lcmem"+(mt?"":" zero");
-    lm.textContent=mt?"암송 "+mt:"암송"; lm.setAttribute("aria-label",(n.ref||"말씀")+" 암송 시작"+(mt?" (지금까지 "+mt+"번)":"")); lm.title=mt?"지금까지 끝까지 외운 횟수 "+mt+"번 · 눌러서 암송":"눌러서 암송";
+    lm.textContent=(isGrad(n)?"🎓 ":"")+(mt?"암송 "+mt:"암송"); lm.setAttribute("aria-label",(n.ref||"말씀")+" 암송 시작"+(mt?" (지금까지 "+mt+"번)":"")); lm.title=mt?"지금까지 끝까지 외운 횟수 "+mt+"번 · 눌러서 암송":"눌러서 암송";
     refEl.appendChild(lm);
     renderVerse(el,n);
     var open=openIds.has(n.id);
@@ -7223,6 +7240,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(b.dataset.act==="sbsync"){sbSync("manual");return}
     if(b.dataset.act==="sblogin"){openSb();return}
     if(b.dataset.act==="rvall"){openRecall();return}
+    if(b.dataset.act==="stepmem"){var sn=notes.get(b.dataset.id); if(sn)openRecall([sn]); return}
+    if(b.dataset.act==="stepact"){stepAct();return}
+    if(b.dataset.act==="stepswap"){weekStepSwap(); buzz(8); renderReviewBar(); return}
     var id=b.dataset.id, act=b.dataset.act||"mem"; if(!id)return; setTopics([]);
     if(boardOn){   // 칸반에서 눌렀으면: 그 말씀 하나만 펼치고, '전체 보기'로 칸반에 바로 돌아가게 (2026-10-17 사용자 요청)
       boardOn=false; applyBoard();   // 설정은 칸반 그대로
@@ -8945,7 +8965,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       if(nxt===3&&!n.mem.s[3]){n.mem.s[3]=now;got.push(3)}
     }
     var cur=(n.rv&&n.rv.gap)||(reviewInfo(n)||{}).gap||1, ok=C.grade==="g2";
-    n.rv={at:now,gap:ok?nextGap(cur):1,ok:((n.rv&&n.rv.ok)||0)+(ok?1:0),miss:((n.rv&&n.rv.miss)||0)+(ok?0:1)};
+    n.rv=rvNext(n,ok,cur); if(rvNext.fresh)setTimeout(function(){toast("🎓 졸업! 이제 한 달에 한 번만 만나요")},600);
     recordDrill(n.id,now-C.t0,wordsOf(n.text).length,false);
     C.got=got; scheduleSave(n.id);
   }
@@ -10065,8 +10085,19 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   var rq=null, rqList=[], rqI=0, rqStage=0, rqDone={ok:0,miss:0};
   function firstLetters(t){return tokens(t).map(function(w){if(/^\s+$/.test(w))return w;var a=Array.from(w),out="",first=true;a.forEach(function(ch){if(/[가-힣A-Za-z0-9]/.test(ch)){out+=first?ch:"○";first=false}else out+=ch});return out}).join("")}
   function nextGap(cur){for(var i=0;i<REVIEW_GAP.length;i++)if(REVIEW_GAP[i]>cur)return REVIEW_GAP[i];return Math.min(180,Math.round(cur*2))}
-  function openRecall(){
-    rqList=Array.from(notes.values()).filter(function(n){var r=reviewInfo(n);return r&&r.due}).sort(function(a,b){return reviewInfo(a).next-reviewInfo(b).next});
+  // 🎓 졸업: 기억났어요로 간격이 7일에 닿으면 졸업 → 한 달에 한 번만 복습. 헷갈리면 다시 외우는 중으로 (2026-10-31 사용자 요청)
+  function rvNext(n,ok,cur){
+    var o=n.rv||{}, g=ok?nextGap(cur):1, grad=ok&&o.grad?o.grad:0;
+    rvNext.fresh=false;
+    if(ok&&!grad&&g>=7){g=Math.max(g,30); grad=Date.now(); rvNext.fresh=true}
+    return {at:Date.now(),gap:g,ok:(o.ok||0)+(ok?1:0),miss:(o.miss||0)+(ok?0:1),grad:grad};
+  }
+  function isGrad(n){return !!(n.rv&&n.rv.grad)}
+  // 오늘 복습은 많아도 5개까지만: 가장 오래 기다린 말씀부터, 나머지는 내일로 (2026-10-31 사용자 요청)
+  var DAY_CAP=5;
+  function dueAll(){return Array.from(notes.values()).filter(function(n){var r=reviewInfo(n);return r&&r.due}).sort(function(a,b){return reviewInfo(a).next-reviewInfo(b).next})}
+  function openRecall(list){
+    rqList=Array.isArray(list)?list.filter(Boolean):dueAll().slice(0,DAY_CAP);
     if(!rqList.length){toast("오늘 복습할 말씀이 없어요");return}
     if(!rq){
       rq=document.createElement("div"); rq.className="rvq"; rq.setAttribute("role","dialog"); rq.setAttribute("aria-modal","true"); rq.hidden=true;
@@ -10084,9 +10115,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         if(k==="say"){if(typeof sayWord==="function"&&canSpeak){try{window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(n.text);u.lang="ko-KR";u.rate=.9;window.speechSynthesis.speak(u)}catch(err){}}return}
         if(k==="ok"||k==="miss"){
           var cur=(n.rv&&n.rv.gap)||(reviewInfo(n)||{}).gap||1, ok=k==="ok";
-          n.rv={at:Date.now(),gap:ok?nextGap(cur):1,ok:((n.rv&&n.rv.ok)||0)+(ok?1:0),miss:((n.rv&&n.rv.miss)||0)+(ok?0:1)};
+          n.rv=rvNext(n,ok,cur);
           scheduleSave(n.id); ok?rqDone.ok++:rqDone.miss++;
-          toast(ok?"🙂 "+n.rv.gap+"일 뒤에 다시 만나요":"😅 내일 다시 복습해요"); buzz(ok?[12,40,18]:15);
+          toast(rvNext.fresh?"🎓 졸업! 이제 한 달에 한 번만 만나요":ok?"🙂 "+n.rv.gap+"일 뒤에 다시 만나요":"😅 내일 다시 복습해요"); buzz(ok?[12,40,18]:15);
           rqI++; rqStage=0; drawRecall(); return;
         }
         if(k==="end"){closeRecall();return}
@@ -11025,7 +11056,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     dl.querySelector(".dldate").textContent=(dlDay===today?"오늘 ":dlDay===dkey(Date.now()-864e5)?"어제 ":"")+dayName(dlDay);
     dl.querySelector(".dlnext").disabled=dlDay>=today;
     var tot=o.items.length, c=on.length;
-    dl.querySelector(".dlcnt").textContent=c+" / "+tot;
+    dl.querySelector(".dlcnt").textContent=(c?"✓ 완료 · ":"")+c+" / "+tot;   // 하나만 해도 그날 완료 (2026-10-31)
     // 막대 = 날짜 위치 (왼쪽 끝 처음 기록한 날 ~ 오른쪽 끝 오늘, 2026-10-24 사용자 요청)
     var rg=dlRange(o,today), bwd=dl.querySelector(".dlbarw");
     var pos=Math.round((new Date(dlDay+"T12:00:00")-new Date(rg.a+"T12:00:00"))/864e5);
@@ -11054,7 +11085,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var wEndT=new Date(dlWEnd+"T12:00:00").getTime();
     for(var i=6;i>=0;i--){
       var k=dkey(wEndT-i*864e5), cc=dailyChecked(o,k).length, d=document.createElement("button"); d.type="button"; d.dataset.day=k; d.setAttribute("aria-label",dayName(k)+" 보기, "+cc+"/"+tot);
-      d.className="dlw"+(k===dlDay?" cur":""); d.title=dayName(k)+" "+cc+"/"+tot;
+      d.className="dlw"+(k===dlDay?" cur":"")+(cc?" ok":""); d.title=dayName(k)+" "+cc+"/"+tot;
       d.innerHTML='<i></i><b></b>'; d.querySelector("b").textContent="일월화수목금토".charAt(new Date(k+"T12:00:00").getDay());
       d.querySelector("i").style.setProperty("--f",tot?(cc/tot):0); d.querySelector("i").textContent=cc||"";
       wk.appendChild(d);
@@ -12324,6 +12355,53 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   }
   setInterval(bsRoll,24000);   // 두 배 천천히 바뀜 (2026-10-29 사용자 요청)
   setInterval(function(){var s0=new Date().getSeconds(), hr=s0<5&&sayHour(); if(hr&&hr.id!==BS.id)bsRoll()},5000);   // 정각에 늦지 않게
+  /* ---------- 🌅 오늘의 한 걸음: 말씀 하나 떠올리기 + 이번 주 실천 하나 (2026-10-31 사용자 요청) ---------- */
+  function weekKey(){var d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-((d.getDay()+6)%7)); return dkey(d.getTime())}
+  function weekStepItems(o){return o.items.filter(function(it){return it.t&&String(it.t).trim()&&it.g!=="essay"&&!it.auto})}
+  function weekStep(o){
+    var its=weekStepItems(o); if(!its.length)return null;
+    var wk=weekKey(), p=null; try{p=JSON.parse(localStorage.getItem("bible-week-step")||"null")}catch(e){}
+    if(p&&p.w===wk){var f=its.filter(function(it){return it.id===p.id})[0]; if(f)return f}
+    return its[Math.floor(new Date(wk+"T12:00:00").getTime()/(7*864e5))%its.length];   // 주마다 차례로 돌아감
+  }
+  function weekStepSwap(){
+    var o=dailyData(), its=weekStepItems(o), cur=weekStep(o); if(!cur)return;
+    var nx=its[(its.indexOf(cur)+1)%its.length];
+    try{localStorage.setItem("bible-week-step",JSON.stringify({w:weekKey(),id:nx.id}))}catch(e){}
+  }
+  function stepVerseDone(){var t0=new Date(); t0.setHours(0,0,0,0); var hit=null; notes.forEach(function(n){if(n.rv&&n.rv.at>=t0.getTime()&&(!hit||n.rv.at>hit.rv.at))hit=n}); return hit}
+  function drawStep(bar){
+    if(!notes.size)return;
+    var o=dailyData(), today=dkey(Date.now()), ws=weekStep(o), vd=stepVerseDone(), due=dueAll(), vn=due[0]||(vd?null:remindPick());
+    var ad=!!(ws&&dailyChecked(o,today).indexOf(ws.id)>=0), cnt=(vd?1:0)+(ad?1:0), tot=ws?2:1;
+    var box=document.createElement("div"); box.className="tdstep"+(cnt>=tot?" alldone":"");
+    var hd=document.createElement("div"); hd.className="tsh";
+    hd.innerHTML='<b></b><span class="tsn"></span>';
+    hd.querySelector("b").textContent=cnt>=tot?"🌿 오늘의 한 걸음 완료":"🌅 오늘의 한 걸음";
+    hd.querySelector(".tsn").textContent=cnt+" / "+tot; box.appendChild(hd);
+    function row(icon,label,sub,done,btns){
+      var r=document.createElement("div"); r.className="tsrow"+(done?" done":"");
+      r.innerHTML='<span class="tsi" aria-hidden="true"></span><span class="tsm"><span class="tsl"></span><span class="tss"></span></span>';
+      r.querySelector(".tsi").textContent=done?"✓":icon; r.querySelector(".tsl").textContent=label; r.querySelector(".tss").textContent=sub;
+      btns.forEach(function(x){var b=document.createElement("button"); b.type="button"; b.className="rvchip "+x.c; b.dataset.id=x.id||""; b.dataset.act=x.act; b.textContent=x.t; if(x.l)b.setAttribute("aria-label",x.l); r.appendChild(b)});
+      box.appendChild(r);
+    }
+    if(vd)row("📖","말씀 하나 떠올리기",vd.ref+(isGrad(vd)?" · 🎓":"")+" · 오늘 떠올렸어요",true,vn&&due.length?[{c:"tsmore",act:"stepmem",id:vn.id,t:"하나 더"}]:[]);
+    else if(vn)row("📖","말씀 하나 떠올리기",vn.ref+" · 30초",false,[{c:"tsgo",act:"stepmem",id:vn.id,t:"떠올리기"}]);
+    if(ws){
+      var g=dlGroups(o).filter(function(x){return x.g===ws.g})[0];
+      row((g&&g.e)||"🌱","이번 주 실천",ws.t,ad,[{c:ad?"tsmore":"tsgo",act:"stepact",t:ad?"했어요 ✓":"했어요",l:ad?"오늘 체크 풀기":"오늘 했어요"},{c:"tsswap",act:"stepswap",t:"↻",l:"이번 주 실천을 다른 것으로 바꾸기"}]);
+    }
+    bar.appendChild(box);
+  }
+  function stepAct(){
+    var o=dailyData(), ws=weekStep(o), today=dkey(Date.now()); if(!ws)return;
+    var day=(o.days[today]||[]).slice(), i=day.indexOf(ws.id);
+    if(i>=0)day.splice(i,1); else day.push(ws.id);
+    o.days[today]=day; saveDaily(o);
+    if(i<0){buzz([12,40,18]); toast(stepVerseDone()?"🌿 오늘의 한 걸음 완료!":"🌱 오늘 실천 체크!")}
+    renderReviewBar();
+  }
   function renderReviewBar(){
     try{renderBoardSay()}catch(e){}
     var bar=$("reviewBar"); if(!bar)return;
@@ -12331,8 +12409,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(reorderMode||!notes.size){bar.hidden=true;return}
     var all=sorted(), rows=[];
     // 1) 복습할 말씀
-    var due=all.filter(function(n){var r=reviewInfo(n);return r&&r.due});
-    if(due.length)rows.push({icon:"🔁",label:"복습할 말씀",chips:[{id:"",t:"▶ 한 번에 복습 "+due.length,act:"rvall"}].concat(due.slice(0,6).map(function(n){return {id:n.id,t:n.ref,act:"mem"}}))});
+    var due=dueAll(), dueN=Math.min(DAY_CAP,due.length);
+    if(due.length)rows.push({icon:"🔁",label:"복습할 말씀",tag:due.length>DAY_CAP?"나머지 "+(due.length-DAY_CAP)+"개는 내일":"",chips:[{id:"",t:"▶ 오늘 복습 "+dueN,act:"rvall"}].concat(due.slice(0,dueN).map(function(n){return {id:n.id,t:n.ref,act:"mem"}}))});
     // 2) 오늘 묵상
     var st=medStats(), today=dkey(Date.now()), didToday=!!st.days[today];
     var lastMedNote=null, lastAt=0;
@@ -12359,7 +12437,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(ss){var fin=(frData&&frData.incoming||[]).length, fct=(frData&&frData.friends||[]).length;
       rows.push({icon:"👥",info:1,label:"친구",tag:fin?"신청 "+fin+"개 💌":fct?fct+"명":"",chips:[{id:"",t:fin?"확인하기":fct?"친구 보기":"친구 맺기",act:"friends"}]})}
     var dd=dailyData(), dc=dailyChecked(dd,dkey(Date.now())).length, dt=dd.items.length;
-    rows.push({icon:"🌙",label:"하루 돌아보기",big:{dc:dc,dt:dt},chips:[],done:dt>0&&dc===dt});
+    rows.push({icon:"🌙",label:"하루 돌아보기",big:{dc:dc,dt:dt},chips:[],done:dc>0});   // 하나만 해도 오늘 완료 (2026-10-31 사용자 요청)
     rows.push({icon:"📝",label:"나의 묵상 질문",chips:[{id:"",t:"묻고 답하기",act:"medq"}]});
     rows.push({icon:"📅",info:1,label:"한 주 돌아보기",chips:[{id:"",t:"이번 주 보기",act:"week"}]});
     if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))rows.push({icon:"📊",info:1,label:"실천 진도표",chips:[{id:"",t:"전체 보기",act:"prog"}]});
@@ -12380,6 +12458,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       tdFold=!tdFold; renderReviewBar();
     });
     bar.appendChild(h);
+    try{drawStep(bar)}catch(e){}
     var sd=sayOfDay();
     if(sd){   // 오늘의 한 마디 (2026-10-18 사용자 요청)
       var swrap=document.createElement("div"); swrap.className="saywrap";
@@ -12399,7 +12478,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var pc=r.big.dt?Math.round(r.big.dc/r.big.dt*100):0;
         bb.setAttribute("aria-label",r.label+" "+r.big.dc+" / "+r.big.dt+" 열기");
         bb.innerHTML='<span class="tbi" aria-hidden="true"></span><span class="tbm"><span class="tbt"></span><span class="tbbar"><i></i></span></span><span class="tbn"></span><span class="tbgo" aria-hidden="true">›</span>';
-        bb.querySelector(".tbi").textContent=r.icon; bb.querySelector(".tbt").textContent=r.done?r.label+" 끝 ✓":r.label;
+        bb.querySelector(".tbi").textContent=r.icon; bb.querySelector(".tbt").textContent=r.done?r.label+" · 오늘 완료 ✓":r.label;
         bb.querySelector(".tbbar i").style.width=pc+"%"; bb.querySelector(".tbn").textContent=r.big.dc+" / "+r.big.dt;
         bar.appendChild(bb); return;
       }
