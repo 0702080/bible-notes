@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-dlstar">
+<meta name="app-build" content="2026-11-01-mqh">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12976,6 +12976,9 @@ body.carddrag #reviewBar{display:none!important}
     function fit(){
       if(!cur||!cur.isConnected||document.activeElement!==cur||!mq||mq.hidden)return;
       var vv=window.visualViewport, vh=vv?vv.height:innerHeight, vtop=vv?vv.offsetTop:0, vbot=vtop+vh;   // 키보드가 화면을 가리기만 하는 브라우저(보이는 영역만 줄어듦)도 맞게
+      // 키보드가 떠도 보이는 높이가 안 줄어드는 기기(홈 화면 앱 등)는 키보드가 화면 아래 42%쯤을 덮는다고 보고 그 위까지만 (2026-11-01 사용자 요청: 칸이 너무 김)
+      var fullH=Math.max(innerHeight,(screen&&screen.height)||0);
+      if(vh>fullH*0.8)vbot=vtop+Math.round(vh*0.58);
       var body=mq.querySelector(".dlbody"), fx=mq.querySelector(".dlfix"), it=cur.closest(".mqitem");
       body.style.paddingBottom=Math.round(innerHeight)+"px";   // 마지막 질문도 위로 끝까지 올릴 수 있게 아래 여백을 잠시 크게
       var topLine=Math.max(fx?fx.getBoundingClientRect().bottom:0,vtop);
