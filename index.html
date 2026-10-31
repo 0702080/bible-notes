@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-dragtop">
+<meta name="app-build" content="2026-10-31-draghide">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3108,6 +3108,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlnohit{margin:18px auto;max-width:608px;padding:14px;border:1px dashed #2E2D34;border-radius:12px;color:var(--faint);font-size:13px;text-align:center}
 @media (max-width:420px){.dlfix{gap:8px;padding:8px 12px}.dlday{gap:6px}.dldate{font-size:14px;min-width:96px}.dlday button{width:28px;height:28px;font-size:12px}.dlcnt{font-size:13.5px}}
 /* 📅 하루 돌아보기 위쪽 달력 (2026-10-31 사용자 요청) */
+body.carddrag #reviewBar{display:none!important}
 .dlcal{display:none}
 .daily.dlhascal .dlfix>.dlday,.daily.dlhascal .dlfix>.dlprog,.daily.dlhascal .dlweek{display:none}
 .daily.dlhascal .dlfix{display:block;padding-top:6px;padding-bottom:8px;border-bottom:0}
@@ -16082,6 +16083,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function endDrag(cancel){
     if(!drag)return;
     var el=drag.el; el.classList.remove("dragging","overdrop"); el.style.transform=""; $("list").classList.remove("sorting");
+    if(document.body.classList.contains("carddrag")){var lr1=el.getBoundingClientRect().top; document.body.classList.remove("carddrag"); var dy1=el.getBoundingClientRect().top-lr1; if(dy1)window.scrollBy(0,dy1)}
     cancelAnimationFrame(dragRAF); document.body.style.userSelect="";
     try{drag.grip.releasePointerCapture(drag.pid)}catch(e){}
     var moved=drag.moved; drag=null;
@@ -16145,6 +16147,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     try{(capEl||el).setPointerCapture(pid)}catch(err){}
     try{var sel=window.getSelection&&window.getSelection(); if(sel)sel.removeAllRanges()}catch(err){}
     el.classList.add("dragging"); $("list").classList.add("sorting"); document.body.style.userSelect="none";
+    if(!reorderMode&&!boardOn){var rb0=$("reviewBar"), lr0=el.getBoundingClientRect().top; document.body.classList.add("carddrag"); if(rb0){var dy0=el.getBoundingClientRect().top-lr0; if(dy0)window.scrollBy(0,dy0)}}   // 카드를 끄는 동안 '오늘' 카드 숨김 — 카드가 손가락 아래 그대로 있게 화면을 맞춤 (2026-10-31 사용자 요청)
     if(!reorderMode)setStatus("위아래로 끌어서 옮기세요");
     colDropOpen(el);
     if(navigator.vibrate)try{navigator.vibrate(15)}catch(err){}
