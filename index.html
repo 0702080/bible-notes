@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-lhgrip2">
+<meta name="app-build" content="2026-10-31-saybar">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3065,6 +3065,12 @@ textarea.lhpad{padding-left:28px!important}
 .saytoday .sayw1{display:block;margin-top:4px;font-size:12px;color:var(--sc);text-align:right}
 @media (hover:hover){.saytoday:hover{background:color-mix(in srgb,var(--sc) 16%,transparent)}}
 .saybox{max-width:640px;margin:0 auto}
+/* PC: 담기·닫기 단추를 카드 줄 왼쪽 끝 위로, 제목은 오른쪽 끝 (2026-10-31 사용자 요청) */
+@media (min-width:900px){
+.saysheet>.dlbar{padding-left:max(16px,calc((100% - 640px) / 2));padding-right:max(16px,calc((100% - 640px) / 2));justify-content:flex-start}
+.saysheet>.dlbar>button{order:-1}
+.saysheet>.dlbar>.dltitle{text-align:right}
+}
 .sayform{display:flex;flex-direction:column;gap:8px;margin:4px 0 16px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 35%,#232229);border-radius:16px;background:color-mix(in srgb,var(--gold) 6%,#131317)}
 .sayform[hidden]{display:none}
 .sayt{width:100%;box-sizing:border-box;min-height:96px;padding:12px 14px;border:1px solid #2A2930;border-radius:12px;background:var(--sheet);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.75;resize:vertical}
