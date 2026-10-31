@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-calfold">
+<meta name="app-build" content="2026-11-01-dlstar">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3284,6 +3284,28 @@ body.carddrag #reviewBar{display:none!important}
 .dllist .dlgh{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .dlgpin{flex:0 0 auto;width:26px;height:26px;border:0;border-radius:13px;background:transparent;color:var(--faint);font-size:14px;line-height:1}
 .dlgpin.on{color:var(--gold)}
+/* ★ 묶음만 보이기·💤 쉬는 항목 (2026-11-01) */
+.dlmorebox{max-width:760px;margin:0 auto}
+.dlmorebox:empty{display:none}
+.dlmorerow{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:4px 0 14px}
+.dlmore{height:38px;padding:0 18px;border:1px dashed color-mix(in srgb,var(--gold) 45%,#34333A);border-radius:19px;background:transparent;color:var(--gold);font:inherit;font-size:13.5px;font-weight:700}
+.dlmore.dlrestbtn{border-color:#34333A;color:var(--muted);font-weight:500}
+.dlmore.dlrestbtn.on{border-style:solid;color:var(--ink)}
+.dlmorehint{margin:0;font-size:12.5px;color:var(--faint);text-align:center}
+.dlrest{margin:0 0 14px;padding:12px 14px;border:1px solid #2A2930;border-radius:14px;background:#121216}
+.dlresthd b{display:block;font-size:14px;color:var(--ink)}
+.dlresthd span{display:block;margin-top:3px;font-size:12.5px;color:var(--muted);line-height:1.5}
+.dlrestlist{display:flex;flex-direction:column;gap:2px;margin-top:10px;max-height:46vh;overflow:auto}
+.dlrestit{display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid #1E1D23;font-size:14px;color:var(--ink)}
+.dlrestit:last-child{border-bottom:0}
+.dlrestit input{flex:0 0 auto;width:18px;height:18px;accent-color:var(--gold)}
+.dlrestit span{flex:1;min-width:0;word-break:keep-all;overflow-wrap:anywhere}
+.dlrestit small{flex:0 0 auto;max-width:40%;font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dlrested .dlresthd{margin-bottom:6px}
+.dlrestback{flex:0 0 auto;height:30px;padding:0 12px;border:1px solid color-mix(in srgb,var(--sky) 45%,#34333A);border-radius:15px;background:transparent;color:var(--sky);font:inherit;font-size:12.5px}
+.dlrestft{display:flex;gap:8px;margin-top:10px}
+.dlrestft button{height:36px;padding:0 16px;border:1px solid #34333A;border-radius:18px;background:transparent;color:var(--muted);font:inherit;font-size:13px}
+.dlrestft .dlrestgo{border:0;background:var(--gold);color:#141416;font-weight:700}
 .dlicall+.dlghgrip{margin-left:4px}
 .dlghgrip{margin-left:auto;flex:0 0 auto;width:28px;height:28px;display:grid;place-items:center;border:0;background:transparent;color:var(--faint);font-size:15px;line-height:1;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
 .dlgsd{position:relative;margin-left:auto;flex:0 1 auto;min-width:0;display:inline-flex;align-items:center;height:26px;padding:0 10px;border:1px dashed #3A3944;border-radius:13px;font-size:12.5px;font-weight:400;color:var(--faint);white-space:nowrap;cursor:pointer}
@@ -10947,9 +10969,10 @@ body.carddrag #reviewBar{display:none!important}
         '<div class="dlcdow"><span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span></div><div class="dlcg"></div></div></div>'+
         '<div class="dlbody"><div class="dlweek" aria-label="최근 7일"></div>'+
         '<div class="dlsearch"><input class="dlsin" type="search" placeholder="묶음 · 항목 · 기록 찾기 (초성도 돼요)" aria-label="하루 돌아보기에서 찾기"><span class="dlsn"></span><button type="button" class="dlsx" hidden>지우기</button></div>'+
-        '<div class="dllist"></div>'+
+        '<div class="dllist"></div><div class="dlmorebox"></div>'+
         '</div>';
       document.body.appendChild(dl);
+      dl.querySelector(".dlmorebox").addEventListener("click",dlMoreClick);
       dl.querySelector(".dlnewg").addEventListener("submit",function(e){
         e.preventDefault(); var ni=dl.querySelector(".dlgn"), ei=dl.querySelector(".dlge"), t=ni.value.trim(); if(!t){ni.focus();return}
         var o=dailyData(); if(!Array.isArray(o.groups))o.groups=[];
@@ -11170,7 +11193,7 @@ body.carddrag #reviewBar{display:none!important}
       });
       dl.querySelector(".dladd").addEventListener("submit",function(e){
         e.preventDefault(); var inp=dl.querySelector(".dlin"), t=inp.value.trim(); if(!t){inp.focus();return}
-        var o=dailyData(); o.items.push({id:"d"+Date.now().toString(36),g:dl.querySelector(".dlg").value,t:t.slice(0,120)}); saveDaily(o); inp.value=""; drawDaily(); inp.focus();
+        var o=dailyData(), nid0="d"+Date.now().toString(36); o.items.push({id:nid0,g:dl.querySelector(".dlg").value,t:t.slice(0,120)}); if(!o.iat||typeof o.iat!=="object")o.iat={}; o.iat[nid0]=dkey(Date.now()); saveDaily(o); inp.value=""; drawDaily(); inp.focus();
       });
       dl.querySelector(".dllist").addEventListener("click",function(e){
         if(Date.now()-dlIcDragAt<500&&e.target.closest(".dlicwrap")){e.stopPropagation();return}   // 끌어 옮긴 직후의 누름은 체크·펼치기로 보지 않음
@@ -11288,13 +11311,14 @@ body.carddrag #reviewBar{display:none!important}
       dlDragInit(dl.querySelector(".dllist"));
     }
     dlDay=(day&&/^\d{4}-\d{2}-\d{2}$/.test(day))?day:dkey(Date.now()); dlWEnd=""; dlCalM="";
+    dlShowAll=false; dlRestOpen="";
     dlCalFold=true;   // 열 때마다 달력은 이번 주만 보이게 접힌 채로 (2026-10-31 사용자 요청)
     dlEdit=false; dlEditId=""; dlGEditId=""; dlMemoId="";
     dlFind=""; var si0=dl.querySelector(".dlsin"); if(si0)si0.value="";
     if(focusId){   // 찾기에서 들어오면 그 항목의 기록을 펼쳐 둔다
       dlMemoMore.add(focusId);
       var fit=dailyData().items.filter(function(x){return x.id===focusId})[0];
-      if(fit){dlGFold.delete(fit.g); saveGFold()}
+      if(fit){dlGFold.delete(fit.g); saveGFold(); if(!dlPinned(dailyData(),fit.g))dlShowAll=true}
     }
     dl.hidden=false; if(dl._dlsPlace)dl._dlsPlace(); document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawDaily();   // 창이 보인 뒤에 그려야 알약 단추 너비를 재서 글자 자리를 비울 수 있다
@@ -11733,6 +11757,91 @@ body.carddrag #reviewBar{display:none!important}
       g.appendChild(b);
     })});
   }
+  /* ★ 묶음만 보이기 + 💤 쉬는 항목 (2026-11-01 사용자 요청: 항목이 너무 많아 줄이고 싶음)
+     - ★(즐겨찾기) 묶음이 하나라도 있으면 열 때 ★ 묶음과 말씀 실천·중보기도만, 나머지는 '나머지 묶음 보기'로
+     - 30일 동안 한 번도 체크·기록하지 않은 항목은 "쉬게 할까요?"로 물어 숨김 (지우지 않음, 언제든 다시 꺼냄)
+     쉬는 항목 o.rest {id:{on:1|0,at}} (늦게 바꾼 쪽, 클라우드로 맞춤), 새로 넣은 항목 날짜 o.iat {id:날짜} */
+  var dlShowAll=false, dlRestOpen="";
+  function dlRested(o,id){var r=o&&o.rest&&o.rest[id]; return !!(r&&r.on)}
+  function dlStale(o){
+    var now=Date.now(), from=dkey(now-29*864e5), old=dkey(now-30*864e5), first="", act={};
+    Object.keys(o.days||{}).concat(Object.keys(o.memo||{})).forEach(function(k){if(/^\d{4}-\d{2}-\d{2}$/.test(k)&&(!first||k<first))first=k});
+    if(!first||first>old)return [];   // 기록이 30일이 안 됐으면 묻지 않음
+    Object.keys(o.days||{}).forEach(function(k){if(k>=from)(o.days[k]||[]).forEach(function(id){act[id]=1})});
+    Object.keys(o.memo||{}).forEach(function(k){if(k>=from)Object.keys(o.memo[k]||{}).forEach(function(id){if(String(o.memo[k][id]||"").trim())act[String(id).split("~")[0]]=1})});
+    return o.items.filter(function(it){
+      if(it.auto||act[it.id]||dlRested(o,it.id))return false;
+      if(o.iat&&o.iat[it.id]&&o.iat[it.id]>old)return false;   // 새로 넣은 지 30일이 안 됨
+      var r=o.rest&&o.rest[it.id]; if(r&&!r.on&&(+r.at||0)>now-30*864e5)return false;   // 다시 꺼낸 지 30일이 안 됨
+      return true;
+    });
+  }
+  function dlRestSet(ids,on){
+    var o=dailyData(), now=Date.now(); if(!o.rest||typeof o.rest!=="object")o.rest={};
+    ids.forEach(function(id){o.rest[id]={on:on?1:0,at:now}}); saveDaily(o);
+  }
+  function dlRestSnoozed(){var t=0; try{t=+localStorage.getItem("bible-dl-restask")||0}catch(e){} return Date.now()-t<7*864e5}
+  function dlMoreDraw(o,hidN,pinN){
+    var box=dl.querySelector(".dlmorebox"); if(!box)return; box.textContent="";
+    if(dlEdit||dlFind)return;
+    var gname=function(it){var g=dlGroups(o).filter(function(x){return x.g===it.g})[0]; return g?g.e+" "+g.t:""};
+    var row=document.createElement("div"); row.className="dlmorerow";
+    if(!dlFocus){
+      if(hidN){var mb=document.createElement("button"); mb.type="button"; mb.className="dlmore"; mb.dataset.k="all"; mb.textContent="＋ 나머지 묶음 "+hidN+"개 보기"; row.appendChild(mb)}
+      else if(dlShowAll&&pinN){var lb=document.createElement("button"); lb.type="button"; lb.className="dlmore"; lb.dataset.k="star"; lb.textContent="★ 묶음만 보기"; row.appendChild(lb)}
+      else if(!pinN){var hp=document.createElement("p"); hp.className="dlmorehint"; hp.textContent="매일 하는 묶음의 ☆를 누르면, 다음부터 그 묶음만 먼저 보여요."; row.appendChild(hp)}
+    }
+    var rested=o.items.filter(function(it){return dlRested(o,it.id)});
+    if(rested.length){var rb=document.createElement("button"); rb.type="button"; rb.className="dlmore dlrestbtn"+(dlRestOpen==="list"?" on":""); rb.dataset.k="restlist"; rb.textContent="💤 쉬는 항목 "+rested.length+"개"; row.appendChild(rb)}
+    if(row.children.length)box.appendChild(row);
+    var stale=dlStale(o);
+    if(stale.length&&(dlRestOpen==="ask"||!dlRestSnoozed())){
+      var ask=document.createElement("section"); ask.className="dlrest";
+      var hd=document.createElement("div"); hd.className="dlresthd";
+      hd.innerHTML='<b></b><span></span>';
+      hd.querySelector("b").textContent="💤 30일 동안 한 번도 안 한 항목이 "+stale.length+"개 있어요";
+      hd.querySelector("span").textContent="쉬게 하면 목록에서 숨어요. 지워지지 않고, 언제든 다시 꺼낼 수 있어요.";
+      ask.appendChild(hd);
+      if(dlRestOpen==="ask"){
+        var ul=document.createElement("div"); ul.className="dlrestlist";
+        stale.forEach(function(it){
+          var lb=document.createElement("label"); lb.className="dlrestit";
+          var cb=document.createElement("input"); cb.type="checkbox"; cb.checked=true; cb.value=it.id;
+          var sp=document.createElement("span"); sp.textContent=it.t; var sm=document.createElement("small"); sm.textContent=gname(it);
+          lb.appendChild(cb); lb.appendChild(sp); lb.appendChild(sm); ul.appendChild(lb);
+        });
+        ask.appendChild(ul);
+      }
+      var ft=document.createElement("div"); ft.className="dlrestft";
+      ft.innerHTML=dlRestOpen==="ask"?'<button type="button" class="dlrestgo" data-k="restgo">고른 것 쉬게 하기</button><button type="button" data-k="restno">닫기</button>':'<button type="button" class="dlrestgo" data-k="restask">살펴보기</button><button type="button" data-k="restlater">나중에</button>';
+      ask.appendChild(ft); box.appendChild(ask);
+    }
+    if(dlRestOpen==="list"&&rested.length){
+      var rs=document.createElement("section"); rs.className="dlrest dlrested";
+      var h2=document.createElement("div"); h2.className="dlresthd"; h2.innerHTML="<b>💤 쉬는 항목</b>"; rs.appendChild(h2);
+      rested.forEach(function(it){
+        var r=document.createElement("div"); r.className="dlrestit";
+        var sp=document.createElement("span"); sp.textContent=it.t; var sm=document.createElement("small"); sm.textContent=gname(it);
+        var bk=document.createElement("button"); bk.type="button"; bk.className="dlrestback"; bk.dataset.k="back"; bk.dataset.id=it.id; bk.textContent="다시 꺼내기";
+        r.appendChild(sp); r.appendChild(sm); r.appendChild(bk); rs.appendChild(r);
+      });
+      box.appendChild(rs);
+    }
+  }
+  function dlMoreClick(e){
+    var b=e.target.closest("button[data-k]"); if(!b)return; var k=b.dataset.k;
+    if(k==="all"){dlShowAll=true; drawDaily(); return}
+    if(k==="star"){dlShowAll=false; drawDaily(); var bd=dl.querySelector(".dlbody"); if(bd)bd.scrollTop=0; return}
+    if(k==="restlist"){dlRestOpen=dlRestOpen==="list"?"":"list"; drawDaily(); return}
+    if(k==="restask"){dlRestOpen="ask"; drawDaily(); return}
+    if(k==="restlater"||k==="restno"){try{localStorage.setItem("bible-dl-restask",String(Date.now()))}catch(err){} dlRestOpen=""; drawDaily(); if(k==="restlater")toast("일주일 뒤에 다시 물어볼게요"); return}
+    if(k==="restgo"){
+      var ids=Array.prototype.map.call(dl.querySelectorAll(".dlrestlist input:checked"),function(x){return x.value});
+      if(!ids.length){toast("쉬게 할 항목을 골라 주세요");return}
+      dlRestSet(ids,true); dlRestOpen=""; drawDaily(); toast("💤 "+ids.length+"개 항목을 쉬게 했어요"); return;
+    }
+    if(k==="back"){dlRestSet([b.dataset.id],false); drawDaily(); toast("다시 꺼냈어요"); return}
+  }
   function drawDaily(){
     var o=dailyData(), on=dailyChecked(o,dlDay), today=dkey(Date.now());
     dl.querySelector(".dldate").textContent=(dlDay===today?"오늘 ":dlDay===dkey(Date.now()-864e5)?"어제 ":"")+dayName(dlDay);
@@ -11778,7 +11887,7 @@ body.carddrag #reviewBar{display:none!important}
     list.classList.toggle("dlfocusing",dlFocus&&!dlEdit&&!dlFind);
     if(dlFocus&&!dlEdit&&!dlFind){   // 🎯 집중: 아직 안 한 것 중 세 가지만 크게
       var gsF=dlSortGroups(o,dlGroups(o)), ordF=[];
-      gsF.forEach(function(g){o.items.forEach(function(it){if(it.g===g.g)ordF.push({it:it,g:g})})});
+      gsF.forEach(function(g){o.items.forEach(function(it){if(it.g===g.g&&!dlRested(o,it.id))ordF.push({it:it,g:g})})});
       var todo=ordF.filter(function(x){return on.indexOf(x.it.id)<0}), doneN=ordF.length-todo.length;
       var wrap=document.createElement("section"); wrap.className="dlfocus";
       var hd=document.createElement("div"); hd.className="dlfhd";
@@ -11804,13 +11913,18 @@ body.carddrag #reviewBar{display:none!important}
       if(todo.length>3){var nx=document.createElement("button"); nx.type="button"; nx.className="dlfnext"; nx.textContent="다른 것 보기 ↻"; ft.appendChild(nx)}
       var all=document.createElement("button"); all.type="button"; all.className="dlfoff"; all.textContent="전체 보기 ("+todo.length+"개 남음)"; ft.appendChild(all);
       wrap.appendChild(ft); list.appendChild(wrap);
+      dlMoreDraw(o,0,0);
       return;
     }
     var fq=dlFind, fcount=0;
     var gs=dlSortGroups(o,dlGroups(o)), sel=dl.querySelector(".dlg"), keep=dlPickG||sel.value;
     sel.innerHTML=gs.map(function(g){return '<option value="'+g.g+'">'+g.e+' '+g.t.replace(/[<&"]/g,"")+'</option>'}).join(""); if(keep&&gs.some(function(g){return g.g===keep}))sel.value=keep; dlPickG="";
+    var pinN=dlEdit||fq?0:gs.filter(function(g){return dlPinned(o,g.g)&&o.items.some(function(it){return it.g===g.g&&!dlRested(o,it.id)})}).length, hidN=0;
+    var starOnly=pinN>0&&!dlShowAll;
     gs.forEach(function(g){
       var its=o.items.filter(function(it){return it.g===g.g}), mine=/^u/.test(g.g), hits={};
+      if(!fq&&!dlEdit){its=its.filter(function(it){return !dlRested(o,it.id)}); if(!its.length)return}   // 💤 쉬는 항목은 숨김
+      if(starOnly&&!fq&&!dlEdit&&!dlPinned(o,g.g)){hidN++; return}   // ★ 묶음만
       if(fq){   // 찾는 중: 묶음 이름·항목 글·적어 둔 기록에 맞는 것만
         var gHit=dlHit(g.e+" "+g.t);
         its=its.filter(function(it){
@@ -12089,6 +12203,7 @@ body.carddrag #reviewBar{display:none!important}
     if(sn)sn.textContent=fq?(fcount?fcount+"개":"없어요"):"";
     if(sx)sx.hidden=!fq;
     outer.classList.toggle("dlsolo",!!fq);   // 찾아서 걸러진 묶음은 화면 가운데에 나란히 (2026-10-24 사용자 요청)
+    dlMoreDraw(o,hidN,pinN);
     if(fq&&!fcount){var nh=document.createElement("p");nh.className="dlnohit";nh.textContent="“"+fq+"”이(가) 든 묶음·항목·기록이 없어요.";outer.appendChild(nh)}
     dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit; dl.querySelector(".dltop").hidden=!dlEdit;
     var eb=dl.querySelector(".dledit:not(.dlfocusbtn)"); eb.textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기"; eb.classList.toggle("on",dlEdit);
@@ -13095,7 +13210,7 @@ body.carddrag #reviewBar{display:none!important}
   setInterval(function(){var s0=new Date().getSeconds(), hr=s0<5&&sayHour(); if(hr&&hr.id!==BS.id)bsRoll()},5000);   // 정각에 늦지 않게
   /* ---------- 🌅 오늘의 한 걸음: 말씀 하나 떠올리기 + 이번 주 실천 하나 (2026-10-31 사용자 요청) ---------- */
   function weekKey(){var d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-((d.getDay()+6)%7)); return dkey(d.getTime())}
-  function weekStepItems(o){return o.items.filter(function(it){return it.t&&String(it.t).trim()&&it.g!=="essay"&&!it.auto})}
+  function weekStepItems(o){return o.items.filter(function(it){return it.t&&String(it.t).trim()&&it.g!=="essay"&&!it.auto&&!dlRested(o,it.id)})}
   function weekStep(o){
     var its=weekStepItems(o); if(!its.length)return null;
     var wk=weekKey(), p=null; try{p=JSON.parse(localStorage.getItem("bible-week-step")||"null")}catch(e){}
@@ -15272,6 +15387,11 @@ body.carddrag #reviewBar{display:none!important}
           // 묶음 차례와 ⭐ 고정도 함께 (이 기기에 없을 때만 받는다)
           if(Array.isArray(obj.daily.gorder)&&!Array.isArray(od.gorder))od.gorder=obj.daily.gorder.slice();
           if(Array.isArray(obj.daily.gpin)&&!Array.isArray(od.gpin))od.gpin=obj.daily.gpin.slice();
+          if(obj.daily.rest&&typeof obj.daily.rest==="object"){   // 💤 쉬는 항목: 늦게 바꾼 쪽
+            if(!od.rest||typeof od.rest!=="object")od.rest={};
+            Object.keys(obj.daily.rest).forEach(function(id){var r=obj.daily.rest[id]; if(r&&typeof r==="object"&&(+r.at||0)>(+(od.rest[id]||{}).at||0))od.rest[id]={on:r.on?1:0,at:+r.at||0}});
+          }
+          if(obj.daily.iat&&typeof obj.daily.iat==="object"){if(!od.iat||typeof od.iat!=="object")od.iat={}; Object.keys(obj.daily.iat).forEach(function(id){if(!od.iat[id])od.iat[id]=obj.daily.iat[id]})}
           if(obj.daily.gstart&&typeof obj.daily.gstart==="object"){   // 작정기도 시작 날짜
             if(!od.gstart||typeof od.gstart!=="object")od.gstart={};
             Object.keys(obj.daily.gstart).forEach(function(g){if(!od.gstart[g])od.gstart[g]=obj.daily.gstart[g]});
