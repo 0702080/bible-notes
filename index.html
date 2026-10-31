@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-dlcal2">
+<meta name="app-build" content="2026-10-31-dlcal3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3148,7 +3148,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .dlcg.dlcin-r{animation:dlcinr .25s ease-out}
 @keyframes dlcinl{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
 @keyframes dlcinr{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
-@media (prefers-reduced-motion:reduce){.dlcg.dlcin-l,.dlcg.dlcin-r{animation:none}}
+.dlcg.dlcin-u{animation:dlcinu .25s ease-out}
+.dlcg.dlcin-d{animation:dlcind .3s ease-out}
+@keyframes dlcinu{from{opacity:.3;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes dlcind{from{opacity:.3;transform:translateY(-18px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.dlcg.dlcin-l,.dlcg.dlcin-r,.dlcg.dlcin-u,.dlcg.dlcin-d{animation:none}}
 @media (max-width:420px){.dlcd{height:40px;border-radius:11px}.dlcdow,.dlcg{gap:2px 3px}.dlcmt{font-size:16px}.dlcsum{font-size:12.5px}}
 .dlw{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 0;border:0;background:transparent;font:inherit;cursor:pointer}
 .dlw i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;color:#141416;background:color-mix(in srgb,var(--gold) calc(var(--f) * 100%),#1c1b21)}
@@ -10530,11 +10534,23 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           if(e.target.closest(".dlcfold")){dlCalFold=!dlCalFold; try{localStorage.setItem("bible-dl-calfold",dlCalFold?"1":"0")}catch(err){} drawDaily()}
         });
         var sx=null, sy=0;
-        g.addEventListener("pointerdown",function(e){sx=e.clientX; sy=e.clientY});
-        g.addEventListener("pointerup",function(e){if(sx==null)return; var dx=e.clientX-sx, dy=e.clientY-sy; sx=null; if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){dlCalShift(dx<0?1:-1); dlCalEat=Date.now()}});
-        g.addEventListener("pointercancel",function(){sx=null});
         g.addEventListener("click",function(e){if(Date.now()-dlCalEat<350){e.stopPropagation(); e.preventDefault()}},true);
-        g.style.touchAction="pan-y";
+        g.style.touchAction="none"; cal.style.touchAction="none";
+        // 달력을 위로 쓱 밀어 올리면 접고, 아래로 끌어 내리면 펼침 (2026-10-31 사용자 요청)
+        var vy=null, vx=0;
+        cal.addEventListener("pointerdown",function(e){vy=e.clientY; vx=e.clientX; cal._inG=!!e.target.closest(".dlcg")});
+        window.addEventListener("pointerup",function(e){   // 손가락이 달력 밖에서 떨어져도 (끌어 내리기)
+          if(vy==null)return; var dy=e.clientY-vy, dx=e.clientX-vx; vy=null;
+          if(cal._inG&&Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){dlCalShift(dx<0?1:-1); dlCalEat=Date.now(); return}   // 좌우로 밀면 달 넘기기
+          if(Math.abs(dy)<40||Math.abs(dy)<Math.abs(dx)*1.3)return;
+          var want=dy<0; if(want===(dlCalFold&&!dlCalM))return;
+          dlCalFold=want; dlCalM=""; dlCalEat=Date.now();
+          try{localStorage.setItem("bible-dl-calfold",want?"1":"0")}catch(err){}
+          buzz(10); drawDaily();
+          var gg=dl.querySelector(".dlcg"); if(gg){gg.classList.remove("dlcin-u","dlcin-d"); void gg.offsetWidth; gg.classList.add(want?"dlcin-u":"dlcin-d")}
+        });
+        window.addEventListener("pointercancel",function(){vy=null});
+        cal.addEventListener("click",function(e){if(Date.now()-dlCalEat<350){e.stopPropagation(); e.preventDefault()}},true);
       })();   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
       dl.querySelector(".dlfocusbtn").addEventListener("click",function(){dlFocus=!dlFocus; dlFocusSkip=0; dlEdit=false; try{localStorage.setItem("bible-dl-focus",dlFocus?"1":"")}catch(err){} drawDaily()});
       dl.querySelector(".dledit:not(.dlfocusbtn)").addEventListener("click",function(){dlEdit=!dlEdit;dlEditId="";dlGEditId="";dlMemoId="";drawDaily()});
@@ -11481,19 +11497,24 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       });
     });
     // 🌱 말씀 실천: 카드 실천 탭에 적은 실천을 하루 돌아보기에서 날마다 점검 — 체크하면 실천 도장과 같은 기록 (2026-10-24 사용자 요청)
-    if(!dlEdit&&!fq){
+    var aGHit=fq&&dlHit("🌱 말씀 실천");   // 찾는 중에도 말씀 실천·중보기도를 거름 (2026-10-31 사용자 요청: "말씀 실천"이 안 찾아짐)
+    if(!dlEdit){
       var acs=[];
       notes.forEach(function(n){(n.acts||[]).forEach(function(a){
         if(!a.t.trim())return;
         var has=(a.stamps||[]).indexOf(dlDay)>=0;
         if(a.done&&!has)return;
+        if(fq&&!aGHit&&!dlHit(a.t)&&!dlHit(n.ref))return;
         acs.push({n:n,a:a,on:has});
       })});
+      if(fq)fcount+=acs.length;
+      if(!fq||acs.length){
       var asec=document.createElement("section"); asec.className="dlgrp dlacts"; asec.dataset.g="__acts"; asec.style.setProperty("--gc","var(--green)");
       var ah=document.createElement("div"); ah.className="dlgh";
       var at=document.createElement("button"); at.type="button"; at.className="dlgname dlactname"; at.dataset.g="__acts";
-      var aOpen=!dlGFold.has("__acts"); at.setAttribute("aria-expanded",String(aOpen)); at.setAttribute("aria-label","말씀 실천 "+(aOpen?"접기":"펼치기"));
+      var aOpen=fq||!dlGFold.has("__acts"); at.setAttribute("aria-expanded",String(aOpen)); at.setAttribute("aria-label","말씀 실천 "+(aOpen?"접기":"펼치기"));
       at.textContent="🌱 말씀 실천"+(acs.length?"  "+acs.filter(function(x){return x.on}).length+"/"+acs.length:"");
+      if(fq)dlMarkIn(at,fq);
       var ach=document.createElement("span"); ach.className="dlgchev"; ach.setAttribute("aria-hidden","true"); at.appendChild(ach);
       ah.appendChild(at); var ahg=document.createElement("button"); ahg.type="button"; ahg.className="dlghgrip"; ahg.dataset.g="__acts"; ahg.textContent="⠿"; ahg.title="끌어서 묶음 차례 바꾸기"; ahg.setAttribute("aria-label","'말씀 실천' 묶음 자리 옮기기"); ah.appendChild(ahg); asec.appendChild(ah);   // 손잡이 (2026-10-25 사용자 요청)
       if(!aOpen)acs=[], asec.dataset.fold="1";
@@ -11505,7 +11526,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var row=document.createElement("div"); row.className="dlitem haspill dlactitem"; row.style.setProperty("--gc","var(--green)");
         var b=document.createElement("button"); b.type="button"; b.className="dlrow dlactrow"+(x.on?" on":""); b.dataset.nid=x.n.id; b.dataset.aid=x.a.id; b.setAttribute("aria-pressed",String(x.on));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
-        b.querySelector(".dlt").textContent=x.a.t;
+        b.querySelector(".dlt").textContent=x.a.t; if(fq)dlMarkIn(b.querySelector(".dlt"),fq);
         var cnt=document.createElement("small"); cnt.className="dlactcnt"; cnt.textContent=" "+(x.a.stamps||[]).length+"/"+(x.a.goal||21)+"일"; b.querySelector(".dlt").appendChild(cnt);
         row.appendChild(b);
         var rb=document.createElement("button"); rb.type="button"; rb.className="dlauto dlactref"; rb.dataset.nid=x.n.id;
@@ -11514,15 +11535,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         asec.appendChild(row);
       });
       outer.insertBefore(asec,outer.firstChild);
+      }
     }
     // 🤲 오늘 중보기도: 명단에서 그날 기도할 사람 (2026-10-24 사용자 요청)
-    if(!dlEdit&&!fq){
-      var ico=icData(), ipk=icPick(ico,dlDay).sort(icOrd);   // 명단 순서대로 (끌어서 바꿀 수 있음, 2026-10-25)
+    var iGHit=fq&&dlHit("🤲 오늘 중보기도");
+    if(!dlEdit){
+      var ico=icData(), ipk=icPick(ico,dlDay).sort(icOrd);
+      if(fq&&!iGHit)ipk=ipk.filter(function(x){return dlHit(x.name)||dlHit(x.memo)});
+      if(fq)fcount+=ipk.length;
+      if(!fq||ipk.length){   // 명단 순서대로 (끌어서 바꿀 수 있음, 2026-10-25)
       var isec=document.createElement("section"); isec.className="dlgrp dlacts dlic"; isec.dataset.g="__ic"; isec.style.setProperty("--gc","var(--sky)");
       var ih=document.createElement("div"); ih.className="dlgh";
       var it2=document.createElement("button"); it2.type="button"; it2.className="dlgname dlactname"; it2.dataset.g="__ic";
-      var iOpen=!dlGFold.has("__ic"); it2.setAttribute("aria-expanded",String(iOpen)); it2.setAttribute("aria-label","오늘 중보기도 "+(iOpen?"접기":"펼치기"));
+      var iOpen=fq||!dlGFold.has("__ic"); it2.setAttribute("aria-expanded",String(iOpen)); it2.setAttribute("aria-label","오늘 중보기도 "+(iOpen?"접기":"펼치기"));
       it2.textContent="🤲 오늘 중보기도"+(ipk.length?"  "+ipk.filter(function(x){return x.log.indexOf(dlDay)>=0}).length+"/"+ipk.length:"");
+      if(fq)dlMarkIn(it2,fq);
       var ich=document.createElement("span"); ich.className="dlgchev"; ich.setAttribute("aria-hidden","true"); it2.appendChild(ich);
       ih.appendChild(it2);
       var il=document.createElement("button"); il.type="button"; il.className="dlicall"; il.textContent=ico.items.length?"명단 "+ico.items.length+"명 ›":"명단 만들기 ›"; ih.appendChild(il);
@@ -11536,7 +11563,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc","var(--sky)");
         var b=document.createElement("button"); b.type="button"; b.className="dlrow dlicrow"+(on2?" on":""); b.dataset.icid=x.id; b.setAttribute("aria-pressed",String(on2));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
-        var tt=b.querySelector(".dlt"); tt.textContent=x.name;
+        var tt=b.querySelector(".dlt"); tt.textContent=x.name; if(fq)dlMarkIn(tt,fq);
         var opn=dlIcOpen.has(x.id);
         // 접혀 있을 때는 제목만 (기도문 미리보기 없음, 2026-10-24 사용자 요청)
         row.appendChild(b);
@@ -11548,6 +11575,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       });
       var afterA=outer.querySelector(".dlacts:not(.dlic)");
       outer.insertBefore(isec,afterA?afterA.nextSibling:outer.firstChild);
+      }
     }
     // 말씀 실천·오늘 중보기도도 끌어서 옮긴 자리에 (다른 묶음보다 위로도, 2026-10-25 사용자 요청: 맨 위로 안 올라감)
     if(!dlEdit&&!fq&&Array.isArray(o.gorder)){
