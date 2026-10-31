@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-lcnwhite">
+<meta name="app-build" content="2026-11-01-refpill">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2524,6 +2524,7 @@ button:active{filter:brightness(1.15)}
 .ccmain{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 .ccmain textarea,.ccmain input,.ccmain [contenteditable]{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default}
 .ccvref{cursor:pointer;margin:0 0 10px;font-size:15px;color:var(--violet);-webkit-text-stroke:.3px currentColor}
+.ccvwrap:not(.ccresult)>.ccvref{display:table;padding:1px 10px;border-radius:11px;background:color-mix(in srgb,var(--violet) 18%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--violet) 38%,transparent)}   /* 구절 이름도 오른쪽 "암송 N"처럼 둥근 사각형 (2026-11-01 사용자 요청) */
 .cch .bqtitle .ccref{display:none}
 .ccw.ccpopx{animation:ccpopx .75s cubic-bezier(.2,1.8,.4,1)}
 @keyframes ccpopx{0%{transform:scale(1)}35%{transform:scale(1.35)}100%{transform:scale(1)}}
@@ -9328,7 +9329,9 @@ body.carddrag #reviewBar{display:none!important}
     }
     // 구절 이름 글자를 말씀 첫 글자와 같은 세로줄에 (가린 칸은 안쪽 여백만큼 글자가 들어가 있음, 2026-10-31 사용자 요청)
     var rfx=ccBox.querySelector(".ccvref"), fw=ccBox.querySelector(".ccverse .ccw");
-    if(rfx){rfx.style.paddingLeft=""; if(fw&&rfx.offsetWidth){
+    var rfPill=rfx&&getComputedStyle(rfx).display==="table";   // 둥근 사각형이면 상자 왼쪽 끝을 말씀 첫 칸 왼쪽 끝에 맞춤
+    if(rfPill){rfx.style.paddingLeft=""; rfx.style.marginLeft=""; if(fw&&rfx.offsetWidth){var dd=Math.round(fw.getBoundingClientRect().left-rfx.getBoundingClientRect().left); if(dd>0&&dd<24)rfx.style.marginLeft=dd+"px"}}
+    else if(rfx){rfx.style.paddingLeft=""; if(fw&&rfx.offsetWidth){
       var fr=fw.getBoundingClientRect(), sc=fw.offsetWidth?fr.width/fw.offsetWidth:1, fcs=getComputedStyle(fw);   // 가린 칸은 조금 작게(scale) 그려져서 보이는 자리로 잼
       var d=Math.round(fr.left+((parseFloat(fcs.paddingLeft)||0)+(parseFloat(fcs.borderLeftWidth)||0))*sc-rfx.getBoundingClientRect().left);
       if(d>0&&d<24)rfx.style.paddingLeft=d+"px";
