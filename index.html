@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-mqgrip">
+<meta name="app-build" content="2026-11-01-mqcol">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2991,6 +2991,11 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind,body.soloon #co
 .mqa{padding-left:40px!important}   /* 왼쪽은 문장 손잡이 자리 (2026-10-25 사용자 요청) */
 .mqa{width:100%;box-sizing:border-box;min-height:60px;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.7;resize:none;overflow:hidden}
 .mqa:focus{outline:none;border-color:var(--gold)}
+/* 묵상 질문 카드마다 다른 바탕색 (2026-11-01 사용자 요청) */
+.mqitem{--mc:var(--gold);border-color:color-mix(in srgb,var(--mc) 32%,#232229);background:radial-gradient(120% 80% at 0% 0%,color-mix(in srgb,var(--mc) 13%,transparent),transparent 65%),color-mix(in srgb,var(--mc) 5%,#121216)}
+.mqitem .mqa{background:color-mix(in srgb,var(--mc) 4%,var(--sheet));border-color:color-mix(in srgb,var(--mc) 22%,#2A2930)}
+.mqitem .mqa:focus{border-color:var(--mc)}
+.mqitem .mqdone{background:var(--mc)}
 .mqdone{display:none;width:100%;height:40px;margin-top:8px;border:0;border-radius:12px;background:var(--gold);color:#141416;font:inherit;font-size:14px;font-weight:700}
 .mqa:focus~.mqdone{display:block}
 .mqa::placeholder{color:var(--faint)}
@@ -13098,6 +13103,7 @@ body.carddrag #reviewBar{display:none!important}
   var mqFold=new Set(); try{(JSON.parse(localStorage.getItem("bible-mq-fold")||"[]")||[]).forEach(function(x){mqFold.add(x)})}catch(e){}
   function mqCard(it,i){
     var c=document.createElement("div"); c.className="mqitem"; c.dataset.id=it.id;
+    if(typeof ANSCOL!=="undefined")c.style.setProperty("--mc",ANSCOL[(i||0)%ANSCOL.length]);   // 카드마다 다른 색 (금·분홍·하늘·초록·보라·주황, 2026-11-01 사용자 요청)
     var h=document.createElement("div"); h.className="mqq";
     var cg=document.createElement("span"); cg.className="mqcgrip"; cg.textContent="⠿"; cg.title="끌어서 질문 차례 바꾸기"; cg.setAttribute("aria-hidden","true"); h.appendChild(cg);
     var num=document.createElement("i"); num.textContent=String(i+1); h.appendChild(num);
