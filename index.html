@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-refleft">
+<meta name="app-build" content="2026-11-01-saypin">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3114,6 +3114,12 @@ textarea.lhpad{padding-left:28px!important}
 .reviewbar.fold .saytoday{margin-bottom:0}.reviewbar.fold{padding-bottom:12px!important}   /* 오늘 카드 아래 여백을 좌우 여백과 같게 (2026-10-31 사용자 요청) */
 .saywrap .saytoday{padding-right:40px}
 .saywrap .saypin{top:8px;right:8px;z-index:2}
+/* 말씀 카드와 같은 핀 그림 (2026-11-01 사용자 요청) */
+.saypin.saypinsvg{filter:none;opacity:.55;background:transparent;color:var(--faint);display:grid;place-items:center;font-size:0}
+.saypin.saypinsvg svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linejoin:round;transform:rotate(35deg)}
+.saypin.saypinsvg.on{opacity:1;color:var(--violet);background:transparent}
+.saypin.saypinsvg.on svg{fill:currentColor}
+@media (hover:hover){.saypin.saypinsvg:not(.on):hover{opacity:1;color:var(--ink)}}
 .saypin{position:absolute;top:6px;right:6px;width:30px;height:30px;padding:0;border:0;border-radius:15px;background:transparent;font-size:14px;line-height:30px;opacity:.35;filter:grayscale(1);transition:opacity .15s,filter .15s,background .15s}
 .saypin.on{opacity:1;filter:none;background:color-mix(in srgb,var(--gold) 16%,transparent)}
 @media (hover:hover){.saypin:hover{opacity:.9;filter:none}}
@@ -13642,7 +13648,7 @@ body.carddrag #reviewBar{display:none!important}
       var swrap=document.createElement("div"); swrap.className="saywrap";
       var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
       var spb=document.createElement("button"); spb.type="button"; spb.className="saypin"+(isPin?" on":""); spb.dataset.sid=sd.id;
-      spb.textContent="📌"; spb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; spb.setAttribute("aria-label",spb.title); spb.setAttribute("aria-pressed",String(isPin));
+      spb.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 4 4v2h-5v6l-1 1-1-1v-6H6v-2l4-4z"/></svg>'; spb.classList.add("saypinsvg"); spb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; spb.setAttribute("aria-label",spb.title); spb.setAttribute("aria-pressed",String(isPin));
       var sb2=document.createElement("button"); sb2.type="button"; sb2.className="saytoday"; sb2.dataset.act="say"; if(!sd.hv)sayPaint(sb2,sd);
       sb2.setAttribute("aria-label","오늘의 한 마디 — 믿음의 한 마디 보기");
       sayTodayFill(sb2,spb,sd,false);
