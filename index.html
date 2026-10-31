@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-stepback2">
+<meta name="app-build" content="2026-10-31-memsize">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -121,6 +121,7 @@ textarea.field{resize:vertical;min-height:80px;font-family:var(--serif);line-hei
 .ref .lcmem:active{transform:scale(.92);background:color-mix(in srgb,var(--sky) 28%,transparent)}
 .ref .lcmem.zero{background:transparent;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sky) 40%,transparent);color:color-mix(in srgb,var(--sky) 80%,var(--muted))}
 body.reorder .ref .lcmem{display:none}
+.ref .logcnt.lcmem{font-size:1em;padding:1px 9px;border-radius:12px;vertical-align:0}   /* "암송 N"을 왼쪽 구절 글자와 같은 크기로 (2026-10-31 사용자 요청) */
 .ref .logcnt{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:10px;background:color-mix(in srgb,var(--sky) 14%,transparent);color:var(--sky);font-size:11.5px;font-weight:700;letter-spacing:0;vertical-align:1px;white-space:nowrap}
 .note .verse{font-family:var(--serif);font-size:18px;line-height:1.75;margin:4px 0 10px;color:var(--orange);white-space:pre-wrap;word-break:keep-all}
 .toggle{display:inline-flex;align-items:center;gap:8px;background:none;border:0;padding:6px 0;font-size:14px;color:var(--green);font-weight:500}
