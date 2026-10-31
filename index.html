@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-stepswap">
+<meta name="app-build" content="2026-10-31-stepswap2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2775,11 +2775,12 @@ button:active{filter:brightness(1.15)}
 .tsrow.done .tsi{background:color-mix(in srgb,var(--green) 30%,#1c1b21);color:var(--green);font-weight:700}
 .tsm{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .tsl{font-size:11.5px;color:var(--muted)}
+.tsl:empty{display:none}   /* 말씀 줄 "말씀 하나 떠올리기" 이름 뺌 (2026-10-31 사용자 요청) */
 .tss{font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tsrow.done .tss{color:color-mix(in srgb,var(--green) 80%,var(--ink))}
 .rvchip.tsgo{flex:0 0 auto;height:34px;padding:0 14px;border-radius:17px;border:0;background:var(--gold);color:#141416;font-weight:700;font-size:13.5px}
 .rvchip.tsmore{flex:0 0 auto;height:32px;padding:0 12px;border-radius:16px;border:1px solid color-mix(in srgb,var(--green) 55%,transparent);background:transparent;color:var(--green);font-size:13px}
-.rvchip.tsswap{flex:0 0 auto;width:32px;height:32px;padding:0;border-radius:50%;border:1px solid var(--rule);background:transparent;color:var(--muted);font-size:15px}
+.rvchip.tsswap{flex:0 0 auto;width:34px;height:34px;padding:0;border-radius:50%;border:1px solid color-mix(in srgb,var(--gold) 70%,transparent);background:color-mix(in srgb,var(--gold) 26%,transparent);color:var(--gold);font-size:17px;font-weight:700}   /* ↻ 눈에 띄게 (2026-10-31 사용자 요청) */
 .dlw.ok b{color:var(--green)}
 .tdsep{height:1px;margin:4px 0 2px;background:color-mix(in srgb,var(--gold) 20%,var(--rule))}
 .rvchip.main{background:var(--gold);color:#141416}
@@ -12419,8 +12420,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       btns.forEach(function(x){var b=document.createElement("button"); b.type="button"; b.className="rvchip "+x.c; b.dataset.id=x.id||""; b.dataset.act=x.act; b.textContent=x.t; if(x.l)b.setAttribute("aria-label",x.l); r.appendChild(b)});
       box.appendChild(r);
     }
-    if(vd)row("📖","말씀 하나 떠올리기",vd.ref+(isGrad(vd)?" · 🎓":""),true,vn&&due.length?[{c:"tsswap",act:"stepmem",id:vn.id,t:"↻",l:"말씀 하나 더 떠올리기"}]:[],vd.id);   // "오늘 떠올렸어요"·"하나 더" 글자 대신 ↻ (2026-10-31 사용자 요청)
-    else if(vn)row("📖","말씀 하나 떠올리기",vn.ref+" · 30초",false,[{c:"tsgo",act:"stepmem",id:vn.id,t:"떠올리기"}],vn.id);
+    if(vd)row("📖","",vd.ref+(isGrad(vd)?" · 🎓":""),true,vn&&due.length?[{c:"tsswap",act:"stepmem",id:vn.id,t:"↻",l:"말씀 하나 더 떠올리기"}]:[],vd.id);   // "오늘 떠올렸어요"·"하나 더" 글자 대신 ↻ (2026-10-31 사용자 요청)
+    else if(vn)row("📖","",vn.ref+" · 30초",false,[{c:"tsgo",act:"stepmem",id:vn.id,t:"떠올리기"}],vn.id);
     if(ws){
       var g=dlGroups(o).filter(function(x){return x.g===ws.g})[0];
       row((g&&g.e)||"🌱","이번 주 실천",ws.t,ad,[{c:ad?"tsmore":"tsgo",act:"stepact",t:ad?"했어요 ✓":"했어요",l:ad?"오늘 체크 풀기":"오늘 했어요"},{c:"tsswap",act:"stepswap",t:"↻",l:"이번 주 실천을 다른 것으로 바꾸기"}],"",ws.id);
