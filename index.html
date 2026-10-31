@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-memsize">
+<meta name="app-build" content="2026-10-31-ccnumsize">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2345,7 +2345,7 @@ button:active{filter:brightness(1.15)}
 .ccw.flip{animation:bwflip .42s cubic-bezier(.2,1.5,.4,1)}
 .ccres{animation:bqres .5s cubic-bezier(.2,1.5,.4,1)}
 .ccbody{position:relative}
-.ccbody>.ccnum{position:absolute;right:20px;top:0;z-index:2}
+.ccbody>.ccnum{position:absolute;right:20px;top:0;z-index:2;font-size:15px;padding:1px 10px;border-radius:11px}   /* 왼쪽 구절 이름(.ccvref 15px)과 같은 크기 (2026-10-31 사용자 요청) */
 /* 암송 숫자가 오를 때: 커지며 금빛으로 빛나고, 숫자가 위로 굴러 바뀌고, 빛 고리 두 겹 + "+1"이 떠오름 (2026-10-30 사용자 요청) */
 .ccnum.ccnumup{animation:ccnumup 1.5s cubic-bezier(.2,1.5,.4,1);overflow:visible}
 @keyframes ccnumup{0%{transform:scale(1)}22%{transform:scale(1.5) rotate(-2deg);background:#FFD54A;color:#141416;box-shadow:0 0 16px 3px rgba(255,213,74,.45)}40%{transform:scale(1.42) rotate(1deg)}55%{transform:scale(1.45) rotate(0)}75%{background:#FFD54A;color:#141416;box-shadow:0 0 10px 1px rgba(255,213,74,.25)}100%{transform:scale(1)}}
