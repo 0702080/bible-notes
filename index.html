@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-ccnumnoscale">
+<meta name="app-build" content="2026-10-31-walkswipe">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9071,6 +9071,21 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var p=wkPref(); if(b.dataset.u){p.u=b.dataset.u; WK.toks=wkTokens(notes.get(WK.id),p.u); WK.i=0} if(b.dataset.nx)p.nx=+b.dataset.nx; if(b.dataset.s)p.s=b.dataset.s;
         wkSavePref(p); wkDraw();
       })});
+      (function(){   // 말씀 칸을 오른쪽 → 왼쪽으로 밀면 다음 말씀 (2026-10-31 사용자 요청)
+        var wl=wkBox.querySelector(".wkline"), x0=null, y0=0;
+        wl.style.touchAction="pan-y";
+        wl.addEventListener("pointerdown",function(e){x0=e.clientX; y0=e.clientY});
+        wl.addEventListener("pointermove",function(e){if(x0==null)return; var dx=e.clientX-x0; if(dx<0&&Math.abs(dx)>Math.abs(e.clientY-y0)){wl.style.transition="none"; wl.style.transform="translateX("+Math.max(dx,-120)*.5+"px)"; wl.style.opacity=String(1+Math.max(dx,-120)/300)}});
+        function up(e){
+          if(x0==null)return; var dx=(e&&e.clientX!=null?e.clientX:x0)-x0, dy=(e&&e.clientY!=null?e.clientY:y0)-y0; x0=null;
+          wl.style.transition="transform .22s ease,opacity .22s ease";
+          if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.3&&wkNext()){
+            wl.style.transform="translateX(40px)"; wl.style.opacity="0";
+            requestAnimationFrame(function(){requestAnimationFrame(function(){wl.style.transform=""; wl.style.opacity=""})});
+          } else {wl.style.transform=""; wl.style.opacity=""}
+        }
+        wl.addEventListener("pointerup",up); wl.addEventListener("pointercancel",function(){up()});
+      })();
       var lk=wkBox.querySelector(".wklock"), ht=0;
       // 주머니 속에서 옷감에 눌려 풀리지 않게: 화면 아래에서 위로 길게(화면 절반 이상) 밀어야 풀림 (2026-10-31)
       var uy=null;
@@ -9113,6 +9128,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var t=WK.toks[WK.i++]; wkSay(t); wkDraw(); wkBeat();
   }
   function wkBeat(){var rg=wkBox.querySelector(".wkring"); rg.classList.remove("beat"); void rg.offsetWidth; rg.classList.add("beat")}   // 걸음마다 원이 톡
+  function wkNext(){   // 바로 다음 말씀으로 (밀기)
+    if(!WK)return false; var p=wkPref(), ord=(typeof ccShownOrder==="function"?ccShownOrder():sorted()).filter(function(x){return wordsOf(x.text||"").length}), at=-1;
+    ord.forEach(function(x,k){if(x.id===WK.id)at=k});
+    var nx=ord[(at+1)%Math.max(1,ord.length)]; if(!nx||nx.id===WK.id)return false;
+    try{window.speechSynthesis.cancel()}catch(e){}
+    WK.id=nx.id; WK.toks=wkTokens(nx,p.u); WK.i=0; WK.rounds=0; buzz(12); wkDraw();
+    if(WK.run)wkSay(refSay(nx.ref||""),1);
+    return true;
+  }
   function wkRound(){   // 한 번 다 들음 → 반복 또는 다음 말씀
     WK.rounds++; var p=wkPref(), moved=false;
     if(p.nx){var ord=(typeof ccShownOrder==="function"?ccShownOrder():sorted()).filter(function(x){return wordsOf(x.text||"").length}), at=-1; ord.forEach(function(x,k){if(x.id===WK.id)at=k});
