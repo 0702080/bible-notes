@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-walkword">
+<meta name="app-build" content="2026-10-31-walkfont">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2428,7 +2428,7 @@ button:active{filter:brightness(1.15)}
 .wkring.run{box-shadow:0 0 50px color-mix(in srgb,var(--gold) 22%,transparent)}
 .wkring.beat{animation:wkbeat .32s ease-out}
 @keyframes wkbeat{0%{transform:scale(1)}40%{transform:scale(1.045)}100%{transform:scale(1)}}
-.wkword{position:relative;max-width:82%;font-size:clamp(30px,10vw,44px);font-weight:800;color:var(--gold);line-height:1.2;word-break:keep-all;text-shadow:0 0 24px color-mix(in srgb,var(--gold) 35%,transparent)}
+.wkword{position:relative;max-width:82%;font-size:clamp(24px,7vw,32px);font-weight:800;color:var(--gold);line-height:1.25;word-break:keep-all;text-shadow:0 0 24px color-mix(in srgb,var(--gold) 35%,transparent)}
 .wkprog{position:relative;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 .wkmeter{position:relative;width:min(240px,70%);height:6px;margin:2px auto 0;border-radius:3px;background:#1E1D24;overflow:hidden}
 .wkmeter i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;background:var(--green);transition:width .09s linear}
@@ -2459,7 +2459,7 @@ button:active{filter:brightness(1.15)}
 .wklock{position:fixed;inset:0;z-index:5;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;touch-action:none;user-select:none;-webkit-user-select:none}
 .wklock[hidden]{display:none}
 .wklref{font-size:15px;color:#7C6BB0}
-.wklword{font-size:44px;font-weight:800;color:#8A7444}
+.wklword{max-width:86%;font-size:28px;font-weight:700;line-height:1.35;text-align:center;word-break:keep-all;color:#8A7444}   /* 글자 줄임 (2026-10-31 사용자 요청) */
 .wklhint{position:absolute;left:0;right:0;bottom:calc(36px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:0 24px}
 .wklhint b{font-size:17px;color:#C9A55E;font-weight:700}
 .wklhint small{font-size:12.5px;color:#6E6A60}
