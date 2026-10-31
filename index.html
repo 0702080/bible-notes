@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-dlcal3">
+<meta name="app-build" content="2026-10-31-tdbigfit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2767,7 +2767,7 @@ button:active{filter:brightness(1.15)}
 .rvchip.tdbig:active{transform:scale(.98);background:color-mix(in srgb,var(--violet) 28%,transparent)}
 .tdbig .tbi{font-size:22px;line-height:1;flex:0 0 auto}
 .tdbig .tbm{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
-.tdbig .tbt{font-size:15px;font-weight:700;color:var(--violet);white-space:nowrap}
+.tdbig .tbt{font-size:15px;font-weight:700;color:var(--violet);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}   /* 오른쪽 숫자와 겹치지 않게 (2026-10-31) */
 .tdbig .tbbar{display:block;height:6px;border-radius:3px;background:color-mix(in srgb,var(--violet) 22%,#000);overflow:hidden}
 .tdbig .tbbar i{display:block;height:100%;border-radius:3px;background:var(--violet)}
 .tdbig .tbn{flex:0 0 auto;font-size:16px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
@@ -12683,7 +12683,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
         var pc=r.big.dt?Math.round(r.big.dc/r.big.dt*100):0;
         bb.setAttribute("aria-label",r.label+" "+r.big.dc+" / "+r.big.dt+" 열기");
         bb.innerHTML='<span class="tbi" aria-hidden="true"></span><span class="tbm"><span class="tbt"></span><span class="tbbar"><i></i></span></span><span class="tbn"></span><span class="tbgo" aria-hidden="true">›</span>';
-        bb.querySelector(".tbi").textContent=r.icon; bb.querySelector(".tbt").textContent=r.done?r.label+" · 오늘 완료 ✓":r.label;
+        bb.querySelector(".tbi").textContent=r.icon; bb.querySelector(".tbt").textContent=r.done?r.label+" ✓ 완료":r.label;   // 짧게 — "3 / 204"와 겹치던 것 (2026-10-31 사용자 요청)
         bb.querySelector(".tbbar i").style.width=pc+"%"; bb.querySelector(".tbn").textContent=r.big.dc+" / "+r.big.dt;
         bar.appendChild(bb); return;
       }
