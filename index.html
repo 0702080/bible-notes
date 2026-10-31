@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-walkbeat">
+<meta name="app-build" content="2026-10-31-walkword">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2458,9 +2458,13 @@ button:active{filter:brightness(1.15)}
 .wktip{max-width:460px;margin:8px 0 0;font-size:13px;line-height:1.6;color:var(--faint)}
 .wklock{position:fixed;inset:0;z-index:5;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;touch-action:none;user-select:none;-webkit-user-select:none}
 .wklock[hidden]{display:none}
-.wklref{font-size:14px;color:#3A3550}
-.wklword{font-size:40px;font-weight:800;color:#4A4030}
-.wklhint{position:absolute;bottom:calc(30px + env(safe-area-inset-bottom,0px));font-size:12px;color:#2E2D33}
+.wklref{font-size:15px;color:#7C6BB0}
+.wklword{font-size:44px;font-weight:800;color:#8A7444}
+.wklhint{position:absolute;left:0;right:0;bottom:calc(36px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding:0 24px}
+.wklhint b{font-size:17px;color:#C9A55E;font-weight:700}
+.wklhint small{font-size:12.5px;color:#6E6A60}
+.wklarr{font-size:34px;color:#E3BE72;animation:wkup 1.4s ease-in-out infinite}
+@keyframes wkup{0%,100%{transform:translateY(8px);opacity:.5}50%{transform:translateY(-8px);opacity:1}}
 .ccpaint[aria-pressed="true"]{border-color:var(--gold);color:#141416;background:var(--gold);font-weight:700}
 .ccpainting .ccverse .ccw{cursor:pointer;border-radius:6px}   /* 색 고르기 때 네모 점선 테두리 없앰 (2026-10-29 사용자 요청) */
 /* 🎨 색 고르기: 색상표를 바로 보여 주고, 고른 색을 낱말에 칠함 (2026-10-29 사용자 요청) */
@@ -9010,8 +9014,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
      화면을 켜 둔 채 주머니에 넣고 걸으면, 걸음마다 말씀을 한 낱말(또는 한 글자)씩 이어폰으로 들려줌.
      웹앱은 화면이 꺼지면 걸음 센서를 못 읽어서 화면 꺼짐 방지(Wake Lock) + 어두운 잠금 화면으로 씀 */
   var WK=null, wkBox=null;
-  function wkPref(){var o={};try{o=JSON.parse(localStorage.getItem("bible-walk")||"{}")||{}}catch(e){} return {u:o.u==="c"||o.u==="w"?o.u:"l",nx:o.nx?1:0,s:o.s==="hi"||o.s==="lo"?o.s:"md"}}
-  function wkSavePref(p){try{localStorage.setItem("bible-walk",JSON.stringify(p))}catch(e){}}
+  function wkPref(){var o={};try{o=JSON.parse(localStorage.getItem("bible-walk")||"{}")||{}}catch(e){} return {u:o.u==="c"||(o.u==="l"&&o.v2)?o.u:"w",nx:o.nx?1:0,s:o.s==="hi"||o.s==="lo"?o.s:"md"}}
+  function wkSavePref(p){p.v2=1; try{localStorage.setItem("bible-walk",JSON.stringify(p))}catch(e){}}   // v2: 기본을 한 낱말로 바꾼 뒤 직접 고른 값 (2026-10-31)
   function wkTokens(n,u){
     var t=String(n.text||"");
     if(u==="c")return Array.from(t.replace(/[^가-힣A-Za-z0-9]/g,""));
@@ -9034,12 +9038,12 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       wkBox=document.createElement("div"); wkBox.className="cch wkv"; wkBox.hidden=true; wkBox.setAttribute("role","dialog"); wkBox.setAttribute("aria-modal","true");
       wkBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🚶 걷기 암송</b></div><button type="button" class="wkclose" aria-label="닫기">✕</button></div>'+
         '<div class="ccbody wkbody"><div class="wkref"></div><div class="wkring"><div class="wkword"></div><div class="wkprog"></div></div><div class="wkstat"></div><div class="wkmeter" aria-hidden="true"><i></i><em></em></div><div class="wksens"></div><div class="wkline"></div>'+
-        '<div class="wkset"><div class="wkopt"><span>한 걸음에</span><div class="wkseg"><button type="button" data-u="l">한 소절</button><button type="button" data-u="w">한 낱말</button><button type="button" data-u="c">한 글자</button></div></div>'+
+        '<div class="wkset"><div class="wkopt"><span>한 걸음에</span><div class="wkseg"><button type="button" data-u="w">한 낱말</button><button type="button" data-u="l">두세 낱말</button><button type="button" data-u="c">한 글자</button></div></div>'+
         '<div class="wkopt"><span>끝나면</span><div class="wkseg"><button type="button" data-nx="0">🔁 반복</button><button type="button" data-nx="1">➡️ 다음 말씀</button></div></div>'+
         '<div class="wkopt"><span>걸음 감지</span><div class="wkseg"><button type="button" data-s="hi">예민</button><button type="button" data-s="md">보통</button><button type="button" data-s="lo">둔감</button></div></div></div>'+
         '</div>'+
         '<div class="ccfoot"><button type="button" class="ccbtn wkstep">👣 한 걸음</button><button type="button" class="ccbtn main wkgo">▶ 시작</button></div>'+
-        '<div class="wklock" hidden><div class="wklref"></div><div class="wklword"></div><div class="wkmeter wklm" aria-hidden="true"><i></i><em></em></div><div class="wklhint">위로 길게 밀어 잠금 풀기</div></div>';
+        '<div class="wklock" hidden><div class="wklref"></div><div class="wklword"></div><div class="wkmeter wklm" aria-hidden="true"><i></i><em></em></div><div class="wklhint"><span class="wklarr">⬆</span><b>멈추려면 화면을 위로 쓱 밀어 올리세요</b><small>주머니 속에서 눌려도 멈추지 않아요</small></div></div>';
       document.body.appendChild(wkBox);
       wkBox.querySelector(".wkclose").addEventListener("click",closeWalk);
       wkBox.querySelector(".wkstep").addEventListener("click",function(){wkStep()});
@@ -9052,7 +9056,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
       // 주머니 속에서 옷감에 눌려 풀리지 않게: 화면 아래에서 위로 길게(화면 절반 이상) 밀어야 풀림 (2026-10-31)
       var uy=null;
       lk.addEventListener("pointerdown",function(e){e.preventDefault(); uy=e.clientY});
-      lk.addEventListener("pointerup",function(e){if(uy!=null&&uy-e.clientY>window.innerHeight*0.45){lk.hidden=true; buzz([20,40,20])} uy=null});
+      lk.addEventListener("pointerup",function(e){if(uy!=null&&uy-e.clientY>window.innerHeight*0.35){buzz([20,40,20]); wkStop(); wkSay("멈췄어요",1.1)} uy=null});   // 위로 밀면 바로 멈춤 (2026-10-31 사용자 요청)
       lk.addEventListener("pointercancel",function(){uy=null});
       document.addEventListener("visibilitychange",function(){
         if(!WK||!WK.run)return;
