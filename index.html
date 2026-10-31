@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-hidedge">
+<meta name="app-build" content="2026-10-31-thincircle">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2280,6 +2280,7 @@ button:active{filter:brightness(1.15)}
 .ccverse.big{font-size:22px}
 .ccw.hid{position:relative;color:var(--faint);cursor:pointer;border-radius:6px}
 .ccw.hid .ccg{visibility:hidden}
+.ccverse .ccw.hid .ccm{-webkit-text-stroke:.2px currentColor}   /* ○ 선을 조금 가늘게 (.75→.2px, 2026-10-31 사용자 요청) */
 .ccw.hid .ccm{position:absolute;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;letter-spacing:1px;white-space:nowrap;pointer-events:none}
 .ccw.hid.peek .ccg{visibility:visible}
 .ccw.hid.peek .ccm{display:none}
