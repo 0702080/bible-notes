@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-mqfit">
+<meta name="app-build" content="2026-10-31-dlgap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3247,6 +3247,7 @@ body.carddrag #reviewBar{display:none!important}
 .dlbar{position:relative}
 .daily.dlhascal .dlfix{position:relative;z-index:2}
 .daily.dlhascal .dlfix::after{content:"";position:absolute;left:max(16px,calc((100% - 1500px) / 2));right:max(16px,calc((100% - 1500px) / 2));bottom:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.09) 15%,rgba(255,255,255,.09) 85%,transparent);pointer-events:none}   /* 달력 아래 흐린 가는 줄로 위쪽과 목록을 나눔 (2026-10-31 사용자 요청) */
+.daily.dlhascal>.dlbody{padding-top:0;margin-top:12px}   /* 줄 아래 여백은 굴려도 그대로 — 목록이 줄에 바로 붙지 않게 (2026-10-31 사용자 요청) */
 .dlbar>.dlsearch{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);max-width:none;margin:0;padding:0}   /* 화면 가로 가운데 (2026-10-31 사용자 요청) */
 .dlbar>.dlsearch input{height:36px;border-radius:18px;font-size:13.5px;padding-left:40px;background-position:14px 50%;background-size:17px}   /* 오른쪽 단추와 같은 높이 */
 .daily.dlhascal .dlcal.dlcal3{max-width:1040px;padding:14px 20px 18px}
