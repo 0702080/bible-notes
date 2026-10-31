@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-stepvswap">
+<meta name="app-build" content="2026-10-31-dragtop">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -16068,12 +16068,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
   function autoScroll(){
     if(!drag)return;
     var y=drag.y, h=window.innerHeight, edge=80, v=0;
+    // 칸 줄이 떠 있으면 위쪽 굴림 자리를 칸 줄 바로 아래로 옮김 — 그래야 맨 위까지 끌어 올릴 수 있음 (2026-10-31 사용자 요청)
+    var top0=colDrop?Math.round(colDrop.el.getBoundingClientRect().bottom):0;
     if(drag.moved){
       var need=reorderMode?16:60;
-      if(y<edge&&y<drag.startY-need)v=-Math.ceil((edge-y)/7);
+      if(y<top0+edge&&y<drag.startY-need)v=-Math.min(28,Math.ceil((top0+edge-y)/6));
       else if(y>h-edge&&y>drag.startY+need)v=Math.ceil((y-(h-edge))/7);
     }
-    if(colDrop&&colDrop.el.getBoundingClientRect().bottom+30>y)v=0;   // 떠 있는 칸 줄 근처에서는 화면이 밀리지 않게
+    if(colDrop&&colDrop.col!=null)v=0;   // 칸 칩 위에 있을 때만 멈춤
     if(v){window.scrollBy(0,v); dragMove(y)}
     dragRAF=requestAnimationFrame(autoScroll);
   }
