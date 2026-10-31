@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-dlhidestep2">
+<meta name="app-build" content="2026-10-31-saytheme">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2993,15 +2993,15 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .mqcnt{font-size:12.5px;color:var(--faint)}
 .mqtomed{margin-left:auto;height:32px;padding:0 14px;border:0;border-radius:16px;background:var(--gold);color:#141416;font:inherit;font-size:12.5px;font-weight:700}
 /* 믿음의 한 마디 (2026-10-18 사용자 요청) */
-.saytoday{display:block;width:100%;margin:2px 0 8px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--gold) 32%,#232229);border-radius:14px;background:color-mix(in srgb,var(--gold) 8%,transparent);color:var(--ink);font:inherit;text-align:left}
-.saytoday .sayq1{display:block;font-family:var(--serif);font-size:15px;line-height:1.7;color:color-mix(in srgb,var(--gold) 35%,var(--ink));word-break:keep-all}
+.saytoday{--sc:var(--gold);display:block;width:100%;margin:2px 0 8px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--sc) 32%,#232229);border-radius:14px;background:color-mix(in srgb,var(--sc) 10%,transparent);color:var(--ink);font:inherit;text-align:left}
+.saytoday .sayq1{display:block;font-family:var(--serif);font-size:15px;line-height:1.7;color:color-mix(in srgb,var(--sc) 35%,var(--ink));word-break:keep-all}
 .saywrap{position:relative}
 .saywrap .saytoday{padding-right:40px}
 .saypin{position:absolute;top:6px;right:6px;width:30px;height:30px;padding:0;border:0;border-radius:15px;background:transparent;font-size:14px;line-height:30px;opacity:.35;filter:grayscale(1);transition:opacity .15s,filter .15s,background .15s}
 .saypin.on{opacity:1;filter:none;background:color-mix(in srgb,var(--gold) 16%,transparent)}
 @media (hover:hover){.saypin:hover{opacity:.9;filter:none}}
-.saytoday .sayw1{display:block;margin-top:4px;font-size:12px;color:var(--gold);text-align:right}
-@media (hover:hover){.saytoday:hover{background:color-mix(in srgb,var(--gold) 14%,transparent)}}
+.saytoday .sayw1{display:block;margin-top:4px;font-size:12px;color:var(--sc);text-align:right}
+@media (hover:hover){.saytoday:hover{background:color-mix(in srgb,var(--sc) 16%,transparent)}}
 .saybox{max-width:640px;margin:0 auto}
 .sayform{display:flex;flex-direction:column;gap:8px;margin:4px 0 16px;padding:14px;border:1px solid color-mix(in srgb,var(--gold) 35%,#232229);border-radius:16px;background:color-mix(in srgb,var(--gold) 6%,#131317)}
 .sayform[hidden]{display:none}
@@ -3013,7 +3013,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
 .saysave{flex:0 0 auto;height:40px;padding:0 18px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:14px;font-weight:700}
 .saycancel{flex:0 0 auto;height:40px;padding:0 14px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
 .saylist{display:flex;flex-direction:column;gap:10px}
-.saycard{padding:14px 16px;border:1px solid #232229;border-left:3px solid color-mix(in srgb,var(--gold) 55%,transparent);border-radius:14px;   /* 왼쪽 모서리도 둥글게 (2026-10-18 사용자 요청) */background:color-mix(in srgb,var(--gold) 5%,#131317)}
+.saycard{--sc:var(--gold);padding:14px 16px;border:1px solid color-mix(in srgb,var(--sc) 18%,#232229);border-left:3px solid color-mix(in srgb,var(--sc) 65%,transparent);border-radius:14px;   /* 왼쪽 모서리도 둥글게 (2026-10-18 사용자 요청) */background:color-mix(in srgb,var(--sc) 9%,#131317)}
+.saythm{padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--sc) 18%,transparent);color:var(--sc);font-size:11.5px}   /* 내용이 비슷한 한 마디는 같은 색 (2026-10-31 사용자 요청) */
 .saycard{position:relative;padding-left:30px!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .saygrip{position:absolute;left:4px;top:0;bottom:0;width:24px;display:grid;place-items:center;color:var(--faint);font-size:16px;cursor:grab;touch-action:none;opacity:.6}
 .saylist.saysorting .saycard:not(.saydragging){transition:transform .15s}
@@ -11845,6 +11846,36 @@ body.carddrag #reviewBar{display:none!important}
     renderReviewBar();
   }
   // "순종하면 고난이 짧아진다. -하용조 목사님-" 처럼 붙여넣으면 글과 이름을 갈라 준다
+  // 🎨 내용이 비슷한 한 마디는 같은 배경색: 글·주제·말한 분에 나온 낱말로 묶음을 고름 (2026-10-31 사용자 요청)
+  var SAY_THEMES=[
+    {k:"pray",n:"🙏 기도",c:"#B79CF2",w:["기도","간구","부르짖","무릎","엎드"],w1:["구하"]},
+    {k:"faith",n:"🕊️ 믿음",c:"#6ECBF4",w:["믿음","믿","신뢰","맡기","맡겨","의지","하나님이 하신","주님이 하신"]},
+    {k:"love",n:"💗 사랑",c:"#F48FB6",w:["사랑","용서","섬기","섬김","이웃","아내","남편","가정","자녀","친구","품"]},
+    {k:"joy",n:"🎵 감사",c:"#FFD36B",w:["감사","기쁨","기뻐","찬양","찬송","즐거","웃"]},
+    {k:"grace",n:"✝️ 은혜",c:"#F59E7B",w:["은혜","긍휼","자비","십자가","복음","구원","보혈","예수"]},
+    {k:"obey",n:"🌱 순종",c:"#6FD09A",w:["순종","따르","따라","행하","실천","제자"],w1:["말씀","듣"]},
+    {k:"endure",n:"⛰️ 인내",c:"#C9A27A",w:["고난","인내","시련","견디","기다리","기다림","고통","광야","연단","눈물"]},
+    {k:"peace",n:"🌿 평안",c:"#5FD3C4",w:["평안","소망","염려","걱정","두려","쉼","안식","위로","천국"]},
+    {k:"humble",n:"🍂 겸손",c:"#9FB0C8",w:["겸손","낮추","낮아","교만","회개","자아","죄","내려놓"]}
+  ];
+  var sayThemeMemo={};
+  function sayTheme(x){
+    if(!x)return null;
+    var key=(x.topic||"")+"|"+(x.t||"")+"|"+(x.who||"");
+    if(key in sayThemeMemo)return sayThemeMemo[key];
+    var tp=String(x.topic||""), body=String(x.t||"")+" "+String(x.who||""), best=null, bs=0;
+    SAY_THEMES.forEach(function(th,i){
+      var sc=0;
+      th.w.forEach(function(w){
+        if(tp.indexOf(w)>=0)sc+=10;   // 적어 둔 주제가 가장 셈
+        var at=0; while((at=body.indexOf(w,at))>=0){sc+=w.length>=2?2:1; at+=w.length}
+      });
+      (th.w1||[]).forEach(function(w){if(tp.indexOf(w)>=0)sc+=5; if(body.indexOf(w)>=0)sc+=1});   // 여러 뜻으로 쓰이는 낱말은 약하게
+      if(sc>bs||(sc===bs&&sc>0&&!best)){bs=sc;best=th}
+    });
+    return (sayThemeMemo[key]=bs>0?best:null);
+  }
+  function sayPaint(el,x){var th=sayTheme(x); if(th)el.style.setProperty("--sc",th.c); else el.style.removeProperty("--sc"); return th}
   function saySplit(raw){
     var t=String(raw||"").replace(/\r/g,"").trim();
     var m=t.match(/^([\s\S]+?)[\s]*[-–—]\s*([^\n\-–—]{1,24})\s*[-–—]?\s*$/);
@@ -11958,12 +11989,13 @@ body.carddrag #reviewBar{display:none!important}
     }
     items.forEach(function(x){
       if(sayEdit===x.id)return;
-      var c=document.createElement("article"); c.className="saycard"; c.dataset.id=x.id;
+      var c=document.createElement("article"); c.className="saycard"; c.dataset.id=x.id; var cth=x.hv?null:sayPaint(c,x);
       var gp=document.createElement("span"); gp.className="saygrip"; gp.setAttribute("aria-hidden","true"); gp.title="끌어서 순서 바꾸기"; gp.textContent="⠿"; c.appendChild(gp);
       var q=document.createElement("p"); q.className="sayq"; q.textContent=x.t||""; c.appendChild(q);
       var f=document.createElement("div"); f.className="sayf";
       if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
       if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
+      if(cth){var thb=document.createElement("span"); thb.className="saythm"; thb.textContent=cth.n; f.appendChild(thb)}
       if(x.hv){   // ⏰ 누르면 시계가 떠서 나올 시각을 정함 (비우면 10분마다)
         var hvt=document.createElement("label"); hvt.className="saytag sayhvtag"+(x.tm?" set":""); hvt.title="눌러서 이 말씀이 나올 시각 정하기";
         var hs=document.createElement("span"); hs.textContent=x.tm?"⏰ 매일 "+x.tm:"⏰ 10분마다 · 시각 정하기"; hvt.appendChild(hs);
@@ -12539,7 +12571,7 @@ body.carddrag #reviewBar{display:none!important}
     BS.id=sd.id;
     var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
     var q=document.createElement("button"); q.type="button"; q.className="bsq"; q.title="믿음의 한 마디 모두 보기";
-    if(next)BS.ci=(BS.ci+1)%BS_COL.length; q.style.setProperty("--bsc",BS_COL[BS.ci]);
+    if(next)BS.ci=(BS.ci+1)%BS_COL.length; var bth=sayTheme(sd); q.style.setProperty("--bsc",bth?bth.c:BS_COL[BS.ci]);
     q.textContent=(sd.hv?"📖  ":"💬  “")+String(sd.t).replace(/\s+/g," ")+(sd.hv?"":"”");
     if(sd.hv){q.classList.add("bshv"); q.style.setProperty("--bsc","#FFD36B"); q.title="짧은 말씀 (10분마다)"}
     if(sd.who){var w=document.createElement("small"); w.textContent="— "+sd.who; q.appendChild(w)}
@@ -12695,7 +12727,7 @@ body.carddrag #reviewBar{display:none!important}
       var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
       var spb=document.createElement("button"); spb.type="button"; spb.className="saypin"+(isPin?" on":""); spb.dataset.sid=sd.id;
       spb.textContent="📌"; spb.title=isPin?"고정 풀기 (지금은 하루 동안 고정)":"이 한 마디를 하루 동안 고정"; spb.setAttribute("aria-label",spb.title); spb.setAttribute("aria-pressed",String(isPin));
-      var sb2=document.createElement("button"); sb2.type="button"; sb2.className="saytoday"; sb2.dataset.act="say";
+      var sb2=document.createElement("button"); sb2.type="button"; sb2.className="saytoday"; sb2.dataset.act="say"; if(!sd.hv)sayPaint(sb2,sd);
       sb2.setAttribute("aria-label","오늘의 한 마디 — 믿음의 한 마디 보기");
       var q2=document.createElement("span"); q2.className="sayq1"; q2.textContent="\u201c"+String(sd.t).replace(/\s+/g," ")+"\u201d";
       sb2.appendChild(q2);
