@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-wkcol">
+<meta name="app-build" content="2026-11-01-wkref">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2421,7 +2421,8 @@ button:active{filter:brightness(1.15)}
 .wkv .bqbar{position:relative}
 .wkclose{position:absolute;right:12px;top:50%;transform:translateY(-50%);width:36px;height:36px;padding:0;border:1px solid #2A2930;border-radius:50%;background:#16151A;color:var(--muted);font-size:15px;line-height:1}
 .wkclose:active{transform:translateY(-50%) scale(.92)}
-.wkref{margin-top:4px;padding:5px 14px;border-radius:999px;background:color-mix(in srgb,var(--violet) 14%,transparent);border:1px solid color-mix(in srgb,var(--violet) 35%,transparent);font-size:14.5px;font-weight:700;color:var(--violet)}
+.wkrefrow{width:100%;max-width:560px;display:flex;justify-content:flex-start;margin:4px 0 -4px}   /* 구절 이름은 말씀 칸 바로 위 왼쪽 (2026-11-01 사용자 요청) */
+.wkref{margin-top:0;padding:5px 14px;border-radius:999px;background:color-mix(in srgb,var(--violet) 14%,transparent);border:1px solid color-mix(in srgb,var(--violet) 35%,transparent);font-size:14.5px;font-weight:700;color:var(--violet)}
 /* 가운데 원: 들은 만큼 금빛 테두리가 차오름, 걸음마다 톡 (2026-10-31 사용자 요청) */
 .wkring{--p:0;position:relative;flex:0 0 auto;width:min(50vw,220px,27vh);height:min(50vw,220px,27vh);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
   background:radial-gradient(circle at 50% 38%,color-mix(in srgb,var(--gold) 12%,#141318) 0%,#0F0E12 70%);box-shadow:0 0 40px color-mix(in srgb,var(--gold) 10%,transparent)}
@@ -9388,7 +9389,7 @@ body.carddrag #reviewBar{display:none!important}
     if(!wkBox){
       wkBox=document.createElement("div"); wkBox.className="cch wkv"; wkBox.hidden=true; wkBox.setAttribute("role","dialog"); wkBox.setAttribute("aria-modal","true");
       wkBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🚶 걷기 암송</b></div><button type="button" class="wkclose" aria-label="닫기">✕</button></div>'+
-        '<div class="ccbody wkbody"><div class="wkref"></div><div class="wkring"><div class="wkword"></div><div class="wkprog"></div></div><div class="wkstat"></div><div class="wkmeter" aria-hidden="true"><i></i><em></em></div><div class="wksens"></div><div class="wkline"></div>'+
+        '<div class="ccbody wkbody"><div class="wkring"><div class="wkword"></div><div class="wkprog"></div></div><div class="wkstat"></div><div class="wkmeter" aria-hidden="true"><i></i><em></em></div><div class="wksens"></div><div class="wkrefrow"><div class="wkref"></div></div><div class="wkline"></div>'+
         '<div class="wkset"><div class="wkopt"><span>한 걸음에</span><div class="wkseg"><button type="button" data-u="w">한 낱말</button><button type="button" data-u="l">두세 낱말</button><button type="button" data-u="c">한 글자</button></div></div>'+
         '<div class="wkopt"><span>끝나면</span><div class="wkseg"><button type="button" data-nx="0">🔁 반복</button><button type="button" data-nx="1">➡️ 다음 말씀</button></div></div>'+
         '<div class="wkopt"><span>걸음 감지</span><div class="wkseg"><button type="button" data-s="hi">예민</button><button type="button" data-s="md">보통</button><button type="button" data-s="lo">둔감</button></div></div></div>'+
