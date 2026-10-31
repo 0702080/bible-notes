@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-anscol">
+<meta name="app-build" content="2026-10-31-tsswipe">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2787,6 +2787,11 @@ button:active{filter:brightness(1.15)}
 .tsi{flex:0 0 28px;height:28px;display:grid;place-items:center;border-radius:50%;background:#1c1b21;font-size:15px}
 .tsrow.done .tsi{background:color-mix(in srgb,var(--green) 30%,#1c1b21);color:var(--green);font-weight:700}
 .tsm{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.tsm.tsinl{animation:tsinl .22s ease-out}   /* 다음 것: 오른쪽에서 들어옴 */
+.tsm.tsinr{animation:tsinr .22s ease-out}   /* 이전 것: 왼쪽에서 들어옴 */
+@keyframes tsinl{from{transform:translateX(40px);opacity:0}}
+@keyframes tsinr{from{transform:translateX(-40px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.tsm.tsinl,.tsm.tsinr{animation:none}}
 .tsl{font-size:11.5px;color:var(--muted)}
 .tsl:empty{display:none}   /* 말씀 줄 "말씀 하나 떠올리기" 이름 뺌 (2026-10-31 사용자 요청) */
 .tss{font-size:14px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -7475,6 +7480,7 @@ body.carddrag #reviewBar{display:none!important}
   function todayActClick(e){
     var spn=e.target.closest(".saypin"); if(spn){e.stopPropagation();sayTogglePin(spn.dataset.sid);return}
     var sayb=e.target.closest(".saytoday"); if(sayb){openSay();return}
+    if(Date.now()-tsSwipeAt<450)return;   // 옆으로 민 끝에 생기는 누름은 무시
     var tsr=e.target.closest(".tsrow[data-nid]"); if(tsr&&!e.target.closest("button")){var tn=notes.get(tsr.dataset.nid); if(tn)openCoach(tn); return}
     var tsw=e.target.closest(".tsrow[data-wid]"); if(tsw&&!e.target.closest("button")){openDaily(); dlFocusSheet(tsw.dataset.wid,true); return}   // 이번 주 실천을 누르면 그 항목 적는 화면 (2026-10-31 사용자 요청)
     var b=e.target.closest(".rvchip,.tmchip"); if(!b)return;
@@ -12995,9 +13001,9 @@ body.carddrag #reviewBar{display:none!important}
     if(p&&p.w===wk){var f=its.filter(function(it){return it.id===p.id})[0]; if(f)return f}
     return its[Math.floor(new Date(wk+"T12:00:00").getTime()/(7*864e5))%its.length];   // 주마다 차례로 돌아감
   }
-  function weekStepSwap(){
+  function weekStepSwap(dir){
     var o=dailyData(), its=weekStepItems(o), cur=weekStep(o); if(!cur)return;
-    var nx=its[(its.indexOf(cur)+1)%its.length];
+    var nx=its[(its.indexOf(cur)+(dir<0?its.length-1:1))%its.length];
     try{localStorage.setItem("bible-week-step",JSON.stringify({w:weekKey(),id:nx.id}))}catch(e){}
   }
   function stepVerseDone(){var t0=new Date(); t0.setHours(0,0,0,0); var hit=null; notes.forEach(function(n){if(n.rv&&n.rv.at>=t0.getTime()&&(!hit||n.rv.at>hit.rv.at))hit=n}); return hit}
@@ -13011,10 +13017,10 @@ body.carddrag #reviewBar{display:none!important}
     if(p&&p.d===dkey(Date.now())){var n=notes.get(p.id); if(n)return n}
     return vd||vn||null;
   }
-  function stepVerseSwap(curId){
+  function stepVerseSwap(curId,dir){
     var ls=stepVerseList(); if(!ls.length)return;
     var i=-1; ls.forEach(function(n,k){if(n.id===curId)i=k});
-    var nx=ls[(i+1)%ls.length]; if(!nx)return;
+    var nx=ls[(i<0?0:i+(dir<0?ls.length-1:1))%ls.length]; if(!nx)return;
     try{localStorage.setItem("bible-step-verse",JSON.stringify({d:dkey(Date.now()),id:nx.id}))}catch(e){}
   }
   function drawStep(bar){
@@ -13031,6 +13037,8 @@ body.carddrag #reviewBar{display:none!important}
       r.innerHTML='<span class="tsi" aria-hidden="true"></span><span class="tsm"><span class="tsl"></span><span class="tss"></span></span>';
       r.querySelector(".tsi").textContent=done?"✓":icon; r.querySelector(".tsl").textContent=label; r.querySelector(".tss").textContent=sub;
       btns.forEach(function(x){var b=document.createElement("button"); b.type="button"; b.className="rvchip "+x.c; b.dataset.id=x.id||""; b.dataset.act=x.act; b.textContent=x.t; if(x.l)b.setAttribute("aria-label",x.l); r.appendChild(b)});
+      if(nid||wid)tsSwipeInit(r,nid?"v":"w",nid);
+      if(tsSlide&&tsSlide.k===(nid?"v":"w")){r.querySelector(".tsm").classList.add(tsSlide.d<0?"tsinl":"tsinr")}
       box.appendChild(r);
     }
     // ↻ = 다음 말씀으로 바꿔 보여 줌 (복습 차례 → 나머지 목록 순서, 2026-10-31 사용자 요청). 누르면 그 말씀이 이 줄에 남음(오늘만)
@@ -13044,7 +13052,30 @@ body.carddrag #reviewBar{display:none!important}
       var g=dlGroups(o).filter(function(x){return x.g===ws.g})[0];
       row((g&&g.e)||"🌱","이번 주 실천",ws.t,ad,[{c:ad?"tsmore":"tsgo",act:"stepact",t:ad?"했어요 ✓":"했어요",l:ad?"오늘 체크 풀기":"오늘 했어요"},{c:"tsswap",act:"stepswap",t:"↻",l:"이번 주 실천을 다른 것으로 바꾸기"}],"",ws.id);
     }
-    bar.appendChild(box);
+    bar.appendChild(box); tsSlide=null;
+  }
+  /* 말씀 줄·실천 줄을 옆으로 밀면 다음/이전 것 — 왼쪽으로 밀면 다음, 오른쪽으로 밀면 이전 (2026-10-31 사용자 요청) */
+  var tsSwipeAt=0, tsSlide=null;
+  function tsSwipeInit(r,k,id){
+    var x0=0,y0=0,dx=0,on=false,lock="",m=r.querySelector(".tsm");
+    r.style.touchAction="pan-y";
+    r.addEventListener("touchstart",function(e){if(e.touches.length!==1||e.target.closest("button"))return; on=true; lock=""; dx=0; x0=e.touches[0].clientX; y0=e.touches[0].clientY; m.style.transition="none"},{passive:true});
+    r.addEventListener("touchmove",function(e){
+      if(!on)return; var ddx=e.touches[0].clientX-x0, ddy=e.touches[0].clientY-y0;
+      if(!lock&&(Math.abs(ddx)>8||Math.abs(ddy)>8))lock=Math.abs(ddx)>Math.abs(ddy)?"x":"y";
+      if(lock!=="x")return; dx=ddx; m.style.transform="translateX("+dx*0.6+"px)"; m.style.opacity=String(Math.max(.3,1-Math.abs(dx)/260));
+    },{passive:true});
+    var end=function(){
+      if(!on)return; on=false; m.style.transition="transform .18s,opacity .18s";
+      if(lock==="x"&&Math.abs(dx)>45){
+        var dir=dx<0?1:-1; tsSwipeAt=Date.now(); buzz(8);
+        if(k==="v")stepVerseSwap(id,dir); else weekStepSwap(dir);
+        tsSlide={k:k,d:dir>0?1:-1}; renderReviewBar(); return;
+      }
+      if(lock==="x")tsSwipeAt=Date.now();
+      m.style.transform=""; m.style.opacity="";
+    };
+    r.addEventListener("touchend",end); r.addEventListener("touchcancel",end);
   }
   function stepAct(){
     var o=dailyData(), ws=weekStep(o), today=dkey(Date.now()); if(!ws)return;
