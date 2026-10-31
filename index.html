@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-grad2">
+<meta name="app-build" content="2026-10-31-grad3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8496,14 +8496,14 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
           var again=!!ccDoneIds[cid];   // 이번에 연 암송 코치에서 이미 끝낸 말씀이면 다음 말씀으로 넘어가지 않음
           if(again){
             var na=notes.get(cid); if(na){C.grade="g2"; ccFinish(na)}
-            toast("✨ 암송 완료"); C.stage=3; C.grade=""; C.autoDone=0; C.t0=Date.now(); C.tapped={};
+            C.stage=3; C.grade=""; C.autoDone=0; C.t0=Date.now(); C.tapped={};
           }else{
             C.autoT=setTimeout(function(){
               C&&(C.autoT=0);
               if(!C||C.id!==cid||ccBox.hidden)return;
               var n1=notes.get(cid); if(!n1)return;
               C.grade="g2"; C.stage=5; ccFinish(n1); ccDoneIds[cid]=1;
-              if(ccNextNote()){toast("✨ 암송 완료"); ccGoNext()} else ccDraw();
+              if(ccNextNote()){ccGoNext()} else ccDraw();
             },3300);   // 마지막 낱말을 누른 뒤 2초 더 머묾 (2026-10-30 사용자 요청)
           }
         }
