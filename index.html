@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-say1">
+<meta name="app-build" content="2026-11-01-wkcol">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2445,7 +2445,8 @@ button:active{filter:brightness(1.15)}
 .wkline{max-width:560px;width:100%;box-sizing:border-box;padding:16px 18px;border-radius:18px;
   background:linear-gradient(155deg,color-mix(in srgb,var(--violet) 16%,#141219) 0%,#121016 60%,color-mix(in srgb,var(--gold) 6%,#121016) 100%);
   border:1px solid color-mix(in srgb,var(--violet) 28%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--violet) 18%,transparent),0 6px 24px rgba(0,0,0,.35);
-  font-size:15.5px;font-weight:700;line-height:1.9;color:var(--orange);word-break:keep-all}   /* 찐한 오렌지 글씨 (2026-10-31 사용자 요청) */
+  font-size:15.5px;font-weight:700;line-height:1.9;color:var(--wkc,var(--orange));word-break:keep-all}
+.wkline.wkcin{animation:wkcIn .45s ease both}@keyframes wkcIn{from{filter:brightness(1.8) blur(1px)}to{filter:none}}   /* 밀 때마다 글자 색 3가지 돌림 (2026-11-01 사용자 요청) */   /* 찐한 오렌지 글씨 (2026-10-31 사용자 요청) */
 .wkline span{transition:color .25s,text-shadow .25s}
 .wkline span.on{color:#F3EBDD}
 .wkline span.now{color:var(--gold);text-decoration:underline 2px;text-underline-offset:5px;text-shadow:0 0 14px color-mix(in srgb,var(--gold) 45%,transparent)}
@@ -9405,12 +9406,22 @@ body.carddrag #reviewBar{display:none!important}
       (function(){   // 말씀 칸을 오른쪽 → 왼쪽으로 밀면 다음 말씀 (2026-10-31 사용자 요청)
         var wl=wkBox.querySelector(".wkline"), x0=null, y0=0;
         wl.style.touchAction="pan-y";
+        var WKCOL=["var(--orange)","var(--sky)","var(--pink)"], wci=0;   // 밀 때마다 주황 → 하늘 → 분홍 (2026-11-01 사용자 요청)
+        try{wci=(parseInt(localStorage.getItem("bible-walk-col"),10)||0)%WKCOL.length}catch(e){}
+        wl.style.setProperty("--wkc",WKCOL[wci]);
+        function wkColNext(){
+          wci=(wci+1)%WKCOL.length; wl.style.setProperty("--wkc",WKCOL[wci]);
+          try{localStorage.setItem("bible-walk-col",String(wci))}catch(e){}
+          wl.classList.remove("wkcin"); void wl.offsetWidth; wl.classList.add("wkcin");
+        }
         wl.addEventListener("pointerdown",function(e){x0=e.clientX; y0=e.clientY});
         wl.addEventListener("pointermove",function(e){if(x0==null)return; var dx=e.clientX-x0; if(dx<0&&Math.abs(dx)>Math.abs(e.clientY-y0)){wl.style.transition="none"; wl.style.transform="translateX("+Math.max(dx,-120)*.5+"px)"; wl.style.opacity=String(1+Math.max(dx,-120)/300)}});
         function up(e){
           if(x0==null)return; var dx=(e&&e.clientX!=null?e.clientX:x0)-x0, dy=(e&&e.clientY!=null?e.clientY:y0)-y0; x0=null;
           wl.style.transition="transform .22s ease,opacity .22s ease";
-          if(dx<-60&&Math.abs(dx)>Math.abs(dy)*1.3&&wkNext()){
+          var sw=dx<-60&&Math.abs(dx)>Math.abs(dy)*1.3;
+          if(sw)wkColNext();
+          if(sw&&wkNext()){
             wl.style.transform="translateX(40px)"; wl.style.opacity="0";
             requestAnimationFrame(function(){requestAnimationFrame(function(){wl.style.transform=""; wl.style.opacity=""})});
           } else {wl.style.transform=""; wl.style.opacity=""}
