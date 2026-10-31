@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-linegrip">
+<meta name="app-build" content="2026-10-31-anscol">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3309,6 +3309,26 @@ body.carddrag #reviewBar{display:none!important}
 .ansit{margin-bottom:16px}
 .ansdot{left:-34px;top:21px;width:12px;height:12px;box-shadow:0 0 0 3px #0B0B0D,0 0 0 4.5px color-mix(in srgb,var(--gold) 40%,transparent),0 0 16px color-mix(in srgb,var(--gold) 55%,transparent)}
 .ansit::before{content:"";position:absolute;left:-20px;top:27px;width:20px;height:1.5px;background:color-mix(in srgb,var(--gold) 80%,transparent)}
+/* 기도 응답 연표: 카드마다 다른 색 (금·분홍·하늘·초록·보라·주황 차례로) — 단색이라 단조롭다는 사용자 요청 (2026-10-31) */
+.ansit{--ac:var(--gold)}
+.ansdot{background:var(--ac);box-shadow:0 0 0 3px #0B0B0D,0 0 0 4.5px color-mix(in srgb,var(--ac) 40%,transparent),0 0 16px color-mix(in srgb,var(--ac) 55%,transparent)}
+.ansit::before{background:color-mix(in srgb,var(--ac) 80%,transparent)}
+.ansbox{border-color:color-mix(in srgb,var(--ac) 30%,#2A2930);background:radial-gradient(120% 70% at 0% 0%,color-mix(in srgb,var(--ac) 12%,transparent),transparent 60%),#131216}
+.ansbox::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--ac)}
+.ansbox::after{color:color-mix(in srgb,var(--ac) 10%,transparent)}
+.ansdd{color:var(--ac)}
+.ansdl{color:color-mix(in srgb,var(--ac) 70%,#fff)}
+.answait{color:color-mix(in srgb,var(--ac) 75%,#fff);background:color-mix(in srgb,var(--ac) 14%,transparent)}
+.ansa{border-left-color:var(--ac);color:color-mix(in srgb,var(--ac) 80%,#fff)}
+.ansmore{border-color:color-mix(in srgb,var(--ac) 50%,transparent);background:color-mix(in srgb,var(--ac) 12%,transparent);color:var(--ac)}
+.ansit.open .ansmore{color:color-mix(in srgb,var(--ac) 75%,#fff)}
+.ansfoot{border-top-color:color-mix(in srgb,var(--ac) 14%,#222127)}
+.anslist::before{background:linear-gradient(var(--gold),var(--pink) 30%,var(--sky) 55%,var(--green) 80%,var(--violet));opacity:.75}
+.anssum>*{--ac:var(--gold)}
+.anssum>:nth-child(2){--ac:var(--sky)}
+.anssum>:nth-child(3){--ac:var(--pink)}
+.anssum b,.anssum button:not(.on) b{color:var(--ac)}
+.anssum button.on{border-color:color-mix(in srgb,var(--ac) 55%,#26252B);background:color-mix(in srgb,var(--ac) 9%,#121116)}
 .ansempty,.icempty{color:var(--muted);font-size:14px;line-height:1.6}
 /* 🤲 중보기도 */
 .ichead{display:flex;align-items:center;gap:10px;margin:6px 0 10px}
@@ -9675,7 +9695,7 @@ body.carddrag #reviewBar{display:none!important}
     return out.sort(function(a,b){return b.ans-a.ans});
   }
   // 맨 위 칸을 눌러 응답된 기도 ↔ 기다리는 기도 목록으로 바꿈 (2026-10-31 사용자 요청)
-  var ansMode="ans";
+  var ansMode="ans", ANSCOL=["var(--gold)","var(--pink)","var(--sky)","var(--green)","var(--violet)","var(--orange)"];
   function waitItems(){
     var out=[];
     notes.forEach(function(n){(n.prays||[]).forEach(function(x){if(!x.ans&&prayClean(x.t))out.push({t:x.t,at:x.at,ref:n.ref||"말씀",nid:n.id,k:"c",id:x.id})})});
@@ -9738,7 +9758,7 @@ body.carddrag #reviewBar{display:none!important}
     rows.forEach(function(x,i){
       var d=new Date(W?x.at:x.ans), m=d.getFullYear()+"년 "+(d.getMonth()+1)+"월";
       if(m!==lastM){lastM=m; var h=document.createElement("div"); h.className="ansmon"; h.textContent=m; list.appendChild(h)}
-      var e=document.createElement("article"); e.className="ansit";
+      var e=document.createElement("article"); e.className="ansit"; e.style.setProperty("--ac",ANSCOL[i%ANSCOL.length]);
       var dd=W?Math.max(0,Math.floor((now-x.at)/864e5)):days[i];
       e.innerHTML='<div class="ansdot"></div><div class="ansbox"><div class="anstop"><b class="ansday"></b><span class="answait"></span></div><p class="anst"></p><p class="ansa"></p><div class="ansfoot"><span class="ansfrom"></span></div></div>';
       var ad=e.querySelector(".ansday"); ad.innerHTML='<span class="ansdd"></span><span class="ansdl">'+(W?"🙏 기도":"🙌 응답")+'</span>'; ad.firstChild.textContent=(d.getMonth()+1)+"."+d.getDate();
