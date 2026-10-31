@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-nomedmenu">
+<meta name="app-build" content="2026-10-31-nonaver">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3451,10 +3451,6 @@ body.carddrag #reviewBar{display:none!important}
 .rmrow span{flex:1;font-size:15px}
 .rmg{flex:0 0 auto;height:38px;padding:0 12px;border:1px solid color-mix(in srgb,var(--sky) 55%,transparent);border-radius:10px;background:transparent;color:var(--sky);font-size:13px;white-space:nowrap}
 @media (max-width:430px){.rmrow{flex-wrap:wrap}.rmg{width:100%}}
-.rmnaver{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:44px;margin-top:10px;border:0;border-radius:12px;background:#03C75A;color:#fff;font-size:15px;font-weight:700}
-.rmnaver b{display:grid;place-items:center;width:20px;height:20px;border-radius:4px;background:#fff;color:#03C75A;font-size:13px;font-weight:900}
-.rmnhow{margin-top:8px;padding:10px 12px;border-radius:10px;background:color-mix(in srgb,#03C75A 10%,transparent);color:var(--ink)}
-.rmnhow[hidden]{display:none}
 .rmfile{margin-top:8px;height:40px;border:1px solid #34333A;border-radius:12px;background:transparent;color:var(--muted);font-size:13.5px}
 .rmrow input[type=time]{width:156px;height:38px;color-scheme:dark}
 .rmrow input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold)}
@@ -10570,8 +10566,6 @@ body.carddrag #reviewBar{display:none!important}
         '<p class="rmtip">아침·점심·저녁에 구글 캘린더가 휴대폰으로 알려 줘요. 알림을 누르면 이 노트가 열리고, <b>오늘 외우는 말씀이 가린 채로</b> 암송 코치에 바로 떠요.</p>'+
         '<div class="rmrows"></div>'+
         '<p class="rmhow">시간마다 <b>구글 캘린더에 넣기</b>를 누르면 구글 캘린더가 새 창으로 열려요. <b>저장</b>을 누르면 매일 반복 알림이 생기고, 같은 구글 계정을 쓰는 갤럭시에서도 알림이 울려요. 시간을 바꾸려면 캘린더에서 예전 일정을 지우고 다시 넣어 주세요.</p>'+
-        '<button type="button" class="rmnaver"><b>N</b> 네이버 캘린더에 넣기</button>'+
-        '<p class="rmhow rmnhow" hidden>알림 파일(말씀알림.ics)을 받았고 네이버 캘린더를 새 창으로 열었어요. 네이버 캘린더의 <b>설정 → 일정 가져오기</b>에서 받은 파일을 고르면 매일 반복 알림이 들어가요. 네이버 캘린더 앱에서도 알림이 울려요.</p>'+
         '<button type="button" class="rmmake rmfile">📄 파일(.ics)로 받기 — 삼성 캘린더 등</button>'+
         '<button type="button" class="rmtry">지금 한 번 열어 보기</button><button type="button" class="rmclose">닫기</button></section>';
       document.body.appendChild(rmv);
@@ -10579,7 +10573,6 @@ body.carddrag #reviewBar{display:none!important}
         if(e.target.closest(".rmback,.rmclose")){closeRemind();return}
         if(e.target.closest(".rmtry")){closeRemind();remindOpen();return}
         if(e.target.closest(".rmmake")){remindMake();return}
-        if(e.target.closest(".rmnaver")){remindMake(); window.open("https://calendar.naver.com/","_blank","noopener"); rmv.querySelector(".rmnhow").hidden=false; return}
         var g=e.target.closest(".rmg"); if(g){e.preventDefault(); var rw=g.closest(".rmrow"); remindGoogle(rw.dataset.l,rw.querySelector("input[type=time]").value||"07:00"); return}
       });
       rmv.addEventListener("change",function(){
