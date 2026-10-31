@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-sayedit">
+<meta name="app-build" content="2026-11-01-saydbl">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3116,6 +3116,7 @@ textarea.lhpad{padding-left:28px!important}
 .saywrap .saypin{top:8px;right:8px;z-index:2}
 /* 길게 눌러 그 자리에서 고치기 (2026-11-01 사용자 요청) */
 .saywrap textarea.sayeta{position:absolute;z-index:3;margin:0;box-sizing:border-box;border:0;border-radius:0;outline:none;background:transparent;resize:none;overflow:hidden;box-shadow:none;min-height:0;caret-color:var(--sc,var(--gold));white-space:pre-wrap}
+.saytoday,.saytoday *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}   /* 길게 눌러도 글자가 선택되지 않게 (2026-11-01 사용자 요청) */
 .saytoday.sayed{border-color:color-mix(in srgb,var(--sc) 80%,#232229)}
 .saytoday.sayed .saylbl::after{content:"· 고치는 중";margin-left:4px;opacity:.8}
 /* 말씀 카드와 같은 핀 그림 (2026-11-01 사용자 요청) */
@@ -7765,7 +7766,10 @@ body.carddrag #reviewBar{display:none!important}
   }
   function todayActClick(e){
     var spn=e.target.closest(".saypin"); if(spn){e.stopPropagation();sayTogglePin(spn.dataset.sid);return}
-    var sayb=e.target.closest(".saytoday"); if(sayb){if(typeof ST!=="undefined"&&(ST.edit||Date.now()-ST.lpAt<800))return; openSay();return}
+    var sayb=e.target.closest(".saytoday"); if(sayb){if(typeof ST!=="undefined"){if(ST.edit||Date.now()-ST.lpAt<800)return;
+        if(ST.tapT){clearTimeout(ST.tapT); ST.tapT=0; sayInlineEdit(sayb); return}   // 두 번 누르면 고치기 (2026-11-01 사용자 요청)
+        ST.tapT=setTimeout(function(){ST.tapT=0; if(!ST.edit)openSay()},300); return}
+      openSay();return}
     if(Date.now()-tsSwipeAt<450)return;   // 옆으로 민 끝에 생기는 누름은 무시
     var tsr=e.target.closest(".tsrow[data-nid]"); if(tsr&&!e.target.closest("button")){var tn=notes.get(tsr.dataset.nid); if(tn)openCoach(tn); return}
     var tsw=e.target.closest(".tsrow[data-wid]"); if(tsw&&!e.target.closest("button")){openDaily(); dlFocusSheet(tsw.dataset.wid,true); return}   // 이번 주 실천을 누르면 그 항목 적는 화면 (2026-10-31 사용자 요청)
@@ -12738,7 +12742,7 @@ body.carddrag #reviewBar{display:none!important}
     return items[h%items.length];
   }
   /* ✦ 오늘 카드의 한 마디: 빛나는 카드 + 낱말이 하나씩 떠오르며 20초마다 다음 한 마디로 (📌 고정·정각 말씀이면 그대로), 옆으로 밀면 넘김 (2026-11-01 사용자 요청) */
-  var ST={id:"",ms:20000,busy:false,at:0,edit:false,lpAt:0};
+  var ST={id:"",ms:20000,busy:false,at:0,edit:false,lpAt:0,tapT:0};
   function sayTodayList(){return sayData().items.filter(function(x){return !x.hv&&String(x.t||"").trim()})}
   function sayTodayLocked(){return !!(sayHour()||sayPinned())}
   function sayTodayPick(){
