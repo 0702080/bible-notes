@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-appbg">
+<meta name="app-build" content="2026-11-01-darkbtn">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1799,6 +1799,12 @@ body.boardon .wrap{max-width:none;padding-left:20px;padding-right:20px}
 body.boardon{height:100vh;overflow:hidden}
 /* 칸반 배경: 은행나무 길 사진을 뿌옇게 흐려서 (2026-11-01 사용자 요청) */
 #appbg{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:-1;pointer-events:none;background:linear-gradient(rgba(10,10,13,.5),rgba(10,10,13,.5)),url(kanban-bg2.jpg) center/cover no-repeat,#0b0b0d}   /* 뿌연 은행나무 길 배경 — 휴대폰·칸반 모두 (2026-11-01 사용자 요청) */
+/* 사진 배경과 확실히 구분되게 맨 위 단추·주제·칸 칩 바탕을 짙게 (2026-11-01 사용자 요청) */
+.homebtn{background:color-mix(in srgb,var(--violet) 20%,#121116)}
+.tbtn{background:#141318}
+.topicbar .tchip:not(.on){background:#141318}
+.colbar .cchip{background:color-mix(in srgb,var(--gold) 6%,#141318)}
+.colbar .cchip.on{background:color-mix(in srgb,var(--gold) 22%,#141318)}
 body.boardon #appbg{background:linear-gradient(rgba(10,10,13,.38),rgba(10,10,13,.38)),url(kanban-bg2.jpg) center/cover no-repeat,#0b0b0d}
 body.boardon .wrap{height:100vh;display:flex;flex-direction:column;padding-bottom:0;box-sizing:border-box}
 body.boardon .top,body.boardon .toolbar,body.boardon .topicbar,body.boardon .filter{flex:0 0 auto}
