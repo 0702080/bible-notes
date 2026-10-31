@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-dlgap">
+<meta name="app-build" content="2026-10-31-calfold">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -11288,6 +11288,7 @@ body.carddrag #reviewBar{display:none!important}
       dlDragInit(dl.querySelector(".dllist"));
     }
     dlDay=(day&&/^\d{4}-\d{2}-\d{2}$/.test(day))?day:dkey(Date.now()); dlWEnd=""; dlCalM="";
+    dlCalFold=true;   // 열 때마다 달력은 이번 주만 보이게 접힌 채로 (2026-10-31 사용자 요청)
     dlEdit=false; dlEditId=""; dlGEditId=""; dlMemoId="";
     dlFind=""; var si0=dl.querySelector(".dlsin"); if(si0)si0.value="";
     if(focusId){   // 찾기에서 들어오면 그 항목의 기록을 펼쳐 둔다
