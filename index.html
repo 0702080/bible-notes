@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-mqsave">
+<meta name="app-build" content="2026-11-01-mqgrip">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6067,7 +6067,7 @@ body.carddrag #reviewBar{display:none!important}
     var mirror=document.createElement("div"); mirror.className="lhmirror"; mirror.setAttribute("aria-hidden","true"); document.body.appendChild(mirror);
     var ta=null, geo=[], drag=null, raf=0;
     var COPY=["fontFamily","fontSize","fontWeight","fontStyle","fontVariant","letterSpacing","lineHeight","wordBreak","wordSpacing","textIndent","textTransform","tabSize","overflowWrap","wordWrap","whiteSpace"];
-    function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&t.offsetParent!==null}
+    function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&!t.classList.contains("mqa")&&t.offsetParent!==null}   // 묵상 질문 답 칸은 자기 손잡이(.mqgut)가 있어 뺌 (2026-11-01)
     function measure(){
       var cs=getComputedStyle(ta);
       COPY.forEach(function(k){mirror.style[k]=cs[k]});
@@ -13126,7 +13126,7 @@ body.carddrag #reviewBar{display:none!important}
       c.appendChild(sl);
     }
     var f=document.createElement("div"); f.className="mqrow";
-    {var sb=document.createElement("button"); sb.type="button"; sb.className="mqsort"+(mqSort.has(it.id)?" on":""); sb.textContent=mqSort.has(it.id)?"✓ 다 옮겼어요":"↕️ 문장 옮기기"; f.appendChild(sb)}
+    if(mqSort.has(it.id)){var sb=document.createElement("button"); sb.type="button"; sb.className="mqsort on"; sb.textContent="✓ 다 옮겼어요"; f.appendChild(sb)}   // '↕️ 문장 옮기기' 단추는 뺌 — 답 칸 왼쪽 손잡이로 옮김 (2026-11-01 사용자 요청)
     var sel=document.createElement("select"); sel.className="field mqlink"; sel.setAttribute("aria-label","말씀 연결 (안 해도 돼요)");
     var o0=document.createElement("option"); o0.value=""; o0.textContent="📖 말씀 연결 안 함"; sel.appendChild(o0);
     sorted().forEach(function(nn){var op=document.createElement("option");op.value=nn.id;op.textContent=nn.ref||"구절 미입력";sel.appendChild(op)});
