@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-walkpocket">
+<meta name="app-build" content="2026-10-31-walkbeat">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9080,9 +9080,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     wkBox.querySelector(".wkgo").textContent=WK.run?"■ 멈춤":"▶ 시작";
     wkBox.querySelector(".wklref").textContent=n.ref||""; wkBox.querySelector(".wklword").textContent=WK.i?cur:"";
   }
-  function wkStep(){   // 한 걸음 = 다음 낱말(글자) 하나
+  function wkStep(auto){   // 한 걸음 = 다음 소절(낱말·글자) 하나. auto: 걸음 센서에서 온 것 — 아직 말하는 중이면 이 걸음은 건너뜀(소절이 끊기지 않게)
     if(!WK)return; var n=notes.get(WK.id); if(!n)return;
     WK.steps++;
+    if(auto){try{var ss0=window.speechSynthesis; if(ss0.speaking||ss0.pending){wkDraw();return}}catch(e){}}
     if(WK.i>=WK.toks.length){   // 다 들었으면: 구절 이름 → 반복 또는 다음 말씀
       wkRound(); wkSay(refSay((notes.get(WK.id)||{}).ref||""),1.05); return;
     }
@@ -9104,7 +9105,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     var sm=WK.sm, minT={hi:0.45,md:0.8,lo:1.4}[wkPref().s], P=WK.pk||2;
     var hi=Math.max(minT,P*0.42), lo=hi*0.55, now=Date.now();
     if(WK.arm){
-      if(sm>hi&&now-WK.last>280){WK.arm=false; WK.last=now; WK.cur=sm; wkStep()}
+      if(sm>hi&&now-WK.last>280){WK.arm=false; WK.last=now; WK.cur=sm; wkStep(true)}
     }else{
       if(sm>WK.cur)WK.cur=sm;
       if(sm<lo||now-WK.last>1500){WK.arm=true; WK.pk=Math.min(8,P*0.75+WK.cur*0.25)}   // 걸음 세기를 익혀 문턱을 맞춤
@@ -9117,25 +9118,45 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind{display:none}
     if(!navigator.wakeLock){WK.noWake=1; return}
     try{navigator.wakeLock.request("screen").then(function(l){WK.lock=l; WK.noWake=0}).catch(function(){WK.noWake=1})}catch(e){WK.noWake=1}
   }
+  function wkGeneric(){   // devicemotion이 막혔을 때: 일반 센서 API(LinearAccelerationSensor·Accelerometer)로 한 번 더
+    try{
+      var Cls=window.LinearAccelerationSensor||window.Accelerometer; if(!Cls)return false;
+      var lin=!!window.LinearAccelerationSensor, sn=new Cls({frequency:50});
+      sn.addEventListener("reading",function(){var v={x:sn.x||0,y:sn.y||0,z:sn.z||0}; wkMotion(lin?{acceleration:v}:{acceleration:null,accelerationIncludingGravity:v})});
+      sn.addEventListener("error",function(){});
+      sn.start(); WK.gs=sn; return true;
+    }catch(e){return false}
+  }
+  function wkBeatMode(){   // 센서가 모두 막혔으면: 걸음 대신 일정한 박자로 한 소절씩 (말이 끝나면 잠깐 쉬고 다음)
+    if(!WK||!WK.run||WK.beat)return; WK.beat=1;
+    var gap={hi:350,md:700,lo:1100}[wkPref().s];
+    (function tick(){
+      if(!WK||!WK.run||!WK.beat)return;
+      var ss=window.speechSynthesis; if(ss.speaking||ss.pending){WK.bt=setTimeout(tick,120);return}
+      WK.bt=setTimeout(function(){if(!WK||!WK.run||!WK.beat)return; wkStep(); WK.bt=setTimeout(tick,300)},gap);
+    })();
+  }
   function wkStart(){
-    var go=function(){WK.run=true; WK.arm=true; WK.ev=0; WK.sm=0; wkWake(); wkBox.querySelector(".wklock").hidden=false; wkSay("시작합니다",1.1); wkDraw();
+    var go=function(){WK.run=true; WK.arm=true; WK.ev=0; WK.sm=0; WK.beat=0; wkWake(); wkBox.querySelector(".wklock").hidden=false; wkSay("시작합니다",1.1); wkDraw();
       var sn=wkBox.querySelector(".wksens"); sn.textContent="";
-      setTimeout(function(){   // 센서 신호가 하나도 안 오면 알려 줌 (브라우저가 막은 경우)
-        if(!WK||!WK.run||WK.ev)return; wkBox.querySelector(".wklock").hidden=true;
-        sn.textContent="⚠️ 움직임 센서 신호가 안 와요. 브라우저가 막고 있을 수 있어요 — 주소창 왼쪽 아이콘 → 사이트 설정 → '동작 센서(움직임 센서)' 허용 후 다시 시작해 주세요. Brave는 방패(🦁) 보호를 이 사이트만 끄면 돼요.";
-        toast("움직임 센서 신호가 안 와요"); buzz([40,60,40]);
-        wkSay("움직임 센서가 막혀 있어요. 휴대폰을 꺼내 화면의 안내를 봐 주세요",1.05);   // 주머니 속이라 귀로 알려 줌
-      },2500);
+      setTimeout(function(){if(WK&&WK.run&&!WK.ev)wkGeneric()},1200);
+      setTimeout(function(){   // 그래도 센서 신호가 하나도 안 오면 박자 모드로 (브라우저가 막은 경우)
+        if(!WK||!WK.run||WK.ev)return;
+        sn.textContent="⚠️ 이 브라우저가 움직임 센서를 막고 있어서 걸음을 못 느껴요. 지금은 일정한 박자로 한 소절씩 들려 드려요 (걸음 감지 = 박자 빠르기).\n걸음에 맞추려면 Brave ⋮ → 설정 → 사이트 설정 → '동작 센서' → 허용, 또는 주소창 🦁 방패 → '핑거프린팅 차단' 끄기 후 다시 시작해 주세요. 크롬에서 열면 바로 돼요.";
+        buzz([40,60,40]);
+        wkSay("움직임 센서가 막혀 있어서, 일정한 박자로 들려 드릴게요",1.05);
+        setTimeout(wkBeatMode,3200);
+      },3000);
       setTimeout(function(){
         if(!WK||!WK.run||!WK.noWake)return;
         var sn2=wkBox.querySelector(".wksens"); sn2.textContent=(sn2.textContent?sn2.textContent+"\n":"")+"⚠️ 이 브라우저는 화면 꺼짐을 막지 못해요. 휴대폰 설정 → 디스플레이 → 화면 자동 꺼짐 시간을 10분으로 늘려 주세요.";
         wkSay("화면이 꺼지면 멈춰요. 화면 자동 꺼짐 시간을 늘려 주세요",1.05);
-      },3500);
+      },9000);
     };
-    if(window.DeviceMotionEvent&&typeof DeviceMotionEvent.requestPermission==="function"){DeviceMotionEvent.requestPermission().then(function(r){if(r!=="granted")toast("움직임 센서를 허용해야 걸음을 느껴요 · 👣 한 걸음으로도 들을 수 있어요"); go()}).catch(go)}
-    else{if(!("ondevicemotion" in window))toast("이 기기에서는 걸음을 느낄 수 없어요 · 👣 한 걸음으로 들어 보세요"); go()}
+    if(window.DeviceMotionEvent&&typeof DeviceMotionEvent.requestPermission==="function"){DeviceMotionEvent.requestPermission().then(function(){go()}).catch(go)}
+    else go();
   }
-  function wkStop(){if(!WK)return; WK.run=false; try{if(WK.lock)WK.lock.release()}catch(e){} WK.lock=null; try{window.speechSynthesis.cancel()}catch(e){} wkBox.querySelector(".wklock").hidden=true; wkDraw()}
+  function wkStop(){if(!WK)return; WK.run=false; WK.beat=0; clearTimeout(WK.bt); try{if(WK.gs)WK.gs.stop()}catch(e){} WK.gs=null; try{if(WK.lock)WK.lock.release()}catch(e){} WK.lock=null; try{window.speechSynthesis.cancel()}catch(e){} wkBox.querySelector(".wklock").hidden=true; wkDraw()}
   function closeWalk(){if(!wkBox||wkBox.hidden)return; wkStop(); wkBox.hidden=true; document.body.style.overflow=ccBox&&!ccBox.hidden?"hidden":""; WK=null}
   function closeCoach(){
     try{closeWalk()}catch(e){}
