@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-mqh">
+<meta name="app-build" content="2026-11-01-mqsave">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2991,6 +2991,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind,body.soloon #co
 .mqa{padding-left:40px!important}   /* 왼쪽은 문장 손잡이 자리 (2026-10-25 사용자 요청) */
 .mqa{width:100%;box-sizing:border-box;min-height:60px;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.7;resize:none;overflow:hidden}
 .mqa:focus{outline:none;border-color:var(--gold)}
+.mqdone{display:none;width:100%;height:40px;margin-top:8px;border:0;border-radius:12px;background:var(--gold);color:#141416;font:inherit;font-size:14px;font-weight:700}
+.mqa:focus~.mqdone{display:block}
 .mqa::placeholder{color:var(--faint)}
 .mqhint{margin:0;font-size:12.5px;color:var(--muted);line-height:1.6}
 .mqbox>.mqhint,.mqbox>.mqfoottop{display:none}   /* 안내 문구·답한 수는 뺌 (2026-10-25 사용자 요청) */
@@ -12978,15 +12980,15 @@ body.carddrag #reviewBar{display:none!important}
       var vv=window.visualViewport, vh=vv?vv.height:innerHeight, vtop=vv?vv.offsetTop:0, vbot=vtop+vh;   // 키보드가 화면을 가리기만 하는 브라우저(보이는 영역만 줄어듦)도 맞게
       // 키보드가 떠도 보이는 높이가 안 줄어드는 기기(홈 화면 앱 등)는 키보드가 화면 아래 42%쯤을 덮는다고 보고 그 위까지만 (2026-11-01 사용자 요청: 칸이 너무 김)
       var fullH=Math.max(innerHeight,(screen&&screen.height)||0);
-      if(vh>fullH*0.8)vbot=vtop+Math.round(vh*0.58);
+      if(vh>fullH*0.8)vbot=vtop+Math.round(vh*0.5);
       var body=mq.querySelector(".dlbody"), fx=mq.querySelector(".dlfix"), it=cur.closest(".mqitem");
       body.style.paddingBottom=Math.round(innerHeight)+"px";   // 마지막 질문도 위로 끝까지 올릴 수 있게 아래 여백을 잠시 크게
       var topLine=Math.max(fx?fx.getBoundingClientRect().bottom:0,vtop);
       var dy=it.getBoundingClientRect().top-(topLine+6); if(Math.abs(dy)>2)body.scrollTop+=dy;   // 질문 카드 머리가 고정 줄 바로 아래로
-      var tt=cur.getBoundingClientRect().top, hpx=Math.max(140,Math.round(vbot-tt-10))+"px";
+      var tt=cur.getBoundingClientRect().top, hpx=Math.max(120,Math.round(vbot-tt-58))+"px";
       if(cur.style.height!==hpx)cur.style.height=hpx;
-      // 칸 아래 끝이 키보드 바로 위 10px에 오는지 한 번 더 재서 맞춤 (키보드 밑으로 들어가던 문제, 2026-10-31 사용자 요청)
-      var over=cur.getBoundingClientRect().bottom-(vbot-10); if(Math.abs(over)>1)cur.style.height=Math.max(140,Math.round(cur.offsetHeight-over))+"px";
+      // 칸 아래(저장 단추까지)가 키보드 바로 위 10px에 오는지 한 번 더 재서 맞춤 (키보드 밑으로 들어가던 문제, 2026-10-31 사용자 요청)
+      var over=cur.getBoundingClientRect().bottom-(vbot-58); if(Math.abs(over)>1)cur.style.height=Math.max(120,Math.round(cur.offsetHeight-over))+"px";
     }
     document.addEventListener("focusin",function(e){
       var t=e.target; if(!t||!t.classList||!t.classList.contains("mqa")||!mq||!mq.contains(t))return;
@@ -13055,6 +13057,12 @@ body.carddrag #reviewBar{display:none!important}
         else if(t.classList.contains("mqa"))mqEdit(c.dataset.id,function(it){it.a=t.value});
       };
       mq.querySelector(".mqbox").addEventListener("focusout",function(e){mqKeep(e.target)});
+      mq.querySelector(".mqbox").addEventListener("pointerdown",function(e){if(e.target.closest(".mqdone"))e.preventDefault()});
+      mq.querySelector(".mqbox").addEventListener("mousedown",function(e){if(e.target.closest(".mqdone"))e.preventDefault()});
+      mq.querySelector(".mqbox").addEventListener("click",function(e){
+        var d=e.target.closest(".mqdone"); if(!d)return;
+        var t=d.closest(".mqitem").querySelector(".mqa"); mqKeep(t); if(document.activeElement===t)t.blur(); toast("저장했어요");
+      });
       mq.querySelector(".mqbox").addEventListener("compositionend",function(e){mqKeep(e.target)});
       document.addEventListener("visibilitychange",function(){if(document.hidden&&mq&&mq.contains(document.activeElement))mqKeep(document.activeElement)});
       mq.querySelector(".mqbox").addEventListener("change",function(e){
@@ -13104,6 +13112,7 @@ body.carddrag #reviewBar{display:none!important}
     if(fd){var pv=document.createElement("p"); pv.className="mqpeek"; var a1=String(it.a||"").trim(); pv.textContent=a1?a1.split("\n")[0]+(a1.indexOf("\n")>=0?" …":""):"아직 답이 없어요"; c.appendChild(pv)}
     var ta=document.createElement("textarea"); ta.className="mqa"; ta.value=it.a||"";
     ta.placeholder="내 답을 적어 보세요"; ta.setAttribute("aria-label","답"); c.appendChild(ta);
+    var dn=document.createElement("button"); dn.type="button"; dn.className="mqdone"; dn.textContent="✓ 저장"; c.appendChild(dn);   // 적는 동안 답 칸 바로 아래 (2026-11-01 사용자 요청)
     var lines=String(it.a||"").split("\n");
     if(mqSort.has(it.id)&&lines.length>1){   // ↕️ 문장 옮기기: 줄마다 오른쪽 손잡이를 잡고 위아래로 끌기 (2026-10-25 사용자 요청)
       ta.hidden=true;
