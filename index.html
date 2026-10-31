@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-sayline">
+<meta name="app-build" content="2026-11-01-refleft">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1508,6 +1508,7 @@ body.reorder .note .chead .copyv{display:none}
 .chead .copyv svg,.chead .fopen svg{width:16px;height:16px}
 .chead .memopen svg{width:17px;height:17px}
 .chead .ref{white-space:normal;overflow:visible;text-overflow:clip;word-break:keep-all;line-height:1.3}
+.chead .ref{display:flex;flex-wrap:wrap;align-items:center;column-gap:8px;row-gap:4px}.chead .ref .logcnt{margin-left:0}   /* "암송 N"이 다음 줄로 넘어가도 왼쪽 끝에 맞춤 (2026-11-01 사용자 요청) */
 .mprow{display:flex;gap:8px;margin:12px 0 4px}
 .mprow .mpractice{flex:1;margin:0}
 .mreveal{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;height:42px;padding:0 14px;border:1px solid var(--rule);border-radius:12px;background:transparent;color:var(--ink);font-size:14px;font-weight:500}
