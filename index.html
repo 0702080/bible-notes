@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-10-31-dlcalpc">
+<meta name="app-build" content="2026-10-31-cal3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3237,7 +3237,26 @@ body.carddrag #reviewBar{display:none!important}
 .dlcd.cur i{background:rgba(0,0,0,.14)}
 .dlcd.today::after{top:11px;right:11px;width:6px;height:6px}
 .daily.dlhascal .dlsearch{margin-top:16px}
+.daily.dlhascal .dlcal.dlcal3{max-width:1180px;padding:16px 22px 20px}
+.dlcal3>.dlcdow,.dlcal3>.dlcg{display:none}
+.dlc3{display:none}
+.daily.dlhascal .dlcal{-webkit-user-select:none;user-select:none;cursor:grab}   /* 마우스로 위로 끌면 이번 주만, 아래로 끌면 석 달 — 끄는 동안 글자 선택 안 되게 */
+.dlcal3 .dlc3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.dlc3.dlcin-l{animation:dlcinl .25s ease-out}
+.dlc3.dlcin-r{animation:dlcinr .25s ease-out}
+.dlcmo{padding:12px 12px 14px;border-radius:18px;border:1px solid #1F1E25;background:#0F0E12}
+.dlcmo.sel{border-color:color-mix(in srgb,var(--gold) 40%,#1F1E25);background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 6%,#121116),#0F0E12)}
+.dlcmh{margin:0 0 8px;text-align:center;font-size:15px;font-weight:800;color:var(--muted);letter-spacing:.01em}
+.dlcmo.sel .dlcmh{color:var(--gold)}
+.dlcmo .dlcdow,.dlcmo .dlcg{gap:4px}
+.dlcmo .dlcdow{margin-bottom:4px}
+.dlcmo .dlcdow span{font-size:11px;padding:2px 0}
+.dlcmo .dlcd{height:46px;padding:5px 7px;border-radius:11px}
+.dlcmo .dlcd b{font-size:13.5px}
+.dlcmo .dlcd i{font-size:10px;padding:1px 5px;border-radius:7px}
+.dlcmo .dlcd.today::after{top:8px;right:8px;width:5px;height:5px}
 }
+@media (prefers-reduced-motion:reduce){.dlc3.dlcin-l,.dlc3.dlcin-r{animation:none}}
 @media (max-width:420px){.dlcd{height:40px;border-radius:11px}.dlcdow,.dlcg{gap:2px 3px}.dlcmt{font-size:16px}.dlcsum{font-size:12.5px}}
 .dlw{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:2px 0;border:0;background:transparent;font:inherit;cursor:pointer}
 .dlw i{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:700;color:#141416;background:color-mix(in srgb,var(--gold) calc(var(--f) * 100%),#1c1b21)}
@@ -6042,6 +6061,11 @@ body.carddrag #reviewBar{display:none!important}
       if(!outside&&!ta.classList.contains("lhpad")){ta.classList.add("lhpad"); m=measure(); cs=m.cs; r=ta.getBoundingClientRect()}
       var bt=parseFloat(cs.borderTopWidth)||0, pt=parseFloat(cs.paddingTop)||0, bl=parseFloat(cs.borderLeftWidth)||0;
       var x=outside?r.left-25:r.left+bl+2;
+      if(outside){   // 칸 왼쪽 바깥 여백(감싼 상자 안쪽 끝 ~ 칸 왼쪽)의 가로 가운데에 맞춤 (2026-10-31 사용자 요청)
+        for(var pe=ta.parentElement;pe&&pe!==document.body;pe=pe.parentElement){
+          var pr=pe.getBoundingClientRect(); if(pr.left<r.left-1){var pl=pr.left+(parseFloat(getComputedStyle(pe).borderLeftWidth)||0), gw=r.left-pl; if(gw>=24&&gw<=90)x=pl+gw/2-12; break}
+        }
+      }
       layer.textContent=""; layer.hidden=false;
       geo.forEach(function(g){
         if(g.empty&&!(drag&&drag.i===g.i))return;
@@ -11634,7 +11658,7 @@ body.carddrag #reviewBar{display:none!important}
     var base=dlCalM||dlDay.slice(0,7), d=new Date(base+"-01T12:00:00"); d.setMonth(d.getMonth()+n);
     var k=dkey(d.getTime()).slice(0,7); if(k>dkey(Date.now()).slice(0,7))return;
     dlCalM=k===dlDay.slice(0,7)?"":k; buzz(8); drawDaily();
-    var g=dl.querySelector(".dlcg"); if(g){g.classList.remove("dlcin-l","dlcin-r"); void g.offsetWidth; g.classList.add(n>0?"dlcin-l":"dlcin-r")}
+    var g=dl.querySelector(".dlcal3 .dlc3")||dl.querySelector(".dlcg"); if(g){g.classList.remove("dlcin-l","dlcin-r"); void g.offsetWidth; g.classList.add(n>0?"dlcin-l":"dlcin-r")}
   }
   function dlCalDraw(o,tot,today){
     var cal=dl.querySelector(".dlcal"); if(!cal)return;
@@ -11649,7 +11673,27 @@ body.carddrag #reviewBar{display:none!important}
     cal.querySelector(".dlcsum em").textContent=(cc0?"✓ ":"")+cc0+"/"+tot;
     cal.querySelector(".dlcsum").classList.toggle("ok",cc0>0);
     var fb=cal.querySelector(".dlcfold"); fb.textContent=fold?"▾":"▴"; fb.setAttribute("aria-label",fold?"달력 펼치기":"달력 접기");
-    var g=cal.querySelector(".dlcg"); g.textContent="";
+    // PC(900px 이상)는 석 달(보는 달과 앞의 두 달)을 나란히 (2026-10-31 사용자 요청)
+    var three=window.innerWidth>=900&&!fold, c3=cal.querySelector(".dlc3");
+    cal.classList.toggle("dlcal3",three);
+    if(!c3){c3=document.createElement("div"); c3.className="dlc3"; cal.appendChild(c3)}
+    c3.textContent="";
+    if(three){
+      var ms=[-2,-1,0].map(function(n){var d=new Date(y,m-1+n,1,12); return {y:d.getFullYear(),m:d.getMonth()+1}});
+      cal.querySelector(".dlcmt").textContent=ms[0].y===ms[2].y?ms[0].y+"년 "+ms[0].m+"월 – "+ms[2].m+"월":ms[0].y+"년 "+ms[0].m+"월 – "+ms[2].y+"년 "+ms[2].m+"월";
+      var dow=cal.querySelector(".dlcdow").outerHTML;
+      ms.forEach(function(q,i){
+        var k=q.y+"-"+("0"+q.m).slice(-2), mo=document.createElement("div"); mo.className="dlcmo"+(k===dlDay.slice(0,7)?" sel":"")+(k===today.slice(0,7)?" now":"");
+        mo.innerHTML='<div class="dlcmh"></div>'+dow+'<div class="dlcg"></div>';
+        mo.querySelector(".dlcmh").textContent=(i===0||q.m===1?q.y+"년 ":"")+q.m+"월";
+        c3.appendChild(mo); dlCalFill(mo.querySelector(".dlcg"),k,false,o,tot,today);
+      });
+      return;
+    }
+    dlCalFill(cal.querySelector(".dlcg"),mk,fold,o,tot,today);
+  }
+  function dlCalFill(g,mk,fold,o,tot,today){
+    var y=+mk.slice(0,4), m=+mk.slice(5,7); g.textContent="";
     var first=new Date(y,m-1,1,12), lead=first.getDay(), days=new Date(y,m,0).getDate();
     var cells=[]; for(var i=0;i<lead;i++)cells.push(null); for(var dd=1;dd<=days;dd++)cells.push(mk+"-"+("0"+dd).slice(-2)); while(cells.length%7)cells.push(null);
     var rows=[]; for(var r=0;r<cells.length;r+=7)rows.push(cells.slice(r,r+7));
