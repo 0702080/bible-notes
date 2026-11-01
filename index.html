@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-bkh">
+<meta name="app-build" content="2026-11-02-bkfit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1988,7 +1988,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 @keyframes bflipin{from{transform:perspective(1400px) rotateY(-90deg)}}
 .bcback{display:none}
 .bcol.bback>.bclist,.bcol.bback>.bcjump{display:none}
-.bcol.bback>.bcback{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:none}
+.bcol.bback>.bcback{display:flex;flex-direction:column;gap:8px;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:none}
 .bcol.bback{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 24%,#201E26),color-mix(in srgb,var(--bc) 10%,#1C1A21) 320px)}
 .bcflipb{flex:0 0 auto;width:26px;height:26px;padding:0;border:0;border-radius:13px;background:color-mix(in srgb,var(--bc) 16%,transparent);color:var(--bc);display:grid;place-items:center;transition:transform .35s ease,background .15s}
 .bcflipb:hover{background:color-mix(in srgb,var(--bc) 30%,transparent)}
@@ -2012,9 +2012,13 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.blocked .bch b::after{content:" 📌";font-size:11px;vertical-align:1px}
 .bcol.blocked .bch{cursor:default}
 /* 뒷면 카드는 모두 같은 높이 — 뜻은 두 줄까지 (2026-11-02 사용자 요청) */
-.bcbk{flex:0 0 auto;height:84px;box-sizing:border-box;justify-content:flex-start;overflow:hidden}
+.bcbk{flex:0 0 auto;height:var(--bkh,84px);box-sizing:border-box;justify-content:flex-start;overflow:hidden}
 .bcbk b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bcbk span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.bcbk span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.bcback .bcbk{padding:12px 14px;gap:8px}   /* 앞면 말씀 카드처럼 */
+.bcback .bcbk b{font-size:14.5px}
+.bcback .bcbk span{color:var(--ink);font-size:14.5px;line-height:1.6}
+.bcback .bcbk.has span{color:var(--muted)}
 /* 칸 이름은 자르지 않고 다 보이게 — 길면 두 줄로 (2026-11-02 사용자 요청) */
 .bcol.btint .bch{align-items:flex-start}
 .bcol.btint .bch b{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;word-break:keep-all;line-height:1.3;padding-top:3px}
@@ -4600,7 +4604,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
   function renderKanban(){
     var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
     box.textContent=""; box.classList.remove("bsolo");
-    if(bMode==="list"){renderKanbanList(box);kbLockApply(box);kbTint(box);kbBackPrep(box);kbFit(box);return}
+    if(bMode==="list"){renderKanbanList(box);kbLockApply(box);kbTint(box);kbBackPrep(box);kbFit(box);setTimeout(kbBackFit,0);return}
     var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
     sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
     var fresh=groups["new"];
@@ -4879,6 +4883,13 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
       cl.insertBefore(bk,cl.querySelector(".bcjump"));
     });
   }
+  // 뒷면 카드 높이 = 옆 칸 앞면 말씀 카드의 보통 높이(가운데값) (2026-11-02 사용자 요청)
+  function kbBackFit(){
+    var b=$("board"); if(!b||!b.querySelector(".bcol.bflipable"))return;
+    var hs=Array.prototype.map.call(b.querySelectorAll(".bcol:not(.bback):not(.bfold) .bcard"),function(c){return c.offsetHeight}).filter(function(h){return h>40}).sort(function(x,y){return x-y});
+    if(!hs.length)return; b.style.setProperty("--bkh",hs[Math.floor(hs.length/2)]+"px");
+  }
+  window.addEventListener("resize",function(){setTimeout(kbBackFit,60)});
   function kbFlip(cl){
     var k=cl.dataset.k; kbBackOn[k]=!kbBackOn[k]; buzz(8);
     if(matchMedia("(prefers-reduced-motion: reduce)").matches){cl.classList.toggle("bback",kbBackOn[k]);return}
@@ -4995,8 +5006,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
     p.innerHTML=KBCOL.map(function(c,i){return '<button type="button" data-c="'+i+'" style="--sw:'+c+'"'+(cur===i?' class="on"':'')+' aria-label="색 '+(i+1)+'"></button>'}).join("")+
       '<button type="button" data-c="" class="auto'+(cur==null?' on':'')+'">자동</button>'+
       '<div class="bcacts">'+(false?'<button type="button" data-act="flip"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3.5V8h4.5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20.5V16h-4.5"/></svg>뒤집기</button>':'')+
-      (col.dataset.cc?'<button type="button" data-act="lock">'+(col.classList.contains("blocked")?'📌 고정 풀기':'📌 자리 고정')+'</button>':'')+
-      '<button type="button" data-act="name"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>이름</button>'+(col.querySelector(".bcdel")?'<button type="button" data-act="del"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>칸 지우기</button>':'')+'</div>';
+      (col.dataset.cc?'<button type="button" data-act="lock">'+(col.classList.contains("blocked")?'📌 고정 풀기':'📌 자리 고정')+'</button>':'')+(col.querySelector(".bcdel")?'<button type="button" data-act="del"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>칸 지우기</button>':'')+'</div>';
     col.querySelector(".bch").insertAdjacentElement("afterend",p);
   },true);
   function renderKanbanList(box){
