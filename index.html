@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-cc-read-swipe">
+<meta name="app-build" content="2026-11-01-rm-3dfoot">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3645,6 +3645,10 @@ body.carddrag #reviewBar{display:none!important}
 .rmsheet .rmrow input[type=time]{width:150px}
 .rmsheet .rmg{width:150px!important}
 .rmsheet .rmtry,.rmsheet .rmclose{margin:8px 6px 0 0}
+/* 파일 받기·지금 한 번 열어 보기·닫기도 입체 (2026-11-01 사용자 요청) */
+.rmsheet .rmmake,.rmsheet .rmtry,.rmsheet .rmclose{background-color:#2A2933!important;border:1px solid #45434F!important;color:var(--ink)!important;background-image:linear-gradient(180deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.42)!important;transition:transform .08s,box-shadow .08s}
+.rmsheet .rmmake{height:42px;border-radius:21px;font-weight:600}
+.rmsheet .rmmake:active,.rmsheet .rmtry:active,.rmsheet .rmclose:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
 .rmsheet .rmg{width:156px!important;margin-left:auto;padding:0 8px}   /* 구글 캘린더에 넣기: 시각 칸과 같은 폭으로 오른쪽에 (2026-11-01 사용자 요청: 가로 폭 줄이기) */
 .rmfile{margin-top:8px;height:40px;border:1px solid #34333A;border-radius:12px;background:transparent;color:var(--muted);font-size:13.5px}
 .rmrow input[type=time]{width:156px;height:38px;color-scheme:dark}
