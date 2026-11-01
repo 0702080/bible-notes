@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-bkmine">
+<meta name="app-build" content="2026-11-02-boardfade">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4270,6 +4270,13 @@ body.boardon .boardsay:not([hidden]){background:linear-gradient(180deg,rgba(255,
   .rmsheet .rmrow{flex-wrap:nowrap}
   .rmsheet .rmrow span{flex:0 0 auto;white-space:nowrap}
 }
+/* 맨 오른쪽 칸·아래쪽 그림자가 잘리지 않게 칸반 끝에 여유 자리 (2026-11-02 사용자 요청) */
+body.boardon #board.board4{padding-bottom:24px}
+body.boardon #board.board4::after{content:"";flex:0 0 18px;align-self:stretch}
+/* 옆으로 넘겨 칸이 화면 끝에서 잘릴 때는 뚝 끊기지 않고 부드럽게 사라지게 (2026-11-02 사용자 요청) */
+body.boardon #board.board4.fadel{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 48px);mask-image:linear-gradient(to right,transparent 0,#000 48px)}
+body.boardon #board.board4.fader{-webkit-mask-image:linear-gradient(to left,transparent 0,#000 48px);mask-image:linear-gradient(to left,transparent 0,#000 48px)}
+body.boardon #board.board4.fadel.fader{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -5002,6 +5009,13 @@ body.boardon .boardsay:not([hidden]){background:linear-gradient(180deg,rgba(255,
     var anchor=cols[cols.length-1].nextSibling;   // 칸들 뒤의 것(없으면 끝)
     seq.forEach(function(c){box.insertBefore(c,anchor)});
   }
+  (function(){   // 칸반 양끝 흐림: 왼쪽으로 넘긴 게 있으면 왼쪽, 오른쪽에 더 있으면 오른쪽
+    var b=$("board"); if(!b)return;
+    var f=function(){var m=b.scrollWidth-b.clientWidth; b.classList.toggle("fadel",b.scrollLeft>2); b.classList.toggle("fader",m>2&&b.scrollLeft<m-2)};
+    b.addEventListener("scroll",f,{passive:true}); window.addEventListener("resize",f);
+    if(window.ResizeObserver)new ResizeObserver(f).observe(b);
+    new MutationObserver(function(){setTimeout(f,0)}).observe(b,{childList:true});
+  })();
   function kbPalClose(){document.querySelectorAll("#board .bcpal").forEach(function(x){x.remove()})}
   $("board").addEventListener("click",function(e){
     if(bMode!=="list")return;
