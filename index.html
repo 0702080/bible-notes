@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-boardfade">
+<meta name="app-build" content="2026-11-02-boardsnap2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4274,9 +4274,6 @@ body.boardon .boardsay:not([hidden]){background:linear-gradient(180deg,rgba(255,
 body.boardon #board.board4{padding-bottom:24px}
 body.boardon #board.board4::after{content:"";flex:0 0 18px;align-self:stretch}
 /* 옆으로 넘겨 칸이 화면 끝에서 잘릴 때는 뚝 끊기지 않고 부드럽게 사라지게 (2026-11-02 사용자 요청) */
-body.boardon #board.board4.fadel{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 48px);mask-image:linear-gradient(to right,transparent 0,#000 48px)}
-body.boardon #board.board4.fader{-webkit-mask-image:linear-gradient(to left,transparent 0,#000 48px);mask-image:linear-gradient(to left,transparent 0,#000 48px)}
-body.boardon #board.board4.fadel.fader{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 48px,#000 calc(100% - 48px),transparent 100%)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -4665,6 +4662,11 @@ body.boardon #board.board4.fadel.fader{-webkit-mask-image:linear-gradient(to rig
     var ad=box.querySelector(":scope>.baddcol,:scope>.bleft"); if(ad){fixed+=120;n++}
     if(!open){box.style.removeProperty("--bcw");return}
     var w=Math.floor((box.clientWidth-fixed-gap*Math.max(0,n-1)-4)/open);
+    if(w<220){   // 다 안 들어가면: 한 화면에 칸이 딱 맞게 들어가는 폭으로 — 넘겨서 멈추면 양끝이 칸 경계에 맞음 (2026-11-02 사용자 요청)
+      var W=box.clientWidth, k=Math.max(1,Math.round((W+gap)/(260+gap))), ww=Math.floor((W-gap*(k-1))/k);
+      while(ww<220&&k>1){k--; ww=Math.floor((W-gap*(k-1))/k)}
+      box.style.setProperty("--bcw",ww+"px"); document.body.style.setProperty("--bcw",ww+"px"); return;
+    }
     if(w>=270){box.style.removeProperty("--bcw");document.body.style.removeProperty("--bcw")} else {box.style.setProperty("--bcw",Math.max(220,w)+"px");document.body.style.setProperty("--bcw",Math.max(220,w)+"px")}   // 찾은 결과 칸도 같은 폭
   }
   window.addEventListener("resize",function(){var b=$("board"); if(b&&!b.hidden&&bMode==="list")kbFit(b)});
@@ -5011,8 +5013,19 @@ body.boardon #board.board4.fadel.fader{-webkit-mask-image:linear-gradient(to rig
   }
   (function(){   // 칸반 양끝 흐림: 왼쪽으로 넘긴 게 있으면 왼쪽, 오른쪽에 더 있으면 오른쪽
     var b=$("board"); if(!b)return;
-    var f=function(){var m=b.scrollWidth-b.clientWidth; b.classList.toggle("fadel",b.scrollLeft>2); b.classList.toggle("fader",m>2&&b.scrollLeft<m-2)};
-    b.addEventListener("scroll",f,{passive:true}); window.addEventListener("resize",f);
+    var f=function(){var m=b.scrollWidth-b.clientWidth; b.classList.toggle("fader",m>2&&b.scrollLeft<m-2)};
+    // 옆으로 넘기다 멈추면 맨 왼쪽 칸이 잘리지 않게 칸 시작에 딱 맞춤 (2026-11-02 사용자 요청: 왼쪽이 가려지면 어색함)
+    var snapT=0, snapping=false;
+    var snap=function(){
+      if(snapping||document.body.classList.contains("lmmoving")||lmP||!document.body.classList.contains("boardon"))return;
+      var m=b.scrollWidth-b.clientWidth, x=b.scrollLeft; if(x<=1||x>=m-1)return;
+      var L=b.getBoundingClientRect().left, starts=[0];
+      Array.prototype.forEach.call(b.querySelectorAll(":scope>.bcol,:scope>.bleft,:scope>.baddcol"),function(c){starts.push(c.getBoundingClientRect().left-L+x)});
+      var best=starts[0]; starts.forEach(function(v){v=Math.max(0,Math.min(m,v)); if(Math.abs(v-x)<Math.abs(best-x))best=v});
+      if(Math.abs(best-x)<2)return;
+      snapping=true; b.scrollTo({left:best,behavior:"smooth"}); setTimeout(function(){snapping=false},400);
+    };
+    b.addEventListener("scroll",function(){f(); clearTimeout(snapT); if(!snapping)snapT=setTimeout(snap,160)},{passive:true}); window.addEventListener("resize",f);
     if(window.ResizeObserver)new ResizeObserver(f).observe(b);
     new MutationObserver(function(){setTimeout(f,0)}).observe(b,{childList:true});
   })();
