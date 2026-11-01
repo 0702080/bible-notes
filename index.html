@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-chipcol">
+<meta name="app-build" content="2026-11-02-clx">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2089,6 +2089,14 @@ body.boardon.tfolded .topicbar{display:none}
 .bcard.bclone .bcclonetag{margin-left:auto;order:9}   /* '복제' 표는 오른쪽 끝에 */
 .bcclonetag{margin-left:6px;padding:0 6px;border-radius:8px;background:color-mix(in srgb,var(--sky) 16%,transparent);color:var(--sky);font-size:11px;font-weight:700;-webkit-text-stroke:0;white-space:nowrap}
 .bcclx{position:absolute;right:8px;bottom:8px;z-index:2;height:22px;min-width:22px;padding:0 6px;border:1px solid #3A3944;border-radius:11px;background:#1B1A21;color:var(--muted);font-size:12px;line-height:20px;cursor:pointer}
+@media (hover:hover){
+  .bcard.bclone:hover .bcclx:not(.sure){display:none}
+  .bcard.bclone:hover .bcclonetag{cursor:pointer}
+  .bcard.bclone:hover .bcclonetag:not(.sure)::after{content:" ×";color:var(--muted)}
+}
+.bcclonetag.sure{color:var(--orange);background:color-mix(in srgb,var(--orange) 16%,transparent)}
+.bcard.bclone>.bcref{padding-right:0}   /* '복제' 표를 오른쪽 끝까지 */
+.bcard.bclone:hover>.bcref{padding-right:24px}   /* 커서를 올리면 오른쪽 위 ↺ 자리만큼 비킴 */
 .bcclx.sure{color:var(--orange);border-color:color-mix(in srgb,var(--orange) 50%,transparent)}
 .lmghost.lmcopy{outline:2px dashed var(--sky)!important}
 .lmghost.lmcopy::after{content:"+ 복제";position:absolute;right:8px;top:8px;padding:2px 8px;border-radius:10px;background:var(--sky);color:#0B0B0D;font-size:12px;font-weight:700}
@@ -4799,8 +4807,9 @@ body.boardon .toolbar .tbtn.tadd{background:linear-gradient(180deg,color-mix(in 
     $("fab").click();   // 위 '말씀 담기'와 똑같이
   },true);
   $("board").addEventListener("click",function(e){
-    var x=e.target.closest(".bcclx"); if(!x)return; e.stopPropagation(); e.preventDefault();
-    if(!x.dataset.sure){x.dataset.sure="1"; x.textContent="지울까요?"; x.classList.add("sure"); setTimeout(function(){if(x.isConnected){delete x.dataset.sure;x.textContent="×";x.classList.remove("sure")}},3000); return}
+    var x=e.target.closest(".bcclx,.bclone .bcclonetag"); if(!x)return; e.stopPropagation(); e.preventDefault();
+    // 커서를 올려 '암송 시작'이 나오면 아래 ×는 숨고, 위의 '복제' 표가 지우기 단추가 됨 (2026-11-02 사용자 요청)
+    if(!x.dataset.sure){var was=x.textContent; x.dataset.sure="1"; x.textContent="지울까요?"; x.classList.add("sure"); setTimeout(function(){if(x.isConnected){delete x.dataset.sure;x.textContent=was;x.classList.remove("sure")}},3000); return}
     var cid=x.closest(".bcard").dataset.clone, o=clData(); o.items=o.items.filter(function(c){return c.id!==cid}); o.del[cid]=Date.now(); clSave(o); render(); toast("복제 카드를 지웠어요 (원본은 그대로)");
   },true);
   function bcJumpState(cl){
