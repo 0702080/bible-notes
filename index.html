@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-sm-3dbtn">
+<meta name="app-build" content="2026-11-01-prd-onecard">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2934,6 +2934,16 @@ button:active{filter:brightness(1.15)}
 .prdword .prdgo{background:color-mix(in srgb,var(--violet) 14%,#1E1D24)}
 .prdword .prdverse{position:relative;z-index:1;margin:8px 0 0;font-size:16.5px;line-height:1.75;color:color-mix(in srgb,var(--violet) 30%,#F4F1FA)}   /* 말씀은 기도문(주황)과 다른 연보라 */
 .prdit{margin:0 0 12px;padding:16px 18px;border-radius:16px;background:#141418;border:1px solid #26252B}
+/* 🃏 말씀 + 그 말씀으로 드린 기도를 한 장의 카드로 (2026-11-01 사용자 요청: 두 장으로 나뉘어 한눈에 안 들어옴)
+   위=말씀(연보라 빛), 가는 줄 아래=기도(주황 빛). 왼쪽 띠도 보라→주황으로 한 줄 */
+.prdsec:not(.p1sec){position:relative;margin:0 0 16px;border-radius:18px;border:1px solid color-mix(in srgb,var(--violet) 28%,#2A2930);background:linear-gradient(180deg,color-mix(in srgb,var(--violet) 12%,#141418) 0%,#141418 38%,color-mix(in srgb,var(--orange) 6%,#141418) 100%);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden}
+.prdsec:not(.p1sec)::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--violet),color-mix(in srgb,var(--violet) 50%,var(--orange)) 45%,var(--orange));z-index:2}
+.prdsec:not(.p1sec) .prdword{margin:0;padding:16px 18px 14px 22px;border:0;border-radius:0;background:transparent}
+.prdsec:not(.p1sec) .prdword::before,.prdsec:not(.p1sec) .prdword::after{display:none}
+.prdsec:not(.p1sec) .prdit{margin:0;padding:14px 18px 16px 22px;border:0;border-radius:0;background:transparent;border-top:1px dashed color-mix(in srgb,var(--orange) 22%,#2A2930)}
+.prdsec:not(.p1sec) .prdword+.prdit{border-top:1px solid color-mix(in srgb,var(--violet) 18%,#2A2930)}
+.prdsec:not(.p1sec) .prdit .prdmeta::before{content:"🙏 ";}
+.prdsec.fold:not(.p1sec){margin-bottom:12px}
 .prdmeta{font-size:12px;color:var(--faint)}
 .prdtext{margin:8px 0 0;font-size:16.5px;line-height:1.75;color:color-mix(in srgb,var(--orange) 85%,var(--ink));white-space:pre-line;word-break:keep-all}
 .prdit.answered .prdtext{color:#C9C4D2}
