@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-clmove">
+<meta name="app-build" content="2026-11-02-cltag">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2086,7 +2086,8 @@ body.boardon.tfolded .topicbar{display:none}
 @media (hover:hover){.bcard:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--tc) 50%,#2A2930);box-shadow:0 10px 24px rgba(0,0,0,.45)}}
 .bcref{display:flex;align-items:center;gap:6px;color:var(--violet);font-size:13.5px}
 .bcref b{font-weight:400;-webkit-text-stroke:.3px currentColor}
-.bcard.bclone{border-style:dashed!important}
+.bcard.bclone{border-style:solid}   /* 복제 카드도 다른 카드처럼 실선 (2026-11-02 사용자 요청) */
+.bcard.bclone .bcclonetag{margin-left:auto;order:9}   /* '복제' 표는 오른쪽 끝에 */
 .bcclonetag{margin-left:6px;padding:0 6px;border-radius:8px;background:color-mix(in srgb,var(--sky) 16%,transparent);color:var(--sky);font-size:11px;font-weight:700;-webkit-text-stroke:0;white-space:nowrap}
 .bcclx{position:absolute;right:8px;bottom:8px;z-index:2;height:22px;min-width:22px;padding:0 6px;border:1px solid #3A3944;border-radius:11px;background:#1B1A21;color:var(--muted);font-size:12px;line-height:20px;cursor:pointer}
 .bcclx.sure{color:var(--orange);border-color:color-mix(in srgb,var(--orange) 50%,transparent)}
