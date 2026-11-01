@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-appbg">
+<meta name="app-build" content="2026-11-01-abgu">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4160,6 +4160,13 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
 .abgrow{display:flex;align-items:center;gap:10px;margin-top:14px;font-size:13px;color:var(--muted)}
 .abgrow input[type=range]{flex:1;accent-color:var(--gold)}
 .abgup{display:block;width:100%;margin-top:12px;padding:10px;border-radius:12px;border:1px dashed color-mix(in srgb,var(--gold) 50%,#3A3842);background:color-mix(in srgb,var(--gold) 8%,transparent);color:var(--gold);font-family:inherit;font-size:14px}
+.abgsheet{max-height:calc(100vh - 90px);overflow-y:auto;scrollbar-width:thin;width:380px}
+.abgsub{display:flex;justify-content:space-between;align-items:center;margin:14px 2px 8px;font-size:13px;color:var(--ink)}
+.abgsub a{color:var(--sky);font-size:12px;text-decoration:none}
+.abgu button{background-color:#222}
+.abgpaste{display:flex;gap:6px;margin-top:10px}
+.abgpaste input{flex:1;min-width:0;height:34px;padding:0 10px;border-radius:10px;border:1px solid #3A3842;background:#0F0E12;color:var(--ink);font-family:inherit;font-size:13px}
+.abgpaste button{height:34px;padding:0 14px;border-radius:10px;border:1px solid color-mix(in srgb,var(--sky) 45%,#3A3842);background:color-mix(in srgb,var(--sky) 12%,transparent);color:var(--sky);font-family:inherit}
 .abgnote{margin:8px 2px 0;font-size:11.5px;color:var(--muted)}
 </style>
 </head>
@@ -14623,12 +14630,30 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
     {k:"none",t:"검정",bg:"#0b0b0d"},
     {k:"photo",t:"내 사진",bg:""}
   ];
-  function abgGet(){var o={}; try{o=JSON.parse(localStorage.getItem(ABG_KEY)||"{}")||{}}catch(e){} return {k:o.k||"default",dim:o.dim==null?null:+o.dim}}
+  // Unsplash 무료 사진 (2026-11-01 사용자 요청) — images.unsplash.com에서 바로 받아 씀
+  var ABG_UNS=[
+    ["photo-1445855743215-296f71d4b49c","노을 길"],["photo-1445964047600-cdbdb873673d","안개 낀 가을숲"],["photo-1508089335109-4c6ae4098f3e","낙엽 터널"],
+    ["photo-1549737328-8b9f3252b927","숲속 햇살"],["photo-1486707471592-8e7eb7e36f78","안개 숲"],["photo-1508108712903-49b7ef9b1df8","안개 산"],
+    ["photo-1444044205806-38f3ed106c10","금빛 바다"],["photo-1439405326854-014607f694d7","해 질 녘 물결"],["photo-1533757879476-8f4a3cb1ae4b","노을 호수"],
+    ["photo-1634145124254-f62127c0f5bb","고요한 호수"],["photo-1498408040764-ab6eb772a145","푸른 밀밭"],["photo-1623958045855-0b7a60cfb9eb","익은 밀밭"],
+    ["photo-1488866022504-f2584929ca5f","은하수"],["photo-1465101162946-4377e57745c3","별밤 산"]
+  ];
+  function unsUrl(id,w){return "https://images.unsplash.com/"+id+"?w="+w+"&q="+(w>1000?80:60)+"&auto=format&fit=crop"}
+  function abgUrlFrom(t){   // 붙여넣은 Unsplash 주소 → 그림 주소
+    t=String(t||"").trim(); var m;
+    if((m=t.match(/images\.unsplash\.com\/(photo-[\w-]+)/)))return unsUrl(m[1],2400);
+    if((m=t.match(/unsplash\.com\/(?:[a-z]{2}\/)?(?:photos|%EC%82%AC%EC%A7%84|사진)\/(?:[^\/?#]*-)?([A-Za-z0-9_-]{11})(?:[\/?#]|$)/)))return "https://unsplash.com/photos/"+m[1]+"/download?w=2400";
+    if(/^https:\/\/\S+\.(jpe?g|png|webp)(\?\S*)?$/i.test(t))return t;
+    return "";
+  }
+  function abgGet(){var o={}; try{o=JSON.parse(localStorage.getItem(ABG_KEY)||"{}")||{}}catch(e){} return {k:o.k||"default",dim:o.dim==null?null:+o.dim,url:o.url||""}}
   function abgApply(){
     var el=$("appbg"); if(!el)return; var o=abgGet();
     if(o.k==="default"&&o.dim==null){el.style.background="";return}   // 손대지 않았으면 원래 CSS 그대로
     var it=ABG_LIST.filter(function(x){return x.k===o.k})[0]||ABG_LIST[0], bg=it.bg;
     if(o.k==="photo"){var u=""; try{u=localStorage.getItem(ABG_PHOTO)||""}catch(e){} bg=u?'url("'+u+'") center/cover no-repeat':ABG_LIST[0].bg}
+    if(/^u:/.test(o.k))bg='url("'+unsUrl(o.k.slice(2),2400)+'") center/cover no-repeat';
+    if(o.k==="url"&&o.url)bg='url("'+String(o.url).replace(/"/g,"")+'") center/cover no-repeat';
     var d=o.dim==null?.38:o.dim;
     el.style.background="linear-gradient(rgba(10,10,13,"+d+"),rgba(10,10,13,"+d+")),"+bg+",#0b0b0d";
   }
@@ -14637,9 +14662,11 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
     var old=document.querySelector(".abgsheet"); if(old){old.remove();return}
     var o=abgGet(), sh=document.createElement("div"); sh.className="abgsheet"; sh.setAttribute("role","dialog"); sh.setAttribute("aria-label","앱 배경 바꾸기");
     sh.innerHTML='<div class="abghd"><b>🖼️ 앱 배경</b><button type="button" class="abgx" aria-label="닫기">✕</button></div><div class="abggrid"></div>'+
+      '<p class="abgsub">📷 Unsplash 사진 <a href="https://unsplash.com/ko" target="_blank" rel="noopener">더 찾아보기 ↗</a></p><div class="abggrid abgu"></div>'+
+      '<div class="abgpaste"><input type="url" placeholder="Unsplash 사진 주소 붙여넣기" aria-label="사진 주소"><button type="button">적용</button></div>'+
       '<div class="abgrow"><span>밝게</span><input type="range" min="0" max="85" step="1" aria-label="배경 어둡기"><span>어둡게</span></div>'+
       '<button type="button" class="abgup">📷 내 사진 올리기</button><input type="file" accept="image/*" hidden>'+
-      '<p class="abgnote">이 컴퓨터에만 저장돼요. 사진은 줄여서 저장해요.</p>';
+      '<p class="abgnote">이 컴퓨터에만 저장돼요. 사진: Unsplash (무료 사진)</p>';
     var g=sh.querySelector(".abggrid"), hasPhoto=false; try{hasPhoto=!!localStorage.getItem(ABG_PHOTO)}catch(e){}
     ABG_LIST.forEach(function(x){
       if(x.k==="photo"&&!hasPhoto)return;
@@ -14647,9 +14674,20 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
       var bg=x.bg; if(x.k==="photo"){try{bg='url("'+localStorage.getItem(ABG_PHOTO)+'") center/cover no-repeat'}catch(e){}}
       b.style.background=bg; b.innerHTML="<span></span>"; b.querySelector("span").textContent=x.t; b.setAttribute("aria-label",x.t); g.appendChild(b);
     });
+    var gu=sh.querySelector(".abgu");
+    ABG_UNS.forEach(function(x){
+      var b=document.createElement("button"); b.type="button"; b.dataset.k="u:"+x[0]; if(o.k===b.dataset.k)b.className="on";
+      b.style.backgroundImage='url("'+unsUrl(x[0],320)+'")'; b.innerHTML="<span></span>"; b.querySelector("span").textContent=x[1]; b.setAttribute("aria-label",x[1]); gu.appendChild(b);
+    });
+    gu.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; sh.querySelectorAll(".abggrid button").forEach(function(x){x.classList.toggle("on",x===b)}); abgSave({k:b.dataset.k})});
+    var pi=sh.querySelector(".abgpaste input"); if(o.k==="url")pi.value=o.url;
+    var pgo=function(){var u=abgUrlFrom(pi.value); if(!u){toast("Unsplash 사진 주소를 붙여넣어 주세요");return}
+      sh.querySelectorAll(".abggrid button").forEach(function(x){x.classList.remove("on")}); abgSave({k:"url",url:u}); toast("배경을 바꿨어요")};
+    sh.querySelector(".abgpaste button").addEventListener("click",pgo);
+    pi.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.isComposing){e.preventDefault();pgo()}});
     var rg=sh.querySelector("input[type=range]"); rg.value=String(Math.round((o.dim==null?.38:o.dim)*100));
     rg.addEventListener("input",function(){abgSave({dim:+rg.value/100})});
-    g.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; g.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b)}); abgSave({k:b.dataset.k})});
+    g.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; sh.querySelectorAll(".abggrid button").forEach(function(x){x.classList.toggle("on",x===b)}); abgSave({k:b.dataset.k})});
     sh.querySelector(".abgx").addEventListener("click",function(){sh.remove()});
     var fi=sh.querySelector("input[type=file]");
     sh.querySelector(".abgup").addEventListener("click",function(){fi.click()});
