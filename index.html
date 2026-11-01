@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-mq-align">
+<meta name="app-build" content="2026-11-01-prog-ui">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1063,6 +1063,41 @@ body.reorder .note .topics{display:none}
 @media (prefers-reduced-motion:reduce){.pgb.got{animation:none}}
 .pgcnt{text-align:right;white-space:nowrap;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion:reduce){.aprog.bump{animation:none}.apbar i{transition:none}}
+/* ✨ 실천 진도표 다듬기 (2026-11-01 사용자 요청): 위 요약 카드, 2주 달력 칸, 말씀마다 색 카드 + 얇은 막대 + 싹 배지 */
+.pgtop.pghero{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:4px 0 18px;padding:16px 16px 14px;border-radius:18px;border:1px solid color-mix(in srgb,var(--sky) 30%,#2A2933);background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--sky) 16%,transparent),transparent 60%),linear-gradient(180deg,#1C1C24,#15151B);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 16px rgba(0,0,0,.35)}
+.pghero .pgbig b{font-size:46px;letter-spacing:-1px;background:linear-gradient(180deg,#BDEBFF,var(--sky));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pghero .pgsub{font-size:13.5px}
+.pghero .apbar.big{flex:1 0 100%;height:10px;margin:10px 0 0;border-radius:5px;background:#26252E;box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+.pghero .apbar.big i{border-radius:5px;background:linear-gradient(90deg,var(--sky),color-mix(in srgb,var(--sky) 55%,var(--green)));box-shadow:0 0 10px color-mix(in srgb,var(--sky) 45%,transparent)}
+.tsres .pgh,.pgh{display:flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.2px;color:var(--muted);margin:4px 0 10px}
+.pgh::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,#2E2D36,transparent)}
+.pgcal{gap:4px;margin-bottom:22px;padding:10px 8px;border-radius:16px;background:#16161C;border:1px solid #26252E}
+.pgday{gap:5px;padding:5px 0 6px;border-radius:10px}
+.pgdot{width:10px;height:10px;background:#2C2B34}
+.pgday.on{background:color-mix(in srgb,var(--sky) 10%,transparent)}
+.pgday.on .pgdot{width:12px;height:12px;background:color-mix(in srgb,var(--sky) 70%,#1a1a20)}
+.pgday.lots .pgdot{width:14px;height:14px;background:var(--sky);box-shadow:0 0 8px color-mix(in srgb,var(--sky) 60%,transparent)}
+.pgday.today{outline:1.5px solid color-mix(in srgb,var(--gold) 60%,transparent);outline-offset:-1.5px}
+.pgday.today .pgw{color:var(--gold);font-weight:700}
+.pgrow{--rc:var(--violet);display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:8px;margin:0 0 10px;padding:12px 14px 12px 16px;border:1px solid color-mix(in srgb,var(--rc) 26%,#2A2933);border-radius:16px;background:linear-gradient(180deg,color-mix(in srgb,var(--rc) 9%,#1A1A20),#15151A);position:relative;overflow:hidden}
+.pgrow:last-of-type{border-bottom:1px solid color-mix(in srgb,var(--rc) 26%,#2A2933)}
+.pgrow::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--rc)}
+.pgline{display:flex;align-items:center;gap:10px;min-width:0;width:100%}
+.pgrow .pgref{text-align:left}
+.pgmini{width:100%}
+.pgrow .pgbs{width:100%}
+.pgrow .pgref{flex:1 1 auto;min-width:0;height:auto;padding:0;margin:0;color:var(--rc);font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:transparent!important;box-shadow:none!important}
+.pgrow .pgcnt{flex:0 0 auto;font-size:12.5px;padding:3px 9px;border-radius:999px;background:color-mix(in srgb,var(--rc) 14%,#1E1E25);color:color-mix(in srgb,var(--rc) 70%,#fff);font-weight:700}
+.pgmini{height:5px;border-radius:3px;background:#26252E;overflow:hidden}
+.pgmini i{display:block;height:100%;border-radius:3px;background:var(--rc);transition:width .5s ease-out}
+.pgrow .pgbs{gap:6px;justify-content:flex-start}
+.pgrow .pgb{width:22px;height:22px;border:1.5px dashed color-mix(in srgb,var(--rc) 30%,#3A3940)}
+.pgrow .pgb.got{border:0;background:radial-gradient(circle at 35% 30%,#FFF1C4,var(--gold) 55%,#C98A1B);background-color:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 40%,transparent);animation:pgbPop .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i)*50ms);opacity:1}
+@keyframes pgbPop{from{transform:scale(.3)}to{transform:scale(1)}}
+.pgrow.full{border-color:color-mix(in srgb,var(--mint) 40%,#2A2933);background:linear-gradient(180deg,color-mix(in srgb,var(--mint) 12%,#1A1A20),#15151A)}
+.pgrow.full::before,.pgrow.full .pgmini i{background:linear-gradient(180deg,var(--mint),var(--green))}
+.pgrow.full .pgcnt{background:color-mix(in srgb,var(--mint) 18%,#1E1E25);color:var(--mint)}
+.pgrow.full .pgb.got{background:radial-gradient(circle at 35% 30%,#E2FFF6,var(--mint) 55%,var(--green));background-color:var(--mint)}
 .tk{font-weight:700;color:var(--hi);-webkit-text-stroke:.35px var(--hi)}
 .tsres .txt .tk{color:var(--hi)}
 .kwon{color:color-mix(in srgb,var(--orange) 62%,var(--sheet))!important}
@@ -8489,7 +8524,7 @@ body.carddrag #reviewBar{display:none!important}
     top.innerHTML='<div class="pgbig"><b></b><span>%</span></div><div class="pgsub"></div>';
     top.querySelector("b").textContent=pct; top.querySelector(".pgsub").textContent="전체 실천 "+T+"개 중 "+D+"개 완료";
     body.appendChild(top);
-    var bar=document.createElement("div"); bar.className="apbar big"; bar.innerHTML='<i></i>'; bar.firstChild.style.width=pct+"%"; body.appendChild(bar);
+    var bar=document.createElement("div"); bar.className="apbar big"; bar.innerHTML='<i></i>'; bar.firstChild.style.width=pct+"%";
     // 최근 14일
     var days=[], now=new Date(); now.setHours(0,0,0,0);
     for(var i=13;i>=0;i--){var d=new Date(now.getTime()-i*864e5);days.push({t:d.getTime(),c:0,d:d})}
@@ -8498,9 +8533,10 @@ body.carddrag #reviewBar{display:none!important}
       if(a.done&&a.doneAt&&!(a.stamps&&a.stamps.length)){var d=new Date(a.doneAt);d.setHours(0,0,0,0);days.forEach(function(x){if(x.t===d.getTime())x.c++})}
     })});
     var h=document.createElement("div"); h.className="pgh"; h.textContent="최근 2주"; body.appendChild(h);
+    top.classList.add("pghero"); top.appendChild(bar);
     var cal=document.createElement("div"); cal.className="pgcal";
     days.forEach(function(x){
-      var c=document.createElement("div"); c.className="pgday"+(x.c?" on":"")+(x.c>2?" lots":"");
+      var c=document.createElement("div"); c.className="pgday"+(x.c?" on":"")+(x.c>1?" lots":"")+(x.t===now.getTime()?" today":"");
       c.innerHTML='<span class="pgw"></span><span class="pgdot"></span><span class="pgn"></span>';
       c.querySelector(".pgw").textContent=WD[x.d.getDay()];
       c.querySelector(".pgn").textContent=x.c?x.c:x.d.getDate();
@@ -8509,9 +8545,11 @@ body.carddrag #reviewBar{display:none!important}
     });
     body.appendChild(cal);
     var h2=document.createElement("div"); h2.className="pgh"; h2.textContent="말씀별 진도"; body.appendChild(h2);
+    var pgi=0, PGCOL=["var(--violet)","var(--sky)","var(--green)","var(--gold)","var(--pink)","var(--orange)"];
     arr.forEach(function(x){
       var r=document.createElement("div"); r.className="pgrow";
-      r.innerHTML='<button type="button" class="pgref pggo"></button><div class="pgbs"></div><div class="pgcnt"></div>';
+      r.innerHTML='<div class="pgline"><button type="button" class="pgref pggo"></button><div class="pgcnt"></div></div><div class="pgmini"><i></i></div><div class="pgbs"></div>';
+      r.style.setProperty("--rc",PGCOL[pgi++%PGCOL.length]); r.querySelector(".pgmini i").style.width=x.st.pct+"%";
       var rb=r.querySelector(".pgref"); rb.textContent=x.n.ref; rb.dataset.id=x.n.id; rb.title=x.n.ref+" 실천으로 가기";
       // 실천 하나 끝낼 때마다 배지 하나씩 모으기 (빈 자리는 점선 동그라미)
       var bs=r.querySelector(".pgbs");
