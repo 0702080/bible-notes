@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-flipb">
+<meta name="app-build" content="2026-11-02-bcmore">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1967,7 +1967,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bch{display:flex;align-items:center;gap:8px;padding:4px 6px 10px;color:var(--bc);font-size:14.5px}
 .bch b{font-weight:400;-webkit-text-stroke:.35px currentColor}
 .bcrn{min-width:90px;max-width:150px;height:24px;padding:0 6px;border:1px solid var(--violet);border-radius:6px;background:#141318;color:var(--ink);font-family:inherit;font-size:13.5px;font-weight:700}
-.bcn{margin-left:auto;min-width:24px;height:22px;padding:0 7px;border-radius:11px;background:color-mix(in srgb,var(--bc) 18%,transparent);color:var(--bc);font-size:12.5px;line-height:22px;text-align:center}
+.bcn{margin-left:auto;min-width:24px;height:22px;padding:0 7px;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;font-variant-numeric:tabular-nums;border-radius:11px;background:color-mix(in srgb,var(--bc) 18%,transparent);color:var(--bc);font-size:12.5px;line-height:1;text-align:center}
 .bclist{display:flex;flex-direction:column;gap:8px}
 /* 내가 만든 칸 */
 .bcol.bcust{border-color:color-mix(in srgb,var(--gold) 30%,#38343F);background:color-mix(in srgb,var(--gold) 4%,#272530)}
@@ -1990,10 +1990,23 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.bback>.bclist,.bcol.bback>.bcjump{display:none}
 .bcol.bback>.bcback{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:none}
 .bcol.bback{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 24%,#201E26),color-mix(in srgb,var(--bc) 10%,#1C1A21) 320px)}
-.bcflipb{flex:0 0 auto;width:26px;height:26px;padding:0;border:0;border-radius:13px;background:color-mix(in srgb,var(--bc) 16%,transparent);font-size:13px;line-height:26px;display:grid;place-items:center;transition:transform .3s}
+.bcflipb{flex:0 0 auto;width:26px;height:26px;padding:0;border:0;border-radius:13px;background:color-mix(in srgb,var(--bc) 16%,transparent);color:var(--bc);display:grid;place-items:center;transition:transform .35s ease,background .15s}
 .bcflipb:hover{background:color-mix(in srgb,var(--bc) 30%,transparent)}
 .bcol.bback .bcflipb{transform:rotate(180deg);background:color-mix(in srgb,var(--bc) 34%,transparent)}
 .bcol.bfold .bcflipb{display:none}
+/* 칸 머리를 간단하게: 📁 아이콘·×·🔄은 숨기고 ⋯ 하나에 모음 → 칸 이름이 더 길게 보임 (2026-11-02 사용자 요청) */
+.bcol.btint .bch{gap:6px}
+.bcol.btint .bch .bce,.bcol.btint .bch .bcdel,.bcol.btint .bch .bcflipb{display:none}
+.bcol.btint .bch b{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bcol.btint:not(.bfold) .bch .bcn{display:none}   /* 숫자 동그라미도 숨김 (2026-11-02 사용자 요청), 접은 칸에서만 보임 */
+.bcmore{flex:0 0 auto;width:26px;height:26px;padding:0 0 6px;border:0;border-radius:13px;background:transparent;color:var(--muted);font-size:17px;line-height:1;letter-spacing:-1px;display:grid;place-items:center}
+.bcmore:hover{background:color-mix(in srgb,var(--bc) 20%,transparent);color:var(--bc)}
+.bcol.bfold .bcmore{display:none}
+.bcol.bback .bch b::after{content:" · 뒷면";color:var(--muted);font-size:12px}
+.bcacts{flex:1 0 100%;display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;padding-top:9px;border-top:1px solid #2A2930}
+.bcpal .bcacts button{width:auto;height:28px;padding:0 10px;border-radius:14px;border:1px solid #3A3842;background:#1E1D23;box-shadow:none;color:var(--ink);font-family:inherit;font-size:12.5px}
+.bcpal .bcacts button:hover{border-color:var(--bc);color:var(--bc)}
+.bcpal .bcacts button.sure{border-color:var(--pink);color:var(--pink)}
 .bcbkh{margin:0 2px 4px;color:var(--bc);font-size:13.5px;font-weight:700}
 .bcbkh em{font-style:normal;font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
 .bcbk{padding:9px 11px;border-radius:11px;background:#16151A;border:1px solid color-mix(in srgb,var(--bc) 14%,#26252B);display:flex;flex-direction:column;gap:2px}
@@ -4765,6 +4778,8 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
       var k=c.dataset.k, j=(k&&m[k]!=null&&KBCOL[m[k]])?+m[k]:i%KBCOL.length;
       c.style.setProperty("--bc",KBCOL[j]); c.classList.add("btint");
       var e=c.querySelector(".bch .bce"); if(e){e.title="눌러서 칸 색 바꾸기"; e.setAttribute("role","button")}
+      var hd=c.querySelector(".bch"), fo=hd&&hd.querySelector(".bcfold");
+      if(hd&&fo&&!hd.querySelector(".bcmore")){var mb=document.createElement("button"); mb.type="button"; mb.className="bcmore"; mb.title="색·뒤집기·이름·지우기"; mb.setAttribute("aria-label","칸 메뉴"); mb.textContent="⋯"; hd.insertBefore(mb,fo)}
     });
   }
   /* 칸 뒤집기 (2026-11-01 사용자 요청): 이름에 '기도'가 든 내가 만든 칸은 누르면 휙 뒤집혀 뒷면에 기도에 관한 다른 말씀 목록이 보임.
@@ -4840,7 +4855,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
     Array.prototype.forEach.call(box.querySelectorAll(":scope>.bcol.bcust"),function(cl){
       var ls=kbBackList(cl.dataset.cc); if(!ls)return;
       cl.classList.add("bflipable"); cl.classList.toggle("bback",!!kbBackOn[cl.dataset.k]);
-      var hb=cl.querySelector(".bch"), fbn=document.createElement("button"); fbn.type="button"; fbn.className="bcflipb"; fbn.textContent="🔄"; fbn.title="앞면·뒷면 뒤집기"; fbn.setAttribute("aria-label","칸 뒤집기");
+      var hb=cl.querySelector(".bch"), fbn=document.createElement("button"); fbn.type="button"; fbn.className="bcflipb"; fbn.innerHTML='<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3.5V8h4.5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20.5V16h-4.5"/></svg>'; fbn.title="앞면·뒷면 뒤집기"; fbn.setAttribute("aria-label","칸 뒤집기");
       if(hb)hb.insertBefore(fbn,hb.querySelector(".bcdel")||hb.querySelector(".bcfold"));
       var bk=document.createElement("div"); bk.className="bcback";
       var have=0, rows=ls.map(function(x){var h=kbBackHas(x[0]); if(h)have++;
@@ -4919,6 +4934,18 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
   function kbPalClose(){document.querySelectorAll("#board .bcpal").forEach(function(x){x.remove()})}
   $("board").addEventListener("click",function(e){
     if(bMode!=="list")return;
+    var act=e.target.closest(".bcpal [data-act]");
+    if(act){
+      e.stopPropagation(); e.preventDefault();
+      var acl=act.closest(".bcol"), a=act.dataset.act; if(!acl)return;
+      if(a==="flip"){kbPalClose(); kbFlip(acl); return}
+      if(a==="name"){kbPalClose(); var hb=acl.querySelector(".bch b"); if(hb)hb.dispatchEvent(new MouseEvent("dblclick",{bubbles:true})); return}
+      if(a==="del"){
+        if(!act.dataset.sure){act.dataset.sure="1"; act.classList.add("sure"); act.textContent="한 번 더 누르면 지워요"; return}
+        var dl=acl.querySelector(".bcdel"); kbPalClose(); if(dl){dl.click(); dl.click()} return;
+      }
+      return;
+    }
     var sw=e.target.closest(".bcpal button");
     if(sw){
       e.stopPropagation(); e.preventDefault();
@@ -4928,13 +4955,15 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
       kbPalClose(); kbTint($("board")); return;
     }
     if(e.target.closest(".bcpal")){e.stopPropagation();return}
-    var ic=e.target.closest(".bch .bce");
+    var ic=e.target.closest(".bch .bcmore,.bch .bce");
     if(!ic||ic.closest(".bfold")){kbPalClose();return}
     e.stopPropagation(); e.preventDefault();
     var col=ic.closest(".bcol"), open=col.querySelector(".bcpal"); kbPalClose(); if(open)return;
     var cur=kbTintMap()[col.dataset.k], p=document.createElement("div"); p.className="bcpal";
     p.innerHTML=KBCOL.map(function(c,i){return '<button type="button" data-c="'+i+'" style="--sw:'+c+'"'+(cur===i?' class="on"':'')+' aria-label="색 '+(i+1)+'"></button>'}).join("")+
-      '<button type="button" data-c="" class="auto'+(cur==null?' on':'')+'">자동</button>';
+      '<button type="button" data-c="" class="auto'+(cur==null?' on':'')+'">자동</button>'+
+      '<div class="bcacts">'+(col.classList.contains("bflipable")?'<button type="button" data-act="flip">🔄 뒤집기</button>':'')+
+      '<button type="button" data-act="name">✎ 이름</button>'+(col.querySelector(".bcdel")?'<button type="button" data-act="del">🗑 칸 지우기</button>':'')+'</div>';
     col.querySelector(".bch").insertAdjacentElement("afterend",p);
   },true);
   function renderKanbanList(box){
