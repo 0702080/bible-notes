@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-mic-err">
+<meta name="app-build" content="2026-11-01-srm-read">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3108,6 +3108,18 @@ textarea.lhpad{padding-left:28px!important}
 .srmfoot{flex:0 0 auto;border-top:1px solid #222128;background:#0B0B0D;padding:8px max(16px,calc((100% - var(--dlw,608px)) / 2)) 10px;box-shadow:0 -10px 24px rgba(0,0,0,.5)}
 .srmfoot[hidden]{display:none}
 .srmfin{display:flex;flex-direction:column;gap:6px}
+.srmread{max-width:640px;margin:6px auto 40px;padding:4px 6px}
+.srmrmeta{font-size:13.5px;color:var(--sky)}
+.srmrttl{margin:6px 0 10px;font-size:22px;line-height:1.4;font-weight:800;color:var(--gold);word-break:keep-all}
+.srmrtags{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
+.srmrtags .srmytc{margin-left:0;padding:4px 12px;font-size:13px}
+.srmrbody{border-top:1px solid #2A2930;padding-top:16px}
+.srmrbody p{margin:0 0 16px;font-size:17.5px;line-height:1.85;color:var(--ink);word-break:keep-all;white-space:pre-wrap}
+.srmrbody p.srmrempty{color:var(--muted);font-size:15px}
+.srmrapply{margin-top:22px;padding:14px 16px;border-radius:14px;border:1px solid color-mix(in srgb,var(--green) 40%,#2A2930);background:color-mix(in srgb,var(--green) 9%,#131317)}
+.srmrapply b{display:block;margin-bottom:6px;font-size:13px;color:var(--green)}
+.srmrapply p{margin:0;font-size:17px;line-height:1.8;white-space:pre-wrap;word-break:keep-all}
+.srmreadbtn.on{border-color:var(--gold);color:var(--gold)}
 .srmfoot textarea{width:100%;box-sizing:border-box;height:64px;min-height:44px;max-height:30vh;padding:10px 14px;border:1px solid color-mix(in srgb,var(--green) 35%,#2A2930);border-radius:12px;background:var(--sheet);color:var(--ink);font-family:var(--serif);font-size:15.5px;line-height:1.6;resize:vertical}
 .srmfoot textarea:focus{outline:none;border-color:var(--green)}
 .srmfoot .srmlab{display:flex;margin:0 2px}
@@ -10406,7 +10418,7 @@ body.carddrag #reviewBar{display:none!important}
   function srmByDate(a,b){return a.d<b.d?1:a.d>b.d?-1:(b.at-a.at)}
   // 목록 순서: 끌어서 옮긴 순서(ord)를 따르고, 아직 순서가 없는 새 메모는 맨 위에 날짜 최신순 (2026-11-01 사용자 요청)
   function srmSorted(o){return o.items.slice().sort(function(a,b){var na=a.ord==null, nb=b.ord==null; if(na!==nb)return na?-1:1; return na?srmByDate(a,b):(a.ord-b.ord)||srmByDate(a,b)})}
-  var srm=null, srmEdit="", srmQ="", srmTimer=0;
+  var srm=null, srmEdit="", srmQ="", srmTimer=0, srmRead=false;   // srmRead: 📖 읽기 모드 (2026-11-01 사용자 요청)
   /* ↕️ 설교 메모는 한 줄(문장)씩 칸으로 적고, 줄마다 앞의 ⠿를 잡고 끌어 위아래로 옮김 (2026-10-31 사용자 요청)
      줄 칸들(.srmli)을 이어 붙인 글이 숨은 .srmbody에 들어가 저장됨. 엔터=다음 줄, 줄 맨 앞에서 지우기=윗줄과 합침 */
   var srmDrag=null;
@@ -10506,10 +10518,11 @@ body.carddrag #reviewBar{display:none!important}
   function openSermon(){
     if(!srm){
       srm=document.createElement("div"); srm.className="daily srmsheet"; srm.setAttribute("role","dialog"); srm.setAttribute("aria-modal","true"); srm.hidden=true;
-      srm.innerHTML='<div class="dlbar"><b class="dltitle">🎤 설교 메모</b><button type="button" class="dlclose srmnew">+ 새 메모</button><button type="button" class="dlclose srmclose">닫기</button></div><div class="dlbody srmbox"></div><div class="srmfoot" hidden></div>';
+      srm.innerHTML='<div class="dlbar"><b class="dltitle">🎤 설교 메모</b><button type="button" class="dlclose srmnew">+ 새 메모</button><button type="button" class="dlclose srmreadbtn" hidden>📖 읽기</button><button type="button" class="dlclose srmclose">닫기</button></div><div class="dlbody srmbox"></div><div class="srmfoot" hidden></div>';
       document.body.appendChild(srm);
       srm.querySelector(".srmclose").addEventListener("click",function(){if(srmEdit){srmCommit();srmEdit="";srmDraw()}else closeSermon()});
       srm.querySelector(".srmnew").addEventListener("click",srmNew);
+      srm.querySelector(".srmreadbtn").addEventListener("click",function(){if(!srmEdit)return; if(!srmRead)srmCommit(); srmRead=!srmRead; srmDraw(); srm.querySelector(".srmbox").scrollTop=0});
       srm.addEventListener("click",srmClick); srmDragInit();
       srm.addEventListener("input",function(e){
         if(e.target.classList.contains("srmq")){srmQ=e.target.value;srmDrawList();return}
@@ -10566,8 +10579,11 @@ body.carddrag #reviewBar{display:none!important}
     var box=srm.querySelector(".srmbox"), foot=srm.querySelector(".srmfoot"); box.textContent=""; foot.textContent=""; foot.hidden=!srmEdit;
     srm.querySelector(".srmnew").hidden=!!srmEdit;
     srm.querySelector(".srmclose").textContent=srmEdit?"목록":"닫기";
+    if(!srmEdit)srmRead=false;
+    var rb=srm.querySelector(".srmreadbtn"); rb.hidden=!srmEdit; rb.textContent=srmRead?"✏️ 고치기":"📖 읽기"; rb.classList.toggle("on",srmRead);
     if(srmEdit){
       var x=srmData().items.find(function(y){return y.id===srmEdit}); if(!x){srmEdit="";return srmDraw()}
+      if(srmRead){foot.hidden=true; box.appendChild(srmReadView(x)); return}
       var f=document.createElement("div"); f.className="srmform"; f.dataset.id=x.id;
       f.innerHTML='<div class="srmrow"><input type="date" class="srmdate" aria-label="날짜"><input class="srmwho" maxlength="60" placeholder="설교자 (예: 담임목사님)" aria-label="설교자"></div>'+
         '<input class="srmtitle" maxlength="200" placeholder="설교 제목" aria-label="설교 제목">'+
@@ -10636,6 +10652,23 @@ body.carddrag #reviewBar{display:none!important}
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(e){if(srmCD&&srmCD.on&&e.pointerId===srmCD.pid)return; end(e)});
     document.addEventListener("touchend",function(e){if(srmCD&&srmCD.on)end(e)});
   })();
+  // 📖 읽기 모드: 고치는 칸 없이 큰 글씨로 차분히 읽기 (2026-11-01 사용자 요청)
+  function srmReadView(x){
+    var v=document.createElement("article"); v.className="srmread";
+    function el(tag,cls,txt){var e=document.createElement(tag); e.className=cls; if(txt!=null)e.textContent=txt; v.appendChild(e); return e}
+    el("div","srmrmeta",srmDateLabel(x.d)+(x.who?" · "+x.who:""));
+    el("h2","srmrttl",x.title.trim()||"(제목 없음)");
+    var tags=el("div","srmrtags");
+    if(x.ref){var r=document.createElement("span"); r.className="srmref"; r.textContent="📖 "+x.ref; tags.appendChild(r)}
+    if(srmYtUrl(x.yt)){var y=document.createElement("span"); y.className="srmytc"; y.dataset.u=x.yt; y.textContent="▶ 영상 보기"; tags.appendChild(y)}
+    if(!tags.childNodes.length)tags.remove();
+    var lines=x.body.split("\n").map(function(t){return t.trim()}).filter(Boolean);
+    var bd=el("div","srmrbody");
+    if(lines.length)lines.forEach(function(t){var pp=document.createElement("p"); pp.textContent=t; bd.appendChild(pp)});
+    else{var em=document.createElement("p"); em.className="srmrempty"; em.textContent="아직 적은 메모가 없어요."; bd.appendChild(em)}
+    if(x.apply.trim()){var ap=el("div","srmrapply"); var h=document.createElement("b"); h.textContent="💡 나의 적용 · 결단"; ap.appendChild(h); var t=document.createElement("p"); t.textContent=x.apply.trim(); ap.appendChild(t)}
+    return v;
+  }
   function srmDrawList(){
     var list=srm&&srm.querySelector(".srmlist"); if(!list)return; list.textContent="";
     var all=srmSorted(srmData()).filter(function(x){return !srmEmpty(x)}), q=srmQ.trim();
