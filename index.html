@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-bfind">
+<meta name="app-build" content="2026-11-02-flipb">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1990,6 +1990,10 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.bback>.bclist,.bcol.bback>.bcjump{display:none}
 .bcol.bback>.bcback{display:flex;flex-direction:column;gap:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:none}
 .bcol.bback{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 24%,#201E26),color-mix(in srgb,var(--bc) 10%,#1C1A21) 320px)}
+.bcflipb{flex:0 0 auto;width:26px;height:26px;padding:0;border:0;border-radius:13px;background:color-mix(in srgb,var(--bc) 16%,transparent);font-size:13px;line-height:26px;display:grid;place-items:center;transition:transform .3s}
+.bcflipb:hover{background:color-mix(in srgb,var(--bc) 30%,transparent)}
+.bcol.bback .bcflipb{transform:rotate(180deg);background:color-mix(in srgb,var(--bc) 34%,transparent)}
+.bcol.bfold .bcflipb{display:none}
 .bcbkh{margin:0 2px 4px;color:var(--bc);font-size:13.5px;font-weight:700}
 .bcbkh em{font-style:normal;font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
 .bcbk{padding:9px 11px;border-radius:11px;background:#16151A;border:1px solid color-mix(in srgb,var(--bc) 14%,#26252B);display:flex;flex-direction:column;gap:2px}
@@ -4836,6 +4840,8 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
     Array.prototype.forEach.call(box.querySelectorAll(":scope>.bcol.bcust"),function(cl){
       var ls=kbBackList(cl.dataset.cc); if(!ls)return;
       cl.classList.add("bflipable"); cl.classList.toggle("bback",!!kbBackOn[cl.dataset.k]);
+      var hb=cl.querySelector(".bch"), fbn=document.createElement("button"); fbn.type="button"; fbn.className="bcflipb"; fbn.textContent="🔄"; fbn.title="앞면·뒷면 뒤집기"; fbn.setAttribute("aria-label","칸 뒤집기");
+      if(hb)hb.insertBefore(fbn,hb.querySelector(".bcdel")||hb.querySelector(".bcfold"));
       var bk=document.createElement("div"); bk.className="bcback";
       var have=0, rows=ls.map(function(x){var h=kbBackHas(x[0]); if(h)have++;
         return '<div class="bcbk'+(h?' has':'')+'"><b></b><span></span></div>'});
@@ -4856,6 +4862,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
   $("board").addEventListener("click",function(e){
     if(bMode!=="list")return;
     var cl=e.target.closest(".bcol.bflipable"); if(!cl||cl.classList.contains("bfold"))return;
+    if(e.target.closest(".bcflipb")){e.stopPropagation(); e.preventDefault(); kbFlip(cl); return}   // 머리의 🔄 단추로도 뒤집기
     if(e.target.closest("button,input,textarea,a,.bch,.bcpal"))return;
     e.stopPropagation(); e.preventDefault();
     var cd=cl.classList.contains("bback")?null:e.target.closest(".bcard");
