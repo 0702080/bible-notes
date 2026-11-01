@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-saybar">
+<meta name="app-build" content="2026-11-02-rmpc">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4249,6 +4249,12 @@ body.boardon .todaymini .tmchip:not(.main):not(.done):not(.warn):not(.bad){backg
 body.boardon .toolbar .tbtn.tadd{background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 32%,rgba(40,38,50,.55)),color-mix(in srgb,var(--gold) 18%,rgba(24,23,30,.6)))!important;color:color-mix(in srgb,var(--gold) 30%,#fff)!important;border:1px solid color-mix(in srgb,var(--gold) 50%,transparent)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 /* 맨 아래 한 마디 줄도 반투명 유리 — 배경 사진이 은은하게 비침 (2026-11-02 사용자 요청) */
 body.boardon .boardsay:not([hidden]){background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),rgba(14,13,18,.42)!important;-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border-top:1px solid rgba(255,255,255,.10);box-shadow:0 -6px 18px rgba(0,0,0,.25)}
+/* ⏰ 말씀 알림 창: PC(넓은 화면)에서는 한 줄에 다 들어가게 폭을 넓힘 — 아·침 세로 줄바꿈, 가로 스크롤 없앰 (2026-11-02 사용자 요청) */
+@media (min-width:431px){
+  .rmsheet .rmpanel{width:min(440px,calc(100% - 40px))!important;overflow-x:hidden!important}
+  .rmsheet .rmrow{flex-wrap:nowrap}
+  .rmsheet .rmrow span{flex:0 0 auto;white-space:nowrap}
+}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
