@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-bkfit">
+<meta name="app-build" content="2026-11-02-bkhover">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2012,7 +2012,15 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.blocked .bch b::after{content:" 📌";font-size:11px;vertical-align:1px}
 .bcol.blocked .bch{cursor:default}
 /* 뒷면 카드는 모두 같은 높이 — 뜻은 두 줄까지 (2026-11-02 사용자 요청) */
-.bcbk{flex:0 0 auto;height:var(--bkh,84px);box-sizing:border-box;justify-content:flex-start;overflow:hidden}
+.bcbk{flex:0 0 auto;height:var(--bkh,84px);box-sizing:border-box;justify-content:flex-start;overflow:hidden;transition:height .14s,transform .14s,border-color .14s,box-shadow .14s}
+.bcbkadd{display:block;width:100%;margin-top:auto;height:0;padding:0;border:0 solid color-mix(in srgb,var(--bc) 45%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--bc) 10%,transparent);color:var(--bc);font-family:inherit;font-size:13px;opacity:0;overflow:hidden;transition:height .14s,margin-top .14s,opacity .14s}
+@media (hover:hover){
+  .bcbk:not(.has):hover{height:calc(var(--bkh,84px) + 42px)}
+  .bcbk:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--bc) 50%,#2A2930);box-shadow:0 10px 24px rgba(0,0,0,.45)}
+  .bcbk:hover .bcbkadd{height:32px;margin-top:10px;border-width:1px;opacity:1}
+  .bcbkadd:hover{background:color-mix(in srgb,var(--bc) 20%,transparent)}
+}
+@media (hover:none){.bcbkadd{height:32px;margin-top:10px;border-width:1px;opacity:1}.bcbk:not(.has){height:calc(var(--bkh,84px) + 42px)}}
 .bcbk b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bcbk span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
 .bcback .bcbk{padding:12px 14px;gap:8px}   /* 앞면 말씀 카드처럼 */
@@ -4876,7 +4884,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
       if(hb)hb.insertBefore(fbn,hb.querySelector(".bcdel")||hb.querySelector(".bcfold"));
       var bk=document.createElement("div"); bk.className="bcback";
       var have=0, rows=ls.map(function(x){var h=kbBackHas(x[0]); if(h)have++;
-        return '<div class="bcbk'+(h?' has':'')+'"><b></b><span></span></div>'});
+        return '<div class="bcbk'+(h?' has':'')+'"><b></b><span></span>'+(h?'':'<button type="button" class="bcbkadd">＋ 이 칸에 담기</button>')+'</div>'});
       bk.innerHTML='<p class="bcbkh">기도에 관한 다른 말씀 <em></em></p>'+rows.join("")+'<p class="bcbkf">Shift+클릭하면 앞면으로 · 본문은 직접 담아 주세요</p>';
       bk.querySelector(".bcbkh em").textContent=ls.length+"곳"+(have?" · ✓ "+have+" 담음":"");
       var it=bk.querySelectorAll(".bcbk"); ls.forEach(function(x,i){it[i].querySelector("b").textContent=x[0]; it[i].querySelector("span").textContent=x[1]});
@@ -4901,6 +4909,14 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
   $("board").addEventListener("click",function(e){
     if(bMode!=="list")return;
     var cl=e.target.closest(".bcol.bflipable"); if(!cl||cl.classList.contains("bfold"))return;
+    var ba=e.target.closest(".bcbkadd");
+    if(ba){   // 뒷면 카드의 '이 칸에 담기': 말씀 담기 창을 열고 구절 이름을 미리 채움 — 본문은 직접 붙여넣기
+      e.stopPropagation(); e.preventDefault();
+      var ref=(ba.closest(".bcbk").querySelector("b")||{}).textContent||"";
+      addToCol=cl.dataset.cc||""; addToBefore=""; addToAfter=""; $("fab").click();
+      setTimeout(function(){var r=$("mRef"), t=$("mText"); if(r){r.value=ref; r.dispatchEvent(new Event("input",{bubbles:true}))} if(t&&!t.closest("[hidden]"))t.focus()},140);
+      return;
+    }
     if(e.target.closest("button,input,textarea,a,.bcpal"))return;
     if(!e.shiftKey){if(cl.classList.contains("bback")&&!e.target.closest(".bch")){e.stopPropagation(); toast("Shift를 누른 채 클릭하면 앞면으로 돌아가요")} return}
     e.stopPropagation(); e.preventDefault();
