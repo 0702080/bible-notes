@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-cc-onlyrecall">
+<meta name="app-build" content="2026-11-01-cc-recall1st2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2474,12 +2474,6 @@ button:active{filter:brightness(1.15)}
 /* 🎙️ 내 목소리 녹음 (2026-10-31 사용자 요청) */
 .ccpainting .ccwalk{display:none}
 .ccwalk{margin-left:8px;width:44px;height:36px;padding:0;border:1px solid #2A2930;border-radius:18px;background:#131217;font-size:15px}
-.ccmain .ccsteps{display:none!important}
-.ccrcl{margin-left:auto;display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 14px 0 5px;border:1px solid color-mix(in srgb,var(--gold) 55%,#2A2930);border-radius:18px;background:color-mix(in srgb,var(--gold) 14%,#131217);color:var(--gold);font-size:13.5px;font-weight:700;white-space:nowrap}
-.ccrcl i{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;border:2px solid var(--gold);font-style:normal;font-size:13px;line-height:1}
-.ccrcl+.ccpaint{margin-left:8px}
-.ccpainting .ccrcl{display:none}
-.ccpainting .ccrcl+.ccpaint{margin-left:auto}
 /* 🚶 걷기 암송 (2026-10-31) */
 .wkv{z-index:75}
 .wkbody{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px}
@@ -9174,10 +9168,6 @@ body.carddrag #reviewBar{display:none!important}
       ccBox.addEventListener("touchend",function(e){if(!tOn||!C||C.edit)return;tOn=false;var t=e.changedTouches[0];ccSwipe(t.clientX-tx0,t.clientY-ty0)},{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
       // 위 단계 줄(읽기·첫 글자·가리기·떠올리기)을 누르면 그 단계부터 연습 (2026-10-23 사용자 요청)
-      // 단계 줄(읽기·첫 글자·가리기)은 숨기고 떠올리기만 맨 위 🎨 색 왼쪽 동그란 단추로 (2026-11-01 사용자 요청)
-      (function(){var rb=document.createElement("button"); rb.type="button"; rb.className="ccrcl"; rb.title="떠올리기 다시"; rb.innerHTML='<i>1</i>떠올리기';
-        var pb=ccBox.querySelector(".ccpaint"); pb.parentNode.insertBefore(rb,pb);
-        rb.addEventListener("click",function(){var d=ccBox.querySelector('.ccsteps .ccst[data-i="3"]'); if(d)d.click()});})();
       ccBox.querySelector(".ccsteps").addEventListener("click",function(e){
         var d=e.target.closest(".ccst"); if(!d||!C||C.edit||C.revealing)return;
         var cnd=ccBox.querySelector(".ccnum"); if(cnd)cnd.classList.remove("lit");   // 다시 연습하면 흐리게
