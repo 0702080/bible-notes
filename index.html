@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-cc-nofoot">
+<meta name="app-build" content="2026-11-01-cc-read-swipe">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9352,7 +9352,7 @@ body.carddrag #reviewBar{display:none!important}
     Array.prototype.forEach.call(hw,function(w,i){w.style.setProperty("--rd",(i*gap).toFixed(3)+"s")});
     clearTimeout(vv._anT); vv.classList.add("ccanim"); vv.classList.toggle("ccall",on);
     vv._anT=setTimeout(function(){vv.classList.remove("ccanim")},1500);
-    buzz(on?[20,30,20]:15); ccEyeSync();
+    buzz(on?[20,30,20]:15); if(C&&C.stage===0)C.r0open=on; ccEyeSync();
   }
   function ccEyeSync(){
     var eye=ccBox&&ccBox.querySelector(".cceye"), vv=ccBox&&ccBox.querySelector(".ccverse"), cb=ccBox&&ccBox.querySelector(".ccbody"); if(!eye||!vv||!cb)return;
@@ -9608,7 +9608,8 @@ body.carddrag #reviewBar{display:none!important}
     if(C.stage===0){
       /* 단계 안내 글은 위 진행 표시로 충분해서 지움 (2026-10-21 사용자 요청) */
       ccMeter(tip,C.reads,C.justRead?C.reads-1:-1,"🗣️"); C.justRead=false;
-      ccWords(n.text,"all",0,C.seed);
+      // 읽기 단계도 위아래로 밀면 말씀 ↔ ○○○ (2026-11-01 사용자 요청): 모두 가린 낱말로 그리고 "다 보기"로 시작
+      ccWords(n.text,"hide",1,C.seed); if(C.r0open!==false)vEl.classList.add("ccall");
       if(canSpeak)btn("🔊 들려주기","say");
       btn("읽었어요 ✓  "+C.reads+" / 3","read",true);
     }else if(C.stage===1){
