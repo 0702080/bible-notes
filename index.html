@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-prd-seg">
+<meta name="app-build" content="2026-11-01-sm-nointro">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10359,7 +10359,6 @@ body.carddrag #reviewBar{display:none!important}
   }
   // 5 🗺️ 장 지도: 같은 장에 담은 말씀을 한 줄 점으로
   function smChap(B){
-    smIntro(B,"같은 장에 담은 절을 점으로 보여 줘요. 채운 점을 누르면 그 말씀이 열려요. (장 전체 절 수는 몰라서 담은 절까지만 보여요)");
     var G={};
     notes.forEach(function(n){var x=dictRefParse(n.ref); if(!x)return; var k=x.b+" "+x.c, g=G[k]||(G[k]={k:k,vs:{},n:0,bk:n.book,c:x.c}); g.n++;
       var e=x.e&&x.e>=x.v?Math.min(x.e,x.v+80):x.v; for(var v=x.v;v<=e;v++)if(!g.vs[v])g.vs[v]=n.id});
