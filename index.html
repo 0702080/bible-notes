@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-boardsnap2">
+<meta name="app-build" content="2026-11-02-bknotext">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4892,8 +4892,8 @@ body.boardon #board.board4::after{content:"";flex:0 0 18px;align-self:stretch}
       var have=0, rows=ls.map(function(x){var h=kbBackHas(x[0]); if(h)have++;
         return '<div class="bcbk'+(h?' has':'')+'"><button type="button" class="bcbkx" title="지우기" aria-label="지우기">×</button><b></b><span></span>'+(h?'':'<button type="button" class="bcbkadd">＋ 이 칸에 담기</button>')+'</div>'});
       var form=kbBackForm===cc?'<div class="bcbkform"><input class="bcbkref" maxlength="30" placeholder="구절 (예: 빌립보서 4:6-7)" aria-label="구절"><input class="bcbkmemo" maxlength="80" placeholder="짧은 메모 (선택)" aria-label="메모"><div class="bcbkfb"><button type="button" class="bcbkok">넣기</button><button type="button" class="bcbkno">닫기</button></div></div>':'<button type="button" class="bcbknew">＋ 구절 넣기</button>';
-      bk.innerHTML='<p class="bcbkh">뒷면 <em></em></p>'+form+rows.join("")+(ls.length?'':'<p class="bcbkempty">아직 비어 있어요.<br>＋ 구절 넣기로 하나씩 넣어 보세요</p>')+'<p class="bcbkf">Shift+클릭하면 앞면으로</p>';
-      bk.querySelector(".bcbkh em").textContent=ls.length?ls.length+"곳"+(have?" · ✓ "+have+" 담음":""):"";
+      bk.innerHTML=(ls.length?'<p class="bcbkh"><em></em></p>':'')+form+rows.join("");   // 안내 문구는 없앰 (2026-11-02 사용자 요청)
+      if(ls.length)bk.querySelector(".bcbkh em").textContent=ls.length+"곳"+(have?" · ✓ "+have+" 담음":"");
       var it=bk.querySelectorAll(".bcbk"); ls.forEach(function(x,i){it[i].dataset.i=String(i); it[i].querySelector("b").textContent=x[0]; it[i].querySelector("span").textContent=x[1]||""});
       cl.insertBefore(bk,cl.querySelector(".bcjump"));
       if(kbBackForm===cc)setTimeout(function(){var r=bk.querySelector(".bcbkref"); if(r)r.focus()},30);
