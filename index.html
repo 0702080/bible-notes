@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-bleft">
+<meta name="app-build" content="2026-11-02-tcenter">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4882,6 +4882,28 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
       var t=e.target; if(!isSay(t)||pend!==t)return;
       setTimeout(function(){if(pend===t)nl(t)},40);
     },true);
+  })();
+  /* PC 칸반: 맨 위 말씀 글과 찾기 칸을 화면 가로 가운데에 (2026-11-02 사용자 요청) — 찾기 칸은 양옆 단추 묶음과 겹치지 않는 폭까지만 */
+  function topCenter(){
+    var tv=document.querySelector(".topverse"), bw=document.querySelector(".toolbar .bfwrap"), tm=$("todayMini"), ta=$("topAdd");
+    if(tv)tv.style.marginLeft=""; if(bw){bw.style.marginLeft="";bw.style.marginRight="";bw.style.flex="";bw.style.maxWidth=""}
+    if(!document.body.classList.contains("boardon"))return;
+    var C=document.documentElement.clientWidth/2;
+    if(tv){var r=tv.getBoundingClientRect(); if(r.width)tv.style.marginLeft=Math.round(C-(r.left+r.right)/2)+"px"}
+    if(bw&&tm&&ta&&bw.offsetWidth){
+      var L=tm.getBoundingClientRect().right, R=ta.getBoundingClientRect().left, w=Math.min(520,R-L-28);
+      if(w<160)return;   // 자리가 모자라면 예전처럼
+      var x=Math.max(L+14,Math.min(R-14-w,C-w/2)), ml=Math.round(x-L);   // 폭은 그대로, 가운데에 최대한 가깝게
+      bw.style.flex="0 0 "+Math.round(w)+"px"; bw.style.maxWidth=Math.round(w)+"px"; bw.style.marginLeft=ml+"px"; bw.style.marginRight="auto";
+    }
+  }
+  (function(){
+    var t=0, go=function(){if(t)return; t=setTimeout(function(){t=0; topCenter()},30)};
+    window.addEventListener("resize",go);
+    if(window.ResizeObserver){var ro=new ResizeObserver(go); ["todayMini","topAdd"].forEach(function(id){if($(id))ro.observe($(id))}); var tb=document.querySelector(".toolbar"); if(tb)ro.observe(tb)}
+    new MutationObserver(go).observe(document.body,{attributes:true,attributeFilter:["class"]});
+    if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go);
+    go();
   })();
   function kbPalClose(){document.querySelectorAll("#board .bcpal").forEach(function(x){x.remove()})}
   $("board").addEventListener("click",function(e){

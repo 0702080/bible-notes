@@ -92,6 +92,7 @@
 - 🔄 칸 뒤집기: 이름에 '기도'가 든 내가 만든 칸은 한 번 누르면 휙 뒤집혀 뒷면에 기도에 관한 다른 말씀 57곳(구절 이름 + 내 말로 쓴 짧은 뜻, 본문 없음). 이미 담은 구절은 ✓. 그 칸의 카드 자세히 보기는 두 번 누르기 (`KB_BACK`, `kbBackPrep(`, `kbFlip(`, 2026-11-01). 다른 주제를 더하려면 `KB_BACK`에 낱말과 목록을 넣으면 됨
 - 🖼️ 앱 배경 바꾸기 (PC ⋯ 메뉴 `appBgBtn`, `openAppBg(`, `abgApply(`): 은행나무 길(기본 `kanban-bg2.jpg`)·밤하늘·새벽·숲·바다·들판·검정·내 사진(1920px JPEG로 줄여 `bible-appbg-photo`), 어둡기 막대, 📷 Unsplash 무료 사진 14장(`ABG_UNS`, images.unsplash.com에서 바로, k=`u:photo-…`)과 Unsplash 주소 붙여넣기(`abgUrlFrom(`, k=`url`). 설정 `bible-appbg` {k, dim, url}, 이 기기만. 손대지 않으면 `#appbg` CSS 그대로. 윗줄 묶음(오늘 단추·찾기 칸·담기·보기·순서)에 그림자 (2026-11-01)
 - 칸반에서 #주제 줄을 접어 '전체'·'펼치기'만 남으면 그 줄을 숨기고(`body.tfolded`), 두 단추를 칸반 왼쪽 '새 칸' 위에 세로로(`.bleft`, 누르면 주제 줄 단추를 대신 누름) — 칸이 위로 올라감 (2026-11-01)
+- PC 칸반 맨 위 말씀 글(`.topverse`)은 화면 가로 정가운데, 찾기 칸(`.bfwrap`)은 폭 520px 그대로 양옆 단추 묶음과 겹치지 않는 선에서 가운데에 가장 가깝게 (`topCenter(`, 2026-11-02)
 - 칸반에서 칸·카드를 끌 때 칸반 왼쪽·오른쪽 끝 90px 안에 가면 그쪽으로 저절로 넘어감 — 화면 밖 칸 사이로도 옮김 (`lmEdge(`, 2026-11-01)
 - PC 칸반 "＋ 새 칸": 내가 만든 칸(금빛). 카드가 들어간 칸 이름은 노트 `n.col`(cleanNote에 있음, 클라우드로 맞춰짐), 칸 목록·순서는 `bible-board-cols`(이 기기). `n.col`이 있는 카드는 자동 칸(말씀 1·2…)에서 빠짐. 이름 두 번 눌러 바꾸기, ×(한 번 더)로 칸만 지우기 (`myCols(`, `renderKanbanList(`)
 - 🧊 또렷한 입체 단추 (2026-11-01 사용자 요청): 맨 위 #sortBtn·#filterBtn·#topMenu summary, `.topicbar .tchip`, `.colbar .cchip`, `.rvchip.tsswap`(↻)는 `.bvol` 아래 규칙에서 빛·그늘 그라데이션+바닥 그림자를 !important로 씌움(다른 규칙의 background 단축 속성이 .bvol을 지워서). 누르면 2px 눌림
