@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-prog-btn">
+<meta name="app-build" content="2026-11-01-drag-buzz">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -17521,8 +17521,9 @@ body.carddrag #reviewBar{display:none!important}
     drag.y=clientY;
     var el=drag.el, list=$("list");
     var prev=visibleSiblings(el,-1), next=visibleSiblings(el,1);
-    if(prev){var pr=prev.getBoundingClientRect(); if(clientY<pr.top+pr.height/2-12){list.insertBefore(el,prev)}}
-    if(next){var nr=next.getBoundingClientRect(); if(clientY>nr.top+nr.height/2+12){list.insertBefore(el,next.nextSibling)}}
+    // 카드 사이로 자리가 바뀔 때마다 짧게 진동 (2026-11-01 사용자 요청)
+    if(prev){var pr=prev.getBoundingClientRect(); if(clientY<pr.top+pr.height/2-12){list.insertBefore(el,prev); buzz(18)}}
+    if(next){var nr=next.getBoundingClientRect(); if(clientY>nr.top+nr.height/2+12){list.insertBefore(el,next.nextSibling); buzz(18)}}
     var natural=el.getBoundingClientRect().top-(drag.tx||0);
     drag.tx=clientY-drag.grab-natural;
     el.style.transform="translateY("+drag.tx+"px)";
