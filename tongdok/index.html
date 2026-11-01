@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-01-ovw">
+<meta name="app-build" content="td-2026-11-02-flat">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -288,6 +288,13 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovc[data-st="full"] i{inset:2px;background:radial-gradient(circle at 34% 28%,color-mix(in srgb,var(--green) 30%,#fff) 0%,var(--green) 50%,color-mix(in srgb,var(--green) 75%,#000) 100%)!important;box-shadow:inset 0 1px 2px rgba(255,255,255,.5)}
 .ovc[data-st="full"] b{color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.25)}
 .ovc:active{transform:scale(.93)}
+/* 입체 구슬은 오히려 어색해서 납작하고 깔끔하게 (2026-11-02 사용자 요청) — 둘레 고리(읽은 만큼)는 그대로 */
+.ovc{box-shadow:none!important}
+.ovc i{inset:3px;background:#FBF6EC!important;box-shadow:none!important}
+.ovc[data-st="part"] i{background:color-mix(in srgb,var(--ring) 10%,#FBF6EC)!important}
+.ovc[data-st="full"]{background:var(--green)!important;box-shadow:none!important}
+.ovc[data-st="full"] i{inset:0;background:var(--green)!important;box-shadow:none!important}
+.ovc[data-st="full"] b{text-shadow:none}
 .shelf{display:none!important}
 .shelf{margin-top:14px;padding:12px 13px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);}
 .shelf h3{margin:0 0 9px;font-family:var(--sans);font-size:15px;font-weight:700}
