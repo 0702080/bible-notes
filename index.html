@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-prog-full">
+<meta name="app-build" content="2026-11-01-prog-btn">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1066,8 +1066,12 @@ body.reorder .note .topics{display:none}
 @media (prefers-reduced-motion:reduce){.aprog.bump{animation:none}.apbar i{transition:none}}
 /* ✨ 실천 진도표 다듬기 (2026-11-01 사용자 요청): 위 요약 카드, 2주 달력 칸, 말씀마다 색 카드 + 얇은 막대 + 싹 배지 */
 .pgtop.pghero{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:4px 0 18px;padding:16px 16px 14px;border-radius:18px;border:1px solid color-mix(in srgb,var(--sky) 30%,#2A2933);background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--sky) 16%,transparent),transparent 60%),linear-gradient(180deg,#1C1C24,#15151B);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 16px rgba(0,0,0,.35)}
-.pghero .pgbig b{font-size:46px;letter-spacing:-1px;background:linear-gradient(180deg,#BDEBFF,var(--sky));-webkit-background-clip:text;background-clip:text;color:transparent}
+.pghero .pgbig b{font-size:34px;letter-spacing:-.5px;background:linear-gradient(180deg,#BDEBFF,var(--sky));-webkit-background-clip:text;background-clip:text;color:transparent}
 .pghero .pgsub{font-size:13.5px}
+.pghero .pgbig span{font-size:15px}
+/* 실천 진도표 닫기 단추 입체 (2026-11-01 사용자 요청) */
+#topicSheet.tsfull .sheetclose{background-color:#2A2933!important;border:1px solid #45434F!important;color:var(--ink);background-image:linear-gradient(180deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.42)!important;transition:transform .08s,box-shadow .08s}
+#topicSheet.tsfull .sheetclose:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
 .pghero .apbar.big{flex:1 0 100%;height:10px;margin:10px 0 0;border-radius:5px;background:#26252E;box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
 .pghero .apbar.big i{border-radius:5px;background:linear-gradient(90deg,var(--sky),color-mix(in srgb,var(--sky) 55%,var(--green)));box-shadow:0 0 10px color-mix(in srgb,var(--sky) 45%,transparent)}
 .tsres .pgh,.pgh{display:flex;align-items:center;gap:8px;font-size:13px;letter-spacing:.2px;color:var(--muted);margin:4px 0 10px}
