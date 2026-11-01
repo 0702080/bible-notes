@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-srm-read">
+<meta name="app-build" content="2026-11-01-srm-color">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3123,6 +3123,19 @@ textarea.lhpad{padding-left:28px!important}
 .srmfoot textarea{width:100%;box-sizing:border-box;height:64px;min-height:44px;max-height:30vh;padding:10px 14px;border:1px solid color-mix(in srgb,var(--green) 35%,#2A2930);border-radius:12px;background:var(--sheet);color:var(--ink);font-family:var(--serif);font-size:15.5px;line-height:1.6;resize:vertical}
 .srmfoot textarea:focus{outline:none;border-color:var(--green)}
 .srmfoot .srmlab{display:flex;margin:0 2px}
+/* 🎨 설교 메모 칸마다 은은한 색 바탕 (2026-11-01 사용자 요청: 카드 배경색을 더 예쁘게) */
+.srmform input,.srmform select{background:linear-gradient(160deg,color-mix(in srgb,var(--fc,var(--sky)) 13%,#16161C),color-mix(in srgb,var(--fc,var(--sky)) 5%,#121216));border-color:color-mix(in srgb,var(--fc,var(--sky)) 28%,#2A2930)}
+.srmform .srmdate,.srmform .srmwho{--fc:var(--sky)}
+.srmform input.srmtitle{--fc:var(--gold)}
+.srmform .srmrefin,.srmform .srmnote{--fc:var(--orange)}
+.srmform .srmyt{--fc:#E5484D}
+.srmform input:focus,.srmform select:focus{border-color:color-mix(in srgb,var(--fc,var(--sky)) 75%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--fc,var(--sky)) 16%,transparent)}
+.srmlines{background:radial-gradient(120% 70% at 0% 0%,color-mix(in srgb,var(--violet) 15%,transparent),transparent 60%),radial-gradient(110% 70% at 100% 100%,color-mix(in srgb,var(--sky) 11%,transparent),transparent 60%),#141419;border-color:color-mix(in srgb,var(--violet) 26%,#2A2930)}
+.srmlines:focus-within{border-color:color-mix(in srgb,var(--violet) 65%,var(--sky));box-shadow:0 0 0 3px color-mix(in srgb,var(--violet) 14%,transparent)}
+.srmline+.srmline{border-top:1px dashed color-mix(in srgb,var(--violet) 14%,transparent);border-radius:0}
+.srmline:focus-within{background:color-mix(in srgb,var(--violet) 9%,transparent)}
+.srmfoot textarea{background:linear-gradient(160deg,color-mix(in srgb,var(--green) 13%,#16161C),color-mix(in srgb,var(--green) 5%,#121216))}
+.srmcard{background:linear-gradient(150deg,color-mix(in srgb,var(--sky) 11%,#16161C),color-mix(in srgb,var(--violet) 8%,#121216))}
 .srmfoot .srmsaved{margin-left:auto;min-height:0}
 .srmfoot .srmbtns{margin-top:0}
 .srmfoot .srmbtns button{height:38px}
