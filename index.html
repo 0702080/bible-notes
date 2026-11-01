@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-fullw">
+<meta name="app-build" content="2026-11-02-calgrip">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4276,6 +4276,12 @@ body.boardon #board.board4{padding-bottom:24px;margin-left:-20px;margin-right:-2
 body.boardon #board.board4::after{content:"";flex:0 0 38px;align-self:stretch}
 /* 옆으로 넘겨 칸이 화면 끝에서 잘릴 때는 뚝 끊기지 않고 부드럽게 사라지게 (2026-11-02 사용자 요청) */
 body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)!important}   /* 오늘 단추 묶음 바깥 테두리선 없앰 (2026-11-02 사용자 요청) */
+.dlcal{-webkit-user-select:none;user-select:none}
+.dlcgrip{display:flex;justify-content:center;align-items:center;height:18px;margin:8px -4px -8px;cursor:ns-resize;touch-action:none}
+.dlcgrip span{width:46px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--gold) 35%,#3A3842);transition:width .15s,background .15s}
+.dlcgrip:hover span{width:64px;background:color-mix(in srgb,var(--gold) 70%,#3A3842)}
+.dlcgrip::after{content:"⌄";margin-left:8px;font-size:13px;line-height:1;color:var(--muted);transform:translateY(-3px)}
+.dlcgrip.up::after{content:"⌃";transform:translateY(3px)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -11881,7 +11887,7 @@ body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)
           var c=e.target.closest(".dlcd"); if(c&&c.dataset.day&&!c.disabled){if(c.dataset.day!==dlDay){dlDay=c.dataset.day; dlCalM=""; drawDaily()} return}
           var m=e.target.closest(".dlcm"); if(m&&!m.disabled){dlCalShift(+m.dataset.m); return}
           if(e.target.closest(".dlcmt")){var t=dkey(Date.now()); dlCalM=""; if(dlDay!==t){dlDay=t} drawDaily(); return}
-          if(e.target.closest(".dlcfold")){dlCalFold=!dlCalFold; try{localStorage.setItem("bible-dl-calfold",dlCalFold?"1":"0")}catch(err){} drawDaily()}
+          if(e.target.closest(".dlcfold,.dlcgrip")){dlCalFold=!dlCalFold; try{localStorage.setItem("bible-dl-calfold",dlCalFold?"1":"0")}catch(err){} drawDaily()}
         });
         var sx=null, sy=0;
         g.addEventListener("click",function(e){if(Date.now()-dlCalEat<350){e.stopPropagation(); e.preventDefault()}},true);
@@ -12583,6 +12589,9 @@ body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)
     var three=window.innerWidth>=900&&!fold, c3=cal.querySelector(".dlc3");
     cal.classList.toggle("dlcal3",three);
     if(!c3){c3=document.createElement("div"); c3.className="dlc3"; cal.appendChild(c3)}
+    // 맨 아래 끌기 손잡이: 위로 끌면 접고 아래로 끌면 펼침, 눌러도 바뀜 (2026-11-02 사용자 요청)
+    var gp=cal.querySelector(".dlcgrip"); if(!gp){gp=document.createElement("div"); gp.className="dlcgrip"; gp.setAttribute("role","button"); gp.innerHTML="<span></span>"; cal.appendChild(gp)}
+    gp.title=fold?"아래로 끌거나 눌러서 펼치기":"위로 끌거나 눌러서 접기"; gp.classList.toggle("up",!fold);
     c3.textContent="";
     if(three){
       var ms=[-1,0,1].map(function(n){var d=new Date(y,m-1+n,1,12); return {y:d.getFullYear(),m:d.getMonth()+1}});
