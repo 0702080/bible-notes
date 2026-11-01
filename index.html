@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-rm-card">
+<meta name="app-build" content="2026-11-01-cc-eye">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2306,6 +2306,9 @@ button:active{filter:brightness(1.15)}
 .ccst.now span{font-size:12.5px;-webkit-text-stroke:.35px currentColor}
 .ccbody{flex:1;overflow-y:auto;padding:10px 20px 16px;max-width:720px;width:100%;margin:0 auto}
 .cch .ccbody{overflow-x:hidden}   /* 암송 숫자 효과가 오른쪽으로 삐져나와 아래에 가로 스크롤 줄이 뜨던 것 막음 (2026-10-30 사용자 요청) */
+.cceye{position:sticky;bottom:10px;z-index:6;display:block;margin:14px 0 0 auto;height:40px;padding:0 16px;border:1px solid color-mix(in srgb,var(--gold) 55%,#2A2933);border-radius:20px;background-color:#3A3220;color:var(--gold);font-size:14px;font-weight:700;background-image:linear-gradient(180deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 6px 14px rgba(0,0,0,.55)}
+.cceye[hidden]{display:none}
+.cceye:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
 .cctip{margin:6px 0 16px;font-size:14.5px;line-height:1.6;color:var(--muted)}
 .cctip b{color:var(--ink);font-size:16px}
 .ccmid{flex:1 1 auto;min-height:0;display:grid;place-items:center;width:100%}   /* 말씀을 화면 한가운데로 (2026-10-18 사용자 요청) */
@@ -9136,16 +9139,16 @@ body.carddrag #reviewBar{display:none!important}
         sx=e.clientX; sy=e.clientY; sw=true;
       });
       var swAt=0;
+      // 👁 말씀이 길어 화면이 스크롤될 때는 위아래 밀기가 스크롤이 되므로, 오른쪽 아래 떠 있는 단추로 ○○○ ↔ 말씀 전체 보기 (2026-11-01 사용자 요청)
+      var eye=document.createElement("button"); eye.type="button"; eye.className="cceye"; eye.hidden=true;
+      ccBox.querySelector(".ccbody").appendChild(eye);
+      eye.addEventListener("click",function(){ccToggleAll()});
+      window.addEventListener("resize",function(){if(ccBox&&!ccBox.hidden)ccEyeSync()});
       function ccSwipe(dx,dy){
         // 위아래로 밀면 가린 ○○○ ↔ 말씀 전체 보기 (2026-10-29 사용자 요청)
         if(Math.abs(dy)>60&&Math.abs(dy)>Math.abs(dx)*1.3&&Date.now()-swAt>600){
           var vv=ccBox.querySelector(".ccverse"); var cb=ccBox.querySelector(".ccbody"); if(!vv||!vv.querySelector(".ccw.hid")||C.paint||(cb&&cb.scrollHeight>cb.clientHeight+2))return;   // 말씀이 길어 화면이 스크롤되면 그냥 스크롤
-          swAt=Date.now(); var on=!vv.classList.contains("ccall");
-          var hw=vv.querySelectorAll(".ccw.hid"), gap=Math.min(.035,.7/Math.max(1,hw.length));
-          Array.prototype.forEach.call(hw,function(w,i){w.style.setProperty("--rd",(i*gap).toFixed(3)+"s")});
-          clearTimeout(vv._anT); vv.classList.add("ccanim"); vv.classList.toggle("ccall",on);
-          vv._anT=setTimeout(function(){vv.classList.remove("ccanim")},1500);
-          buzz(on?[20,30,20]:15); return;
+          swAt=Date.now(); ccToggleAll(); return;
         }
         if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3&&Date.now()-swAt>600){swAt=Date.now();try{window.getSelection().removeAllRanges()}catch(err){} if(dx<0)ccGoNext();else ccGoPrev()}}
       ccBox.addEventListener("pointerup",function(e){
@@ -9192,7 +9195,7 @@ body.carddrag #reviewBar{display:none!important}
       })();
       ccBox.querySelector(".ccwalk").addEventListener("click",function(){if(C)openWalk(notes.get(C.id))});
       ccBox.querySelector(".ccpaint").addEventListener("click",function(){
-        if(!C)return; C.paint=!C.paint; this.setAttribute("aria-pressed",String(C.paint)); this.textContent=C.paint?"✓ 색 다 골랐어요":"🎨 색";
+        if(!C)return; C.paint=!C.paint; this.setAttribute("aria-pressed",String(C.paint)); ccEyeSync(); this.textContent=C.paint?"✓ 색 다 골랐어요":"🎨 색";
         ccBox.classList.toggle("ccpainting",C.paint);
         if(C.paint){if(!C.pc)C.pc="act"; palMark(); toast("아래 색을 고르고 낱말을 누르세요"); ccWords(notes.get(C.id).text,"got",0,C.seed||1)} else ccDraw();
       });
@@ -9341,6 +9344,20 @@ body.carddrag #reviewBar{display:none!important}
       return ccAdj(w,ccRoleOf(w));
     });
   }
+  function ccToggleAll(){   // 가린 ○○○ ↔ 말씀 전체 보기 (위아래 밀기·👁 단추가 같이 씀)
+    var vv=ccBox&&ccBox.querySelector(".ccverse"); if(!vv||!vv.querySelector(".ccw.hid")||(C&&C.paint))return;
+    var on=!vv.classList.contains("ccall");
+    var hw=vv.querySelectorAll(".ccw.hid"), gap=Math.min(.035,.7/Math.max(1,hw.length));
+    Array.prototype.forEach.call(hw,function(w,i){w.style.setProperty("--rd",(i*gap).toFixed(3)+"s")});
+    clearTimeout(vv._anT); vv.classList.add("ccanim"); vv.classList.toggle("ccall",on);
+    vv._anT=setTimeout(function(){vv.classList.remove("ccanim")},1500);
+    buzz(on?[20,30,20]:15); ccEyeSync();
+  }
+  function ccEyeSync(){
+    var eye=ccBox&&ccBox.querySelector(".cceye"), vv=ccBox&&ccBox.querySelector(".ccverse"), cb=ccBox&&ccBox.querySelector(".ccbody"); if(!eye||!vv||!cb)return;
+    var show=!!vv.querySelector(".ccw.hid")&&!(C&&C.paint)&&(vv.classList.contains("ccall")||cb.scrollHeight>cb.clientHeight+2);   // 다 보이는 중이면 늘 보여서 다시 가릴 수 있게
+    eye.hidden=!show; eye.textContent=vv.classList.contains("ccall")?"🙈 다시 가리기":"👁 말씀 보기";
+  }
   function ccMask(sp){   // 가린 낱말: 진짜 글자가 칸 너비를 잡고(안 보임), ○는 그 위에 겹쳐 보여 준다
     sp.textContent="";
     var g=document.createElement("span"); g.className="ccg"; g.textContent=sp.dataset.w||sp.dataset.m||"";
@@ -9353,7 +9370,7 @@ body.carddrag #reviewBar{display:none!important}
   function ccWords(text,mode,frac,seed,opt){   // mode: all | first | hide(frac) | none | got(색 입혀 다 보기)
     opt=opt||{};
     var box=ccBox.querySelector(".ccverse"); box.textContent="";
-    box.classList.toggle("recall",mode==="none"); box.classList.remove("ccall");
+    box.classList.toggle("recall",mode==="none"); box.classList.remove("ccall"); requestAnimationFrame(function(){requestAnimationFrame(ccEyeSync)});
     // 떠올리기 단계에서는 구절 이름도 ○○○○ ○○:○○로 가림 — 말씀 전체 보기(위아래 밀기)나 이름을 누르면 보임 (2026-11-01 사용자 요청)
     var rvx=ccBox.querySelector(".ccvref"), rtx=ccBox.querySelector(".ccref").textContent||"";
     if(rvx){rvx.classList.remove("rfshow"); if(mode==="none"&&rtx){rvx.classList.add("rfhide"); rvx.textContent="";
