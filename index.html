@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-calgrip2">
+<meta name="app-build" content="2026-11-02-dl3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4277,6 +4277,14 @@ body.boardon #board.board4::after{content:"";flex:0 0 38px;align-self:stretch}
 /* 옆으로 넘겨 칸이 화면 끝에서 잘릴 때는 뚝 끊기지 않고 부드럽게 사라지게 (2026-11-02 사용자 요청) */
 body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)!important}   /* 오늘 단추 묶음 바깥 테두리선 없앰 (2026-11-02 사용자 요청) */
 .dlcal{-webkit-user-select:none;user-select:none}
+.dl3foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin-top:4px;padding:8px 4px 2px}
+.dl3done{flex:1 0 100%;text-align:center;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,color-mix(in srgb,var(--gc,var(--gold)) 22%,transparent),color-mix(in srgb,var(--gold) 14%,transparent));color:color-mix(in srgb,var(--gold) 70%,#fff);font-weight:700;font-size:14px;animation:dl3pop .5s cubic-bezier(.2,1.4,.4,1)}
+@keyframes dl3pop{from{transform:scale(.85);opacity:0}}
+.dl3one{height:32px;padding:0 16px;border-radius:16px;border:1px solid color-mix(in srgb,var(--gc,var(--gold)) 60%,transparent);background:color-mix(in srgb,var(--gc,var(--gold)) 18%,transparent);color:color-mix(in srgb,var(--gc,var(--gold)) 70%,#fff);font-family:inherit;font-size:13.5px;font-weight:700}
+.dl3all,.dl3fold{height:30px;padding:0 14px;border-radius:15px;border:1px dashed #3A3944;background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px}
+.dl3all:hover,.dl3fold:hover{color:var(--ink);border-color:var(--gc,var(--gold))}
+.dl3fold{display:block;margin:6px auto 2px}
+@media (prefers-reduced-motion:reduce){.dl3done{animation:none}}
 .dlcgrip{display:flex;justify-content:center;align-items:center;height:18px;margin:8px -4px -8px;cursor:ns-resize;touch-action:none}
 .dlcgrip span{width:46px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--gold) 35%,#3A3842);transition:width .15s,background .15s}
 .dlcgrip:hover span{width:64px;background:color-mix(in srgb,var(--gold) 70%,#3A3842)}
@@ -11906,6 +11914,12 @@ body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)
         window.addEventListener("pointercancel",function(){vy=null});
         cal.addEventListener("click",function(e){if(Date.now()-dlCalEat<350){e.stopPropagation(); e.preventDefault()}},true);
       })();   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
+      dl.addEventListener("click",function(e){
+        var b=e.target.closest(".dl3one,.dl3all,.dl3fold"); if(!b)return; e.stopPropagation(); var gg=b.dataset.g;
+        if(b.classList.contains("dl3one")){var kk=dlDay+"|"+gg; dlG3More[kk]=(dlG3More[kk]||0)+1; buzz(10)}
+        else if(b.classList.contains("dl3all"))dlG3All.add(gg); else dlG3All.delete(gg);
+        drawDaily();
+      },true);
       dl.querySelector(".dlfocusbtn").addEventListener("click",function(){dlFocus=!dlFocus; dlFocusSkip=0; dlEdit=false; try{localStorage.setItem("bible-dl-focus",dlFocus?"1":"")}catch(err){} drawDaily()});
       dl.querySelector(".dledit:not(.dlfocusbtn)").addEventListener("click",function(){dlEdit=!dlEdit;dlEditId="";dlGEditId="";dlMemoId="";drawDaily()});
       // 기록칸에 적으면 바로 저장
@@ -12629,6 +12643,7 @@ body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)
      - 30일 동안 한 번도 체크·기록하지 않은 항목은 "쉬게 할까요?"로 물어 숨김 (지우지 않음, 언제든 다시 꺼냄)
      쉬는 항목 o.rest {id:{on:1|0,at}} (늦게 바꾼 쪽, 클라우드로 맞춤), 새로 넣은 항목 날짜 o.iat {id:날짜} */
   var dlShowAll=false, dlRestOpen="";
+  var dlG3All=new Set(), dlG3More={};   // 🌱 오늘의 3개: 다 펼친 묶음, '하나 더'로 연 수 (이 화면에서만)
   function dlRested(o,id){var r=o&&o.rest&&o.rest[id]; return !!(r&&r.on)}
   function dlStale(o){
     var now=Date.now(), from=dkey(now-29*864e5), old=dkey(now-30*864e5), first="", act={};
@@ -12853,6 +12868,24 @@ body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)
       }
       if(!fq&&dlGFold.has(g.g))return;   // 접힌 묶음은 항목을 그리지 않는다 (찾는 중에는 펼쳐서 보여 줌)
       if(!its.length){var em=document.createElement("p");em.className="dlgempty";em.textContent="아래 '새 항목' 칸에서 이 묶음을 골라 항목을 넣어 주세요.";list.appendChild(em)}
+      // 🌱 오늘의 3개: 항목이 많은 묶음은 오늘 할 3개(+ '하나 더'로 연 것)만 보이고 나머지는 접음. 오래 안 한 것부터 날마다 돌아가며 (2026-11-02 사용자 요청)
+      var d3=null;
+      if(!fq&&!dlEdit&&its.length>5&&!dlG3All.has(g.g)){
+        var last={}; Object.keys(o.days||{}).forEach(function(k){if(k<dlDay)(o.days[k]||[]).forEach(function(id){if(!last[id]||k>last[id])last[id]=k})});
+        var hsh=function(t){var h=0; for(var i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0; return h};
+        var todo=its.filter(function(it){return on.indexOf(it.id)<0}).sort(function(a,b){var la=last[a.id]||"", lb=last[b.id]||""; return la<lb?-1:la>lb?1:hsh(dlDay+a.id)-hsh(dlDay+b.id)});
+        var want=Math.max(0,3+(dlG3More[dlDay+"|"+g.g]||0)-its.filter(function(it){return on.indexOf(it.id)>=0}).length), pick={}; todo.slice(0,want).forEach(function(it){pick[it.id]=1});   // 오늘 한 만큼 빼고 남은 자리만
+        var picked=todo.filter(function(it){return pick[it.id]}).length;
+        // 오늘 한 것(체크한 것)은 그대로 보이고, 고른 것 중 남은 것만 펼쳐 보임
+        its=its.filter(function(it){return on.indexOf(it.id)>=0||pick[it.id]||dlMemoId===it.id});
+        var doneN=its.filter(function(it){return on.indexOf(it.id)>=0}).length, need=Math.min(3,o.items.filter(function(x){return x.g===g.g&&!dlRested(o,x.id)}).length);
+        // 🔥 이어 하기: 이 묶음에서 하루 3개 이상 한 날이 며칠째 이어지는지 (오늘 포함, 오늘 아직이면 어제까지)
+        var gids={}; o.items.forEach(function(x){if(x.g===g.g)gids[x.id]=1});
+        var cnt=function(k){return (o.days[k]||[]).filter(function(id){return gids[id]}).length};
+        var sd=new Date(dlDay+"T12:00:00"), streak=0; if(cnt(dlDay)<need)sd.setDate(sd.getDate()-1);
+        while(streak<999&&cnt(dkey(sd.getTime()))>=need){streak++; sd.setDate(sd.getDate()-1)}
+        d3={rest:todo.length-picked, left:picked, done:doneN>=need&&picked===0, streak:streak, total:todo.length};
+      }
       its.forEach(function(it){
         if(dlEditId===it.id){   // 항목 글 고치기
           var ef=document.createElement("div"); ef.className="dlitform"; ef.dataset.id=it.id;
@@ -12966,6 +12999,15 @@ body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)
         }
         for(var mi=mseq.length-1;mi>=0;mi--)mseq[mi]();
       });
+      if(d3){   // 🔥 다 하면 보상과 '하나 더?', 남은 것은 '＋ N개 더'로 접어 둠
+        var ft=document.createElement("div"); ft.className="dl3foot"; ft.dataset.g=g.g;
+        if(d3.done){var dn=document.createElement("div"); dn.className="dl3done"; dn.textContent="✨ 오늘 기도 완료"+(d3.streak?"  🔥 "+d3.streak+"일째":""); ft.appendChild(dn)}
+        if(d3.done&&d3.rest>0){var one=document.createElement("button"); one.type="button"; one.className="dl3one"; one.dataset.g=g.g; one.textContent="하나 더?"; ft.appendChild(one)}
+        if(d3.rest>0){var al=document.createElement("button"); al.type="button"; al.className="dl3all"; al.dataset.g=g.g; al.textContent="＋ "+d3.rest+"개 더"; ft.appendChild(al)}
+        if(ft.children.length)list.appendChild(ft);
+      }else if(dlG3All.has(g.g)&&!fq&&!dlEdit&&its.length>5){
+        var fb3=document.createElement("button"); fb3.type="button"; fb3.className="dl3fold"; fb3.dataset.g=g.g; fb3.textContent="오늘의 3개만 보기"; list.appendChild(fb3);
+      }
     });
     // 🌱 말씀 실천: 카드 실천 탭에 적은 실천을 하루 돌아보기에서 날마다 점검 — 체크하면 실천 도장과 같은 기록 (2026-10-24 사용자 요청)
     var aGHit=fq&&dlHit("🌱 말씀 실천");   // 찾는 중에도 말씀 실천·중보기도를 거름 (2026-10-31 사용자 요청: "말씀 실천"이 안 찾아짐)
