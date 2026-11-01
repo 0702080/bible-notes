@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-sm-nointro">
+<meta name="app-build" content="2026-11-01-prd-color">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2944,6 +2944,22 @@ button:active{filter:brightness(1.15)}
 .prdsec:not(.p1sec) .prdword+.prdit{border-top:1px solid color-mix(in srgb,var(--violet) 18%,#2A2930)}
 .prdsec:not(.p1sec) .prdit .prdmeta::before{content:"🙏 ";}
 .prdsec.fold:not(.p1sec){margin-bottom:12px}
+/* 🎨 기도 읽기 카드마다 색: 보라·하늘·초록·금·분홍·주황 차례로 (2026-11-01 사용자 요청) */
+.prdsec:not(.p1sec){--pc:var(--violet);border-color:color-mix(in srgb,var(--pc) 45%,#2A2930)!important;background:linear-gradient(160deg,color-mix(in srgb,var(--pc) 24%,#141418) 0%,color-mix(in srgb,var(--pc) 12%,#141418) 55%,color-mix(in srgb,var(--pc) 7%,#121216) 100%)!important;box-shadow:0 6px 18px rgba(0,0,0,.35),inset 0 1px 0 color-mix(in srgb,var(--pc) 25%,transparent)!important}
+.prdlist>.prdsec:not(.p1sec):nth-child(6n+1){--pc:var(--violet)}
+.prdlist>.prdsec:not(.p1sec):nth-child(6n+2){--pc:var(--sky)}
+.prdlist>.prdsec:not(.p1sec):nth-child(6n+3){--pc:var(--green)}
+.prdlist>.prdsec:not(.p1sec):nth-child(6n+4){--pc:var(--gold)}
+.prdlist>.prdsec:not(.p1sec):nth-child(6n+5){--pc:var(--pink)}
+.prdlist>.prdsec:not(.p1sec):nth-child(6n+6){--pc:var(--orange)}
+.prdsec:not(.p1sec)::before{background:var(--pc)!important}
+.prdsec:not(.p1sec) .prdref{color:color-mix(in srgb,var(--pc) 75%,#fff)}
+.prdsec:not(.p1sec) .prdword .prdverse{color:#F2EFF6}
+.prdsec:not(.p1sec) .prdtext{color:color-mix(in srgb,var(--pc) 55%,#fff)}
+.prdsec:not(.p1sec) .prdit.answered .prdtext{color:#C9C4D2}
+.prdsec:not(.p1sec) .prdword+.prdit{border-top-color:color-mix(in srgb,var(--pc) 30%,#2A2930)}
+.prdsec:not(.p1sec) .prdit{border-top-color:color-mix(in srgb,var(--pc) 22%,#2A2930)}
+.prdsec:not(.p1sec) .prdfold{background-color:color-mix(in srgb,var(--pc) 28%,#2A2933)!important;color:color-mix(in srgb,var(--pc) 70%,#fff)}
 .prdmeta{font-size:12px;color:var(--faint)}
 .prdtext{margin:8px 0 0;font-size:16.5px;line-height:1.75;color:color-mix(in srgb,var(--orange) 85%,var(--ink));white-space:pre-line;word-break:keep-all}
 .prdit.answered .prdtext{color:#C9C4D2}
