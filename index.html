@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-dlfit-slim">
+<meta name="app-build" content="2026-11-01-icadd-fix">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10780,6 +10780,15 @@ body.carddrag #reviewBar{display:none!important}
     return f;
   }
   function icDraw(){
+    // 적는 중에 클라우드 맞춤 등으로 다시 그려도 적던 글이 사라지지 않게 칸 내용을 옮겨 둠 (2026-11-01)
+    var kf=icv.querySelector(".icform"), keep=null;
+    if(kf){keep={id:kf.dataset.id,v:{},foc:""}; [".icfn",".icfm",".icfv",".icfa"].forEach(function(s){var el=kf.querySelector(s); if(el){keep.v[s]=el.value; if(document.activeElement===el){keep.foc=s; try{keep.ss=el.selectionStart;keep.se=el.selectionEnd}catch(e){}}}}); keep.st=icv.querySelector(".icbody").scrollTop}
+    icDrawInner();
+    var nf=keep&&icv.querySelector(".icform");
+    if(nf&&nf.dataset.id===keep.id){Object.keys(keep.v).forEach(function(s){var el=nf.querySelector(s); if(el)el.value=keep.v[s]}); icv.querySelector(".icbody").scrollTop=keep.st;
+      if(keep.foc){var fe=nf.querySelector(keep.foc); if(fe){try{fe.focus({preventScroll:true}); if(keep.ss!=null)fe.setSelectionRange(keep.ss,keep.se)}catch(e){}}}}
+  }
+  function icDrawInner(){
     var o=icData(), today=dkey(Date.now()), body=icv.querySelector(".icbody"); body.textContent="";
     icv.querySelector(".iccnt").textContent=o.items.length?o.items.length+"명":"";
     if(icEdit==="new")body.appendChild(icForm(null));   // 새 사람은 맨 위에서 적기 (2026-10-24 사용자 요청: 넣기 단추는 위 제목줄에)
@@ -10829,7 +10838,7 @@ body.carddrag #reviewBar{display:none!important}
       o.items=o.items.filter(function(y){return y.id!==id}); o.del[id]=Date.now(); icSave(o); icEdit=""; icDraw(); return;
     }
     if(b.classList.contains("icok")){
-      var f=b.closest(".icform"); if(!f.querySelector(".icfn").value.trim()){f.querySelector(".icfn").focus(); toast("이름을 적어 주세요"); return}
+      var f=b.closest(".icform"); if(!f.querySelector(".icfn").value.trim()&&!f.querySelector(".icfm").value.trim()){f.querySelector(".icfn").focus(); toast("제목이나 기도 제목을 적어 주세요"); return}   // 기도 제목만 적어도 넣음 — 첫 줄이 제목 (2026-11-01)
       icCommit(f); icEdit=""; icDraw(); return;
     }
   }
