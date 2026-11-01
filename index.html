@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-prog-ui">
+<meta name="app-build" content="2026-11-01-srm-fold">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3157,6 +3157,16 @@ textarea.lhpad{padding-left:28px!important}
 .srmcard{display:block;width:100%;padding:13px 15px;border:1px solid color-mix(in srgb,var(--sky) 20%,#232229);border-left:3px solid color-mix(in srgb,var(--sky) 70%,transparent);border-radius:14px;background:color-mix(in srgb,var(--sky) 7%,#131317);color:var(--ink);font:inherit;text-align:left}
 .srmmeta{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:12.5px;color:var(--muted)}
 .srmmeta .srmd{color:var(--sky)}
+/* ⠿ 끌기 손잡이 · 접기 단추 (2026-11-01 사용자 요청) */
+.srmmeta{align-items:center}
+.srmcgrip{flex:0 0 auto;width:18px;margin:-6px 0 -6px -6px;padding:6px 0;text-align:center;color:var(--faint);font-size:15px;line-height:1;cursor:grab;touch-action:none}
+.srmcfold{flex:0 0 auto;margin-left:auto;width:28px;height:28px;margin-top:-4px;margin-bottom:-4px;border-radius:14px;display:grid;place-items:center;background-color:#2A2933;border:1px solid #45434F;background-image:linear-gradient(180deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.42);cursor:pointer}
+.srmcfold::before{content:"";width:7px;height:7px;border-left:2px solid var(--ink);border-top:2px solid var(--ink);transform:translateY(2px) rotate(45deg);transition:transform .2s}
+.srmfolded .srmcfold::before{transform:translateY(-2px) rotate(225deg)}
+.srmcfold:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
+.srmmeta .srmytc+.srmcfold{margin-left:6px}
+.srmcard.srmfolded .srmref,.srmcard.srmfolded .srmprev,.srmcard.srmfolded .srmap{display:none!important}
+.srmcard.srmfolded{padding-bottom:10px}
 .srmttl{display:block;margin:4px 0 2px;font-size:16.5px;font-weight:700;color:var(--gold);word-break:keep-all}
 .srmref{display:inline-block;margin-top:2px;padding:1px 8px;border-radius:10px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-size:12px}
 .srmprev{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:8px 0 0;font-family:var(--serif);font-size:14.5px;line-height:1.7;color:color-mix(in srgb,var(--ink) 82%,transparent);white-space:pre-wrap;word-break:keep-all}
@@ -10781,6 +10791,10 @@ body.carddrag #reviewBar{display:none!important}
   }
   function srmClick(e){
     var yc=e.target.closest(".srmytc"); if(yc){e.stopPropagation(); srmYtOpen(yc.dataset.u); return}
+    if(e.target.closest(".srmcgrip"))return;
+    var cf=e.target.closest(".srmcfold"); if(cf){var cc=cf.closest(".srmcard"), fid=cc&&cc.dataset.id; if(!fid)return; e.stopPropagation(); try{buzz(8)}catch(err){}
+      if(srmFold.has(fid))srmFold.delete(fid); else srmFold.add(fid); try{localStorage.setItem("bible-srm-fold",JSON.stringify(Array.from(srmFold).slice(-500)))}catch(err){}
+      cc.classList.toggle("srmfolded",srmFold.has(fid)); cf.title=srmFold.has(fid)?"펼치기":"접기"; cf.setAttribute("aria-label",cf.title); return}
     var b=e.target.closest("button"); if(!b)return;
     var o=srmData();
     if(b.classList.contains("srmytgo")){srmYtOpen(srm.querySelector(".srmyt").value); return}
@@ -10842,7 +10856,10 @@ body.carddrag #reviewBar{display:none!important}
     document.addEventListener("pointerdown",function(e){
       if(srmCD||!srm||srm.hidden||srmEdit||srmQ.trim()||(e.pointerType==="mouse"&&e.button!==0))return;
       var c=e.target.closest&&e.target.closest(".srmlist>.srmcard"); if(!c||cards().length<2)return;
-      srmCD={c:c,pid:e.pointerId,x0:e.clientX,y0:e.clientY,on:false,t:setTimeout(start,e.pointerType==="mouse"?250:350)};
+      if(e.target.closest(".srmcfold"))return;
+      var onGrip=!!e.target.closest(".srmcgrip");   // ⠿를 잡으면 바로 끌기
+      srmCD={c:c,pid:e.pointerId,x0:e.clientX,y0:e.clientY,on:false,t:setTimeout(start,onGrip?0:(e.pointerType==="mouse"?250:350))};
+      if(onGrip){e.preventDefault(); try{c.setPointerCapture&&c.setPointerCapture(e.pointerId)}catch(err){}}
     });
     function move(y){
       var d=srmCD, c=d.c; c.style.transform="translateY("+(y-d.y0)+"px)";
@@ -10892,6 +10909,8 @@ body.carddrag #reviewBar{display:none!important}
     if(x.apply.trim()){var ap=el("div","srmrapply"); var h=document.createElement("b"); h.textContent="💡 나의 적용 · 결단"; ap.appendChild(h); var t=document.createElement("p"); t.textContent=x.apply.trim(); ap.appendChild(t)}
     return v;
   }
+  // 설교 메모 카드 접기·펼치기 (2026-11-01 사용자 요청): 접으면 날짜·설교자·제목만
+  var srmFold=new Set(); try{(JSON.parse(localStorage.getItem("bible-srm-fold")||"[]")||[]).forEach(function(x){srmFold.add(String(x))})}catch(e){}
   function srmDrawList(){
     var list=srm&&srm.querySelector(".srmlist"); if(!list)return; list.textContent="";
     var all=srmSorted(srmData()).filter(function(x){return !srmEmpty(x)}), q=srmQ.trim();
@@ -10900,10 +10919,13 @@ body.carddrag #reviewBar{display:none!important}
       em.textContent=all.length?"찾는 설교 메모가 없어요.":"아직 적은 설교 메모가 없어요.\n위 [+ 새 메모]를 눌러 오늘 설교를 적어 보세요."; em.style.whiteSpace="pre-line"; list.appendChild(em); return}
     items.forEach(function(x){
       var c=document.createElement("button"); c.type="button"; c.className="srmcard"; c.dataset.id=x.id;
+      var fd=srmFold.has(x.id); if(fd)c.classList.add("srmfolded");
       var m=document.createElement("span"); m.className="srmmeta";
+      var gr=document.createElement("span"); gr.className="srmcgrip"; gr.textContent="⠿"; gr.title="끌어서 순서 바꾸기"; gr.setAttribute("aria-hidden","true"); m.appendChild(gr);
       var d=document.createElement("span"); d.className="srmd"; d.textContent=srmDateLabel(x.d); m.appendChild(d);
       if(x.who){var w=document.createElement("span"); w.textContent=x.who; m.appendChild(w)}
       if(srmYtUrl(x.yt)){var yv=document.createElement("span"); yv.className="srmytc"; yv.dataset.u=x.yt; yv.textContent="▶ 영상"; yv.title="유튜브로 보기"; m.appendChild(yv)}
+      var fb=document.createElement("span"); fb.className="srmcfold"; fb.setAttribute("role","button"); fb.title=fd?"펼치기":"접기"; fb.setAttribute("aria-label",fb.title); m.appendChild(fb);
       c.appendChild(m);
       var t=document.createElement("span"); t.className="srmttl"; t.textContent=x.title.trim()||"(제목 없음)"; c.appendChild(t);
       if(x.ref){var r=document.createElement("span"); r.className="srmref"; r.textContent="📖 "+x.ref; c.appendChild(r)}
