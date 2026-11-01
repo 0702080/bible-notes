@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-ref-toggle">
+<meta name="app-build" content="2026-11-01-cnt-1s">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9054,7 +9054,7 @@ body.carddrag #reviewBar{display:none!important}
         var cnd=ccBox.querySelector(".ccnum"); if(cnd)cnd.classList.remove("lit");   // 다시 연습하면 흐리게
         var i=+d.dataset.i; if(!(i>=0&&i<4))return;
         if(i===C.stage&&!C.dict){if(i===2){C.frac=ccMoreHide(notes.get(C.id));C.seed=newSeed();C.anim=true;buzz([12,30,12]);ccDraw();return} buzz(8);return}   // 가리기 단계를 또 누르면 가린 자리를 새로 섞음 (2026-10-30)
-        if(C.autoT){clearTimeout(C.autoT);C.autoT=0;var nq=notes.get(C.id);if(nq){C.grade="g2";ccFinish(nq)}ccDoneIds[C.id]=1}   // 끝낸 직후 단계 줄을 눌러 다시 연습해도 넘어가지 않게
+        if(C.autoT){clearTimeout(C.autoT);clearTimeout(C.cntT);C.autoT=0;if(!C.finDone)ccCountNow(C.id);C.finDone=0;ccDoneIds[C.id]=1}   // 끝낸 직후 단계 줄을 눌러 다시 연습해도 넘어가지 않게
         C.frac=null; C.stage=i; C.shown=i; C.reads=0; C.round=0; C.grade=""; C.dict=null; C.autoDone=0; C.keepPrev=false; C.prevHide=null; C.seed=newSeed(); C.anim=true;
         buzz([12,30,12]); ccDraw();
       });
@@ -9110,28 +9110,29 @@ body.carddrag #reviewBar{display:none!important}
         var ws=ccBox.querySelectorAll(".ccverse .ccw"), wsi=Array.prototype.indexOf.call(ws,w), tk=C.seed+":"+C.stage;
         // 끝낸 뒤 기다리는 동안 낱말을 또 누르면(= 같은 구절 다시 연습) 다음 말씀으로 넘어가지 않고 그 자리에서 한 번 더 (2026-10-30 사용자 요청)
         if(C.autoT){
-          clearTimeout(C.autoT); C.autoT=0;
-          var nf=notes.get(C.id); if(nf){C.grade="g2"; ccFinish(nf)}
+          clearTimeout(C.autoT); clearTimeout(C.cntT); C.autoT=0;
+          if(!C.finDone)ccCountNow(C.id); C.finDone=0;
           ccDoneIds[C.id]=1; C.stage=3; C.grade=""; C.autoDone=0; C.t0=Date.now(); C.tapKey=tk; C.tapped={};
         }
         if(C.tapKey!==tk){C.tapKey=tk;C.tapped={}}
         if(wsi>=0)C.tapped[wsi]=1;
         var allTap=ws.length>0&&Object.keys(C.tapped).length>=ws.length;
         if(C.stage===3&&!C.autoDone&&allTap){
-          C.autoDone=1; var cid=C.id;
-          var cnb=ccBox.querySelector(".ccnum");   // 숫자는 누르는 즉시 하나 올려 보여 줌 (2026-10-23 사용자 요청)
-          var n0c=notes.get(cid); if(cnb&&n0c)ccNumUp(cnb,ccCount(n0c),ccCount(n0c)+1);
+          C.autoDone=1; C.finDone=0; var cid=C.id;
           buzz([20,40,20]);
           var again=!!ccDoneIds[cid];   // 이번에 연 암송 코치에서 이미 끝낸 말씀이면 다음 말씀으로 넘어가지 않음
-          if(again){
-            var na=notes.get(cid); if(na){C.grade="g2"; ccFinish(na)}
-            C.stage=3; C.grade=""; C.autoDone=0; C.t0=Date.now(); C.tapped={};
-          }else{
+          clearTimeout(C.cntT);
+          C.cntT=setTimeout(function(){   // 마지막 낱말을 누르고 1초 뒤 "암송 N" 하나 올리고 저장 (2026-11-01 사용자 요청)
+            ccCountNow(cid);
+            if(again&&C&&C.id===cid){C.stage=3; C.grade=""; C.autoDone=0; C.finDone=0; C.t0=Date.now(); C.tapped={}}
+          },1000);
+          if(!again){
             C.autoT=setTimeout(function(){
               C&&(C.autoT=0);
               if(!C||C.id!==cid||ccBox.hidden)return;
               var n1=notes.get(cid); if(!n1)return;
-              C.grade="g2"; C.stage=5; ccFinish(n1); ccDoneIds[cid]=1;
+              if(!C.finDone)ccCountNow(cid); C.finDone=0;
+              C.grade="g2"; C.stage=5; ccDoneIds[cid]=1;
               if(ccNextNote()){ccGoNext()} else ccDraw();
             },3300);   // 마지막 낱말을 누른 뒤 2초 더 머묾 (2026-10-30 사용자 요청)
           }
@@ -9606,6 +9607,13 @@ body.carddrag #reviewBar{display:none!important}
   }
   // 이 말씀을 끝까지 연습한 누적 횟수 (예전 기록은 복습 기록 ok+miss로 이어 셈, 2026-10-23 사용자 요청)
   function ccCount(n){return Math.max(+n.mcnt||0,((n.rv&&n.rv.ok)||0)+((n.rv&&n.rv.miss)||0))}
+  // 떠올리기를 다 누른 뒤 1초에 "암송 N"을 올리고 저장 — 한 번만 (C.finDone) (2026-11-01 사용자 요청: 카운터 업데이트가 늦음)
+  function ccCountNow(cid){
+    if(!C||C.id!==cid||C.finDone||!ccBox||ccBox.hidden)return;
+    var n=notes.get(cid); if(!n)return;
+    var cnb=ccBox.querySelector(".ccnum"); if(cnb)ccNumUp(cnb,ccCount(n),ccCount(n)+1);
+    C.grade="g2"; ccFinish(n); C.finDone=1;
+  }
   function ccFinish(n){
     if(!n.mem)n.mem={s:[0,0,0,0]};
     n.mcnt=ccCount(n)+1;
