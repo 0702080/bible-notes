@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-prd-onecard">
+<meta name="app-build" content="2026-11-01-rm-clean">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3616,6 +3616,10 @@ body.carddrag #reviewBar{display:none!important}
 .rmrow span{flex:1;font-size:15px}
 .rmg{flex:0 0 auto;height:38px;padding:0 12px;border:1px solid color-mix(in srgb,var(--sky) 55%,transparent);border-radius:10px;background:transparent;color:var(--sky);font-size:13px;white-space:nowrap}
 @media (max-width:430px){.rmrow{flex-wrap:wrap}.rmg{width:100%}}
+/* ⏰ 말씀 알림: 구글 캘린더에 넣기 단추 입체, 설명 글 두 개는 지움 (2026-11-01 사용자 요청) */
+.rmsheet .rmg{background-color:color-mix(in srgb,var(--sky) 20%,#1E2A33)!important;border:1px solid color-mix(in srgb,var(--sky) 55%,#2A2933)!important;color:var(--sky);font-weight:700;background-image:linear-gradient(180deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.42)!important;transition:transform .08s,box-shadow .08s}
+.rmsheet .rmg:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
+.rmsheet .rmrows{margin-top:6px}
 .rmfile{margin-top:8px;height:40px;border:1px solid #34333A;border-radius:12px;background:transparent;color:var(--muted);font-size:13.5px}
 .rmrow input[type=time]{width:156px;height:38px;color-scheme:dark}
 .rmrow input[type=checkbox]{width:20px;height:20px;accent-color:var(--gold)}
@@ -11069,9 +11073,7 @@ body.carddrag #reviewBar{display:none!important}
       rmv=document.createElement("div"); rmv.className="sheet rmsheet"; rmv.hidden=true;
       rmv.innerHTML='<div class="sheetback rmback"></div><section class="sheetpanel rmpanel" role="dialog" aria-modal="true" aria-label="말씀 알림">'+
         '<h2>⏰ 하루 세 번 말씀 꺼내기</h2>'+
-        '<p class="rmtip">아침·점심·저녁에 구글 캘린더가 휴대폰으로 알려 줘요. 알림을 누르면 이 노트가 열리고, <b>오늘 외우는 말씀이 가린 채로</b> 암송 코치에 바로 떠요.</p>'+
         '<div class="rmrows"></div>'+
-        '<p class="rmhow">시간마다 <b>구글 캘린더에 넣기</b>를 누르면 구글 캘린더가 새 창으로 열려요. <b>저장</b>을 누르면 매일 반복 알림이 생기고, 같은 구글 계정을 쓰는 갤럭시에서도 알림이 울려요. 시간을 바꾸려면 캘린더에서 예전 일정을 지우고 다시 넣어 주세요.</p>'+
         '<button type="button" class="rmmake rmfile">📄 파일(.ics)로 받기 — 삼성 캘린더 등</button>'+
         '<button type="button" class="rmtry">지금 한 번 열어 보기</button><button type="button" class="rmclose">닫기</button></section>';
       document.body.appendChild(rmv);
