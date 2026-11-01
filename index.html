@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-cnt-1s">
+<meta name="app-build" content="2026-11-01-bvol">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3966,6 +3966,9 @@ body.carddrag #reviewBar{display:none!important}
 .note .qbtns .addbtn.s{height:28px;padding:0;border:0;background:transparent;font-size:13px}
 .note .qbtns .mpriv{height:28px;padding:0;border:0;border-radius:0;background:transparent;color:#8E889A;font-size:12.5px;font-weight:400}
 .note .qbtns .mpriv.on{background:transparent;color:var(--gold)}
+/* 🔘 모든 단추에 은은한 입체감: 위는 살짝 밝고 아래는 살짝 어둡게 (2026-11-01 사용자 요청).
+   단추마다 바탕색은 그대로 두고 그 위에 그라데이션만 겹침. 이미 그라데이션 바탕인 단추·투명 단추는 건드리지 않음 (bvolScan) */
+.bvol{background-image:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.02) 48%,rgba(0,0,0,.14))}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -17655,6 +17658,20 @@ body.carddrag #reviewBar{display:none!important}
     $("filter").addEventListener(ev,function(){clearTimeout(fTimer);fTimer=setTimeout(applyFilter,ev==="compositionupdate"?120:0)});
   });
 
+  // 🔘 단추 입체감 붙이기: 색 있는 바탕 + 그라데이션이 없는 단추에만 .bvol (2026-11-01 사용자 요청)
+  (function(){
+    var Q="button:not([data-bv]),summary.tbtn:not([data-bv]),a.addbtn:not([data-bv])", pend=0;
+    function scan(){pend=0;
+      document.querySelectorAll(Q).forEach(function(b){
+        var cs=getComputedStyle(b), bg=cs.backgroundColor||"", m=bg.match(/rgba?\(([^)]+)\)/), a=1;
+        if(m){var p=m[1].split(/[ ,\/]+/).filter(Boolean); if(p.length>=4)a=parseFloat(p[3])}
+        var ok=cs.backgroundImage==="none"&&!/transparent/.test(bg)&&a>0.05;
+        b.dataset.bv=ok?"1":"0"; if(ok)b.classList.add("bvol");
+      });
+    }
+    function later(){if(!pend)pend=requestAnimationFrame(scan)}
+    later(); new MutationObserver(later).observe(document.body,{childList:true,subtree:true});
+  })();
   /* ---------- start ---------- */
   syncSortBtn();
   render();
