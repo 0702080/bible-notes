@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-prd-bg">
+<meta name="app-build" content="2026-11-01-ic-title">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4175,7 +4175,7 @@ body.carddrag #reviewBar{display:none!important}
         <button type="button" id="openGraphBtn"><svg class="grico" viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M12 4 4.5 18.5h15Z"/><path d="M12 4v9M4.5 18.5 12 13l7.5 5.5"/></g><g fill="currentColor"><circle cx="12" cy="4" r="2.6"/><circle cx="4.5" cy="18.5" r="2.6"/><circle cx="19.5" cy="18.5" r="2.6"/><circle cx="12" cy="13" r="2.2"/></g></svg> 말씀 연결 지도</button>
         <button type="button" id="sermonBtn">🎤 설교 메모</button>
         <button type="button" id="prayReadBtn">🙏 기도 모아 읽기</button>
-        <button type="button" id="icBtn">🤲 중보기도 명단</button>
+        <button type="button" id="icBtn">🙏 기도제목</button>
         <button type="button" id="ansBtn">🙌 기도 응답 연표</button>
         <button type="button" id="smartBtn">🧠 스마트 말씀</button>
         <button type="button" id="remindBtn">⏰ 하루 세 번 말씀 알림</button>
@@ -10986,7 +10986,7 @@ body.carddrag #reviewBar{display:none!important}
   function openIntercede(){
     if(!icv){
       icv=document.createElement("div"); icv.className="cch icv"; icv.setAttribute("role","dialog"); icv.setAttribute("aria-modal","true"); icv.hidden=true;
-      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🤲 중보기도</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icadd icaddtop">＋ <span class="icaddlong">기도할 사람 </span>넣기</button><button type="button" class="icclose">닫기</button></div></div>'+
+      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🙏 기도제목</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icadd icaddtop">＋ <span class="icaddlong">기도제목 </span>넣기</button><button type="button" class="icclose">닫기</button></div></div>'+
         '<div class="ccbody icbody"></div>';
       document.body.appendChild(icv);
       icv.querySelector(".icclose").addEventListener("click",closeIntercede);
@@ -11150,7 +11150,7 @@ body.carddrag #reviewBar{display:none!important}
     if(icEdit==="new")body.appendChild(icForm(null));   // 새 사람은 맨 위에서 적기 (2026-10-24 사용자 요청: 넣기 단추는 위 제목줄에)
     var pick=icPick(o,today), done=pick.filter(function(x){return x.log.indexOf(today)>=0}).length;
     var h=document.createElement("div"); h.className="ichead";
-    h.innerHTML='<b>오늘 기도할 사람</b><span class="icprog"></span><span class="icperl" title="명단이 많을 때, 하루에 몇 명씩 돌아가며 보여 줄지 정해요 (오래 기도하지 못한 사람부터)">하루<span class="icstep"><button type="button" class="icpm" data-d="-1" aria-label="한 명 줄이기">−</button><b>'+o.per+'</b><button type="button" class="icpm" data-d="1" aria-label="한 명 늘리기">+</button></span>명씩</span>';
+    h.innerHTML='<b>오늘 기도제목</b><span class="icprog"></span><span class="icperl" title="명단이 많을 때, 하루에 몇 명씩 돌아가며 보여 줄지 정해요 (오래 기도하지 못한 사람부터)">하루<span class="icstep"><button type="button" class="icpm" data-d="-1" aria-label="한 명 줄이기">−</button><b>'+o.per+'</b><button type="button" class="icpm" data-d="1" aria-label="한 명 늘리기">+</button></span>명씩</span>';
     h.querySelector(".icprog").textContent=pick.length?done+" / "+pick.length:"";
     body.appendChild(h);
     if(!o.items.length){var e=document.createElement("p"); e.className="icempty"; e.textContent="기도해 줄 사람을 명단에 넣어 보세요. 하루에 몇 명씩, 오래 기도하지 못한 사람부터 차례로 보여 드려요."; body.appendChild(e)}
@@ -12767,7 +12767,7 @@ body.carddrag #reviewBar{display:none!important}
       }
     }
     // 🤲 오늘 중보기도: 명단에서 그날 기도할 사람 (2026-10-24 사용자 요청)
-    var iGHit=fq&&dlHit("🤲 오늘 중보기도");
+    var iGHit=fq&&dlHit("🙏 오늘 기도제목");
     if(!dlEdit){
       var ico=icData(), ipk=icPick(ico,dlDay).sort(icOrd);
       if(fq&&!iGHit)ipk=ipk.filter(function(x){return dlHit(x.name)||dlHit(x.memo)});
@@ -12776,8 +12776,8 @@ body.carddrag #reviewBar{display:none!important}
       var isec=document.createElement("section"); isec.className="dlgrp dlacts dlic"; isec.dataset.g="__ic"; isec.style.setProperty("--gc","var(--sky)");
       var ih=document.createElement("div"); ih.className="dlgh";
       var it2=document.createElement("button"); it2.type="button"; it2.className="dlgname dlactname"; it2.dataset.g="__ic";
-      var iOpen=fq||!dlGFold.has("__ic"); it2.setAttribute("aria-expanded",String(iOpen)); it2.setAttribute("aria-label","오늘 중보기도 "+(iOpen?"접기":"펼치기"));
-      it2.textContent="🤲 오늘 중보기도"+(ipk.length?"  "+ipk.filter(function(x){return x.log.indexOf(dlDay)>=0}).length+"/"+ipk.length:"");
+      var iOpen=fq||!dlGFold.has("__ic"); it2.setAttribute("aria-expanded",String(iOpen)); it2.setAttribute("aria-label","오늘 기도제목 "+(iOpen?"접기":"펼치기"));
+      it2.textContent="🙏 오늘 기도제목"+(ipk.length?"  "+ipk.filter(function(x){return x.log.indexOf(dlDay)>=0}).length+"/"+ipk.length:"");
       if(fq)dlMarkIn(it2,fq);
       var ich=document.createElement("span"); ich.className="dlgchev"; ich.setAttribute("aria-hidden","true"); it2.appendChild(ich);
       ih.appendChild(it2);
