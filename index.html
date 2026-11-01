@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-mq-onebtn">
+<meta name="app-build" content="2026-11-01-mq-align">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4067,6 +4067,10 @@ body.carddrag #reviewBar{display:none!important}
 .medqsheet .mqdel.sure{color:var(--pink);border-color:color-mix(in srgb,var(--pink) 55%,#45434F)!important}
 .medqsheet .mqfold.sure{width:auto;padding:0 10px;color:var(--pink)!important;border-color:color-mix(in srgb,var(--pink) 55%,#45434F)!important;font:inherit;font-size:11.5px;font-weight:700;white-space:nowrap}
 .medqsheet .mqfold.sure::before{display:none}
+/* 질문 머리 줄 수평 정렬: ⠿·질문 첫 줄·접기 단추의 가운데를 한 줄에 (2026-11-01 사용자 요청) */
+.medqsheet .mqcgrip{margin-top:0;align-self:flex-start;height:31px;line-height:31px}
+.medqsheet .mqq>.mqfold{align-self:flex-start;margin-top:3.5px}
+.medqsheet .mqq>.mqsaved{align-self:flex-start;line-height:31px}
 .mqfold{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 .medqsheet .dlnext:disabled{opacity:.4;box-shadow:none!important}
 .medqsheet .mqadd{background-color:#3A3220!important;border:1px solid #6B5A30!important}
