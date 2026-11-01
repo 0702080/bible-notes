@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-srm-fold">
+<meta name="app-build" content="2026-11-01-prog-full">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -827,6 +827,7 @@ html,body,button,input,textarea,select{font-family:"Binggrae","Noto Sans KR","Ap
 .fabplus{font-size:24px;line-height:1;font-weight:500;margin-top:-2px}
 .sheet{position:fixed;inset:0;z-index:45}
 .sheet[hidden]{display:none}
+@media (max-width:899px){#topicSheet.tsfull .sheetpanel{top:0;max-height:none;border-radius:0;border-top:0;padding-top:calc(14px + env(safe-area-inset-top,0px))}#topicSheet.tsfull .sheetpanel::before{display:none}}
 .sheetback{position:absolute;inset:0;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}   /* 뒤 화면은 뿌옇게 (2026-10-24 사용자 요청) */
 #addSheet.mtbig .sheetpanel{bottom:auto;border-radius:0}
 #addSheet.mtbig #mText{resize:none;overflow-y:auto}
@@ -1092,7 +1093,7 @@ body.reorder .note .topics{display:none}
 .pgmini i{display:block;height:100%;border-radius:3px;background:var(--rc);transition:width .5s ease-out}
 .pgrow .pgbs{gap:6px;justify-content:flex-start}
 .pgrow .pgb{width:22px;height:22px;border:1.5px dashed color-mix(in srgb,var(--rc) 30%,#3A3940)}
-.pgrow .pgb.got{border:0;background:radial-gradient(circle at 35% 30%,#FFF1C4,var(--gold) 55%,#C98A1B);background-color:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 40%,transparent);animation:pgbPop .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(var(--i)*50ms);opacity:1}
+.pgrow .pgb.got{border:0;background:radial-gradient(circle at 35% 30%,#FFF1C4,var(--gold) 55%,#C98A1B);background-color:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 40%,transparent);animation:none!important;opacity:1;transform:none}
 @keyframes pgbPop{from{transform:scale(.3)}to{transform:scale(1)}}
 .pgrow.full{border-color:color-mix(in srgb,var(--mint) 40%,#2A2933);background:linear-gradient(180deg,color-mix(in srgb,var(--mint) 12%,#1A1A20),#15151A)}
 .pgrow.full::before,.pgrow.full .pgmini i{background:linear-gradient(180deg,var(--mint),var(--green))}
@@ -8091,8 +8092,8 @@ body.carddrag #reviewBar{display:none!important}
     box.hidden=!n.topics.length;
   }
   var ts={mode:"",nid:"",results:[]};
-  function openTS(title){$("tsTitle").textContent=title;$("topicSheet").hidden=false;$("fab").hidden=true;document.body.style.overflow="hidden"}
-  function closeTS(){$("topicSheet").classList.remove("tspick");$("topicSheet").hidden=true;$("fab").hidden=reorderMode;document.body.style.overflow="";ts.mode="";render()}
+  function openTS(title){$("topicSheet").classList.remove("tsfull");$("tsTitle").textContent=title;$("topicSheet").hidden=false;$("fab").hidden=true;document.body.style.overflow="hidden"}
+  function closeTS(){$("topicSheet").classList.remove("tspick","tsfull");$("topicSheet").hidden=true;$("fab").hidden=reorderMode;document.body.style.overflow="";ts.mode="";render()}
   $("tsClose").addEventListener("click",closeTS);
   $("tsBack").addEventListener("click",closeTS);
   function openPicker(nid){
@@ -8524,7 +8525,7 @@ body.carddrag #reviewBar{display:none!important}
   // 실천 배지: 작은 새싹 (실천 하나 = 싹 하나)
   var PGLEAF='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 13C12 8.5 8.6 6 4.5 6.2 4.3 10.4 7.3 13 12 13Z"/><path d="M12 11c0-4.2 3-7 7.5-7 .2 4.6-3 7-7.5 7Z"/></svg>';
   function openProg(){
-    ts.mode="prog"; openTS("실천 진도표");
+    ts.mode="prog"; openTS("실천 진도표"); $("topicSheet").classList.add("tsfull");   // 위 여백 없이 화면 맨 위까지 (2026-11-01 사용자 요청)
     var body=$("tsBody"); body.textContent="";
     var arr=sorted().map(function(n){return {n:n,st:actStats(n)}}).filter(function(x){return x.st.total});
     var T=0,D=0; arr.forEach(function(x){T+=x.st.total;D+=x.st.done});
