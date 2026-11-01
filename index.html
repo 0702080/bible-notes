@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-step-blink2">
+<meta name="app-build" content="2026-11-01-ref-toggle">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9089,7 +9089,7 @@ body.carddrag #reviewBar{display:none!important}
       });
       ccBox.querySelector(".ccvref").addEventListener("click",function(){   // 구절 이름을 누르면 "잠언 11장 3절"처럼 한 번에 읽어 줌 (2026-10-21 사용자 요청)
         var n0=C&&notes.get(C.id); if(!n0||!n0.ref)return; buzz(18);
-        if(this.classList.contains("rfhide")&&!this.classList.contains("rfshow")){this.classList.add("rfshow"); ccNumPlace(); return}   // 가린 이름은 한 번 누르면 보이기만 (읽어 주지 않음)
+        if(this.classList.contains("rfhide")){this.classList.toggle("rfshow"); ccNumPlace(); return}   // 떠올리기에서는 누를 때마다 ○○○ ↔ 구절 이름 (읽어 주지 않음, 2026-11-01 사용자 요청)
         var rfb=this; rfb.classList.remove("rfhit"); void rfb.offsetWidth; rfb.classList.add("rfhit"); clearTimeout(rfb._rfT); rfb._rfT=setTimeout(function(){rfb.classList.remove("rfhit")},650);
         sayWord(refSay(n0.ref),true);
       });
