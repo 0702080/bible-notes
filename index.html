@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-actsvg">
+<meta name="app-build" content="2026-11-02-shiftflip">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1982,7 +1982,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcpal button.on{border-color:#fff}
 .bcpal button.auto{width:auto;height:26px;padding:0 10px;border-radius:13px;border:1px solid #3A3842;background:transparent;box-shadow:none;color:var(--muted);font-family:inherit;font-size:12px}
 .bcpal button.auto.on{border-color:var(--ink);color:var(--ink)}
-.bcol.bflipable .bclist,.bcol.bflipable .bcback{cursor:pointer}
+.bcol.bflipable .bcback{cursor:pointer}
 .bcol.bflipout{transform:perspective(1400px) rotateY(90deg);transition:transform .17s ease-in!important}
 .bcol.bflipin{animation:bflipin .26s cubic-bezier(.2,.8,.3,1.15)}
 @keyframes bflipin{from{transform:perspective(1400px) rotateY(-90deg)}}
@@ -4862,7 +4862,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
       var bk=document.createElement("div"); bk.className="bcback";
       var have=0, rows=ls.map(function(x){var h=kbBackHas(x[0]); if(h)have++;
         return '<div class="bcbk'+(h?' has':'')+'"><b></b><span></span></div>'});
-      bk.innerHTML='<p class="bcbkh">🔄 기도에 관한 다른 말씀 <em></em></p>'+rows.join("")+'<p class="bcbkf">누르면 앞면으로 · 본문은 직접 담아 주세요</p>';
+      bk.innerHTML='<p class="bcbkh">🔄 기도에 관한 다른 말씀 <em></em></p>'+rows.join("")+'<p class="bcbkf">Shift+클릭하면 앞면으로 · 본문은 직접 담아 주세요</p>';
       bk.querySelector(".bcbkh em").textContent=ls.length+"곳"+(have?" · ✓ "+have+" 담음":"");
       var it=bk.querySelectorAll(".bcbk"); ls.forEach(function(x,i){it[i].querySelector("b").textContent=x[0]; it[i].querySelector("span").textContent=x[1]});
       cl.insertBefore(bk,cl.querySelector(".bcjump"));
@@ -4875,18 +4875,18 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
     setTimeout(function(){cl.classList.remove("bflipout"); cl.classList.toggle("bback",kbBackOn[k]); void cl.offsetWidth; cl.classList.add("bflipin");
       setTimeout(function(){cl.classList.remove("bflipin")},260)},170);
   }
-  // 한 번 누르면 뒤집기, 두 번 누르면(카드 위) 자세히 보기
+  // 시프트 누른 채 칸을 클릭하면 앞면·뒷면 뒤집기 — 그냥 클릭은 다른 칸처럼 카드 열기 (2026-11-02 사용자 요청: 뒤집기 아이콘 없앰)
   $("board").addEventListener("click",function(e){
     if(bMode!=="list")return;
     var cl=e.target.closest(".bcol.bflipable"); if(!cl||cl.classList.contains("bfold"))return;
-    if(e.target.closest(".bcflipb")){e.stopPropagation(); e.preventDefault(); kbFlip(cl); return}   // 머리의 🔄 단추로도 뒤집기
-    if(e.target.closest("button,input,textarea,a,.bch,.bcpal"))return;
+    if(e.target.closest("button,input,textarea,a,.bcpal"))return;
+    if(!e.shiftKey){if(cl.classList.contains("bback")&&!e.target.closest(".bch")){e.stopPropagation(); toast("Shift를 누른 채 클릭하면 앞면으로 돌아가요")} return}
     e.stopPropagation(); e.preventDefault();
-    var cd=cl.classList.contains("bback")?null:e.target.closest(".bcard");
-    if(kbTapT&&cd&&kbTapCard===cd){clearTimeout(kbTapT); kbTapT=0; kbTapCard=null; boardOpen(cd.dataset.id); return}
-    if(kbTapT){clearTimeout(kbTapT)}
-    kbTapCard=cd; kbTapT=setTimeout(function(){kbTapT=0; kbTapCard=null; if(cl.isConnected)kbFlip(cl)},cd?280:0);
+    try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
+    kbFlip(cl);
   },true);
+  // 시프트+클릭할 때 글자가 긁혀 선택되지 않게
+  $("board").addEventListener("mousedown",function(e){if(e.shiftKey&&e.target.closest(".bcol.bflipable"))e.preventDefault()});
   /* 한 마디 칸: 시프트+엔터 = 바로 아래 줄로 (2026-11-01 사용자 요청). 한글 조합 중에 눌러도 줄바꿈이 사라지거나 두 번 들어가지 않게 직접 넣음 */
   (function(){
     var pend=null, lastAt=0;
@@ -4964,7 +4964,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
     var cur=kbTintMap()[col.dataset.k], p=document.createElement("div"); p.className="bcpal";
     p.innerHTML=KBCOL.map(function(c,i){return '<button type="button" data-c="'+i+'" style="--sw:'+c+'"'+(cur===i?' class="on"':'')+' aria-label="색 '+(i+1)+'"></button>'}).join("")+
       '<button type="button" data-c="" class="auto'+(cur==null?' on':'')+'">자동</button>'+
-      '<div class="bcacts">'+(col.classList.contains("bflipable")?'<button type="button" data-act="flip"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3.5V8h4.5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20.5V16h-4.5"/></svg>뒤집기</button>':'')+
+      '<div class="bcacts">'+(false?'<button type="button" data-act="flip"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3.5V8h4.5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20.5V16h-4.5"/></svg>뒤집기</button>':'')+
       '<button type="button" data-act="name"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>이름</button>'+(col.querySelector(".bcdel")?'<button type="button" data-act="del"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>칸 지우기</button>':'')+'</div>';
     col.querySelector(".bch").insertAdjacentElement("afterend",p);
   },true);
