@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-srm-gold">
+<meta name="app-build" content="2026-11-01-srm-mic">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6396,17 +6396,19 @@ body.carddrag #reviewBar{display:none!important}
     var ta=null, rec=null, on=false, base=0, interim="";
     function place(){
       if(!ta||!ta.isConnected){hide();return}
-      var r=ta.getBoundingClientRect();
+      // 설교 메모처럼 한 줄씩 작은 칸으로 나뉜 곳은 줄 칸이 아니라 줄들을 담은 큰 칸 기준으로 (작은 칸은 48px가 안 돼 마이크가 숨던 문제, 2026-11-01)
+      var box=ta.closest(".srmlines")||ta;
+      var r=box.getBoundingClientRect();
       if(r.bottom<0||r.top>innerHeight||!r.width){mic.hidden=true;return}
       // 글 칸을 감싼 굴러가는 칸(창 몸통 등)에서 보이는 부분만: 칸이 위 머리 줄 밑으로 들어가면 마이크도 숨김 (2026-11-01 사용자 요청)
       var vt=Math.max(0,r.top), vb=Math.min(innerHeight,r.bottom);
-      for(var pe=ta.parentElement;pe&&pe!==document.body;pe=pe.parentElement){
+      for(var pe=box.parentElement;pe&&pe!==document.body;pe=pe.parentElement){
         var ov=getComputedStyle(pe).overflowY; if(ov!=="auto"&&ov!=="scroll"&&ov!=="hidden")continue;
         var pr=pe.getBoundingClientRect(); vt=Math.max(vt,pr.top); vb=Math.min(vb,pr.bottom);
       }
       if(vb-vt<48){mic.hidden=true;return}
       mic.hidden=false;
-      var cs=getComputedStyle(ta), sbw=Math.max(0,ta.offsetWidth-ta.clientWidth-(parseFloat(cs.borderLeftWidth)||0)-(parseFloat(cs.borderRightWidth)||0));   // 스크롤바가 있으면 그 왼쪽에
+      var cs=getComputedStyle(box), sbw=Math.max(0,box.offsetWidth-box.clientWidth-(parseFloat(cs.borderLeftWidth)||0)-(parseFloat(cs.borderRightWidth)||0));   // 스크롤바가 있으면 그 왼쪽에
       mic.style.left=Math.min(innerWidth-48,r.right-46-sbw)+"px";
       mic.style.top=Math.max(vt+4,Math.min(innerHeight-48,vb-48))+"px";
     }
