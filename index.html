@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-srm-color">
+<meta name="app-build" content="2026-11-01-subdel">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4167,6 +4167,8 @@ body.carddrag #reviewBar{display:none!important}
       tw:(function(o){var r={};if(o&&typeof o==="object"&&!Array.isArray(o)){Object.keys(o).slice(0,20).forEach(function(k){if(Array.isArray(o[k]))r[String(k).slice(0,20)]=o[k].map(String).map(function(w){return w.trim()}).filter(Boolean).slice(0,8)})}return r})(n.tw),
       links:Array.isArray(n.links)?n.links.filter(function(l){return l&&String(l.ref||"").trim()}).slice(0,60).map(function(l){var o={id:String(l.id||("k"+linkKey(l.ref))),ref:String(l.ref).trim().slice(0,40),memo:String(l.memo||"").trim().slice(0,1000)};if(+l.at>0)o.at=+l.at;return o}):[],
       // 지운 연결 기록 {구절키: 지운 시각} — 다른 기기·GitHub와 합칠 때 지운 연결이 되살아나지 않게 (2026-10-23)
+      // 지운 묵상·기도·질문 등 하위 항목 기록 {항목 id: 지운 시각} — 다른 기기·클라우드와 합칠 때 되살아나지 않게 (2026-11-01, 지운 SOAP가 자꾸 다시 생기던 문제)
+      subDel:(function(o){var r={};if(o&&typeof o==="object"&&!Array.isArray(o))Object.keys(o).filter(function(k){return +o[k]>0}).sort(function(a,b){return o[b]-o[a]}).slice(0,400).forEach(function(k){r[String(k).slice(0,60)]=+o[k]});return r})(n.subDel),
       linkDel:(function(o){var r={};if(o&&typeof o==="object"&&!Array.isArray(o))Object.keys(o).filter(function(k){return +o[k]>0}).sort(function(a,b){return o[b]-o[a]}).slice(0,150).forEach(function(k){r[String(k).slice(0,60)]=+o[k]});return r})(n.linkDel),
       topics:Array.isArray(n.topics)?n.topics.map(function(t){return String(t).replace(/^#+/,"").trim().slice(0,20)}).filter(function(t,i,a){return t&&a.indexOf(t)===i}).slice(0,12):[],
       createdAt:+n.createdAt||Date.now(),updatedAt:+n.updatedAt||+n.createdAt||0};
@@ -5828,7 +5830,7 @@ body.carddrag #reviewBar{display:none!important}
     // 내용이 하나도 없는 묵상은 접혀 있으면 아예 지움 — 적는 중(펼쳐져 있거나 글 칸에 커서)인 것은 그대로 (2026-10-30 사용자 요청)
     var mEmpty=function(m){return !String(m.text||"").trim()&&!String(m.thx||"").trim()&&!String(m.todo||"").trim()};
     var mGone=n.meds.filter(function(m){if(!mEmpty(m)||!medFold.has(m.id))return false; var dd=mhave.get(m.id); return !(dd&&dd.contains(document.activeElement))});
-    if(mGone.length){n.meds=n.meds.filter(function(m){return mGone.indexOf(m)<0}); mGone.forEach(function(m){medFold.delete(m.id)}); setTimeout(function(){scheduleSave(n.id)},0)}
+    if(mGone.length){subFilter(n,"meds",function(m){return mGone.indexOf(m)<0}); mGone.forEach(function(m){medFold.delete(m.id)}); setTimeout(function(){scheduleSave(n.id)},0)}
     var chrono=n.meds.slice().sort(function(a,b){return a.at-b.at});
     medOrder(n.meds).forEach(function(m,i){
       var d=mhave.get(m.id); if(!d)d=makeMed(m); mhave.delete(m.id);
@@ -6216,7 +6218,7 @@ body.carddrag #reviewBar{display:none!important}
       if(it.isConnected&&it.contains(document.activeElement))return;
       var n=notes.get(card.dataset.id); if(!n||!n.meds)return;
       var m=n.meds.find(function(x){return x.id===it.dataset.mid}); if(!m||!soapEmpty(m.text))return;
-      n.meds=n.meds.filter(function(x){return x!==m}); render(); scheduleSave(n.id);
+      subFilter(n,"meds",function(x){return x!==m}); render(); scheduleSave(n.id);
     },200);
   });
   list.addEventListener("click",function(e){
@@ -7109,7 +7111,7 @@ body.carddrag #reviewBar{display:none!important}
         return;
       }
       if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="지우기"}},4000);return}
-      n.prays=n.prays.filter(function(x){return x.id!==pid}); render(); scheduleSave(id); return;
+      subFilter(n,"prays",function(x){return x.id!==pid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("addm")){
       var soap=b.classList.contains("soapm"), nm={id:mid(),text:soap?SOAP_TPL:"",at:Date.now()};
@@ -7121,7 +7123,7 @@ body.carddrag #reviewBar{display:none!important}
     if(b.classList.contains("delm")){
       var md=b.closest(".medi"), mm=n.meds.find(function(x){return x.id===md.dataset.mid});
       if(mm&&mm.text.trim()&&!b.dataset.sure){b.dataset.sure="1";b.textContent="한 번 더 누르면 지워져요";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="지우기"}},3000);return}
-      n.meds=n.meds.filter(function(x){return x.id!==md.dataset.mid}); render(); scheduleSave(id); return;
+      subFilter(n,"meds",function(x){return x.id!==md.dataset.mid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("addq")){
       var q={id:qid(),q:"",a:""}; n.qs.unshift(q); render(); scheduleSave(id);   // 새 질문은 맨 위에
@@ -7131,7 +7133,7 @@ body.carddrag #reviewBar{display:none!important}
     if(b.classList.contains("delq")){
       var qa=b.closest(".qa"); var qq=n.qs.find(function(x){return x.id===qa.dataset.qid});
       if(qq&&(qq.q.trim()||qq.a.trim())&&!b.dataset.sure){b.dataset.sure="1";b.textContent="?";b.setAttribute("aria-label","한 번 더 누르면 질문이 지워져요");setStatus("한 번 더 누르면 질문과 답이 지워져요.");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.setAttribute("aria-label","질문 삭제")}},3000);return}
-      n.qs=n.qs.filter(function(x){return x.id!==qa.dataset.qid}); render(); scheduleSave(id); return;
+      subFilter(n,"qs",function(x){return x.id!==qa.dataset.qid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("exportone")){
       b.closest("details").open=false;
@@ -7160,7 +7162,7 @@ body.carddrag #reviewBar{display:none!important}
     }
     if(b.classList.contains("fruitdel")){
       if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
-      var fid=b.closest("li").dataset.fid; n.fruits=(n.fruits||[]).filter(function(x){return x.id!==fid}); render(); scheduleSave(id); return;
+      var fid=b.closest("li").dataset.fid; subFilter(n,"fruits",function(x){return x.id!==fid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("adde")){
       tabOf.set(id,"e"); var ne={id:qid(),title:"",body:"",at:Date.now()}; n.essays.push(ne); render(); scheduleSave(id);
@@ -7177,7 +7179,7 @@ body.carddrag #reviewBar{display:none!important}
     if(b.classList.contains("edel")){
       var eid=b.closest(".es").dataset.eid, ex=n.essays.find(function(x){return x.id===eid});
       if(ex&&(ex.title.trim()||ex.body.trim())&&!b.dataset.sure){b.dataset.sure="1";b.textContent="정말 지울까요?";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="지우기"}},3000);return}
-      n.essays=n.essays.filter(function(x){return x.id!==eid}); render(); scheduleSave(id); return;
+      subFilter(n,"essays",function(x){return x.id!==eid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("addh")){
       tabOf.set(id,"r"); var nh={id:qid(),no:null,sure:true,title:"",why:"",imgs:[],sheets:[]}; n.hymns.push(nh); hyOpen.add(nh.id); hyEdit.add(nh.id); render(); scheduleSave(id);
@@ -7251,7 +7253,7 @@ body.carddrag #reviewBar{display:none!important}
     if(b.classList.contains("dels")){
       var sid=b.closest(".sermi").dataset.sid, sx=n.serms.filter(function(x){return x.id===sid})[0];
       if(sx&&sx.t.trim()&&!b.dataset.sure){b.dataset.sure="1";b.textContent="정말 지울까?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.classList.remove("sure")}},3000);return}
-      n.serms=n.serms.filter(function(x){return x.id!==sid}); render(); scheduleSave(id); return;
+      subFilter(n,"serms",function(x){return x.id!==sid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("addv")){
       var vf=card.querySelector(".vform"); vf.hidden=false; vf.querySelector(".vmsg").textContent="";
@@ -7265,7 +7267,7 @@ body.carddrag #reviewBar{display:none!important}
       n.vids.push({id:qid(),url:url,title:ttl}); vf2.hidden=true; render(); scheduleSave(id); return;
     }
     if(b.classList.contains("delv")){
-      var vid=b.closest(".vd").dataset.vid; n.vids=n.vids.filter(function(x){return x.id!==vid}); render(); scheduleSave(id); return;
+      var vid=b.closest(".vd").dataset.vid; subFilter(n,"vids",function(x){return x.id!==vid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("chip")){
       if(b.classList.contains("s"))n.acts.unshift({id:qid(),t:b.textContent,done:false});
@@ -7417,12 +7419,12 @@ body.carddrag #reviewBar{display:none!important}
     if(b.classList.contains("adel")){
       var dd=b.closest(".act");
       if(!b.dataset.sure){b.dataset.sure="1";b.classList.add("sure");b.textContent="한 번 더 누르면 지워져요";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.classList.remove("sure");b.textContent="이 실천 지우기"}},3000);return}
-      n.acts=n.acts.filter(function(x){return x.id!==dd.dataset.aid}); aOpen.delete(dd.dataset.aid); saveAFold(); toast("실천을 지웠어요"); render(); scheduleSave(id); return;
+      subFilter(n,"acts",function(x){return x.id!==dd.dataset.aid}); aOpen.delete(dd.dataset.aid); saveAFold(); toast("실천을 지웠어요"); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("dela")){
       var ad=b.closest(".act"), ax=n.acts.find(function(x){return x.id===ad.dataset.aid});
       if(ax&&ax.t.trim()&&!b.dataset.sure){b.dataset.sure="1";b.textContent="?";b.setAttribute("aria-label","한 번 더 누르면 지워져요");setStatus("한 번 더 누르면 이 실천이 지워져요.");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="×";b.setAttribute("aria-label","실천 삭제")}},3000);return}
-      n.acts=n.acts.filter(function(x){return x.id!==ad.dataset.aid}); render(); scheduleSave(id); return;
+      subFilter(n,"acts",function(x){return x.id!==ad.dataset.aid}); render(); scheduleSave(id); return;
     }
   });
 
@@ -15231,7 +15233,7 @@ body.carddrag #reviewBar{display:none!important}
         var b=this, r=erRef; if(!r)return;
         if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="🗑";b.classList.remove("sure")}},3000);return}
         delete b.dataset.sure; b.textContent="🗑"; b.classList.remove("sure");
-        var nn=notes.get(r.nid); if(nn){nn.essays=nn.essays.filter(function(x){return x.id!==r.eid}); scheduleSave(nn.id)}
+        var nn=notes.get(r.nid); if(nn){subFilter(nn,"essays",function(x){return x.id!==r.eid}); scheduleSave(nn.id)}
         closeEssayReader(); render(); toast("경험을 지웠어요");
       });
       er.querySelector(".erlg").addEventListener("click",function(){setErSize(erSize+2)});
@@ -15917,6 +15919,13 @@ body.carddrag #reviewBar{display:none!important}
   }
 
   // 두 기기의 같은 말씀 합치기: 글자·설정은 더 최근 것, 목록(묵상·기도·실천·질문·경험·연결)은 id로 모두 모음
+  // 하위 항목 지우기: 지운 항목 id를 n.subDel에 적어 둠 → mergeNote에서 되살리지 않음 (2026-11-01)
+  function subFilter(n,key,fn){
+    var before=Array.isArray(n[key])?n[key]:[], after=before.filter(fn), keep={}, t=Date.now();
+    after.forEach(function(x){if(x&&x.id)keep[x.id]=1});
+    before.forEach(function(x){if(x&&x.id&&!keep[x.id]){if(!n.subDel||typeof n.subDel!=="object")n.subDel={}; n.subDel[x.id]=t}});
+    n[key]=after; return after;
+  }
   function unionBy(older,newer,key,mergeItem){
     var out=[], at={};
     (newer||[]).forEach(function(x){var k=key(x);at[k]=out.length;out.push(x)});
@@ -15952,6 +15961,8 @@ body.carddrag #reviewBar{display:none!important}
     if((older.drill||[]).length){var seen={};m.drill=(newer.drill||[]).concat(older.drill).filter(function(d){var k=d.at+"|"+d.b;if(seen[k])return false;seen[k]=1;return true}).sort(function(a,b){return a.at-b.at}).slice(-300)}
     m.topics=(newer.topics||[]).concat((older.topics||[]).filter(function(t){return (newer.topics||[]).indexOf(t)<0}));
     m.mcnt=Math.max(+older.mcnt||0,+newer.mcnt||0);
+    var sd={}; [older.subDel,newer.subDel].forEach(function(o){if(o)Object.keys(o).forEach(function(k){if(!(sd[k]>=+o[k]))sd[k]=+o[k]})});
+    m.subDel=sd; ["meds","prays","qs","essays","fruits","vids","serms","acts"].forEach(function(k){if(Array.isArray(m[k]))m[k]=m[k].filter(function(x){return !(x&&sd[x.id])})});   // 지운 항목은 합쳐도 되살리지 않음
     m.updatedAt=Math.max(older.updatedAt||0,newer.updatedAt||0);
     return cleanNote(m);
   }
