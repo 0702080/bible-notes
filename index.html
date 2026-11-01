@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-step-blink">
+<meta name="app-build" content="2026-11-01-step-blink2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2369,8 +2369,8 @@ button:active{filter:brightness(1.15)}
 .ccst:not(:last-child)::after{content:"";position:absolute;top:12px;left:calc(50% + 17px);right:calc(-50% + 15px);height:2px;border-radius:1px;background:#2A2930;transition:background .4s}
 .ccst.done:not(:last-child)::after{background:linear-gradient(90deg,var(--green),color-mix(in srgb,var(--green) 55%,#2A2930))}
 .ccst.done.just i{animation:ccpop .55s cubic-bezier(.2,1.6,.4,1)}
-.ccst.now i{animation:ccpulse 1.8s ease-in-out infinite,ccblink 2.2s ease-in-out infinite}
-.ccst.now span{animation:ccblink 2.2s ease-in-out infinite}   /* 지금 단계(숫자·이름)가 부드럽게 흐려졌다 밝아지며 깜빡임 (2026-11-01 사용자 요청) */
+.ccst.now i{animation:ccpulse 1.8s ease-in-out infinite,ccblink 1.98s ease-in-out infinite}
+.ccst.now span{animation:ccblink 1.98s ease-in-out infinite}   /* 지금 단계(숫자·이름)가 부드럽게 흐려졌다 밝아지며 깜빡임 (2026-11-01 사용자 요청) */
 @keyframes ccblink{0%,100%{opacity:1}50%{opacity:.3}}
 @media (prefers-reduced-motion:reduce){.ccst.now i,.ccst.now span{animation:none}}
 @keyframes ccpop{0%{transform:scale(.3) rotate(-30deg)}65%{transform:scale(1.3)}100%{transform:none}}
