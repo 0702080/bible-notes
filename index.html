@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-glass">
+<meta name="app-build" content="2026-11-02-bkfit2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2012,22 +2012,21 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.blocked .bch b::after{content:" 📌";font-size:11px;vertical-align:1px}
 .bcol.blocked .bch{cursor:default}
 /* 뒷면 카드는 모두 같은 높이 — 뜻은 두 줄까지 (2026-11-02 사용자 요청) */
-.bcbk{flex:0 0 auto;height:var(--bkh,84px);box-sizing:border-box;justify-content:flex-start;overflow:hidden;transition:height .14s,transform .14s,border-color .14s,box-shadow .14s}
+.bcbk{flex:0 0 auto;height:auto;box-sizing:border-box;justify-content:flex-start;overflow:hidden;transition:transform .14s,border-color .14s,box-shadow .14s}
 /* 칸반 카드를 끌 때 글자가 긁혀 선택되지 않게 (2026-11-02 사용자 요청) */
 body.boardon #board .bcard,body.boardon #board .bch,body.boardon #board .bcbk{-webkit-user-select:none;user-select:none}
-.bcbkadd{display:block;width:100%;margin-top:auto;height:0;padding:0;border:0 solid color-mix(in srgb,var(--bc) 45%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--bc) 10%,transparent);color:var(--bc);font-family:inherit;font-size:13px;opacity:0;overflow:hidden;transition:height .14s,margin-top .14s,opacity .14s}
+.bcbkadd{display:block;width:100%;margin-top:-8px;height:0;padding:0;border:0 solid color-mix(in srgb,var(--bc) 45%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--bc) 10%,transparent);color:var(--bc);font-family:inherit;font-size:13px;opacity:0;overflow:hidden;transition:height .14s,margin-top .14s,opacity .14s}
 @media (hover:hover){
-  .bcbk:not(.has):hover{height:calc(var(--bkh,84px) + 42px)}
   .bcbk:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--bc) 50%,#2A2930);box-shadow:0 10px 24px rgba(0,0,0,.45)}
-  .bcbk:hover .bcbkadd{height:32px;margin-top:10px;border-width:1px;opacity:1}
+  .bcbk:hover .bcbkadd{height:32px;margin-top:2px;border-width:1px;opacity:1}
   .bcbkadd:hover{background:color-mix(in srgb,var(--bc) 20%,transparent)}
 }
-@media (hover:none){.bcbkadd{height:32px;margin-top:10px;border-width:1px;opacity:1}.bcbk:not(.has){height:calc(var(--bkh,84px) + 42px)}}
+@media (hover:none){.bcbkadd{height:32px;margin-top:2px;border-width:1px;opacity:1}}
 .bcbk b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bcbk span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.bcbk span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 .bcback .bcbk{padding:12px 14px;gap:8px}   /* 앞면 말씀 카드처럼 */
 .bcback .bcbk b{font-size:14.5px}
-.bcback .bcbk span{color:var(--ink);font-size:14.5px;line-height:1.6}
+.bcback .bcbk span{color:var(--ink);font-size:14.5px;line-height:1.6;min-height:3.2em}   /* 뜻은 늘 두 줄 자리 → 카드 높이가 모두 같음 */
 .bcback .bcbk.has span{color:var(--muted)}
 /* 칸 이름은 자르지 않고 다 보이게 — 길면 두 줄로 (2026-11-02 사용자 요청) */
 .bcol.btint .bch{align-items:flex-start}
