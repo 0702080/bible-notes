@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-ic-title">
+<meta name="app-build" content="2026-11-01-ic-newtop">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -11069,7 +11069,8 @@ body.carddrag #reviewBar{display:none!important}
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(e){if(dlIcD&&dlIcD.on&&e.pointerId===dlIcD.pid)return; end(e)});
     document.addEventListener("touchend",function(e){if(dlIcD&&dlIcD.on)end(e)});
   })();
-  function icOrd(a,b){var oa=a.ord==null?1e12+a.at:a.ord, ob=b.ord==null?1e12+b.at:b.ord; return oa-ob}
+  // 새로 넣은 기도제목(끌어 옮긴 적 없는 것)은 맨 위, 가장 최근 것부터 (2026-11-01 사용자 요청)
+  function icOrd(a,b){var oa=a.ord==null?-1e15-a.at:a.ord, ob=b.ord==null?-1e15-b.at:b.ord; return oa-ob}
   document.addEventListener("pointerdown",function(e){
     var g=e.target.closest&&e.target.closest(".icgrip"); if(!g||!icv||icv.hidden)return;
     var c=g.closest(".icp"); if(!c)return;
