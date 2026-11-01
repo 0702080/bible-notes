@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-rm-3dfoot">
+<meta name="app-build" content="2026-11-01-cc-editlay2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2314,6 +2314,8 @@ button:active{filter:brightness(1.15)}
 .cctip b{color:var(--ink);font-size:16px}
 .ccmid{flex:1 1 auto;min-height:0;display:grid;place-items:center;width:100%}   /* 말씀을 화면 한가운데로 (2026-10-18 사용자 요청) */
 .ccverse.ccediting{white-space:pre-wrap;outline:none;cursor:text;caret-color:var(--gold);color:var(--hi);min-width:280px}
+/* 고치기 칸의 줄 배치를 외우기 화면과 똑같이 (2026-11-01 사용자 요청): 낱말 칸은 좌우 4px 여백이 있어 낱말 사이가 8px 더 넓음 → 같은 폭·같은 낱말 간격 */
+.ccverse.ccediting{width:100%;box-sizing:border-box;padding-left:4px!important;padding-right:4px!important;word-spacing:8px;-webkit-text-stroke:.75px currentColor;paint-order:stroke fill}
 .ccverse{font-family:var(--serif);font-size:21px;line-height:2;color:var(--orange);word-break:keep-all}
 /* 받아쓰기 (2026-10-18 사용자 요청) */
 .ccdict{position:relative;width:100%;box-sizing:border-box;min-height:120px;padding:14px 16px 16px;border:1px solid color-mix(in srgb,var(--gold) 35%,#2E2D33);border-radius:14px;background:#101013;cursor:text}
@@ -9518,7 +9520,7 @@ body.carddrag #reviewBar{display:none!important}
   }
   function ccEditForm(n,tip,btn){   // 상자 없이 말씀 자리에서 그대로 고친다 (2026-10-18 사용자 요청)
     var v=ccBox.querySelector(".ccverse");
-    v.textContent=""; v.classList.remove("big","recall","vnum","vlines");
+    v.textContent=""; v.classList.remove("recall","vnum","vlines"); v.classList.toggle("big",C.stage<4);   // 글자 크기도 외우기 화면과 같게
     tip.innerHTML="<b>✏️ 문장 고치기</b><br>엔터로 줄을 나누면 그대로 외우기 화면에 나와요.";
     v.classList.add("ccediting");
     v.setAttribute("contenteditable","plaintext-only");
@@ -9556,7 +9558,7 @@ body.carddrag #reviewBar{display:none!important}
     if(vw){
       var res=vw.classList.contains("ccresult");
       vw.style.paddingLeft="";
-      if(!res&&fb&&fb.offsetWidth){var dx=Math.round(fb.getBoundingClientRect().left-vw.getBoundingClientRect().left);if(dx>0&&dx<120)vw.style.paddingLeft=dx+"px"}
+      if(!res&&!(C&&C.edit)&&fb&&fb.offsetWidth){var dx=Math.round(fb.getBoundingClientRect().left-vw.getBoundingClientRect().left);if(dx>0&&dx<120)vw.style.paddingLeft=dx+"px"}
     }
     // 단계 줄(읽기…떠올리기): 1단계 동그라미 왼쪽 끝 = 말씀 왼쪽 줄, 4단계 오른쪽 끝 = 아래 마지막 단추 오른쪽 끝 (2026-10-23 사용자 요청)
     var stp=ccBox.querySelector(".ccsteps"), fbs=ccBox.querySelectorAll(".ccfoot button"), lb=fbs[fbs.length-1];
