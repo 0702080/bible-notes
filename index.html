@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-dl3">
+<meta name="app-build" content="2026-11-02-fkeys">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3964,6 +3964,10 @@ body.carddrag #reviewBar{display:none!important}
 .dlfhd b{font-size:18px;color:var(--gold)}
 .dlfhd span{font-size:13px;color:var(--green)}
 /* 🎯 집중: 위아래로 밀면 다른 묶음 (2026-10-30 사용자 요청) */
+.dlffoot{flex-wrap:wrap}
+.dlfkeys{flex:1 0 100%;display:flex;justify-content:center;flex-wrap:wrap;gap:14px;margin:10px 0 0;color:var(--muted);font-size:12px}
+.dlfkeys span{display:inline-flex;align-items:center;gap:3px}
+.dlfkeys kbd{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 4px;border:1px solid #3A3944;border-bottom-width:2px;border-radius:5px;background:#1B1A21;color:var(--ink);font-family:inherit;font-size:11px;line-height:1}
 .dlfgrp{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:-2px 0 2px;font-size:13px;color:var(--muted)}
 .dlfgrp b{color:var(--gc,var(--gold));font-size:14px}
 .dlfgrp i{font-style:normal;color:var(--faint);font-size:12px}
@@ -12576,6 +12580,16 @@ body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)
     setTimeout(swap,220+old.length*35);
     return true;
   }
+  // 🎯 집중 화면 키보드: ← → 다른 것, ↑ ↓ 다른 묶음, 1·2·3 그 칸 체크 (2026-11-02 사용자 요청)
+  var DP_KEYS=!!(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches);
+  document.addEventListener("keydown",function(e){
+    if(!dl||dl.hidden||!dlFocus||e.ctrlKey||e.metaKey||e.altKey||e.isComposing)return;
+    var t=e.target; if(t&&(t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.tagName==="SELECT"||t.isContentEditable))return;
+    var w=dl.querySelector(".dlfocus"); if(!w)return;
+    if(e.key==="ArrowLeft"||e.key==="ArrowRight"){if(!w.querySelector(".dlfnext"))return; e.preventDefault(); dlFocusGo(e.key==="ArrowRight"?1:-1); return}
+    if(e.key==="ArrowUp"||e.key==="ArrowDown"){if(!w.querySelector(".dlfgrp"))return; e.preventDefault(); dlFocusGroup(e.key==="ArrowDown"?1:-1); return}
+    if(/^[1-3]$/.test(e.key)){var its=w.querySelectorAll(".dlfit"), b=its[+e.key-1]; if(b){e.preventDefault(); var ck=b.querySelector(".dlfck"); if(ck)ck.click()}}
+  });
   var dlFocus=false, dlFocusSkip=0; try{dlFocus=localStorage.getItem("bible-dl-focus")==="1"}catch(e){}
   var dlCalM="", dlCalEat=0, dlCalFold=false; try{dlCalFold=localStorage.getItem("bible-dl-calfold")==="1"}catch(e){}
   function dlCalShift(n){   // 달 넘기기: 보는 달만 바뀌고, 고른 날은 그대로 (이번 달 너머는 못 감)
@@ -12783,7 +12797,7 @@ body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)
       if(fgs.length>1&&todo[st]){   // 지금 묶음 이름 + 위아래로 밀면 다른 묶음
         var gi=fgs.indexOf(todo[st].g), gl=document.createElement("div"); gl.className="dlfgrp"; gl.style.setProperty("--gc",todo[st].g.c);
         gl.innerHTML="<b></b><i></i>"; gl.querySelector("b").textContent=todo[st].g.e+" "+todo[st].g.t+"  "+(gi+1)+"/"+fgs.length;
-        gl.querySelector("i").textContent="↕ 위아래로 밀면 다른 묶음"; wrap.appendChild(gl);
+        gl.querySelector("i").textContent=DP_KEYS?"↑ ↓ 키 · 위아래로 밀면 다른 묶음":"↕ 위아래로 밀면 다른 묶음"; wrap.appendChild(gl);
       }
       pick.forEach(function(x){
         var b=document.createElement("button"); b.type="button"; b.className="dlfit"; b.dataset.fid=x.it.id; b.style.setProperty("--gc",x.g.c);
@@ -12794,6 +12808,11 @@ body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)
       var ft=document.createElement("div"); ft.className="dlffoot";
       if(todo.length>3){var nx=document.createElement("button"); nx.type="button"; nx.className="dlfnext"; nx.textContent="다른 것 보기 ↻"; ft.appendChild(nx)}
       var all=document.createElement("button"); all.type="button"; all.className="dlfoff"; all.textContent="전체 보기 ("+todo.length+"개 남음)"; ft.appendChild(all);
+      if(DP_KEYS&&(todo.length>3||fgs.length>1)){   // PC: 조작 방법 (2026-11-02 사용자 요청)
+        var kh=document.createElement("p"); kh.className="dlfkeys";
+        kh.innerHTML=(todo.length>3?'<span><kbd>←</kbd><kbd>→</kbd> 다른 것</span>':'')+(fgs.length>1?'<span><kbd>↑</kbd><kbd>↓</kbd> 다른 묶음</span>':'')+'<span><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> 체크</span>';
+        ft.appendChild(kh);
+      }
       wrap.appendChild(ft); list.appendChild(wrap);
       dlMoreDraw(o,0,0);
       return;
