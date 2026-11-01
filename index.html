@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-icadd-fix">
+<meta name="app-build" content="2026-11-01-srm-drag">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3073,6 +3073,8 @@ textarea.lhpad{padding-left:28px!important}
 .srmq{flex:1;min-width:0;height:40px;padding:0 14px;border:1px solid #2A2930;border-radius:20px;background:var(--sheet);color:var(--ink);font:inherit;font-size:14px}
 .srmq:focus{outline:none;border-color:var(--sky)}
 .srmlist{display:flex;flex-direction:column;gap:10px}
+.srmcard.srmcdrag{position:relative;z-index:5;scale:1.03;box-shadow:0 10px 28px rgba(0,0,0,.55),0 0 0 2px color-mix(in srgb,var(--sky) 60%,transparent);transition:scale .15s,box-shadow .15s}
+.srmlist>.srmcard{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .srmcard{display:block;width:100%;padding:13px 15px;border:1px solid color-mix(in srgb,var(--sky) 20%,#232229);border-left:3px solid color-mix(in srgb,var(--sky) 70%,transparent);border-radius:14px;background:color-mix(in srgb,var(--sky) 7%,#131317);color:var(--ink);font:inherit;text-align:left}
 .srmmeta{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:12.5px;color:var(--muted)}
 .srmmeta .srmd{color:var(--sky)}
@@ -10366,7 +10368,7 @@ body.carddrag #reviewBar{display:none!important}
     if(!o.del||typeof o.del!=="object")o.del={};
     o.items=o.items.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),d:/^\d{4}-\d{2}-\d{2}$/.test(x.d||"")?x.d:dkey(+x.at||Date.now()),
       who:String(x.who||"").slice(0,60),title:String(x.title||"").slice(0,200),ref:String(x.ref||"").slice(0,120),nid:String(x.nid||""),
-      body:String(x.body||"").slice(0,40000),apply:String(x.apply||"").slice(0,8000),at:+x.at||Date.now(),u:+x.u||+x.at||0}});
+      body:String(x.body||"").slice(0,40000),apply:String(x.apply||"").slice(0,8000),at:+x.at||Date.now(),u:+x.u||+x.at||0,ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
     return o;
   }
   function srmSave(o){try{localStorage.setItem(SRM_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__sermons")}
@@ -10381,7 +10383,9 @@ body.carddrag #reviewBar{display:none!important}
     if(changed){try{localStorage.setItem(SRM_KEY,JSON.stringify(o))}catch(e){}}
     return changed;
   }
-  function srmSorted(o){return o.items.slice().sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:(b.at-a.at)})}
+  function srmByDate(a,b){return a.d<b.d?1:a.d>b.d?-1:(b.at-a.at)}
+  // 목록 순서: 끌어서 옮긴 순서(ord)를 따르고, 아직 순서가 없는 새 메모는 맨 위에 날짜 최신순 (2026-11-01 사용자 요청)
+  function srmSorted(o){return o.items.slice().sort(function(a,b){var na=a.ord==null, nb=b.ord==null; if(na!==nb)return na?-1:1; return na?srmByDate(a,b):(a.ord-b.ord)||srmByDate(a,b)})}
   var srm=null, srmEdit="", srmQ="", srmTimer=0;
   /* ↕️ 설교 메모는 한 줄(문장)씩 칸으로 적고, 줄마다 앞의 ⠿를 잡고 끌어 위아래로 옮김 (2026-10-31 사용자 요청)
      줄 칸들(.srmli)을 이어 붙인 글이 숨은 .srmbody에 들어가 저장됨. 엔터=다음 줄, 줄 맨 앞에서 지우기=윗줄과 합침 */
@@ -10503,7 +10507,7 @@ body.carddrag #reviewBar{display:none!important}
   function srmNew(){
     if(srmEdit)srmCommit();
     var o=srmData(), id="srm"+Date.now().toString(36)+Math.random().toString(36).slice(2,6), now=Date.now();
-    var last=srmSorted(o)[0];   // 설교자는 지난번 것을 그대로 (보통 같은 목사님)
+    var last=o.items.slice().sort(srmByDate)[0];   // 설교자는 지난번 것을 그대로 (보통 같은 목사님)
     o.items.push({id:id,d:dkey(now),who:last?last.who:"",title:"",ref:"",nid:"",body:"",apply:"",at:now,u:now});
     try{localStorage.setItem(SRM_KEY,JSON.stringify(o))}catch(e){}
     srmEdit=id; srmDraw();
@@ -10522,7 +10526,7 @@ body.carddrag #reviewBar{display:none!important}
   function srmClick(e){
     var b=e.target.closest("button"); if(!b)return;
     var o=srmData();
-    if(b.classList.contains("srmcard")){srmEdit=b.dataset.id; srmDraw(); return}
+    if(b.classList.contains("srmcard")){if(Date.now()-srmCardDragAt<400)return; srmEdit=b.dataset.id; srmDraw(); return}
     if(b.classList.contains("srmdone")){
       srmCommit(); var x=srmData().items.find(function(y){return y.id===srmEdit});
       if(x&&srmEmpty(x)){var o2=srmData(); o2.items=o2.items.filter(function(y){return y.id!==x.id}); try{localStorage.setItem(SRM_KEY,JSON.stringify(o2))}catch(err){}}
@@ -10566,6 +10570,47 @@ body.carddrag #reviewBar{display:none!important}
     var list=document.createElement("div"); list.className="srmlist"; box.appendChild(list);
     srmDrawList();
   }
+  /* ↕️ 설교 메모 카드 순서 바꾸기: 카드를 꾹(0.35초) 눌렀다가 위아래로 끌기 (2026-11-01 사용자 요청). 찾는 중에는 안 됨 */
+  var srmCD=null, srmCardDragAt=0;
+  (function(){
+    function cards(){return Array.prototype.slice.call(srm.querySelectorAll(".srmlist>.srmcard"))}
+    function start(){var d=srmCD; if(!d||d.on)return; d.on=true; d.c.classList.add("srmcdrag"); buzz(12)}
+    document.addEventListener("pointerdown",function(e){
+      if(srmCD||!srm||srm.hidden||srmEdit||srmQ.trim()||(e.pointerType==="mouse"&&e.button!==0))return;
+      var c=e.target.closest&&e.target.closest(".srmlist>.srmcard"); if(!c||cards().length<2)return;
+      srmCD={c:c,pid:e.pointerId,x0:e.clientX,y0:e.clientY,on:false,t:setTimeout(start,e.pointerType==="mouse"?250:350)};
+    });
+    function move(y){
+      var d=srmCD, c=d.c; c.style.transform="translateY("+(y-d.y0)+"px)";
+      var ss=cards().filter(function(x){return x!==c});
+      for(var i=0;i<ss.length;i++){
+        var r=ss[i].getBoundingClientRect(), mid=r.top+r.height/2, before=c.compareDocumentPosition(ss[i])&Node.DOCUMENT_POSITION_PRECEDING;
+        if((before&&y<mid)||(!before&&y>mid)){var t0=c.getBoundingClientRect().top; c.parentNode.insertBefore(c,before?ss[i]:ss[i].nextSibling);
+          d.y0+=c.getBoundingClientRect().top-t0; c.style.transform="translateY("+(y-d.y0)+"px)"; buzz(6); break}
+      }
+      var sc=srm.querySelector(".srmbox"), br=sc.getBoundingClientRect();   // 위·아래 끝에 닿으면 저절로 굴러감
+      if(y<br.top+50)sc.scrollTop-=14; else if(y>br.bottom-50)sc.scrollTop+=14;
+    }
+    document.addEventListener("pointermove",function(e){
+      var d=srmCD; if(!d||e.pointerId!==d.pid)return;
+      if(!d.on){if(Math.abs(e.clientX-d.x0)>8||Math.abs(e.clientY-d.y0)>8){clearTimeout(d.t);srmCD=null}return}   // 꾹 누르기 전에 움직이면 그냥 스크롤
+      e.preventDefault(); move(e.clientY);
+    },{passive:false});
+    document.addEventListener("touchmove",function(e){if(srmCD&&srmCD.on){e.preventDefault(); if(e.touches[0])move(e.touches[0].clientY)}},{passive:false});
+    document.addEventListener("contextmenu",function(e){if(srmCD&&e.target.closest&&e.target.closest(".srmcard"))e.preventDefault()});
+    function end(e){
+      var d=srmCD; if(!d||(e.pointerId!=null&&e.pointerId!==d.pid&&e.type!=="touchend"))return;
+      clearTimeout(d.t); srmCD=null; if(!d.on)return;
+      srmCardDragAt=Date.now(); d.c.classList.remove("srmcdrag"); d.c.style.transform="";
+      var ids=cards().map(function(x){return x.dataset.id});
+      var o=srmData(), all=srmSorted(o), ch=false, rest=all.filter(function(x){return ids.indexOf(x.id)<0});   // 빈 메모 등 목록에 안 보이는 것은 뒤로
+      ids.map(function(id){return o.items.find(function(y){return y.id===id})}).concat(rest).forEach(function(x,i){if(x&&x.ord!==i*10){x.ord=i*10; x.u=Date.now(); ch=true}});
+      if(ch){srmSave(o); buzz(8)}
+      srmDrawList();
+    }
+    document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(e){if(srmCD&&srmCD.on&&e.pointerId===srmCD.pid)return; end(e)});
+    document.addEventListener("touchend",function(e){if(srmCD&&srmCD.on)end(e)});
+  })();
   function srmDrawList(){
     var list=srm&&srm.querySelector(".srmlist"); if(!list)return; list.textContent="";
     var all=srmSorted(srmData()).filter(function(x){return !srmEmpty(x)}), q=srmQ.trim();
