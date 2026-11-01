@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-bcmore">
+<meta name="app-build" content="2026-11-02-actsvg">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2006,6 +2006,8 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcacts{flex:1 0 100%;display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;padding-top:9px;border-top:1px solid #2A2930}
 .bcpal .bcacts button{width:auto;height:28px;padding:0 10px;border-radius:14px;border:1px solid #3A3842;background:#1E1D23;box-shadow:none;color:var(--ink);font-family:inherit;font-size:12.5px}
 .bcpal .bcacts button:hover{border-color:var(--bc);color:var(--bc)}
+.bcpal .bcacts button{display:inline-flex;align-items:center;gap:5px}
+.bcpal .bcacts svg{color:var(--bc);flex:0 0 auto}
 .bcpal .bcacts button.sure{border-color:var(--pink);color:var(--pink)}
 .bcbkh{margin:0 2px 4px;color:var(--bc);font-size:13.5px;font-weight:700}
 .bcbkh em{font-style:normal;font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
@@ -4962,8 +4964,8 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
     var cur=kbTintMap()[col.dataset.k], p=document.createElement("div"); p.className="bcpal";
     p.innerHTML=KBCOL.map(function(c,i){return '<button type="button" data-c="'+i+'" style="--sw:'+c+'"'+(cur===i?' class="on"':'')+' aria-label="색 '+(i+1)+'"></button>'}).join("")+
       '<button type="button" data-c="" class="auto'+(cur==null?' on':'')+'">자동</button>'+
-      '<div class="bcacts">'+(col.classList.contains("bflipable")?'<button type="button" data-act="flip">🔄 뒤집기</button>':'')+
-      '<button type="button" data-act="name">✎ 이름</button>'+(col.querySelector(".bcdel")?'<button type="button" data-act="del">🗑 칸 지우기</button>':'')+'</div>';
+      '<div class="bcacts">'+(col.classList.contains("bflipable")?'<button type="button" data-act="flip"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3.5V8h4.5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20.5V16h-4.5"/></svg>뒤집기</button>':'')+
+      '<button type="button" data-act="name"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>이름</button>'+(col.querySelector(".bcdel")?'<button type="button" data-act="del"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>칸 지우기</button>':'')+'</div>';
     col.querySelector(".bch").insertAdjacentElement("afterend",p);
   },true);
   function renderKanbanList(box){
