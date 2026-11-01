@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-sayonly">
+<meta name="app-build" content="2026-11-01-srm-3dbtn">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3979,6 +3979,11 @@ body.carddrag #reviewBar{display:none!important}
 #topMenu .pop button:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.3)!important}
 /* 색 단추(내 순서·🔍·⋯·전체·#주제 펼치기)는 아래쪽 그늘을 옅게 — 아래도 밝게 (2026-11-01 사용자 요청) */
 #sortBtn,#filterBtn,#topMenu>summary.tbtn,.topicbar .tchip.tfoldbtn,.topicbar .tchip.on,body.boardon .toolbar #sortBtn,body.boardon .toolbar #filterBtn,body.boardon .toolbar #topMenu>summary.tbtn{background-image:linear-gradient(180deg,rgba(255,255,255,.32) 0%,rgba(255,255,255,.12) 50%,rgba(255,255,255,.04) 80%,rgba(0,0,0,.06) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 0 rgba(0,0,0,.12),0 3px 0 rgba(0,0,0,.30),0 5px 9px rgba(0,0,0,.35)!important}
+
+/* 🧊 설교 메모 맨 위 + 새 메모·📖 읽기·닫기 단추도 또렷한 입체 (2026-11-01 사용자 요청) */
+.srmsheet .dlbar .dlclose{background-color:#2A2933!important;border-color:#45434F!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.30),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.45)!important;transition:transform .08s,box-shadow .08s}
+.srmsheet .dlbar .dlclose.srmnew{background-color:#3A3220!important;border-color:#6B5A30!important;color:var(--gold)}
+.srmsheet .dlbar .dlclose:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
