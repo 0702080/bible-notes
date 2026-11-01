@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-menu3d">
+<meta name="app-build" content="2026-11-01-sayonly">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2815,6 +2815,7 @@ button:active{filter:brightness(1.15)}
 /* ===== simpler + smarter ===== */
 .reviewbar{flex-direction:column;align-items:stretch;gap:6px;padding:10px 12px 12px}
 .tdh{display:flex;align-items:baseline;gap:6px;width:100%;margin-bottom:2px;padding:0;border:0;background:transparent;font-size:12.5px;font-weight:700;color:var(--gold);letter-spacing:.04em;text-align:left;font-family:inherit}
+.tdgap{flex:1 1 auto;align-self:stretch;min-width:24px;margin:-8px 0;cursor:pointer}   /* 머리 가운데 빈 곳: 누르면 오늘의 한 마디만 (2026-11-01 사용자 요청) */
 .tddate{margin-left:auto;font-size:12px;font-weight:400;color:var(--muted);letter-spacing:0}
 .tdn{font-size:11.5px;font-weight:700;color:var(--ink);letter-spacing:0}
 .tdn:empty{display:none}
@@ -4308,6 +4309,7 @@ body.carddrag #reviewBar{display:none!important}
   // → 다시 바꿈: PC(폭 900px 이상)에서는 무조건 칸반으로 연다 (2026-10-21 사용자 요청 세 번째). 휴대폰은 목록 그대로
   var boardOn=!!(window.matchMedia&&matchMedia("(min-width:900px)").matches);
   try{localStorage.setItem("bible-view",boardOn?"board":"list")}catch(e){}
+  var tdSayOnly=false;   // '오늘' 카드 머리 가운데 빈 곳을 누르면 오늘의 한 마디만 보이고 나머지는 숨김, 다시 누르면 돌아옴 (2026-11-01 사용자 요청)
   var tdFold=true;   // '오늘' 카드는 앱을 열 때마다 접힌 채로 시작, 누르면 펼침 (2026-10-22 사용자 요청)
   var BCOLS=[{k:"new",t:"새로 담음",e:"🌱",c:"var(--muted)",tip:"아직 암송을 시작하지 않은 말씀"},{k:"doing",t:"외우는 중",e:"✏️",c:"var(--sky)",tip:"도장을 모으는 중"},{k:"due",t:"복습할 차례",e:"🔁",c:"var(--gold)",tip:"오늘 다시 떠올릴 말씀"},{k:"done",t:"다 외움",e:"🏅",c:"var(--green)",tip:"도장 4개를 다 받은 말씀"}];
   function boardCol(n){
@@ -13889,16 +13891,20 @@ body.carddrag #reviewBar{display:none!important}
     bar.classList.toggle("fold",folded);
     var h=document.createElement("button"); h.type="button"; h.className="tdh";
     h.setAttribute("aria-expanded",folded?"false":"true"); h.setAttribute("aria-label","오늘 카드 "+(folded?"펼치기":"접기"));
-    h.innerHTML='<span>오늘</span><span class="tdn"></span><span class="tddate"></span><span class="tdchev" aria-hidden="true"></span>';
+    h.innerHTML='<span>오늘</span><span class="tdn"></span><span class="tdgap" aria-hidden="true"></span><span class="tddate"></span><span class="tdchev" aria-hidden="true"></span>';
     if(folded&&todo.length)h.querySelector(".tdn").textContent="할 일 "+todo.length;
     var nd=new Date(); h.querySelector(".tddate").textContent=(nd.getMonth()+1)+"월 "+nd.getDate()+"일 ("+WD[nd.getDay()]+")";
-    h.addEventListener("click",function(){
+    var sOnly=tdSayOnly&&!filterText&&!!sayTodayPick();   // 한 마디가 없으면 평소대로
+    h.addEventListener("click",function(e){
+      if(e.target.closest(".tdgap")&&!filterText){tdSayOnly=!tdSayOnly; renderReviewBar(); return}
+      if(sOnly){tdSayOnly=false; renderReviewBar(); return}   // 한 마디만 보는 중에 머리를 누르면 원래대로
       if(filterText){bar.classList.toggle("fold");h.setAttribute("aria-expanded",String(!bar.classList.contains("fold")));return}   // 찾는 중에는 이번만 펼치기
       tdFold=!tdFold; renderReviewBar();
     });
     bar.appendChild(h);
-    var dlDoneNow=!folded&&big.some(function(r){return r.done});   // 접었을 때는 A가 안 보이니 B를 보여 줌   // 하루 돌아보기 ✓ 완료가 뜨면 '오늘의 한 걸음'과 한 마디는 숨김 (2026-10-31 사용자 요청)
-    if(!dlDoneNow)try{drawStep(bar)}catch(e){}
+    bar.classList.toggle("sayonly",sOnly);
+    var dlDoneNow=!sOnly&&!folded&&big.some(function(r){return r.done});   // 접었을 때는 A가 안 보이니 B를 보여 줌   // 하루 돌아보기 ✓ 완료가 뜨면 '오늘의 한 걸음'과 한 마디는 숨김 (2026-10-31 사용자 요청)
+    if(!dlDoneNow&&!sOnly)try{drawStep(bar)}catch(e){}
     var sd=dlDoneNow?null:sayTodayPick();
     if(sd){   // 오늘의 한 마디 (2026-10-18 사용자 요청)
       var swrap=document.createElement("div"); swrap.className="saywrap";
@@ -13911,6 +13917,7 @@ body.carddrag #reviewBar{display:none!important}
       swrap.appendChild(sb2); swrap.appendChild(spb); bar.appendChild(swrap);
       saySwipeInit(swrap);
     }
+    if(sOnly)return;   // 한 마디만 보기: 아래 할 일 줄은 그리지 않음
     function drawRow(r){
       if(r.big){   // 하루 돌아보기: 눈에 잘 띄게 한 줄 전체를 큰 버튼으로 (2026-10-15 사용자 요청)
         var bb=document.createElement("button"); bb.type="button"; bb.className="rvchip tdbig"+(r.done?" done":""); bb.dataset.id=""; bb.dataset.act="daily";
