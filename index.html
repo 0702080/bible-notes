@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-ic-newtop">
+<meta name="app-build" content="2026-11-01-kbshadow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1973,6 +1973,7 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcol.bcust{border-color:color-mix(in srgb,var(--gold) 30%,#38343F);background:color-mix(in srgb,var(--gold) 4%,#272530)}
 .bcol.bcust .bch b{color:var(--gold)}
 .bcol.btint,.bcol.btint.bcust{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 16%,#24222B),color-mix(in srgb,var(--bc) 7%,#201E26) 260px);border-color:color-mix(in srgb,var(--bc) 14%,#2B2930)}   /* 테두리는 흐리게 (2026-11-01 사용자 요청) */
+.bcol.btint{box-shadow:0 1px 0 rgba(255,255,255,.04) inset,6px 8px 18px rgba(0,0,0,.42),2px 3px 6px rgba(0,0,0,.3)}   /* 살짝 떠 보이는 그림자 (2026-11-01 사용자 요청) */
 .bcol.btint .bch b,.bcol.btint.bcust .bch b{color:var(--bc)}
 .bcol.btint .bch .bce{cursor:pointer;border-radius:8px;padding:2px 3px;margin:-2px -3px}
 .bcol.btint .bch .bce:hover{background:color-mix(in srgb,var(--bc) 22%,transparent)}
@@ -4829,6 +4830,30 @@ body.carddrag #reviewBar{display:none!important}
     if(kbTapT){clearTimeout(kbTapT)}
     kbTapCard=cd; kbTapT=setTimeout(function(){kbTapT=0; kbTapCard=null; if(cl.isConnected)kbFlip(cl)},cd?280:0);
   },true);
+  /* 한 마디 칸: 시프트+엔터 = 바로 아래 줄로 (2026-11-01 사용자 요청). 한글 조합 중에 눌러도 줄바꿈이 사라지거나 두 번 들어가지 않게 직접 넣음 */
+  (function(){
+    var pend=null, lastAt=0;
+    function nl(t){
+      pend=null; if(Date.now()-lastAt<120)return; lastAt=Date.now();
+      var a=t.selectionStart, b=t.selectionEnd; t.setRangeText("\n",a,b,"end");
+      t.dispatchEvent(new Event("input",{bubbles:true}));
+    }
+    function isSay(t){return t&&t.classList&&t.classList.contains("sayt")}
+    document.addEventListener("keydown",function(e){
+      if(e.key!=="Enter"&&e.keyCode!==13&&!(e.keyCode===229&&e.code==="Enter"))return;
+      if(!e.shiftKey||!isSay(e.target))return;
+      if(e.isComposing||e.keyCode===229){pend=e.target; return}
+      e.preventDefault(); nl(e.target);
+    },true);
+    document.addEventListener("beforeinput",function(e){
+      if(!isSay(e.target)||(e.inputType!=="insertLineBreak"&&e.inputType!=="insertParagraph"))return;
+      if(pend===e.target||Date.now()-lastAt<120){e.preventDefault(); if(pend)nl(e.target)}
+    },true);
+    document.addEventListener("compositionend",function(e){
+      var t=e.target; if(!isSay(t)||pend!==t)return;
+      setTimeout(function(){if(pend===t)nl(t)},40);
+    },true);
+  })();
   function kbPalClose(){document.querySelectorAll("#board .bcpal").forEach(function(x){x.remove()})}
   $("board").addEventListener("click",function(e){
     if(bMode!=="list")return;
