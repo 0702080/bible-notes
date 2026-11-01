@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-prdbar">
+<meta name="app-build" content="2026-11-02-foldsnd">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4736,7 +4736,7 @@ body.boardon #board.board4::after{content:"";flex:0 0 18px;align-self:stretch}
     e.stopPropagation(); e.preventDefault();
     if(cl.dataset.anim)return;
     var on=!cl.classList.contains("bfold"); cl.title=on?"눌러서 펼치기":"";
-    if(on)bFold[cl.dataset.k]=1; else delete bFold[cl.dataset.k]; saveBFold(); buzz(8);
+    if(on)bFold[cl.dataset.k]=1; else delete bFold[cl.dataset.k]; saveBFold(); buzz(8); paperSwish(on?"fold":"open");
     // 부드럽게: 안의 글이 먼저 사르르 사라지고 → 폭이 줄거나 늘고 → 새 모양이 사르르 (2026-10-22 사용자 요청)
     cl.dataset.anim="1"; cl.classList.add("bfade");
     setTimeout(function(){
@@ -6701,13 +6701,16 @@ body.boardon #board.board4::after{content:"";flex:0 0 18px;align-self:stretch}
       if(!(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches))return;   // PC에서만
       var AC=window.AudioContext||window.webkitAudioContext; if(!AC)return;
       if(!hovAC)hovAC=new AC(); if(hovAC.state==="suspended")hovAC.resume();
-      var ac=hovAC, t=ac.currentTime, dur=soft?.16:.24, len=Math.floor(ac.sampleRate*dur), buf=ac.createBuffer(1,len,ac.sampleRate), d=buf.getChannelData(0);
+      var lg=soft==="fold"||soft==="open";   // 칸 접기·펴기: 조금 긴 '쓰윽' — 접을 땐 내려가고 펼 땐 올라가는 소리 (2026-11-02 사용자 요청)
+      if(lg)soft=false;
+      var ac=hovAC, t=ac.currentTime, dur=lg?.38:soft?.16:.24, len=Math.floor(ac.sampleRate*dur), buf=ac.createBuffer(1,len,ac.sampleRate), d=buf.getChannelData(0);
       for(var i=0;i<len;i++){var x=i/len; d[i]=(Math.random()*2-1)*Math.pow(Math.sin(Math.PI*x),1.6)*(0.6+0.4*Math.random())}
       var src=ac.createBufferSource(); src.buffer=buf;
       var bp=ac.createBiquadFilter(); bp.type="bandpass"; bp.Q.value=0.9;
-      bp.frequency.setValueAtTime(soft?2600:1800,t); bp.frequency.exponentialRampToValueAtTime(soft?1500:4200,t+dur);
+      var f0=lg?(arguments[0]==="fold"?3600:1300):soft?2600:1800, f1=lg?(arguments[0]==="fold"?1200:3800):soft?1500:4200;
+      bp.frequency.setValueAtTime(f0,t); bp.frequency.exponentialRampToValueAtTime(f1,t+dur);
       var hp=ac.createBiquadFilter(); hp.type="highpass"; hp.frequency.value=700;
-      var g=ac.createGain(); g.gain.value=soft?.10:.16;
+      var g=ac.createGain(); g.gain.value=lg?.2:soft?.10:.16;
       src.connect(bp); bp.connect(hp); hp.connect(g); g.connect(ac.destination); src.start(t); src.stop(t+dur);
     }catch(e){}
   }
