@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-stshadow">
+<meta name="app-build" content="2026-11-02-wheel">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -17177,6 +17177,7 @@ body.boardon #board>.bcol.over{box-shadow:inset 0 0 0 2px color-mix(in srgb,var(
         if(up||dn)return;
       }
       if(bd.scrollWidth<=bd.clientWidth)return;
+      if(e.target.closest&&e.target.closest(".bcol")&&Math.abs(e.deltaY)>=Math.abs(e.deltaX)){e.preventDefault();return}   // 칸 위에서 휠은 카드 위아래로만, 옆으로 넘어가지 않음 (2026-11-02 사용자 요청) — 옆으로는 칸 사이 빈 곳·Shift+휠·끌기로
       var d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
       if(!d)return;
       bd.scrollLeft+=d; e.preventDefault();
