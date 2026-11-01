@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-01-slide">
+<meta name="app-build" content="td-2026-11-01-ovw">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -273,6 +273,21 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .ovw-key{display:flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;color:var(--muted)}
 .ovw-key i{width:12px;height:12px;border-radius:3px;background:var(--blank);border:1px solid color-mix(in srgb,var(--rule) 60%,transparent)}
 .ovw-none{margin:6px 0 0;font-size:12.5px;color:var(--muted);line-height:1.6}
+/* ✨ 전체 진행표 동그라미 다듬기 (2026-11-01 사용자 요청): 둘레 고리가 읽은 만큼 차오르고, 안은 볼록한 구슬. 다 읽은 책은 초록 구슬 */
+.ovw-h{display:flex;align-items:center;gap:8px}
+.ovw-hs{margin-left:auto;display:flex;gap:6px}
+.ovw-hs em{font-style:normal;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:999px}
+.ovw-full{background:color-mix(in srgb,var(--green) 16%,transparent);color:color-mix(in srgb,var(--green) 80%,#1d3b2a)}
+.ovw-part{background:color-mix(in srgb,var(--ring) 18%,transparent);color:color-mix(in srgb,var(--ring) 70%,#4a3510)}
+.ovw-map{gap:9px 6px;padding:12px 8px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.2));border:1px solid color-mix(in srgb,var(--rule) 70%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.8)}
+.ovc{border:0!important;padding:0;background:conic-gradient(from -90deg,color-mix(in srgb,var(--ring) 85%,#fff) calc(var(--f,0) * 360deg),#E8DCC4 0)!important;box-shadow:0 2px 0 rgba(80,50,20,.12),0 4px 8px rgba(80,50,20,.10);transition:transform .12s}
+.ovc i{inset:3px;height:auto!important;border-radius:50%;background:radial-gradient(circle at 34% 28%,#FFFFFF 0%,#FBF5E9 38%,#EFE4CF 100%)!important;box-shadow:inset 0 -2px 3px rgba(120,90,40,.12)}
+.ovc[data-st="part"] i{background:radial-gradient(circle at 34% 28%,#FFFFFF 0%,color-mix(in srgb,var(--ring) 10%,#FBF5E9) 40%,color-mix(in srgb,var(--ring) 22%,#EFE4CF) 100%)!important}
+.ovc[data-st="part"] b{color:color-mix(in srgb,var(--ring) 55%,#3b2a10)}
+.ovc[data-st="full"]{background:conic-gradient(color-mix(in srgb,var(--green) 70%,#fff) 0 360deg)!important;box-shadow:0 2px 0 rgba(30,90,50,.25),0 4px 10px color-mix(in srgb,var(--green) 35%,transparent)}
+.ovc[data-st="full"] i{inset:2px;background:radial-gradient(circle at 34% 28%,color-mix(in srgb,var(--green) 30%,#fff) 0%,var(--green) 50%,color-mix(in srgb,var(--green) 75%,#000) 100%)!important;box-shadow:inset 0 1px 2px rgba(255,255,255,.5)}
+.ovc[data-st="full"] b{color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.25)}
+.ovc:active{transform:scale(.93)}
 .shelf{display:none!important}
 .shelf{margin-top:14px;padding:12px 13px;border-radius:12px;background:var(--sheet);border:1px solid var(--rule);}
 .shelf h3{margin:0 0 9px;font-family:var(--sans);font-size:15px;font-weight:700}
@@ -966,7 +981,10 @@ function renderOverview(){
   body.textContent="";
   // ① 66권 지도
   [["구약 39권",0,OT_N],["신약 27권",OT_N,BOOKS.length]].forEach(function(part){
-    var h=document.createElement("p"); h.className="ovw-h"; h.textContent=part[0]; body.appendChild(h);
+    var h=document.createElement("p"); h.className="ovw-h"; h.textContent=part[0];
+    var nf=0, nr=0; for(var bj=part[1];bj<part[2];bj++){var dd=bookDone(bj); if(dd>=BOOKS[bj][1])nf++; else if(dd>0)nr++}
+    var hs=document.createElement("span"); hs.className="ovw-hs"; hs.innerHTML='<em class="ovw-full"></em><em class="ovw-part"></em>';
+    hs.firstChild.textContent="✓ "+nf+"권"; hs.lastChild.textContent=(pMode?"쓰는 중 ":"읽는 중 ")+nr+"권"; if(!nr)hs.lastChild.remove(); h.appendChild(hs); body.appendChild(h);
     var map=document.createElement("div"); map.className="ovw-map";
     for(var bi=part[1];bi<part[2];bi++){
       var total=BOOKS[bi][1], done=bookDone(bi), f=total?done/total:0;
