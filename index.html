@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-shiftflip">
+<meta name="app-build" content="2026-11-02-collock">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2009,6 +2009,8 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcpal .bcacts button{display:inline-flex;align-items:center;gap:5px}
 .bcpal .bcacts svg{color:var(--bc);flex:0 0 auto}
 .bcpal .bcacts button.sure{border-color:var(--pink);color:var(--pink)}
+.bcol.blocked .bch b::after{content:" 📌";font-size:11px;vertical-align:1px}
+.bcol.blocked .bch{cursor:default}
 .bcbkh{margin:0 2px 4px;color:var(--bc);font-size:13.5px;font-weight:700}
 .bcbkh em{font-style:normal;font-weight:400;color:var(--muted);font-size:12px;margin-left:4px}
 .bcbk{padding:9px 11px;border-radius:11px;background:#16151A;border:1px solid color-mix(in srgb,var(--bc) 14%,#26252B);display:flex;flex-direction:column;gap:2px}
@@ -4589,7 +4591,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
   function renderKanban(){
     var box=$("board"); if(!boardOn||!boardWide()){box.hidden=true;return}
     box.textContent=""; box.classList.remove("bsolo");
-    if(bMode==="list"){renderKanbanList(box);kbTint(box);kbBackPrep(box);kbFit(box);return}
+    if(bMode==="list"){renderKanbanList(box);kbLockApply(box);kbTint(box);kbBackPrep(box);kbFit(box);return}
     var groups={}; BCOLS.forEach(function(c){groups[c.k]=[]});
     sorted().forEach(function(n){if(visibleNote(n))groups[boardCol(n)].push(n)});
     var fresh=groups["new"];
@@ -4933,6 +4935,20 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
     if(document.fonts&&document.fonts.ready)document.fonts.ready.then(go);
     go();
   })();
+  /* 📌 칸 자리 고정 (2026-11-02 사용자 요청): ⋯ 메뉴에서 고정하면 그 칸은 지금 몇 번째 자리에 못 박힘 — 다른 칸이 옮겨지거나 늘고 줄어도 그 자리, 끌어 옮기기도 막음. 저장 bible-board-collock {칸 이름: 자리 번호}, 이 기기만 */
+  var KLOCK_KEY="bible-board-collock";
+  function kbLocks(){try{return JSON.parse(localStorage.getItem(KLOCK_KEY)||"{}")||{}}catch(e){return {}}}
+  function kbLockSave(o){try{localStorage.setItem(KLOCK_KEY,JSON.stringify(o))}catch(e){}}
+  function kbLockApply(box){
+    var lk=kbLocks(), names=Object.keys(lk); if(!names.length)return;
+    var cols=Array.prototype.slice.call(box.querySelectorAll(":scope>.bcol")), fixed=[];
+    cols.forEach(function(c){if(c.dataset.cc&&lk[c.dataset.cc]!=null){fixed.push({el:c,at:+lk[c.dataset.cc]}); c.classList.add("blocked")}});
+    if(!fixed.length)return;
+    var rest=cols.filter(function(c){return !c.classList.contains("blocked")}), seq=rest.slice();
+    fixed.sort(function(a,b){return a.at-b.at}).forEach(function(f){seq.splice(Math.max(0,Math.min(f.at,seq.length)),0,f.el)});
+    var anchor=cols[cols.length-1].nextSibling;   // 칸들 뒤의 것(없으면 끝)
+    seq.forEach(function(c){box.insertBefore(c,anchor)});
+  }
   function kbPalClose(){document.querySelectorAll("#board .bcpal").forEach(function(x){x.remove()})}
   $("board").addEventListener("click",function(e){
     if(bMode!=="list")return;
@@ -4941,6 +4957,11 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
       e.stopPropagation(); e.preventDefault();
       var acl=act.closest(".bcol"), a=act.dataset.act; if(!acl)return;
       if(a==="flip"){kbPalClose(); kbFlip(acl); return}
+      if(a==="lock"){
+        var lk=kbLocks(), cc=acl.dataset.cc; if(!cc)return;
+        if(lk[cc]!=null){delete lk[cc]; kbLockSave(lk); kbPalClose(); render(); toast("'"+cc+"' 칸 고정을 풀었어요"); return}
+        lk[cc]=Array.prototype.indexOf.call($("board").querySelectorAll(":scope>.bcol"),acl); kbLockSave(lk); kbPalClose(); render(); toast("'"+cc+"' 칸을 이 자리에 고정했어요"); return;
+      }
       if(a==="name"){kbPalClose(); var hb=acl.querySelector(".bch b"); if(hb)hb.dispatchEvent(new MouseEvent("dblclick",{bubbles:true})); return}
       if(a==="del"){
         if(!act.dataset.sure){act.dataset.sure="1"; act.classList.add("sure"); act.textContent="한 번 더 누르면 지워요"; return}
@@ -4965,6 +4986,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
     p.innerHTML=KBCOL.map(function(c,i){return '<button type="button" data-c="'+i+'" style="--sw:'+c+'"'+(cur===i?' class="on"':'')+' aria-label="색 '+(i+1)+'"></button>'}).join("")+
       '<button type="button" data-c="" class="auto'+(cur==null?' on':'')+'">자동</button>'+
       '<div class="bcacts">'+(false?'<button type="button" data-act="flip"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3.5V8h4.5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20.5V16h-4.5"/></svg>뒤집기</button>':'')+
+      (col.dataset.cc?'<button type="button" data-act="lock">'+(col.classList.contains("blocked")?'📌 고정 풀기':'📌 자리 고정')+'</button>':'')+
       '<button type="button" data-act="name"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg>이름</button>'+(col.querySelector(".bcdel")?'<button type="button" data-act="del"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/></svg>칸 지우기</button>':'')+'</div>';
     col.querySelector(".bch").insertAdjacentElement("afterend",p);
   },true);
@@ -16974,6 +16996,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
     if(bMode!=="list"||!boardOn||e.button!==0)return;
     if(e.target.closest("button,input,textarea,a"))return;
     var hd=e.target.closest(".bch"), cd=e.target.closest(".bcard"); if(!hd&&!cd)return;
+    if(hd&&hd.closest(".bcol.blocked")){toast("고정한 칸이에요. ⋯ 에서 고정을 풀면 옮길 수 있어요");return}
     if(cd&&cd.dataset.clone)return;   // 복제 카드는 끌지 않음 (지우고 다시 Shift 끌기)
     var cl=(hd||cd).closest(".bcol");
     lmP={el:hd?cl:cd, type:hd?"col":"card", li:+cl.dataset.li, cc:cl.dataset.cc||"", x:e.clientX, y:e.clientY, on:false,
@@ -17155,7 +17178,7 @@ body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:col
         a=a.map(function(x){return x===was?v:x}); saveCols(a);
         notes.forEach(function(n){if(n.col===was){n.col=v;scheduleSave(n.id)}});
         if(bFold["C:"+was]){bFold["C:"+v]=1;delete bFold["C:"+was];saveBFold()}
-        var cpr=colPos(); if(was in cpr){cpr[v]=cpr[was];delete cpr[was];saveColPos(cpr)}
+        var cpr=colPos(); if(was in cpr){cpr[v]=cpr[was];delete cpr[was];saveColPos(cpr)} var lkr=kbLocks(); if(lkr[was]!=null){lkr[v]=lkr[was];delete lkr[was];kbLockSave(lkr)}
         render(); toast("칸 이름을 '"+v+"'으로 바꿨어요"); return;
       }
       if(save&&v&&v!==was){bNames[k]=v; saveBNames(); b.textContent=v; toast("칸 이름을 '"+v+"'으로 바꿨어요")}
