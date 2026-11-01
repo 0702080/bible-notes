@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-rm-clean">
+<meta name="app-build" content="2026-11-01-prd-seg">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4007,6 +4007,14 @@ body.carddrag #reviewBar{display:none!important}
 .prd .prdfil button[aria-pressed="true"]{background-color:color-mix(in srgb,var(--orange) 30%,#2A2933)}
 .prd .p1go{background-image:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.10) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.16) 100%)!important}
 .prd .dlbar .dlclose:active,.prd .prdfil button:active,.prd .prdfold:active,.prd .prdgo:active,.prd .p1go:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
+/* 🙏 기도 읽기 보기 고르기: 한 줄에 — 세 칸은 움푹한 홈 안의 칸 고르기(고른 칸만 주황 입체), 모두 접기는 오른쪽 작은 입체 단추 (2026-11-01 사용자 요청) */
+.prd .prdfil{flex-wrap:nowrap;align-items:center;gap:8px;margin-bottom:16px}
+.prd .prdseg{flex:1;min-width:0;display:flex;gap:2px;padding:3px;border-radius:19px;background:#0F0E13;border:1px solid #2A2930;box-shadow:inset 0 2px 5px rgba(0,0,0,.55)}
+.prd .prdseg button{flex:1 1 auto;min-width:0;height:32px;padding:0 8px;border:0!important;border-radius:16px;font-size:13px;overflow:hidden;text-overflow:ellipsis}
+.prd .prdseg button:not([aria-pressed="true"]){background-color:transparent!important;background-image:none!important;box-shadow:none!important;color:var(--muted)}
+.prd .prdseg button[aria-pressed="true"]{background-color:var(--orange)!important;color:#1A1208;font-weight:700;background-image:linear-gradient(180deg,rgba(255,255,255,.34) 0%,rgba(255,255,255,.10) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.16) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 2px 0 rgba(0,0,0,.4),0 3px 6px rgba(0,0,0,.4)!important}
+.prd .prdfil .prdall{flex:0 0 auto;margin-left:0;height:34px;padding:0 12px;border-radius:17px;font-size:12.5px}
+@media (max-width:380px){.prd .prdseg button{font-size:12px;padding:0 5px}.prd .prdfil .prdall{padding:0 9px;font-size:12px}}
 /* 🤲 중보기도: 기도할 사람 넣기·닫기·하루 N명씩(−/+)·기도했어요 단추도 입체 (2026-11-01 사용자 요청) */
 .icv .qbarbtns .icaddtop,.icv .qbarbtns .icclose,.icv .icstep,.icv .icbtns .icpray{background-image:linear-gradient(180deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.42)!important;transition:transform .08s,box-shadow .08s}
 .icv .qbarbtns .icclose{background-color:#2A2933!important;border:1px solid #45434F!important;color:var(--ink)}
@@ -5520,7 +5528,7 @@ body.carddrag #reviewBar{display:none!important}
     if(!prd){
       prd=document.createElement("div"); prd.className="rvq prd"; prd.setAttribute("role","dialog"); prd.setAttribute("aria-modal","true"); prd.hidden=true;
       prd.innerHTML='<div class="dlbar"><b class="dltitle">🙏 기도 읽기</b><span class="rqcnt prdcnt"></span><button type="button" class="dlclose prdclose">닫기</button></div>'+
-        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button><button type="button" class="prdall"></button></div>'+
+        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><div class="prdseg"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button></div><button type="button" class="prdall"></button></div>'+
         '<form class="p1add" autocomplete="off"><input class="p1in" type="text" maxlength="500" enterkeyhint="done" placeholder="✏️ 한 줄 기도 적기" aria-label="한 줄 기도"><button type="submit" class="p1go">추가</button></form>'+
         '<div class="prdlist"></div></div>';
       document.body.appendChild(prd);
