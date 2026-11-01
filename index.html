@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-cc-eye2">
+<meta name="app-build" content="2026-11-01-cc-nofoot">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2308,6 +2308,7 @@ button:active{filter:brightness(1.15)}
 .cch .ccbody{overflow-x:hidden}   /* 암송 숫자 효과가 오른쪽으로 삐져나와 아래에 가로 스크롤 줄이 뜨던 것 막음 (2026-10-30 사용자 요청) */
 .cceye{flex:0 0 auto;align-self:center;position:relative;z-index:6;display:block;margin:8px auto 12px;min-width:170px;height:44px;padding:0 22px;border:1px solid color-mix(in srgb,var(--gold) 55%,#2A2933);border-radius:22px;background-color:#3A3220;color:var(--gold);font-size:15px;font-weight:700;background-image:linear-gradient(180deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 6px 14px rgba(0,0,0,.55)}
 .cceye[hidden]{display:none}
+.ccmain.ccnofoot .ccfoot{display:none}
 .cceye:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
 .cctip{margin:6px 0 16px;font-size:14.5px;line-height:1.6;color:var(--muted)}
 .cctip b{color:var(--ink);font-size:16px}
@@ -9355,7 +9356,7 @@ body.carddrag #reviewBar{display:none!important}
   }
   function ccEyeSync(){
     var eye=ccBox&&ccBox.querySelector(".cceye"), vv=ccBox&&ccBox.querySelector(".ccverse"), cb=ccBox&&ccBox.querySelector(".ccbody"); if(!eye||!vv||!cb)return;
-    var show=!!vv.querySelector(".ccw.hid")&&!(C&&C.paint)&&(vv.classList.contains("ccall")||cb.scrollHeight>cb.clientHeight+2);   // 다 보이는 중이면 늘 보여서 다시 가릴 수 있게
+    var show=!!vv.querySelector(".ccw.hid")&&!(C&&C.paint)&&(cb.scrollHeight>cb.clientHeight+2||(vv.classList.contains("ccall")&&!eye.hidden));   // 긴 말씀(스크롤)일 때만. 펼친 뒤 짧아져도 다시 가릴 수 있게 남김. 짧은 말씀은 안 보임 (2026-11-01)
     eye.hidden=!show; eye.textContent=vv.classList.contains("ccall")?"🙈 다시 가리기":"👁 말씀 보기";
   }
   function ccMask(sp){   // 가린 낱말: 진짜 글자가 칸 너비를 잡고(안 보임), ○는 그 위에 겹쳐 보여 준다
@@ -9596,6 +9597,8 @@ body.carddrag #reviewBar{display:none!important}
     var prev=C.shown; C.shown=C.stage;
     CC_STEPS.forEach(function(t,i){var dn=i<Math.min(C.stage,4);var d=document.createElement("span");d.className="ccst"+(dn?" done":i===C.stage?" now":"")+(dn&&i>=prev?" just":"");d.dataset.i=i;d.setAttribute("role","button");d.tabIndex=0;d.setAttribute("aria-label",t+" 단계로");d.innerHTML='<i></i><span></span>';d.querySelector("i").textContent=dn?"✓":String(i+1);d.querySelector("span").textContent=t;st.appendChild(d)});
     var tip=ccBox.querySelector(".cctip"), ft=ccBox.querySelector(".ccfoot"); ft.textContent=""; tip.textContent="";
+    // 읽기·첫 글자·가리기·떠올리기에서는 아래 단추 줄을 숨김 — 단계는 위 단계 줄을 눌러 넘어감 (2026-11-01 사용자 요청). 고치기·타이핑 채점·결과 화면은 그대로
+    ccBox.classList.toggle("ccnofoot",!C.edit&&!(C.dict&&C.dict.on)&&C.stage<=3);
     function btn(t,a,main){var b=document.createElement("button");b.type="button";b.className="ccbtn"+(main?" main":"");b.dataset.a=a;b.textContent=t;ft.appendChild(b);return b}
     var anim=C.anim; C.anim=false;
     var vEl=ccBox.querySelector(".ccverse");
