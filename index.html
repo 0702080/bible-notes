@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-02-cltag">
+<meta name="app-build" content="2026-11-02-glass">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4221,6 +4221,14 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
 body.boardon .toolbar .bfilter{background:rgba(8,8,11,.72);border-color:rgba(255,255,255,.14);color:#F4F1EA;font-size:14px;caret-color:var(--gold)}
 body.boardon .toolbar .bfilter::placeholder{color:rgba(255,255,255,.45)}
 body.boardon .toolbar .bfilter:focus{background:rgba(6,6,9,.88);border-color:color-mix(in srgb,var(--gold) 60%,transparent);color:#fff}
+/* 윗줄 묶음을 검정 대신 반투명 유리처럼 — 배경 사진이 은은하게 비침 (2026-11-02 사용자 요청) */
+body.boardon .todaymini,body.boardon .toolbar .bfilter,body.boardon .viewseg{
+  background-image:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,.035))!important;
+  background-color:rgba(20,19,26,.38)!important;
+  -webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);
+  border:1px solid rgba(255,255,255,.14)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.28)!important}
+body.boardon .toolbar .bfilter:focus{background-color:rgba(14,13,18,.62)!important;border-color:color-mix(in srgb,var(--gold) 55%,transparent)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
