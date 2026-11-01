@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-01-abgu">
+<meta name="app-build" content="2026-11-01-bleft">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1849,10 +1849,10 @@ body.boardon{height:100vh;overflow:hidden}
 #sortBtn,body.boardon .toolbar #sortBtn{--pb:#8B78BD}
 #filterBtn,body.boardon .toolbar #filterBtn{--pb:#6DA58F}
 #topMenu>summary.tbtn,body.boardon .toolbar #topMenu>summary.tbtn{--pb:#B9866E}
-.topicbar .tchip.tfoldbtn{--pb:#7395BD}
-#sortBtn,#filterBtn,#topMenu>summary.tbtn,.topicbar .tchip.tfoldbtn,
+.topicbar .tchip.tfoldbtn,.bleft .tchip.tfoldbtn{--pb:#7395BD}
+#sortBtn,#filterBtn,#topMenu>summary.tbtn,.topicbar .tchip.tfoldbtn,.bleft .tchip.tfoldbtn,
 body.boardon .toolbar #sortBtn,body.boardon .toolbar #filterBtn,body.boardon .toolbar #topMenu>summary.tbtn{background:var(--pb);color:#23202B;border:1px solid color-mix(in srgb,var(--pb) 70%,#000);box-shadow:0 1px 3px rgba(0,0,0,.35);font-weight:600}
-.topicbar .tchip.tfoldbtn{border-style:solid}
+.topicbar .tchip.tfoldbtn,.bleft .tchip.tfoldbtn{border-style:solid}
 #filterBtn[aria-pressed="true"],#topMenu[open]>summary.tbtn,
 body.boardon .toolbar #filterBtn[aria-pressed="true"],body.boardon #topMenu[open]>summary.tbtn{background:color-mix(in srgb,var(--pb) 82%,#000);color:#141218;box-shadow:0 0 0 2px color-mix(in srgb,var(--pb) 60%,transparent)}
 .colbar .cchip.on{background:color-mix(in srgb,var(--gold) 22%,#141318)}
@@ -2011,6 +2011,10 @@ body.boardon #list,body.boardon #reviewBar,body.boardon #empty{display:none!impo
 .bcdel.sure::before{display:none}
 @media (hover:hover){.bcdel:hover{background:#34313D;color:var(--ink)}}
 .baddcol{flex:0 0 120px;align-self:flex-start;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;height:120px;margin:0;border:1.5px dashed #46424F;border-radius:16px;background:transparent;color:var(--muted);font-size:13.5px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+body.boardon.tfolded .topicbar{display:none}
+.bleft{flex:0 0 120px;align-self:flex-start;display:flex;flex-direction:column;gap:8px}
+.bleft .tchip{width:100%;justify-content:center;margin:0;white-space:nowrap}
+.bleft .baddcol{flex:0 0 auto;width:100%;height:96px;margin-top:4px}
 .baddcol span{font-size:26px;line-height:1;font-weight:400}
 @media (hover:hover){.baddcol:hover{border-color:var(--gold);color:var(--gold);background:color-mix(in srgb,var(--gold) 6%,transparent)}}
 .bcfold{flex:0 0 auto;width:26px;height:26px;margin-left:2px;padding:0;border:0;border-radius:13px;background:#34313D;color:var(--ink);display:grid;place-items:center;cursor:pointer}
@@ -4085,7 +4089,7 @@ body.carddrag #reviewBar{display:none!important}
 #topMenu .pop button:hover,#topMenu .pop button:focus-visible,#topMenu .pop button:active{background-color:#34323D!important;background-image:linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.05) 50%,rgba(0,0,0,.08) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.25),0 3px 0 rgba(0,0,0,.35),0 5px 9px rgba(0,0,0,.35)!important;outline:none}
 #topMenu .pop button:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.3)!important}
 /* 색 단추(내 순서·🔍·⋯·전체·#주제 펼치기)는 아래쪽 그늘을 옅게 — 아래도 밝게 (2026-11-01 사용자 요청) */
-#sortBtn,#filterBtn,#topMenu>summary.tbtn,.topicbar .tchip.tfoldbtn,.topicbar .tchip.on,body.boardon .toolbar #sortBtn,body.boardon .toolbar #filterBtn,body.boardon .toolbar #topMenu>summary.tbtn{background-image:linear-gradient(180deg,rgba(255,255,255,.32) 0%,rgba(255,255,255,.12) 50%,rgba(255,255,255,.04) 80%,rgba(0,0,0,.06) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 0 rgba(0,0,0,.12),0 3px 0 rgba(0,0,0,.30),0 5px 9px rgba(0,0,0,.35)!important}
+#sortBtn,#filterBtn,#topMenu>summary.tbtn,.topicbar .tchip.tfoldbtn,.bleft .tchip.tfoldbtn,.topicbar .tchip.on,.bleft .tchip.on,body.boardon .toolbar #sortBtn,body.boardon .toolbar #filterBtn,body.boardon .toolbar #topMenu>summary.tbtn{background-image:linear-gradient(180deg,rgba(255,255,255,.32) 0%,rgba(255,255,255,.12) 50%,rgba(255,255,255,.04) 80%,rgba(0,0,0,.06) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 0 rgba(0,0,0,.12),0 3px 0 rgba(0,0,0,.30),0 5px 9px rgba(0,0,0,.35)!important}
 
 /* 🧊 설교 메모 맨 위 + 새 메모·📖 읽기·닫기 단추도 또렷한 입체 (2026-11-01 사용자 요청) */
 .srmsheet .dlbar .dlclose,.saysheet .dlbar .dlclose{background-color:#2A2933!important;border-color:#45434F!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.30),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.45)!important;transition:transform .08s,box-shadow .08s}
@@ -4553,7 +4557,7 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
   function kbFit(box){
     var cols=box.querySelectorAll(":scope>.bcol"), open=0, fixed=0, gap=14, n=0;
     Array.prototype.forEach.call(cols,function(c){n++; if(c.classList.contains("bfold"))fixed+=54; else open++});
-    var ad=box.querySelector(":scope>.baddcol"); if(ad){fixed+=120;n++}
+    var ad=box.querySelector(":scope>.baddcol,:scope>.bleft"); if(ad){fixed+=120;n++}
     if(!open){box.style.removeProperty("--bcw");return}
     var w=Math.floor((box.clientWidth-fixed-gap*Math.max(0,n-1)-4)/open);
     if(w>=270){box.style.removeProperty("--bcw");document.body.style.removeProperty("--bcw")} else {box.style.setProperty("--bcw",Math.max(220,w)+"px");document.body.style.setProperty("--bcw",Math.max(220,w)+"px")}   // 찾은 결과 칸도 같은 폭
@@ -4914,7 +4918,16 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
     var w=box.clientWidth||document.documentElement.clientWidth||1200, room=Math.max(1,Math.floor((w+14)/284)-2);   // 내가 만든 칸이 늘어도 자동 칸 수는 그대로, 넘치면 오른쪽으로 (2026-10-24 사용자 요청)
     var cols=auto.length?Math.max(1,Math.min(auto.length,room)):0, per=cols?Math.ceil(auto.length/cols):0;
     // 새 칸 단추와 내가 만든 칸은 맨 왼쪽에 (2026-10-23 사용자 요청)
-    if(!filtering){var ad=document.createElement("button"); ad.type="button"; ad.className="baddcol"; ad.innerHTML='<span>＋</span>새 칸'; ad.title="새 칸 만들기"; box.appendChild(ad)}
+    // 주제 줄을 접으면 '전체'·'#주제 펼치기'를 칸반 왼쪽 '새 칸' 위에 세로로 — 위 빈 줄을 없애 칸을 위로 (2026-11-01 사용자 요청)
+    var lstk=null;
+    if(document.body.classList.contains("tfolded")){
+      lstk=document.createElement("div"); lstk.className="bleft";
+      var nT=allTopics().length;
+      lstk.innerHTML='<button type="button" class="tchip bltall'+(topicSel.length?'':' on')+'" data-bl="all">전체</button><button type="button" class="tchip tfoldbtn" data-bl="fold" title="주제를 모두 펼쳐요"></button>';
+      lstk.querySelector('[data-bl="fold"]').textContent="#주제 "+nT+"개 ▾";
+      box.appendChild(lstk);
+    }
+    if(!filtering){var ad=document.createElement("button"); ad.type="button"; ad.className="baddcol"; ad.innerHTML='<span>＋</span>새 칸'; ad.title="새 칸 만들기"; (lstk||box).appendChild(ad)}
     // 내가 만든 칸은 끌어서 놓은 자리(앞에 오는 자동 칸 수)에 그림 (2026-10-23 사용자 요청)
     var cpos=colPos(), nAuto=0;
     for(var c=0;c<cols;c++){if(auto.slice(c*per,(c+1)*per).length)nAuto=c+1}
@@ -8077,6 +8090,7 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
     }
     var add=document.createElement("button"); add.type="button"; add.className="tchip tcollect"; add.id="openCollect"; add.textContent="+ 주제로 모으기"; if(!topicFold)bar.appendChild(add);
     if(ts.length){var fb=document.createElement("button"); fb.type="button"; fb.className="tchip tfoldbtn"; fb.textContent=topicFold?"#주제 "+ts.length+"개 펼치기 ▾":"접기 ▴"; fb.title=topicFold?"주제를 모두 펼쳐요":"주제 줄을 접어요"; bar.insertBefore(fb,bar.children[1]||null)}   // #해시태그 줄 접기·펼치기 (2026-10-29)
+    document.body.classList.toggle("tfolded",!!(topicFold&&ts.length&&bar.querySelectorAll("[data-topic]:not([data-topic=''])").length===0));
     if(typeof firstHit!=="undefined"&&firstHit)setTimeout(function(){try{firstHit.scrollIntoView({block:"nearest",inline:"center",behavior:"smooth"})}catch(e){}},30);
   }
   function todayActClick(e){
@@ -8129,7 +8143,7 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
   })();
   $("colBar").addEventListener("click",function(e){var b=e.target.closest(".cchip"); if(!b)return; var c=b.dataset.col; setColSel(c===colSel?"":c); render(); window.scrollTo(0,0)});
   $("topicBar").addEventListener("click",function(e){
-    if(e.target.closest(".tfoldbtn")){topicFold=!topicFold; try{localStorage.setItem("bible-topic-fold",topicFold?"1":"")}catch(err){} renderTopicBar(); return}
+    if(e.target.closest(".tfoldbtn")){topicFold=!topicFold; try{localStorage.setItem("bible-topic-fold",topicFold?"1":"")}catch(err){} if(boardOn)render(); else renderTopicBar(); return}
     var b=e.target.closest("button"); if(!b)return;
     if(b.id==="openCollect"){openCollect("");return}
     var addT=b.dataset.topic&&!selHas(b.dataset.topic); toggleTopic(b.dataset.topic||""); render();
@@ -17039,6 +17053,8 @@ body.boardon .todaymini,body.boardon .bfilter,body.boardon .tadd,body.boardon .v
   // 칸 이름 두 번 눌러 바꾸기
   $("board").addEventListener("click",function(e){
     if(bMode!=="list")return;
+    var blb=e.target.closest(".bleft [data-bl]");
+    if(blb){e.stopPropagation(); var tb=$("topicBar"), tg=blb.dataset.bl==="all"?tb.querySelector('[data-topic=""]'):tb.querySelector(".tfoldbtn"); if(tg)tg.click(); return}
     var ad=e.target.closest(".baddcol");
     if(ad){
       e.stopPropagation(); var nm=window.prompt("새 칸 이름을 적어 주세요.\n이미 있는 주제 이름(예: 화, 분노, 노함)을 적으면 그 주제 말씀이 바로 이 칸에 모여요.","");
