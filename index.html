@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-cchead">
+<meta name="app-build" content="2026-11-05-ccback">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4552,7 +4552,15 @@ body.reorder .ref .lclisten{display:none}
 .dlic .dlgh .dlicall{flex:0 0 auto;white-space:nowrap}
 /* 암송 코치 맨 위 줄 통일: 🎨·🚶도 단계처럼 동그라미 + 아래 글자, 글자 줄 높이를 맞춤 (2026-11-05 사용자 요청) */
 .cch.ccmain>.bqbar{align-items:flex-start;padding-top:calc(14px + env(safe-area-inset-top,0px))}
-.cch.ccmain>.ccsteps{right:112px}
+.cch.ccmain>.ccsteps{left:50px;right:112px}
+/* 맨 왼쪽 '뒤로': 옆 단계·단추와 같은 동그라미 + 아래 글자 (2026-11-05 사용자 요청) */
+.cch.ccmain>.bqbar .ccback{position:absolute;left:6px;top:calc(14px + env(safe-area-inset-top,0px));z-index:4;display:flex;flex-direction:column;align-items:center;gap:4px;width:44px;margin:0;padding:0;border:0;background:transparent;color:#8E8A97;font-family:inherit;font-size:11px;font-weight:400;line-height:normal;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s}
+.cch.ccmain>.bqbar .ccback::before{content:"";position:absolute;inset:-14px -6px -10px}
+.cch.ccmain>.bqbar .ccback:active{transform:scale(.92)}
+.cch.ccmain>.bqbar .ccback i{box-sizing:border-box;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1.5px solid #55525F;color:#C9C5D2}
+.cch.ccmain>.bqbar .ccback i::before{content:"";width:7px;height:7px;margin-left:3px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg)}
+.cch.ccmain>.bqbar .ccback span{line-height:17px}
+@media (hover:hover){.cch.ccmain>.bqbar .ccback:hover i{border-color:#8E8A97;color:#fff}}
 .cch.ccmain>.bqbar .ccpaint,.cch.ccmain>.bqbar .ccwalk{display:flex;flex-direction:column;align-items:center;gap:4px;width:44px;height:auto;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#8E8A97;font-family:inherit;font-size:11px;font-weight:400;line-height:normal;white-space:nowrap;-webkit-tap-highlight-color:transparent;transition:transform .12s}
 .cch.ccmain>.bqbar .ccpaint:active,.cch.ccmain>.bqbar .ccwalk:active{transform:scale(.92)}
 .cch.ccmain>.bqbar .ccpaint i,.cch.ccmain>.bqbar .ccwalk i{box-sizing:border-box;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:13px;line-height:1;border:1.5px solid #55525F;color:#8E8A97}
@@ -9793,7 +9801,7 @@ body.reorder .ref .lclisten{display:none}
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
       ccBox=document.createElement("div"); ccBox.className="cch ccmain"; ccBox.setAttribute("role","dialog"); ccBox.setAttribute("aria-modal","true"); ccBox.hidden=true;
-      ccBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b class="ccref"></b></div><button type="button" class="ccpaint" aria-pressed="false" title="낱말 색 고르기"><i>🎨</i><span>색</span></button><button type="button" class="ccwalk" title="걸으며 듣기 (걸음마다 한 낱말)"><i>🚶</i><span>걷기</span></button></div>'+
+      ccBox.innerHTML='<div class="bqbar"><button type="button" class="ccback" title="이전 화면으로" aria-label="이전 화면으로"><i></i><span>뒤로</span></button><div class="bqtitle"><b class="ccref"></b></div><button type="button" class="ccpaint" aria-pressed="false" title="낱말 색 고르기"><i>🎨</i><span>색</span></button><button type="button" class="ccwalk" title="걸으며 듣기 (걸음마다 한 낱말)"><i>🚶</i><span>걷기</span></button></div>'+
         '<div class="ccsteps" role="group" aria-label="연습 단계 (눌러서 그 단계로)"></div>'+
         '<div class="ccbody"><small class="ccnum" hidden></small><div class="cctip"></div><div class="ccmid"><div class="ccvwrap"><div class="ccvref"></div><div class="ccverse"></div><div class="ccpal" role="group" aria-label="색상표"></div></div></div></div>'+
         '<div class="ccfoot"></div>';
@@ -9890,6 +9898,7 @@ body.reorder .ref .lclisten{display:none}
         window.addEventListener("resize",later);
       })();
       ccBox.querySelector(".ccwalk").addEventListener("click",function(){if(C)openWalk(notes.get(C.id))});
+      ccBox.querySelector(".ccback").addEventListener("click",function(){closeCoach()});   // 이전 화면으로 (2026-11-05 사용자 요청)
       ccBox.querySelector(".ccpaint").addEventListener("click",function(){
         if(!C)return; C.paint=!C.paint; this.setAttribute("aria-pressed",String(C.paint)); ccEyeSync(); ccPaintLbl(this,C.paint);
         ccBox.classList.toggle("ccpainting",C.paint);
