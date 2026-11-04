@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-dlswipe">
+<meta name="app-build" content="2026-11-05-icrow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4546,6 +4546,10 @@ body.reorder .ref .lclisten{display:none}
 @keyframes dlaslidel{from{transform:translateX(56px);opacity:0}to{transform:none;opacity:1}}
 @keyframes dlaslider{from{transform:translateX(-56px);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.dlaslidel,.dlaslider{animation:none}}
+/* 오늘 기도제목 머리: 제목과 '명단 N명'을 한 줄로, 응답 단추 없앰 (2026-11-05 사용자 요청) */
+.dlic .dlgh{flex-wrap:nowrap}
+.dlic .dlgh .dlgname{flex:0 1 auto;min-width:0;white-space:nowrap}
+.dlic .dlgh .dlicall{flex:0 0 auto;white-space:nowrap}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12342,7 +12346,6 @@ body.reorder .ref .lclisten{display:none}
         cal.addEventListener("click",function(e){if(Date.now()-dlCalEat<350){e.stopPropagation(); e.preventDefault()}},true);
       })();   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
       dl.addEventListener("click",function(e){
-        if(e.target.closest(".dlicansv")){e.stopPropagation(); dlIcShowAns=!dlIcShowAns; buzz(8); drawDaily(); return}
         var ia=e.target.closest(".dlicans");
         if(ia){e.stopPropagation(); var oi=icData(), xi=oi.items.find(function(y){return y.id===ia.dataset.icid}); if(!xi)return;
           xi.ans=xi.ans?0:Date.now(); icTouch(xi); icSave(oi); buzz(xi.ans?[12,40,18]:8); toast(xi.ans?"🙌 응답된 기도로 옮겼어요":"기도제목으로 되돌렸어요"); drawDaily(); return}
@@ -13675,7 +13678,6 @@ body.reorder .ref .lclisten{display:none}
       if(fq)dlMarkIn(it2,fq);
       var ich=document.createElement("span"); ich.className="dlgchev"; ich.setAttribute("aria-hidden","true"); it2.appendChild(ich);
       ih.appendChild(it2);
-      if(icAnsAll.length){var iav=document.createElement("button"); iav.type="button"; iav.className="dlicansv"+(icAV?" on":""); iav.textContent=icAV?"기도제목 보기":"🙌 응답 "+icAnsAll.length; iav.title=icAV?"기다리는 기도제목으로 돌아가요":"응답된 기도만 봐요"; ih.appendChild(iav)}
       var il=document.createElement("button"); il.type="button"; il.className="dlicall"; il.textContent=ico.items.length?"명단 "+ico.items.length+"명 ›":"명단 만들기 ›"; ih.appendChild(il);
       var ihg=document.createElement("button"); ihg.type="button"; ihg.className="dlghgrip"; ihg.dataset.g="__ic"; ihg.textContent="⠿"; ihg.title="끌어서 묶음 차례 바꾸기"; ihg.setAttribute("aria-label","'오늘 중보기도' 묶음 자리 옮기기"); ih.appendChild(ihg);
       isec.appendChild(ih);
