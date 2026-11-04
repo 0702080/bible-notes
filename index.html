@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-iccol">
+<meta name="app-build" content="2026-11-04-acc">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12001,6 +12001,9 @@ body:not(.boardon) .bfwrap{display:none!important}
   var dlIcOpen=new Set(), dlIcTap={id:"",t:0};   // 하루 돌아보기에서 기도문을 펼친 중보기도
   var dl=null, dlDay="", dlWEnd="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set(), dlmTap={id:"",t:0};
   try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
+  // 묶음은 하나만 펼침: 하나를 열면 나머지는 저절로 접힘 — 심플하게 보여야 실천하기 좋음 (2026-11-04 사용자 요청)
+  function dlGKeys(){return ["__acts","__ic"].concat(dlGroups(dailyData()).map(function(g){return g.g}))}
+  function dlGOnly(gg){if(dlGFold.has(gg))return; dlGKeys().forEach(function(k){if(k!==gg)dlGFold.add(k)})}
   function saveGFold(){try{localStorage.setItem("bible-daily-gfold",JSON.stringify(Array.from(dlGFold)))}catch(e){}}
   // PC 달력 팝업: 브라우저 기본 달력은 모서리를 둥글게 못 해서 직접 그림 (휴대폰은 기본 달력, 2026-10-24 사용자 요청)
   var DP_FINE=window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches;
@@ -12357,11 +12360,11 @@ body:not(.boardon) .bfwrap{display:none!important}
         if(rf&&!dlEdit){e.stopPropagation(); openReader({book:+rf.dataset.b,chapter:+rf.dataset.c,verse:+rf.dataset.v||0}); return}   // 시편 91편 → 장 읽기
         var b=e.target.closest("button"); if(!b)return; var o=dailyData(), id=b.dataset.id;
         if(b.classList.contains("dlicall")){openIntercede();return}
-        if(b.classList.contains("dlicopen")){var oid=b.dataset.icid; if(dlIcOpen.has(oid))dlIcOpen.delete(oid); else dlIcOpen.add(oid); drawDaily(); return}
+        if(b.classList.contains("dlicopen")){var oid=b.dataset.icid; if(dlIcOpen.has(oid))dlIcOpen.delete(oid); else{dlIcOpen.clear(); dlIcOpen.add(oid)} drawDaily(); return}
         if(b.classList.contains("dlicrow")){
           var iid=b.dataset.icid;
           if(!e.target.closest(".dlbox")){   // 왼쪽 네모 = 체크, 나머지(글) = 기도문 펼치기·접기 (2026-10-24 사용자 요청)
-            if(dlIcOpen.has(iid))dlIcOpen.delete(iid); else dlIcOpen.add(iid);
+            if(dlIcOpen.has(iid))dlIcOpen.delete(iid); else{dlIcOpen.clear(); dlIcOpen.add(iid)}
             drawDaily(); return;
           }
           var icon=icToggle(iid,dlDay); buzz(icon?[12,40,18]:8); drawDaily(); return}
@@ -12431,13 +12434,14 @@ body:not(.boardon) .bfwrap{display:none!important}
         if(b.classList.contains("dlghgrip"))return;   // 손잡이는 끌기 전용
         if(b.classList.contains("dlgname")){   // 한 번 누르면 접고 펼치기, 빠르게 두 번이면 이름 바꾸기
           var gg=b.dataset.g, nowT=Date.now();
-          if(/^__/.test(gg)){if(dlGFold.has(gg))dlGFold.delete(gg); else dlGFold.add(gg); saveGFold(); drawDaily(); return}   // 말씀 실천·중보기도: 누르면 접고 펼치기만 (2026-10-24 사용자 요청)
+          if(/^__/.test(gg)){if(dlGFold.has(gg))dlGFold.delete(gg); else dlGFold.add(gg); dlGOnly(gg); saveGFold(); drawDaily(); return}   // 말씀 실천·중보기도: 누르면 접고 펼치기만 (2026-10-24 사용자 요청)
           if(dlgTap.g===gg&&nowT-dlgTap.t<450){
-            if(dlGFold.has(gg))dlGFold.delete(gg); else dlGFold.add(gg);   // 첫 번째 누름으로 바뀐 접힘을 되돌림
+            if(dlgTap.snap)dlGFold=new Set(dlgTap.snap); else if(dlGFold.has(gg))dlGFold.delete(gg); else dlGFold.add(gg);   // 첫 번째 누름으로 바뀐 접힘을 되돌림
             saveGFold(); dlgTap={g:"",t:0}; dlGEditId=gg; dlEditId=""; drawDaily(); return;
           }
-          dlgTap={g:gg,t:nowT};
+          dlgTap={g:gg,t:nowT,snap:Array.from(dlGFold)};
           if(dlGFold.has(gg))dlGFold.delete(gg); else dlGFold.add(gg);
+          dlGOnly(gg);
           saveGFold(); drawDaily(); return;
         }
         if(b.classList.contains("dlrow")&&dlEdit){dlEditId=id;dlGEditId="";drawDaily();return}   // 고치기 중에는 눌러서 글 수정
@@ -12459,7 +12463,7 @@ body:not(.boardon) .bfwrap{display:none!important}
             dlrTap={id:"",t:0,tog:false}; dlEditId=id; dlGEditId=""; drawDaily(); return;
           }
           var mtx=dlMemoGet(o,dlDay,id)||dlMemoExtras(o,dlDay,id).length;
-          if(mtx){ if(dlMemoMore.has(id))dlMemoMore.delete(id); else dlMemoMore.add(id); dlrTap={id:id,t:nowR,tog:true}; drawDaily(); return }
+          if(mtx){ if(dlMemoMore.has(id))dlMemoMore.delete(id); else{dlMemoMore.clear(); dlMemoMore.add(id)} dlrTap={id:id,t:nowR,tog:true}; drawDaily(); return }
           dlrTap={id:id,t:nowR,tog:false}; dlOpenMemo(id); return;
         }
       });
@@ -12476,6 +12480,11 @@ body:not(.boardon) .bfwrap{display:none!important}
       var fit=dailyData().items.filter(function(x){return x.id===focusId})[0];
       if(fit){dlGFold.delete(fit.g); saveGFold(); if(!dlPinned(dailyData(),fit.g))dlShowAll=true}
     }
+    (function(){   // 열 때도 펼친 묶음은 하나만
+      var ks=dlGKeys(), keep=ks.filter(function(k){return !dlGFold.has(k)})[0];
+      if(focusId){var fi=dailyData().items.filter(function(x){return x.id===focusId})[0]; if(fi)keep=fi.g}
+      if(keep){dlGFold.delete(keep); dlGOnly(keep); saveGFold()}
+    })();
     dl.hidden=false; if(dl._dlsPlace)dl._dlsPlace(); document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawDaily();   // 창이 보인 뒤에 그려야 알약 단추 너비를 재서 글자 자리를 비울 수 있다
     if(focusId)setTimeout(function(){
