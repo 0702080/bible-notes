@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-pricol">
+<meta name="app-build" content="2026-11-04-pfold">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4485,6 +4485,7 @@ body:not(.boardon) .bfwrap{display:none!important}
 .prays>.pri .prvt{color:color-mix(in srgb,var(--prc) 35%,#fff)}
 .prays>.pri.answered .prvt{color:#C9C4D2}
 .prays>.pri .pt{background:color-mix(in srgb,var(--prc) 10%,#101013);border-color:color-mix(in srgb,var(--prc) 40%,#2E2D33);color:color-mix(in srgb,var(--prc) 35%,#fff)}
+.prays.pallfold>.pri{display:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -6033,10 +6034,15 @@ body:not(.boardon) .bfwrap{display:none!important}
       psb.title=x.sh?"친구도 이 기도를 볼 수 있어요 (누르면 나만 보기)":"이 기도는 나만 봐요 (누르면 친구에게 보여 주기)"; psb.hidden=!!n.priv;
     });
     have.forEach(function(d){d.remove()});
+    // 기도문이 여럿이면 전체 접기·펼치기 (2026-11-04 사용자 요청)
+    var pfb=el.querySelector(".pfoldall"), pfd=prFoldAll.has(n.id)&&list.length>1;
+    if(pfb){pfb.hidden=list.length<2; pfb.textContent=pfd?"펼치기 ("+list.length+") ▾":"전체 접기 ▴"; pfb.setAttribute("aria-expanded",String(!pfd))}
+    box.classList.toggle("pallfold",pfd);
     var hint=el.querySelector(".phint"); if(!hint){hint=document.createElement("p");hint.className="phint";hint.textContent="두 번 누르면 고칠 수 있어요";box.parentNode.insertBefore(hint,box.nextSibling)}
-    hint.hidden=!list.length;
+    hint.hidden=!list.length||pfd;
   }
-  var prEdit=new Set(), prTap={id:"",t:0};
+  var prEdit=new Set(), prTap={id:"",t:0}, prFoldAll=new Set();
+  try{JSON.parse(localStorage.getItem("bible-pray-foldall")||"[]").forEach(function(x){prFoldAll.add(String(x))})}catch(e){}
   function editPray(card,pid){
     prEdit.add(pid); render();
     var d=card.querySelector('.pri[data-pid="'+pid+'"]'); if(!d)return;
@@ -6262,7 +6268,7 @@ body:not(.boardon) .bfwrap{display:none!important}
           '<div class="meds"></div>'+
         '</div>'+
         '<div class="pane" data-pane="p" hidden>'+
-          '<div class="qbtns"><button type="button" class="addbtn s addp">+ 기도</button><button type="button" class="addbtn s pread">읽기 모드</button><button type="button" class="mpriv" aria-pressed="false"></button></div>'+
+          '<div class="qbtns"><button type="button" class="addbtn s addp">+ 기도</button><button type="button" class="addbtn s pread">읽기 모드</button><button type="button" class="addbtn s pfoldall" hidden></button><button type="button" class="mpriv" aria-pressed="false"></button></div>'+
           '<div class="prays"></div>'+
         '</div>'+
         '<div class="pane" data-pane="a" hidden>'+
@@ -7751,6 +7757,7 @@ body:not(.boardon) .bfwrap{display:none!important}
     if(b.classList.contains("addm")||b.classList.contains("addq")||b.classList.contains("adda")){tabOf.set(id,b.classList.contains("addm")?"m":b.classList.contains("addq")?"q":"a")}
     if(b.classList.contains("pread")){openPrayRead(id);return}
     if(b.classList.contains("addp")){
+      prFoldAll.delete(id);   // 새 기도를 적을 때는 펼쳐서
       tabOf.set(id,"p"); if(!n.prays)n.prays=[]; var np={id:qid(),t:PRAY_TPL,at:Date.now(),ans:0,an:""}; n.prays.push(np); prEdit.add(np.id); render(); scheduleSave(id);   // 기도문 틀로 시작 (2026-10-24 사용자 요청)
       var pc=cards.get(id), pe=pc&&pc.querySelector('.pri[data-pid="'+np.id+'"] .pt'); if(pe)setTimeout(function(){grow(pe);pe.focus();var cp=PRAY_HEAD.length;try{pe.setSelectionRange(cp,cp)}catch(err){}},40);
       return;
@@ -7759,6 +7766,11 @@ body:not(.boardon) .bfwrap{display:none!important}
       var spx=(n.prays||[]).find(function(x){return x.id===b.closest(".pri").dataset.pid}); if(!spx)return;
       spx.sh=spx.sh?0:1; render(); scheduleSave(id);
       toast(spx.sh?"이 기도는 친구도 볼 수 있어요":"이 기도는 이제 나만 봐요"); return;
+    }
+    if(b.classList.contains("pfoldall")){
+      if(prFoldAll.has(id))prFoldAll.delete(id); else prFoldAll.add(id);
+      try{localStorage.setItem("bible-pray-foldall",JSON.stringify(Array.from(prFoldAll).slice(-500)))}catch(err){}
+      render(); return;
     }
     if(b.classList.contains("pansbtn")||b.classList.contains("pdel")){
       var pid=b.closest(".pri").dataset.pid, px=(n.prays||[]).find(function(x){return x.id===pid}); if(!px)return;
