@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-mndrag">
+<meta name="app-build" content="2026-11-05-mnbuzz">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -19176,9 +19176,9 @@ body.reorder .ref .lclisten{display:none}
       var sibs=Array.prototype.filter.call(pop.querySelectorAll(":scope>button"),function(x){return x!==M.b&&x.offsetHeight>0});
       for(var i=0;i<sibs.length;i++){
         var r=sibs[i].getBoundingClientRect();
-        if(y<r.top+r.height/2){if(M.b.nextElementSibling!==sibs[i])pop.insertBefore(M.b,sibs[i]);return}
+        if(y<r.top+r.height/2){if(M.b.nextElementSibling!==sibs[i]){pop.insertBefore(M.b,sibs[i]); buzz(14)} return}   // 한 칸 옮길 때마다 진동 (2026-11-05 사용자 요청)
       }
-      if(sibs.length)pop.insertBefore(M.b,sibs[sibs.length-1].nextSibling);
+      if(sibs.length&&sibs[sibs.length-1].nextElementSibling!==M.b){pop.insertBefore(M.b,sibs[sibs.length-1].nextSibling); buzz(14)}
     }
     // 메뉴가 화면보다 길어서, 위·아래 끝으로 끌면 저절로 굴러감
     var edgeT=0, lastY=0;
