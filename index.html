@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-ledger">
+<meta name="app-build" content="2026-11-05-mndrag">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4634,6 +4634,8 @@ body.reorder .ref .lclisten{display:none}
 .lddel.arm{background:#5A2028;border-color:#B5525E;color:#fff}
 .ldcancel{border:1px solid #2F2E36;background:transparent;color:var(--muted)}
 .ldsave{border:0;background:var(--gold);color:#141416;font-weight:700}
+/* ⋯ 메뉴 끌기: 잡은 칸이 떠 보이게 (2026-11-05) */
+.pop>button.mndrag{position:relative;z-index:2;transform:scale(1.03);box-shadow:0 8px 22px rgba(0,0,0,.55);background:color-mix(in srgb,var(--gold) 26%,#1E1D24)!important;outline:1px solid color-mix(in srgb,var(--gold) 65%,transparent)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -19160,13 +19162,33 @@ body.reorder .ref .lclisten{display:none}
     var M=null, block=false;
     pop.addEventListener("pointerdown",function(e){
       var b=e.target.closest("button"); if(!b||b.parentNode!==pop||!b.id||(e.pointerType==="mouse"&&e.button!==0))return;
-      M={b:b,pid:e.pointerId,x:e.clientX,y:e.clientY,on:false,touch:e.pointerType!=="mouse",t:0};
+      M={b:b,pid:e.pointerId,x:e.clientX,y:e.clientY,on:false,touch:e.pointerType!=="mouse",t:0}; lastY=e.clientY;
       if(M.touch)M.t=setTimeout(function(){if(M&&!M.on)start()},380);
     });
     function start(){
       M.on=true; M.b.classList.add("mndrag"); pop.classList.add("mnsorting"); buzz(12);
       try{M.b.setPointerCapture(M.pid)}catch(e){}
+      clearInterval(edgeT); edgeT=setInterval(edgeScroll,30);
     }
+    // 끄는 칸을 손가락 높이에 맞는 자리로
+    function place(y){
+      if(!M)return;
+      var sibs=Array.prototype.filter.call(pop.querySelectorAll(":scope>button"),function(x){return x!==M.b&&x.offsetHeight>0});
+      for(var i=0;i<sibs.length;i++){
+        var r=sibs[i].getBoundingClientRect();
+        if(y<r.top+r.height/2){if(M.b.nextElementSibling!==sibs[i])pop.insertBefore(M.b,sibs[i]);return}
+      }
+      if(sibs.length)pop.insertBefore(M.b,sibs[sibs.length-1].nextSibling);
+    }
+    // 메뉴가 화면보다 길어서, 위·아래 끝으로 끌면 저절로 굴러감
+    var edgeT=0, lastY=0;
+    function edgeScroll(){
+      if(!M||!M.on){clearInterval(edgeT);return}
+      var v=window.innerHeight, d=lastY<70?-Math.ceil((70-lastY)/5):lastY>v-70?Math.ceil((lastY-(v-70))/5):0;
+      if(d){window.scrollBy(0,d); place(lastY)}
+    }
+    // 휴대폰: 꾹 누른 뒤에는 손가락을 움직여도 화면이 스크롤되지 않게 — 안 막으면 브라우저가 끌기를 끊어 버림 (2026-11-05 사용자 요청)
+    pop.addEventListener("touchmove",function(e){if(M&&M.on&&e.cancelable)e.preventDefault()},{passive:false});
     document.addEventListener("pointermove",function(e){
       if(!M||e.pointerId!==M.pid)return;
       var d=Math.abs(e.clientX-M.x)+Math.abs(e.clientY-M.y);
@@ -19174,16 +19196,10 @@ body.reorder .ref .lclisten{display:none}
         if(M.touch){if(d>10){clearTimeout(M.t);M=null}return}   // 휴대폰: 꾹 누르기 전에 움직이면 그냥 스크롤
         if(d<6)return; start();
       }
-      e.preventDefault();
-      var sibs=Array.prototype.filter.call(pop.querySelectorAll(":scope>button"),function(x){return x!==M.b&&!x.hidden});
-      for(var i=0;i<sibs.length;i++){
-        var r=sibs[i].getBoundingClientRect(), mid=r.top+r.height/2, before=M.b.compareDocumentPosition(sibs[i])&Node.DOCUMENT_POSITION_PRECEDING;
-        if(before&&e.clientY<mid){pop.insertBefore(M.b,sibs[i]);break}
-        if(!before&&e.clientY>mid)pop.insertBefore(M.b,sibs[i].nextSibling);
-      }
+      e.preventDefault(); lastY=e.clientY; place(lastY);
     },{passive:false});
     function end(e){
-      if(!M||e.pointerId!==M.pid)return; clearTimeout(M.t);
+      if(!M||e.pointerId!==M.pid)return; clearTimeout(M.t); clearInterval(edgeT);
       if(M.on){
         M.b.classList.remove("mndrag"); pop.classList.remove("mnsorting");
         var ids=Array.prototype.map.call(pop.querySelectorAll(":scope>button"),function(x){return x.id}).filter(Boolean);
