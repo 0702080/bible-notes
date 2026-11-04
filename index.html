@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-act4">
+<meta name="app-build" content="2026-11-04-actrow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4316,10 +4316,16 @@ body.boardon .fscrow{display:none}
 .bcpin.on{opacity:1!important;filter:none}
 @media (hover:none){.bcpin{opacity:.45}}
 /* 6·7 말씀 실천 */
-.dlactedit{flex:0 0 auto;width:28px;height:28px;padding:0;border:0;border-radius:14px;background:transparent;font-size:13px;opacity:.55}
+/* 말씀 실천 줄: 글 | 구절(같은 폭, 세로 줄 맞춤) | ✏️ — 겹치지 않게 (2026-11-04 사용자 요청) */
+.dlactedit{position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:2;width:28px;height:28px;padding:0;border:0;border-radius:14px;background:transparent;font-size:13px;opacity:.6}
+.dlitem.haspill.dlactitem .dlactref{right:40px;width:92px;max-width:92px;box-sizing:border-box;text-align:center;overflow:hidden;text-overflow:ellipsis}
+.dlitem.haspill.dlactitem .dlrow{padding-right:142px!important}
+@media (max-width:480px){.dlitem.haspill.dlactitem .dlrow{padding-right:12px!important;padding-bottom:42px}.dlitem.haspill.dlactitem .dlactref{right:auto;left:12px;width:auto;max-width:calc(100% - 70px)}.dlactedit{top:auto;bottom:6px;transform:none}}
 .dlactedit:hover{opacity:1;background:rgba(255,255,255,.08)}
 .dlactin{flex:1;min-width:0;height:44px}
-.dlactpgr{justify-content:space-between}
+.dlactpgr{display:grid;grid-template-columns:1fr auto 1fr;gap:10px}
+.dlactpgr .dlactpg{width:100%;height:32px;padding:0 8px;border-radius:16px}
+.dlactpgr span{text-align:center}
 .dlactpgr span{color:var(--muted);font-size:12.5px}
 /* 14 스마트 말씀 카드 색 */
 .smbody>*{--sc:var(--violet)}
@@ -13301,13 +13307,13 @@ body.boardon .fscrow{display:none}
         row.appendChild(b);
         var ped=document.createElement("button"); ped.type="button"; ped.className="dlactedit"; ped.dataset.k=x.n.id+"|"+x.a.id; ped.textContent="✏️"; ped.title="이 실천 글 고치기"; ped.setAttribute("aria-label","이 실천 글 고치기"); row.appendChild(ped);
         var rb=document.createElement("button"); rb.type="button"; rb.className="dlauto dlactref"; rb.dataset.nid=x.n.id;
-        rb.textContent=(x.n.ref||"말씀")+" ›"; rb.title="이 말씀 카드 열기";
+        rb.textContent=x.n.ref||"말씀"; rb.title="이 말씀 카드 열기";
         row.appendChild(rb);
         asec.appendChild(row);
       });
       if(acPages>1){
         var pgr=document.createElement("div"); pgr.className="dl3foot dlactpgr";
-        pgr.innerHTML='<button type="button" class="dlactpg dl3all" data-d="-1">‹ 앞 4개</button><span></span><button type="button" class="dlactpg dl3one" data-d="1">다음 4개 ›</button>';
+        pgr.innerHTML='<button type="button" class="dlactpg dl3all" data-d="-1">앞 4개</button><span></span><button type="button" class="dlactpg dl3one" data-d="1">다음 4개</button>';
         pgr.querySelector("span").textContent=(acPg+1)+" / "+acPages; asec.appendChild(pgr);
       }
       outer.insertBefore(asec,outer.firstChild);
