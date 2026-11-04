@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-acswipe">
+<meta name="app-build" content="2026-11-05-dlswipe">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4538,9 +4538,9 @@ body.reorder .ref .lclisten{display:none}
 .ccblank.drag{background:color-mix(in srgb,var(--gold) 12%,transparent)}
 .ccblank.drag::after{background:var(--gold);opacity:1}
 /* 말씀 실천 옆으로 끌어 넘기기 (2026-11-05 사용자 요청) */
-.dlactswipe{overflow-x:clip}
-.dlactswipe .dlactitem{touch-action:pan-y}
-.dlactdrag .dlactitem{-webkit-user-select:none;user-select:none}
+.dlswipe{overflow-x:clip}
+.dlswipe .dlitem,.dlswipe .dlicwrap{touch-action:pan-y}
+.dlswiping .dlitem,.dlswiping .dlicwrap{-webkit-user-select:none;user-select:none}
 .dlaslidel{animation:dlaslidel .24s cubic-bezier(.2,.8,.3,1) both}
 .dlaslider{animation:dlaslider .24s cubic-bezier(.2,.8,.3,1) both}
 @keyframes dlaslidel{from{transform:translateX(56px);opacity:0}to{transform:none;opacity:1}}
@@ -11612,10 +11612,11 @@ body.reorder .ref .lclisten{display:none}
     return changed;
   }
   function icLastBefore(x,day){var l=(x.log||[]).filter(function(d){return d<day}); return l.length?l[l.length-1]:""}
-  function icPick(o,day){   // 그날 기도할 사람: 그날 이미 기도한 사람 + 오래 못 한 사람부터 per명까지
+  function icPick(o,day,skip){   // 그날 기도할 사람: 그날 이미 기도한 사람 + 오래 못 한 사람부터 per명까지 (skip=옆으로 넘긴 수)
     var live=o.items.filter(function(x){return !x.ans});
     var done=live.filter(function(x){return x.log.indexOf(day)>=0});
     var rest=live.filter(function(x){return x.log.indexOf(day)<0}).sort(function(a,b){var la=icLastBefore(a,day), lb=icLastBefore(b,day); return la<lb?-1:la>lb?1:a.at-b.at});
+    if(skip&&rest.length){var sk=((skip%rest.length)+rest.length)%rest.length; rest=rest.slice(sk).concat(rest.slice(0,sk))}
     return done.concat(rest.slice(0,Math.max(0,o.per-done.length)));
   }
   function icToggle(id,day){
@@ -13237,28 +13238,34 @@ body.reorder .ref .lclisten{display:none}
       box.appendChild(ta);
     }
   }
-  // 말씀 실천 카드를 옆으로 끌면 왼쪽=다음 4개, 오른쪽=앞 4개 (2026-11-05 사용자 요청)
-  var dlActSlide=0;
-  function dlActSwipe(sec){
-    sec.classList.add("dlactswipe");
+  // 하루 돌아보기 묶음 카드를 옆으로 끌면 왼쪽=다음, 오른쪽=이전 (2026-11-05 사용자 요청)
+  // key=묶음 이름, sel=움직일 카드, go(d)=d(1 다음, -1 이전)만큼 넘기기
+  var dlSlide=null, dlIcSkip={};
+  function dlSwipe(sec,key,sel,go){
+    sec.classList.add("dlswipe");
+    if(dlSlide&&dlSlide.k===key){
+      var dir0=dlSlide.d; dlSlide=null;
+      sec.querySelectorAll(sel).forEach(function(it,ii){it.classList.add(dir0>0?"dlaslidel":"dlaslider"); it.style.animationDelay=(ii*25)+"ms"});
+    }
     sec.addEventListener("pointerdown",function(e){
-      if(e.button>0||dlActLog||dlActEdit||!e.target.closest(".dlactitem")||e.target.closest("input,textarea"))return;
-      var x0=e.clientX, y0=e.clientY, pid=e.pointerId, dx=0, lock="", items=sec.querySelectorAll(".dlactitem");
+      if(e.button>0||dlActLog||dlActEdit||dlMemoId||dlEditId||dlEdit||!e.target.closest(sel)||e.target.closest("input,textarea,select"))return;
+      var x0=e.clientX, y0=e.clientY, pid=e.pointerId, dx=0, lock="", items=sec.querySelectorAll(sel);
       function paint(tr,op){items.forEach(function(it){it.style.transform=tr; it.style.opacity=op})}
       function mv(ev){
         if(ev.pointerId!==pid)return;
+        if(!lock&&document.querySelector(".dldrag,.dlicdragging")){stop();return}   // 꾹 눌러 자리 옮기는 중
         var ddx=ev.clientX-x0, ddy=ev.clientY-y0;
         if(!lock&&(Math.abs(ddx)>8||Math.abs(ddy)>8)){
           lock=Math.abs(ddx)>Math.abs(ddy)?"x":"y";
           if(lock==="y"){stop();return}
-          sec.classList.add("dlactdrag");
+          sec.classList.add("dlswiping");
         }
         if(lock!=="x")return;
         ev.preventDefault(); dx=ddx; paint("translateX("+dx*.7+"px)",String(Math.max(.35,1-Math.abs(dx)/320)));
       }
       function stop(){window.removeEventListener("pointermove",mv); window.removeEventListener("pointerup",up); window.removeEventListener("pointercancel",cancel)}
       function back(){
-        sec.classList.remove("dlactdrag");
+        sec.classList.remove("dlswiping");
         items.forEach(function(it){it.style.transition="transform .18s,opacity .18s"}); paint("","");
         setTimeout(function(){items.forEach(function(it){it.style.transition=""})},200);
       }
@@ -13268,7 +13275,7 @@ body.reorder .ref .lclisten{display:none}
         // 끌고 놓을 때 따라오는 누름은 체크·고치기로 보지 않음
         var eat=function(c){c.stopPropagation(); c.preventDefault()};
         window.addEventListener("click",eat,true); setTimeout(function(){window.removeEventListener("click",eat,true)},350);
-        if(Math.abs(dx)>50){var d=dx<0?1:-1; dlActPage+=d; dlActSlide=d; buzz(8); drawDaily()}
+        if(Math.abs(dx)>50){var d=dx<0?1:-1; go(d); dlSlide={k:key,d:d}; buzz(8); drawDaily()}
         else back();
       }
       window.addEventListener("pointermove",mv,{passive:false}); window.addEventListener("pointerup",up); window.addEventListener("pointercancel",cancel);
@@ -13430,7 +13437,7 @@ body.reorder .ref .lclisten{display:none}
         var last={}; Object.keys(o.days||{}).forEach(function(k){if(k<dlDay)(o.days[k]||[]).forEach(function(id){if(!last[id]||k>last[id])last[id]=k})});
         var hsh=function(t){var h=0; for(var i=0;i<t.length;i++)h=(h*31+t.charCodeAt(i))|0; return h};
         var todo=its.filter(function(it){return on.indexOf(it.id)<0}).sort(function(a,b){var la=last[a.id]||"", lb=last[b.id]||""; return la<lb?-1:la>lb?1:hsh(dlDay+a.id)-hsh(dlDay+b.id)});
-        var skp=dlG3Skip[dlDay+"|"+g.g]||0; if(skp&&todo.length)todo=todo.slice(skp%todo.length).concat(todo.slice(0,skp%todo.length));   // '다음 3개'로 넘긴 만큼
+        var skp=dlG3Skip[dlDay+"|"+g.g]||0; if(skp&&todo.length){var sk0=((skp%todo.length)+todo.length)%todo.length; todo=todo.slice(sk0).concat(todo.slice(0,sk0))}   // '다음 3개'로 넘긴 만큼
         var want=Math.max(0,3+(dlG3More[dlDay+"|"+g.g]||0)-its.filter(function(it){return on.indexOf(it.id)>=0}).length), pick={}; todo.slice(0,want).forEach(function(it){pick[it.id]=1});   // 오늘 한 만큼 빼고 남은 자리만
         var picked=todo.filter(function(it){return pick[it.id]}).length;
         // 오늘 한 것(체크한 것)은 그대로 보이고, 고른 것 중 남은 것만 펼쳐 보임
@@ -13563,6 +13570,7 @@ body.reorder .ref .lclisten{display:none}
         if(d3.done&&d3.rest>0){var one=document.createElement("button"); one.type="button"; one.className="dl3one"; one.dataset.g=g.g; one.textContent="하나 더?"; ft.appendChild(one)}
         if(d3.rest>0){var al=document.createElement("button"); al.type="button"; al.className="dl3all"; al.dataset.g=g.g; al.textContent="＋ "+d3.rest+"개 더"; ft.appendChild(al)}
         if(ft.children.length)list.appendChild(ft);
+        if(!d3.done&&d3.rest>0)(function(k3,n3){dlSwipe(list,k3,".dlitem",function(d){var kn=dlDay+"|"+k3; dlG3Skip[kn]=(dlG3Skip[kn]||0)+d*n3})})(g.g,d3.left||3);
       }else if(dlG3All.has(g.g)&&!fq&&!dlEdit&&its.length>3){
         var fb3=document.createElement("button"); fb3.type="button"; fb3.className="dl3fold"; fb3.dataset.g=g.g; fb3.textContent="오늘의 3개만 보기"; list.appendChild(fb3);
       }
@@ -13644,8 +13652,7 @@ body.reorder .ref .lclisten{display:none}
         var pgr=document.createElement("div"); pgr.className="dl3foot dlactpgr";
         pgr.innerHTML='<button type="button" class="dlactpg dl3all" data-d="-1">앞 4개</button><span></span><button type="button" class="dlactpg dl3one" data-d="1">다음 4개</button>';
         pgr.querySelector("span").textContent=(acPg+1)+" / "+acPages; asec.appendChild(pgr);
-        dlActSwipe(asec);
-        if(dlActSlide){asec.querySelectorAll(".dlactitem").forEach(function(it,ii){it.classList.add(dlActSlide>0?"dlaslidel":"dlaslider"); it.style.animationDelay=(ii*25)+"ms"}); dlActSlide=0}
+        dlSwipe(asec,"__acts",".dlactitem",function(d){dlActPage+=d});
       }
       outer.insertBefore(asec,outer.firstChild);
       }
@@ -13653,7 +13660,7 @@ body.reorder .ref .lclisten{display:none}
     // 🤲 오늘 중보기도: 명단에서 그날 기도할 사람 (2026-10-24 사용자 요청)
     var iGHit=fq&&dlHit("🙏 오늘 기도제목");
     if(!dlEdit){
-      var ico=icData(), ipk=icPick(ico,dlDay).sort(icOrd), icAnsAll=ico.items.filter(function(y){return y.ans}).sort(function(a,b){return b.ans-a.ans});
+      var ico=icData(), ipk=icPick(ico,dlDay,dlIcSkip[dlDay]||0).sort(icOrd), icAnsAll=ico.items.filter(function(y){return y.ans}).sort(function(a,b){return b.ans-a.ans});
       // 응답된 기도는 목록에서 빠지고, '🙌 응답 N'을 눌렀을 때만 그것만 보임 (2026-11-04 사용자 요청)
       if(!icAnsAll.length)dlIcShowAns=false;
       var icAV=dlIcShowAns&&!fq; if(icAV)ipk=icAnsAll;
@@ -13696,6 +13703,10 @@ body.reorder .ref .lclisten{display:none}
         if(opn&&x.memo.trim()){var fm=document.createElement("div"); fm.className="dlicfull"; fm.textContent=x.memo.trim(); wrap.appendChild(fm)}
       });
       var afterA=outer.querySelector(".dlacts:not(.dlic)");
+      if(!fq&&!icAV){
+        var icLive=ico.items.filter(function(y){return !y.ans}), icDone=icLive.filter(function(y){return y.log.indexOf(dlDay)>=0}).length, icSlots=Math.max(0,ico.per-icDone);
+        if(icSlots>0&&icLive.length-icDone>icSlots)dlSwipe(isec,"__ic",".dlicwrap",function(d){dlIcSkip[dlDay]=(dlIcSkip[dlDay]||0)+d*icSlots});
+      }
       outer.insertBefore(isec,afterA?afterA.nextSibling:outer.firstChild);
       }
     }
