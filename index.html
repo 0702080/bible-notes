@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-list">
+<meta name="app-build" content="2026-11-04-act4">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -13282,11 +13282,11 @@ body.boardon .fscrow{display:none}
         var ap=document.createElement("p"); ap.className="dlacthint"; ap.textContent="말씀 카드의 ✓ 실천 탭에 '이 말씀으로 할 일'을 적으면 여기서 날마다 점검할 수 있어요.";
         asec.appendChild(ap);
       }
-      // 말씀 실천은 5개씩 차례로 (안 한 것 먼저), '다음 5개'로 넘김 (2026-11-04 사용자 요청)
+      // 말씀 실천은 4개씩 차례로 (안 한 것 먼저), '다음 4개'로 넘김 (2026-11-04 사용자 요청)
       var acAll=acs.length, acPages=1, acPg=0;
-      if(!fq&&acAll>5){
+      if(!fq&&acAll>4){
         acs=acs.filter(function(x){return !x.on}).concat(acs.filter(function(x){return x.on}));
-        acPages=Math.ceil(acAll/5); acPg=((dlActPage%acPages)+acPages)%acPages; acs=acs.slice(acPg*5,acPg*5+5);
+        acPages=Math.ceil(acAll/4); acPg=((dlActPage%acPages)+acPages)%acPages; acs=acs.slice(acPg*4,acPg*4+4);
       }
       acs.forEach(function(x){
         var row=document.createElement("div"); row.className="dlitem haspill dlactitem"; row.style.setProperty("--gc","var(--green)");
@@ -13307,7 +13307,7 @@ body.boardon .fscrow{display:none}
       });
       if(acPages>1){
         var pgr=document.createElement("div"); pgr.className="dl3foot dlactpgr";
-        pgr.innerHTML='<button type="button" class="dlactpg dl3all" data-d="-1">‹ 앞 5개</button><span></span><button type="button" class="dlactpg dl3one" data-d="1">다음 5개 ›</button>';
+        pgr.innerHTML='<button type="button" class="dlactpg dl3all" data-d="-1">‹ 앞 4개</button><span></span><button type="button" class="dlactpg dl3one" data-d="1">다음 4개 ›</button>';
         pgr.querySelector("span").textContent=(acPg+1)+" / "+acPages; asec.appendChild(pgr);
       }
       outer.insertBefore(asec,outer.firstChild);
