@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-actrow">
+<meta name="app-build" content="2026-11-04-calhide">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4416,6 +4416,10 @@ body.boardon .fscrow{display:none}
 .saysheet .dlbar .dlclose.saylock.on{background-color:#3A3220!important;border-color:#6B5A30!important;color:var(--gold)}
 .saylist.saylocked .saygrip{display:none}
 .saylist.saylocked .saycard{padding-left:16px!important}
+.daily.dlhascal .dlcal.dlchide{padding:6px 20px;cursor:grab;max-width:220px!important}
+.dlcal.dlchide>:not(.dlcgrip){display:none!important}
+.dlcal.dlchide .dlcgrip{margin:0}
+.dltin{min-height:64px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12061,10 +12065,12 @@ body.boardon .fscrow{display:none}
         function place(){
           var pc=window.innerWidth>=900; if(pc&&se.parentNode!==bar)bar.insertBefore(se,bar.children[1]); else if(!pc&&se.parentNode===bar)body.insertBefore(se,body.querySelector(".dllist"));
           var cal=dl.querySelector(".dlcal");
-          if(!pc){se.style.width=""; if(cal)cal.style.maxWidth=""; return}
+          var tmc=dl.querySelector(".dltime");
+          if(!pc){se.style.width=""; if(cal)cal.style.maxWidth=""; if(tmc)tmc.style.maxWidth=""; return}
           // 찾기 칸·달력 폭을 아래 가운데 묶음 줄 폭에 맞춤 (석 달 달력은 묶음 전체 폭) (2026-10-31 사용자 요청)
           var L=dl.querySelector(".dllist"), W=L?L.clientWidth:0, n=Math.max(1,Math.floor((W+18)/398)), cw=n>1?(W-(n-1)*18)/n:Math.min(540,W), w=n%2?cw:Math.min(540,W);
           if(W&&cal)cal.style.maxWidth=(cal.classList.contains("dlcal3")?W:w)+"px";
+          if(W&&tmc)tmc.style.maxWidth=w+"px";   // 아침·저녁 칸도 가운데 묶음 폭으로 (2026-11-04 사용자 요청)
           // 화면 가로 가운데에 두고, 왼쪽 제목·오른쪽 단추와 겹치지 않는 만큼만 넓게
           var br=bar.getBoundingClientRect(), mid=br.left+br.width/2, rg=document.createRange(), bl=bar.querySelector(".dledit").getBoundingClientRect();
           rg.selectNodeContents(bar.querySelector(".dltitle")); var tr=rg.getBoundingClientRect();   // 제목 칸은 늘어나 있어서 글자 끝을 잼
@@ -12095,6 +12101,7 @@ body.boardon .fscrow{display:none}
           var c=e.target.closest(".dlcd"); if(c&&c.dataset.day&&!c.disabled){if(c.dataset.day!==dlDay){dlDay=c.dataset.day; dlCalM=""; drawDaily()} return}
           var m=e.target.closest(".dlcm"); if(m&&!m.disabled){dlCalShift(+m.dataset.m); return}
           if(e.target.closest(".dlcmt")){var t=dkey(Date.now()); dlCalM=""; if(dlDay!==t){dlDay=t} drawDaily(); return}
+          if(e.target.closest(".dlcgrip")&&dlCalHide){dlCalHideSet(false); drawDaily(); return}   // 완전히 접힌 달력은 누르면 다시 이번 주로
           if(e.target.closest(".dlcfold,.dlcgrip")){dlCalFold=!dlCalFold; try{localStorage.setItem("bible-dl-calfold",dlCalFold?"1":"0")}catch(err){} drawDaily()}
         });
         var sx=null, sy=0;
@@ -12107,7 +12114,11 @@ body.boardon .fscrow{display:none}
           if(vy==null)return; var dy=e.clientY-vy, dx=e.clientX-vx; vy=null;
           if(cal._inG&&Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){dlCalShift(dx<0?1:-1); dlCalEat=Date.now(); return}   // 좌우로 밀면 달 넘기기
           if(Math.abs(dy)<40||Math.abs(dy)<Math.abs(dx)*1.3)return;
-          var want=dy<0; if(want===(dlCalFold&&!dlCalM))return;
+          var want=dy<0;
+          // 위로 끌기: 석 달 → 이번 주 → 완전히 접기. 아래로 끌기: 완전히 접힘 → 이번 주 → 석 달 (2026-11-04 사용자 요청)
+          if(want&&dlCalFold&&!dlCalM&&!dlCalHide){dlCalHideSet(true); dlCalEat=Date.now(); buzz(10); drawDaily(); return}
+          if(!want&&dlCalHide){dlCalHideSet(false); dlCalEat=Date.now(); buzz(10); drawDaily(); return}
+          if(want===(dlCalFold&&!dlCalM))return;
           dlCalFold=want; dlCalM=""; dlCalEat=Date.now();
           try{localStorage.setItem("bible-dl-calfold",want?"1":"0")}catch(err){}
           buzz(10); drawDaily();
@@ -12800,6 +12811,8 @@ body.boardon .fscrow{display:none}
     if(/^[1-3]$/.test(e.key)){var its=w.querySelectorAll(".dlfit"), b=its[+e.key-1]; if(b){e.preventDefault(); var ck=b.querySelector(".dlfck"); if(ck)ck.click()}}
   });
   var dlFocus=false, dlFocusSkip=0; try{dlFocus=localStorage.getItem("bible-dl-focus")==="1"}catch(e){}
+  var dlCalHide=false; try{dlCalHide=localStorage.getItem("bible-dl-calhide")==="1"}catch(e){}
+  function dlCalHideSet(on){dlCalHide=!!on; try{localStorage.setItem("bible-dl-calhide",on?"1":"")}catch(e){}}
   var dlCalM="", dlCalEat=0, dlCalFold=false; try{dlCalFold=localStorage.getItem("bible-dl-calfold")==="1"}catch(e){}
   function dlCalShift(n){   // 달 넘기기: 보는 달만 바뀌고, 고른 날은 그대로 (이번 달 너머는 못 감)
     var base=dlCalM||dlDay.slice(0,7), d=new Date(base+"-01T12:00:00"); d.setMonth(d.getMonth()+n);
@@ -12826,7 +12839,7 @@ body.boardon .fscrow{display:none}
     if(!c3){c3=document.createElement("div"); c3.className="dlc3"; cal.appendChild(c3)}
     // 맨 아래 끌기 손잡이: 위로 끌면 접고 아래로 끌면 펼침, 눌러도 바뀜 (2026-11-02 사용자 요청)
     var gp=cal.querySelector(".dlcgrip"); if(!gp){gp=document.createElement("div"); gp.className="dlcgrip"; gp.setAttribute("role","button"); gp.innerHTML="<span></span>"; cal.appendChild(gp)}
-    gp.title=fold?"아래로 끌거나 눌러서 펼치기":"위로 끌거나 눌러서 접기"; gp.classList.toggle("up",!fold);
+    gp.title=dlCalHide?"아래로 끌거나 눌러서 달력 보기":fold?"아래로 끌면 석 달, 위로 끌면 달력을 완전히 접어요":"위로 끌거나 눌러서 접기"; gp.classList.toggle("up",!fold); cal.classList.toggle("dlchide",dlCalHide);
     c3.textContent="";
     if(three){
       var ms=[-1,0,1].map(function(n){var d=new Date(y,m-1+n,1,12); return {y:d.getFullYear(),m:d.getMonth()+1}});
