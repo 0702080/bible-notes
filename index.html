@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-ccgap">
+<meta name="app-build" content="2026-11-05-acswipe">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4537,6 +4537,15 @@ body.reorder .ref .lclisten{display:none}
 @media (hover:hover){.ccblank:hover::after{opacity:.4}}
 .ccblank.drag{background:color-mix(in srgb,var(--gold) 12%,transparent)}
 .ccblank.drag::after{background:var(--gold);opacity:1}
+/* 말씀 실천 옆으로 끌어 넘기기 (2026-11-05 사용자 요청) */
+.dlactswipe{overflow-x:clip}
+.dlactswipe .dlactitem{touch-action:pan-y}
+.dlactdrag .dlactitem{-webkit-user-select:none;user-select:none}
+.dlaslidel{animation:dlaslidel .24s cubic-bezier(.2,.8,.3,1) both}
+.dlaslider{animation:dlaslider .24s cubic-bezier(.2,.8,.3,1) both}
+@keyframes dlaslidel{from{transform:translateX(56px);opacity:0}to{transform:none;opacity:1}}
+@keyframes dlaslider{from{transform:translateX(-56px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.dlaslidel,.dlaslider{animation:none}}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -13228,6 +13237,43 @@ body.reorder .ref .lclisten{display:none}
       box.appendChild(ta);
     }
   }
+  // 말씀 실천 카드를 옆으로 끌면 왼쪽=다음 4개, 오른쪽=앞 4개 (2026-11-05 사용자 요청)
+  var dlActSlide=0;
+  function dlActSwipe(sec){
+    sec.classList.add("dlactswipe");
+    sec.addEventListener("pointerdown",function(e){
+      if(e.button>0||dlActLog||dlActEdit||!e.target.closest(".dlactitem")||e.target.closest("input,textarea"))return;
+      var x0=e.clientX, y0=e.clientY, pid=e.pointerId, dx=0, lock="", items=sec.querySelectorAll(".dlactitem");
+      function paint(tr,op){items.forEach(function(it){it.style.transform=tr; it.style.opacity=op})}
+      function mv(ev){
+        if(ev.pointerId!==pid)return;
+        var ddx=ev.clientX-x0, ddy=ev.clientY-y0;
+        if(!lock&&(Math.abs(ddx)>8||Math.abs(ddy)>8)){
+          lock=Math.abs(ddx)>Math.abs(ddy)?"x":"y";
+          if(lock==="y"){stop();return}
+          sec.classList.add("dlactdrag");
+        }
+        if(lock!=="x")return;
+        ev.preventDefault(); dx=ddx; paint("translateX("+dx*.7+"px)",String(Math.max(.35,1-Math.abs(dx)/320)));
+      }
+      function stop(){window.removeEventListener("pointermove",mv); window.removeEventListener("pointerup",up); window.removeEventListener("pointercancel",cancel)}
+      function back(){
+        sec.classList.remove("dlactdrag");
+        items.forEach(function(it){it.style.transition="transform .18s,opacity .18s"}); paint("","");
+        setTimeout(function(){items.forEach(function(it){it.style.transition=""})},200);
+      }
+      function cancel(ev){if(ev.pointerId!==pid)return; stop(); if(lock==="x")back()}
+      function up(ev){
+        if(ev.pointerId!==pid)return; stop(); if(lock!=="x")return;
+        // 끌고 놓을 때 따라오는 누름은 체크·고치기로 보지 않음
+        var eat=function(c){c.stopPropagation(); c.preventDefault()};
+        window.addEventListener("click",eat,true); setTimeout(function(){window.removeEventListener("click",eat,true)},350);
+        if(Math.abs(dx)>50){var d=dx<0?1:-1; dlActPage+=d; dlActSlide=d; buzz(8); drawDaily()}
+        else back();
+      }
+      window.addEventListener("pointermove",mv,{passive:false}); window.addEventListener("pointerup",up); window.addEventListener("pointercancel",cancel);
+    });
+  }
   function drawDaily(){
     var o=dailyData(), on=dailyChecked(o,dlDay), today=dkey(Date.now());
     dlTimeCard(o,on,today);
@@ -13598,6 +13644,8 @@ body.reorder .ref .lclisten{display:none}
         var pgr=document.createElement("div"); pgr.className="dl3foot dlactpgr";
         pgr.innerHTML='<button type="button" class="dlactpg dl3all" data-d="-1">앞 4개</button><span></span><button type="button" class="dlactpg dl3one" data-d="1">다음 4개</button>';
         pgr.querySelector("span").textContent=(acPg+1)+" / "+acPages; asec.appendChild(pgr);
+        dlActSwipe(asec);
+        if(dlActSlide){asec.querySelectorAll(".dlactitem").forEach(function(it,ii){it.classList.add(dlActSlide>0?"dlaslidel":"dlaslider"); it.style.animationDelay=(ii*25)+"ms"}); dlActSlide=0}
       }
       outer.insertBefore(asec,outer.firstChild);
       }
