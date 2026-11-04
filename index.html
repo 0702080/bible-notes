@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-wknote">
+<meta name="app-build" content="2026-11-04-wkgo">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -29,7 +29,7 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <style>
 :root{
   --paper:#ECECE8; --sheet:#F7F7F4; --rule:#D6D4CD; --ink:#2C2833; --muted:#6D6776; --faint:#9C97A3;
@@ -6641,6 +6641,22 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     var b2=document.createElement("button"); b2.type="button"; b2.className="solob main";
     b2.textContent="전체 보기"; b2.title=(soloFrom==="board"?"칸반 보드로 돌아가기":"모든 말씀 보기")+" (말씀 제목 줄을 두 번 눌러도 돌아가요)"; sb.appendChild(b2);
   }
+  // 처음 열 때 말씀 카드를 한꺼번에 만들면 화면이 늦게 떠서, 먼저 몇 장만 그리고 나머지는 뒤에서 나눠 만듦
+  var bootN=14, bootT=0;
+  function bootFill(all){
+    clearTimeout(bootT); if(bootN===Infinity)return;
+    if(drag||actDrag){bootT=setTimeout(bootFill,200);return}
+    var list=$("list"), order=sorted(), made=0, more=false;
+    for(var i=0;i<order.length;i++){
+      var n=order[i], el=cards.get(n.id);
+      if(!el){
+        if(!all&&made>=20){more=true;break}
+        el=makeCard(n); cards.set(n.id,el); updateCard(el,n); renderHits(el,n); renderCardTopics(el,n); el.hidden=!visibleNote(n); made++;
+      }
+      if(list.children[i]!==el)list.insertBefore(el,list.children[i]||null);
+    }
+    if(more)bootT=setTimeout(bootFill,16); else bootN=Infinity;
+  }
   function render(){
     if(drag||actDrag)return;
     parseQuery();
@@ -6651,7 +6667,11 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     var keep=new Set(order.map(function(n){return n.id}));
     cards.forEach(function(el,id){if(!keep.has(id)){el.remove();cards.delete(id)}});
     order.forEach(function(n,i){
-      var el=cards.get(n.id); if(!el){el=makeCard(n);cards.set(n.id,el)}
+      var el=cards.get(n.id);
+      if(!el){
+        if(i>=bootN&&!filterText&&!openIds.has(n.id)&&!soloId)return;   // 처음 열 때는 뒤에서 조금씩 (bootFill)
+        el=makeCard(n);cards.set(n.id,el);
+      }
       updateCard(el,n);
       renderHits(el,n);
       renderCardTopics(el,n);
@@ -10369,7 +10389,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
      화면을 켜 둔 채 주머니에 넣고 걸으면, 걸음마다 말씀을 한 낱말(또는 한 글자)씩 이어폰으로 들려줌.
      웹앱은 화면이 꺼지면 걸음 센서를 못 읽어서 화면 꺼짐 방지(Wake Lock) + 어두운 잠금 화면으로 씀 */
   var WK=null, wkBox=null;
-  function wkPref(){var o={};try{o=JSON.parse(localStorage.getItem("bible-walk")||"{}")||{}}catch(e){} return {u:/^[2-5]$/.test(o.u)||o.u==="c"||(o.u==="l"&&o.v2)?o.u:"w",nx:o.nx?1:0,s:o.s==="hi"||o.s==="lo"?o.s:"md",g:o.g==null?4:Math.max(0,Math.min(30,+o.g||0)),min:o.min==null?5:+o.min||0}}   // g: 소절 사이 침묵(0.1초 단위), min: 한 말씀 몇 분 (0=계속)
+  function wkPref(){var o={};try{o=JSON.parse(localStorage.getItem("bible-walk")||"{}")||{}}catch(e){} return {u:/^[2-5]$/.test(o.u)||o.u==="c"||(o.u==="l"&&o.v2)?o.u:"w",nx:o.nx?1:0,s:o.s==="hi"||o.s==="lo"?o.s:"md",g:o.g==null?4:Math.max(0,Math.min(15,+o.g||0)),min:o.min==null?5:+o.min||0}}   // g: 소절 사이 침묵(0.1초 단위), min: 한 말씀 몇 분 (0=계속)
   function wkSavePref(p){p.v2=1; try{localStorage.setItem("bible-walk",JSON.stringify(p))}catch(e){}}   // v2: 기본을 한 낱말로 바꾼 뒤 직접 고른 값 (2026-10-31)
   function wkTokens(n,u){
     var t=String(n.text||"");
@@ -10403,7 +10423,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
       wkBox.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🚶 걷기 암송</b></div><button type="button" class="wkclose" aria-label="닫기">✕</button></div>'+
         '<div class="ccbody wkbody"><div class="wkring"><div class="wkword"></div><div class="wkprog"></div></div><div class="wkstat"></div><div class="wkmeter" aria-hidden="true"><i></i><em></em></div><div class="wksens"></div><div class="wkrefrow"><div class="wkref"></div></div><div class="wkline"></div>'+
         '<div class="wkset"><div class="wkopt"><span>한 걸음에</span><div class="wkseg"><button type="button" data-u="c">글자</button><button type="button" data-u="w">1</button><button type="button" data-u="2">2</button><button type="button" data-u="3">3</button><button type="button" data-u="4">4</button><button type="button" data-u="5">5</button><button type="button" data-u="l">줄</button></div></div>'+
-        '<div class="wkopt"><span>쉬는 길이</span><div class="wkgaprow"><input type="range" class="wkgap" min="0" max="30" step="1" aria-label="소절 사이 쉬는 길이"><em class="wkgapv"></em></div></div>'+
+        '<div class="wkopt"><span>쉬는 길이</span><div class="wkgaprow"><input type="range" class="wkgap" min="0" max="15" step="0.5" aria-label="소절 사이 쉬는 길이"><em class="wkgapv"></em></div></div>'+
         '<div class="wkopt"><span>한 말씀</span><div class="wkseg"><button type="button" data-min="1">1분</button><button type="button" data-min="3">3분</button><button type="button" data-min="5">5분</button><button type="button" data-min="0">계속</button></div></div>'+
         '<div class="wkopt"><span>끝나면</span><div class="wkseg"><button type="button" data-nx="0">🔁 반복</button><button type="button" data-nx="1">➡️ 다음 말씀</button></div></div>'+
         '<div class="wkopt"><span>걸음 감지</span><div class="wkseg"><button type="button" data-s="hi">예민</button><button type="button" data-s="md">보통</button><button type="button" data-s="lo">둔감</button></div></div></div>'+
@@ -10474,13 +10494,13 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     st.querySelectorAll("b")[0].textContent=WK.steps; if(WK.rounds)st.querySelectorAll("b")[1].textContent=WK.rounds;
     if(WK.run&&p.min){var lf=Math.max(0,p.min*60000-(Date.now()-(WK.vAt||Date.now()))), sp0=document.createElement("span"); sp0.textContent="⏱ 다음 말씀까지 "+Math.floor(lf/60000)+":"+("0"+Math.floor(lf%60000/1000)).slice(-2); st.appendChild(sp0)}
     wkBox.querySelectorAll(".wkopt button").forEach(function(b){b.classList.toggle("on",!!((b.dataset.u&&b.dataset.u===p.u)||(b.dataset.nx!=null&&+b.dataset.nx===p.nx)||(b.dataset.s&&b.dataset.s===p.s)||(b.dataset.min!=null&&+b.dataset.min===p.min)))});
-    var gi=wkBox.querySelector(".wkgap"); if(document.activeElement!==gi)gi.value=String(p.g); wkBox.querySelector(".wkgapv").textContent=(p.g/10).toFixed(1)+"초";
+    var gi=wkBox.querySelector(".wkgap"); if(document.activeElement!==gi)gi.value=String(p.g); wkBox.querySelector(".wkgapv").textContent=(p.g/10).toFixed(2)+"초";   // 0~1.5초를 0.05초 단위로 (2026-11-04 사용자 요청)
     wkBox.querySelector(".wkgo").textContent=WK.run?"■ 멈춤":"▶ 시작";
     wkBox.querySelector(".wklref").textContent=n.ref||""; wkBox.querySelector(".wklword").textContent=WK.i?cur:"";
   }
   function wkStep(auto){   // 한 걸음 = 다음 소절(낱말·글자) 하나. auto: 걸음 센서에서 온 것 — 아직 말하는 중이면 이 걸음은 건너뜀(소절이 끊기지 않게)
     if(!WK)return; var n=notes.get(WK.id); if(!n)return;
-    if(auto!=="t")WK.steps++;
+    WK.steps++;
     if(auto===true){
       var nw0=Date.now(); if(WK.lastStep){var dt0=nw0-WK.lastStep; if(dt0<1500)WK.cad=WK.cad?WK.cad*0.7+dt0*0.3:dt0} WK.lastStep=nw0;   // 걸음 빠르기 기억
       try{var ss0=window.speechSynthesis; if(ss0.speaking||ss0.pending){wkDraw();return}}catch(e){}
@@ -10490,7 +10510,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     if(WK.i>=WK.toks.length){   // 다 들었으면: 구절 이름 → 반복 또는 다음 말씀
       wkRound(); wkSay(refSay((notes.get(WK.id)||{}).ref||""),1); return;
     }
-    var t=WK.toks[WK.i++]; wkSay(t,wkRate()); wkDraw(); wkBeat();
+    var t=WK.toks[WK.i++]; WK.sayMax=2000+String(t).length*400; wkSay(t,wkRate()); wkDraw(); wkBeat();
   }
   function wkRate(){   // 걸음이 빨라지면 읽는 것도 빨라짐 (2026-11-04 사용자 요청)
     if(!WK||!WK.cad||Date.now()-(WK.lastStep||0)>2500)return 1;
@@ -10498,7 +10518,12 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
   }
   function wkTick(){   // 걷지 않아도(전철·버스에 서 있어도) 계속 읽음, 정한 시간이 되면 다음 말씀 (2026-11-04 사용자 요청)
     if(!WK||!WK.run)return; var now=Date.now(), ss=window.speechSynthesis, p=wkPref();
-    if(ss&&(ss.speaking||ss.pending)){WK.sp=1;return}
+    if(ss&&(ss.speaking||ss.pending)){
+      WK.sp=1;
+      if(now-(WK.saidAt||0)<(WK.sayMax||6000))return;
+      try{ss.cancel()}catch(e){}   // 휴대폰에서 '말하는 중'에 멈춰 버리면 끊고 다음 소절로
+      WK.sp=0; WK.endAt=now;
+    }
     if(WK.sp){WK.sp=0; WK.endAt=now}
     if(now-(WK.saidAt||0)<350)return;
     if(p.min&&now-(WK.vAt||now)>p.min*60000){wkNext(); WK.saidAt=now; return}
@@ -10554,14 +10579,13 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     }catch(e){return false}
   }
   function wkStart(){
-    var go=function(){WK.run=true; WK.arm=true; WK.ev=0; WK.sm=0; WK.beat=0; WK.vAt=Date.now(); WK.saidAt=Date.now(); WK.endAt=0; WK.lastStep=0; WK.cad=0; clearInterval(WK.tk); WK.tk=setInterval(wkTick,150); wkWake(); wkBox.querySelector(".wklock").hidden=false; wkSay("시작합니다",1.1); wkDraw();
+    var go=function(){WK.run=true; WK.arm=true; WK.ev=0; WK.sm=0; WK.beat=0; WK.vAt=Date.now(); WK.saidAt=Date.now(); WK.endAt=0; WK.lastStep=0; WK.cad=0; clearInterval(WK.tk); WK.tk=setInterval(wkTick,150); wkWake(); wkBox.querySelector(".wklock").hidden=false; WK.sayMax=0; wkStep("t"); wkDraw();
       var sn=wkBox.querySelector(".wksens"); sn.textContent="";
       setTimeout(function(){if(WK&&WK.run&&!WK.ev)wkGeneric()},1200);
       setTimeout(function(){   // 그래도 센서 신호가 하나도 안 오면 박자 모드로 (브라우저가 막은 경우)
         if(!WK||!WK.run||WK.ev)return;
         sn.textContent="⚠️ 이 브라우저가 움직임 센서를 막고 있어서 걸음을 못 느껴요. 지금은 일정한 박자로 한 소절씩 들려 드려요 (쉬는 길이로 조절).\n걸음에 맞추려면 Brave ⋮ → 설정 → 사이트 설정 → '동작 센서' → 허용, 또는 주소창 🦁 방패 → '핑거프린팅 차단' 끄기 후 다시 시작해 주세요. 크롬에서 열면 바로 돼요.";
         buzz([40,60,40]);
-        wkSay("움직임 센서가 막혀 있어서, 일정한 박자로 들려 드릴게요",1.05);
       },3000);
       setTimeout(function(){
         if(!WK||!WK.run||!WK.noWake)return;
@@ -18559,6 +18583,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     return !!hit||y<br.bottom+6;
   }
   function startDrag(el,pid,clientY,capEl){
+    bootFill(true);
     var r=el.getBoundingClientRect();
     drag={el:el,grip:capEl||el,pid:pid,tx:0,grab:clientY-r.top,y:clientY,startY:clientY,moved:false,startIdx:Array.prototype.indexOf.call($("list").children,el)};
     try{(capEl||el).setPointerCapture(pid)}catch(err){}
@@ -18870,7 +18895,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
   syncSortBtn();
   render();
   var api=(window.claude&&typeof window.claude.use==="function")?window.claude:null;
-  if(!api){ assetsState="none"; switchToLocal(); openManual(true); render(); return }
+  if(!api){ assetsState="none"; switchToLocal(); openManual(true); render(); bootT=setTimeout(bootFill,60); return }
 
   api.use("assets").then(function(a){assetsNs=a||null;assetsState=a?"ready":"none";render()},function(){assetsState="none";render()});
   api.use("downloads").then(function(d){
