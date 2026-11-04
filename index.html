@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-ldpair">
+<meta name="app-build" content="2026-11-05-ldverse">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4595,6 +4595,10 @@ body.reorder .ref .lclisten{display:none}
 .ldsum b{display:block;margin-top:2px;font-size:14.5px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ldsum .lds b{color:var(--lds)}.ldsum .ldr b{color:var(--ldr)}.ldsum .ldf b{color:#EDEBF0}
 .ldsum .ldf b.up{color:var(--ldr)}.ldsum .ldf b.down{color:var(--lds)}
+/* 맨 아래 고정 말씀 (2026-11-05 사용자 요청) */
+.ldverse{flex:0 0 auto;padding:10px 16px 12px;border-top:1px solid #222126;background:#0B0B0D;text-align:center}
+.ldverse p{margin:0;font-size:15px;font-weight:700;line-height:1.4;color:var(--gold);word-break:keep-all}
+.ldverse small{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
 .ldrange{display:flex;gap:6px;justify-content:center}
 .ldrange button{height:30px;padding:0 14px;border:1px solid #2A2930;border-radius:15px;background:transparent;color:var(--muted);font-size:13px;white-space:nowrap}
 .ldrange button.on{background:color-mix(in srgb,var(--gold) 18%,#1A1915);border-color:color-mix(in srgb,var(--gold) 45%,transparent);color:var(--gold);font-weight:700}
@@ -4603,7 +4607,7 @@ body.reorder .ref .lclisten{display:none}
 .ldrow{display:flex;gap:6px}
 .ldin{box-sizing:border-box;min-width:0;width:100%;height:38px;padding:0 10px;border:1px solid #2F2E36;border-radius:9px;background:#0B0B0D;color:#EDEBF0;font-family:inherit;font-size:14.5px;color-scheme:dark}
 .ldin:focus{outline:none;border-color:var(--gold)}
-.ldnd,.lded{flex:0 0 136px;width:136px}
+.ldnd,.lded{flex:0 0 158px;width:158px;padding:0 8px}
 .ldna,.ldea{flex:1;text-align:right;font-variant-numeric:tabular-nums}
 .ldadd{flex:1;height:40px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;white-space:nowrap}
 .ldadd.lds{border:1px solid color-mix(in srgb,var(--lds) 55%,transparent);background:color-mix(in srgb,var(--lds) 16%,transparent);color:var(--lds)}
@@ -11206,7 +11210,8 @@ body.reorder .ref .lclisten{display:none}
         '<div class="ldnew"><div class="ldrow"><input type="date" class="ldin ldnd" aria-label="날짜"><input class="ldin ldna" inputmode="numeric" placeholder="금액" aria-label="금액"></div><input class="ldin ldnt" maxlength="120" placeholder="어디에 · 무엇을" aria-label="내용">'+
         '<div class="ldrow"><button type="button" class="ldadd lds" data-k="s">🌱 심었어요</button><button type="button" class="ldadd ldr" data-k="r">🌾 거뒀어요</button></div></div>'+
         '<table class="ldtb"><thead><tr><th class="lds">🌱 심은 곳</th><th class="ldr">🌾 거둔 곳</th></tr></thead><tbody></tbody></table>'+
-        '</div></div>';
+        '</div></div>'+
+        '<div class="ldverse"><p>사람이 무엇으로 심든지 그대로 거두리라</p><small>갈라디아서 6:7</small></div>';
       document.body.appendChild(ld);
       ld.querySelector(".ldclose").addEventListener("click",closeLedger);
       ld.addEventListener("click",ldClick);
