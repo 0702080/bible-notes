@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-sbalpha">
+<meta name="app-build" content="2026-11-04-mtop">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6243,6 +6243,7 @@ body:not(.boardon) .bfwrap{display:none!important}
           '<button type="button" class="medit">본문 고치기</button>'+
           '<button type="button" class="mcopy">말씀 복사</button>'+
           '<button type="button" class="mtopic">주제 정하기</button>'+
+          '<button type="button" class="mtop">⬆ 맨 위로 옮기기</button>'+
           '<button type="button" class="mpin">맨 위에 고정</button>'+
           '<button type="button" class="mcol">📁 칸에 넣기</button>'+
           '<a class="mgae" target="_blank" rel="noopener" hidden>개역개정으로 보기 (성서공회)</a>'+
@@ -7739,6 +7740,12 @@ body:not(.boardon) .bfwrap{display:none!important}
     if(b.classList.contains("frava")||b.classList.contains("frall")){
       var fo=frOpen.get(id), want=b.classList.contains("frall")?"*":b.dataset.uid;
       if(fo===want)frOpen.delete(id); else frOpen.set(id,want); render(); return;
+    }
+    if(b.classList.contains("mtop")){   // ⋯ 메뉴: 맨 위로 한 번 옮기기 (2026-11-04 사용자 요청)
+      b.closest("details").open=false;
+      var ft0=sorted().filter(function(x){return visibleNote(x)})[0];
+      if(ft0&&ft0.id!==id)lmApply(null,[id],ft0.id,null);
+      window.scrollTo({top:0,behavior:"smooth"}); toast("맨 위로 옮겼어요"); return;
     }
     if(b.classList.contains("mcol")){   // ⋯ 메뉴: 칸에 넣기 — 있는 칸 이름을 적거나 새 이름을 적으면 새 칸 (2026-11-04 사용자 요청)
       b.closest("details").open=false;
