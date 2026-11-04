@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-iccard">
+<meta name="app-build" content="2026-11-04-tgo">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4510,6 +4510,8 @@ body:not(.boardon) .bfwrap{display:none!important}
 .dlalit b{font-size:11.5px;font-weight:600;color:var(--green)}
 .dlalit p{margin:2px 0 0;font-size:14px;line-height:1.6;color:var(--ink);white-space:pre-line;word-break:keep-all}
 .dlaldel{position:absolute;right:0;top:8px;width:22px;height:22px;padding:0;border:0;border-radius:11px;background:transparent;color:var(--faint);font-size:14px}
+.dltgo{display:inline;padding:0;border:0;background:transparent;color:inherit;font:inherit;line-height:inherit;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--tc0) 45%,transparent);text-underline-offset:3px}
+@media (hover:hover){.dltgo:hover{color:color-mix(in srgb,var(--tc0) 70%,#fff)}}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12247,6 +12249,13 @@ body:not(.boardon) .bfwrap{display:none!important}
           xi.ans=xi.ans?0:Date.now(); icTouch(xi); icSave(oi); buzz(xi.ans?[12,40,18]:8); toast(xi.ans?"🙌 응답된 기도로 옮겼어요":"기도제목으로 되돌렸어요"); drawDaily(); return}
         var ap=e.target.closest(".dlactpg");
         if(ap){e.stopPropagation(); dlActPage+=+ap.dataset.d; buzz(8); drawDaily(); return}
+        var tg=e.target.closest(".dltgo");   // 맨 위 칸의 실천을 누르면 말씀 실천의 그 카드로 (2026-11-04 사용자 요청)
+        if(tg){
+          e.stopPropagation(); dlActGo=tg.dataset.k; dlGFold.delete("__acts"); dlGOnly("__acts"); saveGFold(); drawDaily();
+          var pr=dlActGo.split("|"), rw=dl.querySelector('.dlactrow[data-nid="'+pr[0]+'"][data-aid="'+pr[1]+'"]'); dlActGo="";
+          if(rw){var ri=rw.closest(".dlitem"); try{ri.scrollIntoView({block:"center",behavior:"smooth"})}catch(err){ri.scrollIntoView()} ri.classList.remove("dlflash"); void ri.offsetWidth; ri.classList.add("dlflash"); setTimeout(function(){ri.classList.remove("dlflash")},1500)}
+          buzz(8); return;
+        }
         var ae=e.target.closest(".dlactedit");   // 연필·실천 글을 누르면 실천 기록 칸 (2026-11-04 사용자 요청)
         var art=!ae&&e.target.closest(".dlactrow");
         if(art&&e.target.closest(".dlbox"))art=null;   // 네모는 체크
@@ -13027,7 +13036,7 @@ body:not(.boardon) .bfwrap{display:none!important}
      쉬는 항목 o.rest {id:{on:1|0,at}} (늦게 바꾼 쪽, 클라우드로 맞춤), 새로 넣은 항목 날짜 o.iat {id:날짜} */
   var dlShowAll=false, dlRestOpen="";
   var dlIcShowAns=false;
-  var dlG3All=new Set(), dlG3More={}, dlG3Skip={}, dlActPage=0, dlActEdit="", dlActLog="", dlActLogFocus=false;   // 🌱 오늘의 3개: 다 펼친 묶음, '하나 더'로 연 수 (이 화면에서만)
+  var dlG3All=new Set(), dlG3More={}, dlG3Skip={}, dlActPage=0, dlActGo="", dlActEdit="", dlActLog="", dlActLogFocus=false;   // 🌱 오늘의 3개: 다 펼친 묶음, '하나 더'로 연 수 (이 화면에서만)
   function dlRested(o,id){var r=o&&o.rest&&o.rest[id]; return !!(r&&r.on)}
   function dlStale(o){
     var now=Date.now(), from=dkey(now-29*864e5), old=dkey(now-30*864e5), first="", act={};
@@ -13117,12 +13126,12 @@ body:not(.boardon) .bfwrap{display:none!important}
     var tomorrow=dkey(new Date(base+"T12:00:00").getTime()+864e5), note=(tmr[today]&&tmr[today].t)||"";
     if(dlDay!==today||dlFind||dlEdit||(!mor&&!eve&&!note)){box.hidden=true;box.textContent="";return}
     box.hidden=false; box.className="dltime "+(eve?"eve":"mor"); box.textContent="";
-    var todo=[]; notes.forEach(function(n){(n.acts||[]).forEach(function(a){if(a.t.trim()&&!a.done&&(a.stamps||[]).indexOf(dlDay)<0)todo.push(a.t)})});
+    var todo=[]; notes.forEach(function(n){(n.acts||[]).forEach(function(a){if(a.t.trim()&&!a.done&&(a.stamps||[]).indexOf(dlDay)<0)todo.push({t:a.t,k:n.id+"|"+a.id})})});
     var el=function(t,c,x){var e=document.createElement(t); if(c)e.className=c; if(x!=null)e.textContent=x; return e};
     box.appendChild(el("b","dlttl",eve?"🌙 오늘 되돌아보기":mor?"☀️ 오늘 아침 꼭 볼 것":"📌 오늘 꼭 볼 것"));
     if(note&&!eve)box.appendChild(el("p","dltnote",note));
     if(eve)box.appendChild(el("p","dltsum","오늘 체크한 것 "+on.length+"개"+(todo.length?" · 아직 안 한 실천 "+todo.length+"개":"")));
-    if(todo.length){var ul=el("ul","dltlist"); todo.slice(0,3).forEach(function(t){ul.appendChild(el("li","",t))}); box.appendChild(ul)}
+    if(todo.length){var ul=el("ul","dltlist"); todo.slice(0,3).forEach(function(t){var li=el("li","",null), lb=el("button","dltgo",t.t); lb.type="button"; lb.dataset.k=t.k; lb.title="이 실천 카드로 가기"; li.appendChild(lb); ul.appendChild(li)}); box.appendChild(ul)}
     if(mor&&typeof dueAll==="function"){var du=dueAll(); if(du&&du.length)box.appendChild(el("p","dltsum","📖 오늘 복습할 말씀: "+du.slice(0,3).map(function(n){return n.ref||""}).filter(Boolean).join(", ")+(du.length>3?" 외 "+(du.length-3)+"개":"")))}
     if(eve){
       var ta=el("textarea","dltin"); ta.rows=2; ta.maxLength=500; ta.placeholder="내일 아침에 꼭 볼 것을 적어 두세요"; ta.value=(tmr[tomorrow]&&tmr[tomorrow].t)||""; ta.setAttribute("aria-label","내일 아침에 볼 것");
@@ -13453,7 +13462,9 @@ body:not(.boardon) .bfwrap{display:none!important}
       var acAll=acs.length, acPages=1, acPg=0;
       if(!fq&&acAll>4){
         acs=acs.filter(function(x){return !x.on}).concat(acs.filter(function(x){return x.on}));
-        acPages=Math.ceil(acAll/4); acPg=((dlActPage%acPages)+acPages)%acPages; acs=acs.slice(acPg*4,acPg*4+4);
+        acPages=Math.ceil(acAll/4);
+        if(dlActGo){acs.forEach(function(y,yi){if(y.n.id+"|"+y.a.id===dlActGo)dlActPage=Math.floor(yi/4)})}   // 맨 위 칸에서 누른 실천이 있는 쪽으로
+        acPg=((dlActPage%acPages)+acPages)%acPages; acs=acs.slice(acPg*4,acPg*4+4);
       }
       acs.forEach(function(x){
         var row=document.createElement("div"); row.className="dlitem haspill dlactitem"; row.style.setProperty("--gc","var(--green)");
