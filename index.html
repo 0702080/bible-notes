@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-ccflat">
+<meta name="app-build" content="2026-11-05-wkfit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4571,6 +4571,16 @@ body.reorder .ref .lclisten{display:none}
 .cch.ccmain>.bqbar .ccpaint[aria-pressed="true"] i{background:var(--gold);border-color:var(--gold);color:#141416;font-weight:700}
 .cch.ccmain .ccst i{box-sizing:border-box}
 .cch.ccmain .ccst.now i{margin-bottom:-3px}
+/* 걷기 암송: 위 원을 줄여 아래 설정이 가리지 않게 (2026-11-05 사용자 요청) */
+.wkv .bqbar{padding-top:10px;padding-bottom:10px}
+.wkv .wkbody{gap:8px;padding-top:4px}
+.wkv .wkring{width:min(30vw,112px,15vh);height:min(30vw,112px,15vh);gap:2px}
+.wkv .wkword{font-size:15px;line-height:1.25;max-width:84%;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.wkv .wkprog{font-size:11.5px}
+.wkv .wkstat span{padding:3px 10px;font-size:12px}
+.wkv .wkrefrow{margin:0 0 -2px}
+.wkv .wkline{padding:10px 14px}
+.wkv .wkopt{min-height:40px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
