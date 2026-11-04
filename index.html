@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-bf38">
+<meta name="app-build" content="2026-11-04-nodrag">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4513,6 +4513,7 @@ body:not(.boardon) .bfwrap{display:none!important}
 .dltgo{display:inline;padding:0;border:0;background:transparent;color:inherit;font:inherit;line-height:inherit;text-align:left;cursor:pointer;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--tc0) 45%,transparent);text-underline-offset:3px}
 @media (hover:hover){.dltgo:hover{color:color-mix(in srgb,var(--tc0) 70%,#fff)}}
 body.boardon .toolbar .bfilter{height:38px;border-radius:19px}   /* 찾기 칸 높이 = 오른쪽 보기·순서 묶음 (2026-11-04 사용자 요청) */
+body:not(.reorder) .note.open .grip{visibility:hidden}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -18624,6 +18625,7 @@ body.boardon .toolbar .bfilter{height:38px;border-radius:19px}   /* 찾기 칸 �
     if(drag||e.button>0)return;
     var card=e.target.closest(".note"); if(!card)return;
     if(reorderMode){e.preventDefault(); startDrag(card,e.pointerId,e.clientY,card); return}
+    if(card.classList.contains("open"))return;   // 펼친 카드는 끌어 옮기지 않음 (2026-11-04 사용자 요청)
     var g=e.target.closest(".grip");
     if(g){e.preventDefault(); startDrag(card,e.pointerId,e.clientY,g); return}
     if(e.target.closest(NODRAG))return;
