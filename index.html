@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-wkgo">
+<meta name="app-build" content="2026-11-04-ccrow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4513,6 +4513,13 @@ body:not(.boardon) .bfwrap{display:none!important}
 @media (hover:hover){.dltgo:hover{color:color-mix(in srgb,var(--tc0) 70%,#fff)}}
 body.boardon .toolbar .bfilter{height:38px;border-radius:19px}   /* 찾기 칸 높이 = 오른쪽 보기·순서 묶음 (2026-11-04 사용자 요청) */
 body:not(.reorder) .note.open .grip{visibility:hidden}
+/* 암송 코치: 단계 줄과 🎨·🚶 단추를 맨 위 한 줄로 (2026-11-04 사용자 요청) */
+.cch.ccmain>.bqbar{min-height:76px;box-sizing:border-box;padding:8px 12px 8px 0;justify-content:flex-end}
+.cch.ccmain>.ccsteps{position:absolute;top:env(safe-area-inset-top,0px);left:4px;right:128px;z-index:3;max-width:520px;width:auto;margin:0;padding:14px 0 0;gap:0}
+.cch.ccmain>.bqbar .ccpaint{margin-left:0;padding:0 11px}
+.cch.ccmain .ccst{font-size:11px;min-width:0}
+.cch.ccmain .ccst span{white-space:nowrap}
+.cch.ccmain .ccst.now span{font-size:11.5px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -10193,11 +10200,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     var br=bd.getBoundingClientRect(), rr=rf.getBoundingClientRect();
     cn.style.top=Math.round(rr.top-br.top+bd.scrollTop+(rr.height-(cn.offsetHeight||20))/2)+"px";
     // 가운데를 4단계(떠올리기) 동그라미의 세로 가운데 줄에 맞춤 (2026-10-23 사용자 요청)
-    var dots=ccBox.querySelectorAll(".ccsteps .ccst i"), last=dots[dots.length-1];
-    if(last&&last.offsetWidth){
-      var lr=last.getBoundingClientRect(), w=cn.offsetWidth||50, L=Math.round(lr.right-br.left-w);   // 오른쪽 끝을 4단계 동그라미 오른쪽 끝 세로줄에 맞춤 (2026-10-31 사용자 요청)
-      L=Math.min(L,bd.clientWidth-w-4); cn.style.left=Math.max(4,L)+"px"; cn.style.right="auto";
-    }
+    cn.style.left=""; cn.style.right="";   // 단계 줄이 맨 위 한 줄로 올라가서, '암송 N'은 말씀 칸 오른쪽 끝에 (2026-11-04)
   }
   window.addEventListener("resize",function(){requestAnimationFrame(ccNumPlace)});
   function ccDraw0(){
