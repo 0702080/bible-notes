@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-sbmint">
+<meta name="app-build" content="2026-11-04-icp">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4487,6 +4487,13 @@ body:not(.boardon) .bfwrap{display:none!important}
 .prays>.pri.answered .prvt{color:#C9C4D2}
 .prays>.pri .pt{background:color-mix(in srgb,var(--prc) 10%,#101013);border-color:color-mix(in srgb,var(--prc) 40%,#2E2D33);color:color-mix(in srgb,var(--prc) 35%,#fff)}
 .prays.pallfold>.pri{display:none}
+/* 기도제목 고치기: 읽을 때와 같은 글자·폭·줄바꿈 */
+.icform.icinline{padding:12px 14px}
+.icform.icinline .field.icfm{min-height:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;font-size:14.5px;line-height:1.6;white-space:pre-wrap;color:var(--ink);resize:none;overflow:hidden;outline:1px dashed color-mix(in srgb,var(--sky) 55%,transparent);outline-offset:5px}
+.icform.icinline .field.icfm:focus{outline-style:solid;box-shadow:none}
+.icbtns .icans{border-color:color-mix(in srgb,var(--gold) 55%,#34333A);background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-weight:700}
+.icp.ans .icbtns .icans{border-color:#34333A;background:transparent;color:var(--faint);font-weight:500}
+.icbtns{flex-wrap:wrap}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -11512,12 +11519,22 @@ body:not(.boardon) .bfwrap{display:none!important}
       // 기도문을 두 번 누르면(휴대폰은 두 번 톡톡) 고치기 (2026-10-24 사용자 요청)
       // 한 번 누르면 접힌 카드가 펼쳐지고, 두 번 누르면 펼치면서 고치기 (2026-10-24 사용자 요청)
       var icTap={id:"",timer:0};
+      icv.addEventListener("input",function(e){if(e.target.closest&&e.target.closest(".icinline .icfm"))grow(e.target)});
       icv.addEventListener("click",function(e){
         if(e.target.closest("button,input,textarea,select,.icform,.icgrip"))return;
         var c=e.target.closest(".icp"); if(!c)return; var id=c.dataset.id;
         if(icTap.id===id&&icTap.timer){clearTimeout(icTap.timer); icTap={id:"",timer:0};
           icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){}
-          icEdit=id; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfm"); if(f){f.focus(); try{f.setSelectionRange(f.value.length,f.value.length)}catch(err){}}},40); return}
+          var mm0=c.querySelector(".icmemo"), myT=(mm0||c).getBoundingClientRect().top;
+          icEdit=id; icDraw();
+          var f0=icv.querySelector(".icfm");
+          if(f0){   // 읽을 때 기도문이 있던 화면 자리에 고치기 칸의 글이 오게 맞춤 (2026-11-04 사용자 요청)
+            grow(f0);
+            var bd0=icv.querySelector(".icbody"); bd0.scrollTop+=f0.getBoundingClientRect().top-myT;
+            var dy0=myT-f0.getBoundingClientRect().top; if(Math.abs(dy0)>0.5)bd0.scrollTop-=dy0;
+            try{f0.focus({preventScroll:true}); f0.setSelectionRange(f0.value.length,f0.value.length)}catch(err){}
+          }
+          return}
         clearTimeout(icTap.timer);
         icTap={id:id,timer:setTimeout(function(){icTap={id:"",timer:0};
           if(window.getSelection&&String(window.getSelection()).length)return;   // 글을 고르는 중이면 그대로
@@ -11635,17 +11652,17 @@ body:not(.boardon) .bfwrap{display:none!important}
     dt.textContent=(ad.getFullYear()!==new Date().getFullYear()?ad.getFullYear()+". ":"")+dayName(dkey(x.at))+" 적음"; bt.appendChild(dt);
     function B(cls,t){var b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=t; bt.appendChild(b); return b}
     if(big&&!x.ans)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
-    if(!big)B("icans",x.ans?"응답 취소":"🙌 응답됐어요");
+    B("icans",x.ans?"응답 취소":"🙌 응답됐어요");   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
     return d;
   }
   function icForm(x){
-    var f=document.createElement("div"); f.className="icform"; f.dataset.id=x?x.id:"";
+    var f=document.createElement("div"); f.className="icform"+(x?" icinline":""); f.dataset.id=x?x.id:"";
     f.innerHTML='<input class="field icfn" maxlength="100" placeholder="제목 (예: 어머니 무릎 회복, 김○○ 집사님 아들)" aria-label="이름">'+
       '<textarea class="field icfm" rows="10" maxlength="8000" placeholder="기도 제목 (예: 수술 회복, 믿음이 자라도록)" aria-label="기도 제목"></textarea>'+
       '<select class="field icfv" aria-label="붙들 말씀">'+icNoteOpts(x?x.nid:"")+'</select>'+
       (x&&x.ans?'<textarea class="field icfa" rows="2" maxlength="1000" placeholder="어떻게 응답하셨는지" aria-label="응답"></textarea>':'')+
       '<div class="icfbtn">'+(x?'<button type="button" class="icdel">지우기</button>':'<span></span>')+'<span><button type="button" class="iccancel">취소</button><button type="button" class="icok">'+(x?"저장":"＋ 명단에 넣기")+'</button></span></div>';
-    if(x){f.querySelector(".icfn").value=x.name; f.querySelector(".icfm").value=x.memo; var fa=f.querySelector(".icfa"); if(fa)fa.value=x.an}
+    if(x){f.querySelector(".icfn").value=x.name; f.querySelector(".icfm").value=x.memo; f.querySelector(".icfm").rows=1; var fa=f.querySelector(".icfa"); if(fa)fa.value=x.an}
     return f;
   }
   function icDraw(){
@@ -11653,6 +11670,7 @@ body:not(.boardon) .bfwrap{display:none!important}
     var kf=icv.querySelector(".icform"), keep=null;
     if(kf){keep={id:kf.dataset.id,v:{},foc:""}; [".icfn",".icfm",".icfv",".icfa"].forEach(function(s){var el=kf.querySelector(s); if(el){keep.v[s]=el.value; if(document.activeElement===el){keep.foc=s; try{keep.ss=el.selectionStart;keep.se=el.selectionEnd}catch(e){}}}}); keep.st=icv.querySelector(".icbody").scrollTop}
     icDrawInner();
+    var inl=icv.querySelector(".icinline .icfm"); if(inl)grow(inl);
     var nf=keep&&icv.querySelector(".icform");
     if(nf&&nf.dataset.id===keep.id){Object.keys(keep.v).forEach(function(s){var el=nf.querySelector(s); if(el)el.value=keep.v[s]}); icv.querySelector(".icbody").scrollTop=keep.st;
       if(keep.foc){var fe=nf.querySelector(keep.foc); if(fe){try{fe.focus({preventScroll:true}); if(keep.ss!=null)fe.setSelectionRange(keep.ss,keep.se)}catch(e){}}}}
