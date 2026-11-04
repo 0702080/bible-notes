@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-fx">
+<meta name="app-build" content="2026-11-04-sayhd">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4434,6 +4434,13 @@ body:not(.boardon) .bfwrap{display:none!important}
 .fx[hidden]{display:none}
 .filter.has{padding-left:44px}
 @media (min-width:900px){body.boardon .bfx{width:26px;height:26px;font-size:13px;line-height:26px;left:4px;border-radius:13px}}
+/* 좁은 화면: 믿음의 한 마디 머리 줄이 겹치지 않게 — 단추는 줄이고 제목은 넘치면 말줄임 (2026-11-04 사용자 요청) */
+@media (max-width:560px){
+  .saysheet>.dlbar{display:flex;align-items:center;gap:6px}
+  .saysheet>.dlbar>.dltitle{position:static;transform:none;flex:1 1 auto;min-width:0;width:auto;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+  .saysheet>.dlbar>button{flex:0 0 auto;margin:0;padding-left:11px;padding-right:11px}
+  .sayhidem{display:none}
+}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -13860,7 +13867,7 @@ body:not(.boardon) .bfwrap{display:none!important}
     }
     sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value="";
     say.querySelector(".dltitle").textContent=sayMode==="v"?"📖 짧은 말씀 한 구절":"💬 믿음의 한 마디";
-    say.querySelector(".sayadd").textContent=sayMode==="v"?"+ 말씀 담기":"+ 한 마디 담기";
+    say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
     say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawSay();
     if(sayEdit==="new"){var ta=say.querySelector(".sayt"); if(ta)setTimeout(function(){ta.focus()},40)}
@@ -13937,7 +13944,7 @@ body:not(.boardon) .bfwrap{display:none!important}
     if(keep&&keep.focus){var nt=form.querySelector(".sayt"); if(nt){try{nt.focus({preventScroll:true}); nt.setSelectionRange(keep.ss,keep.se)}catch(e){}}}
     list.textContent="";
     var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:!x.hv});
-    var lb=say.querySelector(".saylock"); lb.textContent=sayLocked?"📌 고정 ON":"📌 고정 OFF"; lb.classList.toggle("on",sayLocked); lb.setAttribute("aria-pressed",String(sayLocked)); lb.title=sayLocked?"끄면 카드를 끌어서 옮길 수 있어요":"켜면 카드가 움직이지 않아요";
+    var lb=say.querySelector(".saylock"); lb.innerHTML='📌<span class="sayhidem"> 고정 '+(sayLocked?"ON":"OFF")+'</span>'; lb.setAttribute("aria-label",sayLocked?"고정 켜짐":"고정 꺼짐"); lb.classList.toggle("on",sayLocked); lb.setAttribute("aria-pressed",String(sayLocked)); lb.title=sayLocked?"끄면 카드를 끌어서 옮길 수 있어요":"켜면 카드가 움직이지 않아요";
     list.classList.toggle("saylocked",sayLocked||!!sayQ);
     if(sayQ){
       items=items.filter(function(x){return sayQ.split(/\s+/).every(function(w){return hit1([x.t,x.who,x.topic].join(" "),w)})});
