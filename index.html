@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-tgonoline">
+<meta name="app-build" content="2026-11-05-ccgap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4655,6 +4655,10 @@ body.reorder .ref .lclisten{display:none}
   var sortMode="recent", filterText="";
   try{var sv=localStorage.getItem("bible-notes-sort");if(sv==="bible"||sv==="recent"||sv==="custom")sortMode=sv}catch(e){}
   // 말씀 순서(최근순·성경순·내 순서)를 로그인한 모든 기기가 같이 씀: 마지막에 바꾼 쪽을 따름. 처음엔 휴대폰 순서가 기준 (2026-10-22 사용자 요청)
+  // 암송 코치 빈 줄 높이: 한 번 조절하면 모든 말씀에 똑같이, 기기끼리도 맞춤 (글자 크기 배수, 0=기본) (2026-11-05 사용자 요청)
+  var CC_GAP="bible-cc-gap", ccGap=0, ccGapAt=0;
+  try{var cg0=JSON.parse(localStorage.getItem(CC_GAP)||"{}"); ccGap=+cg0.v||0; ccGapAt=+cg0.at||0}catch(e){}
+  function ccGapStore(v,at){ccGap=v; ccGapAt=at; try{localStorage.setItem(CC_GAP,JSON.stringify({v:v,at:at}))}catch(e){}}
   var SORT_AT="bible-notes-sort-at", sortAt=0;
   try{sortAt=+localStorage.getItem(SORT_AT)||0}catch(e){}
   function setSortMode(m){
@@ -4741,7 +4745,6 @@ body.reorder .ref .lclisten{display:none}
       loci:Array.isArray(n.loci)?n.loci.slice(0,12).map(function(x){return String(x||"").slice(0,20)}):[],   // 🏠 장소로 외우기의 장소 이름
       fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
-      gaps:Array.isArray(n.gaps)?n.gaps.slice(0,60).map(function(x){x=+x;return x>0?Math.max(.15,Math.min(10,Math.round(x*100)/100)):0}):[],   // 암송 코치 빈 줄 높이(글자 크기 배수, 0=기본) (2026-11-05)
       lcnt:Math.max(0,Math.min(99999,Math.floor(+n.lcnt||0))),   // 걷기 암송(음성)으로 끝까지 들은 누적 횟수 (2026-11-05)
       rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0,d:/^\d{4}-\d{2}-\d{2}$/.test(n.rv.d||"")?n.rv.d:"",grad:+n.rv.grad||0}:null,
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
@@ -9821,21 +9824,21 @@ body.reorder .ref .lclisten{display:none}
       ccBox.querySelector(".ccverse").addEventListener("pointerdown",function(e){
         var g=e.target.closest&&e.target.closest(".ccblank"); ccGapMoved=false;
         if(!g||!C||C.edit||C.revealing||e.button>0)return;
-        var n0=notes.get(C.id); if(!n0)return;
-        var y0=e.clientY, x0=e.clientX, pid=e.pointerId, fs=parseFloat(getComputedStyle(g).fontSize)||21, h0=g.getBoundingClientRect().height/fs, gi=+g.dataset.gi, val=h0;
+        var y0=e.clientY, x0=e.clientX, pid=e.pointerId, fs=parseFloat(getComputedStyle(g).fontSize)||21, h0=g.getBoundingClientRect().height/fs, val=h0;
+        var vbox=this;
         function mv(ev){
           if(ev.pointerId!==pid)return;
           var dy=ev.clientY-y0, dx=ev.clientX-x0;
           if(!ccGapMoved){if(Math.abs(dy)<6||Math.abs(dy)<=Math.abs(dx))return; ccGapMoved=true; g.classList.add("drag"); buzz(8)}
           ev.preventDefault();
-          val=Math.max(.15,Math.min(10,h0+dy/fs)); g.style.height=val+"em";
+          val=Math.max(.15,Math.min(10,h0+dy/fs));
+          vbox.querySelectorAll(".ccblank").forEach(function(x){x.style.height=val+"em"});   // 이 말씀의 빈 줄도 같이
         }
         function up(ev){
           if(ev.pointerId!==pid)return;
           window.removeEventListener("pointermove",mv); window.removeEventListener("pointerup",up); window.removeEventListener("pointercancel",up);
           g.classList.remove("drag"); if(!ccGapMoved)return;
-          var a=Array.isArray(n0.gaps)?n0.gaps:[]; while(a.length<gi)a.push(0);
-          a[gi]=Math.round(val*100)/100; n0.gaps=a; scheduleSave(n0.id); buzz(6);
+          ccGapStore(Math.round(val*100)/100,Date.now()); if(typeof sbMark==="function")sbMark("__ccgap"); buzz(6);
         }
         window.addEventListener("pointermove",mv,{passive:false}); window.addEventListener("pointerup",up); window.addEventListener("pointercancel",up);
       });
@@ -10048,17 +10051,19 @@ body.reorder .ref .lclisten{display:none}
     for(var i=idx.length-1;i>0;i--){var j=Math.floor(r()*(i+1));var t=idx[i];idx[i]=idx[j];idx[j]=t}
     var hide={}; if(mode==="hide")idx.slice(0,Math.max(1,Math.round(ws.length*frac))).forEach(function(i){hide[i]=1});
     var wi=0, step=Math.min(.05,.9/Math.max(1,ws.length));
-    var gapN=C&&notes.get(C.id), gapI=0;
-    function ccGapEl(cls,def,brs){   // 빈 줄: 위아래로 끌어 높이를 바꿈 (2026-11-05 사용자 요청)
-      var g=document.createElement("span"), sv=gapN&&gapN.gaps&&+gapN.gaps[gapI];
-      g.className=cls; g.dataset.gi=gapI++; g.dataset.def=def; if(brs)g.dataset.br=brs;
-      g.style.height=(sv>0?sv:def)+"em"; g.setAttribute("aria-hidden","true"); box.appendChild(g);
+    function ccGapEl(cls,def,brs){   // 빈 줄: 위아래로 끌어 높이를 바꿈, 모든 말씀 공통 (2026-11-05 사용자 요청)
+      var g=document.createElement("span");
+      g.className=cls; if(brs)g.dataset.br=brs;
+      g.style.height=(ccGap>0?ccGap:def)+"em"; g.setAttribute("aria-hidden","true"); box.appendChild(g);
     }
     tokens(text).forEach(function(tok){
       if(/^\s+$/.test(tok)){var nl=tok.split("\n").length-1; if(nl>1){var nb=Math.min(nl,3); ccGapEl("ccblank",(nb-1)*2,nb)}else if(nl>0){box.appendChild(document.createElement("br"))}else box.appendChild(document.createTextNode(" "));return}   // 빈 줄도 그대로 띄움 (2026-10-30 사용자 요청)
       if(wi>0&&/^\d{1,3}\.?$/.test(tok)){   // 새 절(16, 17 …)은 한 줄 띄우고 시작 (2026-10-29 사용자 요청)
-        if(!box.lastChild||(box.lastChild.nodeName!=="BR"&&!(box.lastChild.classList&&box.lastChild.classList.contains("ccblank"))))box.appendChild(document.createElement("br"));
-        ccGapEl("ccvgap ccblank",.9,0);
+        var lastBlank=box.lastChild&&box.lastChild.classList&&box.lastChild.classList.contains("ccblank");   // 빈 줄 바로 뒤의 새 절은 한 번만 띄움 → 어느 말씀이나 높이가 같게
+        if(!lastBlank){
+          if(!box.lastChild||box.lastChild.nodeName!=="BR")box.appendChild(document.createElement("br"));
+          ccGapEl("ccvgap ccblank",.9,0);
+        }
       }
       var sp=document.createElement("span"), ch=Array.from(tok), col=" r-"+((C&&C.roles&&C.roles[wi])||"etc");
       var isHid=mode==="none"||mode==="first"||!!hide[wi];
@@ -10323,7 +10328,6 @@ body.reorder .ref .lclisten{display:none}
       var vEd=ccBox.querySelector(".ccverse");
       var nv=vEd?String(vEd.innerText||"").split(String.fromCharCode(160)).join(" ").split(String.fromCharCode(13)).join("").split(String.fromCharCode(10)).map(function(x){return x.replace(/\s+$/,"")}).join(String.fromCharCode(10)):"";
       if(nv.trim()&&nv!==n.text&&nv!==C.editPre){
-        var bl0=(String(n.text||"").match(/\n[ \t]*\n/g)||[]).length, bl1=(nv.match(/\n[ \t]*\n/g)||[]).length; if(bl0!==bl1)n.gaps=[];   // 빈 줄 수가 바뀌면 높이는 처음으로
         n.text=nv; if(typeof focusMode!=="undefined")focusMode.delete(n.id);
         scheduleSave(n.id); render(); toast("말씀을 고쳤어요");
       }
@@ -17367,7 +17371,7 @@ body.reorder .ref .lclisten{display:none}
     detail=String(detail||"").replace(/\s+/g," ").trim().slice(0,140);
     return {msg:what+" ("+r.status+(detail?": "+detail:"")+")",short:what+" "+r.status};
   }
-  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__icp");sbDirty.add("__sermons");sbDirty.add("__clones");sbDirty.add("__sayings");sbDirty.add("__medq");sbDirty.add("__sort");try{localStorage.removeItem(SB_LAST)}catch(e){}}
+  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__icp");sbDirty.add("__sermons");sbDirty.add("__clones");sbDirty.add("__sayings");sbDirty.add("__medq");sbDirty.add("__sort");sbDirty.add("__ccgap");try{localStorage.removeItem(SB_LAST)}catch(e){}}
   var SB_DIRTY="bible-sb-dirty";
   try{(JSON.parse(localStorage.getItem(SB_DIRTY)||"[]")||[]).forEach(function(id){sbDirty.add(String(id))})}catch(e){}
   function sbSaveDirty(){try{if(sbDirty.size)localStorage.setItem(SB_DIRTY,JSON.stringify(Array.from(sbDirty)));else localStorage.removeItem(SB_DIRTY)}catch(e){}}
@@ -17386,6 +17390,12 @@ body.reorder .ref .lclisten{display:none}
         if(id==="__me"){
           var me={emoji:myEmoji(),on:shareOn()?1:0}, mjs=JSON.stringify(me);
           if(sbLastJson["s:__me"]!==mjs){rows.push({user_id:uid,id:"s:__me",data:me,updated_at:now,deleted:false,visibility:"friends"});sbLastJson["s:__me"]=mjs}
+          return;
+        }
+        if(id==="__ccgap"){
+          if(!ccGapAt)return;   // 아직 조절한 적 없는 기기는 올리지 않음
+          var cgo={v:ccGap,at:ccGapAt}, cgjs=JSON.stringify(cgo);
+          if(sbLastJson.__ccgap!==cgjs){rows.push({user_id:uid,id:"__ccgap",data:cgo,updated_at:now,deleted:false});sbLastJson.__ccgap=cgjs}
           return;
         }
         if(id==="__sort"){
@@ -17444,6 +17454,14 @@ body.reorder .ref .lclisten{display:none}
           if(String(r.id).indexOf("s:")===0){   // 친구용 사본은 노트가 아님
             if(r.id==="s:__me"&&r.data){sbLastJson["s:__me"]=JSON.stringify(r.data);try{if(r.data.emoji)localStorage.setItem("bible-my-emoji",String(r.data.emoji));localStorage.setItem("bible-share",r.data.on===0?"0":"1")}catch(e){}}
             return;
+          }
+          if(r.id==="__ccgap"){
+            var cg2=r.data||{};
+            if(+cg2.v>0&&(+cg2.at||0)>ccGapAt){
+              ccGapStore(+cg2.v,+cg2.at);
+              document.querySelectorAll(".ccverse .ccblank").forEach(function(x){x.style.height=ccGap+"em"});
+            }
+            sbLastJson.__ccgap=JSON.stringify({v:ccGap,at:ccGapAt}); return;
           }
           if(r.id==="__sort"){
             var so2=r.data||{};
