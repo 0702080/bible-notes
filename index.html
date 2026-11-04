@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-sbactive">
+<meta name="app-build" content="2026-11-04-iccard">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4457,7 +4457,9 @@ body:not(.boardon) .bfwrap{display:none!important}
 .dlic .dlitem .dlicopen{border-color:color-mix(in srgb,var(--gc) 50%,transparent);background:color-mix(in srgb,var(--gc) 16%,transparent);color:color-mix(in srgb,var(--gc) 75%,#fff)}
 .dlic .dlicwrap:has(.dlicfull) .dlicfull{border-color:color-mix(in srgb,var(--gc,var(--sky)) 35%,#2A2930)}
 /* 중보기도 명단 카드도 차례로 다른 색 */
-.icp{--ic0:var(--sky);background:linear-gradient(135deg,color-mix(in srgb,var(--ic0) 18%,#141418),color-mix(in srgb,var(--ic0) 6%,#121116));border-color:color-mix(in srgb,var(--ic0) 36%,#2A2930)}
+.icp{--ic0:var(--sky)}
+.icbody .icp,.icbody .icp.big{background:linear-gradient(150deg,color-mix(in srgb,var(--ic0) 26%,#15141A),color-mix(in srgb,var(--ic0) 11%,#121116))!important;border-color:color-mix(in srgb,var(--ic0) 45%,#2A2930)!important}
+.icbody .icp .icname{color:color-mix(in srgb,var(--ic0) 60%,#fff)}
 .icp:nth-of-type(6n+2){--ic0:var(--green)}
 .icp:nth-of-type(6n+3){--ic0:var(--violet)}
 .icp:nth-of-type(6n+4){--ic0:var(--gold)}
