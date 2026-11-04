@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-ccref">
+<meta name="app-build" content="2026-11-04-stick">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4466,6 +4466,14 @@ body:not(.boardon) .bfwrap{display:none!important}
 .wklock{background:#000!important}   /* 화면을 켜 둔 채 주머니에: 완전히 까맣게 해서 배터리를 아낌 */
 .wklhint em{display:block;margin-top:8px;font-style:normal;font-size:12.5px;color:var(--muted);line-height:1.5}
 .wkcnt{padding:1px 9px;border-radius:12px;background:color-mix(in srgb,var(--sky) 18%,transparent);color:var(--sky);font-weight:700}
+/* 📌 카드 고정 단추: ↺처럼 원 안에, ↺ 바로 왼쪽 */
+.bcard .bcpin{position:absolute;top:6px;right:36px;z-index:3;width:26px;height:26px;padding:0;margin:0;border:1px solid #3A3944;border-radius:14px;background:#1B1A21;display:grid;place-items:center;font-size:12px;line-height:1;order:0}
+.bcard .bcpin.on{border-color:color-mix(in srgb,var(--pink) 55%,#3A3944);background:color-mix(in srgb,var(--pink) 20%,#1B1A21)}
+.bcard>.bcref{padding-right:64px}
+.bcard.bclone>.bcref{padding-right:0}
+.bcard.bclone:hover>.bcref{padding-right:70px}
+/* 고정 카드는 칸 맨 위에 붙음 */
+.bcard.bcstick{position:sticky;background:#17161C;box-shadow:0 4px 10px rgba(0,0,0,.45)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -17444,6 +17452,19 @@ body:not(.boardon) .bfwrap{display:none!important}
     var cdp=pb.closest(".bcard"), np=cdp&&notes.get(cdp.dataset.id); if(!np)return;
     np.pinned=!np.pinned; np.pinnedAt=np.pinned?Date.now():0; scheduleSave(np.id); render(); buzz(10); toast(np.pinned?"맨 위에 고정했어요":"고정을 풀었어요");
   },true);
+  // 📌 고정한 카드는 칸을 굴려도 맨 위에 붙어 늘 보임 (2026-11-04 사용자 요청). 칸 높이의 절반까지만 — 넘치면 나머지는 평소처럼 굴러감
+  function kbStick(){
+    if(!boardOn)return;
+    Array.prototype.forEach.call($("board").querySelectorAll(".bclist"),function(ls){
+      var y=0, max=ls.clientHeight*0.5, z=30;
+      Array.prototype.forEach.call(ls.querySelectorAll(".bcard"),function(c){
+        var on=!!c.querySelector(".bcpin.on"), fit=on&&y+c.offsetHeight<=max;
+        c.classList.toggle("bcstick",fit);
+        if(fit){c.style.top=y+"px"; c.style.zIndex=String(z--); y+=c.offsetHeight+8}else{c.style.top=""; c.style.zIndex=""}
+      });
+    });
+  }
+  (function(){var t=0, go=function(){clearTimeout(t); t=setTimeout(kbStick,60)}; new MutationObserver(go).observe($("board"),{childList:true}); window.addEventListener("resize",go)})();
   var colDrag=null;   // 칸 머리를 끌어 칸 순서 바꾸기
   $("board").addEventListener("dragstart",function(e){
     var hd=e.target.closest&&e.target.closest(".bch");
