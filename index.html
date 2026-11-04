@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-newcol">
+<meta name="app-build" content="2026-11-04-iccol">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4445,6 +4445,24 @@ body:not(.boardon) .bfwrap{display:none!important}
 .fscrow .fsc,.fscrow .fsd{height:34px;padding:0 14px;border:1px solid #4A4855;background:#2A2933;color:var(--ink);font-weight:600}
 .fscrow .fsc.on,.fscrow .fsd.on{border-color:var(--gold);background:var(--gold);color:#17120A;font-weight:700}
 .coldrop .cchip[data-col="__new"]{border-color:var(--green)!important;background:var(--green)!important;background-image:none!important;color:#0F1F17!important;font-weight:700}   /* ＋ 새 칸 만들기는 초록 (2026-11-04 사용자 요청) */
+/* 오늘 기도제목: 응답완료 단추 */
+.dlicbtns{position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:2;display:flex;align-items:center;gap:5px}
+.dlicbtns .dlauto{position:static;transform:none}
+.dlicans{height:26px;padding:0 10px;border:1px solid color-mix(in srgb,var(--gold) 60%,transparent);border-radius:13px;background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold);font-family:inherit;font-size:11.5px;font-weight:700;white-space:nowrap}
+.dlicans.on{background:var(--gold);color:#17120A}
+.dlitem.icb .dlicrow{padding-right:92px}
+.dlitem.icb.ic2 .dlicrow{padding-right:158px}
+.dlitem.icdone .dlt{opacity:.65}
+.dlic .dlitem .dlicrow{background:linear-gradient(135deg,color-mix(in srgb,var(--gc) 24%,#17161C),color-mix(in srgb,var(--gc) 9%,#141418))!important;border-color:color-mix(in srgb,var(--gc) 42%,#2A2930)!important}
+.dlic .dlitem .dlicopen{border-color:color-mix(in srgb,var(--gc) 50%,transparent);background:color-mix(in srgb,var(--gc) 16%,transparent);color:color-mix(in srgb,var(--gc) 75%,#fff)}
+.dlic .dlicwrap:has(.dlicfull) .dlicfull{border-color:color-mix(in srgb,var(--gc,var(--sky)) 35%,#2A2930)}
+/* 중보기도 명단 카드도 차례로 다른 색 */
+.icp{--ic0:var(--sky);background:linear-gradient(135deg,color-mix(in srgb,var(--ic0) 18%,#141418),color-mix(in srgb,var(--ic0) 6%,#121116));border-color:color-mix(in srgb,var(--ic0) 36%,#2A2930)}
+.icp:nth-of-type(6n+2){--ic0:var(--green)}
+.icp:nth-of-type(6n+3){--ic0:var(--violet)}
+.icp:nth-of-type(6n+4){--ic0:var(--gold)}
+.icp:nth-of-type(6n+5){--ic0:var(--pink)}
+.icp:nth-of-type(6n+6){--ic0:var(--orange)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12161,6 +12179,9 @@ body:not(.boardon) .bfwrap{display:none!important}
         cal.addEventListener("click",function(e){if(Date.now()-dlCalEat<350){e.stopPropagation(); e.preventDefault()}},true);
       })();   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
       dl.addEventListener("click",function(e){
+        var ia=e.target.closest(".dlicans");
+        if(ia){e.stopPropagation(); var oi=icData(), xi=oi.items.find(function(y){return y.id===ia.dataset.icid}); if(!xi)return;
+          xi.ans=xi.ans?0:Date.now(); icTouch(xi); icSave(oi); buzz(xi.ans?[12,40,18]:8); toast(xi.ans?"🙌 응답된 기도로 표시했어요":"응답을 취소했어요"); drawDaily(); return}
         var ap=e.target.closest(".dlactpg");
         if(ap){e.stopPropagation(); dlActPage+=+ap.dataset.d; buzz(8); drawDaily(); return}
         var ae=e.target.closest(".dlactedit");   // 말씀 실천 글 바로 고치기 (2026-11-04 사용자 요청)
@@ -13385,19 +13406,26 @@ body:not(.boardon) .bfwrap{display:none!important}
       isec.appendChild(ih);
       if(!iOpen){ipk=[]}
       else if(!ipk.length){var ip=document.createElement("p"); ip.className="dlacthint"; ip.textContent="기도해 줄 사람을 명단에 넣으면, 하루에 몇 명씩 오래 기도하지 못한 사람부터 여기에 보여 드려요."; isec.appendChild(ip)}
-      ipk.forEach(function(x){
+      // 그날 응답 완료한 기도는 그날 칸에 남겨 둠 — 잘못 눌렀으면 바로 되돌림
+      if(iOpen&&!fq)ipk=ipk.concat(ico.items.filter(function(y){return y.ans&&dkey(y.ans)===dlDay}));
+      ipk.forEach(function(x,ii){
         var on2=x.log.indexOf(dlDay)>=0;
         var wrap=document.createElement("div"); wrap.className="dlicwrap"; wrap.dataset.icid=x.id;
-        var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc","var(--sky)");
+        var row=document.createElement("div"); row.className="dlitem"; row.style.setProperty("--gc",ANSCOL[(ii+2)%ANSCOL.length]);   // 기도제목 카드마다 다른 색 (2026-11-04 사용자 요청)
         var b=document.createElement("button"); b.type="button"; b.className="dlrow dlicrow"+(on2?" on":""); b.dataset.icid=x.id; b.setAttribute("aria-pressed",String(on2));
         b.innerHTML='<span class="dlbox" aria-hidden="true"></span><span class="dlt"></span>';
         var tt=b.querySelector(".dlt"); tt.textContent=x.name; if(fq)dlMarkIn(tt,fq);
         var opn=dlIcOpen.has(x.id);
         // 접혀 있을 때는 제목만 (기도문 미리보기 없음, 2026-10-24 사용자 요청)
         row.appendChild(b);
+        // 🙌 응답완료 단추는 늘 보임 (2026-11-04 사용자 요청)
+        var ibs=document.createElement("div"); ibs.className="dlicbtns";
+        var ab=document.createElement("button"); ab.type="button"; ab.className="dlicans"+(x.ans?" on":""); ab.dataset.icid=x.id; ab.textContent=x.ans?"🙌 응답됨":"응답완료"; ab.title=x.ans?"누르면 응답을 취소해요":"응답된 기도로 표시해요"; ibs.appendChild(ab);
         if(x.memo.trim()){   // 기도문 전체 펼쳐 보기 (2026-10-24 사용자 요청)
-          var ob=document.createElement("button"); ob.type="button"; ob.className="dlauto dlicopen"+(opn?" on":""); ob.dataset.icid=x.id; ob.textContent=opn?"접기 ▴":"펼치기 ▾"; ob.setAttribute("aria-expanded",String(opn)); row.appendChild(ob);
+          var ob=document.createElement("button"); ob.type="button"; ob.className="dlauto dlicopen"+(opn?" on":""); ob.dataset.icid=x.id; ob.textContent=opn?"접기 ▴":"펼치기 ▾"; ob.setAttribute("aria-expanded",String(opn)); ibs.appendChild(ob);
+          row.classList.add("ic2");
         }
+        row.classList.add("icb"); if(x.ans)row.classList.add("icdone"); row.appendChild(ibs);
         wrap.appendChild(row); isec.appendChild(wrap);
         if(opn&&x.memo.trim()){var fm=document.createElement("div"); fm.className="dlicfull"; fm.textContent=x.memo.trim(); wrap.appendChild(fm)}
       });
