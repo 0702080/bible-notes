@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-mnbuzz">
+<meta name="app-build" content="2026-11-05-ldpair">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4610,18 +4610,21 @@ body.reorder .ref .lclisten{display:none}
 .ldadd.ldr{border:1px solid color-mix(in srgb,var(--ldr) 55%,transparent);background:color-mix(in srgb,var(--ldr) 16%,transparent);color:var(--ldr)}
 .ldadd:active{transform:scale(.97)}
 .ldtb{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13.5px}
-.ldcold{width:52px}
 .ldtb th{position:sticky;top:0;z-index:1;padding:7px 6px;background:#1B1A20;border:1px solid #2F2E36;font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap}
 .ldtb th.lds{color:var(--lds)}.ldtb th.ldr{color:var(--ldr)}
 .ldtb td{padding:7px 7px;border:1px solid #26252C;vertical-align:top}
-.ldline{cursor:pointer}
-.ldline:nth-child(even) td{background:#121116}
-.ldline:active td{background:#1D1C22}
-@media (hover:hover){.ldline:hover td{background:#1A1920}}
-.ldcd{text-align:center;color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:2px!important;padding-right:2px!important}
-.ldcy{font-size:10.5px;opacity:.75}
-.ldct{color:#EDEBF0;font-size:13px;line-height:1.35;word-break:keep-all;overflow-wrap:anywhere}
-.ldca{margin-top:1px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ldcell{cursor:pointer;height:44px}
+.ldcell:active{background:#1D1C22}
+@media (hover:hover){.ldcell:hover{background:#1A1920}}
+.ldcs{background:color-mix(in srgb,var(--lds) 5%,transparent)}
+.ldcr{background:color-mix(in srgb,var(--ldr) 5%,transparent)}
+.ldblank{background:transparent}
+.ldon{box-shadow:inset 0 0 0 1.5px var(--gold)}
+.ldout{opacity:.42}
+.ldctop{display:flex;align-items:baseline;justify-content:space-between;gap:6px}
+.ldcdate{flex:0 0 auto;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.ldct{margin-top:3px;color:#EDEBF0;font-size:13px;line-height:1.35;word-break:keep-all;overflow-wrap:anywhere}
+.ldca{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ldcs .ldca{color:var(--lds)}.ldcr .ldca{color:var(--ldr)}
 .ldempty td{padding:22px 12px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.6;word-break:keep-all}
 .ldedit td{padding:8px;background:#17161C;border-color:color-mix(in srgb,var(--gold) 45%,#26252C)}
@@ -11107,7 +11110,7 @@ body.reorder .ref .lclisten{display:none}
     var td=dkey(Date.now()), pre=ldRange==="year"?td.slice(0,4):ldRange==="month"?td.slice(0,7):"";
     return o.items.filter(function(x){return !pre||x.d.indexOf(pre)===0}).sort(function(a,b){return a.d<b.d?1:a.d>b.d?-1:(b.at-a.at)});
   }
-  function ldDateCell(d){var td=ldEl("td","ldcd"), thisY=dkey(Date.now()).slice(0,4); if(d.slice(0,4)!==thisY)td.appendChild(ldEl("div","ldcy",d.slice(0,4))); td.appendChild(document.createTextNode(d.slice(5,7)+"/"+d.slice(8,10))); return td}
+  function ldDate(d){var thisY=dkey(Date.now()).slice(0,4); return (d.slice(0,4)===thisY?"":d.slice(2,4)+"/")+d.slice(5,7)+"/"+d.slice(8,10)}
   function ldEl(tag,cls,txt){var e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e}
   function ldAmtFmt(inp){var n=ldNum(inp.value); inp.value=n?ldFmt(n):""}
   function ldDraw(){
@@ -11119,33 +11122,46 @@ body.reorder .ref .lclisten{display:none}
     var df=rr-ss, dv=ld.querySelector(".lddv"); dv.textContent=(df>0?"+":df<0?"−":"")+ldFmt(Math.abs(df)); dv.classList.toggle("up",df>0); dv.classList.toggle("down",df<0);
     ld.querySelectorAll(".ldrange button").forEach(function(b){b.classList.toggle("on",b.dataset.r===ldRange)});
     var tb=ld.querySelector(".ldtb tbody"); tb.textContent="";
-    if(!rows.length){var er=ldEl("tr","ldempty"), etd=ldEl("td","",o.items.length?"이 기간에는 적은 것이 없어요.":"아직 적은 것이 없어요. 위에 적고 심었어요·거뒀어요를 눌러 주세요."); etd.colSpan=3; er.appendChild(etd); tb.appendChild(er); return}
-    rows.forEach(function(x){
-      if(ldEdit===x.id){
-        var fr=ldEl("tr","ldedit"), ftd=ldEl("td"); ftd.colSpan=3; fr.dataset.id=x.id;
-        var box=ldEl("div","ldefrm");
-        var ed=ldEl("input","ldin lded"); ed.type="date"; ed.value=x.d; ed.setAttribute("aria-label","날짜");
-        var ea=ldEl("input","ldin ldea"); ea.inputMode="numeric"; ea.value=ldFmt(x.a); ea.placeholder="금액"; ea.setAttribute("aria-label","금액");
-        var et=ldEl("input","ldin ldet"); et.maxLength=120; et.value=x.t; et.placeholder="어디에 · 무엇을"; et.setAttribute("aria-label","내용");
-        var r1=ldEl("div","ldrow"); r1.appendChild(ed); r1.appendChild(ea); box.appendChild(r1); box.appendChild(et);
-        var seg=ldEl("div","ldkseg");
-        [["s","🌱 심음"],["r","🌾 거둠"]].forEach(function(k){var b=ldEl("button","ldk ld"+k[0]+(x.k===k[0]?" on":""),k[1]); b.type="button"; b.dataset.k=k[0]; seg.appendChild(b)});
-        box.appendChild(seg);
-        var acts=ldEl("div","ldrow ldacts");
-        var del=ldEl("button","lddel",ldDelId===x.id?"한 번 더 누르면 지워요":"지우기"); del.type="button"; acts.appendChild(del);
-        var cc=ldEl("button","ldcancel","취소"); cc.type="button"; acts.appendChild(cc);
-        var sv=ldEl("button","ldsave","저장"); sv.type="button"; acts.appendChild(sv);
-        box.appendChild(acts); ftd.appendChild(box); fr.appendChild(ftd); tb.appendChild(fr); return;
-      }
-      var tr=ldEl("tr","ldline"); tr.dataset.id=x.id; tr.title="눌러서 고치기";
-      tr.appendChild(ldDateCell(x.d));
-      ["s","r"].forEach(function(k){
-        var c=ldEl("td","ldcell ldc"+k);
-        if(x.k===k){if(x.t)c.appendChild(ldEl("div","ldct",x.t)); c.appendChild(ldEl("div","ldca",ldFmt(x.a)))}
-        tr.appendChild(c);
+    // 심음과 거둠을 한 줄에 짝으로: 오래된 것부터 차례로 짝지어(1번째 심음↔1번째 거둠…) 새로 적어도 있던 짝이 흐트러지지 않음.
+    // 짝 없는 심음은 오른쪽이 빈 채로 기다리고, 다음 거둠이 그 칸을 채움 (2026-11-05 사용자 요청)
+    var asc=function(a,b){return a.d<b.d?-1:a.d>b.d?1:(a.at-b.at)}, S=o.items.filter(function(x){return x.k==="s"}).sort(asc), R=o.items.filter(function(x){return x.k==="r"}).sort(asc);
+    var inR={}; rows.forEach(function(x){inR[x.id]=1});
+    var shown=0;
+    for(var pi=Math.max(S.length,R.length)-1;pi>=0;pi--){
+      var ps=S[pi], pr=R[pi];
+      if(!((ps&&inR[ps.id])||(pr&&inR[pr.id])))continue;
+      shown++;
+      var tr=ldEl("tr","ldline");
+      [["s",ps],["r",pr]].forEach(function(c){
+        var x=c[1], td=ldEl("td","ldcell ldc"+c[0]);
+        if(x){
+          td.dataset.id=x.id; td.title="눌러서 고치기"; if(!inR[x.id])td.classList.add("ldout"); if(ldEdit===x.id)td.classList.add("ldon");
+          var top=ldEl("div","ldctop"); top.appendChild(ldEl("span","ldcdate",ldDate(x.d))); top.appendChild(ldEl("span","ldca",ldFmt(x.a))); td.appendChild(top);
+          if(x.t)td.appendChild(ldEl("div","ldct",x.t));
+        }else{td.classList.add("ldblank"); td.dataset.k=c[0]}
+        tr.appendChild(td);
       });
       tb.appendChild(tr);
-    });
+      var ex=ldEdit&&((ps&&ps.id===ldEdit)?ps:(pr&&pr.id===ldEdit)?pr:null);
+      if(ex)tb.appendChild(ldEditRow(ex));
+    }
+    if(!shown){var er=ldEl("tr","ldempty"), etd=ldEl("td","",o.items.length?"이 기간에는 적은 것이 없어요.":"아직 적은 것이 없어요. 위에 적고 심었어요·거뒀어요를 눌러 주세요."); etd.colSpan=2; er.appendChild(etd); tb.appendChild(er)}
+  }
+  function ldEditRow(x){
+    var fr=ldEl("tr","ldedit"), ftd=ldEl("td"); ftd.colSpan=2; fr.dataset.id=x.id;
+    var box=ldEl("div","ldefrm");
+    var ed=ldEl("input","ldin lded"); ed.type="date"; ed.value=x.d; ed.setAttribute("aria-label","날짜");
+    var ea=ldEl("input","ldin ldea"); ea.inputMode="numeric"; ea.value=ldFmt(x.a); ea.placeholder="금액"; ea.setAttribute("aria-label","금액");
+    var et=ldEl("input","ldin ldet"); et.maxLength=120; et.value=x.t; et.placeholder="어디에 · 무엇을"; et.setAttribute("aria-label","내용");
+    var r1=ldEl("div","ldrow"); r1.appendChild(ed); r1.appendChild(ea); box.appendChild(r1); box.appendChild(et);
+    var seg=ldEl("div","ldkseg");
+    [["s","🌱 심음"],["r","🌾 거둠"]].forEach(function(k){var b=ldEl("button","ldk ld"+k[0]+(x.k===k[0]?" on":""),k[1]); b.type="button"; b.dataset.k=k[0]; seg.appendChild(b)});
+    box.appendChild(seg);
+    var acts=ldEl("div","ldrow ldacts");
+    var del=ldEl("button","lddel",ldDelId===x.id?"한 번 더 누르면 지워요":"지우기"); del.type="button"; acts.appendChild(del);
+    var cc=ldEl("button","ldcancel","취소"); cc.type="button"; acts.appendChild(cc);
+    var sv=ldEl("button","ldsave","저장"); sv.type="button"; acts.appendChild(sv);
+    box.appendChild(acts); ftd.appendChild(box); fr.appendChild(ftd); return fr;
   }
   function ldAdd(k){
     var di=ld.querySelector(".ldnd"), ti=ld.querySelector(".ldnt"), ai=ld.querySelector(".ldna"), a=ldNum(ai.value);
@@ -11175,7 +11191,10 @@ body.reorder .ref .lclisten{display:none}
       }
       return;
     }
-    var tr=e.target.closest(".ldline"); if(tr){ldEdit=tr.dataset.id; ldDelId=""; ldDraw(); var ee=ld.querySelector(".ldet"); if(ee)ee.scrollIntoView({block:"nearest"})}
+    var cl=e.target.closest(".ldcell"); if(!cl)return;
+    if(cl.dataset.id){ldEdit=ldEdit===cl.dataset.id?"":cl.dataset.id; ldDelId=""; ldDraw(); var ee=ld.querySelector(".ldedit"); if(ee)ee.scrollIntoView({block:"nearest"}); return}
+    // 빈 칸을 누르면 위 입력 칸으로: 금액부터 적게
+    var ai=ld.querySelector(".ldna"); ld.querySelector(".ldbody").scrollTop=0; ai.focus();
   }
   function openLedger(){
     if(!ld){
@@ -11186,7 +11205,7 @@ body.reorder .ref .lclisten{display:none}
         '<div class="ldrange" role="group" aria-label="기간"><button type="button" data-r="all">전체</button><button type="button" data-r="year">올해</button><button type="button" data-r="month">이번 달</button></div>'+
         '<div class="ldnew"><div class="ldrow"><input type="date" class="ldin ldnd" aria-label="날짜"><input class="ldin ldna" inputmode="numeric" placeholder="금액" aria-label="금액"></div><input class="ldin ldnt" maxlength="120" placeholder="어디에 · 무엇을" aria-label="내용">'+
         '<div class="ldrow"><button type="button" class="ldadd lds" data-k="s">🌱 심었어요</button><button type="button" class="ldadd ldr" data-k="r">🌾 거뒀어요</button></div></div>'+
-        '<table class="ldtb"><colgroup><col class="ldcold"><col><col></colgroup><thead><tr><th>날짜</th><th class="lds">🌱 심은 곳</th><th class="ldr">🌾 거둔 곳</th></tr></thead><tbody></tbody></table>'+
+        '<table class="ldtb"><thead><tr><th class="lds">🌱 심은 곳</th><th class="ldr">🌾 거둔 곳</th></tr></thead><tbody></tbody></table>'+
         '</div></div>';
       document.body.appendChild(ld);
       ld.querySelector(".ldclose").addEventListener("click",closeLedger);
