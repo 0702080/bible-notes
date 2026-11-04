@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-pfold">
+<meta name="app-build" content="2026-11-04-pinswap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4467,7 +4467,8 @@ body:not(.boardon) .bfwrap{display:none!important}
 .wklhint em{display:block;margin-top:8px;font-style:normal;font-size:12.5px;color:var(--muted);line-height:1.5}
 .wkcnt{padding:1px 9px;border-radius:12px;background:color-mix(in srgb,var(--sky) 18%,transparent);color:var(--sky);font-weight:700}
 /* 📌 카드 고정 단추: ↺처럼 원 안에, ↺ 바로 왼쪽 */
-.bcard .bcpin{position:absolute;top:6px;right:36px;z-index:3;width:26px;height:26px;padding:0;margin:0;border:1px solid #3A3944;border-radius:14px;background:#1B1A21;display:grid;place-items:center;font-size:12px;line-height:1;order:0}
+.bcard .bcflip{right:36px}   /* 📌는 오른쪽 끝, ↺는 그 왼쪽 (2026-11-04 사용자 요청) */
+.bcard .bcpin{position:absolute;top:6px;right:6px;z-index:3;width:26px;height:26px;padding:0;margin:0;border:1px solid #3A3944;border-radius:14px;background:#1B1A21;display:grid;place-items:center;font-size:12px;line-height:1;order:0}
 .bcard .bcpin.on{border-color:color-mix(in srgb,var(--pink) 55%,#3A3944);background:color-mix(in srgb,var(--pink) 20%,#1B1A21)}
 .bcard>.bcref{padding-right:64px}
 .bcard.bclone>.bcref{padding-right:0}
