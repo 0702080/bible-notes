@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-ccback">
+<meta name="app-build" content="2026-11-05-ccflat">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4551,10 +4551,10 @@ body.reorder .ref .lclisten{display:none}
 .dlic .dlgh .dlgname{flex:0 1 auto;min-width:0;white-space:nowrap}
 .dlic .dlgh .dlicall{flex:0 0 auto;white-space:nowrap}
 /* 암송 코치 맨 위 줄 통일: 🎨·🚶도 단계처럼 동그라미 + 아래 글자, 글자 줄 높이를 맞춤 (2026-11-05 사용자 요청) */
-.cch.ccmain>.bqbar{align-items:flex-start;padding-top:calc(14px + env(safe-area-inset-top,0px))}
+.cch.ccmain>.bqbar{align-items:flex-start;padding-top:14px}   /* 화면 위 안전 여백은 .cch가 이미 줌 — 두 번 더하면 단계 줄보다 내려감 */
 .cch.ccmain>.ccsteps{left:50px;right:112px}
 /* 맨 왼쪽 '뒤로': 옆 단계·단추와 같은 동그라미 + 아래 글자 (2026-11-05 사용자 요청) */
-.cch.ccmain>.bqbar .ccback{position:absolute;left:6px;top:calc(14px + env(safe-area-inset-top,0px));z-index:4;display:flex;flex-direction:column;align-items:center;gap:4px;width:44px;margin:0;padding:0;border:0;background:transparent;color:#8E8A97;font-family:inherit;font-size:11px;font-weight:400;line-height:normal;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s}
+.cch.ccmain>.bqbar .ccback{position:absolute;left:6px;top:14px;z-index:4;display:flex;flex-direction:column;align-items:center;gap:4px;width:44px;margin:0;padding:0;border:0;background:transparent;color:#8E8A97;font-family:inherit;font-size:11px;font-weight:400;line-height:normal;white-space:nowrap;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s}
 .cch.ccmain>.bqbar .ccback::before{content:"";position:absolute;inset:-14px -6px -10px}
 .cch.ccmain>.bqbar .ccback:active{transform:scale(.92)}
 .cch.ccmain>.bqbar .ccback i{box-sizing:border-box;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1.5px solid #55525F;color:#C9C5D2}
