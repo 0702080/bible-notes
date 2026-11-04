@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-mtop">
+<meta name="app-build" content="2026-11-04-ansv">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4494,6 +4494,9 @@ body:not(.boardon) .bfwrap{display:none!important}
 .icbtns .icans{border-color:color-mix(in srgb,var(--gold) 55%,#34333A);background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-weight:700}
 .icp.ans .icbtns .icans{border-color:#34333A;background:transparent;color:var(--faint);font-weight:500}
 .icbtns{flex-wrap:wrap}
+.dlicansv{flex:0 0 auto;margin-left:6px;height:26px;padding:0 10px;border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);border-radius:13px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-family:inherit;font-size:12px;font-weight:700;white-space:nowrap}
+.dlicansv.on{background:var(--gold);color:#17120A}
+.icansv{display:block;width:100%;height:40px;margin:6px 0 10px;border:1px solid color-mix(in srgb,var(--gold) 50%,#34333A);border-radius:12px;background:color-mix(in srgb,var(--gold) 12%,transparent);color:var(--gold);font-family:inherit;font-size:14px;font-weight:700}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -11507,7 +11510,7 @@ body:not(.boardon) .bfwrap{display:none!important}
     var i=x.log.indexOf(day); if(i>=0)x.log.splice(i,1); else{x.log.push(day);x.log.sort()}
     icTouch(x); icSave(o); return i<0;
   }
-  var icv=null, icEdit="", icOpen={};   // 펼친 카드 (기본은 접힘: 기도 제목 3줄만)
+  var icShowAns=false, icv=null, icEdit="", icOpen={};   // 펼친 카드 (기본은 접힘: 기도 제목 3줄만)
   try{icOpen=JSON.parse(localStorage.getItem("bible-ic-open")||"{}")||{}}catch(e){}
   function openIntercede(){
     if(!icv){
@@ -11684,23 +11687,31 @@ body:not(.boardon) .bfwrap{display:none!important}
   }
   function icDrawInner(){
     var o=icData(), today=dkey(Date.now()), body=icv.querySelector(".icbody"); body.textContent="";
-    icv.querySelector(".iccnt").textContent=o.items.length?o.items.length+"명":"";
+    var icLive=o.items.filter(function(x){return !x.ans}), icAns=o.items.filter(function(x){return x.ans}).sort(function(a,b){return b.ans-a.ans});
+    if(!icAns.length)icShowAns=false;
+    icv.querySelector(".iccnt").textContent=icLive.length?icLive.length+"명":"";
     if(icEdit==="new")body.appendChild(icForm(null));   // 새 사람은 맨 위에서 적기 (2026-10-24 사용자 요청: 넣기 단추는 위 제목줄에)
+    function ansBtn(){if(!icAns.length)return; var av=document.createElement("button"); av.type="button"; av.className="icansv"+(icShowAns?" on":""); av.textContent=icShowAns?"← 기도제목으로":"🙌 응답된 기도 "+icAns.length+"개 보기"; body.appendChild(av)}
+    if(icShowAns){   // 응답된 기도는 이 단추를 눌렀을 때만 (2026-11-04 사용자 요청)
+      ansBtn();
+      icAns.forEach(function(x){body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,false))});
+      return;
+    }
     var pick=icPick(o,today), done=pick.filter(function(x){return x.log.indexOf(today)>=0}).length;
     var h=document.createElement("div"); h.className="ichead";
     h.innerHTML='<b>오늘 기도제목</b><span class="icprog"></span><span class="icperl" title="명단이 많을 때, 하루에 몇 명씩 돌아가며 보여 줄지 정해요 (오래 기도하지 못한 사람부터)">하루<span class="icstep"><button type="button" class="icpm" data-d="-1" aria-label="한 명 줄이기">−</button><b>'+o.per+'</b><button type="button" class="icpm" data-d="1" aria-label="한 명 늘리기">+</button></span>명씩</span>';
     h.querySelector(".icprog").textContent=pick.length?done+" / "+pick.length:"";
     body.appendChild(h);
-    if(!o.items.length){var e=document.createElement("p"); e.className="icempty"; e.textContent="기도해 줄 사람을 명단에 넣어 보세요. 하루에 몇 명씩, 오래 기도하지 못한 사람부터 차례로 보여 드려요."; body.appendChild(e)}
+    if(!icLive.length){var e=document.createElement("p"); e.className="icempty"; e.textContent="기도해 줄 사람을 명단에 넣어 보세요. 하루에 몇 명씩, 오래 기도하지 못한 사람부터 차례로 보여 드려요."; body.appendChild(e)}
     pick.slice().sort(icOrd).forEach(function(x){body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,true))});
     var pid0=pick.map(function(x){return x.id});
-    if(o.items.some(function(x){return pid0.indexOf(x.id)<0})){var t=document.createElement("div"); t.className="ichead ichall"; t.innerHTML='<b>나머지 명단</b>'; body.appendChild(t)}   // 오늘 칸에 다 나오면 비어 있는 제목은 감춤
+    if(icLive.some(function(x){return pid0.indexOf(x.id)<0})){var t=document.createElement("div"); t.className="ichead ichall"; t.innerHTML='<b>나머지 명단</b>'; body.appendChild(t)}   // 오늘 칸에 다 나오면 비어 있는 제목은 감춤
     var pid=pick.map(function(x){return x.id});
-    o.items.slice().sort(function(a,b){return (a.ans?1:0)-(b.ans?1:0)||icOrd(a,b)}).forEach(function(x){
-      if(pid.indexOf(x.id)>=0&&icEdit!==x.id)return;
+    icLive.slice().sort(icOrd).forEach(function(x){
       if(pid.indexOf(x.id)>=0)return;
       body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,false));
     });
+    ansBtn();
   }
   // 고치는 칸의 글을 명단에 저장 (저장 단추·칸 밖 누르기·창 닫기 모두 여기로). 바뀐 게 없으면 그대로
   function icCommit(f){
@@ -11723,10 +11734,11 @@ body:not(.boardon) .bfwrap{display:none!important}
     if(b.classList.contains("icfold")){if(icOpen[id])delete icOpen[id]; else icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){} icDraw(); return}
     if(b.classList.contains("icpm")){o.per=Math.max(1,Math.min(10,(o.per||3)+(+b.dataset.d))); o.perSet=1; icSave(o); buzz(6); icDraw(); return}   // 하루 몇 명 (2026-10-24 다듬음)
     if(b.classList.contains("icpray")){var on=icToggle(id,today); buzz(on?[12,40,18]:8); if(on)toast("🙏 "+(x?x.name:"")+"을(를) 위해 기도했어요"); icDraw(); return}
-    if(b.classList.contains("icadd")){icEdit="new"; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfn"); if(f)f.focus()},30); return}
+    if(b.classList.contains("icansv")){icShowAns=!icShowAns; icEdit=""; icv.querySelector(".icbody").scrollTop=0; icDraw(); return}
+    if(b.classList.contains("icadd")){icShowAns=false; icEdit="new"; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfn"); if(f)f.focus()},30); return}
     if(b.classList.contains("icedit")){icEdit=id; icDraw(); return}
     if(b.classList.contains("iccancel")){icEdit=""; icDraw(); return}
-    if(b.classList.contains("icans")&&x){if(x.ans){x.ans=0}else{x.ans=Date.now(); toast("🙌 응답 연표에 기록했어요")} icTouch(x); icSave(o); icDraw(); return}
+    if(b.classList.contains("icans")&&x){if(x.ans){x.ans=0}else{x.ans=Date.now(); toast("🙌 응답된 기도로 옮겼어요")} icTouch(x); icSave(o); icDraw(); return}
     if(b.classList.contains("icdel")){
       if(!b.dataset.sure){b.dataset.sure="1"; b.textContent="정말 지울까요?"; return}
       o.items=o.items.filter(function(y){return y.id!==id}); o.del[id]=Date.now(); icSave(o); icEdit=""; icDraw(); return;
@@ -12216,9 +12228,10 @@ body:not(.boardon) .bfwrap{display:none!important}
         cal.addEventListener("click",function(e){if(Date.now()-dlCalEat<350){e.stopPropagation(); e.preventDefault()}},true);
       })();   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
       dl.addEventListener("click",function(e){
+        if(e.target.closest(".dlicansv")){e.stopPropagation(); dlIcShowAns=!dlIcShowAns; buzz(8); drawDaily(); return}
         var ia=e.target.closest(".dlicans");
         if(ia){e.stopPropagation(); var oi=icData(), xi=oi.items.find(function(y){return y.id===ia.dataset.icid}); if(!xi)return;
-          xi.ans=xi.ans?0:Date.now(); icTouch(xi); icSave(oi); buzz(xi.ans?[12,40,18]:8); toast(xi.ans?"🙌 응답된 기도로 표시했어요":"응답을 취소했어요"); drawDaily(); return}
+          xi.ans=xi.ans?0:Date.now(); icTouch(xi); icSave(oi); buzz(xi.ans?[12,40,18]:8); toast(xi.ans?"🙌 응답된 기도로 옮겼어요":"기도제목으로 되돌렸어요"); drawDaily(); return}
         var ap=e.target.closest(".dlactpg");
         if(ap){e.stopPropagation(); dlActPage+=+ap.dataset.d; buzz(8); drawDaily(); return}
         var ae=e.target.closest(".dlactedit");   // 말씀 실천 글 바로 고치기 (2026-11-04 사용자 요청)
@@ -12976,6 +12989,7 @@ body:not(.boardon) .bfwrap{display:none!important}
      - 30일 동안 한 번도 체크·기록하지 않은 항목은 "쉬게 할까요?"로 물어 숨김 (지우지 않음, 언제든 다시 꺼냄)
      쉬는 항목 o.rest {id:{on:1|0,at}} (늦게 바꾼 쪽, 클라우드로 맞춤), 새로 넣은 항목 날짜 o.iat {id:날짜} */
   var dlShowAll=false, dlRestOpen="";
+  var dlIcShowAns=false;
   var dlG3All=new Set(), dlG3More={}, dlG3Skip={}, dlActPage=0, dlActEdit="";   // 🌱 오늘의 3개: 다 펼친 묶음, '하나 더'로 연 수 (이 화면에서만)
   function dlRested(o,id){var r=o&&o.rest&&o.rest[id]; return !!(r&&r.on)}
   function dlStale(o){
@@ -13432,7 +13446,10 @@ body:not(.boardon) .bfwrap{display:none!important}
     // 🤲 오늘 중보기도: 명단에서 그날 기도할 사람 (2026-10-24 사용자 요청)
     var iGHit=fq&&dlHit("🙏 오늘 기도제목");
     if(!dlEdit){
-      var ico=icData(), ipk=icPick(ico,dlDay).sort(icOrd);
+      var ico=icData(), ipk=icPick(ico,dlDay).sort(icOrd), icAnsAll=ico.items.filter(function(y){return y.ans}).sort(function(a,b){return b.ans-a.ans});
+      // 응답된 기도는 목록에서 빠지고, '🙌 응답 N'을 눌렀을 때만 그것만 보임 (2026-11-04 사용자 요청)
+      if(!icAnsAll.length)dlIcShowAns=false;
+      var icAV=dlIcShowAns&&!fq; if(icAV)ipk=icAnsAll;
       if(fq&&!iGHit)ipk=ipk.filter(function(x){return dlHit(x.name)||dlHit(x.memo)});
       if(fq)fcount+=ipk.length;
       if(!fq||ipk.length){   // 명단 순서대로 (끌어서 바꿀 수 있음, 2026-10-25)
@@ -13440,17 +13457,16 @@ body:not(.boardon) .bfwrap{display:none!important}
       var ih=document.createElement("div"); ih.className="dlgh";
       var it2=document.createElement("button"); it2.type="button"; it2.className="dlgname dlactname"; it2.dataset.g="__ic";
       var iOpen=fq||!dlGFold.has("__ic"); it2.setAttribute("aria-expanded",String(iOpen)); it2.setAttribute("aria-label","오늘 기도제목 "+(iOpen?"접기":"펼치기"));
-      it2.textContent="🙏 오늘 기도제목"+(ipk.length?"  "+ipk.filter(function(x){return x.log.indexOf(dlDay)>=0}).length+"/"+ipk.length:"");
+      it2.textContent=icAV?"🙌 응답된 기도":"🙏 오늘 기도제목"+(ipk.length?"  "+ipk.filter(function(x){return x.log.indexOf(dlDay)>=0}).length+"/"+ipk.length:"");
       if(fq)dlMarkIn(it2,fq);
       var ich=document.createElement("span"); ich.className="dlgchev"; ich.setAttribute("aria-hidden","true"); it2.appendChild(ich);
       ih.appendChild(it2);
+      if(icAnsAll.length){var iav=document.createElement("button"); iav.type="button"; iav.className="dlicansv"+(icAV?" on":""); iav.textContent=icAV?"기도제목 보기":"🙌 응답 "+icAnsAll.length; iav.title=icAV?"기다리는 기도제목으로 돌아가요":"응답된 기도만 봐요"; ih.appendChild(iav)}
       var il=document.createElement("button"); il.type="button"; il.className="dlicall"; il.textContent=ico.items.length?"명단 "+ico.items.length+"명 ›":"명단 만들기 ›"; ih.appendChild(il);
       var ihg=document.createElement("button"); ihg.type="button"; ihg.className="dlghgrip"; ihg.dataset.g="__ic"; ihg.textContent="⠿"; ihg.title="끌어서 묶음 차례 바꾸기"; ihg.setAttribute("aria-label","'오늘 중보기도' 묶음 자리 옮기기"); ih.appendChild(ihg);
       isec.appendChild(ih);
       if(!iOpen){ipk=[]}
       else if(!ipk.length){var ip=document.createElement("p"); ip.className="dlacthint"; ip.textContent="기도해 줄 사람을 명단에 넣으면, 하루에 몇 명씩 오래 기도하지 못한 사람부터 여기에 보여 드려요."; isec.appendChild(ip)}
-      // 그날 응답 완료한 기도는 그날 칸에 남겨 둠 — 잘못 눌렀으면 바로 되돌림
-      if(iOpen&&!fq)ipk=ipk.concat(ico.items.filter(function(y){return y.ans&&dkey(y.ans)===dlDay}));
       ipk.forEach(function(x,ii){
         var on2=x.log.indexOf(dlDay)>=0;
         var wrap=document.createElement("div"); wrap.className="dlicwrap"; wrap.dataset.icid=x.id;
