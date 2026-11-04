@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-ccbright">
+<meta name="app-build" content="2026-11-05-lcnt">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4524,6 +4524,12 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
 .cch.ccmain .ccst:not(.now):not(.done){color:#8E8A97;opacity:1}
 .cch.ccmain .ccst:not(.now):not(.done) i{border-color:#55525F;color:#8E8A97}
 .cch.ccmain .ccst:not(.done):not(:last-child)::after{background:#45434E;opacity:1}
+/* 카드 구절 옆 "듣기 N" — "암송 N"과 같은 모양, 색만 민트 (2026-11-05 사용자 요청) */
+.ref .logcnt.lclisten{position:relative;--lc:#6FE3C1;border:0;font-family:inherit;line-height:inherit;cursor:pointer;font-size:1em;padding:1px 9px;border-radius:12px;vertical-align:0;background:color-mix(in srgb,var(--lc) 14%,transparent);color:var(--lc);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--lc) 50%,transparent);-webkit-tap-highlight-color:transparent;transition:transform .12s}
+.ref .logcnt.lclisten::after{content:"";position:absolute;inset:-10px -4px}
+.ref .logcnt.lclisten:active{transform:scale(.92)}
+.ref .lclisten .lcn{color:#fff}
+body.reorder .ref .lclisten{display:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -4728,6 +4734,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
       loci:Array.isArray(n.loci)?n.loci.slice(0,12).map(function(x){return String(x||"").slice(0,20)}):[],   // 🏠 장소로 외우기의 장소 이름
       fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
+      lcnt:Math.max(0,Math.min(99999,Math.floor(+n.lcnt||0))),   // 걷기 암송(음성)으로 끝까지 들은 누적 횟수 (2026-11-05)
       rv:(n.rv&&+n.rv.at)?{at:+n.rv.at,gap:Math.max(1,Math.min(180,+n.rv.gap||1)),ok:+n.rv.ok||0,miss:+n.rv.miss||0,d:/^\d{4}-\d{2}-\d{2}$/.test(n.rv.d||"")?n.rv.d:"",grad:+n.rv.grad||0}:null,
       meds:normMeds(n),qs:Array.isArray(n.qs)?n.qs.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),q:String(x.q||""),a:String(x.a||""),from:x.from?String(x.from):"",depth:Math.max(0,Math.min(12,+x.depth||0)),kind:x.kind==="how"?"how":""}}):[],
       order:(typeof n.order==="number"&&isFinite(n.order))?n.order:null,
@@ -6490,6 +6497,12 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     lm.textContent=(isGrad(n)?"🎓 ":"")+(mt?"암송 ":"암송");
     if(mt){var lmn=document.createElement("span"); lmn.className="lcn"; lmn.textContent=mt; lm.appendChild(lmn)}   // 숫자만 흰색 (2026-11-01 사용자 요청) lm.setAttribute("aria-label",(n.ref||"말씀")+" 암송 시작"+(mt?" (지금까지 "+mt+"번)":"")); lm.title=mt?"지금까지 끝까지 외운 횟수 "+mt+"번 · 눌러서 암송":"눌러서 암송";
     refEl.appendChild(lm);
+    if(+n.lcnt>0){   // "듣기 N": 음성으로 끝까지 들은 횟수, 누르면 걷기 암송 (2026-11-05 사용자 요청)
+      var ll=document.createElement("button"); ll.type="button"; ll.className="logcnt lclisten"; ll.textContent="듣기 ";
+      var lln=document.createElement("span"); lln.className="lcn"; lln.textContent=n.lcnt; ll.appendChild(lln);
+      ll.title="음성으로 끝까지 들은 횟수 "+n.lcnt+"번 · 눌러서 듣기"; ll.setAttribute("aria-label",(n.ref||"말씀")+" 듣기 시작 (지금까지 "+n.lcnt+"번)");
+      refEl.appendChild(ll);
+    }
     renderVerse(el,n);
     var open=openIds.has(n.id);
     el.classList.toggle("open",open);
@@ -7730,6 +7743,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
       if(!memOpen.has(id)){memOpen.add(id);focusMode.delete(id);focusOpen.delete(id)}
       memTapOpen(n); return;
     }
+    if(b.classList.contains("lclisten")){openWalk(n);return}
     if(b.classList.contains("mreveal")){memView.set(id,"");memStep.delete(id);memPeek.delete(id);buzz(8);render();return}
     if(b.classList.contains("morder")){openOrderQuiz(n);return}
     if(b.classList.contains("mloci")){openLoci(id);return}
@@ -10497,7 +10511,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     var tl=WK.toks.length||1, rg=wkBox.querySelector(".wkring");
     rg.style.setProperty("--p",Math.min(1,WK.i/tl)); rg.classList.toggle("run",!!WK.run);
     wkBox.querySelector(".wkprog").textContent=WK.i+" / "+WK.toks.length;
-    var st=wkBox.querySelector(".wkstat"); st.innerHTML='<span class="wkcnt">암송 '+ccCount(n)+'</span><span>👣 <b></b>걸음</span>'+(WK.rounds?'<span>🔁 <b></b>번 들었어요</span>':'');
+    var st=wkBox.querySelector(".wkstat"); st.innerHTML='<span class="wkcnt">듣기 '+(+n.lcnt||0)+'</span><span>👣 <b></b>걸음</span>'+(WK.rounds?'<span>🔁 <b></b>번 들었어요</span>':'');
     st.querySelectorAll("b")[0].textContent=WK.steps; if(WK.rounds)st.querySelectorAll("b")[1].textContent=WK.rounds;
     if(WK.run&&p.min){var lf=Math.max(0,p.min*60000-(Date.now()-(WK.vAt||Date.now()))), sp0=document.createElement("span"); sp0.textContent="⏱ 다음 말씀까지 "+Math.floor(lf/60000)+":"+("0"+Math.floor(lf%60000/1000)).slice(-2); st.appendChild(sp0)}
     wkBox.querySelectorAll(".wkopt button").forEach(function(b){b.classList.toggle("on",!!((b.dataset.u&&b.dataset.u===p.u)||(b.dataset.nx!=null&&+b.dataset.nx===p.nx)||(b.dataset.s&&b.dataset.s===p.s)||(b.dataset.min!=null&&+b.dataset.min===p.min)))});
@@ -10549,7 +10563,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
   }
   function wkRound(){   // 한 번 다 들음 → 반복 또는 다음 말씀
     WK.rounds++; var p=wkPref(), moved=false;
-    var n0=notes.get(WK.id); if(n0){n0.mcnt=ccCount(n0)+1; scheduleSave(n0.id); WK.cnted=1}   // 한 번 다 들으면 암송 횟수 +1 (2026-11-04 사용자 요청)
+    var n0=notes.get(WK.id); if(n0){n0.lcnt=(+n0.lcnt||0)+1; scheduleSave(n0.id); WK.cnted=1}   // 한 번 다 들으면 듣기 횟수 +1 — 암송 횟수와 따로 셈 (2026-11-05 사용자 요청)
     if(p.nx){var ord=(typeof ccShownOrder==="function"?ccShownOrder():sorted()).filter(function(x){return wordsOf(x.text||"").length}), at=-1; ord.forEach(function(x,k){if(x.id===WK.id)at=k});
       var nx=ord[(at+1)%Math.max(1,ord.length)]; if(nx&&nx.id!==WK.id){WK.id=nx.id; WK.toks=wkTokens(nx,p.u); WK.rounds=0; moved=true}}
     WK.i=0; buzz(30); wkDraw();
@@ -17141,6 +17155,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
     if((older.drill||[]).length){var seen={};m.drill=(newer.drill||[]).concat(older.drill).filter(function(d){var k=d.at+"|"+d.b;if(seen[k])return false;seen[k]=1;return true}).sort(function(a,b){return a.at-b.at}).slice(-300)}
     m.topics=(newer.topics||[]).concat((older.topics||[]).filter(function(t){return (newer.topics||[]).indexOf(t)<0}));
     m.mcnt=Math.max(+older.mcnt||0,+newer.mcnt||0);
+    m.lcnt=Math.max(+older.lcnt||0,+newer.lcnt||0);
     var sd={}; [older.subDel,newer.subDel].forEach(function(o){if(o)Object.keys(o).forEach(function(k){if(!(sd[k]>=+o[k]))sd[k]=+o[k]})});
     m.subDel=sd; ["meds","prays","qs","essays","fruits","vids","serms","acts"].forEach(function(k){if(Array.isArray(m[k]))m[k]=m[k].filter(function(x){return !(x&&sd[x.id])})});   // 지운 항목은 합쳐도 되살리지 않음
     m.updatedAt=Math.max(older.updatedAt||0,newer.updatedAt||0);
