@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-nodrag">
+<meta name="app-build" content="2026-11-04-wknote">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4466,7 +4466,6 @@ body:not(.boardon) .bfwrap{display:none!important}
 .icp:nth-of-type(6n+5){--ic0:var(--pink)}
 .icp:nth-of-type(6n+6){--ic0:var(--orange)}
 .wklock{background:#000!important}   /* 화면을 켜 둔 채 주머니에: 완전히 까맣게 해서 배터리를 아낌 */
-.wklhint em{display:block;margin-top:8px;font-style:normal;font-size:12.5px;color:var(--muted);line-height:1.5}
 .wkcnt{padding:1px 9px;border-radius:12px;background:color-mix(in srgb,var(--sky) 18%,transparent);color:var(--sky);font-weight:700}
 /* 📌 카드 고정 단추: ↺처럼 원 안에, ↺ 바로 왼쪽 */
 .bcard .bcflip{right:36px}   /* 📌는 오른쪽 끝, ↺는 그 왼쪽 (2026-11-04 사용자 요청) */
@@ -10410,7 +10409,7 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
         '<div class="wkopt"><span>걸음 감지</span><div class="wkseg"><button type="button" data-s="hi">예민</button><button type="button" data-s="md">보통</button><button type="button" data-s="lo">둔감</button></div></div></div>'+
         '</div>'+
         '<div class="ccfoot"><button type="button" class="ccbtn wkstep">👣 한 걸음</button><button type="button" class="ccbtn main wkgo">▶ 시작</button></div>'+
-        '<div class="wklock" hidden><div class="wklref"></div><div class="wklword"></div><div class="wkmeter wklm" aria-hidden="true"><i></i><em></em></div><div class="wklhint"><span class="wklarr">⬆</span><b>멈추려면 화면을 위로 쓱 밀어 올리세요</b><em>전원 버튼을 누르면 소리가 멈춰요. 이 까만 화면 그대로 주머니에 넣으세요</em></div></div>';
+        '<div class="wklock" hidden><div class="wklref"></div><div class="wklword"></div><div class="wkmeter wklm" aria-hidden="true"><i></i><em></em></div><div class="wklhint"><span class="wklarr">⬆</span><b>멈추려면 화면을 위로 쓱 밀어 올리세요</b></div></div>';
       document.body.appendChild(wkBox);
       wkBox.querySelector(".wkclose").addEventListener("click",closeWalk);
       wkBox.querySelector(".wkstep").addEventListener("click",function(){wkStep()});
