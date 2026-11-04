@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-wkfit">
+<meta name="app-build" content="2026-11-05-wkorder">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10642,7 +10642,7 @@ body.reorder .ref .lclisten{display:none}
   }
   function wkBeat(){var rg=wkBox.querySelector(".wkring"); rg.classList.remove("beat"); void rg.offsetWidth; rg.classList.add("beat")}   // 걸음마다 원이 톡
   function wkNext(){   // 바로 다음 말씀으로 (밀기)
-    if(!WK)return false; var p=wkPref(), ord=(typeof ccShownOrder==="function"?ccShownOrder():sorted()).filter(function(x){return wordsOf(x.text||"").length}), at=-1;
+    if(!WK)return false; var p=wkPref(), ord=wkOrder(), at=-1;
     ord.forEach(function(x,k){if(x.id===WK.id)at=k});
     var nx=ord[(at+1)%Math.max(1,ord.length)]; if(!nx||nx.id===WK.id)return false;
     try{window.speechSynthesis.cancel()}catch(e){}
@@ -10650,11 +10650,14 @@ body.reorder .ref .lclisten{display:none}
     if(WK.run)wkSay(refSay(nx.ref||""),1);
     return true;
   }
+  // 듣기 다음 말씀은 늘 휴대폰 첫 화면 차례대로 위에서 아래로, 끝나면 다시 맨 위로 (2026-11-05 사용자 요청)
+  // sorted()는 목록 차례 그대로 — 화면의 카드 순서를 읽으면 잠깐 맨 위로 올린 카드나 아직 안 그린 카드 때문에 어긋남. 칸·주제로 거른 것은 따름
+  function wkOrder(){return sorted().filter(function(x){return wordsOf(x.text||"").length&&visibleNote(x)})}
   function wkRound(){   // 한 번 다 들음 → 반복 또는 다음 말씀
     WK.rounds++; var p=wkPref(), moved=false;
     var n0=notes.get(WK.id); if(n0){n0.lcnt=(+n0.lcnt||0)+1; scheduleSave(n0.id); WK.cnted=1}   // 한 번 다 들으면 듣기 횟수 +1 — 암송 횟수와 따로 셈 (2026-11-05 사용자 요청)
-    if(p.nx){var ord=(typeof ccShownOrder==="function"?ccShownOrder():sorted()).filter(function(x){return wordsOf(x.text||"").length}), at=-1; ord.forEach(function(x,k){if(x.id===WK.id)at=k});
-      var nx=ord[(at+1)%Math.max(1,ord.length)]; if(nx&&nx.id!==WK.id){WK.id=nx.id; WK.toks=wkTokens(nx,p.u); WK.rounds=0; moved=true}}
+    if(p.nx){var ord=wkOrder(), at=-1; ord.forEach(function(x,k){if(x.id===WK.id)at=k});
+      var nx=ord[(at+1)%Math.max(1,ord.length)]; if(nx&&nx.id!==WK.id){WK.id=nx.id; WK.toks=wkTokens(nx,p.u); WK.rounds=0; WK.vAt=Date.now(); moved=true}}
     WK.i=0; buzz(30); wkDraw();
   }
   function wkMotion(e){   // 걸음 찾기 (2026-10-31 다시 만듦: 손에 들고 걸어도 느끼게)
