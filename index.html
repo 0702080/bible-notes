@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-04-ccrow">
+<meta name="app-build" content="2026-11-05-ccbright">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4520,6 +4520,10 @@ body:not(.reorder) .note.open .grip{visibility:hidden}
 .cch.ccmain .ccst{font-size:11px;min-width:0}
 .cch.ccmain .ccst span{white-space:nowrap}
 .cch.ccmain .ccst.now span{font-size:11.5px}
+/* 암송 코치 단계 줄: 아직 안 한 단계와 잇는 선을 조금 더 밝게 (2026-11-05 사용자 요청) */
+.cch.ccmain .ccst:not(.now):not(.done){color:#8E8A97;opacity:1}
+.cch.ccmain .ccst:not(.now):not(.done) i{border-color:#55525F;color:#8E8A97}
+.cch.ccmain .ccst:not(.done):not(:last-child)::after{background:#45434E;opacity:1}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
