@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-glass2">
+<meta name="app-build" content="2026-11-05-glass3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4711,8 +4711,10 @@ body.reorder .ref .lclisten{display:none}
 /* 오늘 카드·칸반 칸도 앱 배경 이미지가 살짝 비치게 (2026-11-05 사용자 요청) */
 .reviewbar{background:color-mix(in srgb,color-mix(in srgb,var(--gold) 7%,#101013) 84%,transparent)}
 .tdstep{background:color-mix(in srgb,color-mix(in srgb,var(--gold) 14%,#141318) 72%,transparent)}
-.bcol.btint,.bcol.btint.bcust{background:color-mix(in srgb,color-mix(in srgb,var(--bc) 16%,#24222B) 80%,transparent)!important}
-.bcol.bcust:not(.btint){background:color-mix(in srgb,color-mix(in srgb,var(--gold) 4%,#272530) 80%,transparent)!important}
+.bcol:not(.over):not(.lmover):not(.bback){background:color-mix(in srgb,#272530 80%,transparent)}
+.bcol.bcust:not(.btint):not(.over):not(.lmover):not(.bback){background:color-mix(in srgb,color-mix(in srgb,var(--gold) 4%,#272530) 80%,transparent)}
+.bcol.btint:not(.over):not(.lmover):not(.bback){background:color-mix(in srgb,color-mix(in srgb,var(--bc) 16%,#24222B) 80%,transparent)}
+@media (hover:hover){.board4>.bcol.bfold:hover{background:#2F2C39!important}}
 /* 찾기 칸의 하루 제외·말씀만 */
 .bfscope{border:1px solid #4A4953!important;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.22) 100%)!important;color:#E8E5EE;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 5px rgba(0,0,0,.34);transition:transform .08s,box-shadow .08s}
 .bfchips .bfscope:active{transform:translateY(1px);box-shadow:inset 0 2px 3px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)}
