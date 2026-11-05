@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-lcm1">
+<meta name="app-build" content="2026-11-05-tabdef">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6681,7 +6681,7 @@ body.reorder .ref .lclisten{display:none}
     el.classList.toggle("pinned",n.pinned);
     var mp=el.querySelector(".mpin"); if(mp)mp.textContent=n.pinned?"고정 풀기":"맨 위에 고정";
     var hc=el.querySelector(".hchev"); hc.setAttribute("aria-label",open?"접기":"펼치기"); hc.setAttribute("aria-expanded",String(open));
-    var tab=tabOf.get(n.id)||"m";
+    var tab=tabOf.get(n.id)||"-";   // 처음에는 어느 칸도 안 열림 — 탭 아이콘을 눌러야 보임 (2026-11-05 사용자 요청)
     el.querySelector(".tabs").dataset.active=tab;
     el.querySelectorAll(".tab").forEach(function(t){t.setAttribute("aria-selected",String(t.dataset.tab===tab))});
     el.querySelectorAll(".pane").forEach(function(p){p.hidden=p.dataset.pane!==tab});
