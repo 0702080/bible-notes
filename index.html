@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-glass4">
+<meta name="app-build" content="2026-11-05-glass6">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4716,10 +4716,10 @@ body.reorder .ref .lclisten{display:none}
 .bcol.btint:not(.over):not(.lmover):not(.bback){background:color-mix(in srgb,color-mix(in srgb,var(--bc) 16%,#24222B) 80%,transparent)}
 @media (hover:hover){.board4>.bcol.bfold:hover{background:#2F2C39!important}}
 /* 믿음의 한 마디·짧은 말씀·기도 읽기·기도제목·기도 응답 연표·하루 돌아보기 창: 뒤 화면은 감추고 앱 배경 이미지가 비치게 (2026-11-05 사용자 요청) */
-.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.medqsheet):not(.wksheet){background:rgba(10,10,13,.42)}
-body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.medqsheet):not(.wksheet)):not([hidden])) main.wrap,
-body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.medqsheet):not(.wksheet)):not([hidden])) #fab{visibility:hidden}
-.saysheet>.dlbar,.prd>.dlbar,.daily:not(.srmsheet):not(.medqsheet):not(.wksheet)>.dlbar{background:rgba(11,11,13,.62)}
+.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet){background:rgba(10,10,13,.42)}
+body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#topicSheet.tsfull):not([hidden])) main.wrap,
+body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#topicSheet.tsfull):not([hidden])) #fab{visibility:hidden}
+.saysheet>.dlbar,.prd>.dlbar,.daily:not(.srmsheet):not(.wksheet)>.dlbar{background:rgba(11,11,13,.62)}
 .saycard.saytint{background:color-mix(in srgb,color-mix(in srgb,var(--sc) 16%,#18171B) 84%,transparent)}
 .saycard.hv{background:color-mix(in srgb,color-mix(in srgb,var(--sc) 16%,#18171B) 84%,transparent)!important}
 /* 기도 읽기 */
@@ -4733,6 +4733,14 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.medqsheet):n
 .icp{background:color-mix(in srgb,#121116 84%,transparent)}
 /* 하루 돌아보기 */
 .dlgrp,.dlgrp.pin{background:color-mix(in srgb,color-mix(in srgb,var(--gc,var(--gold)) 16%,#18171B) 84%,transparent)}
+/* 나의 묵상 질문 */
+.mqitem{background:color-mix(in srgb,color-mix(in srgb,var(--mc) 12%,#121216) 84%,transparent)}
+.medqsheet>.dlbar,.medqsheet>.dlfix{background:rgba(11,11,13,.62)}
+/* 실천 진도표: 뒤 칸반 없이 배경 이미지만 */
+#topicSheet.tsfull .sheetback{background:rgba(10,10,13,.42);-webkit-backdrop-filter:none;backdrop-filter:none}
+#topicSheet.tsfull .sheetpanel{background:rgba(16,16,20,.72)}
+.pgrow{background:color-mix(in srgb,color-mix(in srgb,var(--rc) 9%,#1A1A20) 84%,transparent)}
+.pgtop.pghero{background:color-mix(in srgb,color-mix(in srgb,var(--sky) 12%,#17171E) 84%,transparent)}
 /* 찾기 칸의 하루 제외·말씀만 */
 .bfscope{border:1px solid #4A4953!important;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.22) 100%)!important;color:#E8E5EE;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 5px rgba(0,0,0,.34);transition:transform .08s,box-shadow .08s}
 .bfchips .bfscope:active{transform:translateY(1px);box-shadow:inset 0 2px 3px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)}
