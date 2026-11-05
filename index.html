@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-findword">
+<meta name="app-build" content="2026-11-06-dlicedit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4459,6 +4459,9 @@ body:not(.boardon) .bfwrap{display:none!important}
 .dlic .dlitem .dlicrow{background:color-mix(in srgb,var(--gc) 18%,#17161C)!important;border-color:color-mix(in srgb,var(--gc) 42%,#2A2930)!important}
 .dlic .dlitem .dlicopen{border-color:color-mix(in srgb,var(--gc) 50%,transparent);background:color-mix(in srgb,var(--gc) 16%,transparent);color:color-mix(in srgb,var(--gc) 75%,#fff)}
 .dlic .dlicwrap:has(.dlicfull) .dlicfull{border-color:color-mix(in srgb,var(--gc,var(--sky)) 35%,#2A2930)}
+textarea.dlicfull.dlicedit{display:block;width:calc(100% - 21px);min-height:0;font-family:inherit;color:var(--ink);resize:none;overflow:hidden;outline:1px dashed color-mix(in srgb,var(--sky) 55%,transparent);outline-offset:-3px;border-top:0;border-right:0;border-bottom:0;-webkit-user-select:text;user-select:text}   /* 펼친 기도문 그 자리 고치기 (2026-11-06) */
+textarea.dlicfull.dlicedit:focus{outline-style:solid}
+.dlicfull{-webkit-user-select:text;user-select:text}
 /* 중보기도 명단 카드도 차례로 다른 색 */
 .icp{--ic0:var(--sky)}
 .icbody .icp,.icbody .icp.big{background:color-mix(in srgb,var(--ic0) 18%,#15141A)!important;border-color:color-mix(in srgb,var(--ic0) 45%,#2A2930)!important}
@@ -12592,6 +12595,13 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     return on.filter(function(id){return o.items.some(function(it){return it.id===id})});
   }
   var dlIcOpen=new Set(), dlIcTap={id:"",t:0};   // 하루 돌아보기에서 기도문을 펼친 중보기도
+  var dlIcEd=null;   // 하루 돌아보기에서 고치는 중인 기도문 {id, v, f}
+  function dlIcEdSave(cancel){
+    var ed=dlIcEd; if(!ed)return; dlIcEd=null;
+    if(!cancel){var o=icData(), x=o.items.find(function(y){return y.id===ed.id}), v=ed.v.replace(/\s+$/,"");
+      if(x&&x.memo!==v){x.memo=v; icTouch(x); icSave(o); toast("저장했어요")}}
+    drawDaily();
+  }
   var dl=null, dlDay="", dlWEnd="", dlEdit=false, dlPickG="", dlEditId="", dlGEditId="", dlMemoId="", dlgTap={g:"",t:0}, dlrTap={id:"",t:0,flip:false}, dlMemoMore=new Set(), dlGFold=new Set(), dlmTap={id:"",t:0};
   try{JSON.parse(localStorage.getItem("bible-daily-gfold")||"[]").forEach(function(x){dlGFold.add(String(x))})}catch(e){}
   // 묶음은 하나만 펼침: 하나를 열면 나머지는 저절로 접힘 — 심플하게 보여야 실천하기 좋음 (2026-11-04 사용자 요청)
@@ -12978,6 +12988,24 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         e.preventDefault(); var inp=dl.querySelector(".dlin"), t=inp.value.trim(); if(!t){inp.focus();return}
         var o=dailyData(), nid0="d"+Date.now().toString(36); o.items.push({id:nid0,g:dl.querySelector(".dlg").value,t:t.slice(0,120)}); if(!o.iat||typeof o.iat!=="object")o.iat={}; o.iat[nid0]=dkey(Date.now()); saveDaily(o); inp.value=""; drawDaily(); inp.focus();
       });
+      (function(){   // 펼친 기도문 두 번 누르기 = 그 자리에서 고치기 (2026-11-06 사용자 요청)
+        var ls=dl.querySelector(".dllist");
+        ls.addEventListener("click",function(e){
+          var fm=e.target.closest&&e.target.closest("div.dlicfull"); if(!fm||dlIcEd)return;
+          var id=fm.dataset.icid, now=Date.now();
+          if(dlIcTap.id===id&&now-dlIcTap.t<400){
+            dlIcTap={id:"",t:0};
+            var o=icData(), x=o.items.find(function(y){return y.id===id}); if(!x)return;
+            var pos=null; try{var sel=window.getSelection(); if(sel&&sel.anchorNode&&fm.contains(sel.anchorNode)){var rg=document.createRange(); rg.selectNodeContents(fm); rg.setEnd(sel.anchorNode,sel.anchorOffset); pos=rg.toString().length; sel.removeAllRanges()}}catch(err){}
+            dlIcEd={id:id,v:x.memo.trim(),f:{s:pos}}; buzz(10); drawDaily();
+          } else dlIcTap={id:id,t:now};
+        });
+        ls.addEventListener("input",function(e){if(e.target.classList&&e.target.classList.contains("dlicedit")&&dlIcEd){dlIcEd.v=e.target.value; grow(e.target)}});
+        ls.addEventListener("focusout",function(e){if(e.target.classList&&e.target.classList.contains("dlicedit"))setTimeout(function(){if(dlIcEd&&!dlIcEd.f&&!(document.activeElement&&document.activeElement.classList.contains("dlicedit")))dlIcEdSave()},0)});
+        ls.addEventListener("keydown",function(e){if(!(e.target.classList&&e.target.classList.contains("dlicedit")))return;
+          if(e.key==="Escape"){e.preventDefault(); dlIcEdSave(true)}
+          else if(e.key==="Enter"&&(e.ctrlKey||e.metaKey)){e.preventDefault(); e.target.blur()}});
+      })();
       dl.querySelector(".dllist").addEventListener("click",function(e){
         if(Date.now()-dlIcDragAt<500&&e.target.closest(".dlicwrap")){e.stopPropagation();return}   // 끌어 옮긴 직후의 누름은 체크·펼치기로 보지 않음
         var rf=e.target.closest(".dlref");
@@ -13714,6 +13742,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     });
   }
   function drawDaily(){
+    var dae=document.activeElement; if(dlIcEd&&dae&&dae.classList&&dae.classList.contains("dlicedit")){try{dlIcEd.f={s:dae.selectionStart}}catch(e){dlIcEd.f={s:null}}}   // 고치는 중에 다시 그려도 칸·커서 그대로
     var o=dailyData(), on=dailyChecked(o,dlDay), today=dkey(Date.now());
     dlTimeCard(o,on,today);
     dl.querySelector(".dldate").textContent=(dlDay===today?"오늘 ":dlDay===dkey(Date.now()-864e5)?"어제 ":"")+dayName(dlDay);
@@ -14131,7 +14160,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         }
         row.classList.add("icb"); if(x.ans)row.classList.add("icdone"); row.appendChild(ibs);
         wrap.appendChild(row); isec.appendChild(wrap);
-        if(opn&&x.memo.trim()){var fm=document.createElement("div"); fm.className="dlicfull"; fm.textContent=x.memo.trim(); wrap.appendChild(fm)}
+        if(dlIcEd&&dlIcEd.id===x.id){   // 펼친 기도문을 두 번 누르면 그 자리에서 고치기 (2026-11-06 사용자 요청)
+          var et=document.createElement("textarea"); et.className="dlicfull dlicedit"; et.dataset.icid=x.id; et.value=dlIcEd.v; et.rows=1; et.maxLength=8000; et.setAttribute("aria-label","기도문 고치기");
+          wrap.appendChild(et); setTimeout(function(){grow(et); if(dlIcEd&&dlIcEd.f){var f0=dlIcEd.f; dlIcEd.f=null; try{et.focus({preventScroll:true}); if(f0.s!=null)et.setSelectionRange(f0.s,f0.s)}catch(e){}}},0);
+        }
+        else if(opn&&x.memo.trim()){var fm=document.createElement("div"); fm.className="dlicfull"; fm.dataset.icid=x.id; fm.title="두 번 누르면 고쳐요"; fm.textContent=x.memo.trim(); wrap.appendChild(fm)}
       });
       var afterA=outer.querySelector(".dlacts:not(.dlic)");
       if(!fq&&!icAV){
