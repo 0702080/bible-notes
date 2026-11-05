@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-duelist">
+<meta name="app-build" content="2026-11-06-icans3d">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4504,7 +4504,10 @@ textarea.dlicfull.dlicedit:focus{outline-style:solid}
 .icform.icinline .field.icfm{min-height:0;margin:0;padding:0;border:0;border-radius:0;background:transparent;font-size:14.5px;line-height:1.6;white-space:pre-wrap;color:var(--ink);resize:none;overflow:hidden;outline:1px dashed color-mix(in srgb,var(--sky) 55%,transparent);outline-offset:5px}
 .icform.icinline .field.icfm:focus{outline-style:solid;box-shadow:none}
 .icbtns .icans{border-color:color-mix(in srgb,var(--gold) 55%,#34333A);background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-weight:700}
-.icp.ans .icbtns .icans{border-color:#34333A;background:transparent;color:var(--faint);font-weight:500}
+/* 🙌 응답됐어요 입체 단추, 실제 응답되면 진한 금빛 (2026-11-06 사용자 요청) */
+.icv .icbtns .icans{border:1px solid color-mix(in srgb,var(--gold) 60%,#34333A)!important;background-color:color-mix(in srgb,var(--gold) 16%,#1C2129)!important;color:var(--gold)!important;font-weight:700;background-image:linear-gradient(180deg,rgba(255,255,255,.20) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.42)!important;transition:transform .08s,box-shadow .08s}
+.icv .icbtns .icans.on{border-color:#FFD36B!important;background-color:#F2B73A!important;color:#1E1608!important;font-weight:800;background-image:linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.14) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.18) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(120,70,0,.35),0 3px 0 #8A5A10,0 0 14px rgba(242,183,58,.45),0 5px 10px rgba(0,0,0,.45)!important}
+.icv .icbtns .icans:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
 .icbtns{flex-wrap:wrap}
 .dlicansv{flex:0 0 auto;margin-left:6px;height:26px;padding:0 10px;border:1px solid color-mix(in srgb,var(--gold) 55%,transparent);border-radius:13px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-family:inherit;font-size:12px;font-weight:700;white-space:nowrap}
 .dlicansv.on{background:var(--gold);color:#17120A}
@@ -12217,7 +12220,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     dt.textContent=(ad.getFullYear()!==new Date().getFullYear()?ad.getFullYear()+". ":"")+dayName(dkey(x.at))+" 적음"; bt.appendChild(dt);
     function B(cls,t){var b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=t; bt.appendChild(b); return b}
     if(big&&!x.ans)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
-    B("icans",x.ans?"응답 취소":"🙌 응답됐어요");   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
+    var ansB=B("icans"+(x.ans?" on":""),x.ans?"🙌 응답됐어요 ✓":"🙌 응답됐어요"); ansB.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답된 기도로 표시해요";   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
     return d;
   }
   function icForm(x){
