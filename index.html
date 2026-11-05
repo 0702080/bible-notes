@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-duettl">
+<meta name="app-build" content="2026-11-06-thxpray">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -339,6 +339,25 @@ body.boardon .toolbar{border-bottom:0}   /* PC 칸반: 맨 위 단추 줄 아래
 .pri textarea.ptbig{resize:none;overflow-y:auto;overscroll-behavior:contain}
 .pans[hidden]{display:none}
 .pri.editing .prv{display:none}
+.prays .pri .prv,.prays .pri .pthx{touch-action:pan-y}
+.pri.thxside .prv,.pri.thxside .pt,.pri.thxside .pans{display:none!important}
+.pthx[hidden]{display:none}
+.pthx{padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--gold) 16%,#17150F);border:1px solid color-mix(in srgb,var(--gold) 55%,#2E2A20);box-shadow:inset 2px 0 0 var(--gold)}
+.pthxh{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pthxh b{color:var(--gold);font-size:15px}
+.pthxd{flex:1;color:color-mix(in srgb,var(--gold) 60%,#8E8A80);font-size:12px}
+.pthxback{height:28px;padding:0 10px;border:1px solid color-mix(in srgb,var(--gold) 45%,#3A3630);border-radius:14px;background:rgba(0,0,0,.18);color:color-mix(in srgb,var(--gold) 80%,#fff);font-family:inherit;font-size:12px}
+.pthx .pth{display:block;width:100%;box-sizing:border-box;min-height:120px;padding:10px 12px;border:1px solid color-mix(in srgb,var(--gold) 35%,#2E2A20);border-radius:10px;background:rgba(0,0,0,.22);font:inherit;font-size:17px;line-height:1.8;color:#F4E7C6;resize:vertical;word-break:keep-all}
+.pthx .pth::placeholder{color:color-mix(in srgb,var(--gold) 45%,#7A766E)}
+.pthxtip{margin:6px 2px 0;font-size:11.5px;color:color-mix(in srgb,var(--gold) 45%,#7A766E)}
+.pri.answered.hasthx:not(.thxside) .prv::after{content:"🙏 감사 기도 있음 · 옆으로 밀기";display:block;margin-top:8px;font-size:11.5px;color:var(--gold);opacity:.8}
+.pri.answered:not(.hasthx):not(.thxside) .prv::after{content:"옆으로 밀어 감사 기도 적기 →";display:block;margin-top:8px;font-size:11.5px;color:var(--gold);opacity:.6}
+@keyframes prSlL{from{transform:translateX(40px);opacity:.3}to{transform:none;opacity:1}}
+@keyframes prSlR{from{transform:translateX(-40px);opacity:.3}to{transform:none;opacity:1}}
+.pri.prslidel>.prv,.pri.prslidel>.pthx{animation:prSlL .26s ease-out}
+.pri.prslider>.prv,.pri.prslider>.pthx{animation:prSlR .26s ease-out}
+@keyframes prNudge{0%,100%{transform:none}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.pri.prnudge>.prv{animation:prNudge .3s}
 .phint{margin:8px 2px 0;font-size:11.5px;color:var(--faint)}
 .phint[hidden]{display:none}
 .pt,.pan{display:block;width:100%;box-sizing:border-box;border:1px solid color-mix(in srgb,var(--orange) 30%,#2E2D33);border-radius:10px;background:#101013;padding:10px 12px;font:inherit;font-size:16px;line-height:1.7;color:color-mix(in srgb,var(--orange) 85%,var(--ink));resize:vertical;overflow:auto;min-height:56px}   /* 오른쪽 아래를 끌어 높이 조절 */
@@ -5017,7 +5036,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       serms:Array.isArray(n.serms)?n.serms.filter(function(x){return x&&x.id}).slice(0,100).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,4000),at:+x.at||Date.now()}}):[],
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,8000)}}):[]}}):[],
-      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){var tt=String(x.t||"").slice(0,2000); if(tt.indexOf("하나님 아버지\n")===0)tt="전능하신 나의 아버지 하나님"+tt.slice(7);   /* 예전 기도문 첫 줄을 새 첫 줄로 (2026-10-30) */ return {id:String(x.id),t:tt,at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),sh:x.sh?1:0}}):[],
+      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){var tt=String(x.t||"").slice(0,2000); if(tt.indexOf("하나님 아버지\n")===0)tt="전능하신 나의 아버지 하나님"+tt.slice(7);   /* 예전 기도문 첫 줄을 새 첫 줄로 (2026-10-30) */ return {id:String(x.id),t:tt,at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),sh:x.sh?1:0}}):[],
       loci:Array.isArray(n.loci)?n.loci.slice(0,12).map(function(x){return String(x||"").slice(0,20)}):[],   // 🏠 장소로 외우기의 장소 이름
       fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
@@ -6351,12 +6370,18 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         d.innerHTML='<div class="prv" title="두 번 누르면 고치기"><p class="prvt"></p><div class="prva"><b>🙌 응답</b><p></p></div></div>'+
           '<textarea class="pt" rows="1" placeholder="기도 제목 (예: 이 말씀처럼 가족을 하나님께 맡기게 하소서)" aria-label="기도"></textarea>'+
           '<div class="pans" hidden><span class="panl">🙌 응답</span><textarea class="pan" rows="1" placeholder="어떻게 응답하셨는지 적어 보세요" aria-label="응답"></textarea></div>'+
+          '<div class="pthx" hidden><div class="pthxh"><b>🙏 감사 기도</b><span class="pthxd"></span><button type="button" class="pthxback">← 기도문</button></div><textarea class="pth" rows="3" placeholder="응답해 주신 하나님께 드리는 감사 기도를 적어 보세요" aria-label="감사 기도"></textarea><p class="pthxtip">옆으로 밀면 기도문으로 돌아가요</p></div>'+
           '<div class="pfoot"><span class="pdl"></span><button type="button" class="pshare"></button><button type="button" class="pansbtn"></button><button type="button" class="pdel" aria-label="이 기도 지우기">지우기</button></div>';
       }
       if(box.children[i]!==d)box.insertBefore(d,box.children[i]||null);
       setVal(d.querySelector(".pt"),x.t); setVal(d.querySelector(".pan"),x.an||"");
       d.classList.toggle("answered",!!x.ans);
       d.querySelector(".pans").hidden=!x.ans;
+      // 🙏 감사 기도 쪽 (응답된 기도를 옆으로 밀면, 2026-11-06 사용자 요청)
+      if(!x.ans)prThx.delete(x.id);
+      var thOn=prThx.has(x.id); d.classList.toggle("thxside",thOn); d.querySelector(".pthx").hidden=!thOn;
+      setVal(d.querySelector(".pth"),x.th||""); d.querySelector(".pthxd").textContent=x.ans?"응답 "+dlabel(dkey(x.ans)):"";
+      d.classList.toggle("hasthx",!!(x.th||"").trim());
       // 기본은 읽기, 두 번 누르면 고치기
       var ed=prEdit.has(x.id); d.classList.toggle("editing",ed);
       var ptx=d.querySelector(".pt"); if(ed&&!x.t.trim()&&!ptx.value.trim()&&document.activeElement!==ptx)ptx.value=PRAY_TPL;   // 고치는 중인 빈 기도도 기도문 틀로 (적어야 저장)
@@ -6375,7 +6400,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var hint=el.querySelector(".phint"); if(!hint){hint=document.createElement("p");hint.className="phint";hint.textContent="두 번 누르면 고칠 수 있어요";box.parentNode.insertBefore(hint,box.nextSibling)}
     hint.hidden=!list.length||pfd;
   }
-  var prEdit=new Set(), prTap={id:"",t:0}, prFoldAll=new Set();
+  var prEdit=new Set(), prTap={id:"",t:0}, prFoldAll=new Set(), prThx=new Set(), prSwAt=0;
   try{JSON.parse(localStorage.getItem("bible-pray-foldall")||"[]").forEach(function(x){prFoldAll.add(String(x))})}catch(e){}
   function editPray(card,pid){
     prEdit.add(pid); render();
@@ -7174,6 +7199,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var pp=(n.prays||[]).find(function(x){return x.id===t.closest(".pri").dataset.pid}); if(!pp)return;
       if(t.classList.contains("pt"))pp.t=t.value; else pp.an=t.value;
     }
+    else if(t.classList.contains("pth")){
+      var pq=(n.prays||[]).find(function(x){return x.id===t.closest(".pri").dataset.pid}); if(!pq)return; pq.th=t.value;
+      t.closest(".pri").classList.toggle("hasthx",!!t.value.trim());
+    }
     else if(t.classList.contains("mthx")||t.classList.contains("mtodo")){
       var me=n.meds.find(function(x){return x.id===t.closest(".medi").dataset.mid}); if(!me)return;
       if(t.classList.contains("mthx"))me.thx=t.value; else{me.todo=t.value; var tb2=t.closest(".medi").querySelector(".mtoact"); if(tb2)tb2.hidden=!t.value.trim()}
@@ -7559,11 +7588,46 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   })();
   list.addEventListener("keydown",function(e){var t=e.target; if(e.key==="Enter"&&!e.isComposing&&t.classList&&t.classList.contains("xlref")&&t.value.trim()){e.preventDefault();var m=t.form&&t.form.querySelector(".xlmemo");if(m)m.focus()}});
   list.addEventListener("click",function(e){
+    var bk=e.target.closest&&e.target.closest(".pthxback"); if(bk){prFlip(bk.closest(".pri"),false);return}
     var pv=e.target.closest&&e.target.closest(".prv"); if(!pv)return;
+    if(Date.now()-prSwAt<450)return;   // 옆으로 민 끝의 누름은 고치기로 보지 않음
     var pri=pv.closest(".pri"), card=pv.closest(".note"), pid=pri.dataset.pid, now=Date.now();
     if(prTap.id===pid&&now-prTap.t<400){prTap={id:"",t:0};editPray(card,pid);buzz([10,30,10])}
     else prTap={id:pid,t:now};
   });
+  /* 🙏 응답된 기도를 옆으로 밀면 감사 기도 쪽 ↔ 기도문 쪽 (2026-11-06 사용자 요청) */
+  function prFlip(pri,on,dir){
+    if(!pri)return; var card=pri.closest(".note"), n=card&&notes.get(card.dataset.id), pid=pri.dataset.pid;
+    var x=n&&(n.prays||[]).find(function(y){return y.id===pid}); if(!x)return;
+    if(on&&!x.ans){pri.classList.remove("prnudge"); void pri.offsetWidth; pri.classList.add("prnudge"); toast("응답된 기도에서 감사 기도를 적을 수 있어요"); return}
+    if(on)prThx.add(pid); else prThx.delete(pid);
+    buzz(10); render();
+    var d=card.querySelector('.pri[data-pid="'+pid+'"]'); if(!d)return;
+    d.classList.remove("prslidel","prslider"); void d.offsetWidth; d.classList.add((dir||1)<0?"prslidel":"prslider");
+    if(on){var ta=d.querySelector(".pth"); grow(ta); if(!(x.th||"").trim())setTimeout(function(){try{ta.focus({preventScroll:true})}catch(e){}},280)}
+  }
+  (function(){
+    var sw=null;
+    list.addEventListener("pointerdown",function(e){
+      if(e.pointerType==="mouse"&&e.button!==0)return;
+      var pri=e.target.closest&&e.target.closest(".pri"); if(!pri||pri.classList.contains("editing"))return;
+      if(!e.target.closest(".prv,.pthx")||e.target.closest("textarea,button"))return;
+      sw={pri:pri,x:e.clientX,y:e.clientY,id:e.pointerId,lock:""};
+    });
+    list.addEventListener("pointermove",function(e){
+      if(!sw||e.pointerId!==sw.id)return; var dx=e.clientX-sw.x, dy=e.clientY-sw.y;
+      if(!sw.lock){if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.4)sw.lock="x"; else if(Math.abs(dy)>12)sw.lock="y"}
+      if(sw.lock==="x"){var v=sw.pri.querySelector(sw.pri.classList.contains("thxside")?".pthx":".prv"); if(v){v.style.transition="none"; v.style.transform="translateX("+Math.max(-60,Math.min(60,dx*.5))+"px)"}}
+    });
+    function end(e){
+      if(!sw||e.pointerId!==sw.id)return; var s0=sw; sw=null;
+      s0.pri.querySelectorAll(".prv,.pthx").forEach(function(v){v.style.transition=""; v.style.transform=""});
+      if(s0.lock!=="x"||e.type==="pointercancel")return;
+      var dx=e.clientX-s0.x; if(Math.abs(dx)<50)return;
+      prSwAt=Date.now(); prFlip(s0.pri,!s0.pri.classList.contains("thxside"),dx<0?-1:1);
+    }
+    list.addEventListener("pointerup",end); list.addEventListener("pointercancel",end);
+  })();
   list.addEventListener("focusout",function(e){
     var pri=e.target.closest&&e.target.closest(".pri"); if(!pri||!prEdit.has(pri.dataset.pid))return;
     setTimeout(function(){if(!pri.isConnected||pri.contains(document.activeElement))return;prEdit.delete(pri.dataset.pid);render()},150);
