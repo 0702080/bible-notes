@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-prddark">
+<meta name="app-build" content="2026-11-05-dl3d">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4681,6 +4681,11 @@ body.reorder .ref .lclisten{display:none}
 .dlgrp,.dlgrp.pin{background:color-mix(in srgb,var(--gc,var(--gold)) 16%,#18171B);border-color:color-mix(in srgb,var(--gc,var(--gold)) 40%,#2A282C)}
 .dlgrp .dlgname,.dlgrp .dlgh{color:var(--gb,var(--gc))!important}
 .saytoday{background-image:none!important}
+/* 🧊 하루 돌아보기: 다음 3개·다음 4개·앞 4개·＋N개 더·오늘의 3개만 보기도 입체 (2026-11-05 사용자 요청) */
+.dl3one,.dl3all,.dl3fold{border:1px solid color-mix(in srgb,var(--gc,var(--gold)) 45%,#000)!important;border-style:solid!important;background-color:color-mix(in srgb,var(--gc,var(--gold)) 42%,#23222B)!important;background-image:linear-gradient(180deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.08) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#fff!important;font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -2px 0 rgba(0,0,0,.26),0 3px 0 rgba(0,0,0,.42),0 5px 9px rgba(0,0,0,.38)!important;transition:transform .08s,box-shadow .08s;-webkit-tap-highlight-color:transparent}
+.dl3all,.dl3fold{background-color:#2A2933!important;border-color:#45434F!important}
+.dl3one:active,.dl3all:active,.dl3fold:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)!important}
+.dl3foot{padding-bottom:8px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
