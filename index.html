@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-wkgap">
+<meta name="app-build" content="2026-11-05-pgbar">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1086,7 +1086,6 @@ body.reorder .note .topics{display:none}
 .pgday.today .pgw{color:var(--gold);font-weight:700}
 .pgrow{--rc:var(--violet);display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:8px;margin:0 0 10px;padding:12px 14px 12px 16px;border:1px solid color-mix(in srgb,var(--rc) 26%,#2A2933);border-radius:16px;background:linear-gradient(180deg,color-mix(in srgb,var(--rc) 9%,#1A1A20),#15151A);position:relative;overflow:hidden}
 .pgrow:last-of-type{border-bottom:1px solid color-mix(in srgb,var(--rc) 26%,#2A2933)}
-.pgrow::before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--rc)}
 .pgline{display:flex;align-items:center;gap:10px;min-width:0;width:100%}
 .pgrow .pgref{text-align:left}
 .pgmini{width:100%}
@@ -1100,7 +1099,7 @@ body.reorder .note .topics{display:none}
 .pgrow .pgb.got{border:0;background:radial-gradient(circle at 35% 30%,#FFF1C4,var(--gold) 55%,#C98A1B);background-color:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 40%,transparent);animation:none!important;opacity:1;transform:none}
 @keyframes pgbPop{from{transform:scale(.3)}to{transform:scale(1)}}
 .pgrow.full{border-color:color-mix(in srgb,var(--mint) 40%,#2A2933);background:linear-gradient(180deg,color-mix(in srgb,var(--mint) 12%,#1A1A20),#15151A)}
-.pgrow.full::before,.pgrow.full .pgmini i{background:linear-gradient(180deg,var(--mint),var(--green))}
+.pgrow.full .pgmini i{background:linear-gradient(180deg,var(--mint),var(--green))}
 .pgrow.full .pgcnt{background:color-mix(in srgb,var(--mint) 18%,#1E1E25);color:var(--mint)}
 .pgrow.full .pgb.got{background:radial-gradient(circle at 35% 30%,#E2FFF6,var(--mint) 55%,var(--green));background-color:var(--mint)}
 .tk{font-weight:700;color:var(--hi);-webkit-text-stroke:.35px var(--hi)}
