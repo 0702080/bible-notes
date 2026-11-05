@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-lstap">
+<meta name="app-build" content="2026-11-05-ldbg">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4586,28 +4586,29 @@ body.reorder .ref .lclisten{display:none}
 /* 걷기 암송: 빈 곳 옆으로 밀기가 끊기지 않게 */
 .wkv{touch-action:pan-y}
 /* 💰 하늘나라 재무제표: 왼쪽 심은 곳, 오른쪽 거둔 곳, 엑셀 같은 표 (2026-11-05 사용자 요청) */
-.cch.ldv{--lds:var(--green);--ldr:var(--gold)}
+.cch.ldv{--lds:var(--green);--ldr:var(--gold);background:#1B1A20}
+.cch.ldv .bqbar{background:#1B1A20}
 .cch.ldv .bqbar{justify-content:space-between}
-.ldclose{width:36px;height:36px;padding:0;border:1px solid #2A2930;border-radius:50%;background:#16151A;color:var(--muted);font-size:15px;line-height:1}
+.ldclose{width:36px;height:36px;padding:0;border:1px solid #3F3E47;border-radius:50%;background:#26252C;color:var(--muted);font-size:15px;line-height:1}
 .ldbody{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
 .ldinner{max-width:760px;margin:0 auto;padding:10px 12px 28px;display:flex;flex-direction:column;gap:10px}
 .ldsum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-.ldsum>div{min-width:0;padding:8px 6px;border-radius:12px;border:1px solid #26252C;background:#131217;text-align:center}
+.ldsum>div{min-width:0;padding:8px 6px;border-radius:12px;border:1px solid #3A3942;background:#25242B;text-align:center}
 .ldsum span{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap}
 .ldsum b{display:block;margin-top:2px;font-size:14.5px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ldsum .lds b{color:var(--lds)}.ldsum .ldr b{color:var(--ldr)}.ldsum .ldf b{color:#EDEBF0}
 .ldsum .ldf b.up{color:var(--ldr)}.ldsum .ldf b.down{color:var(--lds)}
 /* 맨 아래 고정 말씀 (2026-11-05 사용자 요청) */
-.ldverse{flex:0 0 auto;padding:10px 16px 12px;border-top:1px solid #222126;background:#0B0B0D;text-align:center}
+.ldverse{flex:0 0 auto;padding:10px 16px 12px;border-top:1px solid #3A3942;background:#1B1A20;text-align:center}
 .ldverse p{margin:0;font-size:15px;font-weight:700;line-height:1.4;color:var(--gold);word-break:keep-all}
 .ldverse small{display:block;margin-top:2px;font-size:12px;color:var(--muted)}
 .ldrange{display:flex;gap:6px;justify-content:center}
-.ldrange button{height:30px;padding:0 14px;border:1px solid #2A2930;border-radius:15px;background:transparent;color:var(--muted);font-size:13px;white-space:nowrap}
+.ldrange button{height:30px;padding:0 14px;border:1px solid #44434C;border-radius:15px;background:transparent;color:var(--muted);font-size:13px;white-space:nowrap}
 .ldrange button.on{background:color-mix(in srgb,var(--gold) 18%,#1A1915);border-color:color-mix(in srgb,var(--gold) 45%,transparent);color:var(--gold);font-weight:700}
 .ldnew,.ldefrm{display:flex;flex-direction:column;gap:6px}
-.ldnew{padding:10px;border:1px solid #26252C;border-radius:14px;background:#111014}
+.ldnew{padding:10px;border:1px solid #3A3942;border-radius:14px;background:#25242B}
 .ldrow{display:flex;gap:6px}
-.ldin{box-sizing:border-box;min-width:0;width:100%;height:38px;padding:0 10px;border:1px solid #2F2E36;border-radius:9px;background:#0B0B0D;color:#EDEBF0;font-family:inherit;font-size:14.5px;color-scheme:dark}
+.ldin{box-sizing:border-box;min-width:0;width:100%;height:38px;padding:0 10px;border:1px solid #4A4953;border-radius:9px;background:#18171C;color:#EDEBF0;font-family:inherit;font-size:14.5px;color-scheme:dark}
 .ldin:focus{outline:none;border-color:var(--gold)}
 .ldnd,.lded{flex:0 0 158px;width:158px;padding:0 8px}
 .ldna,.ldea{flex:1;text-align:right;font-variant-numeric:tabular-nums}
@@ -4616,14 +4617,14 @@ body.reorder .ref .lclisten{display:none}
 .ldadd.ldr{border:1px solid color-mix(in srgb,var(--ldr) 55%,transparent);background:color-mix(in srgb,var(--ldr) 16%,transparent);color:var(--ldr)}
 .ldadd:active{transform:scale(.97)}
 .ldtb{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13.5px}
-.ldtb th{position:sticky;top:0;z-index:1;padding:7px 6px;background:#1B1A20;border:1px solid #2F2E36;font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap}
+.ldtb th{position:sticky;top:0;z-index:1;padding:7px 6px;background:#2C2B33;border:1px solid #44434C;font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap}
 .ldtb th.lds{color:var(--lds)}.ldtb th.ldr{color:var(--ldr)}
-.ldtb td{padding:7px 7px;border:1px solid #26252C;vertical-align:top}
+.ldtb td{padding:7px 7px;border:1px solid #3F3E47;vertical-align:top}
 .ldcell{cursor:pointer;height:44px}
-.ldcell:active{background:#1D1C22}
-@media (hover:hover){.ldcell:hover{background:#1A1920}}
-.ldcs{background:color-mix(in srgb,var(--lds) 5%,transparent)}
-.ldcr{background:color-mix(in srgb,var(--ldr) 5%,transparent)}
+.ldcell:active{background:#2F2E36}
+@media (hover:hover){.ldcell:hover{background:#2A2930}}
+.ldcs{background:color-mix(in srgb,var(--lds) 8%,transparent)}
+.ldcr{background:color-mix(in srgb,var(--ldr) 8%,transparent)}
 .ldblank{background:transparent}
 .ldon{box-shadow:inset 0 0 0 1.5px var(--gold)}
 .ldout{opacity:.42}
@@ -4633,15 +4634,15 @@ body.reorder .ref .lclisten{display:none}
 .ldca{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
 .ldcs .ldca{color:var(--lds)}.ldcr .ldca{color:var(--ldr)}
 .ldempty td{padding:22px 12px;text-align:center;color:var(--muted);font-size:13.5px;line-height:1.6;word-break:keep-all}
-.ldedit td{padding:8px;background:#17161C;border-color:color-mix(in srgb,var(--gold) 45%,#26252C)}
+.ldedit td{padding:8px;background:#25242B;border-color:color-mix(in srgb,var(--gold) 45%,#3F3E47)}
 .ldkseg{display:flex;gap:6px}
-.ldk{flex:1;height:36px;border:1px solid #2F2E36;border-radius:9px;background:transparent;color:var(--muted);font-family:inherit;font-size:13.5px;white-space:nowrap}
+.ldk{flex:1;height:36px;border:1px solid #4A4953;border-radius:9px;background:transparent;color:var(--muted);font-family:inherit;font-size:13.5px;white-space:nowrap}
 .ldk.lds.on{border-color:var(--lds);background:color-mix(in srgb,var(--lds) 18%,transparent);color:var(--lds);font-weight:700}
 .ldk.ldr.on{border-color:var(--ldr);background:color-mix(in srgb,var(--ldr) 18%,transparent);color:var(--ldr);font-weight:700}
 .ldacts button{height:36px;padding:0 14px;border-radius:9px;font-family:inherit;font-size:13.5px;white-space:nowrap}
 .lddel{margin-right:auto;border:1px solid #3A2A2E;background:transparent;color:#D98A92}
 .lddel.arm{background:#5A2028;border-color:#B5525E;color:#fff}
-.ldcancel{border:1px solid #2F2E36;background:transparent;color:var(--muted)}
+.ldcancel{border:1px solid #4A4953;background:transparent;color:var(--muted)}
 .ldsave{border:0;background:var(--gold);color:#141416;font-weight:700}
 /* ⋯ 메뉴 끌기: 잡은 칸이 떠 보이게 (2026-11-05) */
 .pop>button.mndrag{position:relative;z-index:2;transform:scale(1.03);box-shadow:0 8px 22px rgba(0,0,0,.55);background:color-mix(in srgb,var(--gold) 26%,#1E1D24)!important;outline:1px solid color-mix(in srgb,var(--gold) 65%,transparent)}
