@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-icglass">
+<meta name="app-build" content="2026-11-05-gstack">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4733,6 +4733,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 .icbody .icp,.icbody .icp.big{background:color-mix(in srgb,color-mix(in srgb,var(--ic0) 18%,#15141A) 84%,transparent)!important}
 /* 하루 돌아보기 */
 .dlgrp,.dlgrp.pin{background:color-mix(in srgb,color-mix(in srgb,var(--gc,var(--gold)) 16%,#18171B) 84%,transparent)}
+/* 비치는 창 위에 비치는 창이 또 열리면 맨 위 창만 남김 (glassStack) */
+.gsunder{visibility:hidden!important}
 /* 나의 묵상 질문 */
 .mqitem{background:color-mix(in srgb,color-mix(in srgb,var(--mc) 12%,#121216) 84%,transparent)}
 .medqsheet>.dlbar,.medqsheet>.dlfix{background:rgba(11,11,13,.62)}
@@ -15864,6 +15866,20 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
   $("openGraphBtn").addEventListener("click",function(){openGraph(null)});
   /* ---------- 🖼️ 앱 배경 바꾸기 (PC ⋯ 메뉴, 2026-11-01 사용자 요청): 기본 사진·색 배경·내 사진, 어둡기 조절. 이 기기에만 저장 */
+  /* 비치는 창이 맨 위일 때 그 밑의 전체 화면 창은 감춤: 안 그러면 기도제목 뒤로 하루 돌아보기 카드가 보임 (2026-11-05 사용자 요청) */
+  (function glassStack(){
+    var ALL=".rvq,.cch,.daily,#topicSheet.tsfull", GLASS=".rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#topicSheet.tsfull";
+    function sync(){
+      var els=Array.prototype.filter.call(document.querySelectorAll(ALL),function(x){return !x.hidden}), top=null, topZ=-1;
+      els.forEach(function(x){var z=parseInt(getComputedStyle(x).zIndex,10)||0; if(z>=topZ){top=x;topZ=z}});   // 같은 높이면 문서에서 뒤에 있는 창이 위
+      var glass=top&&top.matches(GLASS);
+      els.forEach(function(x){x.classList.toggle("gsunder",!!glass&&x!==top)});
+      Array.prototype.forEach.call(document.querySelectorAll(".gsunder"),function(x){if(x.hidden)x.classList.remove("gsunder")});
+    }
+    new MutationObserver(function(ms){
+      if(ms.some(function(m){return m.target.matches&&m.target.matches(ALL)}))sync();
+    }).observe(document.body,{subtree:true,attributes:true,attributeFilter:["hidden"]});
+  })();
   var ABG_KEY="bible-appbg", ABG_PHOTO="bible-appbg-photo";
   var ABG_LIST=[
     {k:"default",t:"은행나무 길",bg:"url(kanban-bg2.jpg) center/cover no-repeat"},
