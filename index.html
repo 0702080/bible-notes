@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-ldx3d">
+<meta name="app-build" content="2026-11-05-colcc">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4754,6 +4754,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 .toolbar{border-bottom:0}
 /* 믿음의 한 마디: 윗줄 폭을 아래 찾기 칸·카드 폭과 같게 (2026-11-05 사용자 요청) */
 .saysheet>.dlbar{width:auto;margin:8px max(16px,calc((100% - 640px) / 2)) 0;padding:7px 8px;border:0;border-radius:14px}
+/* 휴대폰 칸 고르기 줄: 칸마다 다른 색, 고른 칸은 그 색으로 꽉 채움 (2026-11-05 사용자 요청) */
+.colbar .cchip.cctint{background-color:color-mix(in srgb,var(--cc) 30%,#141318);border-color:color-mix(in srgb,var(--cc) 55%,#141318);color:color-mix(in srgb,var(--cc) 72%,#fff)}
+.colbar .cchip.cctint .ccnt{background:rgba(0,0,0,.24)}
+.colbar .cchip.cctint.on{background-color:var(--cc);border-color:var(--cc);color:#141218}
+.colbar .cchip.cctint.on .ccnt{background:rgba(0,0,0,.16)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -5752,7 +5757,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var t=document.createElement("span"); t.textContent=label; b.appendChild(t);
       if(cnt!=null){var k=document.createElement("span"); k.className="ccnt"; k.textContent=cnt; b.appendChild(k)} bar.appendChild(b)};
     mk("","📚 모든 칸",null);
-    cs.forEach(function(c){var k=0; notes.forEach(function(n){if(n.col===c)k++}); mk(c,"📁 "+c,k)});
+    // 칸마다 다른 색: 내 칸 목록의 순서로 정해서, 카드가 없는 칸이 생겨도 다른 칸 색이 바뀌지 않음 (2026-11-05 사용자 요청)
+    var COLCC=["#E58FB1","#7FB8E6","#7FCFA4","#B79BEB","#EDA46F","#6FCBC7","#D9C25E","#E58A7F"], allC=myCols();
+    cs.forEach(function(c){var k=0; notes.forEach(function(n){if(n.col===c)k++}); mk(c,"📁 "+c,k); var el=bar.lastChild; el.classList.add("cctint"); el.style.setProperty("--cc",COLCC[allC.indexOf(c)%COLCC.length])});
   }
   // 두 낱말 이상으로 찾을 때, 말씀(본문·구절 이름)에 그 말이 붙은 그대로 들어 있는 카드가 있으면 그 카드만 보여 줌 (2026-10-22 사용자 요청)
   var exKey=null, exSet=null;
