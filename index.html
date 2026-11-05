@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-ldcomma2">
+<meta name="app-build" content="2026-11-06-pgrow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4763,6 +4763,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 .sayform.saylocked{padding-left:16px}
 .sayform .sayt{padding:0;border:0;border-radius:0;background:transparent;font-size:16.5px;line-height:1.8;word-break:keep-all}
 .sayform .sayt:focus{outline:none}
+/* 실천 진도표: 말씀 칸 전체가 누르는 자리 */
+.pgrow{cursor:pointer;transition:transform .1s}
+.pgrow:active{transform:scale(.985)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -9036,14 +9039,15 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       pk[rw.dataset.wi]=!pk[rw.dataset.wi]; rw.classList.toggle("peek",!!pk[rw.dataset.wi]); if(!rw.classList.contains("box"))rw.textContent=pk[rw.dataset.wi]?rw.dataset.word:circles(rw.dataset.word); buzz(5);
       return;
     }
-    var b=e.target.closest("button"); if(!b)return;
-    if(b.classList.contains("pggo")){   // 실천 진도표의 말씀 → 그 말씀의 실천 탭으로
-      var gid=b.dataset.id; if(!notes.has(gid))return;
-      closeTS(); setTopics([]); tabOf.set(gid,"a"); openIds.clear(); openIds.add(gid); try{localStorage.setItem("bible-last-open",gid)}catch(err){}
-      spotId=gid; render();
-      var gc=cards.get(gid); if(gc){gc.scrollIntoView({block:"start",behavior:"smooth"});gc.classList.remove("spotin");void gc.offsetWidth;gc.classList.add("spotin")}
+    var pgr=e.target.closest(".pgrow");   // 실천 진도표: 말씀 칸 어디를 눌러도 그 말씀 카드의 실천 칸으로 (2026-11-06 사용자 요청)
+    if(pgr){
+      var gid=pgr.querySelector(".pggo").dataset.id; if(!notes.has(gid))return;
+      if(!e.target.closest("button"))buzz(8);
+      closeTS(); if(colSel&&notes.get(gid).col!==colSel)setColSel("");
+      openNoteFocus(gid,"a");
       return;
     }
+    var b=e.target.closest("button"); if(!b)return;
     if(b.classList.contains("mcprev")||b.classList.contains("mcnext")){
       var dm=b.classList.contains("mcprev")?-1:1; var nd=new Date(medCal.y,medCal.m+dm,1); medCal={y:nd.getFullYear(),m:nd.getMonth()}; drawMedProgress(); return;
     }
