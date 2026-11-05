@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-actnogrid">
+<meta name="app-build" content="2026-11-06-chead2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4782,6 +4782,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 .act .chk{width:22px;height:22px;margin-top:0;border-width:1.5px}
 .agrip{opacity:.5}
 .afold{color:var(--muted)}
+/* 휴대폰에서 펼친 카드 머리: 첫 줄에 구절 이름·암송·듣기, 둘째 줄 오른쪽에 아이콘 — 좁은 칸에 세로로 쌓이지 않게 (2026-11-06 사용자 요청) */
+@media (max-width:520px){
+  .note.open:not(.vediting) .chead{flex-wrap:wrap;justify-content:flex-end;row-gap:2px}
+  .note.open:not(.vediting) .chead .ref{flex:1 0 100%;margin-right:0}
+}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
