@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-02-flat">
+<meta name="app-build" content="td-2026-11-05-bg">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -497,9 +497,31 @@ body.pm .modeseg::before{transform:translateX(calc(100% + 6px));background-color
 .ovw-tg:active{transform:translateY(1px)}
 .tg-all{background-image:linear-gradient(180deg,rgba(255,255,255,.38) 0%,rgba(255,255,255,.10) 45%,rgba(0,0,0,.03) 55%,rgba(0,0,0,.12) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -2px 0 rgba(80,50,20,.18),0 3px 0 rgba(80,50,20,.22),0 5px 9px rgba(80,50,20,.18);transition:transform .08s,box-shadow .08s}
 .tg-all:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.2),0 1px 0 rgba(80,50,20,.22)}
+/* 묵상 노트와 같은 앱 배경 이미지가 살짝 비치게: 아이보리 막을 덮어 밝은 바탕은 그대로 (2026-11-05 사용자 요청) */
+html{background:#F7F1E3}
+body{background:transparent}
+#tdbg{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:-1;pointer-events:none;background:linear-gradient(rgba(247,241,227,.66),rgba(247,241,227,.66)),url(../kanban-bg2.jpg) center/cover no-repeat,#F7F1E3}
+:root{--sheetg:rgba(255,251,242,.8)}
+.sum,.ovw{background:linear-gradient(160deg,color-mix(in srgb,var(--ring) 9%,var(--sheetg)) 0%,var(--sheetg) 55%,color-mix(in srgb,var(--violet) 8%,var(--sheetg)) 100%)}
+.shelf{background:linear-gradient(160deg,color-mix(in srgb,var(--violet) 11%,var(--sheetg)),var(--sheetg) 70%)}
+.pinned{background:color-mix(in srgb,var(--pink) 6%,var(--sheetg))}
 </style>
 </head>
 <body>
+<div id="tdbg" aria-hidden="true"></div>
+<script>
+/* 묵상 노트에서 고른 앱 배경(bible-appbg)을 그대로 씀. 저장·기기 공유는 같은 주소라 그대로 */
+(function(){try{
+  var o=JSON.parse(localStorage.getItem("bible-appbg")||"{}")||{}, bg="", q=function(u){return 'url("'+String(u).replace(/"/g,"")+'") center/cover no-repeat'};
+  var PRE={night:"radial-gradient(1200px 700px at 70% 10%,#2B3566 0%,#141a33 45%,#07080f 100%)",dawn:"linear-gradient(160deg,#3b2a4d 0%,#7a4a5a 45%,#c98a5a 100%)",forest:"radial-gradient(1000px 600px at 20% 0%,#2f5a3e 0%,#173024 50%,#0a140f 100%)",sea:"linear-gradient(180deg,#0f3a52 0%,#0b2536 55%,#06121b 100%)",wheat:"linear-gradient(170deg,#5a4a22 0%,#3a3018 50%,#141109 100%)"};
+  if(o.k==="photo"){var u=localStorage.getItem("bible-appbg-photo"); if(u)bg=q(u)}
+  else if(o.k==="url"&&o.url)bg=q(o.url);
+  else if(/^u:/.test(o.k||""))bg=q("https://images.unsplash.com/"+o.k.slice(2)+"?w=2400&q=80&auto=format&fit=crop");
+  else if(PRE[o.k])bg=PRE[o.k];
+  else if(o.k==="none")bg="#F7F1E3";
+  if(bg)document.getElementById("tdbg").style.background="linear-gradient(rgba(247,241,227,.66),rgba(247,241,227,.66)),"+bg+",#F7F1E3";
+}catch(e){}})();
+</script>
 <div class="turn" aria-live="polite"><b aria-hidden="true">📱</b>휴대폰을 세로로 돌려 주세요</div>
 <header class="bar"><button type="button" class="bar-back" id="barBack" hidden aria-label="묵상 노트로 돌아가기">← 노트</button><h1>성경 통독표</h1><span class="bar-cnt" id="barCnt"></span></header>
 <main class="wrap">
