@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-ldbg">
+<meta name="app-build" content="2026-11-05-ld3d">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4612,10 +4612,10 @@ body.reorder .ref .lclisten{display:none}
 .ldin:focus{outline:none;border-color:var(--gold)}
 .ldnd,.lded{flex:0 0 158px;width:158px;padding:0 8px}
 .ldna,.ldea{flex:1;text-align:right;font-variant-numeric:tabular-nums}
-.ldadd{flex:1;height:40px;border-radius:10px;font-family:inherit;font-size:14px;font-weight:700;white-space:nowrap}
-.ldadd.lds{border:1px solid color-mix(in srgb,var(--lds) 55%,transparent);background:color-mix(in srgb,var(--lds) 16%,transparent);color:var(--lds)}
-.ldadd.ldr{border:1px solid color-mix(in srgb,var(--ldr) 55%,transparent);background:color-mix(in srgb,var(--ldr) 16%,transparent);color:var(--ldr)}
-.ldadd:active{transform:scale(.97)}
+/* 심었어요·거뒀어요: 아랫단이 있는 입체 단추, 누르면 내려감 (2026-11-05 사용자 요청) */
+.ldadd{--ldf:var(--lds);flex:1;height:44px;margin:2px 0 5px;border:0;border-radius:11px;background-color:color-mix(in srgb,var(--ldf) 86%,#1B1A20);color:#141416;font-family:inherit;font-size:14.5px;font-weight:700;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.38),0 5px 0 color-mix(in srgb,var(--ldf) 42%,#0B0B0D),0 8px 10px rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s;-webkit-tap-highlight-color:transparent}
+.ldadd.ldr{--ldf:var(--ldr)}
+.ldadd:active{transform:translateY(4px);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 1px 0 color-mix(in srgb,var(--ldf) 42%,#0B0B0D),0 2px 3px rgba(0,0,0,.35)}
 .ldtb{width:100%;border-collapse:collapse;table-layout:fixed;font-size:13.5px}
 .ldtb th{position:sticky;top:0;z-index:1;padding:7px 6px;background:#2C2B33;border:1px solid #44434C;font-size:12.5px;font-weight:700;color:var(--muted);white-space:nowrap}
 .ldtb th.lds{color:var(--lds)}.ldtb th.ldr{color:var(--ldr)}
