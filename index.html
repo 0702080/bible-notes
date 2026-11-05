@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-nolastopen">
+<meta name="app-build" content="2026-11-06-duelist">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4396,6 +4396,11 @@ body.boardon .fscrow{display:none}
 .dlttl{display:block;color:color-mix(in srgb,var(--tc0) 70%,#fff);font-size:15px}
 .dltnote{margin:8px 0 0;padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.25);white-space:pre-line;line-height:1.6}
 .dltsum{margin:6px 0 0;color:var(--muted);font-size:13px}
+.dltdue .dltsum{margin-top:10px}
+.dltduel{list-style:none;margin:6px 0 0;padding:0 0 0 24px;display:flex;flex-direction:column;gap:3px}
+.dltduel li{color:var(--ink);font-size:14px;line-height:1.45}
+.dltduel li::before{content:"·";color:var(--muted);margin-right:8px}
+.dltmore{margin:4px 0 0 24px;color:var(--muted);font-size:12.5px}
 .dltlist{margin:6px 0 0;padding-left:18px;font-size:13.5px;line-height:1.6}
 .dltin{display:block;width:100%;box-sizing:border-box;margin-top:8px;padding:8px 10px;border:1px solid #34333A;border-radius:10px;background:#0F0E12;color:var(--ink);font:inherit;font-size:14px;resize:vertical}
 /* 27 짧은 말씀 카드 왼쪽 선 두께 = 한 마디 카드와 같게 */
@@ -13691,7 +13696,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(note&&!eve)box.appendChild(el("p","dltnote",note));
     if(eve)box.appendChild(el("p","dltsum","오늘 체크한 것 "+on.length+"개"+(todo.length?" · 아직 안 한 실천 "+todo.length+"개":"")));
     if(todo.length){var ul=el("ul","dltlist"); todo.slice(0,3).forEach(function(t){var li=el("li","",null), lb=el("button","dltgo",t.t); lb.type="button"; lb.dataset.k=t.k; lb.title="이 실천 카드로 가기"; li.appendChild(lb); ul.appendChild(li)}); box.appendChild(ul)}
-    if(mor&&typeof dueAll==="function"){var du=dueAll(); if(du&&du.length)box.appendChild(el("p","dltsum","📖 오늘 복습할 말씀: "+du.slice(0,3).map(function(n){return n.ref||""}).filter(Boolean).join(", ")+(du.length>3?" 외 "+(du.length-3)+"개":"")))}
+    if(mor&&typeof dueAll==="function"){var du=(dueAll()||[]).filter(function(n){return n&&n.ref}); if(du.length){   // 한 줄에 하나씩 세로로 (2026-11-06 사용자 요청)
+      var dw=el("div","dltdue"); dw.appendChild(el("p","dltsum","📖 오늘 복습할 말씀 "+du.length+"개"));
+      var dul=el("ul","dltduel"); du.slice(0,5).forEach(function(n){dul.appendChild(el("li","",n.ref))}); dw.appendChild(dul);
+      if(du.length>5)dw.appendChild(el("p","dltmore","외 "+(du.length-5)+"개"));
+      box.appendChild(dw)}}
     if(eve){
       var ta=el("textarea","dltin"); ta.rows=2; ta.maxLength=500; ta.placeholder="내일 아침에 꼭 볼 것을 적어 두세요"; ta.value=(tmr[tomorrow]&&tmr[tomorrow].t)||""; ta.setAttribute("aria-label","내일 아침에 볼 것");
       ta.addEventListener("change",function(){var d=dailyData(); if(!d.tmr||typeof d.tmr!=="object")d.tmr={}; d.tmr[tomorrow]={t:ta.value.trim().slice(0,500),at:Date.now()}; saveDaily(d); toast("내일 아침에 보여 드릴게요")});
