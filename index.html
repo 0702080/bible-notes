@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-hold2">
+<meta name="app-build" content="2026-11-06-wkquiet">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -10874,17 +10874,17 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     if(WK.sp){WK.sp=0; WK.endAt=now}
     if(now-(WK.saidAt||0)<350)return;
-    if(p.min&&now-(WK.vAt||now)>p.min*60000){wkNext(); WK.saidAt=now; return}
+    if(p.min&&now-(WK.vAt||now)>p.min*60000){wkNext(0,1); WK.saidAt=now; return}
     if(now-(WK.lastStep||0)>2500&&now-(WK.endAt||0)>=p.g*100)wkStep("t");
     if(now-(WK.drawAt||0)>1000){WK.drawAt=now; wkDraw()}
   }
   function wkBeat(){var rg=wkBox.querySelector(".wkring"); rg.classList.remove("beat"); void rg.offsetWidth; rg.classList.add("beat")}   // 걸음마다 원이 톡
-  function wkNext(dir){   // 바로 다음 말씀으로 (밀기), dir=-1이면 이전 말씀 (맨 위에서는 맨 아래로)
+  function wkNext(dir,quiet){   // 바로 다음 말씀으로 (밀기), dir=-1이면 이전 말씀 (맨 위에서는 맨 아래로)
     if(!WK)return false; var p=wkPref(), ord=wkOrder(), at=-1;
     ord.forEach(function(x,k){if(x.id===WK.id)at=k});
     var ol=Math.max(1,ord.length), nx=ord[at<0?0:((at+(dir<0?-1:1))%ol+ol)%ol]; if(!nx||nx.id===WK.id)return false;
     try{window.speechSynthesis.cancel()}catch(e){}
-    WK.id=nx.id; WK.toks=wkTokens(nx,p.u); WK.i=0; WK.rounds=0; WK.vAt=Date.now(); buzz(12); wkDraw();
+    WK.id=nx.id; WK.toks=wkTokens(nx,p.u); WK.i=0; WK.rounds=0; WK.vAt=Date.now(); if(!quiet)buzz(12); wkDraw();
     if(WK.run)wkSay(refSay(nx.ref||""),1);
     return true;
   }
@@ -10896,7 +10896,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var n0=notes.get(WK.id); if(n0){n0.lcnt=(+n0.lcnt||0)+1; scheduleSave(n0.id); WK.cnted=1}   // 한 번 다 들으면 듣기 횟수 +1 — 암송 횟수와 따로 셈 (2026-11-05 사용자 요청)
     if(p.nx){var ord=wkOrder(), at=-1; ord.forEach(function(x,k){if(x.id===WK.id)at=k});
       var nx=ord[(at+1)%Math.max(1,ord.length)]; if(nx&&nx.id!==WK.id){WK.id=nx.id; WK.toks=wkTokens(nx,p.u); WK.rounds=0; WK.vAt=Date.now(); moved=true}}
-    WK.i=0; buzz(30); wkDraw();
+    WK.i=0; wkDraw();   // 다 들어도 진동 없음 — 배터리 아끼기 (2026-11-06 사용자 요청)
   }
   function wkMotion(e){   // 걸음 찾기 (2026-10-31 다시 만듦: 손에 들고 걸어도 느끼게)
     if(!WK||!WK.run)return; WK.ev=(WK.ev||0)+1;
