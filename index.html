@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-glass3">
+<meta name="app-build" content="2026-11-05-sayglass">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4715,6 +4715,12 @@ body.reorder .ref .lclisten{display:none}
 .bcol.bcust:not(.btint):not(.over):not(.lmover):not(.bback){background:color-mix(in srgb,color-mix(in srgb,var(--gold) 4%,#272530) 80%,transparent)}
 .bcol.btint:not(.over):not(.lmover):not(.bback){background:color-mix(in srgb,color-mix(in srgb,var(--bc) 16%,#24222B) 80%,transparent)}
 @media (hover:hover){.board4>.bcol.bfold:hover{background:#2F2C39!important}}
+/* 믿음의 한 마디·짧은 말씀 창: 뒤 화면은 감추고 앱 배경 이미지가 비치게 (2026-11-05 사용자 요청) */
+.daily.saysheet{background:rgba(10,10,13,.42)}
+.saysheet>.dlbar{background:rgba(11,11,13,.62)}
+body:has(.daily.saysheet:not([hidden])) main.wrap,body:has(.daily.saysheet:not([hidden])) #fab{visibility:hidden}
+.saycard.saytint{background:color-mix(in srgb,color-mix(in srgb,var(--sc) 16%,#18171B) 84%,transparent)}
+.saycard.hv{background:color-mix(in srgb,color-mix(in srgb,var(--sc) 16%,#18171B) 84%,transparent)!important}
 /* 찾기 칸의 하루 제외·말씀만 */
 .bfscope{border:1px solid #4A4953!important;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.22) 100%)!important;color:#E8E5EE;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 5px rgba(0,0,0,.34);transition:transform .08s,box-shadow .08s}
 .bfchips .bfscope:active{transform:translateY(1px);box-shadow:inset 0 2px 3px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)}
