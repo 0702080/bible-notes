@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-ldthing">
+<meta name="app-build" content="2026-11-05-lcm1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -116,7 +116,7 @@ textarea.field{resize:vertical;min-height:80px;font-family:var(--serif);line-hei
 .note{padding:18px 0 16px;border-bottom:1px solid var(--rule)}
 .note .ref{font-weight:700;color:var(--violet);font-size:14px;letter-spacing:.01em}
 .ref .lcmem{border:0;font-family:inherit;line-height:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s,background .15s}
-.ref .lcmem{position:relative}
+.ref .lcmem{position:relative;touch-action:manipulation}
 .ref .lcmem::after{content:"";position:absolute;inset:-10px -6px}
 .ref .lcmem:active{transform:scale(.92);background:color-mix(in srgb,var(--sky) 28%,transparent)}
 .ref .lcmem.zero{background:transparent;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--sky) 40%,transparent);color:color-mix(in srgb,var(--sky) 80%,var(--muted))}
@@ -7897,6 +7897,8 @@ body.reorder .ref .lclisten{display:none}
     if(b.classList.contains("memopen")||b.classList.contains("lcmem")){
       // 머리의 암송 아이콘: 아래 "암송 시작 / 한 번 더 떠올리기" 버튼과 똑같이 암송 코치를 엶 (닫으면 암송 칸이 펼쳐져 있음)
       if(!memOpen.has(id)){memOpen.add(id);focusMode.delete(id);focusOpen.delete(id)}
+      // 카드의 "암송 N"은 한 번 누르면 바로 암송 코치, 두 번 누르기 없음 (2026-11-05 사용자 요청)
+      if(b.classList.contains("lcmem")){lcmemEat=Date.now(); openCoach(n); return}
       memTapOpen(n); return;
     }
     if(b.classList.contains("lclisten")){lsTapOpen(n);return}
@@ -10620,7 +10622,10 @@ body.reorder .ref .lclisten{display:none}
       if(ss.speaking||ss.pending){ss.cancel(); setTimeout(function(){try{ss.resume();ss.speak(u)}catch(e){}},40)} else{ss.resume(); ss.speak(u)}   // 안드로이드: 끊고 바로 말하면 소리가 빠지는 문제 (2026-10-31)
     }catch(e){}
   }
-  // 암송 단추: 한 번 = 암송 코치, 빠르게 두 번 = 걷기 암송 (2026-11-04 사용자 요청)
+  // "암송 N"을 빠르게 두 번 눌러도 둘째 누름이 막 열린 코치의 단추를 건드리지 않게 버림
+  var lcmemEat=0;
+  document.addEventListener("click",function(e){if(lcmemEat&&Date.now()-lcmemEat<350){lcmemEat=0;e.stopPropagation();e.preventDefault()}},true);
+  // 암송 단추(머리 아이콘·칸반): 한 번 = 암송 코치, 빠르게 두 번 = 걷기 암송 (2026-11-04 사용자 요청)
   var memTap={id:"",t:0,tm:0};
   function memTapOpen(n){
     var now=Date.now();
