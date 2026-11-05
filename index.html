@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-icans3d">
+<meta name="app-build" content="2026-11-06-ansclear">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4458,6 +4458,11 @@ body:not(.boardon) .bfwrap{display:none!important}
 .dlicbtns .dlauto{position:static;transform:none}
 .dlicans{height:26px;padding:0 10px;border:1px solid color-mix(in srgb,var(--gold) 60%,transparent);border-radius:13px;background:color-mix(in srgb,var(--gold) 16%,transparent);color:var(--gold);font-family:inherit;font-size:11.5px;font-weight:700;white-space:nowrap}
 .dlicans.on{background:var(--gold);color:#17120A}
+/* 응답 표시(아직) ↔ 🙌 응답됨 ✓ 이 한눈에 구분되게 (2026-11-06 사용자 요청) */
+.dlicans:not(.on),.icv .icbtns .icans:not(.on){border:1px dashed color-mix(in srgb,var(--gold) 45%,#3A3940)!important;background-color:rgba(255,255,255,.04)!important;color:color-mix(in srgb,var(--gold) 70%,#9A968F)!important;font-weight:600}
+.dlicans{background-image:linear-gradient(180deg,rgba(255,255,255,.16) 0%,rgba(255,255,255,.04) 45%,rgba(0,0,0,.06) 55%,rgba(0,0,0,.2) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.25),0 2px 0 rgba(0,0,0,.42),0 4px 7px rgba(0,0,0,.35)!important;transition:transform .08s,box-shadow .08s}
+.dlicans.on{border:1px solid #FFD36B!important;background-color:#F2B73A!important;color:#1E1608!important;font-weight:800;background-image:linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.14) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.18) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(120,70,0,.35),0 2px 0 #8A5A10,0 0 12px rgba(242,183,58,.45),0 4px 8px rgba(0,0,0,.4)!important}
+.dlicans:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
 .dlitem.icb .dlicrow{padding-right:92px}
 .dlitem.icb.ic2 .dlicrow{padding-right:158px}
 .dlitem.icdone .dlt{opacity:.65}
@@ -12220,7 +12225,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     dt.textContent=(ad.getFullYear()!==new Date().getFullYear()?ad.getFullYear()+". ":"")+dayName(dkey(x.at))+" 적음"; bt.appendChild(dt);
     function B(cls,t){var b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=t; bt.appendChild(b); return b}
     if(big&&!x.ans)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
-    var ansB=B("icans"+(x.ans?" on":""),x.ans?"🙌 응답됐어요 ✓":"🙌 응답됐어요"); ansB.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답된 기도로 표시해요";   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
+    var ansB=B("icans"+(x.ans?" on":""),x.ans?"🙌 응답됨 ✓":"응답 표시"); ansB.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답을 받았으면 눌러 표시해요";   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
     return d;
   }
   function icForm(x){
@@ -14165,7 +14170,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         row.appendChild(b);
         // 🙌 응답완료 단추는 늘 보임 (2026-11-04 사용자 요청)
         var ibs=document.createElement("div"); ibs.className="dlicbtns";
-        var ab=document.createElement("button"); ab.type="button"; ab.className="dlicans"+(x.ans?" on":""); ab.dataset.icid=x.id; ab.textContent=x.ans?"🙌 응답됨":"응답완료"; ab.title=x.ans?"누르면 응답을 취소해요":"응답된 기도로 표시해요"; ibs.appendChild(ab);
+        var ab=document.createElement("button"); ab.type="button"; ab.className="dlicans"+(x.ans?" on":""); ab.dataset.icid=x.id; ab.textContent=x.ans?"🙌 응답됨 ✓":"응답 표시"; ab.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답을 받았으면 눌러 표시해요"; ibs.appendChild(ab);
         if(x.memo.trim()){   // 기도문 전체 펼쳐 보기 (2026-10-24 사용자 요청)
           var ob=document.createElement("button"); ob.type="button"; ob.className="dlauto dlicopen"+(opn?" on":""); ob.dataset.icid=x.id; ob.textContent=opn?"접기 ▴":"펼치기 ▾"; ob.setAttribute("aria-expanded",String(opn)); ibs.appendChild(ob);
           row.classList.add("ic2");
