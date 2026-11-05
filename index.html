@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-sayr14">
+<meta name="app-build" content="2026-11-05-saygap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4761,6 +4761,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 .colbar .cchip.cctint.on .ccnt{background:rgba(0,0,0,.16)}
 /* 한 마디 고치는 칸: 글 폭·글자·줄 간격을 읽을 때 카드와 똑같이 해서 문장이 같은 자리에서 꺾이게 (2026-11-05 사용자 요청) */
 .sayform{padding:14px 16px 14px 30px;border-left-width:3px}
+/* 굴러가는 칸을 윗줄에서 12px 띄워서, 카드가 그 여백 앞에서 사라지게 (2026-11-05 사용자 요청) */
+.saysheet>.dlbody{margin-top:12px;padding-top:0}
 .sayform.saylocked{padding-left:16px}
 .sayform .sayt{padding:0;border:0;border-radius:0;background:transparent;font-size:16.5px;line-height:1.8;word-break:keep-all}
 .sayform .sayt:focus{outline:none}
