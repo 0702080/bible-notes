@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-apone3">
+<meta name="app-build" content="2026-11-06-actsimple">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4773,6 +4773,13 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 .aprog .apbar i{display:block;border-radius:3px}
 .aprog .apn{flex:0 0 auto;font-size:13px;font-weight:400;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 .aprog .apgo{flex:0 0 auto;box-sizing:border-box;width:9px;height:9px;margin:0 3px 0 -2px;border:solid var(--sky);border-width:2px 2px 0 0;transform:rotate(45deg)}
+/* 카드 실천 칸 더 심플하게: 글자는 한 색, 손잡이·화살표는 흐리게, '+ 실천'과 '모두 접기'는 한 줄 (2026-11-06 사용자 요청) */
+.pane[data-pane="a"] .atools{margin:-34px 0 4px;position:relative;pointer-events:none}
+.pane[data-pane="a"] .afoldall{pointer-events:auto;color:var(--muted);font-weight:400}
+.act:not(.done) textarea.at{color:var(--ink)}
+.act .chk{width:22px;height:22px;margin-top:0;border-width:1.5px}
+.agrip{opacity:.5}
+.afold{color:var(--muted)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -9177,11 +9184,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var fb=d.querySelector(".afold"); if(fb){fb.hidden=!named; fb.setAttribute("aria-expanded",String(!fold)); fb.setAttribute("aria-label",fold?"체크표 펼치기":"체크표 접기")}
     var sm=d.querySelector(".asum");
     if(sm){
-      sm.hidden=!fold;
-      if(fold){
+      sm.hidden=!fold||(!n&&!a.logs.length);   // 아직 한 번도 안 했으면 아래 줄 없이 (2026-11-06 사용자 요청)
+      if(fold&&!sm.hidden){
         var lc=a.logs.length?" · 한 줄 "+a.logs.length:"";
-        sm.innerHTML=""; sm.appendChild(document.createTextNode((n>=goal?"🎉 "+goal+"일 완주":n+" / "+goal+"일")+(st>=2&&n<goal?" · 🔥 "+st+"일 연속":"")+lc+" · "));
-        var ok=document.createElement("span"); if(todayDone)ok.className="aok"; ok.textContent=n>=goal?"펼쳐 보기":(todayDone?"오늘 체크함 ✓":"오늘 아직"); sm.appendChild(ok);
+        sm.innerHTML=""; sm.appendChild(document.createTextNode((n>=goal?"🎉 "+goal+"일 완주":n+" / "+goal+"일")+(st>=2&&n<goal?" · 🔥 "+st+"일":"")+lc));
+        if(todayDone&&n<goal){var ok=document.createElement("span"); ok.className="aok"; ok.textContent=" · 오늘 ✓"; sm.appendChild(ok)}
         sm.setAttribute("aria-label","접힌 체크표: "+sm.textContent+". 눌러서 펼치기");
       }
     }
