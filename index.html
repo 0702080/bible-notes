@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-tm3d">
+<meta name="app-build" content="2026-11-05-glass2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4708,6 +4708,11 @@ body.reorder .ref .lclisten{display:none}
   body.boardon .todaymini .tmchip:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)!important}
   body.boardon .todaymini{padding-bottom:6px!important}
 }
+/* 오늘 카드·칸반 칸도 앱 배경 이미지가 살짝 비치게 (2026-11-05 사용자 요청) */
+.reviewbar{background:color-mix(in srgb,color-mix(in srgb,var(--gold) 7%,#101013) 84%,transparent)}
+.tdstep{background:color-mix(in srgb,color-mix(in srgb,var(--gold) 14%,#141318) 72%,transparent)}
+.bcol.btint,.bcol.btint.bcust{background:color-mix(in srgb,color-mix(in srgb,var(--bc) 16%,#24222B) 80%,transparent)!important}
+.bcol.bcust:not(.btint){background:color-mix(in srgb,color-mix(in srgb,var(--gold) 4%,#272530) 80%,transparent)!important}
 /* 찾기 칸의 하루 제외·말씀만 */
 .bfscope{border:1px solid #4A4953!important;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.22) 100%)!important;color:#E8E5EE;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 5px rgba(0,0,0,.34);transition:transform .08s,box-shadow .08s}
 .bfchips .bfscope:active{transform:translateY(1px);box-shadow:inset 0 2px 3px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)}
@@ -18070,19 +18075,40 @@ body.reorder .ref .lclisten{display:none}
     var cdp=pb.closest(".bcard"), np=cdp&&notes.get(cdp.dataset.id); if(!np)return;
     np.pinned=!np.pinned; np.pinnedAt=np.pinned?Date.now():0; scheduleSave(np.id); render(); buzz(10); toast(np.pinned?"맨 위에 고정했어요":"고정을 풀었어요");
   },true);
-  // 📌 고정한 카드는 칸을 굴려도 맨 위에 붙어 늘 보임 (2026-11-04 사용자 요청). 칸 높이의 절반까지만 — 넘치면 나머지는 평소처럼 굴러감
+  // 📌 고정한 카드는 칸을 굴려도 맨 위에 붙어 늘 보임 (2026-11-04 사용자 요청)
+  // 다음 고정 카드가 앞 카드 위에 겹쳐 붙어 틈이 없음 — 지나가는 카드가 틈으로 안 비침. 칸 높이 절반 안에 다 들어가면 온전히 쌓고,
+  // 많으면 지갑처럼 앞 카드들은 구절 이름 줄만 남기고 겹침(칸의 65%까지, 넘는 고정 카드는 평소처럼 굴러감) (2026-11-05 사용자 요청)
   function kbStick(){
     if(!boardOn)return;
     Array.prototype.forEach.call($("board").querySelectorAll(".bclist"),function(ls){
-      var y=0, max=ls.clientHeight*0.5, z=30;
-      Array.prototype.forEach.call(ls.querySelectorAll(".bcard"),function(c){
-        var on=!!c.querySelector(".bcpin.on"), fit=on&&y+c.offsetHeight<=max;
+      var cards=Array.prototype.slice.call(ls.querySelectorAll(".bcard")), H=ls.clientHeight, total=0;
+      var isPin=function(c){return !!c.querySelector(".bcpin.on")};
+      cards.forEach(function(c){if(isPin(c))total+=c.offsetHeight-12});
+      var wallet=total+12>H*0.5, max=H*(wallet?0.65:0.5), y=0, z=30;
+      cards.forEach(function(c){
+        var h=c.offsetHeight, fit=isPin(c)&&y+h<=max;
         c.classList.toggle("bcstick",fit);
-        if(fit){c.style.top=y+"px"; c.style.zIndex=String(z--); y+=c.offsetHeight+8}else{c.style.top=""; c.style.zIndex=""}
+        if(fit){
+          c.style.top=y+"px"; c.style.zIndex=String(z++);
+          var rf=c.querySelector(".bcref");
+          y+=wallet?(rf?rf.offsetTop+rf.offsetHeight+7:36):h-12;
+        }else{c.style.top=""; c.style.zIndex=""; c.style.clipPath=""}
       });
+      kbClip(ls);
     });
   }
-  (function(){var t=0, go=function(){clearTimeout(t); t=setTimeout(kbStick,60)}; new MutationObserver(go).observe($("board"),{childList:true}); window.addEventListener("resize",go)})();
+  // 겹쳐 붙은 카드: 앞 카드가 뒤 카드보다 길어도 아래로 삐져나오지 않게 뒤 카드에 덮인 만큼 잘라 냄
+  function kbClip(ls){
+    var st=ls.querySelectorAll(".bcard.bcstick");
+    Array.prototype.forEach.call(st,function(c,i){
+      var nx=st[i+1];
+      if(!nx){c.style.clipPath="";return}
+      var cut=c.getBoundingClientRect().bottom-nx.getBoundingClientRect().top-14;
+      c.style.clipPath=cut>0?"inset(-8px -8px "+Math.round(cut)+"px -8px)":"";
+    });
+  }
+  $("board").addEventListener("scroll",function(e){var t=e.target; if(t&&t.classList&&t.classList.contains("bclist"))kbClip(t)},{capture:true,passive:true});
+  (function(){var t=0, go=function(){clearTimeout(t); t=setTimeout(kbStick,60)}; new MutationObserver(go).observe($("board"),{childList:true,subtree:true}); window.addEventListener("resize",go); try{document.fonts.ready.then(go)}catch(e){}})();
   var colDrag=null;   // 칸 머리를 끌어 칸 순서 바꾸기
   $("board").addEventListener("dragstart",function(e){
     var hd=e.target.closest&&e.target.closest(".bch");
