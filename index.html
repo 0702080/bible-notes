@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-gaphold">
+<meta name="app-build" content="2026-11-06-ldcomma2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -11367,6 +11367,19 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       ld.querySelector(".ldclose").addEventListener("click",closeLedger);
       ld.addEventListener("click",ldClick);
       ld.addEventListener("focusout",function(e){if(e.target.classList.contains("ldna")||e.target.classList.contains("ldea"))ldAmtFmt(e.target)});
+      // 금액을 적는 동안 천 단위마다 쉼표. 커서는 그 뒤 숫자 개수로 제자리를 찾음 (2026-11-06 사용자 요청)
+      ld.addEventListener("input",function(e){
+        var t=e.target; if(!t.classList.contains("ldna")&&!t.classList.contains("ldea"))return;
+        var after=t.value.slice(t.selectionStart).replace(/[^\d]/g,"").length, d=t.value.replace(/[^\d]/g,"");
+        var v=d?ldFmt(ldNum(d)):"", cn=function(x){return x.split(",").length};
+        if(e.inputType==="deleteContentBackward"&&cn(t.value)<cn(v)){   // 쉼표를 지우면 그 앞 숫자를 지움 (안 그러면 쉼표가 되살아나 지우기가 멈춤)
+          var at=d.length-after; if(at>0){d=d.slice(0,at-1)+d.slice(at); v=d?ldFmt(ldNum(d)):""}
+        }
+        if(v===t.value)return;
+        t.value=v;
+        var pos=v.length; for(var k=after;k>0&&pos>0;pos--){if(/\d/.test(v.charAt(pos-1)))k--}
+        try{t.setSelectionRange(pos,pos)}catch(err){}
+      });
       ld.addEventListener("keydown",function(e){if(e.key==="Enter"&&e.target.classList.contains("ldnt")&&!e.isComposing)ld.querySelector(".ldna").focus()});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ld&&!ld.hidden)closeLedger()});
     }
