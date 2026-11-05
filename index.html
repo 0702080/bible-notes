@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-tabdef">
+<meta name="app-build" content="2026-11-05-prdbar">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3047,7 +3047,7 @@ button:active{filter:brightness(1.15)}
 .prdverse{margin:6px 0 12px;font-size:14px;line-height:1.7;color:var(--muted);white-space:pre-line;word-break:keep-all}
 /* 말씀을 놓고 드린 기도: 말씀도 기도문과 같은 크기·색으로, 보라 줄이 있는 말씀 카드에 (2026-10-21 사용자 요청) */
 .prdword{position:relative;margin:0 0 12px;padding:14px 18px 16px 20px;border-radius:16px;border:1px solid color-mix(in srgb,var(--violet) 30%,#26252B);background:color-mix(in srgb,var(--violet) 13%,#141418);overflow:hidden}
-.prdword::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--violet),color-mix(in srgb,var(--violet) 35%,transparent))}
+.prdword::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(var(--violet),color-mix(in srgb,var(--violet) 35%,transparent))}
 .prdword::after{content:"”";position:absolute;right:16px;bottom:-30px;font-family:Georgia,"Times New Roman",serif;font-size:90px;line-height:1;color:color-mix(in srgb,var(--violet) 16%,transparent);pointer-events:none}
 .prdword .prdref{font-size:13.5px;letter-spacing:.2px}
 .prdword .prdgo{background:color-mix(in srgb,var(--violet) 14%,#1E1D24)}
@@ -3056,7 +3056,7 @@ button:active{filter:brightness(1.15)}
 /* 🃏 말씀 + 그 말씀으로 드린 기도를 한 장의 카드로 (2026-11-01 사용자 요청: 두 장으로 나뉘어 한눈에 안 들어옴)
    위=말씀(연보라 빛), 가는 줄 아래=기도(주황 빛). 왼쪽 띠도 보라→주황으로 한 줄 */
 .prdsec:not(.p1sec){position:relative;margin:0 0 16px;border-radius:18px;border:1px solid color-mix(in srgb,var(--violet) 28%,#2A2930);background:color-mix(in srgb,var(--violet) 12%,#141418);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden}
-.prdsec:not(.p1sec)::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--violet),color-mix(in srgb,var(--violet) 50%,var(--orange)) 45%,var(--orange));z-index:2}
+.prdsec:not(.p1sec)::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:linear-gradient(var(--violet),color-mix(in srgb,var(--violet) 50%,var(--orange)) 45%,var(--orange));z-index:2}
 .prdsec:not(.p1sec) .prdword{margin:0;padding:16px 18px 14px 22px;border:0;border-radius:0;background:transparent}
 .prdsec:not(.p1sec) .prdword::before,.prdsec:not(.p1sec) .prdword::after{display:none}
 .prdsec:not(.p1sec) .prdit{margin:0;padding:14px 18px 16px 22px;border:0;border-radius:0;background:transparent;border-top:1px dashed color-mix(in srgb,var(--orange) 22%,#2A2930)}
@@ -4363,7 +4363,7 @@ body.boardon .fscrow{display:none}
 /* 10 기도 읽기: 말씀 칸은 밝게, 기도문은 어두운 바탕에 저마다 다른 색 */
 .prdsec:not(.p1sec) .prdword{background:color-mix(in srgb,var(--pc) 42%,#23222B)!important}
 .prdsec:not(.p1sec) .prdword .prdverse{color:#fff;font-weight:500}
-.prdsec:not(.p1sec) .prdit.prdcard{background:color-mix(in srgb,var(--ic) 16%,#0C0B0F)!important;border-top:1px solid color-mix(in srgb,var(--ic) 32%,#1E1D23);box-shadow:inset 4px 0 0 var(--ic)}
+.prdsec:not(.p1sec) .prdit.prdcard{background:color-mix(in srgb,var(--ic) 16%,#0C0B0F)!important;border-top:1px solid color-mix(in srgb,var(--ic) 32%,#1E1D23);box-shadow:inset 2px 0 0 var(--ic)}
 .prdsec:not(.p1sec) .prdcard .prdtext{color:color-mix(in srgb,var(--ic) 48%,#fff)}
 .prdsec:not(.p1sec) .prdcard.answered .prdtext{color:#C9C4D2}
 .prdsec:not(.p1sec) .prdcard .prdmeta{color:color-mix(in srgb,var(--ic) 55%,var(--muted))}
