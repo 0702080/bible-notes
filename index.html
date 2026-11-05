@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-pgbar">
+<meta name="app-build" content="2026-11-05-notetint">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3368,6 +3368,8 @@ textarea.lhpad{padding-left:28px!important}
 .saylist{display:flex;flex-direction:column;gap:10px}
 .saycard{--sc:var(--gold);padding:14px 16px;border:1px solid color-mix(in srgb,var(--sc) 18%,#232229);border-left:3px solid color-mix(in srgb,var(--sc) 65%,transparent);border-radius:14px;   /* 왼쪽 모서리도 둥글게 (2026-10-18 사용자 요청) */background:color-mix(in srgb,var(--sc) 9%,#131317)}
 .saythm{padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--sc) 18%,transparent);color:var(--sc);font-size:11.5px}   /* 내용이 비슷한 한 마디는 같은 색 (2026-10-31 사용자 요청) */
+.saycard.saytint{border-color:color-mix(in srgb,var(--sc) 45%,#2A2930);border-left-color:var(--sc);background:linear-gradient(160deg,color-mix(in srgb,var(--sc) 24%,#141418) 0%,color-mix(in srgb,var(--sc) 10%,#141418) 70%)}
+.saycard.saytint .sayf b{color:color-mix(in srgb,var(--sc) 80%,#fff)}
 .saycard{position:relative;padding-left:30px!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .saygrip{position:absolute;left:4px;top:0;bottom:0;width:24px;display:grid;place-items:center;color:var(--faint);font-size:16px;cursor:grab;touch-action:none;opacity:.6}
 .saylist.saysorting .saycard:not(.saydragging){transition:transform .15s}
@@ -4642,6 +4644,21 @@ body.reorder .ref .lclisten{display:none}
 .ldsave{border:0;background:var(--gold);color:#141416;font-weight:700}
 /* ⋯ 메뉴 끌기: 잡은 칸이 떠 보이게 (2026-11-05) */
 .pop>button.mndrag{position:relative;z-index:2;transform:scale(1.03);box-shadow:0 8px 22px rgba(0,0,0,.55);background:color-mix(in srgb,var(--gold) 26%,#1E1D24)!important;outline:1px solid color-mix(in srgb,var(--gold) 65%,transparent)}
+/* 말씀 카드 바탕색을 카드마다 차례로 (휴대폰 목록·PC 칸반). 구절 글자·칩의 주제 색(--tc)은 그대로 (2026-11-05 사용자 요청) */
+#list>.note:nth-child(8n+1),.bcard:nth-child(8n+1){--bc:var(--violet)}
+#list>.note:nth-child(8n+2),.bcard:nth-child(8n+2){--bc:var(--sky)}
+#list>.note:nth-child(8n+3),.bcard:nth-child(8n+3){--bc:var(--green)}
+#list>.note:nth-child(8n+4),.bcard:nth-child(8n+4){--bc:var(--gold)}
+#list>.note:nth-child(8n+5),.bcard:nth-child(8n+5){--bc:var(--pink)}
+#list>.note:nth-child(8n+6),.bcard:nth-child(8n+6){--bc:var(--orange)}
+#list>.note:nth-child(8n+7),.bcard:nth-child(8n+7){--bc:#5FD3C4}
+#list>.note:nth-child(8n+8),.bcard:nth-child(8n+8){--bc:#C9A27A}
+#list>.note{background:linear-gradient(165deg,color-mix(in srgb,var(--bc) 22%,#1A191D) 0%,color-mix(in srgb,var(--bc) 9%,#161518) 100%);border-color:color-mix(in srgb,var(--bc) 40%,#2A282C)}
+#list>.note.open{border-color:color-mix(in srgb,var(--bc) 55%,#2E2C31)}
+#list>.note.open .chead{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 21%,#1A191D) 0%,color-mix(in srgb,var(--bc) 21%,#1A191D) 82%,transparent 100%)}
+#list>.note.open .chead.stuck{background:color-mix(in srgb,var(--bc) 21%,#1A191D)}
+.bcard{background:linear-gradient(165deg,color-mix(in srgb,var(--bc,var(--tc)) 22%,#16151B),color-mix(in srgb,var(--bc,var(--tc)) 9%,#111016));border-color:color-mix(in srgb,var(--bc,var(--tc)) 40%,#2A2930)}
+.bcard.bcstick{background:color-mix(in srgb,var(--bc,var(--tc)) 18%,#16151B)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -14508,11 +14525,11 @@ body.reorder .ref .lclisten{display:none}
       em.textContent=sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 10분마다(00·10·20…분) 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
       list.appendChild(em); return;
     }
-    var hvN=0, SAY_VCOL=["var(--violet)","var(--sky)","var(--green)","var(--gold)","var(--pink)","var(--orange)"];
+    var hvN=0, SAY_VCOL=["var(--violet)","var(--sky)","var(--green)","var(--gold)","var(--pink)","var(--orange)","#5FD3C4","#C9A27A"];
     items.forEach(function(x){
       if(sayEdit===x.id)return;
-      var c=document.createElement("article"); c.className="saycard"; c.dataset.id=x.id; var cth=x.hv?null:sayPaint(c,x);
-      if(x.hv){c.style.setProperty("--sc",SAY_VCOL[hvN%SAY_VCOL.length]); hvN++}   // 📖 짧은 말씀은 카드마다 색이 차례로 (2026-11-01 사용자 요청)
+      var c=document.createElement("article"); c.className="saycard"; c.dataset.id=x.id; var cth=x.hv?null:sayTheme(x);
+      c.style.setProperty("--sc",SAY_VCOL[hvN%SAY_VCOL.length]); hvN++; if(!x.hv)c.classList.add("saytint");   // 목록 카드는 한 마디도 짧은 말씀처럼 카드마다 색이 차례로, 묶음은 이름표로만 (2026-11-05 사용자 요청)
       var gp=document.createElement("span"); gp.className="saygrip"; gp.setAttribute("aria-hidden","true"); gp.title="끌어서 순서 바꾸기"; gp.textContent="⠿"; c.appendChild(gp);
       var q=document.createElement("p"); q.className="sayq"; q.textContent=x.t||""; c.appendChild(q);
       var f=document.createElement("div"); f.className="sayf";
