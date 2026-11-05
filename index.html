@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-hold3">
+<meta name="app-build" content="2026-11-06-hold2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -19179,11 +19179,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(!reorderMode&&!boardOn){var rb0=$("reviewBar"), lr0=el.getBoundingClientRect().top; document.body.classList.add("carddrag"); if(rb0){var dy0=el.getBoundingClientRect().top-lr0; if(dy0)window.scrollBy(0,dy0)}}   // 카드를 끄는 동안 '오늘' 카드 숨김 — 카드가 손가락 아래 그대로 있게 화면을 맞춤 (2026-10-31 사용자 요청)
     if(!reorderMode)setStatus("위아래로 끌어서 옮기세요");
     colDropOpen(el);
-    // 카드를 3초 동안 움직이지 않고 꾹 누르고 있으면 칸 줄을 닫고 순서 바꾸기만 (2026-11-06 사용자 요청)
+    // 카드를 2초 동안 움직이지 않고 꾹 누르고 있으면 칸 줄을 닫고 순서 바꾸기만 (2026-11-06 사용자 요청)
     if(colDrop){var dg=drag; dg.noColT=setTimeout(function(){
       if(drag!==dg||dg.moved||!colDrop)return;
       colDropClose(); dg.el.classList.remove("overdrop"); buzz([30,50,30]); setStatus("칸 목록 없이 순서만 바꿔요");
-    },capEl?3000:2740)}
+    },capEl?2000:1740)}
     if(navigator.vibrate)try{navigator.vibrate(15)}catch(err){}
     cancelAnimationFrame(dragRAF); dragRAF=requestAnimationFrame(autoScroll);
   }
