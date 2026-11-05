@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-colcc">
+<meta name="app-build" content="2026-11-05-sayedit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4759,6 +4759,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 .colbar .cchip.cctint .ccnt{background:rgba(0,0,0,.24)}
 .colbar .cchip.cctint.on{background-color:var(--cc);border-color:var(--cc);color:#141218}
 .colbar .cchip.cctint.on .ccnt{background:rgba(0,0,0,.16)}
+/* 한 마디 고치는 칸: 글 폭·글자·줄 간격을 읽을 때 카드와 똑같이 해서 문장이 같은 자리에서 꺾이게 (2026-11-05 사용자 요청) */
+.sayform{padding:14px 16px 14px 30px;border-left-width:3px}
+.sayform.saylocked{padding-left:16px}
+.sayform .sayt{padding:0;border:0;border-radius:0;background:transparent;font-size:16.5px;line-height:1.8;word-break:keep-all}
+.sayform .sayt:focus{outline:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -14615,7 +14620,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     // 적던 중에 화면이 다시 그려져도(동기화 등) 적던 글은 그대로 (2026-10-25 사용자 요청)
     var keep=null, ft=form.querySelector(".sayt");
     if(ft&&sayEdit&&form.dataset.ed===sayEdit){var q=function(c){var e=form.querySelector(c);return e?e.value:""}; keep={t:ft.value,who:q(".saywho"),topic:q(".saytopic"),note:q(".saynote"),focus:document.activeElement===ft,ss:ft.selectionStart,se:ft.selectionEnd}}
-    form.textContent=""; form.hidden=!sayEdit; form.dataset.ed=sayEdit||"";
+    form.textContent=""; form.hidden=!sayEdit; form.dataset.ed=sayEdit||""; form.classList.toggle("saylocked",sayLocked||!!sayQ);
     if(sayEdit){
       var cur=sayEdit==="new"?{t:"",who:"",topic:"",note:""}:(o.items.filter(function(x){return x.id===sayEdit})[0]||{t:"",who:"",topic:"",note:""});
       if(keep)cur={t:keep.t,who:keep.who,topic:keep.topic,note:keep.note,hv:cur.hv};
