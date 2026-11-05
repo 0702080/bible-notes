@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-notesolid">
+<meta name="app-build" content="2026-11-05-dlgrp">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -639,7 +639,7 @@ h1::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%
 .tbtn{border-color:var(--rule);color:var(--ink);background:rgba(255,255,255,.02)}
 .tbtn[aria-pressed="true"]{border-color:var(--violet);color:var(--violet)}
 .filter{background:var(--sheet);border-color:var(--rule);color:var(--ink)}
-.note{background:linear-gradient(180deg,#1A1A1F 0%,var(--sheet) 100%);border-color:#26252B;
+.note{background:#1A1A1F;border-color:#26252B;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 10px 28px rgba(0,0,0,.45)}
 .note.open{border-color:color-mix(in srgb,var(--violet) 32%,#26252B);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 14px 36px rgba(0,0,0,.55)}
 .note .med,.note .tabs,.note .editbox .field,.note .fbtn{background:#101013}
@@ -1065,7 +1065,7 @@ body.reorder .note .topics{display:none}
 .pgcnt{text-align:right;white-space:nowrap;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 @media (prefers-reduced-motion:reduce){.aprog.bump{animation:none}.apbar i{transition:none}}
 /* ✨ 실천 진도표 다듬기 (2026-11-01 사용자 요청): 위 요약 카드, 2주 달력 칸, 말씀마다 색 카드 + 얇은 막대 + 싹 배지 */
-.pgtop.pghero{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:4px 0 18px;padding:16px 16px 14px;border-radius:18px;border:1px solid color-mix(in srgb,var(--sky) 30%,#2A2933);background:radial-gradient(120% 140% at 0% 0%,color-mix(in srgb,var(--sky) 16%,transparent),transparent 60%),linear-gradient(180deg,#1C1C24,#15151B);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 16px rgba(0,0,0,.35)}
+.pgtop.pghero{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;margin:4px 0 18px;padding:16px 16px 14px;border-radius:18px;border:1px solid color-mix(in srgb,var(--sky) 30%,#2A2933);background:color-mix(in srgb,var(--sky) 12%,#17171E);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 6px 16px rgba(0,0,0,.35)}
 .pghero .pgbig b{font-size:34px;letter-spacing:-.5px;background:linear-gradient(180deg,#BDEBFF,var(--sky));-webkit-background-clip:text;background-clip:text;color:transparent}
 .pghero .pgsub{font-size:13.5px}
 .pghero .pgbig span{font-size:15px}
@@ -1084,7 +1084,7 @@ body.reorder .note .topics{display:none}
 .pgday.lots .pgdot{width:14px;height:14px;background:var(--sky);box-shadow:0 0 8px color-mix(in srgb,var(--sky) 60%,transparent)}
 .pgday.today{outline:1.5px solid color-mix(in srgb,var(--gold) 60%,transparent);outline-offset:-1.5px}
 .pgday.today .pgw{color:var(--gold);font-weight:700}
-.pgrow{--rc:var(--violet);display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:8px;margin:0 0 10px;padding:12px 14px 12px 16px;border:1px solid color-mix(in srgb,var(--rc) 26%,#2A2933);border-radius:16px;background:linear-gradient(180deg,color-mix(in srgb,var(--rc) 9%,#1A1A20),#15151A);position:relative;overflow:hidden}
+.pgrow{--rc:var(--violet);display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:8px;margin:0 0 10px;padding:12px 14px 12px 16px;border:1px solid color-mix(in srgb,var(--rc) 26%,#2A2933);border-radius:16px;background:color-mix(in srgb,var(--rc) 9%,#1A1A20);position:relative;overflow:hidden}
 .pgrow:last-of-type{border-bottom:1px solid color-mix(in srgb,var(--rc) 26%,#2A2933)}
 .pgline{display:flex;align-items:center;gap:10px;min-width:0;width:100%}
 .pgrow .pgref{text-align:left}
@@ -1098,7 +1098,7 @@ body.reorder .note .topics{display:none}
 .pgrow .pgb{width:22px;height:22px;border:1.5px dashed color-mix(in srgb,var(--rc) 30%,#3A3940)}
 .pgrow .pgb.got{border:0;background:radial-gradient(circle at 35% 30%,#FFF1C4,var(--gold) 55%,#C98A1B);background-color:var(--gold);box-shadow:0 0 6px color-mix(in srgb,var(--gold) 40%,transparent);animation:none!important;opacity:1;transform:none}
 @keyframes pgbPop{from{transform:scale(.3)}to{transform:scale(1)}}
-.pgrow.full{border-color:color-mix(in srgb,var(--mint) 40%,#2A2933);background:linear-gradient(180deg,color-mix(in srgb,var(--mint) 12%,#1A1A20),#15151A)}
+.pgrow.full{border-color:color-mix(in srgb,var(--mint) 40%,#2A2933);background:color-mix(in srgb,var(--mint) 12%,#1A1A20)}
 .pgrow.full .pgmini i{background:linear-gradient(180deg,var(--mint),var(--green))}
 .pgrow.full .pgcnt{background:color-mix(in srgb,var(--mint) 18%,#1E1E25);color:var(--mint)}
 .pgrow.full .pgb.got{background:radial-gradient(circle at 35% 30%,#E2FFF6,var(--mint) 55%,var(--green));background-color:var(--mint)}
@@ -1972,7 +1972,7 @@ body.boardon #board.board4{scrollbar-width:auto;scrollbar-color:auto}   /* 가�
 /* 내가 만든 칸 */
 .bcol.bcust{border-color:color-mix(in srgb,var(--gold) 30%,#38343F);background:color-mix(in srgb,var(--gold) 4%,#272530)}
 .bcol.bcust .bch b{color:var(--gold)}
-.bcol.btint,.bcol.btint.bcust{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 16%,#24222B),color-mix(in srgb,var(--bc) 7%,#201E26) 260px);border-color:color-mix(in srgb,var(--bc) 14%,#2B2930)}   /* 테두리는 흐리게 (2026-11-01 사용자 요청) */
+.bcol.btint,.bcol.btint.bcust{background:color-mix(in srgb,var(--bc) 16%,#24222B);border-color:color-mix(in srgb,var(--bc) 14%,#2B2930)}   /* 테두리는 흐리게 (2026-11-01 사용자 요청) */
 .bcol.btint{box-shadow:0 1px 0 rgba(255,255,255,.04) inset,6px 8px 18px rgba(0,0,0,.42),2px 3px 6px rgba(0,0,0,.3)}   /* 살짝 떠 보이는 그림자 (2026-11-01 사용자 요청) */
 .bcol.btint .bch b,.bcol.btint.bcust .bch b{color:var(--bc)}
 .bcol.btint .bch .bce{cursor:pointer;border-radius:8px;padding:2px 3px;margin:-2px -3px}
@@ -1989,7 +1989,7 @@ body.boardon #board.board4{scrollbar-width:auto;scrollbar-color:auto}   /* 가�
 .bcback{display:none}
 .bcol.bback>.bclist,.bcol.bback>.bcjump{display:none}
 .bcol.bback>.bcback{display:flex;flex-direction:column;gap:8px;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:none}
-.bcol.bback{background:linear-gradient(180deg,color-mix(in srgb,var(--bc) 24%,#201E26),color-mix(in srgb,var(--bc) 10%,#1C1A21) 320px)}
+.bcol.bback{background:color-mix(in srgb,var(--bc) 18%,#201E26)}
 .bcflipb{flex:0 0 auto;width:26px;height:26px;padding:0;border:0;border-radius:13px;background:color-mix(in srgb,var(--bc) 16%,transparent);color:var(--bc);display:grid;place-items:center;transition:transform .35s ease,background .15s}
 .bcflipb:hover{background:color-mix(in srgb,var(--bc) 30%,transparent)}
 .bcol.bback .bcflipb{transform:rotate(180deg);background:color-mix(in srgb,var(--bc) 34%,transparent)}
@@ -2615,7 +2615,7 @@ button:active{filter:brightness(1.15)}
 .wkstat b{font-variant-numeric:tabular-nums}
 /* 말씀 카드: 은은한 보라빛 바탕에 라벤더 글씨, 들은 곳은 아이보리, 지금 낱말은 금빛 (2026-10-31 사용자 요청) */
 .wkline{max-width:560px;width:100%;box-sizing:border-box;padding:16px 18px;border-radius:18px;
-  background:linear-gradient(155deg,color-mix(in srgb,var(--violet) 16%,#141219) 0%,#121016 60%,color-mix(in srgb,var(--gold) 6%,#121016) 100%);
+  background:color-mix(in srgb,var(--violet) 16%,#141219);
   border:1px solid color-mix(in srgb,var(--violet) 28%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,var(--violet) 18%,transparent),0 6px 24px rgba(0,0,0,.35);
   font-size:15.5px;font-weight:700;line-height:1.9;color:var(--wkc,var(--orange));word-break:keep-all}
 .wkline.wkcin{animation:wkcIn .45s ease both}@keyframes wkcIn{from{filter:brightness(1.8) blur(1px)}to{filter:none}}   /* 밀 때마다 글자 색 3가지 돌림 (2026-11-01 사용자 요청) */   /* 찐한 오렌지 글씨 (2026-10-31 사용자 요청) */
@@ -2757,7 +2757,7 @@ button:active{filter:brightness(1.15)}
 .hksave{flex:1;height:40px;border:0;border-radius:10px;background:#9FB4FF;color:#141416;font-size:14.5px;font-weight:700}
 .hkcancel{height:40px;padding:0 16px;border:1px solid var(--rule);border-radius:10px;background:transparent;color:var(--muted);font-size:14px}
 /* ===== 암송 게임판: refined ===== */
-.dboard{margin:12px 0 4px;padding:14px 14px 12px;border-radius:16px;background:linear-gradient(180deg,#17161c,#121115);border:1px solid #26252c;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+.dboard{margin:12px 0 4px;padding:14px 14px 12px;border-radius:16px;background:#17161c;border:1px solid #26252c;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
 .dhd{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .dtitle{display:flex;align-items:center;gap:8px}
 .dicon{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;font-size:15px;background:color-mix(in srgb,var(--orange) 16%,transparent)}
@@ -2767,7 +2767,7 @@ button:active{filter:brightness(1.15)}
 .dnum span{font-size:12px;color:var(--muted)}
 .dmrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
 .dmed{display:flex;align-items:center;justify-content:center;gap:5px;height:30px;border-radius:15px;border:1px solid #2a2930;background:#141318;filter:grayscale(1);opacity:.45}
-.dmed.got{filter:none;opacity:1;border-color:color-mix(in srgb,var(--gold) 45%,#2a2930);background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 16%,#18171c),#141318)}
+.dmed.got{filter:none;opacity:1;border-color:color-mix(in srgb,var(--gold) 45%,#2a2930);background:color-mix(in srgb,var(--gold) 16%,#18171c)}
 .dme{font-size:14px;line-height:1}
 .dmt{font-size:11.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
 .dmed.got .dmt{color:var(--gold)}
@@ -2921,7 +2921,7 @@ button:active{filter:brightness(1.15)}
 .mbe{font-size:28px;line-height:1.1;filter:grayscale(1);opacity:.35}
 .mbt{font-size:12.5px;font-weight:700;color:var(--muted)}
 .mbd{font-size:10.5px;color:var(--faint);line-height:1.4}
-.mbcell.got{border-color:color-mix(in srgb,var(--gold) 45%,#26252c);background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 10%,#16151a),#141318)}
+.mbcell.got{border-color:color-mix(in srgb,var(--gold) 45%,#26252c);background:color-mix(in srgb,var(--gold) 10%,#16151a)}
 .mbcell.got .mbe{filter:none;opacity:1}
 .mbcell.got .mbt{color:var(--gold)}
 .mbcell.got .mbd{color:var(--green)}
@@ -2962,8 +2962,8 @@ button:active{filter:brightness(1.15)}
 .tdbig.done .tbt,.tdbig.done .tbgo{color:var(--green)}
 .tdbig.done .tbbar i{background:var(--green)}
 .reviewbar.fold .tdbig{display:none}
-.tdstep{display:flex;flex-direction:column;gap:6px;width:100%;box-sizing:border-box;min-width:0;margin:4px 0 2px;padding:10px 12px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--gold) 55%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--gold) 14%,#141318),#111014)}
-.tdstep.alldone{border-color:color-mix(in srgb,var(--green) 65%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--green) 14%,#141318),#111014);box-shadow:0 0 18px color-mix(in srgb,var(--green) 18%,transparent)}
+.tdstep{display:flex;flex-direction:column;gap:6px;width:100%;box-sizing:border-box;min-width:0;margin:4px 0 2px;padding:10px 12px;border-radius:14px;border:1.5px solid color-mix(in srgb,var(--gold) 55%,transparent);background:color-mix(in srgb,var(--gold) 14%,#141318)}
+.tdstep.alldone{border-color:color-mix(in srgb,var(--green) 65%,transparent);background:color-mix(in srgb,var(--green) 14%,#141318);box-shadow:0 0 18px color-mix(in srgb,var(--green) 18%,transparent)}
 .tsh{display:flex;align-items:baseline;gap:8px}
 .tsh b{font-size:14.5px;color:var(--gold)}
 .tdstep.alldone .tsh b{color:var(--green)}
@@ -3046,7 +3046,7 @@ button:active{filter:brightness(1.15)}
 .prdgo{margin-left:auto;height:28px;padding:0 12px;border:0;border-radius:14px;background:#1E1D24;color:#D9D5E0;font-size:12.5px;white-space:nowrap}
 .prdverse{margin:6px 0 12px;font-size:14px;line-height:1.7;color:var(--muted);white-space:pre-line;word-break:keep-all}
 /* 말씀을 놓고 드린 기도: 말씀도 기도문과 같은 크기·색으로, 보라 줄이 있는 말씀 카드에 (2026-10-21 사용자 요청) */
-.prdword{position:relative;margin:0 0 12px;padding:14px 18px 16px 20px;border-radius:16px;border:1px solid color-mix(in srgb,var(--violet) 30%,#26252B);background:linear-gradient(150deg,color-mix(in srgb,var(--violet) 13%,#141418),#141418 70%);overflow:hidden}
+.prdword{position:relative;margin:0 0 12px;padding:14px 18px 16px 20px;border-radius:16px;border:1px solid color-mix(in srgb,var(--violet) 30%,#26252B);background:color-mix(in srgb,var(--violet) 13%,#141418);overflow:hidden}
 .prdword::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--violet),color-mix(in srgb,var(--violet) 35%,transparent))}
 .prdword::after{content:"”";position:absolute;right:16px;bottom:-30px;font-family:Georgia,"Times New Roman",serif;font-size:90px;line-height:1;color:color-mix(in srgb,var(--violet) 16%,transparent);pointer-events:none}
 .prdword .prdref{font-size:13.5px;letter-spacing:.2px}
@@ -3055,7 +3055,7 @@ button:active{filter:brightness(1.15)}
 .prdit{margin:0 0 12px;padding:16px 18px;border-radius:16px;background:#141418;border:1px solid #26252B}
 /* 🃏 말씀 + 그 말씀으로 드린 기도를 한 장의 카드로 (2026-11-01 사용자 요청: 두 장으로 나뉘어 한눈에 안 들어옴)
    위=말씀(연보라 빛), 가는 줄 아래=기도(주황 빛). 왼쪽 띠도 보라→주황으로 한 줄 */
-.prdsec:not(.p1sec){position:relative;margin:0 0 16px;border-radius:18px;border:1px solid color-mix(in srgb,var(--violet) 28%,#2A2930);background:linear-gradient(180deg,color-mix(in srgb,var(--violet) 12%,#141418) 0%,#141418 38%,color-mix(in srgb,var(--orange) 6%,#141418) 100%);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden}
+.prdsec:not(.p1sec){position:relative;margin:0 0 16px;border-radius:18px;border:1px solid color-mix(in srgb,var(--violet) 28%,#2A2930);background:color-mix(in srgb,var(--violet) 12%,#141418);box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden}
 .prdsec:not(.p1sec)::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(var(--violet),color-mix(in srgb,var(--violet) 50%,var(--orange)) 45%,var(--orange));z-index:2}
 .prdsec:not(.p1sec) .prdword{margin:0;padding:16px 18px 14px 22px;border:0;border-radius:0;background:transparent}
 .prdsec:not(.p1sec) .prdword::before,.prdsec:not(.p1sec) .prdword::after{display:none}
@@ -3064,7 +3064,7 @@ button:active{filter:brightness(1.15)}
 .prdsec:not(.p1sec) .prdit .prdmeta::before{content:"🙏 ";}
 .prdsec.fold:not(.p1sec){margin-bottom:12px}
 /* 🎨 기도 읽기 카드마다 색: 보라·하늘·초록·금·분홍·주황 차례로 (2026-11-01 사용자 요청) */
-.prdsec:not(.p1sec){--pc:var(--violet);border-color:color-mix(in srgb,var(--pc) 45%,#2A2930)!important;background:linear-gradient(160deg,color-mix(in srgb,var(--pc) 24%,#141418) 0%,color-mix(in srgb,var(--pc) 12%,#141418) 55%,color-mix(in srgb,var(--pc) 7%,#121216) 100%)!important;box-shadow:0 6px 18px rgba(0,0,0,.35),inset 0 1px 0 color-mix(in srgb,var(--pc) 25%,transparent)!important}
+.prdsec:not(.p1sec){--pc:var(--violet);border-color:color-mix(in srgb,var(--pc) 45%,#2A2930)!important;background:color-mix(in srgb,var(--pc) 18%,#141418)!important;box-shadow:0 6px 18px rgba(0,0,0,.35),inset 0 1px 0 color-mix(in srgb,var(--pc) 25%,transparent)!important}
 .prdlist>.prdsec:not(.p1sec):nth-child(6n+1){--pc:var(--violet)}
 .prdlist>.prdsec:not(.p1sec):nth-child(6n+2){--pc:var(--sky)}
 .prdlist>.prdsec:not(.p1sec):nth-child(6n+3){--pc:var(--green)}
@@ -3078,7 +3078,7 @@ button:active{filter:brightness(1.15)}
 .prdsec:not(.p1sec) .prdit.answered .prdtext{color:#C9C4D2}
 .prdsec:not(.p1sec) .prdword+.prdit{border-top-color:color-mix(in srgb,var(--pc) 30%,#2A2930)}
 /* 아래 기도문 칸은 말씀 칸보다 살짝 어둡고 따뜻한 바탕 (2026-11-01 사용자 요청) */
-.prdsec:not(.p1sec) .prdit{background:linear-gradient(180deg,rgba(0,0,0,.22),rgba(0,0,0,.14)),color-mix(in srgb,var(--orange) 4%,transparent)!important}
+.prdsec:not(.p1sec) .prdit{background:linear-gradient(rgba(0,0,0,.18),rgba(0,0,0,.18)),color-mix(in srgb,var(--orange) 4%,transparent)!important}
 .prdsec:not(.p1sec) .prdit{border-top-color:color-mix(in srgb,var(--pc) 22%,#2A2930)}
 .prdsec:not(.p1sec) .prdfold{background-color:color-mix(in srgb,var(--pc) 28%,#2A2933)!important;color:color-mix(in srgb,var(--pc) 70%,#fff)}
 .prdmeta{font-size:12px;color:var(--faint)}
@@ -3207,7 +3207,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind,body.soloon #co
 .mqa{width:100%;box-sizing:border-box;min-height:60px;padding:10px 12px;border:1px solid #2A2930;border-radius:10px;background:var(--sheet);color:var(--ink);font-family:inherit;font-size:14.5px;line-height:1.7;resize:none;overflow:hidden}
 .mqa:focus{outline:none;border-color:var(--gold)}
 /* 묵상 질문 카드마다 다른 바탕색 (2026-11-01 사용자 요청) */
-.mqitem{--mc:var(--gold);border-color:color-mix(in srgb,var(--mc) 32%,#232229);background:radial-gradient(120% 80% at 0% 0%,color-mix(in srgb,var(--mc) 13%,transparent),transparent 65%),color-mix(in srgb,var(--mc) 5%,#121216)}
+.mqitem{--mc:var(--gold);border-color:color-mix(in srgb,var(--mc) 32%,#232229);background:color-mix(in srgb,var(--mc) 12%,#121216)}
 .mqitem .mqa{background:color-mix(in srgb,var(--mc) 4%,var(--sheet));border-color:color-mix(in srgb,var(--mc) 22%,#2A2930)}
 .mqitem .mqa:focus{border-color:var(--mc)}
 .mqitem .mqdone{background:var(--mc)}
@@ -3293,18 +3293,18 @@ textarea.lhpad{padding-left:28px!important}
 .srmfoot textarea:focus{outline:none;border-color:var(--green)}
 .srmfoot .srmlab{display:flex;margin:0 2px}
 /* 🎨 설교 메모 칸마다 은은한 색 바탕 (2026-11-01 사용자 요청: 카드 배경색을 더 예쁘게) */
-.srmform input,.srmform select{background:linear-gradient(160deg,color-mix(in srgb,var(--fc,var(--sky)) 13%,#16161C),color-mix(in srgb,var(--fc,var(--sky)) 5%,#121216));border-color:color-mix(in srgb,var(--fc,var(--sky)) 28%,#2A2930)}
+.srmform input,.srmform select{background:color-mix(in srgb,var(--fc,var(--sky)) 13%,#16161C);border-color:color-mix(in srgb,var(--fc,var(--sky)) 28%,#2A2930)}
 .srmform .srmdate,.srmform .srmwho{--fc:var(--sky)}
 .srmform input.srmtitle{--fc:var(--gold)}
 .srmform .srmrefin,.srmform .srmnote{--fc:var(--orange)}
 .srmform .srmyt{--fc:#E5484D}
 .srmform input:focus,.srmform select:focus{border-color:color-mix(in srgb,var(--fc,var(--sky)) 75%,transparent);box-shadow:0 0 0 3px color-mix(in srgb,var(--fc,var(--sky)) 16%,transparent)}
-.srmlines{background:radial-gradient(120% 70% at 0% 0%,color-mix(in srgb,var(--violet) 15%,transparent),transparent 60%),radial-gradient(110% 70% at 100% 100%,color-mix(in srgb,var(--sky) 11%,transparent),transparent 60%),#141419;border-color:color-mix(in srgb,var(--violet) 26%,#2A2930)}
+.srmlines{background:color-mix(in srgb,var(--violet) 9%,transparent),radial-gradient(110% 70% at 100% 100%,color-mix(in srgb,var(--sky) 11%,transparent),transparent 60%),#141419;border-color:color-mix(in srgb,var(--violet) 26%,#2A2930)}
 .srmlines:focus-within{border-color:color-mix(in srgb,var(--violet) 65%,var(--sky));box-shadow:0 0 0 3px color-mix(in srgb,var(--violet) 14%,transparent)}
 .srmline+.srmline{border-top:1px dashed color-mix(in srgb,var(--violet) 14%,transparent);border-radius:0}
 .srmline:focus-within{background:color-mix(in srgb,var(--violet) 9%,transparent)}
-.srmfoot textarea{background:linear-gradient(160deg,color-mix(in srgb,var(--green) 13%,#16161C),color-mix(in srgb,var(--green) 5%,#121216))}
-.srmcard{background:linear-gradient(150deg,color-mix(in srgb,var(--sky) 11%,#16161C),color-mix(in srgb,var(--violet) 8%,#121216))}
+.srmfoot textarea{background:color-mix(in srgb,var(--green) 13%,#16161C)}
+.srmcard{background:color-mix(in srgb,var(--sky) 11%,#16161C)}
 .srmfoot .srmsaved{margin-left:auto;min-height:0}
 .srmfoot .srmbtns{margin-top:0}
 .srmfoot .srmbtns button{height:38px}
@@ -3513,7 +3513,7 @@ body.carddrag #reviewBar{display:none!important}
 @media (prefers-reduced-motion:reduce){.dlcg.dlcin-l,.dlcg.dlcin-r,.dlcg.dlcin-u,.dlcg.dlcin-d{animation:none}}
 /* PC 달력: 가운데 카드 판, 칸마다 테두리·날짜 왼쪽 위·개수 오른쪽 아래 (2026-10-31 사용자 요청: 너무 이상하다) */
 @media (min-width:900px){
-.daily.dlhascal .dlcal{max-width:540px;margin:6px auto 4px;padding:14px 20px 18px;box-sizing:border-box;border:1px solid #24232A;border-radius:22px;background:radial-gradient(90% 60% at 0% 0%,color-mix(in srgb,var(--gold) 7%,transparent),transparent 70%),#121116;box-shadow:0 12px 32px rgba(0,0,0,.35)}
+.daily.dlhascal .dlcal{max-width:540px;margin:6px auto 4px;padding:14px 20px 18px;box-sizing:border-box;border:1px solid #24232A;border-radius:22px;background:#121116;box-shadow:0 12px 32px rgba(0,0,0,.35)}
 .dlch{margin:0 0 10px}
 .dlcmt{font-size:19px}
 .dlcsum{font-size:13.5px}
@@ -3545,7 +3545,7 @@ body.carddrag #reviewBar{display:none!important}
 .dlc3.dlcin-l{animation:dlcinl .25s ease-out}
 .dlc3.dlcin-r{animation:dlcinr .25s ease-out}
 .dlcmo{padding:12px 12px 14px;border-radius:18px;border:1px solid #1F1E25;background:#0F0E12}
-.dlcmo.sel{border-color:color-mix(in srgb,var(--gold) 40%,#1F1E25);background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 6%,#121116),#0F0E12)}
+.dlcmo.sel{border-color:color-mix(in srgb,var(--gold) 40%,#1F1E25);background:color-mix(in srgb,var(--gold) 6%,#121116)}
 .dlcmh{margin:0 0 8px;text-align:center;font-size:15px;font-weight:800;color:var(--muted);letter-spacing:.01em}
 .dlcmo.sel .dlcmh{color:var(--gold)}
 .dlcmo .dlcdow,.dlcmo .dlcg{gap:4px}
@@ -3659,7 +3659,7 @@ body.carddrag #reviewBar{display:none!important}
 /* 응답 연표 — 역사책 느낌 (2026-10-31 사용자 요청) */
 .anslist::before{width:2px;background:linear-gradient(var(--gold) 0%,color-mix(in srgb,var(--gold) 45%,transparent) 60%,transparent)}
 .ansdot{top:22px;left:-23px;width:10px;height:10px;border:0;background:var(--gold);box-shadow:0 0 0 3px #0B0B0D,0 0 0 5px color-mix(in srgb,var(--gold) 35%,transparent),0 0 14px color-mix(in srgb,var(--gold) 60%,transparent)}
-.ansbox{position:relative;overflow:hidden;padding:16px 18px 12px;border:1px solid color-mix(in srgb,var(--gold) 22%,#2A2930);background:radial-gradient(120% 70% at 0% 0%,color-mix(in srgb,var(--gold) 9%,transparent),transparent 60%),#131216;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.ansbox{position:relative;overflow:hidden;padding:16px 18px 12px;border:1px solid color-mix(in srgb,var(--gold) 22%,#2A2930);background:color-mix(in srgb,var(--gold) 8%,#131216);box-shadow:0 6px 20px rgba(0,0,0,.35)}
 .ansbox::after{content:"“";position:absolute;right:14px;top:44px;font-family:Georgia,serif;font-size:96px;line-height:1;color:color-mix(in srgb,var(--gold) 6%,transparent);pointer-events:none}
 .ansday{display:flex;align-items:baseline;gap:8px}
 .ansdd{font-size:22px;font-weight:800;letter-spacing:-.01em;color:var(--gold)}
@@ -3680,7 +3680,7 @@ body.carddrag #reviewBar{display:none!important}
 .ansit{--ac:var(--gold)}
 .ansdot{background:var(--ac);box-shadow:0 0 0 3px #0B0B0D,0 0 0 4.5px color-mix(in srgb,var(--ac) 40%,transparent),0 0 16px color-mix(in srgb,var(--ac) 55%,transparent)}
 .ansit::before{background:color-mix(in srgb,var(--ac) 80%,transparent)}
-.ansbox{border-color:color-mix(in srgb,var(--ac) 30%,#2A2930);background:radial-gradient(120% 70% at 0% 0%,color-mix(in srgb,var(--ac) 12%,transparent),transparent 60%),#131216}
+.ansbox{border-color:color-mix(in srgb,var(--ac) 30%,#2A2930);background:color-mix(in srgb,var(--ac) 12%,#131216)}
 .ansbox::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;border-radius:0 3px 3px 0;background:var(--ac)}
 .ansbox::after{color:color-mix(in srgb,var(--ac) 10%,transparent)}
 .ansdd{color:var(--ac)}
@@ -3935,7 +3935,7 @@ body.carddrag #reviewBar{display:none!important}
 .dlmemobox.dlfloat{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:301;width:min(820px,calc(100vw - 80px));max-height:88vh;overflow:auto;margin:0;padding:16px 18px;box-sizing:border-box;background:#141318;border-color:color-mix(in srgb,var(--sky) 45%,#2A2930);box-shadow:0 24px 60px rgba(0,0,0,.6);border-radius:16px}
 .dlmemobox textarea.dlessay{min-height:200px;line-height:1.8}
 /* 떠 있는 기록 창: 바깥 판은 하늘빛으로 밝게, 글 칸은 더 어둡게 해서 둘이 또렷이 나뉘게 (2026-10-25 사용자 요청) */
-.dlmemobox.dlfloat{background:linear-gradient(180deg,color-mix(in srgb,var(--sky) 14%,#1D1C25),color-mix(in srgb,var(--sky) 9%,#191820))!important;border-color:color-mix(in srgb,var(--sky) 55%,#2A2930)!important}
+.dlmemobox.dlfloat{background:color-mix(in srgb,var(--sky) 14%,#1D1C25)!important;border-color:color-mix(in srgb,var(--sky) 55%,#2A2930)!important}
 .dlmemobox.dlfloat textarea{background:#0E0D12!important}
 .dlmemobox.dlfloat .dlmemofoot{margin:12px -18px -16px;padding:12px 18px;border-top:1px solid color-mix(in srgb,var(--sky) 30%,#2A2930);border-radius:0 0 16px 16px;background:color-mix(in srgb,var(--sky) 16%,#1A1922)}
 .dlmemobox.dlfloat textarea{min-height:min(52vh,520px);font-size:16px;line-height:1.75}
@@ -4068,10 +4068,10 @@ body.carddrag #reviewBar{display:none!important}
 .ghout{flex:0 0 auto;height:44px;padding:0 14px;border:1px solid var(--rule);border-radius:12px;background:transparent;color:var(--faint);font-size:13px}
 /* 하나님 경외 주제 카드: 은은한 짙은 보라 */
 /* 말씀 카드: 따뜻한 먹색 바탕에 주제 색을 아주 살짝 (주황·금색 말씀 글씨와 잘 어울리게) */
-.note{background:linear-gradient(165deg,color-mix(in srgb,var(--tc,var(--violet)) 7%,#1E1C1F) 0%,#19181B 45%,#161518 100%);
+.note{background:color-mix(in srgb,var(--tc,var(--violet)) 7%,#1E1C1F);
   border-color:color-mix(in srgb,var(--tc,var(--violet)) 20%,#2A282C)}
 .note.open{border-color:color-mix(in srgb,var(--tc,var(--violet)) 34%,#2E2C31);box-shadow:inset 0 1px 0 rgba(255,240,220,.05),0 14px 36px rgba(0,0,0,.5)}
-.note.open .chead{background:linear-gradient(180deg,color-mix(in srgb,var(--tc,var(--violet)) 7%,#1E1C1F) 0%,color-mix(in srgb,var(--tc,var(--violet)) 7%,#1E1C1F) 82%,transparent 100%)}
+.note.open .chead{background:color-mix(in srgb,var(--tc,var(--violet)) 7%,#1E1C1F)}
 .note.open .chead.stuck{background:color-mix(in srgb,var(--tc,var(--violet)) 7%,#1E1C1F)}
 /* 말씀 속 진한 글씨: 짙은 노란색 */
 :root{--boldy:#FFD43B}
@@ -4270,7 +4270,7 @@ body.boardon .todaymini .tmchip:not(.main):not(.done):not(.warn):not(.bad):nth-c
 body.boardon .todaymini .tmchip:not(.main):not(.done):not(.warn):not(.bad){background:linear-gradient(180deg,color-mix(in srgb,var(--tk) 26%,rgba(40,38,50,.55)),color-mix(in srgb,var(--tk) 14%,rgba(24,23,30,.55)));color:color-mix(in srgb,var(--tk) 35%,#fff);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 0 0 1px color-mix(in srgb,var(--tk) 40%,transparent),0 1px 3px rgba(0,0,0,.3)}
 body.boardon .toolbar .tbtn.tadd{background:linear-gradient(180deg,color-mix(in srgb,var(--gold) 32%,rgba(40,38,50,.55)),color-mix(in srgb,var(--gold) 18%,rgba(24,23,30,.6)))!important;color:color-mix(in srgb,var(--gold) 30%,#fff)!important;border:1px solid color-mix(in srgb,var(--gold) 50%,transparent)!important;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 /* 맨 아래 한 마디 줄도 반투명 유리 — 배경 사진이 은은하게 비침 (2026-11-02 사용자 요청) */
-body.boardon .boardsay:not([hidden]){background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02)),rgba(14,13,18,.42)!important;-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border-top:1px solid rgba(255,255,255,.10);box-shadow:0 -6px 18px rgba(0,0,0,.25)}
+body.boardon .boardsay:not([hidden]){background:linear-gradient(rgba(255,255,255,.04),rgba(255,255,255,.04)),rgba(14,13,18,.42)!important;-webkit-backdrop-filter:blur(16px) saturate(140%);backdrop-filter:blur(16px) saturate(140%);border-top:1px solid rgba(255,255,255,.10);box-shadow:0 -6px 18px rgba(0,0,0,.25)}
 /* ⏰ 말씀 알림 창: PC(넓은 화면)에서는 한 줄에 다 들어가게 폭을 넓힘 — 아·침 세로 줄바꿈, 가로 스크롤 없앰 (2026-11-02 사용자 요청) */
 @media (min-width:431px){
   .rmsheet .rmpanel{width:min(440px,calc(100% - 40px))!important;overflow-x:hidden!important}
@@ -4284,7 +4284,7 @@ body.boardon #board.board4::after{content:"";flex:0 0 38px;align-self:stretch}
 body.boardon .todaymini{border:0!important;box-shadow:0 6px 18px rgba(0,0,0,.28)!important}   /* 오늘 단추 묶음 바깥 테두리선 없앰 (2026-11-02 사용자 요청) */
 .dlcal{-webkit-user-select:none;user-select:none}
 .dl3foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;margin-top:4px;padding:8px 4px 2px}
-.dl3done{flex:1 0 100%;text-align:center;padding:10px 12px;border-radius:12px;background:linear-gradient(135deg,color-mix(in srgb,var(--gc,var(--gold)) 22%,transparent),color-mix(in srgb,var(--gold) 14%,transparent));color:color-mix(in srgb,var(--gold) 70%,#fff);font-weight:700;font-size:14px;animation:dl3pop .5s cubic-bezier(.2,1.4,.4,1)}
+.dl3done{flex:1 0 100%;text-align:center;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,var(--gc,var(--gold)) 22%,transparent);color:color-mix(in srgb,var(--gold) 70%,#fff);font-weight:700;font-size:14px;animation:dl3pop .5s cubic-bezier(.2,1.4,.4,1)}
 @keyframes dl3pop{from{transform:scale(.85);opacity:0}}
 .dl3one{height:32px;padding:0 16px;border-radius:16px;border:1px solid color-mix(in srgb,var(--gc,var(--gold)) 60%,transparent);background:color-mix(in srgb,var(--gc,var(--gold)) 18%,transparent);color:color-mix(in srgb,var(--gc,var(--gold)) 70%,#fff);font-family:inherit;font-size:13.5px;font-weight:700}
 .dl3all,.dl3fold{height:30px;padding:0 14px;border-radius:15px;border:1px dashed #3A3944;background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px}
@@ -4341,11 +4341,11 @@ body.boardon .fscrow{display:none}
 .smbody>:nth-child(6n+4){--sc:var(--gold)}
 .smbody>:nth-child(6n+5){--sc:var(--pink)}
 .smbody>:nth-child(6n+6){--sc:var(--orange)}
-.smbody>.smit,.smbody>.smchap,.smbody>.smplay,.smbody>.smtwin{background:linear-gradient(150deg,color-mix(in srgb,var(--sc) 20%,#141418),color-mix(in srgb,var(--sc) 7%,#141418))!important;border:1px solid color-mix(in srgb,var(--sc) 38%,#2A2930)!important;border-radius:14px}
+.smbody>.smit,.smbody>.smchap,.smbody>.smplay,.smbody>.smtwin{background:color-mix(in srgb,var(--sc) 18%,#141418)!important;border:1px solid color-mix(in srgb,var(--sc) 38%,#2A2930)!important;border-radius:14px}
 .smbody>.smit .smref,.smbody>.smchap .smref,.smbody>.smplay .smref{color:color-mix(in srgb,var(--sc) 75%,#fff)}
 .smbody>.smit .smtx{color:color-mix(in srgb,var(--sc) 25%,#F2EEE6)}
 /* 15 설교 메모 카드 색 */
-.srmlist>.srmcard{--sc:var(--sky);background:linear-gradient(150deg,color-mix(in srgb,var(--sc) 18%,#141418),color-mix(in srgb,var(--sc) 6%,#141418))!important;border-color:color-mix(in srgb,var(--sc) 34%,#232229)!important;border-left-color:var(--sc)!important}
+.srmlist>.srmcard{--sc:var(--sky);background:color-mix(in srgb,var(--sc) 18%,#141418)!important;border-color:color-mix(in srgb,var(--sc) 34%,#232229)!important;border-left-color:var(--sc)!important}
 .srmlist>.srmcard:nth-child(6n+2){--sc:var(--gold)}
 .srmlist>.srmcard:nth-child(6n+3){--sc:var(--green)}
 .srmlist>.srmcard:nth-child(6n+4){--sc:var(--pink)}
@@ -4361,9 +4361,9 @@ body.boardon .fscrow{display:none}
 .board4::-webkit-scrollbar-thumb{background:linear-gradient(180deg,rgba(198,247,233,.62) 0%,rgba(127,227,200,.58) 38%,rgba(76,199,166,.55) 72%,rgba(47,159,131,.58) 100%);border-radius:7px;border:1px solid rgba(42,140,115,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -2px 2px rgba(0,60,45,.25)}   /* 살짝 반투명 (2026-11-04 사용자 요청) */
 .board4::-webkit-scrollbar-thumb:hover,.board4::-webkit-scrollbar-thumb:active{background:linear-gradient(180deg,rgba(220,251,241,.68) 0%,rgba(152,237,213,.65) 38%,rgba(95,214,182,.65) 72%,rgba(56,176,146,.68) 100%)}   /* 잡았을 때도 살짝 투명 (2026-11-04 사용자 요청) */
 /* 10 기도 읽기: 말씀 칸은 밝게, 기도문은 어두운 바탕에 저마다 다른 색 */
-.prdsec:not(.p1sec) .prdword{background:linear-gradient(160deg,color-mix(in srgb,var(--pc) 42%,#23222B),color-mix(in srgb,var(--pc) 24%,#1D1C24))!important}
+.prdsec:not(.p1sec) .prdword{background:color-mix(in srgb,var(--pc) 42%,#23222B)!important}
 .prdsec:not(.p1sec) .prdword .prdverse{color:#fff;font-weight:500}
-.prdsec:not(.p1sec) .prdit.prdcard{background:linear-gradient(120deg,color-mix(in srgb,var(--ic) 16%,#0C0B0F),#0C0B0F 75%)!important;border-top:1px solid color-mix(in srgb,var(--ic) 32%,#1E1D23);box-shadow:inset 4px 0 0 var(--ic)}
+.prdsec:not(.p1sec) .prdit.prdcard{background:color-mix(in srgb,var(--ic) 16%,#0C0B0F)!important;border-top:1px solid color-mix(in srgb,var(--ic) 32%,#1E1D23);box-shadow:inset 4px 0 0 var(--ic)}
 .prdsec:not(.p1sec) .prdcard .prdtext{color:color-mix(in srgb,var(--ic) 48%,#fff)}
 .prdsec:not(.p1sec) .prdcard.answered .prdtext{color:#C9C4D2}
 .prdsec:not(.p1sec) .prdcard .prdmeta{color:color-mix(in srgb,var(--ic) 55%,var(--muted))}
@@ -4388,7 +4388,7 @@ body.boardon .fscrow{display:none}
 .wkgapv{flex:0 0 auto;min-width:38px;font-style:normal;font-size:12.5px;color:var(--muted);text-align:right}
 .wkseg button[data-u]{min-width:0;padding-left:8px;padding-right:8px}
 /* 17·18 아침·저녁 */
-.dltime{margin:0 auto 12px;padding:12px 14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--tc0) 40%,#2A2930);background:linear-gradient(135deg,color-mix(in srgb,var(--tc0) 16%,#141418),#141418 70%);--tc0:var(--gold)}
+.dltime{margin:0 auto 12px;padding:12px 14px;border-radius:14px;border:1px solid color-mix(in srgb,var(--tc0) 40%,#2A2930);background:color-mix(in srgb,var(--tc0) 16%,#141418);--tc0:var(--gold)}
 .dltime[hidden]{display:none}
 .dltime.eve{--tc0:var(--violet)}
 .dlttl{display:block;color:color-mix(in srgb,var(--tc0) 70%,#fff);font-size:15px}
@@ -4454,12 +4454,12 @@ body:not(.boardon) .bfwrap{display:none!important}
 .dlitem.icb .dlicrow{padding-right:92px}
 .dlitem.icb.ic2 .dlicrow{padding-right:158px}
 .dlitem.icdone .dlt{opacity:.65}
-.dlic .dlitem .dlicrow{background:linear-gradient(135deg,color-mix(in srgb,var(--gc) 24%,#17161C),color-mix(in srgb,var(--gc) 9%,#141418))!important;border-color:color-mix(in srgb,var(--gc) 42%,#2A2930)!important}
+.dlic .dlitem .dlicrow{background:color-mix(in srgb,var(--gc) 18%,#17161C)!important;border-color:color-mix(in srgb,var(--gc) 42%,#2A2930)!important}
 .dlic .dlitem .dlicopen{border-color:color-mix(in srgb,var(--gc) 50%,transparent);background:color-mix(in srgb,var(--gc) 16%,transparent);color:color-mix(in srgb,var(--gc) 75%,#fff)}
 .dlic .dlicwrap:has(.dlicfull) .dlicfull{border-color:color-mix(in srgb,var(--gc,var(--sky)) 35%,#2A2930)}
 /* 중보기도 명단 카드도 차례로 다른 색 */
 .icp{--ic0:var(--sky)}
-.icbody .icp,.icbody .icp.big{background:linear-gradient(150deg,color-mix(in srgb,var(--ic0) 26%,#15141A),color-mix(in srgb,var(--ic0) 11%,#121116))!important;border-color:color-mix(in srgb,var(--ic0) 45%,#2A2930)!important}
+.icbody .icp,.icbody .icp.big{background:color-mix(in srgb,var(--ic0) 18%,#15141A)!important;border-color:color-mix(in srgb,var(--ic0) 45%,#2A2930)!important}
 .icbody .icp .icname{color:color-mix(in srgb,var(--ic0) 60%,#fff)}
 .icp:nth-of-type(6n+2){--ic0:var(--green)}
 .icp:nth-of-type(6n+3){--ic0:var(--violet)}
@@ -4484,7 +4484,7 @@ body:not(.boardon) .bfwrap{display:none!important}
 .prays>.pri:nth-child(6n+4){--prc:var(--violet)}
 .prays>.pri:nth-child(6n+5){--prc:var(--pink)}
 .prays>.pri:nth-child(6n+6){--prc:var(--gold)}
-.prays>.pri .prv{background:linear-gradient(140deg,color-mix(in srgb,var(--prc) 24%,#15141A),color-mix(in srgb,var(--prc) 9%,#121116));border-color:color-mix(in srgb,var(--prc) 42%,#26252B);box-shadow:inset 2px 0 0 color-mix(in srgb,var(--prc) 75%,transparent)}   /* 왼쪽 색 줄 2px (2026-11-04 사용자 요청) */
+.prays>.pri .prv{background:color-mix(in srgb,var(--prc) 18%,#15141A);border-color:color-mix(in srgb,var(--prc) 42%,#26252B);box-shadow:inset 2px 0 0 color-mix(in srgb,var(--prc) 75%,transparent)}   /* 왼쪽 색 줄 2px (2026-11-04 사용자 요청) */
 .prays>.pri .prvt{color:color-mix(in srgb,var(--prc) 35%,#fff)}
 .prays>.pri.answered .prvt{color:#C9C4D2}
 .prays>.pri .pt{background:color-mix(in srgb,var(--prc) 10%,#101013);border-color:color-mix(in srgb,var(--prc) 40%,#2E2D33);color:color-mix(in srgb,var(--prc) 35%,#fff)}
@@ -4659,6 +4659,18 @@ body.reorder .ref .lclisten{display:none}
 #list>.note.open .chead.stuck{background:color-mix(in srgb,var(--bc) 16%,#18171B)}
 .bcard{background:color-mix(in srgb,var(--bc,var(--tc)) 16%,#18171B);border-color:color-mix(in srgb,var(--bc,var(--tc)) 40%,#2A2930)}
 .bcard.bcstick{background:color-mix(in srgb,var(--bc,var(--tc)) 16%,#18171B)}
+/* 하루 돌아보기 묶음 카드: 묶음마다 다른 색 단색, 그라데이션 없음 (2026-11-05 사용자 요청) */
+.dlgrp:nth-child(8n+1){--gc:var(--green)!important;--gb:var(--green)}
+.dlgrp:nth-child(8n+2){--gc:var(--sky)!important;--gb:var(--sky)}
+.dlgrp:nth-child(8n+3){--gc:var(--violet)!important;--gb:var(--violet)}
+.dlgrp:nth-child(8n+4){--gc:var(--orange)!important;--gb:var(--orange)}
+.dlgrp:nth-child(8n+5){--gc:var(--pink)!important;--gb:var(--pink)}
+.dlgrp:nth-child(8n+6){--gc:var(--gold)!important;--gb:var(--gold)}
+.dlgrp:nth-child(8n+7){--gc:#5FD3C4!important;--gb:#5FD3C4}
+.dlgrp:nth-child(8n+8){--gc:#C9A27A!important;--gb:#C9A27A}
+.dlgrp,.dlgrp.pin{background:color-mix(in srgb,var(--gc,var(--gold)) 16%,#18171B);border-color:color-mix(in srgb,var(--gc,var(--gold)) 40%,#2A282C)}
+.dlgrp .dlgname,.dlgrp .dlgh{color:var(--gb,var(--gc))!important}
+.saytoday{background-image:none!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -14314,7 +14326,7 @@ body.reorder .ref .lclisten{display:none}
   }
   function sayTodayFill(sb,pb,sd,anim){
     if(anim||sd.id!==ST.id)ST.at=Date.now(); ST.id=sd.id;   // 다른 이유로 다시 그려도 시간은 이어서
-    if(!sd.hv)sayPaint(sb,sd); else sb.style.setProperty("--sc","#FFD36B");
+    if(!sd.hv)sayPaint(sb,sd); else{var hvh=0; String(sd.id).split("").forEach(function(ch){hvh=(hvh*31+ch.charCodeAt(0))>>>0}); sb.style.setProperty("--sc",["#B79CF2","#6ECBF4","#6FD09A","#FFD36B","#F48FB6","#F4A45E","#5FD3C4","#C9A27A"][hvh%8])}   // 짧은 말씀도 말씀마다 다른 색 (2026-11-05 사용자 요청)
     sb.textContent="";
     var lb=document.createElement("span"); lb.className="saylbl"; lb.textContent=sd.hv?"짧은 말씀":"오늘의 한 마디"; sb.appendChild(lb);
     var q=document.createElement("span"); q.className="sayq1";
