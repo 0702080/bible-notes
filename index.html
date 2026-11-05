@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-wkquiet">
+<meta name="app-build" content="2026-11-06-boardtint">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4777,6 +4777,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 .pane[data-pane="a"] .atools{margin:-34px 0 4px;position:relative;pointer-events:none}
 .board .bhead,.board .bbody,.board .lbadges{display:none}   /* 21일 체크 칸·목표·배지는 뺌. 체크 기록은 그대로 보관 (2026-11-06 사용자 요청) */
 .board .bfoot{margin-top:8px;padding-top:0;border-top:0}
+.board{background:color-mix(in srgb,var(--violet) 14%,rgba(255,255,255,.05));border-color:color-mix(in srgb,var(--violet) 30%,transparent)}   /* 검정 대신 카드 보라빛에 어울리는 옅은 색 (2026-11-06 사용자 요청) */
+.board .blin{background:rgba(20,16,30,.35)}
+.board .bllist li+li,.board .bllist li:last-child{border-color:rgba(255,255,255,.08)}
 .pane[data-pane="a"] .afoldall{pointer-events:auto;color:var(--muted);font-weight:400}
 .act:not(.done) textarea.at{color:var(--ink)}
 .act .chk{width:22px;height:22px;margin-top:0;border-width:1.5px}
