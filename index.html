@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-pgrow">
+<meta name="app-build" content="2026-11-06-apone3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4766,6 +4766,13 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 /* 실천 진도표: 말씀 칸 전체가 누르는 자리 */
 .pgrow{cursor:pointer;transition:transform .1s}
 .pgrow:active{transform:scale(.985)}
+/* 카드 안 실천 진도표: 상자 없이 한 줄 (2026-11-06 사용자 요청) */
+.aprog{margin:0 0 6px;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.aprog .apall{display:flex;align-items:center;gap:10px;width:100%;height:32px;margin:0;padding:0;border:0;border-radius:0;background:transparent;box-shadow:none;color:var(--sky);text-align:left;-webkit-text-stroke:0}
+.aprog .apbar{flex:1 1 auto;min-width:0;height:6px;border-radius:3px;background:rgba(255,255,255,.14)}
+.aprog .apbar i{display:block;border-radius:3px}
+.aprog .apn{flex:0 0 auto;font-size:13px;font-weight:400;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.aprog .apgo{flex:0 0 auto;box-sizing:border-box;width:9px;height:9px;margin:0 3px 0 -2px;border:solid var(--sky);border-width:2px 2px 0 0;transform:rotate(45deg)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -9326,23 +9333,14 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var box=el.querySelector(".aprog"), st=actStats(n);
     box.hidden=!(st.total&&(st.done||n.acts.some(function(a){return a.stamps&&a.stamps.length})));
     if(box.hidden){box.textContent="";return}
-    var key=st.done+"/"+st.total+"/"+n.acts.reduce(function(s2,a){return s2+(a.stamps?a.stamps.length:0)},0)+"/"+st.doneList.map(function(a){return a.id+(a.doneAt||0)+a.t}).join("|");
+    // 한 줄로 간단하게: 막대 + 2/3 · 체크 2일. 끝낸 실천은 바로 아래 목록에 있어 따로 안 적음, 누르면 전체 진도표 (2026-11-06 사용자 요청)
+    var days=n.acts.reduce(function(s2,a){return s2+(a.stamps?a.stamps.length:0)},0), key=st.done+"/"+st.total+"/"+days;
     if(box.dataset.key===key)return; box.dataset.key=key; box.textContent="";
-    var head=document.createElement("div"); head.className="aphead";
-    head.innerHTML='<span class="apt">실천 진도표</span><span class="apn"></span>';
-    var days=n.acts.reduce(function(s2,a){return s2+(a.stamps?a.stamps.length:0)},0);
-    head.querySelector(".apn").textContent=st.done+" / "+st.total+" 완료  "+st.pct+"%"+(days?"  체크 "+days+"일":"");
-    var bar=document.createElement("div"); bar.className="apbar"; bar.innerHTML='<i></i>'; bar.firstChild.style.width=st.pct+"%";
-    if(st.pct>=100)bar.classList.add("full");
-    var ol=document.createElement("ol"); ol.className="aplist";
-    st.doneList.forEach(function(a){
-      var li=document.createElement("li");
-      var d=document.createElement("span"); d.className="apd"; d.textContent=a.doneAt?dateShort(a.doneAt):"완료";
-      var x=document.createElement("span"); x.className="apx"; x.textContent=a.t.trim();
-      li.appendChild(d); li.appendChild(x); ol.appendChild(li);
-    });
-    var all=document.createElement("button"); all.type="button"; all.className="apall"; all.textContent="전체 실천 진도표 보기";
-    box.appendChild(head); box.appendChild(bar); box.appendChild(ol); box.appendChild(all);
+    var all=document.createElement("button"); all.type="button"; all.className="apall"; all.title="전체 실천 진도표 보기"; all.setAttribute("aria-label","실천 "+st.done+" / "+st.total+" 완료, 전체 실천 진도표 보기");
+    var bar=document.createElement("span"); bar.className="apbar"; bar.innerHTML='<i></i>'; bar.firstChild.style.width=st.pct+"%"; if(st.pct>=100)bar.classList.add("full");
+    var num=document.createElement("span"); num.className="apn"; num.textContent=st.done+"/"+st.total+(days?" · 체크 "+days+"일":"");
+    var go=document.createElement("span"); go.className="apgo";
+    all.appendChild(bar); all.appendChild(num); all.appendChild(go); box.appendChild(all);
   }
   // 실천 배지: 작은 새싹 (실천 하나 = 싹 하나)
   var PGLEAF='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21v-8"/><path d="M12 13C12 8.5 8.6 6 4.5 6.2 4.3 10.4 7.3 13 12 13Z"/><path d="M12 11c0-4.2 3-7 7.5-7 .2 4.6-3 7-7.5 7Z"/></svg>';
