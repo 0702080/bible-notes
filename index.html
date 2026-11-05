@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-05-dl3d">
+<meta name="app-build" content="2026-11-05-tm3d">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4663,11 +4663,11 @@ body.reorder .ref .lclisten{display:none}
 #list>.note:nth-child(8n+6),.bcard:nth-child(8n+6){--bc:var(--orange)}
 #list>.note:nth-child(8n+7),.bcard:nth-child(8n+7){--bc:#5FD3C4}
 #list>.note:nth-child(8n+8),.bcard:nth-child(8n+8){--bc:#C9A27A}
-#list>.note{background:color-mix(in srgb,var(--bc) 16%,#18171B);border-color:color-mix(in srgb,var(--bc) 40%,#2A282C)}
+#list>.note{background:color-mix(in srgb,color-mix(in srgb,var(--bc) 16%,#18171B) 84%,transparent);border-color:color-mix(in srgb,var(--bc) 40%,#2A282C)}
 #list>.note.open{border-color:color-mix(in srgb,var(--bc) 55%,#2E2C31)}
-#list>.note.open .chead{background:color-mix(in srgb,var(--bc) 16%,#18171B)}
+#list>.note.open .chead{background:transparent}
 #list>.note.open .chead.stuck{background:color-mix(in srgb,var(--bc) 16%,#18171B)}
-.bcard{background:color-mix(in srgb,var(--bc,var(--tc)) 16%,#18171B);border-color:color-mix(in srgb,var(--bc,var(--tc)) 40%,#2A2930)}
+.bcard{background:color-mix(in srgb,color-mix(in srgb,var(--bc,var(--tc)) 16%,#18171B) 84%,transparent);border-color:color-mix(in srgb,var(--bc,var(--tc)) 40%,#2A2930)}
 .bcard.bcstick{background:color-mix(in srgb,var(--bc,var(--tc)) 16%,#18171B)}
 /* 하루 돌아보기 묶음 카드: 묶음마다 다른 색 단색, 그라데이션 없음 (2026-11-05 사용자 요청) */
 .dlgrp:nth-child(8n+1){--gc:var(--green)!important;--gb:var(--green)}
@@ -4686,6 +4686,31 @@ body.reorder .ref .lclisten{display:none}
 .dl3all,.dl3fold{background-color:#2A2933!important;border-color:#45434F!important}
 .dl3one:active,.dl3all:active,.dl3fold:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)!important}
 .dl3foot{padding-bottom:8px}
+/* 🧊 오늘 카드의 하루 돌아보기: 입체 단추 (2026-11-05 사용자 요청) */
+.rvchip.tdbig{--tb:var(--violet);margin:8px 0 10px;border:1px solid color-mix(in srgb,var(--tb) 50%,#000)!important;background-color:color-mix(in srgb,var(--tb) 36%,#23222B)!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.22) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.36),inset 0 -2px 0 rgba(0,0,0,.24),0 4px 0 rgba(0,0,0,.42),0 6px 10px rgba(0,0,0,.38)!important;transition:transform .08s,box-shadow .08s}
+.rvchip.tdbig.done{--tb:var(--green)}
+.rvchip.tdbig:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.4)!important}
+.tdbig .tbt,.tdbig.done .tbt,.tdbig .tbgo,.tdbig.done .tbgo{color:color-mix(in srgb,var(--tb) 55%,#fff)}
+.tdbig .tbbar{background:rgba(0,0,0,.34)}
+.tdbig .tbbar i{background:color-mix(in srgb,var(--tb) 70%,#fff)}
+/* 🧊 PC 맨 위 보기·순서 단추: 고른 쪽은 입체 (2026-11-05 사용자 요청) */
+@media (min-width:900px){
+  .viewseg button[aria-pressed="true"]{--vs:var(--violet);border:1px solid color-mix(in srgb,var(--vs) 50%,#000);background-color:color-mix(in srgb,var(--vs) 36%,#23222B)!important;background-image:linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.22) 100%)!important;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -2px 0 rgba(0,0,0,.24),0 3px 0 rgba(0,0,0,.42),0 4px 7px rgba(0,0,0,.38)!important;transition:transform .08s,box-shadow .08s}
+  .bmodeseg button[aria-pressed="true"]{--vs:var(--gold)}
+  .viewseg button[aria-pressed="true"]:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)!important}
+  .viewseg{padding-bottom:6px}
+  /* 하루 돌아보기·복습·묵상·실천·동기화·친구 작은 단추 */
+  body.boardon .todaymini .tmchip{--tmc:var(--tk,var(--sky));border:1px solid color-mix(in srgb,var(--tmc) 45%,#000)!important;background:color-mix(in srgb,var(--tmc) 30%,#23222B) linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.22) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.36),inset 0 -2px 0 rgba(0,0,0,.24),0 3px 0 rgba(0,0,0,.42),0 4px 7px rgba(0,0,0,.36)!important;transition:transform .08s,box-shadow .08s}
+  body.boardon .todaymini .tmchip.main{--tmc:var(--violet)}
+  body.boardon .todaymini .tmchip.done{--tmc:var(--green)}
+  body.boardon .todaymini .tmchip.warn{--tmc:var(--gold)}
+  body.boardon .todaymini .tmchip.bad{--tmc:var(--pink)}
+  body.boardon .todaymini .tmchip:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)!important}
+  body.boardon .todaymini{padding-bottom:6px!important}
+}
+/* 찾기 칸의 하루 제외·말씀만 */
+.bfscope{border:1px solid #4A4953!important;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.22) 100%)!important;color:#E8E5EE;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 5px rgba(0,0,0,.34);transition:transform .08s,box-shadow .08s}
+.bfchips .bfscope:active{transform:translateY(1px);box-shadow:inset 0 2px 3px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.35)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -4713,6 +4738,8 @@ body.reorder .ref .lclisten{display:none}
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
         <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
+        <button type="button" id="rvAllBtn">🔁 오늘 복습</button>
+        <button type="button" id="weekBtn">📅 한 주 돌아보기</button>
         <button type="button" id="openProgBtn">✅ 실천 진도표</button>
         <button type="button" id="openTongdokBtn">📖 성경 통독표</button>
         <button type="button" id="appBgBtn">🖼️ 앱 배경 바꾸기</button>
@@ -15312,22 +15339,8 @@ body.reorder .ref .lclisten{display:none}
     bar.textContent="";
     if(reorderMode||!notes.size){bar.hidden=true;return}
     var all=sorted(), rows=[];
-    // 1) 복습할 말씀
-    var due=dueAll(), dueN=Math.min(DAY_CAP,due.length);
-    if(due.length)rows.push({icon:"🔁",label:"복습할 말씀",tag:due.length>DAY_CAP?"나머지 "+(due.length-DAY_CAP)+"개는 내일":"",chips:[{id:"",t:"▶ 오늘 복습 "+dueN,act:"rvall"}].concat(due.slice(0,dueN).map(function(n){return {id:n.id,t:n.ref,act:"mem"}}))});
-    // 2) 오늘 묵상
-    var st=medStats(), today=dkey(Date.now()), didToday=!!st.days[today];
-    var lastMedNote=null, lastAt=0;
-    all.forEach(function(n){(n.meds||[]).forEach(function(m){if(String(m.text||"").trim()&&(+m.at||0)>lastAt){lastAt=+m.at;lastMedNote=n}})});
-    var target=notes.get(lastOpenId())||lastMedNote||all[0];
-    if(didToday)rows.push({icon:"✨",label:"오늘 묵상",tag:"완료 ✓"+(st.streak>=2?"  ·  🔥 "+st.streak+"일 연속":""),chips:[],done:true});
-    else if(target)rows.push({icon:"✍️",label:"오늘 묵상",tag:st.streak>=1?"쓰면 🔥 "+(st.streak+1)+"일 연속":"",chips:[{id:target.id,t:target.ref,act:"med"}]});
-    // 3) 오늘 실천 (체크표가 있는 실천 중 오늘 아직 안 찍은 것)
-    var acts=[];
-    all.forEach(function(n){(n.acts||[]).forEach(function(a){if(a.t&&a.t.trim()&&!a.done&&(a.stamps||[]).length&&(a.stamps||[]).indexOf(today)<0)acts.push(n)})});
-    var actNotes=acts.filter(function(n,i){return acts.indexOf(n)===i});
-    if(actNotes.length)rows.push({icon:"✅",label:"오늘 실천",chips:actNotes.slice(0,4).map(function(n){return {id:n.id,t:n.ref,act:"act"}})});
-    // 4) 이어서 보기
+    // 복습할 말씀·오늘 묵상·오늘 실천·친구·묵상 질문·한 주 돌아보기·실천 진도표 줄은 뺌 — ⋯ 메뉴에서 열기 (2026-11-05 사용자 요청)
+    // 이어서 보기
     var lo=notes.get(lastOpenId());
     if(lo&&!openIds.has(lo.id)&&!rows.some(function(r){return r.chips.some(function(c){return c.id===lo.id})}))rows.push({icon:"↩️",label:"이어서 보기",chips:[{id:lo.id,t:lo.ref,act:"open"}]});
     // ☁️ 동기화 상태: 이 기기가 GitHub에 올리고 있는지 한눈에
@@ -15338,13 +15351,8 @@ body.reorder .ref .lclisten{display:none}
     else if(gc){var ago=gs.at?Math.round((Date.now()-gs.at)/60000):-1;
       rows.push({icon:"☁️",info:1,label:"동기화",tag:gs.ok===false?"안 됐어요":ghBusy?"맞추는 중…":ago<0?"GitHub 켜짐":ago<1?"방금 맞춤":ago+"분 전 맞춤",bad:gs.ok===false,chips:[{id:"",t:"지금 맞추기",act:"sync"}],done:gs.ok===true})}
     else rows.push({icon:"☁️",info:1,label:"동기화",tag:"꺼짐",chips:[{id:"",t:"로그인",act:"sblogin"}]});
-    if(ss){var fin=(frData&&frData.incoming||[]).length, fct=(frData&&frData.friends||[]).length;
-      rows.push({icon:"👥",info:1,label:"친구",tag:fin?"신청 "+fin+"개 💌":fct?fct+"명":"",chips:[{id:"",t:fin?"확인하기":fct?"친구 보기":"친구 맺기",act:"friends"}]})}
     var dd=dailyData(), dc=dailyChecked(dd,dkey(Date.now())).length, dt=dd.items.length;
     rows.push({icon:"🌙",label:"하루 돌아보기",big:{dc:dc,dt:dt},chips:[],done:dc>0});   // 하나만 해도 오늘 완료 (2026-10-31 사용자 요청)
-    rows.push({icon:"📝",label:"나의 묵상 질문",chips:[{id:"",t:"묻고 답하기",act:"medq"}]});
-    rows.push({icon:"📅",info:1,label:"한 주 돌아보기",chips:[{id:"",t:"이번 주 보기",act:"week"}]});
-    if(all.some(function(n){return (n.acts||[]).some(function(x){return x.t&&x.t.trim()})}))rows.push({icon:"📊",info:1,label:"실천 진도표",chips:[{id:"",t:"전체 보기",act:"prog"}]});
     bar.hidden=!rows.length;
     if(!rows.length)return;
     // 할 일(위)과 상태 보기(아래)로 나눠 한 줄씩: [아이콘] [이름] [상태 · 버튼들]
@@ -15355,7 +15363,6 @@ body.reorder .ref .lclisten{display:none}
     var h=document.createElement("button"); h.type="button"; h.className="tdh";
     h.setAttribute("aria-expanded",folded?"false":"true"); h.setAttribute("aria-label","오늘 카드 "+(folded?"펼치기":"접기"));
     h.innerHTML='<span>오늘</span><span class="tdn"></span><span class="tdgap" aria-hidden="true"></span><span class="tddate"></span><span class="tdchev" aria-hidden="true"></span>';
-    if(folded&&todo.length)h.querySelector(".tdn").textContent="할 일 "+todo.length;
     var nd=new Date(); h.querySelector(".tddate").textContent=(nd.getMonth()+1)+"월 "+nd.getDate()+"일 ("+WD[nd.getDay()]+")";
     var sOnly=tdSayOnly&&!filterText&&!!sayTodayPick();   // 한 마디가 없으면 평소대로
     h.addEventListener("click",function(e){
@@ -19230,6 +19237,8 @@ body.reorder .ref .lclisten{display:none}
   $("medqBtn").addEventListener("click",function(){$("topMenu").open=false;openMedq()});   // 내가 묻고 내가 답하는 묵상 (⋯ 메뉴, 2026-10-25 사용자 요청)
   $("ansBtn").addEventListener("click",function(){$("topMenu").open=false;openAnswers()});
   $("smartBtn").addEventListener("click",function(){$("topMenu").open=false;openSmart()});
+  $("rvAllBtn").addEventListener("click",function(){$("topMenu").open=false;openRecall()});   // 오늘 카드의 복습·한 주 돌아보기 줄을 빼면서 ⋯ 메뉴로 (2026-11-05)
+  $("weekBtn").addEventListener("click",function(){$("topMenu").open=false;openWeek()});
   $("remindBtn").addEventListener("click",function(){$("topMenu").open=false;openRemind()});
   // ⋯ 메뉴 항목을 끌어서 차례 바꾸기 (2026-10-24 사용자 요청): PC는 누른 채 끌기, 휴대폰은 꾹 누른 뒤 끌기. 차례는 이 기기에 기억
   (function(){
