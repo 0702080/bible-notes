@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-blzebra3">
+<meta name="app-build" content="2026-11-06-wordonlyhits">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5928,7 +5928,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   function renderHits(el,n){
     var box=el.querySelector(".hits"); if(!box)return;
     box.textContent="";
-    if(!filterText)return;
+    if(!filterText||findWordOnly)return;   // 말씀만 찾을 때는 묵상·실천 줄을 보이지 않음 (2026-11-06 사용자 요청)
     var found=[];
     n.meds.forEach(function(m){if(found.length<3&&has(m.text))found.push(["묵상",m.text,"g"])});
     n.qs.forEach(function(q){if(found.length<3&&has(q.q))found.push(["질문",q.q,"v"]);if(found.length<3&&has(q.a))found.push(["답",q.a,"b"])});
