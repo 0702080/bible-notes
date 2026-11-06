@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-icansdark">
+<meta name="app-build" content="2026-11-07-stickyfind">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4501,6 +4501,13 @@ body.boardon .fscrow{display:none}
 body:not(.boardon) .bfwrap{display:none!important}
 .filter::-webkit-search-cancel-button{display:none;-webkit-appearance:none}
 .fwrap{position:relative}
+/* 🔍 찾기 칸은 늘 보이고 화면 맨 위에 떠 있음, 🔍 단추는 없앰 (휴대폰, 2026-11-07 사용자 요청) */
+body:not(.boardon) #filterBtn{display:none!important}
+body:not(.boardon) .fwrap{position:sticky;top:0;z-index:40;margin:0 -10px;padding:6px 10px 6px;background:rgba(14,13,18,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:0 0 14px 14px}
+body:not(.boardon) .fwrap .filter{margin:0}
+body:not(.boardon) .fwrap .fx{top:50%;left:16px}
+body:not(.boardon) .note.open .chead{top:52px}
+body:not(.boardon) .solobar{top:54px}
 .fx{position:absolute;left:7px;top:calc(50% + 4px);transform:translateY(-50%);z-index:1;width:30px;height:30px;padding:0;border:0;border-radius:15px;background:#34333A;color:var(--ink);font-size:15px;line-height:30px;text-align:center}
 .fx[hidden]{display:none}
 .filter.has{padding-left:44px}
@@ -4988,7 +4995,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   </div>
   <div class="topicbar" id="topicBar" role="toolbar" aria-label="주제"></div>
   <div class="colbar" id="colBar" role="toolbar" aria-label="칸" hidden></div>
-  <div class="fwrap"><button type="button" class="fx" id="filterX" aria-label="찾기 지우기" title="지우기" hidden>✕</button><input class="filter" id="filter" type="search" placeholder="노트에서 찾기 (초성도 돼요: ㅅㅁ)" aria-label="노트에서 찾기" hidden></div>
+  <div class="fwrap"><button type="button" class="fx" id="filterX" aria-label="찾기 지우기" title="지우기" hidden>✕</button><input class="filter" id="filter" type="search" placeholder="🔍 말씀 찾기 (초성도 돼요: ㅅㅁ)" aria-label="노트에서 찾기"></div>
   <div class="fscrow" id="fScopeRow" hidden><button type="button" class="fsc" aria-pressed="false">📝 내 기록까지 찾기</button><button type="button" class="fsd" aria-pressed="false">🌙 하루 돌아보기 빼기</button></div>
   <div class="reviewbar" id="reviewBar" hidden></div>
   <div class="recentfind" id="recentFind" hidden></div>
@@ -7259,7 +7266,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(typeof reorderMode!=="undefined"&&reorderMode)setReorder(false);
     soloId=null; soloFrom="";
     setBoard(false); setTopics([]); openIds.clear(); spotId=null;
-    var f=$("filter"); if(f){f.value="";f.hidden=true}
+    var f=$("filter"); if(f){f.value="";f.blur()}
     var bf1=$("bFilter"); if(bf1)bf1.value="";
     var fb=$("filterBtn"); if(fb)fb.setAttribute("aria-pressed","false");
     filterText="";
@@ -19744,7 +19751,14 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     exKey=""; fscSync(); render(); toast(findWordOnly?"말씀에서만 찾아요":"내가 적은 기록까지 찾아요");
   });
   fscSync();
-  new MutationObserver(function(){$("fScopeRow").hidden=$("filter").hidden}).observe($("filter"),{attributes:true,attributeFilter:["hidden"]});
+  // 찾기 칸은 늘 맨 위에 떠 있음(2026-11-07 사용자 요청) — '내 기록까지 찾기' 줄은 찾는 중(칸을 눌렀거나 글자가 있을 때)만
+  (function(){var f=$("filter"), r=$("fScopeRow"), t=0;
+    function sy(){r.hidden=f.hidden||!(f.value||document.activeElement===f)}
+    f.addEventListener("focus",function(){clearTimeout(t);sy()}); f.addEventListener("input",sy);
+    f.addEventListener("blur",function(){t=setTimeout(sy,250)});
+    r.addEventListener("pointerdown",function(){clearTimeout(t); setTimeout(function(){clearTimeout(t)},0)});
+    new MutationObserver(sy).observe(f,{attributes:true,attributeFilter:["hidden"]}); sy();
+  })();
   $("filterBtn").addEventListener("click",function(){
     var f=$("filter"), show=f.hidden; f.hidden=!show; this.setAttribute("aria-pressed",String(show));
     if(show)f.focus(); else if(f.value){f.value="";filterText="";var bf2=$("bFilter");if(bf2)bf2.value="";render()}
