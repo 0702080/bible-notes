@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-dailyq">
+<meta name="app-build" content="2026-11-07-notopicfind">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -9132,7 +9132,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(topicSel.some(function(t){return !ts.some(function(x){return x[0]===t})}))setTopics(topicSel.filter(function(t){return ts.some(function(x){return x[0]===t})}));
     if(ts.length){
       var all=document.createElement("button"); all.type="button"; all.className="tchip"+(topicSel.length?"":" on"); all.dataset.topic=""; all.textContent="전체"; bar.appendChild(all);
-      var tq=filterText?qInc:[], firstHit=null;
+      var tq=[], firstHit=null;   // 말씀 찾기는 #주제 줄을 거르거나 펼치지 않음 (2026-11-07 사용자 요청)
       ts.forEach(function(x){
         var hitT=tq.length&&tq.some(function(q){return hit1(x[0],q)});
         if(topicFold&&!selHas(x[0])&&!hitT)return;   // 접혀 있으면 고른 것·찾은 것만
