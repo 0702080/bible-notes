@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-noevesum">
+<meta name="app-build" content="2026-11-06-sayonebtn">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3407,6 +3407,9 @@ textarea.lhpad{padding-left:28px!important}
 .sayrow2{display:flex;gap:8px;flex-wrap:wrap}
 .sayrow2 .field{flex:1 1 150px;min-width:0;height:40px;font-size:14px}
 .saysave{flex:0 0 auto;height:40px;padding:0 18px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:14px;font-weight:700}
+.sayrow2:has(.saydelx){flex-wrap:nowrap}.sayrow2:has(.saydelx)>:first-child{flex:1 1 0;min-width:0}
+.saydelx{padding:0 12px!important;color:var(--pink)!important;border-color:color-mix(in srgb,var(--pink) 45%,#34333A)!important}
+.saydelx.sure{background:color-mix(in srgb,var(--pink) 18%,transparent)!important}
 .saycancel{flex:0 0 auto;height:40px;padding:0 14px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
 .saylist{display:flex;flex-direction:column;gap:10px}
 .saycard{--sc:var(--gold);padding:14px 16px;border:1px solid color-mix(in srgb,var(--sc) 18%,#232229);border-left:3px solid color-mix(in srgb,var(--sc) 65%,transparent);border-radius:14px;   /* 왼쪽 모서리도 둥글게 (2026-10-18 사용자 요청) */background:color-mix(in srgb,var(--sc) 9%,#131317)}
@@ -14943,6 +14946,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       sel.hidden=true; row2.appendChild(sel); row2.appendChild(noteFinder(sel));
       var sv=document.createElement("button"); sv.type="button"; sv.className="saysave"; sv.dataset.act="save"; sv.textContent="저장";
       var cn=document.createElement("button"); cn.type="button"; cn.className="saycancel"; cn.dataset.act="cancel"; cn.textContent="취소";
+      if(sayEdit!=="new"){var dx=document.createElement("button"); dx.type="button"; dx.className="saycancel saydelx"; dx.dataset.act="del"; dx.dataset.id=sayEdit; dx.textContent="🗑"; dx.title="이 한 마디 지우기"; dx.setAttribute("aria-label","지우기"); row2.appendChild(dx)}
       row2.appendChild(cn); row2.appendChild(sv); form.appendChild(row2);
     }
     if(keep&&keep.focus){var nt=form.querySelector(".sayt"); if(nt){try{nt.focus({preventScroll:true}); nt.setSelectionRange(keep.ss,keep.se)}catch(e){}}}
@@ -14982,8 +14986,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
       }
       var ed=document.createElement("button"); ed.type="button"; ed.className="saybtn"; ed.dataset.act="edit"; ed.textContent="고치기";
-      var dl2=document.createElement("button"); dl2.type="button"; dl2.className="saybtn"; dl2.dataset.act="del"; dl2.textContent="지우기";
-      f.appendChild(ed); f.appendChild(dl2);
+      f.appendChild(ed);   // 고치기·지우기를 한 단추로 — 지우기는 고치는 칸 안에 (2026-11-06 사용자 요청)
       c.appendChild(f); list.appendChild(c);
     });
   }
@@ -15100,7 +15103,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   });
   function sayClick(e){
     var b=e.target.closest("button"); if(!b)return;
-    var act=b.dataset.act||"", card=b.closest(".saycard"), id=card?card.dataset.id:"";
+    var act=b.dataset.act||"", card=b.closest(".saycard"), id=card?card.dataset.id:(b.dataset.id||"");
     if(act==="cancel"){sayEdit="";drawSay();return}
     if(act==="hvclear"){e.preventDefault(); var oo=sayData(), xx=oo.items.filter(function(y){return y.id===id})[0]; if(xx){xx.tm="";xx.at=Date.now();saveSay(oo);drawSay();renderReviewBar();toast("10분마다 돌아가며 나와요")} return}
     if(act==="save"){
@@ -15117,8 +15120,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     if(act==="edit"){sayEdit=id;drawSay();var ta=say.querySelector(".sayt");if(ta)setTimeout(function(){ta.focus()},30);return}
     if(act==="del"){
-      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="정말 지울까요?";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="지우기";b.classList.remove("sure")}},3000);return}
-      var o2=sayData(); o2.items=o2.items.filter(function(x){return x.id!==id}); saveSay(o2); drawSay(); renderReviewBar(); toast("지웠어요");
+      if(!b.dataset.sure){var x0=b.classList.contains("saydelx");b.dataset.sure="1";b.textContent=x0?"지울까요?":"한 번 더 누르면 지워요";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent=x0?"🗑":"지우기";b.classList.remove("sure")}},3000);return}
+      var o2=sayData(); o2.items=o2.items.filter(function(x){return x.id!==id}); if(sayEdit===id)sayEdit=""; saveSay(o2); drawSay(); renderReviewBar(); toast("지웠어요");
       return;
     }
     if(act==="note"){closeSay();openNoteFocus(b.dataset.note);return}
