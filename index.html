@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-prayorder">
+<meta name="app-build" content="2026-11-06-thxdel">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6403,7 +6403,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       // 🙏 감사 기도 쪽 (응답된 기도를 옆으로 밀면, 2026-11-06 사용자 요청)
       var thOn=prThx.has(x.id); d.classList.toggle("thxside",thOn); d.querySelector(".pthx").hidden=!thOn;
       setVal(d.querySelector(".pth"),x.th||""); d.querySelector(".pthxd").textContent=x.ans?"응답 "+dlabel(dkey(x.ans)):"";
-      d.classList.toggle("hasthx",!!(x.th||"").trim()); var hasTh=!!(x.th||"").trim();
+      d.classList.toggle("hasthx",!!(x.th||"").trim());
+      var pdb=d.querySelector(".pdel"); if(pdb&&!pdb.dataset.sure){pdb.textContent=thOn?"감사 지우기":"지우기"; pdb.hidden=thOn&&!(x.th||"").trim(); pdb.title=thOn?"감사 기도만 지워요 (앞면 기도문은 그대로)":"이 기도를 통째로 지워요"} var hasTh=!!(x.th||"").trim();
       d.querySelector(".pthxask").hidden=!!x.ans||hasTh;   // 적어 둔 감사 기도가 있으면 응답 표시를 풀었어도 그대로 보임 (2026-11-06)
       var thEd=thxEdit.has(x.id)||!hasTh, thv=d.querySelector(".pthv");   // 다 적은 감사 기도는 앞면 기도문처럼 읽는 글로, 두 번 누르면 고치기
       thv.textContent=x.th||""; thv.hidden=thEd; d.querySelector(".pth").hidden=!thEd||(!x.ans&&!hasTh);
@@ -8274,7 +8275,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         if(px.ans){toast("🙌 기도 응답을 기록했어요"); buzz([12,40,18]); var ac=cards.get(id), ae=ac&&ac.querySelector('.pri[data-pid="'+pid+'"]'); if(ae){confetti(ae);var at=ae.querySelector(".pan");if(at)setTimeout(function(){at.focus()},60)}}
         return;
       }
-      if(!b.dataset.sure){b.dataset.sure="1";b.textContent="지울까요?";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent="지우기"}},4000);return}
+      var thSide=b.closest(".pri").classList.contains("thxside");   // 감사 기도 쪽에서는 감사 기도만 지움 (2026-11-06 사용자 요청)
+      if(!b.dataset.sure){b.dataset.sure="1";b.textContent=thSide?"감사 기도 지울까요?":"기도 전체 지울까요?";setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent=thSide?"감사 지우기":"지우기"}},4000);return}
+      delete b.dataset.sure;
+      if(thSide){px.th=""; thxEdit.delete(pid); render(); scheduleSave(id); toast("감사 기도를 지웠어요"); return}
       subFilter(n,"prays",function(x){return x.id!==pid}); render(); scheduleSave(id); return;
     }
     if(b.classList.contains("addm")){
