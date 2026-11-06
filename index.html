@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-thxview">
+<meta name="app-build" content="2026-11-06-thxkeep">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -355,7 +355,7 @@ body.boardon .toolbar{border-bottom:0}   /* PC 칸반: 맨 위 단추 줄 아래
 .pthx .pthv{margin:0;padding:12px 14px;border-radius:12px;background:rgba(0,0,0,.22);border:1px solid color-mix(in srgb,var(--gold) 30%,#2E2A20);font-size:17px;line-height:1.8;color:#F4E7C6;white-space:pre-line;word-break:keep-all;-webkit-user-select:none;user-select:none;cursor:pointer;touch-action:pan-y}
 .pthv[hidden]{display:none!important}
 .pthxtip{margin:6px 2px 0;font-size:11.5px;color:color-mix(in srgb,var(--gold) 45%,#7A766E)}
-.pri.answered.hasthx:not(.thxside) .prv::after{content:"🙏 감사 기도 있음 · 옆으로 밀기";display:block;margin-top:8px;font-size:11.5px;color:var(--gold);opacity:.8}
+.pri.hasthx:not(.thxside) .prv::after{content:"🙏 감사 기도 있음 · 옆으로 밀기";display:block;margin-top:8px;font-size:11.5px;color:var(--gold);opacity:.8}
 .pri.answered:not(.hasthx):not(.thxside) .prv::after{content:"옆으로 밀어 감사 기도 적기 →";display:block;margin-top:8px;font-size:11.5px;color:var(--gold);opacity:.6}
 @keyframes prSlL{from{transform:translateX(40px);opacity:.3}to{transform:none;opacity:1}}
 @keyframes prSlR{from{transform:translateX(-40px);opacity:.3}to{transform:none;opacity:1}}
@@ -6403,9 +6403,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       // 🙏 감사 기도 쪽 (응답된 기도를 옆으로 밀면, 2026-11-06 사용자 요청)
       var thOn=prThx.has(x.id); d.classList.toggle("thxside",thOn); d.querySelector(".pthx").hidden=!thOn;
       setVal(d.querySelector(".pth"),x.th||""); d.querySelector(".pthxd").textContent=x.ans?"응답 "+dlabel(dkey(x.ans)):"";
-      d.classList.toggle("hasthx",!!(x.th||"").trim()); d.querySelector(".pthxask").hidden=!!x.ans;
-      var thEd=thxEdit.has(x.id)||!(x.th||"").trim(), thv=d.querySelector(".pthv");   // 다 적은 감사 기도는 앞면 기도문처럼 읽는 글로, 두 번 누르면 고치기
-      thv.textContent=x.th||""; thv.hidden=!x.ans||thEd; d.querySelector(".pth").hidden=!x.ans||!thEd;
+      d.classList.toggle("hasthx",!!(x.th||"").trim()); var hasTh=!!(x.th||"").trim();
+      d.querySelector(".pthxask").hidden=!!x.ans||hasTh;   // 적어 둔 감사 기도가 있으면 응답 표시를 풀었어도 그대로 보임 (2026-11-06)
+      var thEd=thxEdit.has(x.id)||!hasTh, thv=d.querySelector(".pthv");   // 다 적은 감사 기도는 앞면 기도문처럼 읽는 글로, 두 번 누르면 고치기
+      thv.textContent=x.th||""; thv.hidden=thEd; d.querySelector(".pth").hidden=!thEd||(!x.ans&&!hasTh);
       // 기본은 읽기, 두 번 누르면 고치기
       var ed=prEdit.has(x.id); d.classList.toggle("editing",ed);
       var ptx=d.querySelector(".pt"); if(ed&&!x.t.trim()&&!ptx.value.trim()&&document.activeElement!==ptx)ptx.value=PRAY_TPL;   // 고치는 중인 빈 기도도 기도문 틀로 (적어야 저장)
