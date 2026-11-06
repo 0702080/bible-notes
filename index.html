@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-nosametopic">
+<meta name="app-build" content="2026-11-06-tphide">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -972,6 +972,8 @@ body.reorder .note:not(.dragging){border-style:dashed;border-color:color-mix(in 
 .topics{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
 .note:not(.open) .topics{display:none}
 body.reorder .note .topics{display:none}
+.note .vtopic[data-n]:not([data-n=""])::after{content:attr(data-n);margin-left:3px;font-size:11px;vertical-align:super;color:var(--muted)}
+.note .vtopic.on{color:var(--violet)!important}
 .ctfold{height:28px;padding:0 10px;border:1px dashed #3A3944;border-radius:14px;background:transparent;color:var(--muted);font-size:12.5px;cursor:pointer}
 @media (hover:hover){.ctfold:hover{color:var(--ink);border-color:#55535F}}
 .ctopic{height:28px;padding:0 10px;border:0;border-radius:14px;background:color-mix(in srgb,var(--violet) 16%,transparent);color:var(--violet);font-size:13px;font-weight:500}
@@ -8050,7 +8052,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     if(b.classList.contains("mtopic")){b.closest("details").open=false;openPicker(id);return}
     if(b.classList.contains("hcal")){openGcal(id);return}
-    if(b.classList.contains("vtopic")){openPicker(id);return}
+    if(b.classList.contains("ctedit")){openPicker(id);return}
+    if(b.classList.contains("vtopic")){
+      if(!(n.topics||[]).length){openPicker(id);return}
+      if(tpShow.has(id))tpShow.delete(id); else tpShow.add(id); render(); return;
+    }
     if(b.classList.contains("vxref")){toggleXref(card,n);return}
     if(b.classList.contains("mhd")){   // '말씀 암송' 칸 접고 펼치기
       if(memFolded.has(id))memFolded.delete(id); else memFolded.add(id);
@@ -9041,17 +9047,21 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var addT=b.dataset.topic&&!selHas(b.dataset.topic); toggleTopic(b.dataset.topic||""); render();
     if(addT&&topicSel.length===1)window.scrollTo({top:Math.max(0,$("topicBar").getBoundingClientRect().top+window.scrollY-70),behavior:"smooth"});
   });
+  var tpShow=new Set();   // 카드의 #주제 줄은 평소 숨김, # 단추를 눌렀을 때만 (2026-11-06 사용자 요청)
   var ctOpen=new Set(); try{(JSON.parse(localStorage.getItem("bible-ctopic-open")||"[]")||[]).forEach(function(x){ctOpen.add(x)})}catch(e){}
   function renderCardTopics(el,n){
     var ct=cardTopic(n); el.style.setProperty("--tc",ct?topicColor(ct):"var(--violet)");
     el.classList.toggle("fear",n.topics.some(function(t){return t.indexOf("경외")>=0}));   // 하나님 경외 주제 카드: 은은한 짙은 보라 배경
     // 주제가 많으면 접어서 3개만 (+N 펼치기), 펼친 카드는 기억 (2026-10-29 사용자 요청)
     var many=n.topics.length>4, open=ctOpen.has(n.id), shown=many&&!open?n.topics.slice(0,3):n.topics;
-    var box=el.querySelector(".topics"), key=n.topics.join("|")+"/"+topicSel.join("|")+"/"+n.topics.map(topicColor).join(",")+"/"+open;
+    var tpOn=tpShow.has(n.id), vt=el.querySelector(".vtopic");
+    if(vt){vt.dataset.n=n.topics.length||""; vt.classList.toggle("on",tpOn&&!!n.topics.length); vt.setAttribute("aria-pressed",String(tpOn&&!!n.topics.length)); vt.title=n.topics.length?(tpOn?"주제 숨기기":"주제 "+n.topics.length+"개 보기"):"주제 정하기"}
+    var box=el.querySelector(".topics"), key=n.topics.join("|")+"/"+topicSel.join("|")+"/"+n.topics.map(topicColor).join(",")+"/"+open+"/"+tpOn;
     if(box.dataset.key===key)return; box.dataset.key=key; box.textContent="";
     shown.forEach(function(t){var c=document.createElement("button");c.type="button";c.className="ctopic"+(selHas(t)?" on":"");c.dataset.topic=t;c.textContent="#"+t;c.style.setProperty("--tc",topicColor(t));box.appendChild(c)});
     if(many){var fb=document.createElement("button"); fb.type="button"; fb.className="ctfold"; fb.textContent=open?"접기 ▴":"+"+(n.topics.length-3)+"개 ▾"; fb.title=open?"주제 접기":"주제 모두 보기"; box.appendChild(fb)}
-    box.hidden=!n.topics.length;
+    if(n.topics.length){var eb=document.createElement("button"); eb.type="button"; eb.className="ctfold ctedit"; eb.textContent="✎ 주제 정하기"; box.appendChild(eb)}
+    box.hidden=!n.topics.length||!tpOn;
   }
   var ts={mode:"",nid:"",results:[]};
   function openTS(title){$("topicSheet").classList.remove("tsfull");$("tsTitle").textContent=title;$("topicSheet").hidden=false;$("fab").hidden=true;document.body.style.overflow="hidden"}
