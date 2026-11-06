@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-icgae">
+<meta name="app-build" content="2026-11-07-icansdark">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4545,7 +4545,9 @@ textarea.dlicfull.dlicedit:focus{outline-style:solid}
 .icp:nth-of-type(6n+5){--ic0:var(--pink)}
 .icp:nth-of-type(6n+6){--ic0:var(--orange)}
 /* 🙌 응답된 기도 카드: 명단 맨 아래, 밝은 금빛 바탕으로 확실히 구분 (2026-11-07 사용자 요청) */
-.icbody .icp.ans,.icbody .icp.ans.big{opacity:1;background:#4A3A12!important;border:2px solid #F2B73A!important;box-shadow:inset 4px 0 0 #F2B73A,0 2px 10px rgba(0,0,0,.3)}
+.icbody .icp.ans,.icbody .icp.ans.big{opacity:1;background:#4A3A12!important;border:2px solid #F2B73A!important;box-shadow:0 2px 10px rgba(0,0,0,.3)!important}
+/* 응답된 카드의 '응답됨' 단추는 카드보다 확실히 어둡게 (2026-11-07 사용자 요청) */
+.icbody .icp.ans .icbtns .icans.on{background-color:#2A1F08!important;background-image:linear-gradient(180deg,rgba(255,255,255,.08) 0%,rgba(0,0,0,.25) 100%)!important;border:1px solid #B8862A!important;color:#FFD36B!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 2px 0 rgba(0,0,0,.5),0 3px 8px rgba(0,0,0,.4)!important}
 .icbody .icp.ans .icname{color:#FFE7A8}
 .icbody .icp.ans .icmemo,.icbody .icp.ans .icmeta{color:#F4E6C4}
 .icv .icanshd{margin-top:18px}
