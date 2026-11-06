@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-tap3scroll">
+<meta name="app-build" content="2026-11-06-nosametopic">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7718,9 +7718,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var links=n.links||[];
     var s1=document.createElement("div"); s1.className="cbsec"; s1.textContent="🔗 연결한 말씀 "+links.length; bk.appendChild(s1);
     links.forEach(function(l){var x=byRef[linkKey(l.ref)]; bk.appendChild(item(l.ref,x?x.text:"",l.memo,x?x.id:""))});
-    var tps=n.topics||[], same=[];
-    if(tps.length)notes.forEach(function(x){if(x.id!==n.id&&(x.topics||[]).some(function(t){return tps.indexOf(t)>=0}))same.push(x)});
-    if(tps.length){
+    // 📚 같은 주제 말씀은 내용과 상관없이 태그만 같아도 나와서 뺌 — 뒷면은 내가 직접 연결한 말씀만 (2026-11-06 사용자 요청)
+    var tps=[], same=[];
+    if(false){
       var s2=document.createElement("div"); s2.className="cbsec"; s2.textContent="📚 같은 주제 말씀 "+same.length; bk.appendChild(s2);
       same.slice(0,12).forEach(function(x){bk.appendChild(item(x.ref||"구절 미입력",x.text,"",x.id))});
       if(!same.length){var e2=document.createElement("p"); e2.className="cbempty"; e2.textContent="같은 주제를 붙인 다른 말씀이 아직 없어요."; bk.appendChild(e2)}
