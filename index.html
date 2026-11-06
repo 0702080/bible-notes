@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-syncrow">
+<meta name="app-build" content="2026-11-06-noevesum">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -13916,7 +13916,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var el=function(t,c,x){var e=document.createElement(t); if(c)e.className=c; if(x!=null)e.textContent=x; return e};
     box.appendChild(el("b","dlttl",eve?"🌙 오늘 되돌아보기":mor?"☀️ 오늘 아침 꼭 볼 것":"📌 오늘 꼭 볼 것"));
     if(note&&!eve)box.appendChild(el("p","dltnote",note));
-    if(eve)box.appendChild(el("p","dltsum","오늘 체크한 것 "+on.length+"개"+(todo.length?" · 아직 안 한 실천 "+todo.length+"개":"")));
+    // 저녁 칸의 "오늘 체크한 것 N개 · 아직 안 한 실천 N개" 줄은 뺌 (2026-11-06 사용자 요청)
     if(todo.length){var ul=el("ul","dltlist"); todo.slice(0,3).forEach(function(t){var li=el("li","",null), lb=el("button","dltgo",t.t); lb.type="button"; lb.dataset.k=t.k; lb.title="이 실천 카드로 가기"; li.appendChild(lb); ul.appendChild(li)}); box.appendChild(ul)}
     if(mor&&typeof dueAll==="function"){var du=(dueAll()||[]).filter(function(n){return n&&n.ref}); if(du.length){   // 한 줄에 하나씩 세로로 (2026-11-06 사용자 요청)
       var dw=el("div","dltdue"); dw.appendChild(el("p","dltsum","📖 오늘 복습할 말씀 "+du.length+"개"));
