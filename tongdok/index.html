@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-06-glassbtn">
+<meta name="app-build" content="td-2026-11-06-pinclear">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -489,6 +489,24 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
 .bk-prog[data-st="none"] b,.bk-prog:not([data-st="full"]) b{color:#F3EADB}
 .bk-prog[data-st="full"] b{background:var(--green);color:#fff}
 .bk[data-rc] .bk-prog[data-st="full"] b{background:var(--rc)}
+/* 📌 읽는(쓰는) 중 칸은 밝은 바탕이라 글자를 짙고 또렷하게, 진행 동그라미는 크고 불투명하게 (2026-11-06 사용자 요청) */
+.pinned .bk[data-g="law"] .bk-name{color:#A65F0B}
+.pinned .bk[data-g="hist"] .bk-name{color:#1D6E8E}
+.pinned .bk[data-g="poem"] .bk-name{color:#5E3FB0}
+.pinned .bk[data-g="major"] .bk-name{color:#A8304F}
+.pinned .bk[data-g="minor"] .bk-name{color:#1C7D52}
+.pinned .bk[data-g="gospel"] .bk-name{color:#8C6200}
+.pinned .bk[data-g="paul"] .bk-name{color:#34499F}
+.pinned .bk[data-g="general"] .bk-name{color:#A64A2A}
+.pinned .bk[data-g="rev"] .bk-name{color:#933B74}
+.pinned .bk .bk-name{text-shadow:none;font-size:18px;font-weight:800}
+.pinned .bk .bk-cnt{color:#3E362B;font-weight:700;font-size:13.5px}
+.pinned .bk .bk-chev{border-color:#5E5446}
+.pinned .bk-prog{width:46px;height:46px;background:conic-gradient(var(--c) calc(var(--p)*1%),#E2D6BE 0);box-shadow:0 2px 6px rgba(80,60,30,.25)}
+.pinned .bk-prog b{width:36px;height:36px;background:#FFFBF2;color:#2E2820;font-size:12.5px;font-weight:800}
+.pinned .bk-prog[data-st="full"] b{background:var(--green);color:#fff}
+.pinned .bk[data-rc] .bk-prog[data-st="full"] b{background:var(--rc)}
+.pinned .bk-pin{background:#FFFBF2;border-color:#E2D8C2;opacity:1}
 .rcl{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:3px 7px;margin-top:4px}
 .rcl b{display:inline-flex;align-items:center;gap:3px;font-weight:500}
 .rcl i{width:10px;height:10px;border-radius:50%;display:inline-block}
