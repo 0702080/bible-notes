@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-mxblink">
+<meta name="app-build" content="2026-11-06-tap3scroll">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7797,7 +7797,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   function tap3Blocked(t){
     if(document.body.style.overflow==="hidden")return true;   // 다른 창이 떠 있음
     if(Array.prototype.some.call(document.querySelectorAll('[role="dialog"]'),function(d){return d.getClientRects().length>0}))return true;   // 눈에 보이는 창
-    return !!(t.closest&&t.closest("button,a,input,textarea,select,summary,details,label,[contenteditable],.pop,.editbox,.vediting,.verse.picking,.verse.memv,.mempanel,.chip,.fab,#fab,header,.bar"));
+    return !!(t.closest&&t.closest("button,a,input,textarea,select,summary,details,label,[contenteditable],.pop,.editbox,.vediting,.verse.picking,.verse.memv,.mempanel,.chip,.fab,#fab,header,.bar,.pane,.tabs"));   // 카드 안 기도·묵상·실천 칸을 읽으며 누르는 것은 셈하지 않음 (2026-11-06)
   }
   function tap3Card(x,y,t){
     var c=t.closest&&t.closest(".note"); if(c)return c;
@@ -7808,9 +7808,20 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     });
     return best;
   }
+  // 화면을 슥슥 밀며 내리는 손가락은 누르기로 세지 않음: 떼는 순간 거의 안 움직였고(10px), 짧게(0.35초) 눌렀고, 바로 전에 화면이 굴러가고 있지 않았을 때만 (2026-11-06 사용자 요청)
+  var tap3Down=null, tap3Scroll=0;
+  window.addEventListener("scroll",function(){tap3Scroll=Date.now()},{passive:true,capture:true});
   document.addEventListener("pointerdown",function(e){
-    if(e.pointerType!=="touch")return;
+    if(e.pointerType!=="touch"){tap3Down=null;return}
+    tap3Down={x:e.clientX,y:e.clientY,t:Date.now(),target:e.target,scrolling:Date.now()-tap3Scroll<300};
+  },true);
+  document.addEventListener("pointercancel",function(){tap3Down=null; tap3.n=0},true);
+  document.addEventListener("pointerup",function(e){
+    var d0=tap3Down; tap3Down=null;
+    if(e.pointerType!=="touch"||!d0)return;
     var now=Date.now();
+    if(d0.scrolling||Math.abs(e.clientX-d0.x)>10||Math.abs(e.clientY-d0.y)>10||now-d0.t>350||now-tap3Scroll<120){tap3.n=0;return}
+    e={clientX:d0.x,clientY:d0.y,target:d0.target};
     if(tap3.n&&(now-tap3.t>420||Math.abs(e.clientX-tap3.x)>45||Math.abs(e.clientY-tap3.y)>45))tap3.n=0;
     if(!tap3.n&&tap3Blocked(e.target))return;
     if(tap3.n&&tap3Blocked(e.target)){   // 첫 누름으로 카드가 펼쳐져 자리가 바뀌어도 이어서 셈 — 그 자리 단추는 눌리지 않게
