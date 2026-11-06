@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-wordonlyhits">
+<meta name="app-build" content="2026-11-06-mintmark">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2178,6 +2178,9 @@ body.boardon.tfolded .topicbar{display:none}
 .bctext.vlines .vl{display:block;white-space:pre-wrap}
 /* 찾은 말은 찐한 노란 바탕으로 (2026-10-17 사용자 요청) */
 .bcard mark{background:#FFD54A;color:#141416;border-radius:3px;padding:0 2px;font-weight:700;-webkit-text-stroke:0}
+/* 찾기에서 일치한 글자는 민트색 네모 (2026-11-06 사용자 요청) */
+#list .note mark,.saysheet mark{background:color-mix(in srgb,#4FE3C1 42%,transparent)!important;color:#F2FFFB!important;border-radius:4px;padding:0 2px}
+.bcard mark{background:#6EE7C8!important;color:#0E1A17!important}
 .bctext.full{display:block;-webkit-line-clamp:none;overflow:visible}
 .bcard.landed{animation:kbland .5s cubic-bezier(.2,1.6,.4,1)}
 @keyframes kbland{0%{transform:scale(.9);box-shadow:0 0 0 0 var(--tc)}60%{transform:scale(1.03);box-shadow:0 0 0 6px color-mix(in srgb,var(--tc) 30%,transparent)}100%{transform:none;box-shadow:none}}
