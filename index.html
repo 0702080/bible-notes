@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-thxdel">
+<meta name="app-build" content="2026-11-06-thxcolor">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4537,6 +4537,12 @@ textarea.dlicfull.dlicedit:focus{outline-style:solid}
 .prays>.pri:nth-child(6n+6){--prc:var(--gold)}
 .prays>.pri .prv{background:color-mix(in srgb,var(--prc) 18%,#15141A);border-color:color-mix(in srgb,var(--prc) 42%,#26252B);box-shadow:inset 2px 0 0 color-mix(in srgb,var(--prc) 75%,transparent)}   /* 왼쪽 색 줄 2px (2026-11-04 사용자 요청) */
 .prays>.pri .prvt{color:color-mix(in srgb,var(--prc) 35%,#fff)}
+/* 감사 기도(뒷면)도 앞면 기도문과 같은 색 (2026-11-06 사용자 요청) */
+.prays>.pri .pthx{background:color-mix(in srgb,var(--prc) 18%,#15141A);border-color:color-mix(in srgb,var(--prc) 42%,#26252B);box-shadow:inset 2px 0 0 color-mix(in srgb,var(--prc) 75%,transparent)}
+.prays>.pri .pthxh b{color:color-mix(in srgb,var(--prc) 70%,#fff)}
+.prays>.pri .pthxd,.prays>.pri .pthxtip{color:color-mix(in srgb,var(--prc) 45%,#8E8A80)}
+.prays>.pri .pthxback{border-color:color-mix(in srgb,var(--prc) 45%,#3A3630);color:color-mix(in srgb,var(--prc) 60%,#fff)}
+.prays>.pri .pthx .pthv,.prays>.pri .pthx .pth{background:rgba(0,0,0,.18);border-color:color-mix(in srgb,var(--prc) 30%,#26252B);color:color-mix(in srgb,var(--prc) 35%,#fff)}
 .prays>.pri.answered .prvt{color:#C9C4D2}
 .prays>.pri .pt{background:color-mix(in srgb,var(--prc) 10%,#101013);border-color:color-mix(in srgb,var(--prc) 40%,#2E2D33);color:color-mix(in srgb,var(--prc) 35%,#fff)}
 .prays.pallfold>.pri{display:none}
