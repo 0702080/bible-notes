@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-icans">
+<meta name="app-build" content="2026-11-07-ntfind">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4474,6 +4474,20 @@ body.boardon .fscrow{display:none}
 .ntlist button{display:block;width:100%;padding:7px 9px;border:0;border-radius:8px;background:transparent;color:var(--muted);font-family:inherit;font-size:12.5px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ntlist button:hover{background:#25242C}
 .ntlist b{color:var(--ink)}
+.ntqrow{position:relative}
+.ntqrow .ntq{padding-right:40px}
+.ntclr{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:28px;height:28px;padding:0;border:0;border-radius:14px;background:rgba(255,255,255,.08);color:var(--muted);font-size:13px;font-family:inherit}
+.ntclr[hidden]{display:none}
+.ntfind.ntset .ntq{color:var(--violet);font-weight:700;border-color:color-mix(in srgb,var(--violet) 60%,#34333A)}
+.ntlist span{margin-left:6px;color:var(--muted)}
+.ntlist button.on{background:color-mix(in srgb,var(--violet) 22%,transparent)}
+.ntnone{margin:6px 9px;font-size:12px;color:var(--muted)}
+/* 기도제목 칸: 목록을 칸 바로 아래에 크게 (2026-11-07) */
+.ntfind.ntinline{flex:none;width:100%}
+.ntinline .ntq{height:46px;font-size:16px}
+.ntinline .ntlist{position:static;margin-top:6px;max-height:min(46vh,380px);overflow-y:auto;overscroll-behavior:contain}
+.ntinline .ntlist button{padding:11px 10px;font-size:15px;border-bottom:1px solid #24232A;border-radius:0}
+.ntinline .ntlist button:last-of-type{border-bottom:0}
 /* 28 한 마디 찾기·고정 */
 .saysearch{width:100%;box-sizing:border-box;height:40px;margin-bottom:12px;font-size:14px}
 .saysheet .dlbar .dlclose.saylock{color:var(--muted)}
@@ -12524,6 +12538,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       (x&&x.ans?'<textarea class="field icfa" rows="2" maxlength="1000" placeholder="어떻게 응답하셨는지" aria-label="응답"></textarea>':'')+
       '<div class="icfbtn">'+(x?'<button type="button" class="icdel">지우기</button>':'<span></span>')+'<span><button type="button" class="iccancel">취소</button><button type="button" class="icok">'+(x?"저장":"＋ 명단에 넣기")+'</button></span></div>';
     if(x){f.querySelector(".icfn").value=x.name; f.querySelector(".icfm").value=x.memo; f.querySelector(".icfm").rows=1; var fa=f.querySelector(".icfa"); if(fa)fa.value=x.an}
+    var fv=f.querySelector(".icfv"); fv.hidden=true; fv.parentNode.insertBefore(noteFinder(fv,{inline:true,max:8,ph:"📖 붙들 말씀 찾기 (책·장절·낱말)"}),fv.nextSibling);   // 긴 목록 대신 찾아서 고르기 (2026-11-07 사용자 요청)
     return f;
   }
   function icDraw(){
@@ -12537,7 +12552,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(ktk){var nc=icv.querySelector('.icp[data-id="'+ktk.id+'"] textarea.ictht'); if(nc){nc.value=ktk.v; grow(nc); icv.querySelector(".icbody").scrollTop=ktk.st; try{nc.focus({preventScroll:true}); nc.setSelectionRange(ktk.s,ktk.e)}catch(e){}}}
     var inl=icv.querySelector(".icinline .icfm"); if(inl)grow(inl);
     var nf=keep&&icv.querySelector(".icform");
-    if(nf&&nf.dataset.id===keep.id){Object.keys(keep.v).forEach(function(s){var el=nf.querySelector(s); if(el)el.value=keep.v[s]}); icv.querySelector(".icbody").scrollTop=keep.st;
+    if(nf&&nf.dataset.id===keep.id){Object.keys(keep.v).forEach(function(s){var el=nf.querySelector(s); if(el)el.value=keep.v[s]}); var ntf=nf.querySelector(".ntfind"); if(ntf&&ntf._sync)ntf._sync(); icv.querySelector(".icbody").scrollTop=keep.st;
       if(keep.foc){var fe=nf.querySelector(keep.foc); if(fe){try{fe.focus({preventScroll:true}); if(keep.ss!=null)fe.setSelectionRange(keep.ss,keep.se)}catch(e){}}}}
   }
   function icDrawInner(){
@@ -14980,19 +14995,32 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     return w;
   }
   // 붙일 말씀 찾기: 긴 목록 대신 글자로 찾아 고름 (값은 숨은 select에)
-  function noteFinder(sel){
-    var w=document.createElement("div"); w.className="ntfind";
-    w.innerHTML='<input class="field ntq" placeholder="📖 붙일 말씀 찾기 (없어도 돼요)" aria-label="붙일 말씀 찾기"><div class="ntlist" hidden></div>';
-    var q=w.querySelector(".ntq"), l=w.querySelector(".ntlist");
-    if(sel.value&&notes.has(sel.value))q.value=notes.get(sel.value).ref||"";
-    function draw(){
-      var t=q.value.trim(); l.textContent=""; if(!t){sel.value=""; l.hidden=true; return}
-      var hits=sorted().filter(function(n){return hit1(n.ref||"",t)||hit1(n.text||"",t)}).slice(0,6);
-      hits.forEach(function(n){var b=document.createElement("button"); b.type="button"; b.dataset.nt=n.id; var bb=document.createElement("b"); bb.textContent=n.ref||"구절 미입력"; b.appendChild(bb); b.appendChild(document.createTextNode(" "+String(n.text||"").replace(/\s+/g," ").slice(0,28))); l.appendChild(b)});
-      l.hidden=!hits.length;
+  function noteFinder(sel,opt){
+    // 붙일 말씀 찾기: 누르면 바로 최근 말씀, 글자(책 이름·장절·낱말·초성)를 치면 거름, 누르면 고름, ✕로 비움 (2026-11-07 사용자 요청: 긴 목록에서 찾기 불편)
+    opt=opt||{}; var MAX=opt.max||6;
+    var w=document.createElement("div"); w.className="ntfind"+(opt.inline?" ntinline":"");
+    w.innerHTML='<div class="ntqrow"><input class="field ntq" placeholder="'+(opt.ph||"📖 붙일 말씀 찾기 (없어도 돼요)")+'" aria-label="붙일 말씀 찾기" autocomplete="off"><button type="button" class="ntclr" aria-label="말씀 비우기" hidden>✕</button></div><div class="ntlist" hidden></div>';
+    var q=w.querySelector(".ntq"), l=w.querySelector(".ntlist"), clr=w.querySelector(".ntclr");
+    function cur(){return sel.value&&notes.has(sel.value)?notes.get(sel.value):null}
+    function sync(){var n=cur(); q.value=n?(n.ref||"구절 미입력"):""; w.classList.toggle("ntset",!!n); clr.hidden=!n}
+    sync(); w._sync=sync;
+    function draw(show){
+      var t=q.value.trim(), n=cur(); if(n&&t===(n.ref||"구절 미입력"))t="";
+      l.textContent="";
+      if(!show&&!t){l.hidden=true; return}
+      var all=sorted(), hits=t?all.filter(function(m){return hit1(m.ref||"",t)||hit1(m.text||"",t)}):all;
+      hits.slice(0,MAX).forEach(function(m){var b=document.createElement("button"); b.type="button"; b.dataset.nt=m.id; if(n&&m.id===n.id)b.className="on"; var bb=document.createElement("b"); bb.textContent=m.ref||"구절 미입력"; b.appendChild(bb); var sp=document.createElement("span"); sp.textContent=String(m.text||"").replace(/\s+/g," ").slice(0,40); b.appendChild(sp); l.appendChild(b)});
+      if(!hits.length){var e=document.createElement("p"); e.className="ntnone"; e.textContent="찾는 말씀이 없어요"; l.appendChild(e)}
+      else if(hits.length>MAX){var e2=document.createElement("p"); e2.className="ntnone"; e2.textContent="더 있어요 · 글자를 더 쳐서 줄여 보세요 ("+hits.length+"개)"; l.appendChild(e2)}
+      l.hidden=false;
     }
-    q.addEventListener("input",draw);
-    l.addEventListener("click",function(e){var b=e.target.closest("[data-nt]"); if(!b)return; e.preventDefault(); e.stopPropagation(); sel.value=b.dataset.nt; q.value=notes.get(b.dataset.nt).ref||""; l.hidden=true});
+    q.addEventListener("focus",function(){try{q.select()}catch(e){} draw(true)});
+    q.addEventListener("input",function(){if(!q.value.trim()){sel.value=""; w.classList.remove("ntset"); clr.hidden=true; sel.dispatchEvent(new Event("change",{bubbles:true}))} draw(true)});
+    q.addEventListener("blur",function(){setTimeout(function(){if(document.activeElement===q)return; l.hidden=true; sync()},180)});
+    clr.addEventListener("pointerdown",function(e){e.preventDefault()});
+    clr.addEventListener("click",function(e){e.stopPropagation(); sel.value=""; sel.dispatchEvent(new Event("change",{bubbles:true})); sync(); q.focus()});
+    l.addEventListener("pointerdown",function(e){e.preventDefault()});   // 고르는 동안 칸 커서를 잃지 않게
+    l.addEventListener("click",function(e){var b=e.target.closest("[data-nt]"); if(!b)return; e.preventDefault(); e.stopPropagation(); sel.value=b.dataset.nt; sel.dispatchEvent(new Event("change",{bubbles:true})); sync(); l.hidden=true; buzz(8); q.blur()});
     return w;
   }
   function drawSay(){
