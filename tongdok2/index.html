@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-06-darkbg">
+<meta name="app-build" content="td-2026-11-06-darkbg2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -388,8 +388,20 @@ main.mswr{animation:mswr .22s ease-out}
 .bk[data-g="general"] .bk-name{color:#C26444}
 .bk[data-g="rev"] .bk-name{color:#B2508F}
 /* 바탕을 어둡게 한 만큼 책 이름·장 수를 또렷하게 (2026-11-06) */
-#tdbg~* .bk-name,.bk .bk-name{filter:brightness(.8) saturate(1.15)}
-.bk .bk-cnt{color:#4E4538}
+.bk[data-g="law"] .bk-name{color:#FFC27A}
+.bk[data-g="hist"] .bk-name{color:#8FD8F5}
+.bk[data-g="poem"] .bk-name{color:#C9B4FF}
+.bk[data-g="major"] .bk-name{color:#FF9DB6}
+.bk[data-g="minor"] .bk-name{color:#9CE6C2}
+.bk[data-g="gospel"] .bk-name{color:#FFDB85}
+.bk[data-g="paul"] .bk-name{color:#B5C4FF}
+.bk[data-g="general"] .bk-name{color:#FFB497}
+.bk[data-g="rev"] .bk-name{color:#F5AADB}
+.bk .bk-name{text-shadow:0 1px 2px rgba(0,0,0,.45)}
+.bk .bk-cnt{color:#EDE3D2}
+.bk .bk-chev{border-color:#EDE3D2}
+h2.tg{color:#F3EADB}
+p.note{color:#D9CFBF}p.note b{color:#F3EADB}
 .chip::before{background:#EFE7D5;border-color:#DFD4BD}
 .chip{color:#8C8270}
 .chip[data-s="me"]{--c:#F2C94C;color:#3A2A00}
@@ -503,7 +515,7 @@ body.pm .modeseg::before{transform:translateX(calc(100% + 6px));background-color
 /* 묵상 노트와 같은 앱 배경 이미지가 살짝 비치게: 아이보리 막을 덮어 밝은 바탕은 그대로 (2026-11-05 사용자 요청) */
 html{background:#F7F1E3}
 body{background:transparent}
-#tdbg{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:-1;pointer-events:none;background:linear-gradient(rgba(160,142,114,.74),rgba(160,142,114,.74)),url(../kanban-bg2.jpg) center/cover no-repeat,#F7F1E3}
+#tdbg{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:-1;pointer-events:none;background:linear-gradient(rgba(58,47,36,.74),rgba(58,47,36,.74)),url(../kanban-bg2.jpg) center/cover no-repeat,#F7F1E3}
 :root{--sheetg:rgba(255,251,242,.8)}
 .sum,.ovw{background:linear-gradient(160deg,color-mix(in srgb,var(--ring) 9%,var(--sheetg)) 0%,var(--sheetg) 55%,color-mix(in srgb,var(--violet) 8%,var(--sheetg)) 100%)}
 .shelf{background:linear-gradient(160deg,color-mix(in srgb,var(--violet) 11%,var(--sheetg)),var(--sheetg) 70%)}
@@ -523,7 +535,7 @@ body{background:transparent}
   else if(/^u:/.test(o.k||""))bg=q("https://images.unsplash.com/"+o.k.slice(2)+"?w=2400&q=80&auto=format&fit=crop");
   else if(PRE[o.k])bg=PRE[o.k];
   else if(o.k==="none")bg="#F7F1E3";
-  if(bg)document.getElementById("tdbg").style.background="linear-gradient(rgba(160,142,114,.74),rgba(160,142,114,.74)),"+bg+",#F7F1E3";
+  if(bg)document.getElementById("tdbg").style.background="linear-gradient(rgba(58,47,36,.74),rgba(58,47,36,.74)),"+bg+",#F7F1E3";
 }catch(e){}})();
 </script>
 <div class="turn" aria-live="polite"><b aria-hidden="true">📱</b>휴대폰을 세로로 돌려 주세요</div>
