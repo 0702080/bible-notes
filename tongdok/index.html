@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-06-darkbg2">
+<meta name="app-build" content="td-2026-11-06-glassbtn">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -480,6 +480,14 @@ body.pm #btnShare,body.pm #btnFriend{display:none}
 .bk[data-rc] .chips:not(.fchips) .chip[data-s="me"],.bk[data-rc] .chips:not(.fchips) .chip[data-s="me"][data-five]{--c:var(--rc);color:#fff}
 .bk[data-rc] .bk-prog[data-st="part"]{--c:var(--rc)}
 .bk[data-rc] .bk-prog[data-st="full"]{--c:var(--rc);box-shadow:0 0 10px color-mix(in srgb,var(--rc) 40%,transparent)}
+.bk[data-rc] .bk-prog[data-st="full"] b{background:var(--rc)}
+/* 📌·진도 동그라미도 살짝 비치게 (2026-11-06 사용자 요청) */
+.bk-pin{background:rgba(255,251,242,.28);border-color:rgba(255,251,242,.35);opacity:.85}
+.bk-pin[aria-pressed="true"]{background:color-mix(in srgb,var(--pink) 30%,rgba(255,251,242,.3))}
+.bk-prog{background:conic-gradient(var(--c) calc(var(--p)*1%),rgba(240,230,212,.38) 0)}
+.bk-prog b{background:rgba(255,250,240,.3)}
+.bk-prog[data-st="none"] b,.bk-prog:not([data-st="full"]) b{color:#F3EADB}
+.bk-prog[data-st="full"] b{background:var(--green);color:#fff}
 .bk[data-rc] .bk-prog[data-st="full"] b{background:var(--rc)}
 .rcl{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:3px 7px;margin-top:4px}
 .rcl b{display:inline-flex;align-items:center;gap:3px;font-weight:500}
