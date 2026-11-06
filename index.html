@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-sayuse1line">
+<meta name="app-build" content="2026-11-07-coldrag">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4922,7 +4922,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 /* 칸 칩이 화면 끝에서 잘리지 않게: 칩이 줄어들고 이름은 …으로 (2026-11-07 사용자 요청) */
 .colbar{margin:0;padding-left:0;padding-right:0}
 .colbar .cchip{flex:0 0 auto;max-width:100%;overflow:hidden}
-.colbar .cchip.ccfit>.ccnt{display:none}   /* 좁게 줄인 칩은 숫자를 감추고 이름…을 보임 */
+.colbar .cchip.ccfit>.ccnt{display:none}
+.colbar .cchip{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.colbar .cchip.ccdrag{position:relative;z-index:5;transition:none;box-shadow:0 8px 18px rgba(0,0,0,.55)!important;opacity:.95}
+.colbar.ccsorting .cchip:not(.ccdrag){transition:transform .12s}
+.colbar .cchip.ccpin{border-width:2px}   /* 좁게 줄인 칩은 숫자를 감추고 이름…을 보임 */
 .colbar .cchip>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .colbar .cchip>.ccnt{flex:none}
 /* 한 마디 고치는 칸: 글 폭·글자·줄 간격을 읽을 때 카드와 똑같이 해서 문장이 같은 자리에서 꺾이게 (2026-11-05 사용자 요청) */
@@ -5953,8 +5957,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   // 휴대폰: PC 칸반에서 만든 칸(n.col)을 목록 위 칩으로 골라 그 칸 카드만 보기 (2026-10-31 사용자 요청)
   var colSel=""; try{colSel=localStorage.getItem("bible-m-col")||""}catch(e){}
   function setColSel(c){colSel=c||""; try{localStorage.setItem("bible-m-col",colSel)}catch(e){}}
+  var colDragging=false;
   function renderColBar(){
-    var bar=$("colBar"); if(!bar)return;
+    var bar=$("colBar"); if(!bar||colDragging)return;   // 칩을 끄는 중엔 다시 그리지 않음
     var cs=myCols().filter(function(c){var k=0; notes.forEach(function(n){if(n.col===c)k++}); return k>0});
     if(colSel&&cs.indexOf(colSel)<0)setColSel("");
     bar.hidden=boardOn||!cs.length; if(bar.hidden)return;
@@ -5965,14 +5970,67 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     mk("","📚 모든 칸",null);
     // 칸마다 다른 색: 내 칸 목록의 순서로 정해서, 카드가 없는 칸이 생겨도 다른 칸 색이 바뀌지 않음 (2026-11-05 사용자 요청)
     var COLCC=["#E58FB1","#7FB8E6","#7FCFA4","#B79BEB","#EDA46F","#6FCBC7","#D9C25E","#E58A7F"], allC=myCols();
-    cs.forEach(function(c){var k=0; notes.forEach(function(n){if(n.col===c)k++}); mk(c,"📁 "+c,k); var el=bar.lastChild; el.classList.add("cctint"); el.style.setProperty("--cc",COLCC[allC.indexOf(c)%COLCC.length])});
-    colBarFit(); requestAnimationFrame(colBarFit);
+    var pins=colPins().filter(function(c){return cs.indexOf(c)>=0});
+    cs=pins.concat(cs.filter(function(c){return pins.indexOf(c)<0}));   // 📌 고정한 칸은 맨 앞 (2026-11-07 사용자 요청)
+    cs.forEach(function(c){var k=0; notes.forEach(function(n){if(n.col===c)k++}); var pn=pins.indexOf(c)>=0; mk(c,(pn?"📌 ":"📁 ")+c,k); var el=bar.lastChild; el.classList.add("cctint"); if(pn)el.classList.add("ccpin"); el.style.setProperty("--cc",COLCC[allC.indexOf(c)%COLCC.length])});
+    bar.scrollLeft=0; colBarFit(); requestAnimationFrame(colBarFit);
   }
+  function colPins(){try{var a=JSON.parse(localStorage.getItem("bible-m-colpin")||"[]");return Array.isArray(a)?a:[]}catch(e){return []}}
+  function colPinsSave(a){try{localStorage.setItem("bible-m-colpin",JSON.stringify(a))}catch(e){}}
+  // 칸 칩 꾹(0.4초) 눌러 옆으로 끌면 자리 옮기기, 꾹 누르고 그냥 떼면 📌 고정/풀기 (2026-11-07 사용자 요청)
+  (function(){
+    var bar=null, hold=0, st=null, dr=null, eatClick=0;
+    function init(){bar=$("colBar"); if(!bar){setTimeout(init,300);return}
+      bar.addEventListener("pointerdown",function(e){
+        var b=e.target.closest(".cchip"); if(!b||!b.dataset.col||e.button>0)return;
+        st={b:b,x:e.clientX,y:e.clientY,moved:false}; clearTimeout(hold);
+        hold=setTimeout(function(){if(!st||!b.isConnected)return; dr={b:b,x0:st.x,last:st.x}; colDragging=true; b.classList.add("ccdrag"); bar.classList.add("ccsorting"); buzz(15)},400);
+      });
+      document.addEventListener("pointermove",function(e){
+        if(st&&!dr&&(Math.abs(e.clientX-st.x)>8||Math.abs(e.clientY-st.y)>8)){clearTimeout(hold); st=null}
+        if(!dr||e.pointerType==="touch")return; e.preventDefault(); mv(e.clientX);
+      },{passive:false});
+      function mv(cx){
+        dr.moved=true; var e={clientX:cx};
+        var b=dr.b; b.style.transform="translateX("+(e.clientX-dr.x0)+"px)";
+        var r=b.getBoundingClientRect(), mid=r.left+r.width/2;
+        var sib=[].slice.call(bar.querySelectorAll(".cchip")).filter(function(x){return x!==b&&x.dataset.col});
+        for(var i=0;i<sib.length;i++){var o=sib[i], orr=o.getBoundingClientRect(), om=orr.left+orr.width/2, before=b.compareDocumentPosition(o)&Node.DOCUMENT_POSITION_PRECEDING;
+          if(before&&mid<om){var l0=b.getBoundingClientRect().left; bar.insertBefore(b,o); dr.x0+=b.getBoundingClientRect().left-l0; b.style.transform="translateX("+(e.clientX-dr.x0)+"px)"; buzz(6); break}
+          if(!before&&mid>om){var l1=b.getBoundingClientRect().left; bar.insertBefore(b,o.nextSibling); dr.x0+=b.getBoundingClientRect().left-l1; b.style.transform="translateX("+(e.clientX-dr.x0)+"px)"; buzz(6); break}}
+        var br=bar.getBoundingClientRect(); if(e.clientX>br.right-30)bar.scrollLeft+=8; else if(e.clientX<br.left+30)bar.scrollLeft-=8;
+      }
+      bar.addEventListener("touchmove",function(e){if(!dr)return; e.preventDefault(); var t=e.touches[0]; mv(t.clientX)},{passive:false});   // 휴대폰: 꾹 누른 뒤엔 줄이 굴러가지 않고 칩이 따라옴
+      bar.addEventListener("touchend",function(){if(dr)end()});
+      function end(){
+        clearTimeout(hold); var d=dr, s0=st; st=null; dr=null; colDragging=false; if(!d)return;
+        eatClick=Date.now(); d.b.classList.remove("ccdrag"); bar.classList.remove("ccsorting"); d.b.style.transform="";
+        var c=d.b.dataset.col, pins=colPins();
+        if(!d.moved){   // 꾹 누르고 그냥 떼면 고정/풀기
+          var i=pins.indexOf(c); if(i>=0){pins.splice(i,1); toast("고정을 풀었어요")} else {pins.push(c); toast("📌 맨 앞에 고정했어요")}
+          colPinsSave(pins); buzz([10,30,10]); renderColBar(); return;
+        }
+        var ord=[].slice.call(bar.querySelectorAll(".cchip")).map(function(x){return x.dataset.col}).filter(Boolean);
+        colPinsSave(ord.filter(function(x){return pins.indexOf(x)>=0}));
+        var all=myCols(), rest=all.filter(function(x){return ord.indexOf(x)<0}); saveCols(ord.concat(rest));
+        toast("칸 자리를 옮겼어요"); renderColBar(); if(typeof boardOn!=="undefined"&&boardOn)render();
+      }
+      document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(e){if(!dr){clearTimeout(hold);st=null;return} if(e.pointerType==="touch")return; if(!dr.moved){dr.b.classList.remove("ccdrag"); bar.classList.remove("ccsorting"); dr=null; st=null; colDragging=false; return} end()});
+      bar.addEventListener("click",function(e){if(Date.now()-eatClick<500){e.stopPropagation();e.preventDefault()}},true);
+      bar.addEventListener("contextmenu",function(e){if(st||dr)e.preventDefault()});
+      // 옆으로 넘기면 줄였던 칩을 바로 다 펼침, 맨 앞으로 돌아오면 다시 맞춤 (2026-11-07 사용자 요청)
+      bar.addEventListener("scroll",function(){
+        if(bar.scrollLeft>2){[].forEach.call(bar.children,function(x){if(x.style.maxWidth){x.style.maxWidth=""; x.classList.remove("ccfit")}})}
+        else colBarFit();
+      },{passive:true});
+    }
+    init();
+  })();
   // 칸 칩 줄 오른쪽 끝에 걸린 칩은 잘리지 않게 줄여서 오른쪽도 둥글게, 이름은 … (2026-11-07 사용자 요청)
   function colBarFit(){
     var bar=$("colBar"); if(!bar||bar.hidden)return;
     var ch=[].slice.call(bar.children); ch.forEach(function(b){b.style.maxWidth=""; b.classList.remove("ccfit")});
-    if(bar.scrollWidth<=bar.clientWidth+1)return;
+    if(bar.scrollWidth<=bar.clientWidth+1||bar.scrollLeft>2)return;
     var br=bar.getBoundingClientRect().right-2;
     for(var i=0;i<ch.length;i++){var r=ch[i].getBoundingClientRect(); if(r.right>br){var av=Math.floor(br-r.left); if(av>=48){ch[i].style.maxWidth=av+"px"; ch[i].classList.toggle("ccfit",av<120)} break}}
   }
