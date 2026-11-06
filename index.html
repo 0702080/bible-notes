@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-stickyfind">
+<meta name="app-build" content="2026-11-07-findlight">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4503,9 +4503,12 @@ body:not(.boardon) .bfwrap{display:none!important}
 .fwrap{position:relative}
 /* 🔍 찾기 칸은 늘 보이고 화면 맨 위에 떠 있음, 🔍 단추는 없앰 (휴대폰, 2026-11-07 사용자 요청) */
 body:not(.boardon) #filterBtn{display:none!important}
-body:not(.boardon) .fwrap{position:sticky;top:0;z-index:40;margin:0 -10px;padding:6px 10px 6px;background:rgba(14,13,18,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:0 0 14px 14px}
+body:not(.boardon) .fwrap{position:sticky;top:0;z-index:40;padding:6px 0}
+/* 찾기 칸 둘레의 어두운 바탕은 지우고, 칸만 밝게 (2026-11-07 사용자 요청) */
+body:not(.boardon) .fwrap .filter{background:#3B3947;border:1px solid #6E6A82;color:#F2EFFA;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+body:not(.boardon) .fwrap .filter::placeholder{color:#C9C4DA}
 body:not(.boardon) .fwrap .filter{margin:0}
-body:not(.boardon) .fwrap .fx{top:50%;left:16px}
+body:not(.boardon) .fwrap .fx{top:50%;left:6px}
 body:not(.boardon) .note.open .chead{top:52px}
 body:not(.boardon) .solobar{top:54px}
 .fx{position:absolute;left:7px;top:calc(50% + 4px);transform:translateY(-50%);z-index:1;width:30px;height:30px;padding:0;border:0;border-radius:15px;background:#34333A;color:var(--ink);font-size:15px;line-height:30px;text-align:center}
