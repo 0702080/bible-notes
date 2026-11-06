@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-notopicfind">
+<meta name="app-build" content="2026-11-07-findhidetoday">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4504,6 +4504,7 @@ body:not(.boardon) .bfwrap{display:none!important}
 .fwrap{position:relative}
 /* 🔍 찾기 칸은 늘 보이고 화면 맨 위에 떠 있음, 🔍 단추는 없앰 (휴대폰, 2026-11-07 사용자 요청) */
 body:not(.boardon) #filterBtn{display:none!important}
+body.finding:not(.boardon) #reviewBar{display:none!important}
 body:not(.boardon) .fwrap{position:sticky;top:0;z-index:40;padding:6px 0}
 /* 찾기 칸 둘레의 어두운 바탕은 지우고, 칸만 밝게 (2026-11-07 사용자 요청) */
 body:not(.boardon) .fwrap .filter{background:#3B3947;border:1px solid #6E6A82;color:#F2EFFA;box-shadow:0 4px 14px rgba(0,0,0,.45)}
@@ -7124,6 +7125,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   function render(){
     if(drag||actDrag)return;
     parseQuery();
+    document.body.classList.toggle("finding",!!filterText);   // 찾는 중엔 '오늘' 카드를 숨김 (2026-11-07 사용자 요청)
     renderTopicBar(); renderColBar(); renderReviewBar(); renderTodayMini(); refreshXrefs(); renderSoloBar();
     var list=$("list"), order=sorted(), shown=0;
     if(spotId&&!openIds.has(spotId))spotId=null;
