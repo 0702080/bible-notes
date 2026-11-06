@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-tphide">
+<meta name="app-build" content="2026-11-06-thxview">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -352,6 +352,8 @@ body.boardon .toolbar{border-bottom:0}   /* PC 칸반: 맨 위 단추 줄 아래
 .pthxask[hidden],.pth[hidden]{display:none!important}
 .pthxask p{margin:4px 2px 10px;color:color-mix(in srgb,var(--gold) 70%,#ddd);font-size:14px}
 .pthxmark{width:100%;min-height:40px;padding:6px 12px;border:1px solid #FFD36B;border-radius:20px;background:#F2B73A;color:#1E1608;font-family:inherit;font-size:14px;font-weight:800;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 2px 0 #8A5A10,0 4px 8px rgba(0,0,0,.4)}
+.pthx .pthv{margin:0;padding:12px 14px;border-radius:12px;background:rgba(0,0,0,.22);border:1px solid color-mix(in srgb,var(--gold) 30%,#2E2A20);font-size:17px;line-height:1.8;color:#F4E7C6;white-space:pre-line;word-break:keep-all;-webkit-user-select:none;user-select:none;cursor:pointer;touch-action:pan-y}
+.pthv[hidden]{display:none!important}
 .pthxtip{margin:6px 2px 0;font-size:11.5px;color:color-mix(in srgb,var(--gold) 45%,#7A766E)}
 .pri.answered.hasthx:not(.thxside) .prv::after{content:"🙏 감사 기도 있음 · 옆으로 밀기";display:block;margin-top:8px;font-size:11.5px;color:var(--gold);opacity:.8}
 .pri.answered:not(.hasthx):not(.thxside) .prv::after{content:"옆으로 밀어 감사 기도 적기 →";display:block;margin-top:8px;font-size:11.5px;color:var(--gold);opacity:.6}
@@ -6391,7 +6393,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         d.innerHTML='<div class="prv" title="두 번 누르면 고치기"><p class="prvt"></p><div class="prva"><b>🙌 응답</b><p></p></div></div>'+
           '<textarea class="pt" rows="1" placeholder="기도 제목 (예: 이 말씀처럼 가족을 하나님께 맡기게 하소서)" aria-label="기도"></textarea>'+
           '<div class="pans" hidden><span class="panl">🙌 응답</span><textarea class="pan" rows="1" placeholder="어떻게 응답하셨는지 적어 보세요" aria-label="응답"></textarea></div>'+
-          '<div class="pthx" hidden><div class="pthxh"><b>🙏 감사 기도</b><span class="pthxd"></span><button type="button" class="pthxback">← 기도문</button></div><div class="pthxask"><p>아직 응답 표시가 안 된 기도예요.</p><button type="button" class="pthxmark">🙌 응답됐어요 · 표시하고 감사 기도 적기</button></div><textarea class="pth" rows="3" placeholder="응답해 주신 하나님께 드리는 감사 기도를 적어 보세요" aria-label="감사 기도"></textarea><p class="pthxtip">옆으로 밀면 기도문으로 돌아가요</p></div>'+
+          '<div class="pthx" hidden><div class="pthxh"><b>🙏 감사 기도</b><span class="pthxd"></span><button type="button" class="pthxback">← 기도문</button></div><div class="pthxask"><p>아직 응답 표시가 안 된 기도예요.</p><button type="button" class="pthxmark">🙌 응답됐어요 · 표시하고 감사 기도 적기</button></div><p class="pthv" title="두 번 누르면 고치기"></p><textarea class="pth" rows="3" placeholder="응답해 주신 하나님께 드리는 감사 기도를 적어 보세요" aria-label="감사 기도"></textarea><p class="pthxtip">두 번 누르면 고치기 · 옆으로 밀면 기도문</p></div>'+
           '<div class="pfoot"><span class="pdl"></span><button type="button" class="pshare"></button><button type="button" class="pansbtn"></button><button type="button" class="pdel" aria-label="이 기도 지우기">지우기</button></div>';
       }
       if(box.children[i]!==d)box.insertBefore(d,box.children[i]||null);
@@ -6401,7 +6403,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       // 🙏 감사 기도 쪽 (응답된 기도를 옆으로 밀면, 2026-11-06 사용자 요청)
       var thOn=prThx.has(x.id); d.classList.toggle("thxside",thOn); d.querySelector(".pthx").hidden=!thOn;
       setVal(d.querySelector(".pth"),x.th||""); d.querySelector(".pthxd").textContent=x.ans?"응답 "+dlabel(dkey(x.ans)):"";
-      d.classList.toggle("hasthx",!!(x.th||"").trim()); d.querySelector(".pthxask").hidden=!!x.ans; d.querySelector(".pth").hidden=!x.ans;
+      d.classList.toggle("hasthx",!!(x.th||"").trim()); d.querySelector(".pthxask").hidden=!!x.ans;
+      var thEd=thxEdit.has(x.id)||!(x.th||"").trim(), thv=d.querySelector(".pthv");   // 다 적은 감사 기도는 앞면 기도문처럼 읽는 글로, 두 번 누르면 고치기
+      thv.textContent=x.th||""; thv.hidden=!x.ans||thEd; d.querySelector(".pth").hidden=!x.ans||!thEd;
       // 기본은 읽기, 두 번 누르면 고치기
       var ed=prEdit.has(x.id); d.classList.toggle("editing",ed);
       var ptx=d.querySelector(".pt"); if(ed&&!x.t.trim()&&!ptx.value.trim()&&document.activeElement!==ptx)ptx.value=PRAY_TPL;   // 고치는 중인 빈 기도도 기도문 틀로 (적어야 저장)
@@ -6420,7 +6424,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var hint=el.querySelector(".phint"); if(!hint){hint=document.createElement("p");hint.className="phint";hint.textContent="두 번 누르면 고칠 수 있어요";box.parentNode.insertBefore(hint,box.nextSibling)}
     hint.hidden=!list.length||pfd;
   }
-  var prEdit=new Set(), prTap={id:"",t:0}, prFoldAll=new Set(), prThx=new Set(), prSwAt=0;
+  var prEdit=new Set(), prTap={id:"",t:0}, prFoldAll=new Set(), prThx=new Set(), prSwAt=0, thxEdit=new Set(), thxTap={id:"",t:0};
   try{JSON.parse(localStorage.getItem("bible-pray-foldall")||"[]").forEach(function(x){prFoldAll.add(String(x))})}catch(e){}
   function editPray(card,pid){
     prEdit.add(pid); render();
@@ -7609,6 +7613,17 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   list.addEventListener("keydown",function(e){var t=e.target; if(e.key==="Enter"&&!e.isComposing&&t.classList&&t.classList.contains("xlref")&&t.value.trim()){e.preventDefault();var m=t.form&&t.form.querySelector(".xlmemo");if(m)m.focus()}});
   list.addEventListener("click",function(e){
     var bk=e.target.closest&&e.target.closest(".pthxback"); if(bk){prFlip(bk.closest(".pri"),false);return}
+    var tv=e.target.closest&&e.target.closest(".pthv");
+    if(tv){
+      if(Date.now()-prSwAt<450)return;
+      var tp=tv.closest(".pri").dataset.pid, tn=Date.now();
+      if(thxTap.id===tp&&tn-thxTap.t<400){
+        thxTap={id:"",t:0}; thxEdit.add(tp); render();
+        var tc=tv.closest(".note"), tq=tc&&tc.querySelector('.pri[data-pid="'+tp+'"] .pth');
+        if(tq){grow(tq); try{tq.focus(); tq.setSelectionRange(tq.value.length,tq.value.length)}catch(err){}}
+      } else thxTap={id:tp,t:tn};
+      return;
+    }
     var pv=e.target.closest&&e.target.closest(".prv"); if(!pv)return;
     if(Date.now()-prSwAt<450)return;   // 옆으로 민 끝의 누름은 고치기로 보지 않음
     var pri=pv.closest(".pri"), card=pv.closest(".note"), pid=pri.dataset.pid, now=Date.now();
@@ -7648,6 +7663,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     list.addEventListener("pointerup",end); list.addEventListener("pointercancel",end);
   })();
   list.addEventListener("focusout",function(e){
+    if(e.target.classList&&e.target.classList.contains("pth")){
+      var tpid=e.target.closest(".pri").dataset.pid, tval=e.target.value.trim();
+      setTimeout(function(){if(document.activeElement&&document.activeElement.classList.contains("pth"))return; if(tval){thxEdit.delete(tpid); render()}},0);
+      return;
+    }
     var pri=e.target.closest&&e.target.closest(".pri"); if(!pri||!prEdit.has(pri.dataset.pid))return;
     setTimeout(function(){if(!pri.isConnected||pri.contains(document.activeElement))return;prEdit.delete(pri.dataset.pid);render()},150);
   });
