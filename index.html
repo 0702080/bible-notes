@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-icheadclean">
+<meta name="app-build" content="2026-11-06-ldsumcol">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4673,6 +4673,13 @@ body.reorder .ref .lclisten{display:none}
 .ldsum b{display:block;margin-top:2px;font-size:14.5px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ldsum .lds b{color:var(--lds)}.ldsum .ldr b{color:var(--ldr)}.ldsum .ldf b{color:#EDEBF0}
 .ldsum .ldf b.up{color:var(--ldr)}.ldsum .ldf b.down{color:var(--lds)}
+/* 심은 돈·차이 칸은 눈에 띄는 색 바탕 (2026-11-06 사용자 요청) */
+.ldsum>.lds{background:color-mix(in srgb,var(--green) 38%,#1B1A20);border-color:color-mix(in srgb,var(--green) 70%,#3A3942)}
+.ldsum>.lds span{color:color-mix(in srgb,var(--green) 35%,#fff)}
+.ldsum>.lds b{color:#fff}
+.ldsum>.ldf{background:color-mix(in srgb,var(--violet) 40%,#1B1A20);border-color:color-mix(in srgb,var(--violet) 70%,#3A3942)}
+.ldsum>.ldf span{color:color-mix(in srgb,var(--violet) 35%,#fff)}
+.ldsum>.ldf b,.ldsum>.ldf b.up,.ldsum>.ldf b.down{color:#fff}
 /* 맨 아래 고정 말씀 (2026-11-05 사용자 요청) */
 .ldverse{flex:0 0 auto;padding:10px 16px 12px;border-top:1px solid #3A3942;background:#1B1A20;text-align:center}
 .ldverse p{margin:0;font-size:15px;font-weight:700;line-height:1.4;color:var(--gold);word-break:keep-all}
