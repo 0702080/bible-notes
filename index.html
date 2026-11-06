@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-dlflat2">
+<meta name="app-build" content="2026-11-06-icthx">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4518,6 +4518,19 @@ textarea.dlicfull.dlicedit:focus{outline-style:solid}
 .icp:nth-of-type(6n+4){--ic0:var(--gold)}
 .icp:nth-of-type(6n+5){--ic0:var(--pink)}
 .icp:nth-of-type(6n+6){--ic0:var(--orange)}
+/* 🙏 기도제목 카드 뒷면 = 응답 감사 기도 (옆으로 밀기, 2026-11-06 사용자 요청) */
+.icbody .icp{touch-action:pan-y}
+.icp.thx>:not(.icthx):not(.icgrip){display:none!important}
+.icp:not(.thx)>.icthx{display:none}
+.icthxh{display:flex;align-items:center;gap:8px;margin:0 0 10px;padding-left:22px}
+.icthxh b{flex:1;color:color-mix(in srgb,var(--ic0) 60%,#fff);font-size:16px}
+.icthxh button{padding:5px 12px;border:1px solid color-mix(in srgb,var(--ic0) 45%,#3A3944);border-radius:14px;background:color-mix(in srgb,var(--ic0) 16%,#1B1A21);color:var(--ink);font-size:13px}
+.icthn{margin:0 0 8px;color:var(--muted);font-size:13px}
+.icthv{margin:0;white-space:pre-wrap;font-size:16px;line-height:1.8;color:var(--ink);-webkit-user-select:text;user-select:text}
+textarea.ictht{display:block;width:100%;min-height:180px;box-sizing:border-box;padding:10px 12px;border:1px solid color-mix(in srgb,var(--ic0) 45%,#3A3944);border-radius:12px;background:rgba(0,0,0,.22);color:var(--ink);font:inherit;font-size:16px;line-height:1.8;resize:none;overflow:hidden}
+textarea.ictht:focus{outline:none;border-color:color-mix(in srgb,var(--ic0) 75%,#fff)}
+.icthtip{margin:10px 0 0;color:var(--muted);font-size:12px;text-align:right}
+.icthmark{margin-left:auto;margin-right:8px;color:color-mix(in srgb,var(--ic0) 60%,#fff);font-size:12.5px;opacity:.85}
 .wklock{background:#000!important}   /* 화면을 켜 둔 채 주머니에: 완전히 까맣게 해서 배터리를 아낌 */
 .wkcnt{padding:1px 9px;border-radius:12px;background:color-mix(in srgb,var(--sky) 18%,transparent);color:var(--sky);font-weight:700}
 /* 📌 카드 고정 단추: ↺처럼 원 안에, ↺ 바로 왼쪽 */
@@ -12182,7 +12195,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(!o.del||typeof o.del!=="object")o.del={};
     o.per=Math.max(1,Math.min(10,+o.per||3));
     o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,100),memo:String(x.memo||"").slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
-      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,an:String(x.an||"").slice(0,1000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
+      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
     return o;
   }
   function icSave(o){try{localStorage.setItem(IC_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__icp")}
@@ -12213,7 +12226,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var i=x.log.indexOf(day); if(i>=0)x.log.splice(i,1); else{x.log.push(day);x.log.sort()}
     icTouch(x); icSave(o); return i<0;
   }
-  var icShowAns=false, icv=null, icEdit="", icOpen={};   // 펼친 카드 (기본은 접힘: 기도 제목 3줄만)
+  var icShowAns=false, icv=null, icEdit="", icOpen={}, icThx={}, icThxEd={}, icSwAt=0, icThxT=0;   // 펼친 카드 (기본은 접힘: 기도 제목 3줄만)
   try{icOpen=JSON.parse(localStorage.getItem("bible-ic-open")||"{}")||{}}catch(e){}
   function openIntercede(){
     if(!icv){
@@ -12233,8 +12246,40 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       // 한 번 누르면 접힌 카드가 펼쳐지고, 두 번 누르면 펼치면서 고치기 (2026-10-24 사용자 요청)
       var icTap={id:"",timer:0};
       icv.addEventListener("input",function(e){if(e.target.closest&&e.target.closest(".icinline .icfm"))grow(e.target)});
+      // 🙏 응답 감사 기도: 카드를 옆으로 밀면 뒷면 (2026-11-06 사용자 요청)
+      function thxSave(ta,now){
+        var c=ta.closest(".icp"); if(!c)return; var id=c.dataset.id, v=ta.value.replace(/\s+$/,"");
+        var o=icData(), x=o.items.find(function(y){return y.id===id}); if(!x||x.th===v)return;
+        x.th=v; icTouch(x); icSave(o); if(now)toast("감사 기도를 저장했어요");
+      }
+      icv.addEventListener("input",function(e){var ta=e.target; if(!ta.classList||!ta.classList.contains("ictht"))return; grow(ta); clearTimeout(icThxT); icThxT=setTimeout(function(){thxSave(ta)},500)});
+      icv.addEventListener("focusout",function(e){var ta=e.target; if(!ta.classList||!ta.classList.contains("ictht"))return; clearTimeout(icThxT); thxSave(ta,true);
+        var c=ta.closest(".icp"); if(c){var id=c.dataset.id; if(ta.value.trim())delete icThxEd[id]; setTimeout(function(){if(!icv.hidden&&!(document.activeElement&&document.activeElement.classList&&document.activeElement.classList.contains("ictht")))icDraw()},0)}});
       icv.addEventListener("click",function(e){
-        if(e.target.closest("button,input,textarea,select,.icform,.icgrip"))return;
+        var bb=e.target.closest(".icthback"); if(bb){var c0=bb.closest(".icp"); delete icThx[c0.dataset.id]; icDraw(); return}
+        var tv=e.target.closest(".icthv"); if(!tv)return; var c1=tv.closest(".icp"), id1=c1.dataset.id, now=Date.now();
+        if(icThxTap.id===id1&&now-icThxTap.t<350){icThxTap={id:"",t:0}; icThxEd[id1]=1; icDraw(); var ta=icv.querySelector('.icp[data-id="'+id1+'"] textarea.ictht'); if(ta){grow(ta); try{ta.focus({preventScroll:true}); ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}}}
+        else icThxTap={id:id1,t:now};
+      });
+      var sw=null, icThxTap={id:"",t:0};
+      icv.addEventListener("pointerdown",function(e){
+        sw=null; if(e.pointerType==="mouse"&&e.button!==0)return;
+        var c=e.target.closest(".icp"); if(!c||e.target.closest(".icgrip,.icform,input,select,textarea.icfm"))return;
+        sw={c:c,x:e.clientX,y:e.clientY,id:e.pointerId};
+      });
+      icv.addEventListener("pointerup",function(e){
+        var d=sw; sw=null; if(!d||e.pointerId!==d.id)return;
+        var dx=e.clientX-d.x, dy=e.clientY-d.y; if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;
+        var id=d.c.dataset.id; icSwAt=Date.now();
+        var ta=d.c.querySelector("textarea.ictht"); if(ta){clearTimeout(icThxT); thxSave(ta)}
+        if(icThx[id])delete icThx[id]; else icThx[id]=1;
+        buzz(10); icDraw();
+        if(icThx[id]){var nt=icv.querySelector('.icp[data-id="'+id+'"] textarea.ictht'); if(nt){grow(nt); try{nt.focus({preventScroll:true})}catch(err){}}}
+      });
+      icv.addEventListener("pointercancel",function(){sw=null});
+      icv.addEventListener("click",function(e){
+        if(e.target.closest("button,input,textarea,select,.icform,.icgrip,.icthx"))return;
+        if(Date.now()-icSwAt<450)return;   // 옆으로 민 손길은 펼치기·고치기로 세지 않음
         var c=e.target.closest(".icp"); if(!c)return; var id=c.dataset.id;
         if(icTap.id===id&&icTap.timer){clearTimeout(icTap.timer); icTap={id:"",timer:0};
           icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){}
@@ -12364,8 +12409,19 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var dt=document.createElement("span"); dt.className="icdate"; var ad=new Date(x.at);   // 기도를 적은 날 (2026-10-24 사용자 요청)
     dt.textContent=(ad.getFullYear()!==new Date().getFullYear()?ad.getFullYear()+". ":"")+dayName(dkey(x.at))+" 적음"; bt.appendChild(dt);
     function B(cls,t){var b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=t; bt.appendChild(b); return b}
+    if(x.th.trim()){var tm=document.createElement("span"); tm.className="icthmark"; tm.textContent="🙏 감사 기도 있음"; bt.appendChild(tm)}
     if(big&&!x.ans)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
     var ansB=B("icans"+(x.ans?" on":""),x.ans?"🙌 응답됨 ✓":"응답 표시"); ansB.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답을 받았으면 눌러 표시해요";   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
+    // 뒷면: 응답 감사 기도 — 적은 게 있으면 읽는 글, 없으면 바로 적는 칸 (2026-11-06 사용자 요청)
+    var bk=document.createElement("div"); bk.className="icthx";
+    bk.innerHTML='<div class="icthxh"><b>🙏 응답 감사 기도</b><button type="button" class="icthback">← 기도문</button></div>';
+    var ed=!x.th.trim()||icThxEd[x.id];
+    if(!x.ans){var nt=document.createElement("p"); nt.className="icthn"; nt.textContent="아직 응답 표시 전이에요. 응답해 주신 것을 미리 감사로 적어도 좋아요."; bk.appendChild(nt)}
+    if(ed){var ta=document.createElement("textarea"); ta.className="ictht"; ta.maxLength=4000; ta.placeholder="응답해 주신 하나님께 감사 기도를 적어 보세요"; ta.value=x.th; bk.appendChild(ta)}
+    else{var tv=document.createElement("p"); tv.className="icthv"; tv.textContent=x.th; bk.appendChild(tv)}
+    var tip=document.createElement("p"); tip.className="icthtip"; tip.textContent=ed?"적는 대로 저장돼요 · 옆으로 밀면 기도문":"두 번 누르면 고치기 · 옆으로 밀면 기도문"; bk.appendChild(tip);
+    d.appendChild(bk);
+    if(icThx[x.id])d.classList.add("thx");
     return d;
   }
   function icForm(x){
@@ -12382,7 +12438,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     // 적는 중에 클라우드 맞춤 등으로 다시 그려도 적던 글이 사라지지 않게 칸 내용을 옮겨 둠 (2026-11-01)
     var kf=icv.querySelector(".icform"), keep=null;
     if(kf){keep={id:kf.dataset.id,v:{},foc:""}; [".icfn",".icfm",".icfv",".icfa"].forEach(function(s){var el=kf.querySelector(s); if(el){keep.v[s]=el.value; if(document.activeElement===el){keep.foc=s; try{keep.ss=el.selectionStart;keep.se=el.selectionEnd}catch(e){}}}}); keep.st=icv.querySelector(".icbody").scrollTop}
+    var kt=document.activeElement&&document.activeElement.classList&&document.activeElement.classList.contains("ictht")?document.activeElement:null, ktk=null;
+    if(kt){var kc=kt.closest(".icp"); ktk={id:kc&&kc.dataset.id,v:kt.value,s:kt.selectionStart,e:kt.selectionEnd,st:icv.querySelector(".icbody").scrollTop}}
     icDrawInner();
+    icv.querySelectorAll(".icp.thx textarea.ictht").forEach(grow);
+    if(ktk){var nc=icv.querySelector('.icp[data-id="'+ktk.id+'"] textarea.ictht'); if(nc){nc.value=ktk.v; grow(nc); icv.querySelector(".icbody").scrollTop=ktk.st; try{nc.focus({preventScroll:true}); nc.setSelectionRange(ktk.s,ktk.e)}catch(e){}}}
     var inl=icv.querySelector(".icinline .icfm"); if(inl)grow(inl);
     var nf=keep&&icv.querySelector(".icform");
     if(nf&&nf.dataset.id===keep.id){Object.keys(keep.v).forEach(function(s){var el=nf.querySelector(s); if(el)el.value=keep.v[s]}); icv.querySelector(".icbody").scrollTop=keep.st;
