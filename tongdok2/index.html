@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-05-blank">
+<meta name="app-build" content="td-2026-11-06-noscrolltap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1383,6 +1383,10 @@ document.addEventListener("click",function(ev){
    휴대폰(카톡 안 브라우저 포함)에서는 포인터 이벤트가 중간에 끊길 수 있어 터치 이벤트로 직접 처리하고, 마우스만 포인터 이벤트로 처리 */
 (function(){
   var P=null, D=null, eat=false;
+  /* 위아래로 굴리다 장이 체크되던 문제 (2026-11-06 사용자 요청): 화면이 굴러가는 중에 손을 댔거나(굴러가던 것을 멈추는 손길),
+     손가락이 10px 넘게 움직였거나, 누르는 동안 화면이 굴렀으면 그 손길의 체크(click)는 버림 */
+  var lastScroll=0, T0=null, noTap=false, noTapT=0;
+  window.addEventListener("scroll",function(){lastScroll=Date.now(); if(T0)T0.scrolled=true; cancelArm()},{passive:true});
   function chipAt(x,y){var t=document.elementFromPoint(x,y);return t&&t.closest?t.closest('.chip[data-act="chip"]'):null}
   function buzzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
   function paint(c){
@@ -1402,7 +1406,7 @@ document.addEventListener("click",function(ev){
   function cancelArm(){if(P){clearTimeout(P.t);P=null}}
   function move(x,y){
     if(P){var dx=Math.abs(x-P.x),dy=Math.abs(y-P.y);
-      if(dx>8&&dx>dy*1.2){var c1=P.c;cancelArm();begin(c1)}   // 기다리지 않고 바로 옆으로 밀어도 칠하기 시작 (위아래로 밀면 스크롤)
+      if(dx>12&&dx>dy*2){var c1=P.c;cancelArm();begin(c1)}   // 기다리지 않고 바로 옆으로 밀어도 칠하기 시작 (위아래로 밀면 스크롤)
       else if(dx>10||dy>10)cancelArm();
     }
     if(!D)return false;
@@ -1423,15 +1427,22 @@ document.addEventListener("click",function(ev){
   }
   // 터치
   document.addEventListener("touchstart",function(e){
-    if(e.touches.length!==1){cancelArm();return}
-    var t=e.touches[0], c=e.target.closest&&e.target.closest('.chip[data-act="chip"]'); if(c)arm(c,t.clientX,t.clientY);
+    if(e.touches.length!==1){cancelArm();if(T0)T0.moved=true;return}
+    var t=e.touches[0], fling=Date.now()-lastScroll<300;
+    T0={x:t.clientX,y:t.clientY,fling:fling,moved:false,scrolled:false};
+    var c=e.target.closest&&e.target.closest('.chip[data-act="chip"]'); if(c&&!fling)arm(c,t.clientX,t.clientY);
   },{passive:true});
   document.addEventListener("touchmove",function(e){
     var t=e.touches[0]; if(!t)return;
+    if(T0&&(Math.abs(t.clientX-T0.x)>10||Math.abs(t.clientY-T0.y)>10))T0.moved=true;
     if(move(t.clientX,t.clientY)&&e.cancelable)e.preventDefault();   // 끄는 동안 화면이 스크롤되지 않게
   },{passive:false});
-  document.addEventListener("touchend",end,{passive:true});
-  document.addEventListener("touchcancel",end,{passive:true});
+  function tEnd(){
+    if(T0&&!D&&(T0.fling||T0.moved||T0.scrolled)){noTap=true;clearTimeout(noTapT);noTapT=setTimeout(function(){noTap=false},500)}
+    T0=null; end();
+  }
+  document.addEventListener("touchend",tEnd,{passive:true});
+  document.addEventListener("touchcancel",tEnd,{passive:true});
   // 마우스 (PC)
   document.addEventListener("pointerdown",function(e){
     if(e.pointerType!=="mouse"||e.button!==0)return;
@@ -1440,7 +1451,7 @@ document.addEventListener("click",function(ev){
   document.addEventListener("pointermove",function(e){if(e.pointerType==="mouse")move(e.clientX,e.clientY)});
   document.addEventListener("pointerup",function(e){if(e.pointerType==="mouse")end()});
   document.addEventListener("contextmenu",function(e){if(D||P)e.preventDefault()});
-  document.addEventListener("click",function(e){if(eat&&e.target.closest&&e.target.closest(".chip")){e.stopPropagation();e.preventDefault();eat=false}},true);
+  document.addEventListener("click",function(e){if(noTap&&e.target.closest&&e.target.closest('.chip[data-act="chip"]')){e.stopPropagation();e.preventDefault();noTap=false;return}if(eat&&e.target.closest&&e.target.closest(".chip")){e.stopPropagation();e.preventDefault();eat=false}},true);
 })();
 function bookOf(idx){
   for(var i=BOOKS.length-1;i>=0;i--)if(idx>=OFF[i])return i;
