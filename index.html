@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-pthalign">
+<meta name="app-build" content="2026-11-07-icans">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2365,6 +2365,10 @@ button:active{filter:brightness(1.15)}
 .oquiz[hidden]{display:none}
 .micbtn{position:fixed;z-index:500;width:40px;height:40px;border-radius:20px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);background:#1B1A21;color:var(--sky);display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.45);cursor:pointer;padding:0}
 .micbtn[hidden]{display:none}
+.cpybtn{position:fixed;z-index:500;width:40px;height:40px;padding:0;border-radius:20px;border:1px solid color-mix(in srgb,var(--gold) 55%,#34333A);background:rgba(27,26,33,.88);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);color:var(--gold);display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.45);cursor:pointer}
+.cpybtn[hidden]{display:none}
+.cpybtn svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linejoin:round}
+.cpybtn.done{background:var(--gold);color:#1E1608}
 .micbtn{background:rgba(27,26,33,.88);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .dlmemobox textarea,.mqa,.sermt{scrollbar-width:thin;scrollbar-color:#3A3944 transparent}   /* 글 칸 스크롤바는 얇고 은은하게 (2026-10-25) */
 .micbtn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round}
@@ -4527,6 +4531,12 @@ textarea.dlicfull.dlicedit:focus{outline-style:solid}
 .icp:nth-of-type(6n+4){--ic0:var(--gold)}
 .icp:nth-of-type(6n+5){--ic0:var(--pink)}
 .icp:nth-of-type(6n+6){--ic0:var(--orange)}
+/* 🙌 응답된 기도 카드: 명단 맨 아래, 밝은 금빛 바탕으로 확실히 구분 (2026-11-07 사용자 요청) */
+.icbody .icp.ans,.icbody .icp.ans.big{opacity:1;background:#4A3A12!important;border:2px solid #F2B73A!important;box-shadow:inset 4px 0 0 #F2B73A,0 2px 10px rgba(0,0,0,.3)}
+.icbody .icp.ans .icname{color:#FFE7A8}
+.icbody .icp.ans .icmemo,.icbody .icp.ans .icmeta{color:#F4E6C4}
+.icv .icanshd{margin-top:18px}
+.icv .icanshd b{color:#F2B73A}
 .icv .ichead .icprog,.icv .ichead .icperl{display:none!important}   /* 오늘 기도제목 옆 'N / N'·'하루 N명씩'은 숨김 (2026-11-06 사용자 요청) */
 /* 🙏 기도제목 카드 뒷면 = 응답 감사 기도 (옆으로 밀기, 2026-11-06 사용자 요청) */
 .icbody .icp{touch-action:pan-y}
@@ -7633,6 +7643,43 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       if(rec){rec.onend=null; try{rec.stop()}catch(err){} rec=null}
       if(document.activeElement!==ta)hide();
     }
+  })();
+  /* ---------- 📋 글 칸 전체 복사 (2026-11-07 사용자 요청: 기도문 적을 때 한 번에 복사) ----------
+     글이 있는 글 칸을 누르면 🎤 왼쪽에 📋 단추가 떠요. 누르면 칸의 글 전체를 복사해요. */
+  (function(){
+    var cb=document.createElement("button"); cb.type="button"; cb.className="cpybtn"; cb.hidden=true;
+    cb.setAttribute("aria-label","글 전체 복사"); cb.title="글 전체 복사";
+    cb.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="12" rx="2.2"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></svg>';
+    document.body.appendChild(cb);
+    var ta=null;
+    function skip(t){return !t||t.tagName!=="TEXTAREA"||t.disabled||t.classList.contains("sayeta")||t.classList.contains("srmli")||t.classList.contains("ccdta")}
+    function place(){
+      if(!ta||!ta.isConnected||!ta.value.trim()){cb.hidden=true;return}
+      var r=ta.getBoundingClientRect(); if(r.bottom<0||r.top>innerHeight||!r.width){cb.hidden=true;return}
+      var vt=Math.max(0,r.top), vb=Math.min(innerHeight,r.bottom);
+      for(var pe=ta.parentElement;pe&&pe!==document.body;pe=pe.parentElement){
+        var ov=getComputedStyle(pe).overflowY; if(ov!=="auto"&&ov!=="scroll"&&ov!=="hidden")continue;
+        var pr=pe.getBoundingClientRect(); vt=Math.max(vt,pr.top); vb=Math.min(vb,pr.bottom);
+      }
+      if(vb-vt<48){cb.hidden=true;return}
+      cb.hidden=false;
+      var cs=getComputedStyle(ta), sbw=Math.max(0,ta.offsetWidth-ta.clientWidth-(parseFloat(cs.borderLeftWidth)||0)-(parseFloat(cs.borderRightWidth)||0));
+      var mic=document.querySelector(".micbtn"), hasMic=mic&&!mic.hidden;
+      cb.style.left=Math.max(4,Math.min(innerWidth-48,r.right-46-sbw)-(hasMic?48:0))+"px";
+      cb.style.top=Math.max(vt+4,Math.min(innerHeight-48,vb-48))+"px";
+    }
+    document.addEventListener("focusin",function(e){var t=e.target; if(skip(t))return; ta=t; setTimeout(place,0)});
+    document.addEventListener("focusout",function(e){if(e.target===ta)setTimeout(function(){if(document.activeElement!==ta){cb.hidden=true; ta=null}},150)});
+    document.addEventListener("input",function(e){if(e.target===ta)place()},true);
+    window.addEventListener("scroll",function(){if(ta)place()},true);
+    window.addEventListener("resize",function(){if(ta)setTimeout(place,60)});
+    cb.addEventListener("pointerdown",function(e){e.preventDefault()});   // 글 칸 커서를 잃지 않게
+    cb.addEventListener("click",function(e){
+      e.stopPropagation(); if(!ta)return; var v=ta.value; if(!v.trim())return;
+      function ok(){buzz([10,30,10]); toast("📋 글 전체를 복사했어요"); cb.classList.add("done"); setTimeout(function(){cb.classList.remove("done")},900)}
+      function old(){var a=ta.selectionStart,b=ta.selectionEnd; try{ta.select(); var r=document.execCommand("copy"); ta.setSelectionRange(a,b); r?ok():toast("복사하지 못했어요")}catch(err){toast("복사하지 못했어요")}}
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(ok,old); else old();
+    });
   })();
   // 📴 오프라인에서도 열리게: 서비스 워커 (2026-10-25 사용자 요청)
   if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){
@@ -12499,7 +12546,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(!icAns.length)icShowAns=false;
     icv.querySelector(".iccnt").textContent=icLive.length?icLive.length+"명":"";
     if(icEdit==="new")body.appendChild(icForm(null));   // 새 사람은 맨 위에서 적기 (2026-10-24 사용자 요청: 넣기 단추는 위 제목줄에)
-    function ansBtn(){if(!icAns.length)return; var av=document.createElement("button"); av.type="button"; av.className="icansv"+(icShowAns?" on":""); av.textContent=icShowAns?"← 기도제목으로":"🙌 응답된 기도 "+icAns.length+"개 보기"; body.appendChild(av)}
+    // 응답된 기도는 명단 맨 아래에 늘 보임 — 카드 색을 달리해 구분 (2026-11-07 사용자 요청)
+    icShowAns=false;
+    function ansBtn(){if(!icAns.length)return; var t=document.createElement("div"); t.className="ichead ichall icanshd"; t.innerHTML='<b>🙌 응답된 기도 '+icAns.length+'</b>'; body.appendChild(t);
+      icAns.forEach(function(x){body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,false))})}
     if(icShowAns){   // 응답된 기도는 이 단추를 눌렀을 때만 (2026-11-04 사용자 요청)
       ansBtn();
       icAns.forEach(function(x){body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,false))});
