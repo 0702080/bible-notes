@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-colellip2">
+<meta name="app-build" content="2026-11-07-sayuse">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3425,6 +3425,20 @@ textarea.lhpad{padding-left:28px!important}
 .saylist.saysorting .saycard:not(.saydragging){transition:transform .15s}
 .saycard.saydragging{position:relative;z-index:5;box-shadow:0 14px 30px rgba(0,0,0,.6);border-color:color-mix(in srgb,var(--gold) 60%,#232229);background:color-mix(in srgb,var(--gold) 10%,#16161b);cursor:grabbing}
 .sayq{margin:0;font-family:var(--serif);font-size:16.5px;line-height:1.8;color:var(--ink);word-break:keep-all;white-space:pre-wrap}
+/* 💡 한 마디 카드 뒷면: 활용 적기 (2026-11-07 사용자 요청) */
+.saycard.sayback{padding-left:16px!important}
+.saycard.sayback .saygrip{display:none}
+.saybkh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.saybkh b{font-size:14.5px;color:color-mix(in srgb,var(--sc) 75%,#fff)}
+.saybkx{flex:none;height:30px;padding:0 12px;font-size:12.5px}
+.saybkq{margin:0 0 10px;font-size:13px;line-height:1.5;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+textarea.sayuse{display:block;width:100%;box-sizing:border-box;min-height:110px;padding:12px 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--sc) 45%,#34333A);background:color-mix(in srgb,var(--sc) 10%,#101013);color:var(--ink);font-family:inherit;font-size:16.5px;line-height:1.8;resize:vertical;word-break:keep-all;-webkit-user-select:text;user-select:text}
+.sayusev{margin:0;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--sc) 10%,#101013);border:1px solid color-mix(in srgb,var(--sc) 30%,#2A2930);font-family:var(--serif);font-size:16.5px;line-height:1.8;color:var(--ink);white-space:pre-wrap;word-break:keep-all}
+.saybktip{margin:8px 2px 0;font-size:11.5px;color:var(--muted)}
+.sayusemark{display:inline-block;margin-top:6px;font-size:11.5px;color:color-mix(in srgb,var(--sc) 70%,#fff);opacity:.85}
+.saycard.sayflipl{animation:sayFlipL .28s ease-out}.saycard.sayflipr{animation:sayFlipR .28s ease-out}
+@keyframes sayFlipL{from{transform:translateX(36px);opacity:.3}to{transform:none;opacity:1}}
+@keyframes sayFlipR{from{transform:translateX(-36px);opacity:.3}to{transform:none;opacity:1}}
 .sayf{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px;font-size:12.5px}
 .sayf b{color:var(--gold);font-weight:700}
 .saytag{padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--violet) 14%,transparent);color:var(--violet);font-size:11.5px}
@@ -15057,6 +15071,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   }
   function drawSay(){
     if(!say)return;
+    var ua=document.activeElement; if(ua&&ua.classList&&ua.classList.contains("sayuse")&&say.contains(ua)){sayUsePend=true; return}   // 뒷면에 적는 중엔 다시 그리지 않음
     var o=sayData(), form=say.querySelector(".sayform"), list=say.querySelector(".saylist");
     // 적던 중에 화면이 다시 그려져도(동기화 등) 적던 글은 그대로 (2026-10-25 사용자 요청)
     var keep=null, ft=form.querySelector(".sayt");
@@ -15107,7 +15122,19 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var c=document.createElement("article"); c.className="saycard"; c.dataset.id=x.id; var cth=x.hv?null:sayTheme(x);
       c.style.setProperty("--sc",SAY_VCOL[hvN%SAY_VCOL.length]); hvN++; if(!x.hv)c.classList.add("saytint");   // 목록 카드는 한 마디도 짧은 말씀처럼 카드마다 색이 차례로, 묶음은 이름표로만 (2026-11-05 사용자 요청)
       var gp=document.createElement("span"); gp.className="saygrip"; gp.setAttribute("aria-hidden","true"); gp.title="끌어서 순서 바꾸기"; gp.textContent="⠿"; c.appendChild(gp);
+      // 🔄 옆으로 밀면 뒷면: 이 말을 어떻게 활용할지 적기 (2026-11-07 사용자 요청)
+      if(sayBack[x.id]){
+        c.classList.add("sayback");
+        var bh=document.createElement("div"); bh.className="saybkh";
+        bh.innerHTML='<b>💡 이 말을 이렇게 활용해요</b><button type="button" class="saybtn saybkx" data-act="front">← 앞면</button>'; c.appendChild(bh);
+        var bq=document.createElement("p"); bq.className="saybkq"; bq.textContent=String(x.t||"").replace(/\s+/g," "); c.appendChild(bq);
+        if(x.use&&sayUseEd!==x.id){var uv=document.createElement("p"); uv.className="sayusev"; uv.textContent=x.use; c.appendChild(uv)}
+        else{var ut=document.createElement("textarea"); ut.className="sayuse"; ut.dataset.id=x.id; ut.maxLength=3000; ut.rows=4; ut.value=x.use||""; ut.placeholder="이 말을 내 삶에 어떻게 활용하면 좋을까요?\n(예: 아내에게, 친구에게, 일터에서…)"; c.appendChild(ut)}
+        var bt=document.createElement("p"); bt.className="saybktip"; bt.textContent=(x.use&&sayUseEd!==x.id)?"두 번 누르면 고치기 · 옆으로 밀면 앞면":"적는 대로 저장돼요 · 옆으로 밀면 앞면"; c.appendChild(bt);
+        list.appendChild(c); return;
+      }
       var q=document.createElement("p"); q.className="sayq"; q.textContent=x.t||""; c.appendChild(q);
+      if(x.use){var um=document.createElement("span"); um.className="sayusemark"; um.textContent="💡 활용"; um.title="옆으로 밀면 이 말을 어떻게 활용할지 적은 글이 보여요"; c.appendChild(um)}
       var f=document.createElement("div"); f.className="sayf";
       if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
       if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
@@ -15137,6 +15164,12 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     return fresh.concat(rest);
   }
   // 한 마디 카드 끌어서 순서 바꾸기: 카드를 꾹(0.35초) 누르거나 왼쪽 ⠿를 잡고 위아래로 끌기
+  var sayBack={}, sayUseEd="", sayUsePend=false, sayUseT=0, saySwAt=0;
+  function sayUseSave(ta){
+    var o=sayData(), x=o.items.find(function(y){return y.id===ta.dataset.id}); if(!x)return;
+    var v=ta.value.replace(/\s+$/,""); if((x.use||"")===v)return;
+    x.use=v; x.at=Date.now(); saveSay(o);
+  }
   var sayDrag=null, sayQ="", sayLocked=false; try{sayLocked=localStorage.getItem("bible-say-lock")==="1"}catch(e){}
   function sayDragInit(){
     var list=say.querySelector(".saylist"), body=say.querySelector(".dlbody"), hold=0, sx=0, sy=0, pend=null;
@@ -15181,9 +15214,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     list.addEventListener("click",function(e){
       var card=e.target.closest(".saycard"); if(!card||e.target.closest("button,a,input,textarea,select,label"))return;
       var now=Date.now(), id=card.dataset.id;
+      if(Date.now()-saySwAt<450){e.preventDefault(); e.stopPropagation(); return}   // 옆으로 민 끝의 누름은 무시
       if(dtap.id===id&&now-dtap.t<380){
         dtap={id:"",t:0}; e.preventDefault(); e.stopPropagation();
         try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
+        if(sayBack[id]){sayUseEd=id; drawSay(); var ut=say.querySelector('.sayuse[data-id="'+id+'"]'); if(ut){try{ut.focus({preventScroll:true}); ut.setSelectionRange(ut.value.length,ut.value.length)}catch(err){}} return}
         sayEdit=id; drawSay(); var ta=say.querySelector(".sayt");
         if(ta){ta.scrollIntoView({block:"center"}); setTimeout(function(){try{ta.focus({preventScroll:true}); ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}},30)}
         return;
@@ -15205,6 +15240,21 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     document.addEventListener("touchmove",function(e){if(sayDrag)e.preventDefault()},{passive:false});   // 끄는 동안 화면이 같이 밀리지 않게
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(){if(sayDrag)end();clearTimeout(hold);pend=null});
     list.addEventListener("contextmenu",function(e){if(sayDrag||pend)e.preventDefault()});
+    // 카드를 옆으로 밀면 앞면 ↔ 뒷면(활용 적기) (2026-11-07 사용자 요청)
+    var sw=null;
+    list.addEventListener("pointerdown",function(e){var c=e.target.closest(".saycard"); sw=(c&&!e.target.closest("textarea,input,select"))?{c:c,x:e.clientX,y:e.clientY}:null},true);
+    document.addEventListener("pointerup",function(e){
+      var w=sw; sw=null; if(!w||sayDrag||sayEdit)return;
+      var dx=e.clientX-w.x, dy=e.clientY-w.y; if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;
+      var id=w.c.dataset.id; saySwAt=Date.now(); clearTimeout(hold); pend=null;
+      var ua=document.activeElement; if(ua&&ua.classList&&ua.classList.contains("sayuse")){sayUseSave(ua); ua.blur()}
+      if(sayBack[id])delete sayBack[id]; else sayBack[id]=1;
+      sayUseEd=""; buzz(10); drawSay();
+      var nc=list.querySelector('.saycard[data-id="'+id+'"]'); if(nc){nc.classList.add(dx<0?"sayflipl":"sayflipr"); var t0=nc.querySelector(".sayuse"); if(t0&&!t0.value)setTimeout(function(){try{t0.focus({preventScroll:true})}catch(err){}},60)}
+    });
+    list.addEventListener("input",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return; t.style.height="auto"; t.style.height=t.scrollHeight+"px"; clearTimeout(sayUseT); sayUseT=setTimeout(function(){sayUseSave(t)},500)});
+    list.addEventListener("focusout",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return; clearTimeout(sayUseT); sayUseSave(t);
+      setTimeout(function(){var a=document.activeElement; if(a&&a.classList&&a.classList.contains("sayuse"))return; if(sayUseEd===t.dataset.id)sayUseEd=""; sayUsePend=false; drawSay()},120)});
   }
   document.addEventListener("click",function(e){var i=e.target.closest&&e.target.closest(".sayhvtm"); if(!i)return; if(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches){e.preventDefault();return} try{i.showPicker()}catch(err){}});
   // PC 시간 고르기 창: 크롬 기본 창은 모양을 못 바꿔서 직접 그림 (휴대폰은 기본 시계 판, 2026-10-25 사용자 요청)
@@ -15254,6 +15304,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     toast(x.tm?"⏰ 매일 "+x.tm+"에 이 말씀이 나와요":"10분마다 돌아가며 나와요");
   });
   function sayClick(e){
+    var fb=e.target.closest&&e.target.closest('[data-act="front"]'); if(fb){var fc=fb.closest(".saycard"); if(fc){delete sayBack[fc.dataset.id]; sayUseEd=""; drawSay()} return}
     var b=e.target.closest("button"); if(!b)return;
     var act=b.dataset.act||"", card=b.closest(".saycard"), id=card?card.dataset.id:(b.dataset.id||"");
     if(act==="cancel"){sayEdit="";drawSay();return}
