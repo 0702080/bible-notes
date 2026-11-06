@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-colellip">
+<meta name="app-build" content="2026-11-07-colellip2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4905,8 +4905,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
 .colbar .cchip.cctint.on{background-color:var(--cc);border-color:var(--cc);color:#141218}
 .colbar .cchip.cctint.on .ccnt{background:rgba(0,0,0,.16)}
 /* 칸 칩이 화면 끝에서 잘리지 않게: 칩이 줄어들고 이름은 …으로 (2026-11-07 사용자 요청) */
-.colbar .cchip{flex:0 0 auto;min-width:76px;max-width:100%;overflow:hidden}
-.colbar .cchip:last-child{flex-shrink:1}
+.colbar{margin:0;padding-left:0;padding-right:0}
+.colbar .cchip{flex:0 0 auto;max-width:100%;overflow:hidden}
+.colbar .cchip.ccfit>.ccnt{display:none}   /* 좁게 줄인 칩은 숫자를 감추고 이름…을 보임 */
 .colbar .cchip>span:first-child{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .colbar .cchip>.ccnt{flex:none}
 /* 한 마디 고치는 칸: 글 폭·글자·줄 간격을 읽을 때 카드와 똑같이 해서 문장이 같은 자리에서 꺾이게 (2026-11-05 사용자 요청) */
@@ -5950,7 +5951,18 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     // 칸마다 다른 색: 내 칸 목록의 순서로 정해서, 카드가 없는 칸이 생겨도 다른 칸 색이 바뀌지 않음 (2026-11-05 사용자 요청)
     var COLCC=["#E58FB1","#7FB8E6","#7FCFA4","#B79BEB","#EDA46F","#6FCBC7","#D9C25E","#E58A7F"], allC=myCols();
     cs.forEach(function(c){var k=0; notes.forEach(function(n){if(n.col===c)k++}); mk(c,"📁 "+c,k); var el=bar.lastChild; el.classList.add("cctint"); el.style.setProperty("--cc",COLCC[allC.indexOf(c)%COLCC.length])});
+    colBarFit();
   }
+  // 칸 칩 줄 오른쪽 끝에 걸린 칩은 잘리지 않게 줄여서 오른쪽도 둥글게, 이름은 … (2026-11-07 사용자 요청)
+  function colBarFit(){
+    var bar=$("colBar"); if(!bar||bar.hidden)return;
+    var ch=[].slice.call(bar.children); ch.forEach(function(b){b.style.maxWidth=""; b.classList.remove("ccfit")});
+    if(bar.scrollWidth<=bar.clientWidth+1)return;
+    var br=bar.getBoundingClientRect().right-2;
+    for(var i=0;i<ch.length;i++){var r=ch[i].getBoundingClientRect(); if(r.right>br){var av=Math.floor(br-r.left); if(av>=48){ch[i].style.maxWidth=av+"px"; ch[i].classList.toggle("ccfit",av<120)} break}}
+  }
+  window.addEventListener("resize",function(){clearTimeout(colBarFit.t); colBarFit.t=setTimeout(colBarFit,120)});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){colBarFit()});
   // 두 낱말 이상으로 찾을 때, 말씀(본문·구절 이름)에 그 말이 붙은 그대로 들어 있는 카드가 있으면 그 카드만 보여 줌 (2026-10-22 사용자 요청)
   var exKey=null, exSet=null;
   function exactSet(){
