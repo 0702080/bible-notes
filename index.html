@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-saydbl">
+<meta name="app-build" content="2026-11-06-saydelbtn">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -14985,7 +14985,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         var nb=document.createElement("button"); nb.type="button"; nb.className="saynotebtn"; nb.dataset.act="note"; nb.dataset.note=x.note;
         nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
       }
-      var ed=document.createElement("button"); ed.type="button"; ed.className="saybtn"; ed.dataset.act="edit"; ed.textContent="고치기";
+      var ed=document.createElement("button"); ed.type="button"; ed.className="saybtn saydelc"; ed.dataset.act="del"; ed.textContent="삭제";   // 고치기는 카드 두 번 누르기로, 단추는 삭제 (2026-11-06 사용자 요청)
       f.appendChild(ed);   // 고치기·지우기를 한 단추로 — 지우기는 고치는 칸 안에 (2026-11-06 사용자 요청)
       c.appendChild(f); list.appendChild(c);
     });
@@ -15134,7 +15134,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     if(act==="edit"){sayEdit=id;drawSay();var ta=say.querySelector(".sayt");if(ta)setTimeout(function(){ta.focus()},30);return}
     if(act==="del"){
-      if(!b.dataset.sure){var x0=b.classList.contains("saydelx");b.dataset.sure="1";b.textContent=x0?"지울까요?":"한 번 더 누르면 지워요";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent=x0?"🗑":"지우기";b.classList.remove("sure")}},3000);return}
+      if(!b.dataset.sure){var x0=b.classList.contains("saydelx");b.dataset.sure="1";b.textContent=x0?"지울까요?":"한 번 더 누르면 삭제";b.classList.add("sure");setTimeout(function(){if(b.isConnected){delete b.dataset.sure;b.textContent=x0?"🗑":"삭제";b.classList.remove("sure")}},3000);return}
       var o2=sayData(); o2.items=o2.items.filter(function(x){return x.id!==id}); if(sayEdit===id)sayEdit=""; saveSay(o2); drawSay(); renderReviewBar(); toast("지웠어요");
       return;
     }
