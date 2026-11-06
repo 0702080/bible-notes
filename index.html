@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-ldsumcol">
+<meta name="app-build" content="2026-11-06-syncrow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3035,6 +3035,12 @@ button:active{filter:brightness(1.15)}
 .tdrow .rvchip{height:40px;padding:0 18px;border-radius:20px;font-size:15px}
 .tdrow .rvchip:active{transform:scale(.96)}
 @media (max-width:480px){.tdrow{grid-template-columns:22px 6.2em minmax(0,1fr)}.tdrow.many .tdc{grid-column:2/-1;margin-bottom:4px}}
+/* ☁️ 동기화 줄: 한 줄로 [☁️ 동기화 · 상태 …… 지금 맞추기], 단추는 카드 오른쪽 끝 (2026-11-06 사용자 요청) */
+.tdrow.sync,.reviewbar .tdrow.sync{grid-template-columns:22px auto minmax(0,1fr);align-items:center}
+.tdrow.sync .tdl{white-space:nowrap}
+.tdrow.sync .tdc{flex-wrap:nowrap;justify-content:space-between;gap:8px;margin:0}
+.tdrow.sync .tdtag{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tdrow.sync .rvchip{margin-left:auto;flex:0 0 auto}
 .mmore{display:flex;flex-direction:column;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed #2E2D33}
 .mmore > *{margin:0!important}
 .dfold,.aftoggle{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;border:1px solid #2A2930;border-radius:12px;background:#141317;color:var(--ink);text-align:left}
@@ -15702,7 +15708,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var gc=ghCfg(), gs=(typeof ghState==="object"&&ghState)||{};   // 앱이 처음 그려질 때는 아직 동기화 상태가 없을 수 있음
     var ss=sbSession(), sst=(typeof sbState==="object"&&sbState)||{};
     if(ss){var sago=sst.at?Math.round((Date.now()-sst.at)/60000):-1;
-      rows.push({icon:"☁️",info:1,label:"동기화",tag:sst.ok===false?"안 됐어요 · "+(sst.short||""):(typeof sbBusy!=="undefined"&&sbBusy)||sago<0?"맞추는 중…":sago<1?"방금 맞춤":sago+"분 전 맞춤",bad:sst.ok===false,chips:[{id:"",t:"지금 맞추기",act:"sbsync"}],done:sst.ok===true})}
+      rows.push({icon:"☁️",info:1,label:"동기화",tag:sst.ok===false?"안 됐어요":(typeof sbBusy!=="undefined"&&sbBusy)||sago<0?"맞추는 중…":sago<1?"방금 맞춤":sago+"분 전 맞춤",bad:sst.ok===false,chips:[{id:"",t:"지금 맞추기",act:"sbsync"}],done:sst.ok===true})}
     else if(gc){var ago=gs.at?Math.round((Date.now()-gs.at)/60000):-1;
       rows.push({icon:"☁️",info:1,label:"동기화",tag:gs.ok===false?"안 됐어요":ghBusy?"맞추는 중…":ago<0?"GitHub 켜짐":ago<1?"방금 맞춤":ago+"분 전 맞춤",bad:gs.ok===false,chips:[{id:"",t:"지금 맞추기",act:"sync"}],done:gs.ok===true})}
     else rows.push({icon:"☁️",info:1,label:"동기화",tag:"꺼짐",chips:[{id:"",t:"로그인",act:"sblogin"}]});
@@ -15753,11 +15759,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         bb.querySelector(".tbbar i").style.width=pc+"%"; bb.querySelector(".tbn").textContent=r.big.dc+" / "+r.big.dt;
         bar.appendChild(bb); return;
       }
-      var row=document.createElement("div"); row.className="tdrow"+(r.done?" done":"")+(r.bad?" bad":"")+(r.chips.length>=2||(r.chips.length&&r.tag&&r.tag.length>6)?" many":"");
+      var row=document.createElement("div"); row.className="tdrow"+(r.done?" done":"")+(r.bad?" bad":"")+(r.info?" sync":(r.chips.length>=2||(r.chips.length&&r.tag&&r.tag.length>6)?" many":""));   // 동기화 줄은 한 줄로, 단추는 오른쪽 끝 (2026-11-06 사용자 요청)
       var ic=document.createElement("span"); ic.className="tdi"; ic.textContent=r.icon; ic.setAttribute("aria-hidden","true"); row.appendChild(ic);
       var lb=document.createElement("span"); lb.className="tdl"; lb.textContent=r.label; row.appendChild(lb);
       var cs=document.createElement("div"); cs.className="tdc";
-      if(r.tag){var tg=document.createElement("span");tg.className="tdtag";tg.textContent=r.tag;cs.appendChild(tg)}
+      if(r.tag){var tg=document.createElement("span");tg.className="tdtag";tg.textContent=r.tag;if(r.info&&r.bad&&sst&&sst.short)tg.title=sst.short;cs.appendChild(tg)}
       r.chips.forEach(function(c){var b=document.createElement("button");b.type="button";b.className="rvchip"+(spotId===c.id&&openIds.has(c.id)?" on":"")+(c.act==="rvall"?" main":"");b.dataset.id=c.id;b.dataset.act=c.act;b.textContent=c.t;cs.appendChild(b)});
       row.appendChild(cs); bar.appendChild(row);
     }
