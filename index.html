@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-06-sayonebtn">
+<meta name="app-build" content="2026-11-06-saydbl">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -15038,6 +15038,20 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       if(old.join()===ids.join())return;
       o.ord=ids.concat((Array.isArray(o.ord)?o.ord:[]).filter(function(x){return ids.indexOf(x)<0})); o.ordAt=Date.now();   // 다른 코너(한 마디/말씀) 순서는 그대로 saveSay(o); renderReviewBar(); toast("순서를 바꿨어요");
     }
+    // 카드를 두 번 누르면 바로 고치기 (2026-11-06 사용자 요청)
+    var dtap={id:"",t:0};
+    list.addEventListener("click",function(e){
+      var card=e.target.closest(".saycard"); if(!card||e.target.closest("button,a,input,textarea,select,label"))return;
+      var now=Date.now(), id=card.dataset.id;
+      if(dtap.id===id&&now-dtap.t<380){
+        dtap={id:"",t:0}; e.preventDefault(); e.stopPropagation();
+        try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
+        sayEdit=id; drawSay(); var ta=say.querySelector(".sayt");
+        if(ta){ta.scrollIntoView({block:"center"}); setTimeout(function(){try{ta.focus({preventScroll:true}); ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}},30)}
+        return;
+      }
+      dtap={id:id,t:now};
+    },true);
     list.addEventListener("pointerdown",function(e){
       if(sayEdit||e.button>0||sayLocked||sayQ)return;   // 고정 ON이거나 찾는 중이면 끌지 않음
       var card=e.target.closest(".saycard"); if(!card||e.target.closest("button,a,input,textarea,select"))return;
