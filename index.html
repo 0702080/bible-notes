@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-colfit2">
+<meta name="app-build" content="2026-11-07-sayswipe2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3420,7 +3420,7 @@ textarea.lhpad{padding-left:28px!important}
 .saythm{padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--sc) 18%,transparent);color:var(--sc);font-size:11.5px}   /* 내용이 비슷한 한 마디는 같은 색 (2026-10-31 사용자 요청) */
 .saycard.saytint{border-color:color-mix(in srgb,var(--sc) 45%,#2A2930);border-left-color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,#18171B)}
 .saycard.saytint .sayf b{color:color-mix(in srgb,var(--sc) 80%,#fff)}
-.saycard{position:relative;padding-left:30px!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.saycard{position:relative;touch-action:pan-y;padding-left:30px!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .saygrip{position:absolute;left:4px;top:0;bottom:0;width:24px;display:grid;place-items:center;color:var(--faint);font-size:16px;cursor:grab;touch-action:none;opacity:.6}
 .saylist.saysorting .saycard:not(.saydragging){transition:transform .15s}
 .saycard.saydragging{position:relative;z-index:5;box-shadow:0 14px 30px rgba(0,0,0,.6);border-color:color-mix(in srgb,var(--gold) 60%,#232229);background:color-mix(in srgb,var(--gold) 10%,#16161b);cursor:grabbing}
@@ -15244,17 +15244,23 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(){if(sayDrag)end();clearTimeout(hold);pend=null});
     list.addEventListener("contextmenu",function(e){if(sayDrag||pend)e.preventDefault()});
     // 카드를 옆으로 밀면 앞면 ↔ 뒷면(활용 적기) (2026-11-07 사용자 요청)
+    // 휴대폰은 손가락이 움직이면 브라우저가 pointer를 끊어서(pointercancel) touch 이벤트로 잼
     var sw=null;
-    list.addEventListener("pointerdown",function(e){var c=e.target.closest(".saycard"); sw=(c&&!e.target.closest("textarea,input,select"))?{c:c,x:e.clientX,y:e.clientY}:null},true);
-    document.addEventListener("pointerup",function(e){
+    function swStart(c,x,y,t){sw=c?{c:c,x:x,y:y,t:t}:null}
+    function swEnd(x,y){
       var w=sw; sw=null; if(!w||sayDrag||sayEdit)return;
-      var dx=e.clientX-w.x, dy=e.clientY-w.y; if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;
+      var dx=x-w.x, dy=y-w.y; if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.3)return;
       var id=w.c.dataset.id; saySwAt=Date.now(); clearTimeout(hold); pend=null;
       var ua=document.activeElement; if(ua&&ua.classList&&ua.classList.contains("sayuse")){sayUseSave(ua); ua.blur()}
       if(sayBack[id])delete sayBack[id]; else sayBack[id]=1;
-      sayUseEd=""; buzz(10); drawSay();
+      sayUseEd=""; sayUsePend=false; buzz(10); drawSay();
       var nc=list.querySelector('.saycard[data-id="'+id+'"]'); if(nc){nc.classList.add(dx<0?"sayflipl":"sayflipr"); var t0=nc.querySelector(".sayuse"); if(t0&&!t0.value)setTimeout(function(){try{t0.focus({preventScroll:true})}catch(err){}},60)}
-    });
+    }
+    list.addEventListener("touchstart",function(e){if(e.touches.length!==1){sw=null;return} var c=e.target.closest(".saycard"); swStart(c&&!e.target.closest("textarea,input,select")?c:null,e.touches[0].clientX,e.touches[0].clientY,1)},{passive:true,capture:true});
+    list.addEventListener("touchend",function(e){if(!sw||!sw.t)return; var t=e.changedTouches[0]; swEnd(t.clientX,t.clientY)},{passive:true,capture:true});
+    list.addEventListener("touchcancel",function(){sw=null},{passive:true});
+    list.addEventListener("pointerdown",function(e){if(e.pointerType==="touch")return; var c=e.target.closest(".saycard"); swStart(c&&!e.target.closest("textarea,input,select")?c:null,e.clientX,e.clientY,0)},true);
+    document.addEventListener("pointerup",function(e){if(e.pointerType==="touch"||!sw||sw.t)return; swEnd(e.clientX,e.clientY)});
     list.addEventListener("input",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return; t.style.height="auto"; t.style.height=t.scrollHeight+"px"; clearTimeout(sayUseT); sayUseT=setTimeout(function(){sayUseSave(t)},500)});
     list.addEventListener("focusout",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return; clearTimeout(sayUseT); sayUseSave(t);
       setTimeout(function(){var a=document.activeElement; if(a&&a.classList&&a.classList.contains("sayuse"))return; if(sayUseEd===t.dataset.id)sayUseEd=""; sayUsePend=false; drawSay()},120)});
