@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-pthleft">
+<meta name="app-build" content="2026-11-07-pthalign">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4573,7 +4573,9 @@ textarea.ictht:focus{outline:none;border-color:color-mix(in srgb,var(--ic0) 75%,
 .pri .pthx textarea.pth{min-height:0;padding:12px 14px;border-radius:12px;font-size:17px;line-height:1.8;word-break:keep-all;overflow-wrap:break-word;resize:vertical}
 .prays>.pri .pthx textarea.pth{background:color-mix(in srgb,var(--prc) 10%,#101013);border:1px solid color-mix(in srgb,var(--prc) 40%,#2E2D33);color:color-mix(in srgb,var(--prc) 35%,#fff)}
 .pri .pthx textarea.pth.ptbig{resize:none;overflow-y:auto;overscroll-behavior:contain}
-.note .prays .pri>.pthx{margin-left:-4px}
+/* 감사 기도 뒷면 왼쪽을 오른쪽과 똑같이: 색 줄 없이, 다른 기도 칸과 왼쪽 끝을 맞춤. 카드 왼쪽 틈은 기도 목록 전체를 4px 넓혀 오른쪽과 맞춤 (2026-11-07 사용자 요청) */
+.note .prays{margin-left:-4px}
+.prays>.pri .pthx{box-shadow:none}
 .pri .pthx textarea.pth,.pri .pthx .pthv{margin-left:-14px;margin-right:-14px;width:calc(100% + 28px);max-width:none}
 .prays.pallfold>.pri{display:none}
 /* 기도제목 고치기: 읽을 때와 같은 글자·폭·줄바꿈 */
