@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-nodailyrow">
+<meta name="app-build" content="2026-11-07-saytdbl">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7731,7 +7731,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     function hide(){if(on)return; mic.hidden=true; ta=null}
     document.addEventListener("focusin",function(e){
-      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||t.readOnly||t.disabled||t.classList.contains("sayeta")||t.closest(".qa")||t.classList.contains("sayuse"))return;   // 질문 탭의 질문·답 칸, 한 마디 뒷면 활용 칸은 뺌 (2026-11-07 사용자 요청)   // 오늘의 한 마디 고치기 칸은 글자를 가려서 뺌
+      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||t.readOnly||t.disabled||t.classList.contains("sayeta")||t.closest(".qa")||t.classList.contains("sayuse")||t.classList.contains("sayt"))return;   // 질문 탭의 질문·답 칸, 한 마디 뒷면 활용 칸은 뺌 (2026-11-07 사용자 요청)   // 오늘의 한 마디 고치기 칸은 글자를 가려서 뺌
       if(on&&t!==ta)stop();
       ta=t; place();
     });
@@ -15357,7 +15357,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var fdt={t:0,x:0,y:0};
     function formDbl(x,y,tg){
       if(!sayEdit||!tg.closest(".sayform")||tg.closest("button,select,input:not(.sayt)"))return false;
-      var now=Date.now(), hit=now-fdt.t<380&&Math.abs(x-fdt.x)<30&&Math.abs(y-fdt.y)<30;
+      var now=Date.now(), hit=now-fdt.t<480&&Math.abs(x-fdt.x)<60&&Math.abs(y-fdt.y)<80;   // 휴대폰에서 첫 누름에 키보드가 올라와 자리가 밀려도 두 번으로 셈 (2026-11-07)
       fdt={t:hit?0:now,x:x,y:y}; if(!hit)return false;
       var sv=tg.closest(".sayform").querySelector(".saysave"); if(sv){try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(e){} if(document.activeElement)document.activeElement.blur(); sv.click()} return true;
     }
