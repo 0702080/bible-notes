@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-rdbtn">
+<meta name="app-build" content="2026-11-07-rdtap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1310,6 +1310,12 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .rdpbar .rdedit{border-color:color-mix(in srgb,var(--gold) 55%,#34333A);color:var(--gold);font-weight:700}
 .rdpbar .rdedit[hidden]{display:none}
 .rdpbar button[hidden]{display:none!important}
+.rdpbar .rdchm,.rdpbar .rdedit{display:none!important}
+.rdpbar .rdvcard{border-color:color-mix(in srgb,var(--gold) 60%,#34333A);color:var(--gold);font-weight:700}
+.rdpbar .rdvcard.has{border-color:color-mix(in srgb,var(--green) 55%,#34333A);color:var(--green)}
+.rdv{cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+.rdv.sel{background:color-mix(in srgb,var(--gold) 16%,transparent)!important;box-shadow:inset 3px 0 0 var(--gold)!important;color:var(--hi)}
+.rdv.sel .rdn{color:var(--gold)}
 .rdpform.editing .rdphint{display:none}
 .rdpform.editing .rdptext{min-height:55vh}
 .rdpbar .rdpaste{border-color:color-mix(in srgb,var(--mint) 55%,#34333A);color:var(--mint);font-weight:700}
@@ -16890,7 +16896,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         '<a class="rdhb" target="_blank" rel="noopener">개역개정으로 보기 (대한성서공회) ↗</a>'+
         '<p class="rdalt">안 열리면 <a class="rdhb2" target="_blank" rel="noopener">홀리바이블로 보기</a></p>'+
         '<div class="rdscroll"><ol class="rdlist"></ol><div class="rdmsg" aria-live="polite"></div>'+'</div>'+
-        '<div class="rdpbar"><button type="button" class="rdchm" hidden>🧠 한 장 암송</button><button type="button" class="rdedit" hidden>✏️ 본문 고치기</button><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button><button type="button" class="rdcard" hidden>📌 이 장을 말씀 카드로 담기</button></div>'+
+        '<div class="rdpbar"><button type="button" class="rdchm" hidden>🧠 한 장 암송</button><button type="button" class="rdedit" hidden>✏️ 본문 고치기</button><button type="button" class="rdpaste">📋 복사한 본문 붙여넣기</button><button type="button" class="rdsrc">📄 홀리바이블에서 열기 ↗</button><button type="button" class="rdvcard" hidden></button><button type="button" class="rdcard" hidden>📌 이 장을 말씀 카드로 담기</button></div>'+
         '<div class="rdpform" hidden><p class="rdphint">성서공회나 홀리바이블에서 장 본문을 복사해 붙여 넣으세요. 절 번호(1, 2, 3 …)가 있으면 그대로 나누고, 없으면 한 줄을 한 절로 보고 번호를 붙여요. 이 기기에만 저장돼요.</p>'+
         '<textarea class="field rdptext" placeholder="1 그는 허물과 죄로 죽었던 너희를 살리셨도다&#10;2 그 때에 너희는 …&#10;(절 번호가 없으면 한 줄을 한 절로 봐요)" aria-label="장 본문 붙여넣기"></textarea>'+
         '<div class="rdpbtns"><button type="button" class="rdpcancel">취소</button><button type="button" class="primary rdpsave">저장</button></div></div>';
@@ -16924,6 +16930,45 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         if(nn){closeReader();toast(BOOKS[bk]+" "+ch+(bk===18?"편":"장")+" 전체를 말씀 카드로 담았어요")}
       });
       rd.querySelector(".rdsrc").addEventListener("click",function(){window.open(rd.dataset.hb,"_blank","noopener")});
+      // 두 번 누르면 본문 고치기, 고치는 칸에서 두 번 누르면 저장하고 읽기로 / 한 절을 누르면 고르고 그 절만 말씀 카드로 (2026-11-07 사용자 요청)
+      var rdSel=0, rdT0=0, rdX0=0, rdY0=0, rdTapT=0;
+      function rdSelSync(){
+        rd.querySelectorAll(".rdv.sel").forEach(function(li){if(+li.dataset.v!==rdSel)li.classList.remove("sel")});
+        var li=rdSel&&rd.querySelector('.rdv[data-v="'+rdSel+'"]'); if(li)li.classList.add("sel");
+        var b=rd.querySelector(".rdvcard"), rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1];
+        b.hidden=!rdSel||bk<0;
+        if(!b.hidden){var has=myNoteAt(bk,ch,rdSel); b.textContent=has?"✓ "+ch+":"+rdSel+" 담은 말씀 보기":"📌 "+ch+":"+rdSel+" 이 절만 말씀 카드로"; b.classList.toggle("has",!!has)}
+      }
+      rd._selReset=function(){rdSel=0; rdSelSync()}; rd._selSync=rdSelSync;
+      function rdDbl(e,el){
+        var now=Date.now(), x=e.changedTouches?e.changedTouches[0].clientX:e.clientX, y=e.changedTouches?e.changedTouches[0].clientY:e.clientY;
+        var hit=now-rdT0<380&&Math.abs(x-rdX0)<30&&Math.abs(y-rdY0)<30&&rdT0El===el;
+        rdT0=hit?0:now; rdX0=x; rdY0=y; rdT0El=el; return hit;
+      }
+      var rdT0El=null;
+      function rdListDbl(){clearTimeout(rdTapT); rdTapT=0; var f=rd.querySelector(".rdpform"); if(!f.hidden||!myChapters()[rd.dataset.key])return; rd.querySelector(".rdedit").click()}
+      function rdFormDbl(){var f=rd.querySelector(".rdpform"); if(f.hidden)return; rd.querySelector(".rdpsave").click()}
+      var rdList=rd.querySelector(".rdscroll"), rdTxt=rd.querySelector(".rdptext"), rdMoved=false, rdSX=0, rdSY=0;
+      rdList.addEventListener("touchstart",function(e){var t=e.touches[0]; rdSX=t.clientX; rdSY=t.clientY; rdMoved=false},{passive:true});
+      rdList.addEventListener("touchmove",function(e){var t=e.touches[0]; if(Math.abs(t.clientX-rdSX)>10||Math.abs(t.clientY-rdSY)>10)rdMoved=true},{passive:true});
+      rdList.addEventListener("touchend",function(e){if(rdMoved)return; if(rdDbl(e,rdList)){e.preventDefault(); rdListDbl()}});
+      rdList.addEventListener("dblclick",function(e){if(!("ontouchstart" in window)){var sl=window.getSelection&&getSelection(); if(sl)try{sl.removeAllRanges()}catch(err){} rdListDbl()}});
+      rdList.addEventListener("click",function(e){
+        var li=e.target.closest(".rdv"); if(!li)return;
+        var v=+li.dataset.v; clearTimeout(rdTapT);
+        rdTapT=setTimeout(function(){rdTapT=0; if(!rd.querySelector(".rdpform").hidden)return; rdSel=rdSel===v?0:v; rdSelSync()},300);
+      });
+      rdTxt.addEventListener("touchend",function(e){if(rdDbl(e,rdTxt)){e.preventDefault(); rdFormDbl()}});
+      rdTxt.addEventListener("dblclick",function(e){if(!("ontouchstart" in window))rdFormDbl()});
+      rd.querySelector(".rdvcard").addEventListener("click",function(){
+        var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1], v=rdSel; if(bk<0||!v)return;
+        var has=myNoteAt(bk,ch,v);
+        if(has){closeReader(); openIds.add(has.id); render(); var el=cards.get(has.id); if(el)el.scrollIntoView({block:"center",behavior:"smooth"}); return}
+        var li=rd.querySelector('.rdv[data-v="'+v+'"] .rdt'), txt=li?li.textContent.trim():""; if(!txt)return;
+        var ref=BOOKS[bk]+" "+ch+":"+v;
+        var nn=addNote({ref:ref,text:txt,book:bk,chapter:ch,verse:v});
+        if(nn){closeReader(); toast(ref+" 말씀 카드를 만들었어요")}
+      });
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&rd&&!rd.hidden)closeReader()});
     }
     var key=USFM[n.book]+"-"+n.chapter;
@@ -16931,7 +16976,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     rd.querySelector(".rdhb").href=cl.bs; rd.querySelector(".rdhb2").href=onDesktop()?cl.hbpc:cl.hb;
     rd.querySelector(".rdlist").textContent=""; rd.querySelector(".rdmsg").textContent="";
     rd.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
-    rd.dataset.hl=String(n.verse||0); rd.dataset.key=key;
+    rd.dataset.hl=String(n.verse||0); rd.dataset.key=key; if(rd._selReset)rd._selReset();
     // Claude가 없으면: 대한성서공회 개역개정 페이지를 앱 안 창에 그대로 띄움 (본문을 가져오지 않음)
     // Claude가 없으면: 홀리바이블(개역개정)은 새 탭으로 열고, 복사해 붙여 넣은 본문을 여기서 읽음
     var nos=!sampleFn, hbu=onDesktop()?cl.hbpc:cl.hb;
@@ -17411,6 +17456,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       li.appendChild(num); li.appendChild(t); ol.appendChild(li);
     });
     var h=ol.querySelector(".hl"); if(h)setTimeout(function(){h.scrollIntoView({block:"center"})},60);
+    if(rd._selSync)rd._selSync();
   }
   async function loadChapter(n,key){
     var msg=rd.querySelector(".rdmsg");
