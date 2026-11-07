@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-saytap">
+<meta name="app-build" content="2026-11-08-srmalign">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5034,7 +5034,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 /* 설교 메모 목록: 제목이 맨 위, 날짜·설교자는 그 아래 (2026-11-08) */
 .srmcard .srmmeta .srmttl{flex:1 1 0;min-width:0;margin:0}
 .srmcard .srmmeta .srmbr{flex:0 0 100%;height:0}
-.srmcard .srmmeta .srmbr+.srmd{margin-left:22px}
+.srmcard .srmmeta .srmbr+.srmd{margin-left:0}
 .srmcard .srmmeta .srmytc{margin-left:0}
 /* 🌿 은혜 카드 글 = 설교 메모 줄 칸 모양 (2026-11-08 사용자 요청) */
 .saycard.saylined{padding-left:16px!important}
@@ -5044,6 +5044,12 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .sayln+.sayln{border-top:1px dashed color-mix(in srgb,var(--sc) 18%,transparent)}
 .saylg{flex:0 0 30px;height:40px;display:grid;place-items:center;color:var(--faint);font-size:17px;opacity:.35}
 .saylt{flex:1;min-width:0;min-height:40px;box-sizing:border-box;padding:8px 10px 8px 0;font-family:var(--serif);font-size:16px;line-height:1.5;color:var(--ink);white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word}
+/* 설교 메모 목록 카드 정렬: ⠿는 카드 왼쪽 가운데에 따로, 제목·날짜·메모·본문은 모두 같은 왼쪽 선 (2026-11-08 사용자 요청) */
+.srmlist>.srmcard{position:relative;padding:12px 14px 12px 30px!important}
+.srmcard .srmmeta .srmcgrip{position:absolute;left:7px;top:0;bottom:0;margin:0;width:18px;padding:0;display:flex;align-items:center;justify-content:center}
+.srmcard .srmmeta{column-gap:8px;row-gap:3px}
+.srmcard .srmmeta .srmttl{font-size:16px;line-height:1.35}
+.srmcard .srmprev{margin-top:6px}
 /* 설교 메모 목록 카드의 삭제 단추 */
 .srmcdel{flex:0 0 auto;height:26px;padding:0 10px;margin:-4px 0 -4px 6px;border-radius:13px;display:inline-flex;align-items:center;font-size:12px;color:#C9C4D2;background:#2A2933 linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.2) 100%);border:1px solid #45434F;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 0 rgba(0,0,0,.4);cursor:pointer;white-space:nowrap}
 .srmcdel:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
