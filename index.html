@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-qanomic">
+<meta name="app-build" content="2026-11-07-sayusenomic">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7730,7 +7730,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     function hide(){if(on)return; mic.hidden=true; ta=null}
     document.addEventListener("focusin",function(e){
-      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||t.readOnly||t.disabled||t.classList.contains("sayeta")||t.closest(".qa"))return;   // 질문 탭의 질문·답 칸은 글자를 가려서 뺌 (2026-11-07 사용자 요청)   // 오늘의 한 마디 고치기 칸은 글자를 가려서 뺌
+      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||t.readOnly||t.disabled||t.classList.contains("sayeta")||t.closest(".qa")||t.classList.contains("sayuse"))return;   // 질문 탭의 질문·답 칸, 한 마디 뒷면 활용 칸은 뺌 (2026-11-07 사용자 요청)   // 오늘의 한 마디 고치기 칸은 글자를 가려서 뺌
       if(on&&t!==ta)stop();
       ta=t; place();
     });
