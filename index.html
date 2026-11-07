@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-act-name">
+<meta name="app-build" content="2026-11-07-actdbl">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -13252,7 +13252,16 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         var ae=e.target.closest(".dlactedit");   // 연필·실천 글을 누르면 실천 기록 칸 (2026-11-04 사용자 요청)
         var art=!ae&&e.target.closest(".dlactrow");
         if(art&&e.target.closest(".dlbox"))art=null;   // 네모는 체크
-        if(ae||art){e.stopPropagation(); e.preventDefault(); var ak=ae?ae.dataset.k:art.dataset.nid+"|"+art.dataset.aid; if(dlActLog===ak){dlActLog=""; dlActLogFocus=false}else{dlActLog=ak; dlActLogFocus=true; dlGFold.delete("__acts")} drawDaily(); return}
+        if(art){   // 실천 글: 두 번 누르면 기록 적기, 기록 칸이 열린 채로 또 두 번 누르면 제목 고치기 (2026-11-07 사용자 요청)
+          e.stopPropagation(); e.preventDefault(); var tk=art.dataset.nid+"|"+art.dataset.aid, tn=Date.now();
+          if(dlActTap.k===tk&&tn-dlActTap.t<400){
+            dlActTap={k:"",t:0};
+            if(dlActLog===tk){dlActEdit=tk; dlActLog=""; dlActLogFocus=false; drawDaily(); var ip2=dl.querySelector(".dlactin"); if(ip2){ip2.focus(); try{ip2.setSelectionRange(ip2.value.length,ip2.value.length)}catch(err){}}}
+            else{dlActLog=tk; dlActLogFocus=true; dlGFold.delete("__acts"); drawDaily()}
+          }else dlActTap={k:tk,t:tn};
+          return;
+        }
+        if(ae){e.stopPropagation(); e.preventDefault(); var ak=ae.dataset.k; if(dlActLog===ak){dlActLog=""; dlActLogFocus=false}else{dlActLog=ak; dlActLogFocus=true; dlGFold.delete("__acts")} drawDaily(); return}
         var alb=e.target.closest(".dlactlog");
         if(alb&&e.target.closest(".dlalclose")){e.stopPropagation(); dlActLog=""; dlActLogFocus=false; render(); drawDaily(); return}
         if(alb&&e.target.closest(".dlaledit")){e.stopPropagation(); dlActEdit=dlActLog; dlActLog=""; dlActLogFocus=false; drawDaily(); var ip=dl.querySelector(".dlactin"); if(ip){ip.focus(); ip.setSelectionRange(ip.value.length,ip.value.length)} return}
@@ -14047,7 +14056,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
      쉬는 항목 o.rest {id:{on:1|0,at}} (늦게 바꾼 쪽, 클라우드로 맞춤), 새로 넣은 항목 날짜 o.iat {id:날짜} */
   var dlShowAll=false, dlRestOpen="";
   var dlIcShowAns=false;
-  var dlG3All=new Set(), dlG3More={}, dlG3Skip={}, dlActPage=0, dlActGo="", dlActEdit="", dlActLog="", dlActLogFocus=false;   // 🌱 오늘의 3개: 다 펼친 묶음, '하나 더'로 연 수 (이 화면에서만)
+  var dlActTap={k:"",t:0}, dlG3All=new Set(), dlG3More={}, dlG3Skip={}, dlActPage=0, dlActGo="", dlActEdit="", dlActLog="", dlActLogFocus=false;   // 🌱 오늘의 3개: 다 펼친 묶음, '하나 더'로 연 수 (이 화면에서만)
   function dlRested(o,id){var r=o&&o.rest&&o.rest[id]; return !!(r&&r.on)}
   function dlStale(o){
     var now=Date.now(), from=dkey(now-29*864e5), old=dkey(now-30*864e5), first="", act={};
