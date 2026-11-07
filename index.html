@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-saytfit">
+<meta name="app-build" content="2026-11-07-sayedithide">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4518,6 +4518,7 @@ body.boardon .fscrow{display:none}
 .ntinline .ntlist button{padding:11px 10px;font-size:15px;border-bottom:1px solid #24232A;border-radius:0}
 .ntinline .ntlist button:last-of-type{border-bottom:0}
 /* 28 한 마디 찾기·고정 */
+.saysearch[hidden]{display:none!important}
 .saysearch{width:100%;box-sizing:border-box;height:40px;margin-bottom:12px;font-size:14px}
 .sayfoldall{display:flex;justify-content:flex-end;margin:-4px 0 8px}
 .sayfab{font:inherit;font-size:13px;padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:#3B3947;color:#fff;cursor:pointer}
@@ -15174,6 +15175,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     // 적던 중에 화면이 다시 그려져도(동기화 등) 적던 글은 그대로 (2026-10-25 사용자 요청)
     var keep=null, ft=form.querySelector(".sayt");
     if(ft&&sayEdit&&form.dataset.ed===sayEdit){var q=function(c){var e=form.querySelector(c);return e?e.value:""}; keep={t:ft.value,who:q(".saywho"),topic:q(".saytopic"),note:q(".saynote"),focus:document.activeElement===ft,ss:ft.selectionStart,se:ft.selectionEnd}}
+    var sq0=say.querySelector(".saysearch"); if(sq0)sq0.hidden=!!sayEdit&&!sayQ;   // 고치는 중엔 찾기 칸 숨김 (찾는 글이 있으면 그대로)
     form.textContent=""; form.hidden=!sayEdit; form.dataset.ed=sayEdit||""; form.classList.toggle("saylocked",sayLocked||!!sayQ);
     if(sayEdit){
       var cur=sayEdit==="new"?{t:"",who:"",topic:"",note:""}:(o.items.filter(function(x){return x.id===sayEdit})[0]||{t:"",who:"",topic:"",note:""});
@@ -15220,7 +15222,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     // ▴▾ 모두 접기·펼치기 (2026-11-07 사용자 요청)
     var sLongF=function(x){return String(x.t||"").trim().split("\n").filter(function(s){return s.trim()}).length>1||String(x.t||"").length>34};
     var longIds=items.filter(function(x){return sayEdit!==x.id&&!sayBack[x.id]&&sLongF(x)}).map(function(x){return x.id});
-    if(longIds.length>=2){
+    if(longIds.length>=2&&!sayEdit){   // 고치는 중엔 모두 접기 단추 숨김 (2026-11-07 사용자 요청)
       var allF=longIds.every(function(i){return !!sayFold[i]});
       var fr=document.createElement("div"); fr.className="sayfoldall";
       var fa=document.createElement("button"); fa.type="button"; fa.className="sayfab"; fa.dataset.act="foldall"; fa.dataset.ids=longIds.join(","); fa.dataset.on=allF?"1":"";
