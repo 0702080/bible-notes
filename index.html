@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-srmglass">
+<meta name="app-build" content="2026-11-07-srmtap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3338,11 +3338,11 @@ textarea.lhpad{padding-left:28px!important}
 .srmrtags{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:18px}
 .srmrtags .srmytc{margin-left:0;padding:4px 12px;font-size:13px}
 .srmrbody{border-top:1px solid #2A2930;padding-top:16px}
-.srmrbody p{margin:0 0 16px;font-size:17.5px;line-height:1.85;color:var(--ink);word-break:keep-all;white-space:pre-wrap}
+.srmrbody p{margin:0 0 4px;padding:8px 0;font-size:16px;line-height:1.5;color:var(--ink);word-break:keep-all;white-space:pre-wrap}
 .srmrbody p.srmrempty{color:var(--muted);font-size:15px}
 .srmrapply{margin-top:22px;padding:14px 16px;border-radius:14px;border:1px solid color-mix(in srgb,var(--green) 40%,#2A2930);background:color-mix(in srgb,var(--green) 9%,#131317)}
 .srmrapply b{display:block;margin-bottom:6px;font-size:13px;color:var(--green)}
-.srmrapply p{margin:0;font-size:17px;line-height:1.8;white-space:pre-wrap;word-break:keep-all}
+.srmrapply p{margin:0;font-size:16px;line-height:1.5;white-space:pre-wrap;word-break:keep-all}
 .srmreadbtn.on{border-color:var(--gold);color:var(--gold)}
 .srmfoot textarea{width:100%;box-sizing:border-box;height:64px;min-height:44px;max-height:30vh;padding:10px 14px;border:1px solid color-mix(in srgb,var(--green) 35%,#2A2930);border-radius:12px;background:var(--sheet);color:var(--ink);font-family:var(--serif);font-size:15.5px;line-height:1.6;resize:vertical}
 .srmfoot textarea:focus{outline:none;border-color:var(--green)}
@@ -12276,6 +12276,17 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       srm.querySelector(".srmnew").addEventListener("click",srmNew);
       srm.querySelector(".srmreadbtn").addEventListener("click",function(){if(!srmEdit)return; if(!srmRead)srmCommit(); srmRead=!srmRead; srmDraw(); srm.querySelector(".srmbox").scrollTop=0});
       srm.addEventListener("click",srmClick); srmDragInit();
+      // 휴대폰: 메모를 빠르게 두 번 누르면 고치기 ↔ 읽기 (2026-11-07 사용자 요청)
+      var srmTap={t:0,x:0,y:0};
+      srm.addEventListener("pointerup",function(e){
+        if(e.pointerType!=="touch"||!srmEdit||!e.target.closest(".srmbox")||e.target.closest("button,select,input,a,.srmytc,.srmgrip"))return;
+        var now=Date.now();
+        if(now-srmTap.t<350&&Math.abs(e.clientX-srmTap.x)<30&&Math.abs(e.clientY-srmTap.y)<30){
+          srmTap.t=0; e.preventDefault(); var ae=document.activeElement; if(ae&&srm.contains(ae))ae.blur();
+          srm.querySelector(".srmreadbtn").click(); buzz(10); return;
+        }
+        srmTap={t:now,x:e.clientX,y:e.clientY};
+      });
       srm.addEventListener("input",function(e){
         if(e.target.classList.contains("srmq")){srmQ=e.target.value;srmDrawList();return}
         if(!e.target.closest(".srmform,.srmfoot"))return;
