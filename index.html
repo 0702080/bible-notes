@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-dleditbtn">
+<meta name="app-build" content="2026-11-07-titleedit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -14451,7 +14451,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
           var mx=document.createElement("div"); mx.className="dlmemobox"; mx.dataset.id=key; mx.dataset.day=dlDay;
           mx.innerHTML='<div class="dlmemoh"><span></span><span class="dlmemosave"></span></div>'+
             '<textarea maxlength="8000" placeholder="'+(no>1?'새 기록을 적어 보세요':'구체적으로 적어 보세요 (예: 어머니 건강을 위해 10분, 이웃 ○○씨를 위해)')+'"></textarea>'+
-            '<div class="dlmemofoot">'+(no>1?'':'<button type="button" class="dlmemoedit">✏️ 항목 글 고치기</button>')+'<button type="button" class="dlmemoclose">'+(no>1?'다 썼어요':'닫기')+'</button></div>';
+            '<div class="dlmemofoot">'+(no>1?'':'<button type="button" class="dlmemoedit">✏️ 제목 수정</button>')+'<button type="button" class="dlmemoclose">'+(no>1?'다 썼어요':'닫기')+'</button></div>';
           mx.querySelector(".dlmemoh span").textContent="📝 "+dayName(dlDay)+" 기록"+(no>1?" "+no:"");
           var ta=mx.querySelector("textarea"); ta.value=val; ta.setAttribute("aria-label",it.t+" 기록"+(no>1?" "+no:""));
           // 항목 글에 성경 구절이 있으면 기록 칸 위에 그 말씀 열기 단추 (2026-10-25 사용자 요청)
@@ -14559,7 +14559,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         asec.appendChild(row);
         if(dlActLog===x.n.id+"|"+x.a.id){   // 📝 실천 기록: 무엇을 구체적으로 언제 어떻게 (2026-11-04 사용자 요청)
           var lb=document.createElement("div"); lb.className="dlmemobox dlactlog"; lb.dataset.nid=x.n.id; lb.dataset.aid=x.a.id;
-          lb.innerHTML='<div class="dlmemoh"><span></span><span class="dlmemosave"></span></div><textarea class="dlactlogta" maxlength="8000" placeholder="무엇을, 언제, 어떻게 실천했는지 구체적으로 적어 보세요" aria-label="실천 기록"></textarea><div class="dlmemofoot"><button type="button" class="dlmemoedit dlaledit">✏️ 항목 글 고치기</button><button type="button" class="dlmemoclose dlalclose">닫기</button></div><div class="dlallist"></div>';
+          lb.innerHTML='<div class="dlmemoh"><span></span><span class="dlmemosave"></span></div><textarea class="dlactlogta" maxlength="8000" placeholder="무엇을, 언제, 어떻게 실천했는지 구체적으로 적어 보세요" aria-label="실천 기록"></textarea><div class="dlmemofoot"><button type="button" class="dlmemoedit dlaledit">✏️ 제목 수정</button><button type="button" class="dlmemoclose dlalclose">닫기</button></div><div class="dlallist"></div>';
           lb.querySelector(".dlmemoh span").textContent="📝 "+dayName(dlDay)+" 기록";
           var lta=lb.querySelector("textarea"), lts=(x.a.logs||[]).filter(function(l){return dkey(l.at)===dlDay}).sort(function(p,q){return q.at-p.at}), lcur=lts[0];
           lta.value=lcur?lcur.t:""; if(lcur)lb.dataset.lid=lcur.id;
