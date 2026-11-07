@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-grback">
+<meta name="app-build" content="2026-11-07-menuh">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -235,7 +235,7 @@ body.boardon .toolbar{border-bottom:0}   /* PC 칸반: 맨 위 단추 줄 아래
 @keyframes mdim{from{opacity:0}to{opacity:1}}
 #topMenu[open]>summary{position:relative;z-index:81}
 #topMenu[open]>.pop{z-index:81}
-#topMenu .pop{width:max-content;max-width:calc(100vw - 24px)}   /* 메뉴 글이 한 줄로 (2026-10-24 사용자 요청) */
+#topMenu .pop{width:max-content;max-width:calc(100vw - 24px);box-sizing:border-box;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}   /* 메뉴 글이 한 줄로 (2026-10-24 사용자 요청) */
 .pop>button{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .pop.mnsorting>button{cursor:grabbing}
 .pop>button.mndrag{background:color-mix(in srgb,var(--violet) 22%,transparent)!important;outline:1px dashed color-mix(in srgb,var(--violet) 60%,transparent);outline-offset:-1px}
@@ -20060,6 +20060,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   // ⋯ 메뉴 항목을 끌어서 차례 바꾸기 (2026-10-24 사용자 요청): PC는 누른 채 끌기, 휴대폰은 꾹 누른 뒤 끌기. 차례는 이 기기에 기억
   (function(){
     var KEY="bible-menu-order", pop=document.querySelector("#topMenu .pop"); if(!pop)return;
+    // ⋯ 메뉴가 화면보다 길면 메뉴 안에서 굴러가게: PC 칸반은 화면이 안 굴러가 아래 항목이 안 보였음 (2026-11-07 사용자 요청)
+    function fitPop(){var m=$("topMenu"); if(!m.open){pop.style.maxHeight="";return} pop.style.maxHeight=""; var t=pop.getBoundingClientRect().top; pop.style.maxHeight=Math.max(220,Math.floor(window.innerHeight-t-12))+"px"}
+    $("topMenu").addEventListener("toggle",fitPop); window.addEventListener("resize",fitPop);
     // 메뉴가 열려 있는 동안 뒤 화면은 뿌옇게 (2026-10-24 사용자 요청)
     var tm=$("topMenu"), dim=document.createElement("div"); dim.className="menudim"; tm.insertBefore(dim,pop);
     dim.addEventListener("click",function(e){e.preventDefault();e.stopPropagation();tm.open=false});
@@ -20094,8 +20097,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var edgeT=0, lastY=0;
     function edgeScroll(){
       if(!M||!M.on){clearInterval(edgeT);return}
-      var v=window.innerHeight, d=lastY<70?-Math.ceil((70-lastY)/5):lastY>v-70?Math.ceil((lastY-(v-70))/5):0;
-      if(d){window.scrollBy(0,d); place(lastY)}
+      var inner=pop.scrollHeight>pop.clientHeight+2, pr=pop.getBoundingClientRect(), tp=inner?pr.top:0, v=inner?pr.bottom:window.innerHeight;
+      var d=lastY<tp+70?-Math.ceil((tp+70-lastY)/5):lastY>v-70?Math.ceil((lastY-(v-70))/5):0;
+      if(d){if(inner)pop.scrollTop+=d; else window.scrollBy(0,d); place(lastY)}
     }
     // 휴대폰: 꾹 누른 뒤에는 손가락을 움직여도 화면이 스크롤되지 않게 — 안 막으면 브라우저가 끌기를 끊어 버림 (2026-11-05 사용자 요청)
     pop.addEventListener("touchmove",function(e){if(M&&M.on&&e.cancelable)e.preventDefault()},{passive:false});
