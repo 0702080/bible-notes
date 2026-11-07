@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-srmtap">
+<meta name="app-build" content="2026-11-07-srmrv">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5000,6 +5000,20 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 /* 설교 메모도 앱 배경이 비치게: 창 바탕·아래 고정 줄은 반투명, 메모 칸은 살짝 보랏빛 반투명 (2026-11-07 사용자 요청) */
 .srmsheet .srmfoot{background:rgba(11,11,13,.62);box-shadow:none}
 .srmsheet .srmlines{background:color-mix(in srgb,color-mix(in srgb,var(--violet) 12%,#141419) 78%,transparent)!important;border-color:color-mix(in srgb,var(--violet) 30%,#2A2930)!important}
+/* 📖 설교 메모 읽기 = 고치는 화면과 같은 모양 (2026-11-07 사용자 요청) */
+.srmread.srmrv{max-width:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.srmrv .rbx{display:flex;align-items:center;min-height:42px;padding:6px 12px;box-sizing:border-box;border:1px solid color-mix(in srgb,var(--fc,var(--sky)) 28%,#2A2930);border-radius:10px;background:color-mix(in srgb,var(--fc,var(--sky)) 13%,#16161C);font-size:14.5px;color:var(--ink);word-break:keep-all}
+.srmrv .rdate,.srmrv .rwho{--fc:var(--sky)}
+.srmrv .rtitle{--fc:var(--gold);font-size:16.5px;font-weight:700;color:var(--gold)}
+.srmrv .rref{--fc:var(--orange)}
+.srmrv .ryt{--fc:#E5484D;cursor:pointer}
+.srmrv .rempty{color:var(--faint);font-weight:400}
+.srmrv .srmlab{margin-top:4px}
+.srmrv .srmrlines{min-height:0}
+.srmrgrip{flex:0 0 30px;height:40px;display:grid;place-items:center;color:var(--faint);font-size:17px;opacity:.35;-webkit-user-select:none;user-select:none}
+.srmrli{flex:1;min-width:0;min-height:40px;box-sizing:border-box;padding:8px 46px 8px 0;font-family:var(--serif);font-size:16px;line-height:1.5;color:var(--ink);white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word}
+.srmrv .srmrempty{padding:12px 14px;color:var(--muted);font-size:15px}
+.srmrv .rapply{padding:10px 14px;border:1px solid color-mix(in srgb,var(--green) 35%,#2A2930);border-radius:12px;background:color-mix(in srgb,var(--green) 13%,#16161C);font-family:var(--serif);font-size:16px;line-height:1.5;white-space:pre-wrap;word-break:keep-all;margin-bottom:24px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12423,20 +12437,22 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     document.addEventListener("touchend",function(e){if(srmCD&&srmCD.on)end(e)});
   })();
   // 📖 읽기 모드: 고치는 칸 없이 큰 글씨로 차분히 읽기 (2026-11-01 사용자 요청)
-  function srmReadView(x){
-    var v=document.createElement("article"); v.className="srmread";
-    function el(tag,cls,txt){var e=document.createElement(tag); e.className=cls; if(txt!=null)e.textContent=txt; v.appendChild(e); return e}
-    el("div","srmrmeta",srmDateLabel(x.d)+(x.who?" · "+x.who:""));
-    el("h2","srmrttl",x.title.trim()||"(제목 없음)");
-    var tags=el("div","srmrtags");
-    if(x.ref){var r=document.createElement("span"); r.className="srmref"; r.textContent="📖 "+x.ref; tags.appendChild(r)}
-    if(srmYtUrl(x.yt)){var y=document.createElement("span"); y.className="srmytc"; y.dataset.u=x.yt; y.textContent="▶ 영상 보기"; tags.appendChild(y)}
-    if(!tags.childNodes.length)tags.remove();
-    var lines=x.body.split("\n").map(function(t){return t.trim()}).filter(Boolean);
-    var bd=el("div","srmrbody");
-    if(lines.length)lines.forEach(function(t){var pp=document.createElement("p"); pp.textContent=t; bd.appendChild(pp)});
-    else{var em=document.createElement("p"); em.className="srmrempty"; em.textContent="아직 적은 메모가 없어요."; bd.appendChild(em)}
-    if(x.apply.trim()){var ap=el("div","srmrapply"); var h=document.createElement("b"); h.textContent="💡 나의 적용 · 결단"; ap.appendChild(h); var t=document.createElement("p"); t.textContent=x.apply.trim(); ap.appendChild(t)}
+  function srmReadView(x){   // 📖 읽기: 고치는 화면과 같은 모양(색 칸·줄 칸·빈 줄 그대로)에서 글만 고칠 수 없게 (2026-11-07 사용자 요청)
+    var v=document.createElement("article"); v.className="srmread srmrv";
+    function el(par,tag,cls,txt){var e=document.createElement(tag); e.className=cls; if(txt!=null)e.textContent=txt; par.appendChild(e); return e}
+    var r1=el(v,"div","srmrow");
+    el(r1,"div","rbx rdate",srmDateLabel(x.d));
+    el(r1,"div","rbx rwho"+(x.who?"":" rempty"),x.who||"설교자");
+    el(v,"div","rbx rtitle"+(x.title.trim()?"":" rempty"),x.title.trim()||"(제목 없음)");
+    var nref=x.nid&&notes.has(x.nid)?(notes.get(x.nid).ref||""):"";
+    if(x.ref||nref){var r2=el(v,"div","srmrow"); el(r2,"div","rbx rref"+(x.ref?"":" rempty"),x.ref||"본문"); if(nref)el(r2,"div","rbx rref","📖 "+nref)}
+    if(srmYtUrl(x.yt)){var y=el(v,"div","rbx ryt srmytc","▶ 유튜브 설교 영상 보기"); y.dataset.u=x.yt}
+    el(v,"div","srmlab","📝 설교 메모");
+    var bd=el(v,"div","srmlines srmrlines");
+    var lines=x.body.replace(/\s+$/,"").split("\n");
+    if(!x.body.trim()){el(bd,"div","srmrempty","아직 적은 메모가 없어요.")}
+    else lines.forEach(function(t){var ln=el(bd,"div","srmline"); el(ln,"span","srmrgrip","⠿"); el(ln,"div","srmrli",t)});
+    if(x.apply.trim()){el(v,"div","srmlab ap","💡 나의 적용 · 결단"); el(v,"div","rapply",x.apply.trim())}
     return v;
   }
   // 설교 메모 카드 접기·펼치기 (2026-11-01 사용자 요청): 접으면 날짜·설교자·제목만
