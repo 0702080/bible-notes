@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmshot2">
+<meta name="app-build" content="2026-11-08-noshot">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12734,7 +12734,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var nref=x.nid&&notes.has(x.nid)?(notes.get(x.nid).ref||""):"";
     if(x.ref||nref){var r2=el(v,"div","srmrow"); el(r2,"div","rbx rref"+(x.ref?"":" rempty"),x.ref||"본문"); if(nref)el(r2,"div","rbx rref","📖 "+nref)}
     if(srmYtUrl(x.yt)){var y=el(v,"div","rbx ryt srmytc","▶ 유튜브 설교 영상 보기"); y.dataset.u=x.yt}
-    var lab=el(v,"div","srmlab","📝 설교 메모 "); if(x.body.trim()){var cpb=el(lab,"button","srmcopy","📋 전체 복사"); cpb.type="button"; cpb.title="설교 메모 전체 복사"; var shb=el(lab,"button","srmcopy srmshot","📷 이미지"); shb.type="button"; shb.title="화면 크기 그림 여러 장으로 저장"}
+    var lab=el(v,"div","srmlab","📝 설교 메모 "); if(x.body.trim()){var cpb=el(lab,"button","srmcopy","📋 전체 복사"); cpb.type="button"; cpb.title="설교 메모 전체 복사"}
     var bd=el(v,"div","srmlines srmrlines");
     var lines=x.body.replace(/\s+$/,"").split("\n");
     if(!x.body.trim()){el(bd,"div","srmrempty","아직 적은 메모가 없어요.")}
