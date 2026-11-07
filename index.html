@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-sayrow">
+<meta name="app-build" content="2026-11-07-saytfit2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -15191,7 +15191,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       ta.placeholder=sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
       var sayFit=function(){ta.style.height="auto"; ta.style.height=(ta.scrollHeight+2)+"px"};   // 글 길이에 맞춰 높이
-      ta.addEventListener("input",sayFit); setTimeout(sayFit,0);
+      ta.addEventListener("input",sayFit); ta.addEventListener("focus",sayFit); setTimeout(sayFit,0); setTimeout(sayFit,350); requestAnimationFrame(function(){requestAnimationFrame(sayFit)});   // 칸 폭이 정해진 뒤 다시 재야 높이가 맞음 (처음엔 폭이 덜 잡혀 칸이 길어지던 문제)
+      if(window.ResizeObserver){var sro=new ResizeObserver(function(){if(ta.isConnected)sayFit(); else sro.disconnect()}); sro.observe(form)}
       ta.addEventListener("focus",function(){setTimeout(function(){var rw=form.querySelector(".sayrow2:last-of-type")||form; try{rw.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}},350)});   // 키보드가 올라오면 아래 단추 줄까지 보이게
       var row=document.createElement("div"); row.className="sayrow2";
       var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="v"?"구절 (예: 로마서 12:21)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
