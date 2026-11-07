@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-mornrand">
+<meta name="app-build" content="2026-11-07-act-name">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -14497,7 +14497,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       }
     });
     // 🌱 말씀 실천: 카드 실천 탭에 적은 실천을 하루 돌아보기에서 날마다 점검 — 체크하면 실천 도장과 같은 기록 (2026-10-24 사용자 요청)
-    var aGHit=fq&&dlHit("🌱 말씀 실천");   // 찾는 중에도 말씀 실천·중보기도를 거름 (2026-10-31 사용자 요청: "말씀 실천"이 안 찾아짐)
+    var aGHit=fq&&(dlHit("🌱 말씀 실천")||dlHit("🌱 실천"));   // 찾는 중에도 말씀 실천·중보기도를 거름 (2026-10-31 사용자 요청: "말씀 실천"이 안 찾아짐)
     if(!dlEdit){
       var acs=[];
       notes.forEach(function(n){(n.acts||[]).forEach(function(a){
@@ -14512,8 +14512,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var asec=document.createElement("section"); asec.className="dlgrp dlacts"; asec.dataset.g="__acts"; asec.style.setProperty("--gc","var(--green)");
       var ah=document.createElement("div"); ah.className="dlgh";
       var at=document.createElement("button"); at.type="button"; at.className="dlgname dlactname"; at.dataset.g="__acts";
-      var aOpen=fq||!dlGFold.has("__acts"); at.setAttribute("aria-expanded",String(aOpen)); at.setAttribute("aria-label","말씀 실천 "+(aOpen?"접기":"펼치기"));
-      at.textContent="🌱 말씀 실천"+(acs.length?"  "+acs.filter(function(x){return x.on}).length+"/"+acs.length:"");
+      var aOpen=fq||!dlGFold.has("__acts"); at.setAttribute("aria-expanded",String(aOpen)); at.setAttribute("aria-label","실천 "+(aOpen?"접기":"펼치기"));
+      at.textContent="🌱 실천"+(acs.length?"  "+acs.filter(function(x){return x.on}).length+"/"+acs.length:"");
       if(fq)dlMarkIn(at,fq);
       var ach=document.createElement("span"); ach.className="dlgchev"; ach.setAttribute("aria-hidden","true"); at.appendChild(ach);
       ah.appendChild(at); var ahg=document.createElement("button"); ahg.type="button"; ahg.className="dlghgrip"; ahg.dataset.g="__acts"; ahg.textContent="⠿"; ahg.title="끌어서 묶음 차례 바꾸기"; ahg.setAttribute("aria-label","'말씀 실천' 묶음 자리 옮기기"); ah.appendChild(ahg); asec.appendChild(ah);   // 손잡이 (2026-10-25 사용자 요청)
