@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-onesearch">
+<meta name="app-build" content="2026-11-07-nomic2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4549,8 +4549,8 @@ body:not(.boardon) .fwrap .filter{background:#3B3947;border:1px solid #6E6A82;co
 body:not(.boardon) .fwrap .filter::placeholder{color:#C9C4DA}
 body:not(.boardon) .fwrap .filter{margin:0}
 body:not(.boardon) .fwrap .fx{top:50%;left:6px}
-body:not(.boardon) .note.open .chead{top:52px}
-body:not(.boardon) .solobar{top:54px}
+body:not(.boardon) .note.open .chead{top:46px}
+body:not(.boardon) .solobar{position:relative;top:auto}   /* '이 말씀만 보는 중' 띠는 위에 붙지 않고 같이 굴러감 — 붙으면 카드 머리를 가려 겹쳐 보였음 (2026-11-07 사용자 요청) */
 .fx{position:absolute;left:7px;top:calc(50% + 4px);transform:translateY(-50%);z-index:1;width:30px;height:30px;padding:0;border:0;border-radius:15px;background:#34333A;color:var(--ink);font-size:15px;line-height:30px;text-align:center}
 .fx[hidden]{display:none}
 .filter.has{padding-left:44px}
@@ -7405,7 +7405,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       requestAnimationFrame(function(){
         var y=window.scrollY, dy=y-lastY;
         if(Math.abs(dy)>6){$("fab").classList.toggle("away",dy>0&&y>120); lastY=y}
-        document.querySelectorAll(".note.open .chead").forEach(function(h){var t=h.getBoundingClientRect().top;h.classList.toggle("stuck",t<=0.5&&h.parentElement.getBoundingClientRect().top<-4)});
+        document.querySelectorAll(".note.open .chead").forEach(function(h){var t=h.getBoundingClientRect().top, st=parseFloat(getComputedStyle(h).top)||0;h.classList.toggle("stuck",t<=st+0.5&&h.parentElement.getBoundingClientRect().top<st-4)});   // 찾기 칸 아래(top 46px)에 붙어도 '붙음' 바탕이 깔리게 (2026-11-07)
         ticking=false;
       });
     },{passive:true});
@@ -7738,7 +7738,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     function hide(){if(on)return; mic.hidden=true; ta=null}
     document.addEventListener("focusin",function(e){
-      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||t.readOnly||t.disabled||t.classList.contains("sayeta")||t.closest(".qa")||t.classList.contains("sayuse")||t.classList.contains("sayt"))return;   // 질문 탭의 질문·답 칸, 한 마디 뒷면 활용 칸은 뺌 (2026-11-07 사용자 요청)   // 오늘의 한 마디 고치기 칸은 글자를 가려서 뺌
+      var t=e.target; if(!t||t.tagName!=="TEXTAREA"||!t.classList.contains("ccdta"))return;   // 🎤는 암송 코치 받아쓰기 칸에서만 — 다른 글 칸의 마이크는 없앰 (2026-11-07 사용자 요청)
+      if(t.readOnly||t.disabled||t.classList.contains("sayeta")||t.closest(".qa")||t.classList.contains("sayuse")||t.classList.contains("sayt"))return;   // 질문 탭의 질문·답 칸, 한 마디 뒷면 활용 칸은 뺌 (2026-11-07 사용자 요청)   // 오늘의 한 마디 고치기 칸은 글자를 가려서 뺌
       if(on&&t!==ta)stop();
       ta=t; place();
     });
