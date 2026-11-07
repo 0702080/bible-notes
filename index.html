@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmwide">
+<meta name="app-build" content="2026-11-08-linefit3">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5036,6 +5036,14 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmcard .srmmeta .srmbr{flex:0 0 100%;height:0}
 .srmcard .srmmeta .srmbr+.srmd{margin-left:22px}
 .srmcard .srmmeta .srmytc{margin-left:0}
+/* 🌿 은혜 카드 글 = 설교 메모 줄 칸 모양 (2026-11-08 사용자 요청) */
+.saycard.saylined{padding-left:16px!important}
+.saycard.saylined>.saygrip{display:none}
+.sayq.saylines{display:flex;flex-direction:column;margin:30px 0 4px;padding:4px 0!important;border:1px solid color-mix(in srgb,var(--sc) 30%,#2A2930);border-radius:12px;background:rgba(0,0,0,.16);white-space:normal}
+.sayln{display:flex;align-items:flex-start}
+.sayln+.sayln{border-top:1px dashed color-mix(in srgb,var(--sc) 18%,transparent)}
+.saylg{flex:0 0 30px;height:40px;display:grid;place-items:center;color:var(--faint);font-size:17px;opacity:.35}
+.saylt{flex:1;min-width:0;min-height:40px;box-sizing:border-box;padding:8px 10px 8px 0;font-family:var(--serif);font-size:16px;line-height:1.5;color:var(--ink);white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12210,7 +12218,19 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
   /* ↕️ 설교 메모는 한 줄(문장)씩 칸으로 적고, 줄마다 앞의 ⠿를 잡고 끌어 위아래로 옮김 (2026-10-31 사용자 요청)
      줄 칸들(.srmli)을 이어 붙인 글이 숨은 .srmbody에 들어가 저장됨. 엔터=다음 줄, 줄 맨 앞에서 지우기=윗줄과 합침 */
   var srmDrag=null;
-  function srmFit(t){t.style.height="auto"; t.style.height=t.scrollHeight+"px"}
+  // 한 줄 = 한 칸: 칸 폭보다 긴 줄은 글자를 조금 줄여(16px → 최소 11px) 한 줄에 들어가게. 그래도 길면 그때만 다음 줄로 (2026-11-08 사용자 요청)
+  var lnFitCv=null;
+  function lineFit(el,txt){
+    if(!el||!el.isConnected)return; el.style.fontSize="";
+    var cs=getComputedStyle(el), base=parseFloat(cs.fontSize)||16, w=el.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0);
+    txt=txt==null?(el.value!=null&&el.tagName==="TEXTAREA"?el.value:el.textContent):txt; if(!txt||w<=0)return;
+    if(!lnFitCv)lnFitCv=document.createElement("canvas"); var cx=lnFitCv.getContext("2d");
+    cx.font=cs.fontWeight+" "+base+"px "+cs.fontFamily; var tw=cx.measureText(txt).width;
+    if(tw>w)el.style.fontSize=Math.max(11,Math.floor(base*w/tw*0.97*10)/10)+"px";
+  }
+  function lineFitAll(root){(root||document).querySelectorAll(".srmrli,.saylt,textarea.srmli").forEach(function(e){lineFit(e); if(e.tagName==="TEXTAREA"){e.style.height="auto"; e.style.height=e.scrollHeight+"px"}})}
+  window.addEventListener("resize",function(){clearTimeout(lineFit.t); lineFit.t=setTimeout(function(){lineFitAll()},150)});
+  function srmFit(t){lineFit(t); t.style.height="auto"; t.style.height=t.scrollHeight+"px"}
   function srmRow(txt){
     var r=document.createElement("div"); r.className="srmline";
     var g=document.createElement("span"); g.className="srmgrip"; g.textContent="⠿"; g.title="끌어서 옮기기"; g.setAttribute("aria-label","끌어서 옮기기");
@@ -12392,7 +12412,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var rb=srm.querySelector(".srmreadbtn"); rb.hidden=!srmEdit; rb.textContent=srmRead?"✏️ 고치기":"📖 읽기"; rb.classList.toggle("on",srmRead);
     if(srmEdit){
       var x=srmData().items.find(function(y){return y.id===srmEdit}); if(!x){srmEdit="";return srmDraw()}
-      if(srmRead){foot.hidden=true; box.appendChild(srmReadView(x)); return}
+      if(srmRead){foot.hidden=true; box.appendChild(srmReadView(x)); lineFitAll(box); return}
       var f=document.createElement("div"); f.className="srmform"; f.dataset.id=x.id;
       f.innerHTML='<div class="srmrow"><input type="date" class="srmdate" aria-label="날짜"><input class="srmwho" maxlength="60" placeholder="설교자 (예: 담임목사님)" aria-label="설교자"></div>'+
         '<input class="srmtitle" maxlength="200" placeholder="설교 제목" aria-label="설교 제목">'+
@@ -15366,7 +15386,13 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       var sLong=String(x.t||"").trim().split("\n").filter(function(s){return s.trim()}).length>1||String(x.t||"").length>34;
       var sfd=sLong&&!!sayFold[x.id]; if(sfd)c.classList.add("sayfolded");
       if(sLong){var fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="fold"; fbn.textContent=sfd?"▾":"▴"; fbn.setAttribute("aria-label",sfd?"펼치기":"접기"); fbn.title=sfd?"펼치기":"접기"; c.appendChild(fbn)} else c.classList.add("sayshort");
+      if(x.gr&&!sfd&&String(x.t||"").indexOf("\n")>=0){   // 🌿 은혜: 설교 메모처럼 한 줄씩 칸으로, 빈 줄도 그대로 (2026-11-08 사용자 요청)
+        var q=document.createElement("div"); q.className="sayq saylines"; c.classList.add("saylined");
+        String(x.t||"").replace(/\s+$/,"").split("\n").forEach(function(ln){var r=document.createElement("div"); r.className="sayln"; var g=document.createElement("span"); g.className="saylg"; g.textContent="⠿"; g.setAttribute("aria-hidden","true"); r.appendChild(g); var tx=document.createElement("span"); tx.className="saylt"; tx.textContent=ln; r.appendChild(tx); q.appendChild(r)});
+        c.appendChild(q); setTimeout(function(){lineFitAll(q)},60);   // 창이 열린 뒤 폭을 재야 해서 조금 기다림
+      }else{
       var q=document.createElement("p"); q.className="sayq"; q.textContent=sfd?String(x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean)[0]||"":(x.t||""); c.appendChild(q);
+      }
       if(x.use){var um=document.createElement("span"); um.className="sayusemark"; um.textContent="💡 활용"; um.title="옆으로 밀면 이 말을 어떻게 활용할지 적은 글이 보여요"; c.appendChild(um)}
       var f=document.createElement("div"); f.className="sayf";
       if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
