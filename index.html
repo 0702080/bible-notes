@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-pgone">
+<meta name="app-build" content="2026-11-08-hvnodel">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -15737,7 +15737,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
         nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
       }
       var ed=document.createElement("button"); ed.type="button"; ed.className="saybtn saydelc"; ed.dataset.act="del"; ed.textContent="삭제";   // 고치기는 카드 두 번 누르기로, 단추는 삭제 (2026-11-06 사용자 요청)
-      f.appendChild(ed);   // 고치기·지우기를 한 단추로 — 지우기는 고치는 칸 안에 (2026-11-06 사용자 요청)
+      if(!x.hv)f.appendChild(ed);   // 고치기·지우기를 한 단추로 — 지우기는 고치는 칸 안에 (2026-11-06 사용자 요청). 짧은 말씀 카드는 접기 단추 바로 밑이라 잘못 누르기 쉬워 뺌 — 두 번 눌러 고치는 칸의 🗑로 지움 (2026-11-08 사용자 요청)
       c.appendChild(f); list.appendChild(c);
     });
   }
