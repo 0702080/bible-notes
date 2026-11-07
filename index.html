@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-rdtap">
+<meta name="app-build" content="2026-11-07-mornrand">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7611,8 +7611,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var ta=null, geo=[], drag=null, raf=0;
     var COPY=["fontFamily","fontSize","fontWeight","fontStyle","fontVariant","letterSpacing","lineHeight","wordBreak","wordSpacing","textIndent","textTransform","tabSize","overflowWrap","wordWrap","whiteSpace"];
     function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&!t.classList.contains("mqa")&&!t.classList.contains("sayeta")&&t.offsetParent!==null}   // 묵상 질문 답 칸은 자기 손잡이(.mqgut)가 있어 뺌 (2026-11-01)
+    var mKey="", mLines=null;
     function measure(){
-      var cs=getComputedStyle(ta);
+      var cs=getComputedStyle(ta), key=ta.value+"\u0001"+ta.clientWidth+"\u0001"+cs.fontSize+"\u0001"+cs.paddingLeft;
+      if(key===mKey&&mLines&&!drag)return {cs:cs,lines:mLines};   // 글·폭이 그대로면 다시 재지 않음
+      mKey=key;
       COPY.forEach(function(k){mirror.style[k]=cs[k]});
       if(cs.whiteSpace==="normal"||cs.whiteSpace==="nowrap")mirror.style.whiteSpace="pre-wrap";
       var pl=parseFloat(cs.paddingLeft)||0, pr=parseFloat(cs.paddingRight)||0;
@@ -7622,7 +7625,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       lines.forEach(function(t){var d=document.createElement("div"); d.textContent=t||"​"; mirror.appendChild(d)});
       var lh=parseFloat(cs.lineHeight); if(!isFinite(lh))lh=(parseFloat(cs.fontSize)||16)*1.5;
       geo=[].map.call(mirror.children,function(d,i){return {i:i,top:d.offsetTop,h:d.offsetHeight,lh:Math.min(lh,d.offsetHeight),empty:!lines[i].trim()}});
-      return {cs:cs,lines:lines};
+      mLines=lines; return {cs:cs,lines:lines};
     }
     function draw(){
       raf=0;
@@ -7641,21 +7644,25 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
           var pr=pe.getBoundingClientRect(); if(pr.left<r.left-1){var pl=pr.left+(parseFloat(getComputedStyle(pe).borderLeftWidth)||0), gw=r.left-pl; if(gw>=6&&gw<=90)x=pl+gw/2-12; break}   // 좁은 여백(14px 남짓)도 가운데로
         }
       }
+      var st=ta.scrollTop, frag=document.createDocumentFragment();   // scrollTop은 한 번만 읽음 — 줄마다 읽으면 글자마다 화면 계산이 수십 번 일어나 타이핑이 느려짐 (2026-11-07)
       layer.textContent=""; layer.hidden=false;
       geo.forEach(function(g){
         if(g.empty&&!(drag&&drag.i===g.i))return;
-        var y=r.top+bt+pt+g.top-ta.scrollTop+g.lh/2;
+        var y=r.top+bt+pt+g.top-st+g.lh/2;
         if(y<r.top+4||y>r.bottom-4)return;   // 칸 밖으로 굴러간 줄은 숨김
         var h=document.createElement("span"); h.className="lhgrip"+(drag&&drag.i===g.i?" on":""); h.textContent="⠿"; h.dataset.i=g.i;
-        h.style.left=x+"px"; h.style.top=(y-14)+"px"; layer.appendChild(h);
+        h.style.left=x+"px"; h.style.top=(y-14)+"px"; frag.appendChild(h);
       });
+      layer.appendChild(frag);
     }
     function sched(){if(!raf)raf=requestAnimationFrame(draw)}
     function hide(){if(drag)return; layer.hidden=true; layer.textContent=""; if(ta)ta.classList.remove("lhpad"); ta=null}
     document.addEventListener("focusin",function(e){var t=e.target; if(ok(t)){if(ta&&ta!==t)ta.classList.remove("lhpad"); ta=t; sched()} else if(ta&&!drag){hide()}});
     document.addEventListener("focusout",function(e){if(e.target===ta&&!drag)setTimeout(function(){if(document.activeElement!==ta&&!drag)hide()},120)});
-    document.addEventListener("input",function(e){if(e.target===ta)sched()},true);
-    document.addEventListener("selectionchange",function(){if(ta)sched()});
+    var typT=0, typing=false;
+    function schedIdle(){typing=true; clearTimeout(typT); typT=setTimeout(function(){typing=false; sched()},350)}   // 글자를 치는 동안은 손잡이를 다시 그리지 않고 손을 멈추면 그림 (2026-11-07 타이핑이 느리던 문제)
+    document.addEventListener("input",function(e){if(e.target===ta&&!drag)schedIdle(); else if(e.target===ta)sched()},true);
+    document.addEventListener("selectionchange",function(){if(ta&&!typing)sched()});
     window.addEventListener("scroll",function(){if(ta)sched()},true);
     window.addEventListener("resize",function(){if(ta)sched()});
     if(window.ResizeObserver){var ro=new ResizeObserver(function(){if(ta)sched()}); document.addEventListener("focusin",function(e){if(ok(e.target)){ro.disconnect(); ro.observe(e.target)}})}
@@ -14135,6 +14142,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     box.appendChild(el("b","dlttl",eve?"🌙 오늘 되돌아보기":mor?"☀️ 오늘 아침 꼭 볼 것":"📌 오늘 꼭 볼 것"));
     if(note&&!eve)box.appendChild(el("p","dltnote",note));
     // 저녁 칸의 "오늘 체크한 것 N개 · 아직 안 한 실천 N개" 줄은 뺌 (2026-11-06 사용자 요청)
+    // 날마다 다른 3개: 날짜와 실천 id로 섞은 차례 — 같은 날엔 그대로, 다음 날엔 바뀜 (2026-11-07 사용자 요청)
+    var dhash=function(str){var h=2166136261; for(var i=0;i<str.length;i++){h^=str.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0};
+    todo.sort(function(a,b){return dhash(dlDay+"|"+a.k)-dhash(dlDay+"|"+b.k)});
+    todo.forEach(function(t){t.t=t.t.replace(/\s*\n\s*/g," ").trim()});   // 줄바꿈이 든 실천은 한 줄로
     if(todo.length){var ul=el("ul","dltlist"); todo.slice(0,3).forEach(function(t){var li=el("li","",null), lb=el("button","dltgo",t.t); lb.type="button"; lb.dataset.k=t.k; lb.title="이 실천 카드로 가기"; li.appendChild(lb); ul.appendChild(li)}); box.appendChild(ul)}
     if(mor&&typeof dueAll==="function"){var du=(dueAll()||[]).filter(function(n){return n&&n.ref}); if(du.length){   // 한 줄에 하나씩 세로로 (2026-11-06 사용자 요청)
       var dw=el("div","dltdue"); dw.appendChild(el("p","dltsum","📖 오늘 복습할 말씀 "+du.length+"개"));
