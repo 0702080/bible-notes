@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-saylong">
+<meta name="app-build" content="2026-11-07-srmglass">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4907,10 +4907,10 @@ body.reorder .ref .lclisten{display:none}
 .bcol.btint:not(.over):not(.lmover):not(.bback){background:color-mix(in srgb,color-mix(in srgb,var(--bc) 16%,#24222B) 80%,transparent)}
 @media (hover:hover){.board4>.bcol.bfold:hover{background:#2F2C39!important}}
 /* 믿음의 한 마디·짧은 말씀·기도 읽기·기도제목·기도 응답 연표·하루 돌아보기 창: 뒤 화면은 감추고 앱 배경 이미지가 비치게 (2026-11-05 사용자 요청) */
-.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet){background:rgba(10,10,13,.42)}
-body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#topicSheet.tsfull):not([hidden])) main.wrap,
-body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#topicSheet.tsfull):not([hidden])) #fab{visibility:hidden}
-.saysheet>.dlbar,.prd>.dlbar,.daily:not(.srmsheet):not(.wksheet)>.dlbar{background:rgba(11,11,13,.62)}
+.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet){background:rgba(10,10,13,.42)}
+body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull):not([hidden])) main.wrap,
+body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull):not([hidden])) #fab{visibility:hidden}
+.saysheet>.dlbar,.prd>.dlbar,.daily:not(.wksheet)>.dlbar{background:rgba(11,11,13,.62)}
 .saycard.saytint{background:color-mix(in srgb,color-mix(in srgb,var(--sc) 16%,#18171B) 84%,transparent)}
 .saycard.hv{background:color-mix(in srgb,color-mix(in srgb,var(--sc) 16%,#18171B) 84%,transparent)!important}
 /* 기도 읽기 */
@@ -4997,6 +4997,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   .note.open:not(.vediting) .chead{flex-wrap:wrap;justify-content:flex-end;row-gap:2px}
   .note.open:not(.vediting) .chead .ref{flex:1 0 100%;margin-right:0}
 }
+/* 설교 메모도 앱 배경이 비치게: 창 바탕·아래 고정 줄은 반투명, 메모 칸은 살짝 보랏빛 반투명 (2026-11-07 사용자 요청) */
+.srmsheet .srmfoot{background:rgba(11,11,13,.62);box-shadow:none}
+.srmsheet .srmlines{background:color-mix(in srgb,color-mix(in srgb,var(--violet) 12%,#141419) 78%,transparent)!important;border-color:color-mix(in srgb,var(--violet) 30%,#2A2930)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -16595,7 +16598,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   /* ---------- 🖼️ 앱 배경 바꾸기 (PC ⋯ 메뉴, 2026-11-01 사용자 요청): 기본 사진·색 배경·내 사진, 어둡기 조절. 이 기기에만 저장 */
   /* 비치는 창이 맨 위일 때 그 밑의 전체 화면 창은 감춤: 안 그러면 기도제목 뒤로 하루 돌아보기 카드가 보임 (2026-11-05 사용자 요청) */
   (function glassStack(){
-    var ALL=".rvq,.cch,.daily,#topicSheet.tsfull", GLASS=".rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#topicSheet.tsfull";
+    var ALL=".rvq,.cch,.daily,#topicSheet.tsfull", GLASS=".rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull";
     function sync(){
       var els=Array.prototype.filter.call(document.querySelectorAll(ALL),function(x){return !x.hidden}), top=null, topZ=-1;
       els.forEach(function(x){var z=parseInt(getComputedStyle(x).zIndex,10)||0; if(z>=topZ){top=x;topZ=z}});   // 같은 높이면 문서에서 뒤에 있는 창이 위
