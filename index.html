@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-pgflip">
+<meta name="app-build" content="2026-11-08-pgrow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12672,8 +12672,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     function pgSync(){   // 📄 지금 쪽 / 전체 쪽: 메모 칸이 안에서 굴러가면 그 칸, 아니면 화면 높이로 셈
       if(!pg||!bd.isConnected)return;
       var sc=bd.classList.contains("srmpinned")?bd:box, ch=sc.clientHeight; if(ch<50){pg.hidden=true;return}
-      var tot=Math.max(1,Math.ceil((sc.scrollHeight-4)/ch)), end=sc.scrollTop>=sc.scrollHeight-ch-2;
-      var cur=end?tot:Math.min(tot,Math.floor((sc.scrollTop+4)/ch)+1);
+      var tot, cur, end=sc.scrollTop>=sc.scrollHeight-ch-2, P=sc===bd&&bd._P;
+      if(P){tot=P.length; cur=end?tot:pgIdx(sc.scrollTop)+1}   // 줄 경계로 나눈 쪽
+      else{tot=Math.max(1,Math.ceil((sc.scrollHeight-4)/ch)); cur=end?tot:Math.min(tot,Math.floor((sc.scrollTop+4)/ch)+1)}
       pg.hidden=tot<2; pg.textContent=cur+" / "+tot;
       if(pg._cur&&pg._cur!==cur&&tot>1){buzz(12);   // 쪽이 바뀌면 짧게 진동 + 숫자 톡·테두리 금빛 (2026-11-08 사용자 요청)
         [[pg,"pgpop"],[bd,"pgflash"]].forEach(function(a){a[0].classList.remove(a[1]); void a[0].offsetWidth; a[0].classList.add(a[1])});
@@ -12708,18 +12709,25 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       function end(){
         if(!T)return; var S=T; T=null; if(S.ax!=="y")return;
         var ch=bd.clientHeight, max=bd.scrollHeight-ch; if(ch<50)return;
-        var p0=Math.round(S.top/ch), moved=S.top-bd.scrollTop, dir=0;   // moved>0: 아래로 끌어 앞쪽으로
+        var P=bd._P||[0], moved=S.top-bd.scrollTop, dir=0;   // moved>0: 아래로 끌어 앞쪽으로
+        var p0=S.top>=max-2?P.length-1:pgIdx(S.top);   // 쪽 시작(줄 맨 위)에 맞춤
         if(moved<-40||S.v<-0.35)dir=1; else if(moved>40||S.v>0.35)dir=-1;
-        var to=Math.max(0,Math.min(max,(p0+dir)*ch)); if(dir===1&&S.top>=max-2)to=max;
+        var pi=Math.max(0,Math.min(P.length-1,p0+dir)), to=Math.max(0,Math.min(max,P[pi]));
+        if(dir===1&&p0>=P.length-1)to=max;
         glide(to);
       }
       bd.addEventListener("touchend",end,{passive:true}); bd.addEventListener("touchcancel",end,{passive:true});
     }
-    function pgTint(){   // 쪽마다(홀수·짝수) 줄 바탕을 번갈아
+    function pgIdx(top){var P=bd._P||[0], i=0; while(i+1<P.length&&P[i+1]<=top+4)i++; return i}
+    function pgTint(){   // 쪽 나누기: 메모 칸 높이에 다 들어가는 줄까지 한 쪽, 다음 쪽은 늘 줄 맨 위에서 시작 (2026-11-08 사용자 요청: 쪽 위끝을 줄에 정확히) + 홀수·짝수 쪽 바탕 번갈아
       if(!bd.isConnected)return;
-      var sc=bd.classList.contains("srmpinned")?bd:box, ch=sc.clientHeight; if(ch<50)return;
-      var top0=sc.getBoundingClientRect().top-sc.scrollTop;
-      bd.querySelectorAll(".srmline").forEach(function(ln){var y=ln.getBoundingClientRect().top-top0; ln.classList.toggle("srmpg2",Math.floor((y+2)/ch)%2===1)});
+      var pinned=bd.classList.contains("srmpinned"), sc=pinned?bd:box, ch=sc.clientHeight; if(ch<50)return;
+      var top0=sc.getBoundingClientRect().top-sc.scrollTop, P=[0], start=0, rows=[];
+      bd.querySelectorAll(".srmline").forEach(function(ln){var r=ln.getBoundingClientRect(); rows.push({el:ln,t:r.top-top0,b:r.bottom-top0})});
+      if(pinned){
+        rows.forEach(function(r){if(r.b>start+ch+0.5&&r.t>start+1){start=Math.round(r.t); P.push(start)}});
+        bd._P=P; rows.forEach(function(r){r.el.classList.toggle("srmpg2",pgIdx(r.t)%2===1)});
+      }else{bd._P=null; rows.forEach(function(r){r.el.classList.toggle("srmpg2",Math.floor((r.t+2)/ch)%2===1)})}
     }
     function sync(){
       pgSync();
