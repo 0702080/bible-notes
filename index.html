@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmpin">
+<meta name="app-build" content="2026-11-08-sayfold3d">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5089,6 +5089,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmrv .srmrlines.srmpinned{overscroll-behavior:contain;scrollbar-width:none}
 .srmrv .srmrlines.srmpinned::-webkit-scrollbar{display:none}
 .srmrv .srmlab .srmshot{margin-left:6px}
+/* 한 마디·은혜 카드 ▾ 접기 단추: 입체, 오른쪽 끝을 아래 '삭제' 단추와 같은 줄에 (2026-11-08 사용자 요청) */
+.saysheet .saycard .sayfoldb{right:var(--sayfr,16px);background-color:#2A2933!important;border-color:#45434F!important;color:var(--ink)!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 6px rgba(0,0,0,.34);transition:transform .08s,box-shadow .08s}
+.saysheet .saycard .sayfoldb:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
