@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-saydbl">
+<meta name="app-build" content="2026-11-07-sayfold">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3436,6 +3436,11 @@ textarea.sayuse{display:block;width:100%;box-sizing:border-box;min-height:110px;
 textarea.sayuse:focus{outline:none;box-shadow:none;border-color:color-mix(in srgb,var(--sc) 80%,#fff)}   /* 테두리 한 줄만, 모서리 손잡이 없음 (2026-11-07 사용자 요청) */
 .sayusev{margin:0;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--sc) 10%,#101013);border:1px solid color-mix(in srgb,var(--sc) 30%,#2A2930);font-family:var(--serif);font-size:16.5px;line-height:1.8;color:var(--ink);white-space:pre-wrap;word-break:keep-all}
 .saybktip{margin:8px 2px 0;font-size:11.5px;color:var(--muted)}
+.saycard .sayfoldb{position:absolute;top:10px;right:10px;z-index:2;width:30px;height:30px;padding:0;border-radius:50%;border:1px solid color-mix(in srgb,var(--sc,var(--gold)) 45%,#3A3630);background:rgba(0,0,0,.22);color:color-mix(in srgb,var(--sc,var(--gold)) 70%,#fff);font-size:12px;line-height:1;font-family:inherit}
+.saycard:not(.sayback):not(.sayshort) .sayq{padding-right:30px}
+.saycard.sayfolded .sayq{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saycard.sayfolded .sayusemark,.saycard.sayfolded .saynote{display:none}
+.saycard.sayback .sayfoldb{display:none}
 .sayusemark{display:inline-block;margin-top:6px;font-size:11.5px;color:color-mix(in srgb,var(--sc) 70%,#fff);opacity:.85}
 .saycard.sayflipl{animation:sayFlipL .28s ease-out}.saycard.sayflipr{animation:sayFlipR .28s ease-out}
 @keyframes sayFlipL{from{transform:translateX(36px);opacity:.3}to{transform:none;opacity:1}}
@@ -15195,7 +15200,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         var bt=document.createElement("p"); bt.className="saybktip"; bt.textContent=(x.use&&sayUseEd!==x.id)?"두 번 누르면 고치기 · 옆으로 밀면 앞면":"적는 대로 저장돼요 · 옆으로 밀면 앞면"; c.appendChild(bt);
         list.appendChild(c); return;
       }
-      var q=document.createElement("p"); q.className="sayq"; q.textContent=x.t||""; c.appendChild(q);
+      // ▴ 카드 하나씩 접기·펼치기 (2026-11-07 사용자 요청) — 접으면 첫 줄만
+      var sLong=String(x.t||"").trim().split("\n").filter(function(s){return s.trim()}).length>1||String(x.t||"").length>34;
+      var sfd=sLong&&!!sayFold[x.id]; if(sfd)c.classList.add("sayfolded");
+      if(sLong){var fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="fold"; fbn.textContent=sfd?"▾":"▴"; fbn.setAttribute("aria-label",sfd?"펼치기":"접기"); fbn.title=sfd?"펼치기":"접기"; c.appendChild(fbn)} else c.classList.add("sayshort");
+      var q=document.createElement("p"); q.className="sayq"; q.textContent=sfd?String(x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean)[0]||"":(x.t||""); c.appendChild(q);
       if(x.use){var um=document.createElement("span"); um.className="sayusemark"; um.textContent="💡 활용"; um.title="옆으로 밀면 이 말을 어떻게 활용할지 적은 글이 보여요"; c.appendChild(um)}
       var f=document.createElement("div"); f.className="sayf";
       if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
@@ -15226,6 +15235,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     return fresh.concat(rest);
   }
   // 한 마디 카드 끌어서 순서 바꾸기: 카드를 꾹(0.35초) 누르거나 왼쪽 ⠿를 잡고 위아래로 끌기
+  var sayFold={}; try{sayFold=JSON.parse(localStorage.getItem("bible-say-fold")||"{}")||{}}catch(e){sayFold={}}
   var sayBack={}, sayUseEd="", sayUsePend=false, sayUseT=0, saySwAt=0;
   function sayUseSave(ta){
     var o=sayData(), x=o.items.find(function(y){return y.id===ta.dataset.id}); if(!x)return;
@@ -15387,6 +15397,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var b=e.target.closest("button"); if(!b)return;
     var act=b.dataset.act||"", card=b.closest(".saycard"), id=card?card.dataset.id:(b.dataset.id||"");
     if(act==="cancel"){sayEdit="";drawSay();return}
+    if(act==="fold"){if(sayFold[id])delete sayFold[id]; else sayFold[id]=1; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
     if(act==="hvclear"){e.preventDefault(); var oo=sayData(), xx=oo.items.filter(function(y){return y.id===id})[0]; if(xx){xx.tm="";xx.at=Date.now();saveSay(oo);drawSay();renderReviewBar();toast("10분마다 돌아가며 나와요")} return}
     if(act==="save"){
       var t=say.querySelector(".sayt").value.trim();
