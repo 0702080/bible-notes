@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmhit">
+<meta name="app-build" content="2026-11-08-srmresp">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3304,6 +3304,22 @@ textarea.lhpad{padding-left:28px!important}
 .srmcard.srmfolded{padding-bottom:10px}
 .srmttl{display:block;margin:4px 0 2px;font-size:16.5px;font-weight:700;color:var(--gold);word-break:keep-all}
 .srmref{display:inline-block;margin-top:2px;padding:1px 8px;border-radius:10px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-size:12px}
+.srmrsp{display:flex;flex-direction:column;gap:10px;padding-bottom:30px}
+.srmrhd{display:flex;flex-direction:column;gap:3px;padding:12px 14px;border:1px solid color-mix(in srgb,var(--pink) 35%,#2A2930);border-radius:12px;background:color-mix(in srgb,var(--pink) 12%,#16161C)}
+.srmrhd b{color:var(--pink);font-size:16px}
+.srmrsub{color:var(--muted);font-size:13px;word-break:keep-all}
+textarea.srmresp{width:100%;box-sizing:border-box;min-height:50vh;padding:14px;border:1px solid color-mix(in srgb,var(--pink) 30%,#2A2930);border-radius:12px;background:color-mix(in srgb,var(--pink) 7%,#141419);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.8;resize:none;overflow:hidden}
+textarea.srmresp:focus{outline:none;border-color:var(--pink)}
+.srmrrow{display:flex;align-items:center;gap:8px}
+.srmrrow .srmrsaved{flex:1;text-align:center;color:var(--faint);font-size:12.5px}
+.srmrback,.srmrcopy{height:38px;padding:0 14px;border-radius:19px;border:1px solid #3A3942;background:#24232B;color:var(--ink);font:inherit;font-size:14px}
+.srmrhint{margin:0;text-align:center;color:var(--faint);font-size:12px}
+.srmrgo{display:block;width:100%;margin:6px 0 24px;height:44px;border-radius:22px;border:1px solid color-mix(in srgb,var(--pink) 45%,#2A2930);background:color-mix(in srgb,var(--pink) 16%,#1A1A20);color:var(--pink);font:inherit;font-size:14.5px;font-weight:700}
+.srmcard .srmrspc{color:color-mix(in srgb,var(--pink) 75%,#fff)}
+.srmsheet.srmresping{background:rgba(48,20,36,.62)}
+.srmbox.srmslL{animation:srmSlL .26s ease-out}.srmbox.srmslR{animation:srmSlR .26s ease-out}
+@keyframes srmSlL{from{transform:translateX(42px);opacity:.3}to{transform:none;opacity:1}}
+@keyframes srmSlR{from{transform:translateX(-42px);opacity:.3}to{transform:none;opacity:1}}
 mark.srmhit{background:rgba(255,205,80,.5);color:inherit;border-radius:4px;padding:0 2px;margin:0 -1px;box-decoration-break:clone;-webkit-box-decoration-break:clone;animation:srmHitBlink 1.6s ease-in-out infinite}
 @keyframes srmHitBlink{0%,100%{background:rgba(255,205,80,.55);box-shadow:0 0 0 1px rgba(255,205,80,.55)}50%{background:rgba(255,205,80,.14);box-shadow:0 0 0 1px rgba(255,205,80,.2)}}
 @media (prefers-reduced-motion:reduce){mark.srmhit{animation:none}}
@@ -7898,7 +7914,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     cb.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="12" rx="2.2"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></svg>';
     document.body.appendChild(cb);
     var ta=null;
-    function skip(t){return !t||t.tagName!=="TEXTAREA"||t.disabled||(t.classList.contains("sayt")&&!!t.closest(".saygr"))||t.classList.contains("sayeta")||t.classList.contains("srmli")||t.classList.contains("ccdta")||!!t.closest(".qa")}
+    function skip(t){return !t||t.tagName!=="TEXTAREA"||t.disabled||(t.classList.contains("sayt")&&!!t.closest(".saygr"))||t.classList.contains("srmresp")||t.classList.contains("sayeta")||t.classList.contains("srmli")||t.classList.contains("ccdta")||!!t.closest(".qa")}
     function place(){
       if(!ta||!ta.isConnected||!ta.value.trim()){cb.hidden=true;return}
       var r=ta.getBoundingClientRect(); if(r.bottom<0||r.top>innerHeight||!r.width){cb.hidden=true;return}
@@ -12219,11 +12235,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     if(!o.del||typeof o.del!=="object")o.del={};
     o.items=o.items.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),d:/^\d{4}-\d{2}-\d{2}$/.test(x.d||"")?x.d:dkey(+x.at||Date.now()),
       who:String(x.who||"").slice(0,60),title:String(x.title||"").slice(0,200),ref:String(x.ref||"").slice(0,120),nid:String(x.nid||""),
-      body:String(x.body||"").slice(0,40000),apply:String(x.apply||"").slice(0,8000),yt:String(x.yt||"").slice(0,500),at:+x.at||Date.now(),u:+x.u||+x.at||0,ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
+      body:String(x.body||"").slice(0,40000),apply:String(x.apply||"").slice(0,8000),yt:String(x.yt||"").slice(0,500),resp:String(x.resp||"").slice(0,40000),at:+x.at||Date.now(),u:+x.u||+x.at||0,ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
     return o;
   }
   function srmSave(o){try{localStorage.setItem(SRM_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__sermons")}
-  function srmEmpty(x){return !(x.title.trim()||x.body.trim()||x.apply.trim()||x.ref.trim()||x.who.trim()||(x.yt||"").trim())}
+  function srmEmpty(x){return !((x.resp||"").trim()||x.title.trim()||x.body.trim()||x.apply.trim()||x.ref.trim()||x.who.trim()||(x.yt||"").trim())}
   // ▶ 유튜브 설교 영상 링크 (2026-11-01 사용자 요청): 붙여넣은 글에서 주소만 골라 열기
   function srmYtUrl(t){t=String(t||"").trim(); if(!t)return ""; var m=t.match(/https?:\/\/\S+/); if(m)return m[0]; if(/^(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(t))return "https://"+t.split(/\s/)[0]; return ""}
   function srmYtOpen(t){var u=srmYtUrl(t); if(!u){toast("유튜브 링크를 확인해 주세요");return} window.open(u,"_blank","noopener")}
@@ -12240,7 +12256,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
   function srmByDate(a,b){return a.d<b.d?1:a.d>b.d?-1:(b.at-a.at)}
   // 목록 순서: 끌어서 옮긴 순서(ord)를 따르고, 아직 순서가 없는 새 메모는 맨 위에 날짜 최신순 (2026-11-01 사용자 요청)
   function srmSorted(o){return o.items.slice().sort(function(a,b){var na=a.ord==null, nb=b.ord==null; if(na!==nb)return na?-1:1; return na?srmByDate(a,b):(a.ord-b.ord)||srmByDate(a,b)})}
-  var srm=null, srmEdit="", srmQ="", srmTimer=0, srmRead=false;   // srmRead: 📖 읽기 모드 (2026-11-01 사용자 요청)
+  var srm=null, srmEdit="", srmQ="", srmTimer=0, srmRead=false, srmResp=false, srmRespT=0;   // srmResp: ✍️ 이 설교를 듣고 쓰는 기도·에세이 쪽 (2026-11-08)   // srmRead: 📖 읽기 모드 (2026-11-01 사용자 요청)
   /* ↕️ 설교 메모는 한 줄(문장)씩 칸으로 적고, 줄마다 앞의 ⠿를 잡고 끌어 위아래로 옮김 (2026-10-31 사용자 요청)
      줄 칸들(.srmli)을 이어 붙인 글이 숨은 .srmbody에 들어가 저장됨. 엔터=다음 줄, 줄 맨 앞에서 지우기=윗줄과 합침 */
   var srmDrag=null;
@@ -12438,14 +12454,30 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       srm=document.createElement("div"); srm.className="daily srmsheet"; srm.setAttribute("role","dialog"); srm.setAttribute("aria-modal","true"); srm.hidden=true;
       srm.innerHTML='<div class="dlbar"><b class="dltitle">🎤 설교 메모</b><button type="button" class="dlclose srmnew">+ 새 메모</button><button type="button" class="dlclose srmreadbtn" hidden>📖 읽기</button><button type="button" class="dlclose srmclose">닫기</button></div><div class="dlbody srmbox"></div><div class="srmfoot" hidden></div>';
       document.body.appendChild(srm);
-      srm.querySelector(".srmclose").addEventListener("click",function(){if(srmEdit){srmCommit();srmEdit="";srmDraw()}else closeSermon()});
+      srm.querySelector(".srmclose").addEventListener("click",function(){if(srmEdit){srmRespFlush();srmCommit();srmEdit="";srmDraw()}else closeSermon()});
       srm.querySelector(".srmnew").addEventListener("click",srmNew);
       srm.querySelector(".srmreadbtn").addEventListener("click",function(){if(!srmEdit)return; if(!srmRead)srmCommit(); srmRead=!srmRead; srmDraw(); srm.querySelector(".srmbox").scrollTop=0});
       srm.addEventListener("click",srmClick); srmDragInit();
+      // ↔ 옆으로 밀기 (2026-11-08 사용자 요청): 메모에서 오른쪽→왼쪽 = ✍️ 이 설교를 듣고 쓰는 기도·에세이, 왼쪽→오른쪽 = 목록 (기도·에세이 쪽에서는 메모로)
+      var srmSw=null;
+      srm.addEventListener("touchstart",function(e){
+        if(!srmEdit||e.touches.length!==1||srmDrag||e.target.closest(".srmgrip,.srmhl,.srmhlfloat,input[type=date],select")){srmSw=null;return}
+        var t=e.touches[0]; srmSw={x:t.clientX,y:t.clientY,t:Date.now()};
+      },{passive:true});
+      srm.addEventListener("touchend",function(e){
+        var sw=srmSw; srmSw=null; if(!sw||!srmEdit||srmDrag)return;
+        var t=e.changedTouches[0], dx=t.clientX-sw.x, dy=t.clientY-sw.y;
+        if(Date.now()-sw.t>900||Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*2)return;
+        try{var sl=window.getSelection(); if(sl&&String(sl).length)return}catch(err){}   // 글자를 고르던 중이면 넘기지 않음
+        var ae=document.activeElement; if(ae&&srm.contains(ae)&&ae.blur)ae.blur();
+        if(dx<0){if(srmResp)return; if(!srmRead)srmCommit(); srmResp=true; srmDraw(); srmSlide("l"); buzz(10)}
+        else if(srmResp){srmRespFlush(); srmResp=false; srmDraw(); srmSlide("r"); buzz(10)}
+        else{srmCommit(); srmEdit=""; srmDraw(); srmSlide("r"); buzz(10)}
+      },{passive:true});
       // 휴대폰: 메모를 빠르게 두 번 누르면 고치기 ↔ 읽기 (2026-11-07 사용자 요청)
       var srmTap={t:0,x:0,y:0};
       srm.addEventListener("pointerup",function(e){
-        if(e.pointerType!=="touch"||!srmEdit||!e.target.closest(".srmbox")||e.target.closest("button,select,input,a,.srmytc,.srmgrip"))return;
+        if(e.pointerType!=="touch"||!srmEdit||srmResp||!e.target.closest(".srmbox")||e.target.closest("button,select,input,a,.srmytc,.srmgrip"))return;
         var now=Date.now();
         if(now-srmTap.t<350&&Math.abs(e.clientX-srmTap.x)<30&&Math.abs(e.clientY-srmTap.y)<30){
           srmTap.t=0; e.preventDefault(); var ae=document.activeElement; if(ae&&srm.contains(ae))ae.blur();
@@ -12490,6 +12522,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     Object.keys(nx).forEach(function(k){x[k]=nx[k]}); x.u=Date.now(); srmSave(o);
   }
   function srmClick(e){
+    if(e.target.closest(".srmrgo")){e.stopPropagation(); if(!srmRead)srmCommit(); srmResp=true; srmDraw(); srmSlide("l"); return}
+    if(e.target.closest(".srmrback")){e.stopPropagation(); srmRespFlush(); srmResp=false; srmDraw(); srmSlide("r"); return}
+    if(e.target.closest(".srmrcopy")){e.stopPropagation(); var rt=srm.querySelector("textarea.srmresp"), rv=rt?rt.value:""; if(!rv.trim()){toast("복사할 글이 없어요");return}
+      var ok=function(){toast("📋 복사했어요")}; if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(rv).then(ok,function(){try{rt.select();document.execCommand("copy");ok()}catch(err){toast("복사하지 못했어요")}}); else{try{rt.select();document.execCommand("copy");ok()}catch(err){toast("복사하지 못했어요")}} return}
     // 📋 설교 메모 전체 복사: 줄·빈 줄 그대로 (2026-11-07 사용자 요청)
     var cpy=e.target.closest(".srmcopy"); if(cpy){e.stopPropagation(); if(!srmRead)srmCommit();
       var cx=srmData().items.find(function(y){return y.id===srmEdit}), ct=cx?hlStrip(String(cx.body||"")).replace(/\s+$/,"").replace(/^\n+/,""):"";
@@ -12527,6 +12563,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     if(!srmEdit)srmRead=false;
     srm.classList.toggle("srmreading",!!srmEdit&&srmRead);   // 읽기·고치기 바탕색을 다르게 (2026-11-07 사용자 요청)
     var rb=srm.querySelector(".srmreadbtn"); rb.hidden=!srmEdit; rb.textContent=srmRead?"✏️ 고치기":"📖 읽기"; rb.classList.toggle("on",srmRead);
+    if(!srmEdit)srmResp=false;
+    srm.classList.toggle("srmresping",!!srmEdit&&srmResp);
+    if(srmEdit&&srmResp){srm.classList.remove("srmreading"); var xr=srmData().items.find(function(y){return y.id===srmEdit}); if(!xr){srmEdit="";srmResp=false;return srmDraw()} rb.hidden=true; foot.hidden=true; box.appendChild(srmRespView(xr)); box.scrollTop=0; return}
     if(srmEdit){
       var x=srmData().items.find(function(y){return y.id===srmEdit}); if(!x){srmEdit="";return srmDraw()}
       if(srmRead){foot.hidden=true; box.appendChild(srmReadView(x)); return}
@@ -12618,6 +12657,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     if(!x.body.trim()){el(bd,"div","srmrempty","아직 적은 메모가 없어요.")}
     else lineRowsSet(bd,lines,function(t){var ln=document.createElement("div"); ln.className="srmline"; var g=document.createElement("span"); g.className="srmrgrip"; g.textContent="⠿"; ln.appendChild(g); var d=document.createElement("div"); d.className="srmrli"; hlFill(d,t); ln.appendChild(d); return ln},".srmrli");
     if(x.apply.trim()){el(v,"div","srmlab ap","💡 나의 적용 · 결단"); el(v,"div","rapply",x.apply.trim())}
+    var rgo=el(v,"button","srmrgo",x.resp&&x.resp.trim()?"✍️ 이 설교를 듣고 쓴 글 보기 →":"✍️ 이 설교를 듣고 기도·에세이 쓰기 →"); rgo.type="button";   // 옆으로 밀어도 열림 (2026-11-08)
     if(srmWords().length){   // 찾다가 연 메모면 찾은 낱말 표시 + 첫 자리로 (2026-11-08)
       srmMarkIn(v); var first=true;
       bd._after=function(b){srmMarkIn(b); if(first){first=false; var mk=v.querySelector("mark.srmhit"); if(mk)try{mk.scrollIntoView({block:"center"})}catch(e){}}};
@@ -12629,7 +12669,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
   function srmDrawList(){
     var list=srm&&srm.querySelector(".srmlist"); if(!list)return; list.textContent="";
     var all=srmSorted(srmData()).filter(function(x){return !srmEmpty(x)}), q=srmQ.trim();
-    var items=q?all.filter(function(x){var hay=hlStrip([x.title,x.who,x.ref,x.body,x.apply].join(" \n ")); return q.split(/\s+/).every(function(w){return hit1(hay,w)})}):all;
+    var items=q?all.filter(function(x){var hay=hlStrip([x.title,x.who,x.ref,x.body,x.apply,x.resp||""].join(" \n ")); return q.split(/\s+/).every(function(w){return hit1(hay,w)})}):all;
     if(!items.length){var em=document.createElement("p"); em.className="srmempty";
       em.textContent=all.length?"찾는 설교 메모가 없어요.":"아직 적은 설교 메모가 없어요.\n위 [+ 새 메모]를 눌러 오늘 설교를 적어 보세요."; em.style.whiteSpace="pre-line"; list.appendChild(em); return}
     items.forEach(function(x){
@@ -12651,9 +12691,34 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
         if(q){var fi=-1; srmWords().forEach(function(w){var m=matchAll(pt,w,true); if(m.length&&(fi<0||m[0][0]<fi))fi=m[0][0]}); if(fi>24){var st=pt.lastIndexOf("\n",fi); st=st>=fi-40?st+1:fi-20; pt="…"+pt.slice(st)}}   // 찾은 낱말이 뒤에 있으면 그 근처부터 보이게
         p.textContent=pt; c.appendChild(p)}
       if(x.apply.trim()){var a=document.createElement("span"); a.className="srmap"; a.style.display="block"; a.textContent="💡 "+x.apply.trim(); c.appendChild(a)}
+      if((x.resp||"").trim()){var rs=document.createElement("span"); rs.className="srmap srmrspc"; rs.style.display="block"; rs.textContent="✍️ "+x.resp.trim(); c.appendChild(rs)}
       list.appendChild(c);
     });
     if(q)srmMarkIn(list);
+  }
+  // ✍️ 이 설교를 듣고 쓰는 기도·에세이 (2026-11-08 사용자 요청): 메모를 오른쪽→왼쪽으로 밀면 이 쪽. 항목의 resp 필드, 적는 대로 0.6초 뒤 저장
+  function srmSlide(d){var b=srm&&srm.querySelector(".srmbox"); if(!b)return; b.classList.remove("srmslL","srmslR"); void b.offsetWidth; b.classList.add(d==="l"?"srmslL":"srmslR")}
+  function srmRespSave(id,val){var o=srmData(), x=o.items.find(function(y){return y.id===id}); if(!x||x.resp===val)return; x.resp=val; x.u=Date.now(); srmSave(o)}
+  function srmRespFlush(){clearTimeout(srmRespT); var t=srm&&srm.querySelector("textarea.srmresp"); if(t)srmRespSave(t.dataset.id,t.value)}
+  function srmRespView(x){
+    var v=document.createElement("div"); v.className="srmrsp";
+    var hd=document.createElement("div"); hd.className="srmrhd";
+    var h=document.createElement("b"); h.textContent="✍️ 이 설교를 듣고"; hd.appendChild(h);
+    var sub=document.createElement("span"); sub.className="srmrsub"; sub.textContent=[x.title.trim()||"(제목 없음)",srmDateLabel(x.d),x.who].filter(Boolean).join(" · "); hd.appendChild(sub);
+    v.appendChild(hd);
+    var ta=document.createElement("textarea"); ta.className="srmresp"; ta.dataset.id=x.id; ta.value=x.resp||"";
+    ta.placeholder="이 설교를 듣고 드리는 기도나 에세이를 자유롭게 적어 보세요.\n\n예) 주님, 오늘 말씀을 통해…"; ta.setAttribute("aria-label","이 설교를 듣고 쓰는 기도·에세이");
+    var fit=function(){ta.style.height="auto"; ta.style.height=Math.max(ta.scrollHeight+2,Math.round(innerHeight*0.5))+"px"};
+    ta.addEventListener("input",function(){fit(); var sv=v.querySelector(".srmrsaved"); if(sv)sv.textContent="적는 중…"; clearTimeout(srmRespT); srmRespT=setTimeout(function(){srmRespSave(x.id,ta.value); var s2=v.querySelector(".srmrsaved"); if(s2)s2.textContent="저장됨 ✓"},600)});
+    ta.addEventListener("blur",srmRespFlush);
+    v.appendChild(ta); requestAnimationFrame(fit);
+    var row=document.createElement("div"); row.className="srmrrow";
+    var bk=document.createElement("button"); bk.type="button"; bk.className="srmrback"; bk.textContent="← 설교 메모"; row.appendChild(bk);
+    var sv=document.createElement("span"); sv.className="srmrsaved"; sv.setAttribute("aria-live","polite"); row.appendChild(sv);
+    var cp=document.createElement("button"); cp.type="button"; cp.className="srmrcopy"; cp.textContent="📋 복사"; row.appendChild(cp);
+    v.appendChild(row);
+    var hint=document.createElement("p"); hint.className="srmrhint"; hint.textContent="← 오른쪽으로 밀면 설교 메모로 돌아가요"; v.appendChild(hint);
+    return v;
   }
   // 🔍 찾은 낱말 표시: 금빛 사각형이 부드럽게 깜박임 (2026-11-08 사용자 요청)
   function srmWords(){return String(srmQ||"").trim().split(/\s+/).filter(Boolean)}
