@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-saytdbl">
+<meta name="app-build" content="2026-11-07-saytfit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3415,7 +3415,7 @@ textarea.lhpad{padding-left:28px!important}
 .sayform[hidden]{display:none}
 .sayt{width:100%;box-sizing:border-box;min-height:96px;padding:12px 14px;border:1px solid #2A2930;border-radius:12px;background:var(--sheet);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.75;resize:vertical}
 .sayt:focus{outline:none;border-color:var(--gold)}
-.sayform .sayt{min-height:min(52vh,480px)}   /* 적는 동안은 세로로 넉넉하게 (2026-10-25 사용자 요청) */
+.sayform .sayt{min-height:90px;resize:none;overflow:hidden}   /* 글 길이만큼만 — 키보드가 올라와도 아래 단추 줄이 보이게 (2026-11-07 사용자 요청, 예전엔 52vh) */
 .sayrow2{display:flex;gap:8px;flex-wrap:wrap}
 .sayrow2 .field{flex:1 1 150px;min-width:0;height:40px;font-size:14px}
 .saysave{flex:0 0 auto;height:40px;padding:0 18px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:14px;font-weight:700}
@@ -15181,6 +15181,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=600; ta.value=cur.t||"";
       ta.placeholder=sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
+      var sayFit=function(){ta.style.height="auto"; ta.style.height=(ta.scrollHeight+2)+"px"};   // 글 길이에 맞춰 높이
+      ta.addEventListener("input",sayFit); setTimeout(sayFit,0);
+      ta.addEventListener("focus",function(){setTimeout(function(){var rw=form.querySelector(".sayrow2:last-of-type")||form; try{rw.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}},350)});   // 키보드가 올라오면 아래 단추 줄까지 보이게
       var row=document.createElement("div"); row.className="sayrow2";
       var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="v"?"구절 (예: 로마서 12:21)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
