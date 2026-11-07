@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-rgoname">
+<meta name="app-build" content="2026-11-08-norgo">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12740,7 +12740,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     if(!x.body.trim()){el(bd,"div","srmrempty","아직 적은 메모가 없어요.")}
     else lineRowsSet(bd,lines,function(t){var ln=document.createElement("div"); ln.className="srmline"; var g=document.createElement("span"); g.className="srmrgrip"; g.textContent="⠿"; ln.appendChild(g); var d=document.createElement("div"); d.className="srmrli"; hlFill(d,t); ln.appendChild(d); return ln},".srmrli");
     if(x.apply.trim()){el(v,"div","srmlab ap","💡 나의 적용 · 결단"); el(v,"div","rapply",x.apply.trim())}
-    var rgo=el(v,"button","srmrgo",x.resp&&x.resp.trim()?"✍️ 이 설교를 듣고 쓴 글 보기 →":"✍️ 기도 or 에세이 작성 →"); rgo.type="button";   // 옆으로 밀어도 열림 (2026-11-08)
+    // ✍️ 기도·에세이 단추는 없앰 — 메모를 옆으로 밀어 엶 (2026-11-08 사용자 요청)
     if(srmWords().length){   // 찾다가 연 메모면 찾은 낱말 표시 + 첫 자리로 (2026-11-08)
       srmMarkIn(v); var first=true;
       bd._after=function(b){srmMarkIn(b); if(first){first=false; var mk=v.querySelector("mark.srmhit"); if(mk)try{mk.scrollIntoView({block:"center"})}catch(e){}}};
