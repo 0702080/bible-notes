@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-pgno">
+<meta name="app-build" content="2026-11-08-pgbuzz">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12669,6 +12669,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       var tot=Math.max(1,Math.ceil((sc.scrollHeight-4)/ch)), end=sc.scrollTop>=sc.scrollHeight-ch-2;
       var cur=end?tot:Math.min(tot,Math.floor((sc.scrollTop+4)/ch)+1);
       pg.hidden=tot<2; pg.textContent=cur+" / "+tot;
+      if(pg._cur&&pg._cur!==cur&&tot>1)buzz(12);   // 쪽이 바뀌면 짧게 진동 (2026-11-08 사용자 요청)
+      pg._cur=cur;
     }
     if(!bd._pgOn){bd._pgOn=1; bd.addEventListener("scroll",pgSync,{passive:true})}
     function sync(){
