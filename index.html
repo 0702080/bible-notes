@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-sayedithide">
+<meta name="app-build" content="2026-11-07-sayrow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4521,6 +4521,11 @@ body.boardon .fscrow{display:none}
 .saysearch[hidden]{display:none!important}
 .saysearch{width:100%;box-sizing:border-box;height:40px;margin-bottom:12px;font-size:14px}
 .sayfoldall{display:flex;justify-content:flex-end;margin:-4px 0 8px}
+.saysrow{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.saysrow .saysearch{flex:1 1 auto;min-width:0;margin-bottom:0}
+.saysrow .sayfoldall{flex:0 0 auto;margin:0}
+.saysrow .sayfab{height:40px;white-space:nowrap}
+.saysrow:has(.saysearch[hidden]):not(:has(.sayfoldall)){display:none}
 .sayfab{font:inherit;font-size:13px;padding:6px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:#3B3947;color:#fff;cursor:pointer}
 .saysheet .dlbar .dlclose.saylock{color:var(--muted)}
 .saysheet .dlbar .dlclose.saylock.on{background-color:#3A3220!important;border-color:#6B5A30!important;color:var(--gold)}
@@ -15092,7 +15097,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(!say){
       say=document.createElement("div"); say.className="daily saysheet"; say.setAttribute("role","dialog"); say.setAttribute("aria-modal","true"); say.hidden=true;
       say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose saylock"></button><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose">닫기</button></div>'+
-        '<div class="dlbody"><div class="saybox"><input class="field saysearch" type="search" placeholder="🔍 찾기 (글·말한 분·주제, 초성도 돼요)" aria-label="한 마디 찾기"><div class="sayform" hidden></div><div class="saylist"></div></div></div>';
+        '<div class="dlbody"><div class="saybox"><input class="field saysearch" type="search" placeholder="🔍 찾기 (초성 예: ㄱㅅ)" aria-label="한 마디 찾기 (글·말한 분·주제)"><div class="sayform" hidden></div><div class="saylist"></div></div></div>';
       document.body.appendChild(say);
       say.querySelector(".sayclose").addEventListener("click",closeSay);
       say.querySelector(".saylock").addEventListener("click",function(){sayLocked=!sayLocked; try{localStorage.setItem("bible-say-lock",sayLocked?"1":"")}catch(e){} buzz(10); toast(sayLocked?"📌 카드를 고정했어요":"이제 카드를 끌어서 옮길 수 있어요"); drawSay()});
@@ -15175,6 +15180,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     // 적던 중에 화면이 다시 그려져도(동기화 등) 적던 글은 그대로 (2026-10-25 사용자 요청)
     var keep=null, ft=form.querySelector(".sayt");
     if(ft&&sayEdit&&form.dataset.ed===sayEdit){var q=function(c){var e=form.querySelector(c);return e?e.value:""}; keep={t:ft.value,who:q(".saywho"),topic:q(".saytopic"),note:q(".saynote"),focus:document.activeElement===ft,ss:ft.selectionStart,se:ft.selectionEnd}}
+    var sayRowEl=function(){var si=say.querySelector(".saysearch"); if(!si)return null; var rw=si.parentNode; if(!rw.classList.contains("saysrow")){rw=document.createElement("div"); rw.className="saysrow"; si.parentNode.insertBefore(rw,si); rw.appendChild(si)} return rw};
+    var oldFa=say.querySelector(".saysrow .sayfoldall"); if(oldFa)oldFa.remove();
     var sq0=say.querySelector(".saysearch"); if(sq0)sq0.hidden=!!sayEdit&&!sayQ;   // 고치는 중엔 찾기 칸 숨김 (찾는 글이 있으면 그대로)
     form.textContent=""; form.hidden=!sayEdit; form.dataset.ed=sayEdit||""; form.classList.toggle("saylocked",sayLocked||!!sayQ);
     if(sayEdit){
@@ -15226,7 +15233,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var allF=longIds.every(function(i){return !!sayFold[i]});
       var fr=document.createElement("div"); fr.className="sayfoldall";
       var fa=document.createElement("button"); fa.type="button"; fa.className="sayfab"; fa.dataset.act="foldall"; fa.dataset.ids=longIds.join(","); fa.dataset.on=allF?"1":"";
-      fa.textContent=allF?"▾ 모두 펼치기":"▴ 모두 접기"; fr.appendChild(fa); list.appendChild(fr);
+      fa.textContent=allF?"▾ 모두 펼치기":"▴ 모두 접기"; fr.appendChild(fa);
+      var srow=sayRowEl(); if(srow)srow.appendChild(fr); else list.appendChild(fr);   // 찾기 칸 오른쪽 같은 줄에 (2026-11-07 사용자 요청)
     }
     var hvN=0, SAY_VCOL=["var(--violet)","var(--sky)","var(--green)","var(--gold)","var(--pink)","var(--orange)","#5FD3C4","#C9A27A"];
     items.forEach(function(x){
