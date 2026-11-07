@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-menuh">
+<meta name="app-build" content="2026-11-07-onesearch">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4542,6 +4542,7 @@ body:not(.boardon) .bfwrap{display:none!important}
 /* 🔍 찾기 칸은 늘 보이고 화면 맨 위에 떠 있음, 🔍 단추는 없앰 (휴대폰, 2026-11-07 사용자 요청) */
 body:not(.boardon) #filterBtn{display:none!important}
 body.finding:not(.boardon) #reviewBar{display:none!important}
+body.boardon .fwrap,body.boardon #fScopeRow{display:none!important}   /* PC 칸반은 위 줄 찾기 칸(#bFilter)과 같은 기능이라 아래 넓은 찾기 칸은 숨김 (2026-11-07 사용자 요청) */
 body:not(.boardon) .fwrap{position:sticky;top:0;z-index:40;padding:6px 0}
 /* 찾기 칸 둘레의 어두운 바탕은 지우고, 칸만 밝게 (2026-11-07 사용자 요청) */
 body:not(.boardon) .fwrap .filter{background:#3B3947;border:1px solid #6E6A82;color:#F2EFFA;box-shadow:0 4px 14px rgba(0,0,0,.45)}
@@ -20035,6 +20036,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     new MutationObserver(sy).observe(f,{attributes:true,attributeFilter:["hidden"]}); sy();
   })();
   $("filterBtn").addEventListener("click",function(){
+    var bfz=$("bFilter"); if(document.body.classList.contains("boardon")&&bfz&&bfz.offsetParent){bfz.focus(); bfz.select(); return}   // PC 칸반: 찾기 칸은 맨 위 한 줄 하나만 (2026-11-07 사용자 요청)
     var f=$("filter"), show=f.hidden; f.hidden=!show; this.setAttribute("aria-pressed",String(show));
     if(show)f.focus(); else if(f.value){f.value="";filterText="";var bf2=$("bFilter");if(bf2)bf2.value="";render()}
   });
