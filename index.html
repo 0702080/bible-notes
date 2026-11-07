@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmdbl">
+<meta name="app-build" content="2026-11-08-srmq">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12452,6 +12452,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
         }
         srmTap={t:now,x:e.clientX,y:e.clientY};
       });
+      srm.addEventListener("compositionend",function(e){if(e.target.classList&&e.target.classList.contains("srmq")){srmQ=e.target.value;srmDrawList()}});   // 한글 조합이 끝날 때도 거름 (2026-11-08)
       srm.addEventListener("input",function(e){
         if(e.target.classList.contains("srmq")){srmQ=e.target.value;srmDrawList();return}
         if(!e.target.closest(".srmform,.srmfoot"))return;
@@ -12620,7 +12621,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
   function srmDrawList(){
     var list=srm&&srm.querySelector(".srmlist"); if(!list)return; list.textContent="";
     var all=srmSorted(srmData()).filter(function(x){return !srmEmpty(x)}), q=srmQ.trim();
-    var items=q?all.filter(function(x){var hay=[x.title,x.who,x.ref,x.body,x.apply].join(" "); return q.split(/\s+/).every(function(w){return hit1(hay,w)})}):all;
+    var items=q?all.filter(function(x){var hay=hlStrip([x.title,x.who,x.ref,x.body,x.apply].join(" \n ")); return q.split(/\s+/).every(function(w){return hit1(hay,w)})}):all;
     if(!items.length){var em=document.createElement("p"); em.className="srmempty";
       em.textContent=all.length?"찾는 설교 메모가 없어요.":"아직 적은 설교 메모가 없어요.\n위 [+ 새 메모]를 눌러 오늘 설교를 적어 보세요."; em.style.whiteSpace="pre-line"; list.appendChild(em); return}
     items.forEach(function(x){
@@ -18870,7 +18871,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
           if(r.id==="__clones"){if(clMerge(r.data))setTimeout(render,0);sbLastJson.__clones=JSON.stringify(clData());return}
           if(r.id==="__icp"){if(icMerge(r.data)&&icv&&!icv.hidden)icDraw();sbLastJson.__icp=JSON.stringify(icData());return}
           if(r.id==="__ledger"){if(ldMerge(r.data)&&ld&&!ld.hidden&&!ldEdit)ldDraw();sbLastJson.__ledger=JSON.stringify(ldData());return}
-          if(r.id==="__sermons"){if(srmMerge(r.data)&&srm&&!srm.hidden&&!srmEdit)srmDraw();sbLastJson.__sermons=JSON.stringify(srmData());return}
+          if(r.id==="__sermons"){if(srmMerge(r.data)&&srm&&!srm.hidden&&!srmEdit){if(srm.querySelector(".srmlist"))srmDrawList(); else srmDraw()}   // 목록만 다시 — 찾기 칸을 새로 만들면 적던 글·키보드가 끊김 (2026-11-08)
+          sbLastJson.__sermons=JSON.stringify(srmData());return}
           if(r.id==="__prays1"){if(p1Merge(r.data)&&prd&&!prd.hidden)drawPrayRead();sbLastJson.__prays1=JSON.stringify(p1Data());return}
           if(r.id==="__medq"){sbLastJson.__medq=JSON.stringify(r.data);medqMerge(r.data);return}
           if(r.id==="__sayings"){sbLastJson.__sayings=JSON.stringify(r.data);sayMerge(r.data);return}
