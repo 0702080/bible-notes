@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-gracename2">
+<meta name="app-build" content="2026-11-07-grback">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -15089,7 +15089,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var on=!(cur&&cur.id===id); toast(on?"📌 이 한 마디를 하루 동안 고정했어요":"고정을 풀었어요. 5분마다 바뀌어요"); buzz(10); renderReviewBar();
   }
   var say=null;
-  function closeSay(){if(!say)return; say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
+  function closeSay(){if(!say)return; var sae=document.activeElement; if(sae&&say.contains(sae))sae.blur();   /* 뒷면 칸에 커서가 남은 채 닫으면 다음에 열 때 목록이 안 바뀌던 문제 (2026-11-07) */ say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
   // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 10분마다 나옴
   var sayMode="s";
   function openSay(focus,mode){
@@ -15259,7 +15259,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       if(sayBack[x.id]){
         c.classList.add("sayback");
         var bh=document.createElement("div"); bh.className="saybkh";
-        bh.innerHTML='<b>💡 이 말을 이렇게 활용해요</b><button type="button" class="saybtn saybkx" data-act="front">← 앞면</button>'; c.appendChild(bh);
+        bh.innerHTML='<b>'+(sayMode==="g"?"💡 은혜 위에 은혜":"💡 이 말을 이렇게 활용해요")+'</b><button type="button" class="saybtn saybkx" data-act="front">← 앞면</button>'; c.appendChild(bh);
         var bq=document.createElement("p"); bq.className="saybkq"; bq.textContent=String(x.t||"").replace(/\s+/g," "); c.appendChild(bq);
         if(x.use&&sayUseEd!==x.id){var uv=document.createElement("p"); uv.className="sayusev"; uv.textContent=x.use; c.appendChild(uv)}
         else{var ut=document.createElement("textarea"); ut.className="sayuse"; ut.dataset.id=x.id; ut.maxLength=3000; ut.rows=4; ut.value=x.use||""; ut.placeholder="이 말을 내 삶에 어떻게 활용하면 좋을까요?\n(예: 아내에게, 친구에게, 일터에서…)"; c.appendChild(ut)}
