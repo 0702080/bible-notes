@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-nomic2">
+<meta name="app-build" content="2026-11-07-gracecpy">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3417,6 +3417,10 @@ textarea.lhpad{padding-left:28px!important}
 .sayt:focus{outline:none;border-color:var(--gold)}
 .sayform .sayt{min-height:90px;resize:none;overflow:hidden}   /* 글 길이만큼만 — 키보드가 올라와도 아래 단추 줄이 보이게 (2026-11-07 사용자 요청, 예전엔 52vh) */
 .sayrow2{display:flex;gap:8px;flex-wrap:wrap}
+.sayrow2[hidden]{display:none!important}
+.sayform .saycpy{margin-right:auto;width:46px;padding:0;display:grid;place-items:center;color:var(--gold);border-color:color-mix(in srgb,var(--gold) 55%,#34333A)}
+.sayform .saycpy svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linejoin:round}
+.sayform .saycpy.done{background:var(--gold)!important;color:#1E1608}
 .sayrow2 .field{flex:1 1 150px;min-width:0;height:40px;font-size:14px}
 .saysave{flex:0 0 auto;height:40px;padding:0 18px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:14px;font-weight:700}
 .sayrow2:has(.saydelx){flex-wrap:nowrap}.sayrow2:has(.saydelx)>:first-child{flex:1 1 0;min-width:0}
@@ -7805,7 +7809,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     cb.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="12" rx="2.2"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></svg>';
     document.body.appendChild(cb);
     var ta=null;
-    function skip(t){return !t||t.tagName!=="TEXTAREA"||t.disabled||t.classList.contains("sayeta")||t.classList.contains("srmli")||t.classList.contains("ccdta")||!!t.closest(".qa")}
+    function skip(t){return !t||t.tagName!=="TEXTAREA"||t.disabled||(t.classList.contains("sayt")&&!!t.closest(".saygr"))||t.classList.contains("sayeta")||t.classList.contains("srmli")||t.classList.contains("ccdta")||!!t.closest(".qa")}
     function place(){
       if(!ta||!ta.isConnected||!ta.value.trim()){cb.hidden=true;return}
       var r=ta.getBoundingClientRect(); if(r.bottom<0||r.top>innerHeight||!r.width){cb.hidden=true;return}
@@ -15212,6 +15216,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="v"?"구절 (예: 로마서 12:21)":sayMode==="g"?"어디서·누구에게 (예: 주일 예배)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
       row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
+      if(sayMode==="g")row.hidden=true;   // 은혜: 어디서·누구에게·주제 칸 숨김 (2026-11-07 사용자 요청, 값은 그대로 둠)
       if(sayMode==="v")form.insertBefore(bookPicker(wi),row);
       var hvl=document.createElement("label"); hvl.className="sayhvl";
       hvl.innerHTML='<input type="checkbox" class="sayhv"><span>⏰ 짧은 말씀 — 10분마다(12:00, 12:10 …) 나와요. 담은 뒤 ⏰를 눌러 시각을 정하면 매일 그 시각에 나와요. 말한 분 칸에 구절(예: 로마서 12:21)을 적어 주세요</span>';
@@ -15221,7 +15226,19 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var o0=document.createElement("option"); o0.value=""; o0.textContent="📖 말씀 없음"; sel.appendChild(o0);
       sorted().forEach(function(nn){var op=document.createElement("option");op.value=nn.id;op.textContent=nn.ref||"구절 미입력";sel.appendChild(op)});
       sel.value=cur.note&&notes.has(cur.note)?cur.note:"";
-      sel.hidden=true; row2.appendChild(sel); row2.appendChild(noteFinder(sel));
+      sel.hidden=true; row2.appendChild(sel);
+      if(sayMode==="g"){   // 은혜: 붙일 말씀 칸 대신 📋 글 전체 복사 단추 (2026-11-07 사용자 요청)
+        var cpb=document.createElement("button"); cpb.type="button"; cpb.className="saycancel saycpy"; cpb.title="글 전체 복사"; cpb.setAttribute("aria-label","글 전체 복사");
+        cpb.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8.5" y="8.5" width="11" height="12" rx="2.2"/><path d="M15.5 8.5V6a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h2"/></svg>';
+        cpb.addEventListener("pointerdown",function(e){e.preventDefault()});
+        cpb.addEventListener("click",function(e){
+          e.stopPropagation(); var v=ta.value; if(!v.trim()){toast("복사할 글이 없어요");return}
+          function ok(){buzz([10,30,10]); toast("📋 글 전체를 복사했어요"); cpb.classList.add("done"); setTimeout(function(){cpb.classList.remove("done")},900)}
+          function old(){var a=ta.selectionStart,b=ta.selectionEnd; try{ta.select(); var r=document.execCommand("copy"); ta.setSelectionRange(a,b); r?ok():toast("복사하지 못했어요")}catch(err){toast("복사하지 못했어요")}}
+          if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(v).then(ok,old); else old();
+        });
+        row2.appendChild(cpb);
+      } else row2.appendChild(noteFinder(sel));
       var sv=document.createElement("button"); sv.type="button"; sv.className="saysave"; sv.dataset.act="save"; sv.textContent="저장";
       var cn=document.createElement("button"); cn.type="button"; cn.className="saycancel"; cn.dataset.act="cancel"; cn.textContent="취소";
       if(sayEdit!=="new"){var dx=document.createElement("button"); dx.type="button"; dx.className="saycancel saydelx"; dx.dataset.act="del"; dx.dataset.id=sayEdit; dx.textContent="🗑"; dx.title="이 한 마디 지우기"; dx.setAttribute("aria-label","지우기"); row2.appendChild(dx)}
