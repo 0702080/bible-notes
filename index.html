@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmq">
+<meta name="app-build" content="2026-11-08-srmhit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3304,6 +3304,9 @@ textarea.lhpad{padding-left:28px!important}
 .srmcard.srmfolded{padding-bottom:10px}
 .srmttl{display:block;margin:4px 0 2px;font-size:16.5px;font-weight:700;color:var(--gold);word-break:keep-all}
 .srmref{display:inline-block;margin-top:2px;padding:1px 8px;border-radius:10px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-size:12px}
+mark.srmhit{background:rgba(255,205,80,.5);color:inherit;border-radius:4px;padding:0 2px;margin:0 -1px;box-decoration-break:clone;-webkit-box-decoration-break:clone;animation:srmHitBlink 1.6s ease-in-out infinite}
+@keyframes srmHitBlink{0%,100%{background:rgba(255,205,80,.55);box-shadow:0 0 0 1px rgba(255,205,80,.55)}50%{background:rgba(255,205,80,.14);box-shadow:0 0 0 1px rgba(255,205,80,.2)}}
+@media (prefers-reduced-motion:reduce){mark.srmhit{animation:none}}
 .srmprev{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;margin:8px 0 0;font-family:var(--serif);font-size:14.5px;line-height:1.7;color:color-mix(in srgb,var(--ink) 82%,transparent);white-space:pre-wrap;word-break:keep-all}
 .srmap{margin:8px 0 0;padding:7px 10px;border-radius:10px;background:color-mix(in srgb,var(--green) 12%,transparent);color:color-mix(in srgb,var(--green) 55%,var(--ink));font-size:13.5px;line-height:1.6;white-space:pre-wrap;word-break:keep-all}
 .srmempty{margin:30px 4px;color:var(--muted);font-size:14px;line-height:1.8;text-align:center}
@@ -12290,6 +12293,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       });
       if(row.length)push();
     });
+    if(box._after)box._after(box);   // 다시 나눈 뒤 찾은 낱말 표시 등 (2026-11-08)
   }
   function lineRowsSet(box,lines,mk,sel){box._lines=lines; box._mk=mk; box._sel=sel; lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); setTimeout(function(){lineRows(box)},60)}
   window.addEventListener("resize",function(){clearTimeout(lineRows.t); lineRows.t=setTimeout(function(){document.querySelectorAll(".srmrlines,.saylines").forEach(lineRows)},150)});
@@ -12614,6 +12618,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     if(!x.body.trim()){el(bd,"div","srmrempty","아직 적은 메모가 없어요.")}
     else lineRowsSet(bd,lines,function(t){var ln=document.createElement("div"); ln.className="srmline"; var g=document.createElement("span"); g.className="srmrgrip"; g.textContent="⠿"; ln.appendChild(g); var d=document.createElement("div"); d.className="srmrli"; hlFill(d,t); ln.appendChild(d); return ln},".srmrli");
     if(x.apply.trim()){el(v,"div","srmlab ap","💡 나의 적용 · 결단"); el(v,"div","rapply",x.apply.trim())}
+    if(srmWords().length){   // 찾다가 연 메모면 찾은 낱말 표시 + 첫 자리로 (2026-11-08)
+      srmMarkIn(v); var first=true;
+      bd._after=function(b){srmMarkIn(b); if(first){first=false; var mk=v.querySelector("mark.srmhit"); if(mk)try{mk.scrollIntoView({block:"center"})}catch(e){}}};
+    }
     return v;
   }
   // 설교 메모 카드 접기·펼치기 (2026-11-01 사용자 요청): 접으면 날짜·설교자·제목만
@@ -12639,9 +12647,29 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       if(srmYtUrl(x.yt)){var yv=document.createElement("span"); yv.className="srmytc"; yv.dataset.u=x.yt; yv.textContent="▶ 영상"; yv.title="유튜브로 보기"; m.appendChild(yv)}
       c.appendChild(m);
       if(x.ref){var r=document.createElement("span"); r.className="srmref"; r.textContent="📖 "+x.ref; c.appendChild(r)}
-      if(x.body.trim()){var p=document.createElement("span"); p.className="srmprev"; p.textContent=hlStrip(x.body).trim(); c.appendChild(p)}
+      if(x.body.trim()){var p=document.createElement("span"); p.className="srmprev"; var pt=hlStrip(x.body).trim();
+        if(q){var fi=-1; srmWords().forEach(function(w){var m=matchAll(pt,w,true); if(m.length&&(fi<0||m[0][0]<fi))fi=m[0][0]}); if(fi>24){var st=pt.lastIndexOf("\n",fi); st=st>=fi-40?st+1:fi-20; pt="…"+pt.slice(st)}}   // 찾은 낱말이 뒤에 있으면 그 근처부터 보이게
+        p.textContent=pt; c.appendChild(p)}
       if(x.apply.trim()){var a=document.createElement("span"); a.className="srmap"; a.style.display="block"; a.textContent="💡 "+x.apply.trim(); c.appendChild(a)}
       list.appendChild(c);
+    });
+    if(q)srmMarkIn(list);
+  }
+  // 🔍 찾은 낱말 표시: 금빛 사각형이 부드럽게 깜박임 (2026-11-08 사용자 요청)
+  function srmWords(){return String(srmQ||"").trim().split(/\s+/).filter(Boolean)}
+  function srmMarkIn(root){
+    var ws=srmWords(); if(!root||!ws.length)return;
+    var tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){return n.nodeValue.trim()&&!(n.parentNode.closest&&n.parentNode.closest("mark.srmhit,.srmcopy,.srmcdel,.srmcfold,.srmcgrip,.srmrgrip"))?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
+    var nodes=[]; while(tw.nextNode())nodes.push(tw.currentNode);
+    nodes.forEach(function(n){
+      var t=n.nodeValue, rs=[];
+      ws.forEach(function(w){matchAll(t,w).forEach(function(r){rs.push(r)})});
+      if(!rs.length)return;
+      rs.sort(function(a,b){return a[0]-b[0]}); var mg=[]; rs.forEach(function(r){var l=mg[mg.length-1]; if(l&&r[0]<=l[1])l[1]=Math.max(l[1],r[1]); else mg.push([r[0],r[1]])});
+      var fr=document.createDocumentFragment(), at=0;
+      mg.forEach(function(r){if(r[0]>at)fr.appendChild(document.createTextNode(t.slice(at,r[0]))); var mk=document.createElement("mark"); mk.className="srmhit"; mk.textContent=t.slice(r[0],r[1]); fr.appendChild(mk); at=r[1]});
+      if(at<t.length)fr.appendChild(document.createTextNode(t.slice(at)));
+      n.parentNode.replaceChild(fr,n);
     });
   }
   /* ---------- 🤲 중보기도 명단 (2026-10-24 사용자 요청) ----------
