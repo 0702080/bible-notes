@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmresp">
+<meta name="app-build" content="2026-11-08-srmpin">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5086,6 +5086,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmhl.srmhlfloat .hlclr{white-space:nowrap}
 .srmhl.srmhlfloat{position:fixed;left:50%;transform:translateX(-50%);z-index:120;margin:0;padding:6px 8px;gap:6px;flex-wrap:nowrap;border:1px solid #4A4953;border-radius:22px;background:rgba(24,23,30,.96);box-shadow:0 8px 24px rgba(0,0,0,.55)}
 .srmhl.srmhlfloat[hidden]{display:none}
+.srmrv .srmrlines.srmpinned{overscroll-behavior:contain;scrollbar-width:none}
+.srmrv .srmrlines.srmpinned::-webkit-scrollbar{display:none}
+.srmrv .srmlab .srmshot{margin-left:6px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12522,6 +12525,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     Object.keys(nx).forEach(function(k){x[k]=nx[k]}); x.u=Date.now(); srmSave(o);
   }
   function srmClick(e){
+    if(e.target.closest(".srmshot")){e.stopPropagation(); var sx=srmData().items.find(function(y){return y.id===srmEdit}); if(sx)srmShots(sx); return}
     if(e.target.closest(".srmrgo")){e.stopPropagation(); if(!srmRead)srmCommit(); srmResp=true; srmDraw(); srmSlide("l"); return}
     if(e.target.closest(".srmrback")){e.stopPropagation(); srmRespFlush(); srmResp=false; srmDraw(); srmSlide("r"); return}
     if(e.target.closest(".srmrcopy")){e.stopPropagation(); var rt=srm.querySelector("textarea.srmresp"), rv=rt?rt.value:""; if(!rv.trim()){toast("복사할 글이 없어요");return}
@@ -12568,7 +12572,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     if(srmEdit&&srmResp){srm.classList.remove("srmreading"); var xr=srmData().items.find(function(y){return y.id===srmEdit}); if(!xr){srmEdit="";srmResp=false;return srmDraw()} rb.hidden=true; foot.hidden=true; box.appendChild(srmRespView(xr)); box.scrollTop=0; return}
     if(srmEdit){
       var x=srmData().items.find(function(y){return y.id===srmEdit}); if(!x){srmEdit="";return srmDraw()}
-      if(srmRead){foot.hidden=true; box.appendChild(srmReadView(x)); return}
+      if(srmRead){foot.hidden=true; box.appendChild(srmReadView(x)); srmPinInit(box); return}
       var f=document.createElement("div"); f.className="srmform"; f.dataset.id=x.id;
       f.innerHTML='<div class="srmrow"><input type="date" class="srmdate" aria-label="날짜"><input class="srmwho" maxlength="60" placeholder="설교자 (예: 담임목사님)" aria-label="설교자"></div>'+
         '<input class="srmtitle" maxlength="200" placeholder="설교 제목" aria-label="설교 제목">'+
@@ -12641,6 +12645,67 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     document.addEventListener("touchend",function(e){if(srmCD&&srmCD.on)end(e)});
   })();
   // 📖 읽기 모드: 고치는 칸 없이 큰 글씨로 차분히 읽기 (2026-11-01 사용자 요청)
+  // 📖 읽기: 위로 굴리면 메모 칸 윗줄이 화면 맨 위에, 아래 '기도·에세이' 단추는 맨 아래에 딱 붙고, 가운데 메모 줄만 굴러감 (2026-11-08 사용자 요청)
+  function srmPinInit(box){
+    var v=box.querySelector(".srmrv"), bd=v&&v.querySelector(".srmrlines"); if(!bd||!bd.querySelector(".srmline"))return;
+    function size(){
+      if(!bd.isConnected)return; bd.style.maxHeight=""; bd.style.overflowY="";
+      var br=box.getBoundingClientRect(), bb=bd.getBoundingClientRect(), after=box.scrollHeight-(bb.bottom-br.top+box.scrollTop);
+      var h=Math.floor(box.clientHeight-after);
+      if(bd.scrollHeight>h&&h>160){bd.style.maxHeight=h+"px"; bd.classList.add("srmpinned")} else bd.classList.remove("srmpinned");
+      sync();
+    }
+    function sync(){
+      if(!bd.classList.contains("srmpinned"))return;
+      var atEnd=box.scrollTop>=box.scrollHeight-box.clientHeight-2;
+      bd.style.overflowY=atEnd?"auto":"hidden";   // 바깥이 끝까지 굴러간 뒤에야 메모 칸 안이 굴러감
+    }
+    if(!box._pinOn){box._pinOn=1; box.addEventListener("scroll",function(){if(box._pinSync)box._pinSync()},{passive:true}); window.addEventListener("resize",function(){if(box._pinSize)setTimeout(box._pinSize,200)})}
+    box._pinSync=sync; box._pinSize=size;
+    setTimeout(size,150); setTimeout(size,600);
+  }
+  // 📷 설교 메모를 휴대폰 화면 크기 그림 여러 장으로 (2026-11-08 사용자 요청)
+  function srmShots(x){
+    var W=Math.min(window.innerWidth,520), H=window.innerHeight, sc=Math.min(3,Math.max(2,window.devicePixelRatio||2));
+    var ff=getComputedStyle(document.body).fontFamily, pad=22, rowH=40, top=96, bot=46;
+    var lines=String(x.body||"").replace(/\s+$/,"").split("\n"), maxW=W-pad*2-8;
+    var cv=document.createElement("canvas"), cx=cv.getContext("2d");
+    function fnt(b,sz){return (b?"800 ":"400 ")+sz+"px "+ff}
+    var rows=[];   // 화면처럼 폭을 넘으면 다음 칸으로
+    lines.forEach(function(line){
+      var toks=[]; hlParse(line).forEach(function(g){g.t.split(/( )/).forEach(function(t){if(t){cx.font=fnt(g.b,16); toks.push({t:t,b:g.b,c:g.c,w:cx.measureText(t).width})}})});
+      if(!toks.length){rows.push([]);return}
+      var row=[], rw=0;
+      toks.forEach(function(k){if(!row.length&&k.t===" ")return; if(rw+k.w>maxW&&row.length){rows.push(row); row=[]; rw=0; if(k.t===" ")return} row.push(k); rw+=k.w});
+      if(row.length)rows.push(row);
+    });
+    var per=Math.max(4,Math.floor((H-top-bot)/rowH)), pages=Math.max(1,Math.ceil(rows.length/per)), files=[], done=0;
+    var COL={"금":"#E3BE72","분홍":"#F48FB6","하늘":"#6ECBF4","초록":"#6FD09A","보라":"#B79CF2","주황":"#F4A45E"};
+    var title=(x.title||"").trim()||"설교 메모", meta=srmDateLabel(x.d)+(x.who?" · "+x.who:"");
+    for(var p=0;p<pages;p++){
+      var c=document.createElement("canvas"); c.width=Math.round(W*sc); c.height=Math.round(H*sc); var g=c.getContext("2d"); g.scale(sc,sc);
+      var gr=g.createLinearGradient(0,0,0,H); gr.addColorStop(0,"#241C10"); gr.addColorStop(1,"#15120C"); g.fillStyle=gr; g.fillRect(0,0,W,H);
+      g.textBaseline="middle";
+      g.fillStyle="#E3BE72"; g.font=fnt(true,19); var tt=title; while(g.measureText(tt).width>W-pad*2-60&&tt.length>2)tt=tt.slice(0,-2)+"…"; g.fillText(tt,pad,38);
+      g.fillStyle="rgba(232,229,238,.6)"; g.font=fnt(false,13); g.fillText(meta,pad,64);
+      g.textAlign="right"; g.fillText((p+1)+" / "+pages,W-pad,38); g.textAlign="left";
+      var bx=pad-8, by=top-12, bw=W-bx*2, bh=Math.min(per,rows.length-p*per)*rowH+12;
+      g.fillStyle="rgba(227,190,114,.08)"; g.strokeStyle="rgba(227,190,114,.35)"; g.lineWidth=1;
+      if(g.roundRect){g.beginPath(); g.roundRect(bx,by,bw,bh,12); g.fill(); g.stroke()} else {g.fillRect(bx,by,bw,bh); g.strokeRect(bx,by,bw,bh)}
+      rows.slice(p*per,(p+1)*per).forEach(function(r,i){
+        var y=top-6+i*rowH+rowH/2;
+        if(i>0){g.save(); g.strokeStyle="rgba(227,190,114,.16)"; g.setLineDash([3,3]); g.beginPath(); g.moveTo(bx+1,y-rowH/2); g.lineTo(bx+bw-1,y-rowH/2); g.stroke(); g.restore()}
+        var xx=pad+4; r.forEach(function(k){g.font=fnt(k.b,16); g.fillStyle=k.c?COL[k.c]:"#F3E9D2"; g.fillText(k.t,xx,y); xx+=k.w});
+      });
+      g.fillStyle="rgba(232,229,238,.35)"; g.font=fnt(false,11); g.textAlign="center"; g.fillText("🎤 설교 메모",W/2,H-20); g.textAlign="left";
+      (function(idx,canvas){canvas.toBlob(function(b){files[idx]=new File([b],"설교메모-"+(x.d||"")+"-"+(idx+1)+".png",{type:"image/png"}); if(++done===pages)srmShotsSave(files,title)},"image/png")})(p,c);
+    }
+  }
+  function srmShotsSave(files,title){
+    if(navigator.canShare&&navigator.share&&navigator.canShare({files:files})){navigator.share({files:files,title:title}).catch(function(){}); return}   // 휴대폰: 공유 창에서 '이미지 저장'·갤러리로
+    files.forEach(function(f,i){setTimeout(function(){var a=document.createElement("a"); a.href=URL.createObjectURL(f); a.download=f.name; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove()},1500)},i*350)});
+    toast(files.length+"장 그림으로 저장했어요 📷");
+  }
   function srmReadView(x){   // 📖 읽기: 고치는 화면과 같은 모양(색 칸·줄 칸·빈 줄 그대로)에서 글만 고칠 수 없게 (2026-11-07 사용자 요청)
     var v=document.createElement("article"); v.className="srmread srmrv";
     function el(par,tag,cls,txt){var e=document.createElement(tag); e.className=cls; if(txt!=null)e.textContent=txt; par.appendChild(e); return e}
@@ -12651,7 +12716,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var nref=x.nid&&notes.has(x.nid)?(notes.get(x.nid).ref||""):"";
     if(x.ref||nref){var r2=el(v,"div","srmrow"); el(r2,"div","rbx rref"+(x.ref?"":" rempty"),x.ref||"본문"); if(nref)el(r2,"div","rbx rref","📖 "+nref)}
     if(srmYtUrl(x.yt)){var y=el(v,"div","rbx ryt srmytc","▶ 유튜브 설교 영상 보기"); y.dataset.u=x.yt}
-    var lab=el(v,"div","srmlab","📝 설교 메모 "); if(x.body.trim()){var cpb=el(lab,"button","srmcopy","📋 전체 복사"); cpb.type="button"; cpb.title="설교 메모 전체 복사"}
+    var lab=el(v,"div","srmlab","📝 설교 메모 "); if(x.body.trim()){var cpb=el(lab,"button","srmcopy","📋 전체 복사"); cpb.type="button"; cpb.title="설교 메모 전체 복사"; var shb=el(lab,"button","srmcopy srmshot","📷 이미지"); shb.type="button"; shb.title="화면 크기 그림 여러 장으로 저장"}
     var bd=el(v,"div","srmlines srmrlines");
     var lines=x.body.replace(/\s+$/,"").split("\n");
     if(!x.body.trim()){el(bd,"div","srmrempty","아직 적은 메모가 없어요.")}
