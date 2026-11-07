@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-grace">
+<meta name="app-build" content="2026-11-07-gracerec">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -15117,7 +15117,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value="";
     say.querySelector(".dltitle").textContent=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 나의 은혜":"💬 믿음의 한 마디";
-    say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
+    say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 기록':'+<span class="sayhidem"> 한 마디</span> 담기';
     say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawSay();
     if(sayEdit==="new"){var ta=say.querySelector(".sayt"); if(ta)setTimeout(function(){ta.focus()},40)}
@@ -15235,7 +15235,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     if(!items.length&&!sayEdit){
       var em=document.createElement("p"); em.className="sayempty";
-      em.textContent=sayMode==="g"?"아직 담은 은혜가 없어요. 위 [+ 은혜 담기]로 하나님께 받은 은혜를 적어 두세요.":sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 10분마다(00·10·20…분) 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
+      em.textContent=sayMode==="g"?"아직 기록한 은혜가 없어요. 위 [+ 기록]으로 하나님께 받은 은혜를 적어 두세요.":sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 10분마다(00·10·20…분) 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
       list.appendChild(em); return;
     }
     // ▴▾ 모두 접기·펼치기 (2026-11-07 사용자 요청)
@@ -15474,7 +15474,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
         var it=o.items.filter(function(x){return x.id===sayEdit})[0];
         if(it){it.t=t;it.who=who;it.topic=tp;it.note=nt;it.hv=hv;it.at=Date.now()}
       }
-      saveSay(o); sayEdit=""; drawSay(); renderReviewBar(); toast(sayMode==="g"?"담았어요 🌿":"담았어요 💬");
+      saveSay(o); sayEdit=""; drawSay(); renderReviewBar(); toast(sayMode==="g"?"기록했어요 🌿":"담았어요 💬");
       return;
     }
     if(act==="edit"){sayEdit=id;drawSay();var ta=say.querySelector(".sayt");if(ta)setTimeout(function(){ta.focus()},30);return}
