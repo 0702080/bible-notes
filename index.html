@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-linewrap2">
+<meta name="app-build" content="2026-11-08-srmhl">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5049,6 +5049,15 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmcdel:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
 .srmcdel.armed{color:#fff;background:#B23A48;border-color:#E5484D}
 .srmcard .srmmeta .srmcdel+.srmcfold{margin-left:6px}
+/* ✨ 설교 메모 강조 */
+.hlx.hlb{font-weight:800}
+.srmhl{display:flex;align-items:center;gap:6px;margin:6px 2px 2px;flex-wrap:wrap}
+.srmhlt{font-size:12.5px;color:var(--muted);margin-right:2px}
+.hlbtn{height:28px;min-width:28px;padding:0 8px;border:1px solid #4A4953;border-radius:14px;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.04) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.2) 100%);color:#E8E5EE;font-family:inherit;font-size:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 0 rgba(0,0,0,.4);transition:transform .08s}
+.hlbtn:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
+.hlbtn.hlbold{font-weight:900}
+.hlbtn.hldot{width:28px;padding:0;background:var(--d);border-color:color-mix(in srgb,var(--d) 60%,#000)}
+.hlbtn.hlclr{font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12225,28 +12234,55 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
   var srmDrag=null;
   // 한 칸 = 한 줄: 글자 크기는 그대로, 칸 폭을 넘는 부분은 다음 칸으로 넘김 (낱말 단위, 2026-11-08 사용자 요청)
   var lnCv=null;
+  // ✨ 강조 표시: **굵게**, [[금:글자]] 처럼 색 (금·분홍·하늘·초록·보라·주황). 고치는 칸에는 기호로, 읽을 때는 색·굵게로 (2026-11-08 사용자 요청)
+  var HL_COL={"금":"var(--gold)","분홍":"var(--pink)","하늘":"var(--sky)","초록":"var(--green)","보라":"var(--violet)","주황":"var(--orange)"};
+  var HL_RE=/\[\[(금|분홍|하늘|초록|보라|주황):|\]\]|\*\*/g;
+  function hlStrip(t){return String(t||"").replace(HL_RE,"")}
+  function hlParse(line){   // → [{t,b,c}]
+    var out=[], b=false, c=null, last=0, m; HL_RE.lastIndex=0;
+    while((m=HL_RE.exec(line))){
+      if(m.index>last)out.push({t:line.slice(last,m.index),b:b,c:c});
+      if(m[0]==="**")b=!b; else if(m[0]==="]]")c=null; else c=m[1];
+      last=HL_RE.lastIndex;
+    }
+    if(last<line.length)out.push({t:line.slice(last),b:b,c:c});
+    return out;
+  }
+  function hlFill(el,segs){
+    el.textContent="";
+    segs.forEach(function(g){
+      if(!g.b&&!g.c){el.appendChild(document.createTextNode(g.t));return}
+      var sp=document.createElement("span"); sp.className="hlx"+(g.b?" hlb":""); if(g.c)sp.style.color=HL_COL[g.c]; sp.textContent=g.t; el.appendChild(sp);
+    });
+  }
   function lineRows(box){
     if(!box||!box.isConnected||!box._lines)return;
     var mk=box._mk, lines=box._lines, sel=box._sel;
-    box.textContent=""; var probe=mk("가"); box.appendChild(probe);
-    var sp=probe.querySelector(sel), cs=getComputedStyle(sp), w=sp.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0), fnt=cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;   // 글꼴은 칸을 지우기 전에 읽어 둠 (지우면 값이 비어 버림)
-    box.textContent=""; if(w<=20){lines.forEach(function(t){box.appendChild(mk(t))}); return}
-    if(!lnCv)lnCv=document.createElement("canvas"); var cx=lnCv.getContext("2d"); cx.font=fnt;
-    var fits=function(t){return cx.measureText(t).width<=w};
-    lines.forEach(function(t){
-      if(!t||fits(t)){box.appendChild(mk(t));return}
-      var words=t.split(" "), cur="";
-      words.forEach(function(wd){
-        var nx=cur?cur+" "+wd:wd;
-        if(fits(nx)){cur=nx;return}
-        if(cur){box.appendChild(mk(cur)); cur=""}
-        while(wd&&!fits(wd)){var k=wd.length; while(k>1&&!fits(wd.slice(0,k)))k--; box.appendChild(mk(wd.slice(0,k))); wd=wd.slice(k)}   // 아주 긴 낱말은 글자에서 끊음
-        cur=wd;
+    box.textContent=""; var probe=mk([{t:"가"}]); box.appendChild(probe);
+    var sp=probe.querySelector(sel), cs=getComputedStyle(sp), w=sp.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0), fs=cs.fontSize, ff=cs.fontFamily, fw=cs.fontWeight;   // 글꼴은 칸을 지우기 전에 읽어 둠 (지우면 값이 비어 버림)
+    box.textContent=""; if(w<=20){lines.forEach(function(t){box.appendChild(mk(hlParse(t)))}); return}
+    if(!lnCv)lnCv=document.createElement("canvas"); var cx=lnCv.getContext("2d");
+    var wd=function(t,bold){cx.font=(bold?"800":fw)+" "+fs+" "+ff; return cx.measureText(t).width};
+    lines.forEach(function(line){
+      var segs=hlParse(line), toks=[];
+      segs.forEach(function(g){g.t.split(/( )/).forEach(function(x){if(x)toks.push({t:x,b:g.b,c:g.c,w:wd(x,g.b)})})});
+      var row=[], rw=0;
+      function push(){
+        while(row.length&&row[row.length-1].t===" "){rw-=row[row.length-1].w; row.pop()}
+        var m2=[]; row.forEach(function(k){var l=m2[m2.length-1]; if(l&&l.b===k.b&&l.c===k.c)l.t+=k.t; else m2.push({t:k.t,b:k.b,c:k.c})});
+        box.appendChild(mk(m2)); row=[]; rw=0;
+      }
+      if(!toks.length){box.appendChild(mk([]));return}
+      toks.forEach(function(k){
+        if(!row.length&&k.t===" ")return;
+        if(rw+k.w>w&&row.length)push();
+        if(!row.length&&k.t===" ")return;
+        row.push(k); rw+=k.w;
       });
-      if(cur)box.appendChild(mk(cur));
+      if(row.length)push();
     });
   }
-  function lineRowsSet(box,lines,mk,sel){box._lines=lines; box._mk=mk; box._sel=sel; lines.forEach(function(t){box.appendChild(mk(t))}); setTimeout(function(){lineRows(box)},60)}
+  function lineRowsSet(box,lines,mk,sel){box._lines=lines; box._mk=mk; box._sel=sel; lines.forEach(function(t){box.appendChild(mk(hlParse(t)))}); setTimeout(function(){lineRows(box)},60)}
   window.addEventListener("resize",function(){clearTimeout(lineRows.t); lineRows.t=setTimeout(function(){document.querySelectorAll(".srmrlines,.saylines").forEach(lineRows)},150)});
   function srmFit(t){t.style.height="auto"; t.style.height=t.scrollHeight+"px"}
   function srmRow(txt){
@@ -12289,6 +12325,24 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
   }
   function srmDragInit(){
     srm.addEventListener("input",function(e){if(e.target.classList.contains("srmli"))srmLineInput(e.target)},true);
+    // ✨ 강조: 줄에서 글자를 고르고(안 고르면 그 줄 전체) 굵게·색 단추 (2026-11-08 사용자 요청)
+    var hlTa=null;
+    srm.addEventListener("focusin",function(e){if(e.target.classList&&e.target.classList.contains("srmli"))hlTa=e.target});
+    srm.addEventListener("pointerdown",function(e){if(e.target.closest(".hlbtn"))e.preventDefault()},true);   // 단추를 눌러도 고른 글자가 풀리지 않게
+    srm.addEventListener("click",function(e){
+      var hb=e.target.closest(".hlbtn"); if(!hb)return; e.stopPropagation();
+      var ta=(document.activeElement&&document.activeElement.classList.contains("srmli"))?document.activeElement:hlTa;
+      if(!ta||!ta.isConnected){toast("강조할 줄을 먼저 눌러 주세요");return}
+      var v=ta.value, a=ta.selectionStart, b=ta.selectionEnd; if(a===b){a=0;b=v.length}
+      if(a===b){toast("글자를 먼저 적어 주세요");return}
+      var mid=v.slice(a,b), k=hb.dataset.hl, nm;
+      if(k==="x")nm=hlStrip(mid);
+      else if(k==="b")nm="**"+mid+"**";
+      else nm="[["+k+":"+hlStrip(mid).replace(/\*\*/g,"")+"]]";
+      if(k!=="x"&&k!=="b"&&/\*\*/.test(mid))nm="**"+nm+"**";   // 굵게 해 둔 글에 색을 입혀도 굵게는 그대로
+      ta.value=v.slice(0,a)+nm+v.slice(b); try{ta.focus(); ta.setSelectionRange(a,a+nm.length)}catch(err){}
+      ta.dispatchEvent(new Event("input",{bubbles:true})); buzz(8);
+    },true);
     srm.addEventListener("keydown",function(e){
       var t=e.target; if(!t.classList||!t.classList.contains("srmli"))return;
       if(e.key==="Backspace"&&t.selectionStart===0&&t.selectionEnd===0){if(srmLineBack(t))e.preventDefault()}
@@ -12396,7 +12450,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
   function srmClick(e){
     // 📋 설교 메모 전체 복사: 줄·빈 줄 그대로 (2026-11-07 사용자 요청)
     var cpy=e.target.closest(".srmcopy"); if(cpy){e.stopPropagation(); if(!srmRead)srmCommit();
-      var cx=srmData().items.find(function(y){return y.id===srmEdit}), ct=cx?String(cx.body||"").replace(/\s+$/,"").replace(/^\n+/,""):"";
+      var cx=srmData().items.find(function(y){return y.id===srmEdit}), ct=cx?hlStrip(String(cx.body||"")).replace(/\s+$/,"").replace(/^\n+/,""):"";
       if(!ct.trim()){toast("복사할 메모가 없어요");return}
       copyText(ct).then(function(ok){toast(ok?"설교 메모를 복사했어요 📋":"복사하지 못했어요")}); return}
     var yc=e.target.closest(".srmytc"); if(yc){e.stopPropagation(); srmYtOpen(yc.dataset.u); return}
@@ -12439,7 +12493,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
         '<input class="srmtitle" maxlength="200" placeholder="설교 제목" aria-label="설교 제목">'+
         '<div class="srmrow"><input class="srmrefin" maxlength="120" placeholder="본문 (예: 요한복음 15:1-8)" aria-label="본문"><select class="srmnote" aria-label="내 말씀 카드와 잇기"></select></div>'+
         '<div class="srmytrow"><input class="srmyt" type="url" inputmode="url" maxlength="500" placeholder="▶ 유튜브 설교 영상 링크 붙여넣기" aria-label="유튜브 링크"><button type="button" class="srmytgo" hidden>▶ 보기</button></div>'+
-        '<div class="srmlab">📝 설교 메모 <span class="srmhint">· ⠿를 잡고 끌면 줄을 옮겨요</span><button type="button" class="srmcopy" title="설교 메모 전체 복사">📋 전체 복사</button></div><div class="srmlines"></div><textarea class="srmbody" hidden placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
+        '<div class="srmlab">📝 설교 메모 <span class="srmhint">· ⠿를 잡고 끌면 줄을 옮겨요</span><button type="button" class="srmcopy" title="설교 메모 전체 복사">📋 전체 복사</button></div><div class="srmhl" role="toolbar" aria-label="강조"><span class="srmhlt">✨ 강조</span><button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button><button type="button" class="hlbtn hldot" data-hl="금" style="--d:var(--gold)" title="금색"></button><button type="button" class="hlbtn hldot" data-hl="분홍" style="--d:var(--pink)" title="분홍"></button><button type="button" class="hlbtn hldot" data-hl="하늘" style="--d:var(--sky)" title="하늘색"></button><button type="button" class="hlbtn hldot" data-hl="초록" style="--d:var(--green)" title="초록"></button><button type="button" class="hlbtn hldot" data-hl="주황" style="--d:var(--orange)" title="주황"></button><button type="button" class="hlbtn hlclr" data-hl="x" title="강조 지우기">지우기</button></div><div class="srmlines"></div><textarea class="srmbody" hidden placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
         '';
       // 💡 나의 적용과 단추들은 화면 아래에 고정 (2026-10-31 사용자 요청)
       foot.innerHTML='<div class="srmfin"><div class="srmlab ap">💡 나의 적용 · 결단<span class="srmsaved" aria-live="polite"></span></div><textarea class="srmapply" placeholder="이번 주에 이렇게 살아 보겠습니다" aria-label="나의 적용"></textarea>'+
@@ -12520,7 +12574,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var bd=el(v,"div","srmlines srmrlines");
     var lines=x.body.replace(/\s+$/,"").split("\n");
     if(!x.body.trim()){el(bd,"div","srmrempty","아직 적은 메모가 없어요.")}
-    else lineRowsSet(bd,lines,function(t){var ln=document.createElement("div"); ln.className="srmline"; var g=document.createElement("span"); g.className="srmrgrip"; g.textContent="⠿"; ln.appendChild(g); var d=document.createElement("div"); d.className="srmrli"; d.textContent=t; ln.appendChild(d); return ln},".srmrli");
+    else lineRowsSet(bd,lines,function(t){var ln=document.createElement("div"); ln.className="srmline"; var g=document.createElement("span"); g.className="srmrgrip"; g.textContent="⠿"; ln.appendChild(g); var d=document.createElement("div"); d.className="srmrli"; hlFill(d,t); ln.appendChild(d); return ln},".srmrli");
     if(x.apply.trim()){el(v,"div","srmlab ap","💡 나의 적용 · 결단"); el(v,"div","rapply",x.apply.trim())}
     return v;
   }
@@ -12547,7 +12601,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       if(srmYtUrl(x.yt)){var yv=document.createElement("span"); yv.className="srmytc"; yv.dataset.u=x.yt; yv.textContent="▶ 영상"; yv.title="유튜브로 보기"; m.appendChild(yv)}
       c.appendChild(m);
       if(x.ref){var r=document.createElement("span"); r.className="srmref"; r.textContent="📖 "+x.ref; c.appendChild(r)}
-      if(x.body.trim()){var p=document.createElement("span"); p.className="srmprev"; p.textContent=x.body.trim(); c.appendChild(p)}
+      if(x.body.trim()){var p=document.createElement("span"); p.className="srmprev"; p.textContent=hlStrip(x.body).trim(); c.appendChild(p)}
       if(x.apply.trim()){var a=document.createElement("span"); a.className="srmap"; a.style.display="block"; a.textContent="💡 "+x.apply.trim(); c.appendChild(a)}
       list.appendChild(c);
     });
@@ -15411,7 +15465,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       if(x.gr&&!sfd&&String(x.t||"").indexOf("\n")>=0){   // 🌿 은혜: 설교 메모처럼 한 줄씩 칸으로, 빈 줄도 그대로 (2026-11-08 사용자 요청)
         var q=document.createElement("div"); q.className="sayq saylines"; c.classList.add("saylined");
         c.appendChild(q);
-        lineRowsSet(q,String(x.t||"").replace(/\s+$/,"").split("\n"),function(ln){var r=document.createElement("div"); r.className="sayln"; var g=document.createElement("span"); g.className="saylg"; g.textContent="⠿"; g.setAttribute("aria-hidden","true"); r.appendChild(g); var tx=document.createElement("span"); tx.className="saylt"; tx.textContent=ln; r.appendChild(tx); return r},".saylt");
+        lineRowsSet(q,String(x.t||"").replace(/\s+$/,"").split("\n"),function(ln){var r=document.createElement("div"); r.className="sayln"; var g=document.createElement("span"); g.className="saylg"; g.textContent="⠿"; g.setAttribute("aria-hidden","true"); r.appendChild(g); var tx=document.createElement("span"); tx.className="saylt"; hlFill(tx,ln); r.appendChild(tx); return r},".saylt");
       }else{
       var q=document.createElement("p"); q.className="sayq"; q.textContent=sfd?String(x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean)[0]||"":(x.t||""); c.appendChild(q);
       }
