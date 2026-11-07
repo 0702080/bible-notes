@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-norgo">
+<meta name="app-build" content="2026-11-08-pgno">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5090,6 +5090,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmhl.srmhlfloat[hidden]{display:none}
 .srmrv .srmrlines.srmpinned{scrollbar-width:none}   /* overscroll-behavior:contain 은 휴대폰에서 바깥으로 넘어가는 굴림을 막아 화면이 멈춰서 뺌 (2026-11-08) */
 .srmrv .srmrlines.srmpinned::-webkit-scrollbar{display:none}
+.srmrv .srmpgno{text-align:center;margin:8px 0 4px;font-size:13px;font-weight:700;color:color-mix(in srgb,var(--gold) 80%,#fff);letter-spacing:.5px;opacity:.85}   /* 지금 쪽 / 전체 쪽 (2026-11-08 사용자 요청) */
+.srmrv .srmpgno[hidden]{display:none}
 .srmrv .srmlab .srmshot{margin-left:6px}
 /* 한 마디·은혜 카드 ▾ 접기 단추: 입체, 오른쪽 끝을 아래 '삭제' 단추와 같은 줄에 (2026-11-08 사용자 요청) */
 .saysheet .saycard .sayfoldb{right:var(--sayfr,16px);background-color:#2A2933!important;border-color:#45434F!important;color:var(--ink)!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 6px rgba(0,0,0,.34);transition:transform .08s,box-shadow .08s}
@@ -12660,7 +12662,17 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       if(bd.scrollHeight>h&&h>160){bd.style.maxHeight=h+"px"; bd.classList.add("srmpinned")} else bd.classList.remove("srmpinned");
       sync();
     }
+    var pg=v.querySelector(".srmpgno");
+    function pgSync(){   // 📄 지금 쪽 / 전체 쪽: 메모 칸이 안에서 굴러가면 그 칸, 아니면 화면 높이로 셈
+      if(!pg||!bd.isConnected)return;
+      var sc=bd.classList.contains("srmpinned")?bd:box, ch=sc.clientHeight; if(ch<50){pg.hidden=true;return}
+      var tot=Math.max(1,Math.ceil((sc.scrollHeight-4)/ch)), end=sc.scrollTop>=sc.scrollHeight-ch-2;
+      var cur=end?tot:Math.min(tot,Math.floor((sc.scrollTop+4)/ch)+1);
+      pg.hidden=tot<2; pg.textContent=cur+" / "+tot;
+    }
+    if(!bd._pgOn){bd._pgOn=1; bd.addEventListener("scroll",pgSync,{passive:true})}
     function sync(){
+      pgSync();
       if(!bd.classList.contains("srmpinned"))return;
       var atEnd=box.scrollTop>=box.scrollHeight-box.clientHeight-2;
       bd.style.overflowY=atEnd?"auto":"hidden";   // 바깥이 끝까지 굴러간 뒤에야 메모 칸 안이 굴러감
@@ -12736,9 +12748,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     if(srmYtUrl(x.yt)){var y=el(v,"div","rbx ryt srmytc","▶ 유튜브 설교 영상 보기"); y.dataset.u=x.yt}
     var lab=el(v,"div","srmlab","📝 설교 메모 "); if(x.body.trim()){var cpb=el(lab,"button","srmcopy","📋 전체 복사"); cpb.type="button"; cpb.title="설교 메모 전체 복사"}
     var bd=el(v,"div","srmlines srmrlines");
+    var pgno=document.createElement("div"); pgno.className="srmpgno"; pgno.hidden=true;   // 📄 지금 쪽 / 전체 쪽 — 메모 칸 바로 아래 (2026-11-08 사용자 요청)
     var lines=x.body.replace(/\s+$/,"").split("\n");
     if(!x.body.trim()){el(bd,"div","srmrempty","아직 적은 메모가 없어요.")}
     else lineRowsSet(bd,lines,function(t){var ln=document.createElement("div"); ln.className="srmline"; var g=document.createElement("span"); g.className="srmrgrip"; g.textContent="⠿"; ln.appendChild(g); var d=document.createElement("div"); d.className="srmrli"; hlFill(d,t); ln.appendChild(d); return ln},".srmrli");
+    v.insertBefore(pgno,bd.nextSibling);
     if(x.apply.trim()){el(v,"div","srmlab ap","💡 나의 적용 · 결단"); el(v,"div","rapply",x.apply.trim())}
     // ✍️ 기도·에세이 단추는 없앰 — 메모를 옆으로 밀어 엶 (2026-11-08 사용자 요청)
     if(srmWords().length){   // 찾다가 연 메모면 찾은 낱말 표시 + 첫 자리로 (2026-11-08)
