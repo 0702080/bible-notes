@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmalign">
+<meta name="app-build" content="2026-11-08-srmdbl">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12269,19 +12269,19 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var mk=box._mk, lines=box._lines, sel=box._sel;
     box.textContent=""; var probe=mk([{t:"가"}]); box.appendChild(probe);
     var sp=probe.querySelector(sel), cs=getComputedStyle(sp), w=sp.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0), fs=cs.fontSize, ff=cs.fontFamily, fw=cs.fontWeight;   // 글꼴은 칸을 지우기 전에 읽어 둠 (지우면 값이 비어 버림)
-    box.textContent=""; if(w<=20){lines.forEach(function(t){box.appendChild(mk(hlParse(t)))}); return}
+    box.textContent=""; if(w<=20){lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); return}
     if(!lnCv)lnCv=document.createElement("canvas"); var cx=lnCv.getContext("2d");
     var wd=function(t,bold){cx.font=(bold?"800":fw)+" "+fs+" "+ff; return cx.measureText(t).width};
-    lines.forEach(function(line){
+    lines.forEach(function(line,li){   // data-li: 화면 줄이 원래 몇 번째 줄인지 (읽기에서 두 번 누르면 그 줄로 고치기, 2026-11-08)
       var segs=hlParse(line), toks=[];
       segs.forEach(function(g){g.t.split(/( )/).forEach(function(x){if(x)toks.push({t:x,b:g.b,c:g.c,w:wd(x,g.b)})})});
       var row=[], rw=0;
       function push(){
         while(row.length&&row[row.length-1].t===" "){rw-=row[row.length-1].w; row.pop()}
         var m2=[]; row.forEach(function(k){var l=m2[m2.length-1]; if(l&&l.b===k.b&&l.c===k.c)l.t+=k.t; else m2.push({t:k.t,b:k.b,c:k.c})});
-        box.appendChild(mk(m2)); row=[]; rw=0;
+        var e=mk(m2); e.dataset.li=li; box.appendChild(e); row=[]; rw=0;
       }
-      if(!toks.length){box.appendChild(mk([]));return}
+      if(!toks.length){var e0=mk([]); e0.dataset.li=li; box.appendChild(e0);return}
       toks.forEach(function(k){
         if(!row.length&&k.t===" ")return;
         if(rw+k.w>w&&row.length)push();
@@ -12291,7 +12291,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       if(row.length)push();
     });
   }
-  function lineRowsSet(box,lines,mk,sel){box._lines=lines; box._mk=mk; box._sel=sel; lines.forEach(function(t){box.appendChild(mk(hlParse(t)))}); setTimeout(function(){lineRows(box)},60)}
+  function lineRowsSet(box,lines,mk,sel){box._lines=lines; box._mk=mk; box._sel=sel; lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); setTimeout(function(){lineRows(box)},60)}
   window.addEventListener("resize",function(){clearTimeout(lineRows.t); lineRows.t=setTimeout(function(){document.querySelectorAll(".srmrlines,.saylines").forEach(lineRows)},150)});
   function srmFit(t){t.style.height="auto"; t.style.height=t.scrollHeight+"px"}
   function srmRow(txt){
@@ -12299,6 +12299,15 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var g=document.createElement("span"); g.className="srmgrip"; g.textContent="⠿"; g.title="끌어서 옮기기"; g.setAttribute("aria-label","끌어서 옮기기");
     var t=document.createElement("textarea"); t.className="srmli"; t.rows=1; t.value=txt; t.setAttribute("aria-label","설교 메모 한 줄");
     r.appendChild(g); r.appendChild(t); return r;
+  }
+  function srmFocusLine(li){
+    var go=function(){
+      var ls=srm&&srm.querySelectorAll(".srmform .srmlines .srmli"); if(!ls||!ls.length)return;
+      var t=ls[Math.min(li,ls.length-1)];
+      try{t.focus({preventScroll:true}); var n=t.value.length; t.setSelectionRange(n,n)}catch(e){}
+      try{t.scrollIntoView({block:"center"})}catch(e){}
+    };
+    requestAnimationFrame(function(){requestAnimationFrame(go)}); setTimeout(go,350);   // 키보드가 올라온 뒤 한 번 더 맞춤
   }
   function srmLinesDraw(){
     var f=srm.querySelector(".srmform"), ta=f.querySelector(".srmbody"), ls=f.querySelector(".srmlines");
@@ -12436,7 +12445,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
         var now=Date.now();
         if(now-srmTap.t<350&&Math.abs(e.clientX-srmTap.x)<30&&Math.abs(e.clientY-srmTap.y)<30){
           srmTap.t=0; e.preventDefault(); var ae=document.activeElement; if(ae&&srm.contains(ae))ae.blur();
-          srm.querySelector(".srmreadbtn").click(); buzz(10); return;
+          var wasRead=srmRead, hitRow=wasRead&&e.target.closest&&e.target.closest(".srmrlines [data-li]"), li=hitRow?+hitRow.dataset.li:-1;
+          srm.querySelector(".srmreadbtn").click(); buzz(10);
+          if(wasRead&&li>=0)srmFocusLine(li);   // 읽기에서 두 번 누른 그 줄을 고치기 칸으로 열고 커서·화면을 그 줄로 (2026-11-08 사용자 요청)
+          return;
         }
         srmTap={t:now,x:e.clientX,y:e.clientY};
       });
