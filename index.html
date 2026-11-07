@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-gracecpy">
+<meta name="app-build" content="2026-11-07-iccnt">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12702,7 +12702,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var o=icData(), today=dkey(Date.now()), body=icv.querySelector(".icbody"); body.textContent="";
     var icLive=o.items.filter(function(x){return !x.ans}), icAns=o.items.filter(function(x){return x.ans}).sort(function(a,b){return b.ans-a.ans});
     if(!icAns.length)icShowAns=false;
-    icv.querySelector(".iccnt").textContent=icLive.length?icLive.length+"명":"";
+    icv.querySelector(".iccnt").textContent=icLive.length?icLive.length+"개":"";   // "기도제목 10개" (2026-11-07 사용자 요청)
     if(icEdit==="new")body.appendChild(icForm(null));   // 새 사람은 맨 위에서 적기 (2026-10-24 사용자 요청: 넣기 단추는 위 제목줄에)
     // 응답된 기도는 명단 맨 아래에 늘 보임 — 카드 색을 달리해 구분 (2026-11-07 사용자 요청)
     icShowAns=false;
