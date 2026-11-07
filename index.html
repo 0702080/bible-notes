@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-thxbtn">
+<meta name="app-build" content="2026-11-07-caret">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -20180,6 +20180,36 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     function later(){if(!pend)pend=requestAnimationFrame(scan)}
     later(); new MutationObserver(later).observe(document.body,{childList:true,subtree:true});
   })();
+  /* ---------- ✍ 적는 자리(커서) 따라가기: 글 칸이 길어져 커서가 키보드 밑으로 들어가면 화면을 굴려 보이게 (2026-11-07 사용자 요청) ---------- */
+  (function(){
+    if(window.matchMedia&&matchMedia("(min-width:900px)").matches)return;
+    var mir=null, T=0;
+    function caretY(ta){   // 칸 안에서 커서 줄의 아래 끝 위치(px)
+      if(!mir){mir=document.createElement("div"); mir.setAttribute("aria-hidden","true"); mir.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all"; document.body.appendChild(mir)}
+      var cs=getComputedStyle(ta);
+      ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","wordSpacing","paddingTop","paddingLeft","paddingRight","borderTopWidth","borderLeftWidth","borderRightWidth","boxSizing","wordBreak","textIndent"].forEach(function(k){mir.style[k]=cs[k]});
+      mir.style.width=ta.offsetWidth+"px";
+      mir.textContent=ta.value.slice(0,ta.selectionEnd||0)+"​";
+      return mir.offsetHeight;
+    }
+    function follow(ta){
+      if(!ta||ta.tagName!=="TEXTAREA"||document.activeElement!==ta)return;
+      var vv=window.visualViewport, vtop=vv?vv.offsetTop:0, vbot=vv?vtop+vv.height:innerHeight;
+      var fullH=Math.max(innerHeight,(screen&&screen.height)||0); if(vv&&vv.height>fullH*0.8)vbot=vtop+Math.round(vv.height*0.55);   // 키보드가 보이는 높이를 안 줄이는 기기
+      var r=ta.getBoundingClientRect(), y=r.top+caretY(ta)-ta.scrollTop, lh=parseFloat(getComputedStyle(ta).lineHeight)||26;
+      var over=y-(vbot-24);
+      if(over>0||y-lh<vtop+60){
+        var dy=over>0?over:(y-lh-(vtop+80));
+        var sc=ta.parentElement; while(sc&&sc!==document.body){var o=getComputedStyle(sc).overflowY; if((o==="auto"||o==="scroll")&&sc.scrollHeight>sc.clientHeight+2)break; sc=sc.parentElement}
+        if(sc&&sc!==document.body)sc.scrollTop+=dy; else window.scrollBy(0,dy);
+      }
+    }
+    function sched(ta){clearTimeout(T); T=setTimeout(function(){follow(ta)},60)}
+    document.addEventListener("input",function(e){if(e.target&&e.target.tagName==="TEXTAREA")sched(e.target)},true);
+    document.addEventListener("focusin",function(e){var t=e.target; if(t&&t.tagName==="TEXTAREA"){setTimeout(function(){follow(t)},350); setTimeout(function(){follow(t)},800)}},true);
+    if(window.visualViewport)visualViewport.addEventListener("resize",function(){var a=document.activeElement; if(a&&a.tagName==="TEXTAREA")sched(a)});
+  })();
+
   /* ---------- start ---------- */
   syncSortBtn();
   render();
