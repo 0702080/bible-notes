@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmlist">
+<meta name="app-build" content="2026-11-08-srmnosel">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5023,6 +5023,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 /* 📖 읽기 단추는 금빛, ✏️ 고치기 단추는 보랏빛 (2026-11-07 사용자 요청) */
 .srmsheet .dlbar .dlclose.srmreadbtn{background-color:#6B5424!important;border-color:#A8853E!important;color:#FFF3D6!important}
 .srmsheet .dlbar .dlclose.srmreadbtn.on{background-color:#4E3F86!important;border-color:#8C79D6!important;color:#F1ECFF!important}
+/* 📖 읽기 모드에서는 글이 선택되지 않게 — 꾹 누르거나 두 번 눌러도 파란 선택이 안 생김 (복사는 📋 전체 복사로, 2026-11-08 사용자 요청) */
+.srmrv,.srmrv *{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 /* 📋 설교 메모 전체 복사 단추 */
 .srmsheet .srmlab:has(.srmcopy){display:flex;align-items:center;gap:4px}
 .srmcopy{margin-left:auto;height:28px;padding:0 12px;border:1px solid #4A4953;border-radius:14px;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.2) 100%);color:#E8E5EE;font-family:inherit;font-size:12.5px;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 2px 0 rgba(0,0,0,.4),0 3px 6px rgba(0,0,0,.3);transition:transform .08s,box-shadow .08s}
