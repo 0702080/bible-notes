@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-caret">
+<meta name="app-build" content="2026-11-07-grace">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5019,7 +5019,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     <details class="menu" id="topMenu"><summary class="tbtn" aria-label="더보기">⋯</summary>
       <div class="pop">
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
-        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button>
+        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 나의 은혜</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="rvAllBtn">🔁 오늘 복습</button>
         <button type="button" id="weekBtn">📅 한 주 돌아보기</button>
@@ -6309,7 +6309,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       box._wired=1;
       box.addEventListener("click",function(e){
         var r=e.target.closest(".dlfr"); if(!r)return;
-        if(r.dataset.say)openSay();
+        if(r.dataset.say)openSay(null,r.dataset.say);
         else if(r.dataset.read)openReader({book:+r.dataset.b,chapter:+r.dataset.c,verse:+r.dataset.v||0});
         else if(r.dataset.note)openNoteFocus(r.dataset.note,r.dataset.tab);
         else openDaily(r.dataset.day,r.dataset.id);
@@ -6432,7 +6432,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(sh.length){   // 💬 믿음의 한 마디
       var lsq=col("💬","믿음의 한 마디",sh.length);
       sh.forEach(function(x){
-        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.say="1";
+        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.say=x.hv?"v":x.gr?"g":"s";
         b.style.setProperty("--gc","var(--gold)");
         b.setAttribute("aria-label","믿음의 한 마디 보기");
         var top=document.createElement("span"); top.className="dlfrh"; top.textContent=(x.who||"한 마디")+(x.topic?"  ·  #"+x.topic:"");
@@ -14976,7 +14976,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   },1500);
   function sayOfDay(){
     var hr=sayHour(); if(hr)return hr;
-    var items=sayData().items.filter(function(x){return !x.hv&&String(x.t||"").trim()});
+    var items=sayData().items.filter(function(x){return !x.hv&&!x.gr&&String(x.t||"").trim()});
     if(!items.length)return null;
     var pin=sayPinned(); if(pin){var pi=items.filter(function(x){return x.id===pin.id})[0]; if(pi)return pi}
     var k="s"+Math.floor(Date.now()/300000), h=0, i;
@@ -14985,7 +14985,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   }
   /* ✦ 오늘 카드의 한 마디: 빛나는 카드 + 낱말이 하나씩 떠오르며 20초마다 다음 한 마디로 (📌 고정·정각 말씀이면 그대로), 옆으로 밀면 넘김 (2026-11-01 사용자 요청) */
   var ST={id:"",ms:20000,busy:false,at:0,edit:false,lpAt:0,tapT:0,pendRR:false};
-  function sayTodayList(){return sayData().items.filter(function(x){return !x.hv&&String(x.t||"").trim()})}
+  function sayTodayList(){return sayData().items.filter(function(x){return !x.hv&&!x.gr&&String(x.t||"").trim()})}
   function sayTodayLocked(){return !!(sayHour()||sayPinned())}
   function sayTodayPick(){
     if(sayTodayLocked())return sayOfDay();
@@ -15093,7 +15093,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 10분마다 나옴
   var sayMode="s";
   function openSay(focus,mode){
-    sayMode=mode==="v"?"v":"s";
+    sayMode=mode==="v"?"v":mode==="g"?"g":"s";
     if(!say){
       say=document.createElement("div"); say.className="daily saysheet"; say.setAttribute("role","dialog"); say.setAttribute("aria-modal","true"); say.hidden=true;
       say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose saylock"></button><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose">닫기</button></div>'+
@@ -15116,8 +15116,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&say&&!say.hidden)closeSay()});
     }
     sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value="";
-    say.querySelector(".dltitle").textContent=sayMode==="v"?"📖 짧은 말씀 한 구절":"💬 믿음의 한 마디";
-    say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
+    say.querySelector(".dltitle").textContent=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 나의 은혜":"💬 믿음의 한 마디";
+    say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
     say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawSay();
     if(sayEdit==="new"){var ta=say.querySelector(".sayt"); if(ta)setTimeout(function(){ta.focus()},40)}
@@ -15188,7 +15188,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var cur=sayEdit==="new"?{t:"",who:"",topic:"",note:""}:(o.items.filter(function(x){return x.id===sayEdit})[0]||{t:"",who:"",topic:"",note:""});
       if(keep)cur={t:keep.t,who:keep.who,topic:keep.topic,note:keep.note,hv:cur.hv};
       var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=600; ta.value=cur.t||"";
-      ta.placeholder=sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
+      ta.placeholder=sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":sayMode==="g"?"받은 은혜를 적어 보세요 (예: 오늘 기도 중에 마음이 평안해졌다)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
       var sayFit=function(){
         ta.style.height="auto"; var h0=ta.scrollHeight+2; ta.style.height=h0+"px";   // 글 길이에 맞춰 높이
@@ -15206,7 +15206,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       ta.addEventListener("focus",function(){[150,400,800].forEach(function(d){setTimeout(sayFit,d)})});
       ta.addEventListener("focus",function(){setTimeout(function(){var rw=form.querySelector(".sayrow2:last-of-type")||form; try{rw.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}},350)});   // 키보드가 올라오면 아래 단추 줄까지 보이게
       var row=document.createElement("div"); row.className="sayrow2";
-      var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="v"?"구절 (예: 로마서 12:21)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
+      var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="v"?"구절 (예: 로마서 12:21)":sayMode==="g"?"어디서·누구에게 (예: 주일 예배)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
       row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
       if(sayMode==="v")form.insertBefore(bookPicker(wi),row);
@@ -15226,7 +15226,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     if(keep&&keep.focus){var nt=form.querySelector(".sayt"); if(nt){try{nt.focus({preventScroll:true}); nt.setSelectionRange(keep.ss,keep.se)}catch(e){}}}
     list.textContent="";
-    var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:!x.hv});
+    var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:sayMode==="g"?(!x.hv&&!!x.gr):(!x.hv&&!x.gr)});   // 🌿 나의 은혜(gr:1)는 따로
     var lb=say.querySelector(".saylock"); lb.innerHTML='📌<span class="sayhidem"> 고정 '+(sayLocked?"ON":"OFF")+'</span>'; lb.setAttribute("aria-label",sayLocked?"고정 켜짐":"고정 꺼짐"); lb.classList.toggle("on",sayLocked); lb.setAttribute("aria-pressed",String(sayLocked)); lb.title=sayLocked?"끄면 카드를 끌어서 옮길 수 있어요":"켜면 카드가 움직이지 않아요";
     list.classList.toggle("saylocked",sayLocked||!!sayQ);
     if(sayQ){
@@ -15235,7 +15235,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     }
     if(!items.length&&!sayEdit){
       var em=document.createElement("p"); em.className="sayempty";
-      em.textContent=sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 10분마다(00·10·20…분) 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
+      em.textContent=sayMode==="g"?"아직 담은 은혜가 없어요. 위 [+ 은혜 담기]로 하나님께 받은 은혜를 적어 두세요.":sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 10분마다(00·10·20…분) 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
       list.appendChild(em); return;
     }
     // ▴▾ 모두 접기·펼치기 (2026-11-07 사용자 요청)
@@ -15469,12 +15469,12 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var t=say.querySelector(".sayt").value.trim();
       if(!t){toast("한 마디를 적어 주세요");return}
       var o=sayData(), who=say.querySelector(".saywho").value.trim(), tp=say.querySelector(".saytopic").value.trim(), nt=say.querySelector(".saynote").value, hv=say.querySelector(".sayhv").checked?1:0;
-      if(sayEdit==="new")o.items.unshift({id:"s"+Date.now().toString(36),t:t,who:who,topic:tp,note:nt,hv:hv,at:Date.now()});
+      if(sayEdit==="new"){var nit={id:"s"+Date.now().toString(36),t:t,who:who,topic:tp,note:nt,hv:hv,at:Date.now()}; if(sayMode==="g"&&!hv)nit.gr=1; o.items.unshift(nit)}
       else{
         var it=o.items.filter(function(x){return x.id===sayEdit})[0];
         if(it){it.t=t;it.who=who;it.topic=tp;it.note=nt;it.hv=hv;it.at=Date.now()}
       }
-      saveSay(o); sayEdit=""; drawSay(); renderReviewBar(); toast("담았어요 💬");
+      saveSay(o); sayEdit=""; drawSay(); renderReviewBar(); toast(sayMode==="g"?"담았어요 🌿":"담았어요 💬");
       return;
     }
     if(act==="edit"){sayEdit=id;drawSay();var ta=say.querySelector(".sayt");if(ta)setTimeout(function(){ta.focus()},30);return}
@@ -15925,7 +15925,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   // PC 칸반 맨 아래 한 줄: 몇 초마다 위로 스르륵 사라지고 다음 한 마디가 아래에서 올라옴 (📌 고정이면 그대로, 2026-10-24 사용자 요청)
   var BS={id:"",timer:0,busy:false,ci:0};
   var BS_COL=["#6FD09A","#6ECBF4","#F48FB6","#FFD36B","#B79CF2","#5FD3C4","#F59E7B"];   // 문장마다 산뜻한 색 (2026-10-24 사용자 요청)
-  function bsItems(){return sayData().items.filter(function(x){return !x.hv&&String(x.t||"").trim()})}
+  function bsItems(){return sayData().items.filter(function(x){return !x.hv&&!x.gr&&String(x.t||"").trim()})}
   function bsPick(next){
     var hr=sayHour(); if(hr)return hr;
     var items=bsItems(); if(!items.length)return null;
@@ -16550,6 +16550,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   $("openSayBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay()});
 
   $("openVerseBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"v")});
+  $("openGraceBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"g")});
   /* ⋯ 메뉴의 "묵상 진도표"는 뺌 (2026-10-31 사용자 요청) — 카드 묵상 칸의 진도 단추로는 열림 */
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
   $("openGraphBtn").addEventListener("click",function(){openGraph(null)});
