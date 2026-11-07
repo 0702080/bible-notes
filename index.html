@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-saypaste">
+<meta name="app-build" content="2026-11-07-saylong">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -15211,7 +15211,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     if(sayEdit){
       var cur=sayEdit==="new"?{t:"",who:"",topic:"",note:""}:(o.items.filter(function(x){return x.id===sayEdit})[0]||{t:"",who:"",topic:"",note:""});
       if(keep)cur={t:keep.t,who:keep.who,topic:keep.topic,note:keep.note,hv:cur.hv};
-      var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=600; ta.value=cur.t||"";
+      var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=20000;   /* 예전 600자 — 긴 대언기도를 붙이면 중간에서 잘렸음 (2026-11-07 사용자 요청) */ ta.value=cur.t||"";
       ta.placeholder=sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":sayMode==="g"?"받은 은혜를 적어 보세요 (예: 오늘 기도 중에 마음이 평안해졌다)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
       var sayFit=function(){
