@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-saytfit2">
+<meta name="app-build" content="2026-11-07-saytkb">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -15190,9 +15190,20 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=600; ta.value=cur.t||"";
       ta.placeholder=sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
-      var sayFit=function(){ta.style.height="auto"; ta.style.height=(ta.scrollHeight+2)+"px"};   // 글 길이에 맞춰 높이
+      var sayFit=function(){
+        ta.style.height="auto"; var h0=ta.scrollHeight+2; ta.style.height=h0+"px";   // 글 길이에 맞춰 높이
+        // 휴대폰에서 적는 중이면 칸을 키보드 바로 위까지 늘림 — 아래 저장 줄이 키보드 바로 위에 오게 (2026-11-07 사용자 요청)
+        if(document.activeElement===ta&&!(window.matchMedia&&matchMedia("(min-width:900px)").matches)){
+          var vv=window.visualViewport, vbot=vv?vv.offsetTop+vv.height:innerHeight;
+          var fullH=Math.max(innerHeight,(screen&&screen.height)||0); if(vv&&vv.height>fullH*0.8)vbot=(vv.offsetTop||0)+Math.round(vv.height*0.55);   // 키보드가 보이는 높이를 줄이지 않는 기기
+          var extra=Math.round(vbot-12-form.getBoundingClientRect().bottom); if(extra>0)ta.style.height=(h0+extra)+"px";
+        }
+      };
       ta.addEventListener("input",sayFit); ta.addEventListener("focus",sayFit); setTimeout(sayFit,0); setTimeout(sayFit,350); requestAnimationFrame(function(){requestAnimationFrame(sayFit)});   // 칸 폭이 정해진 뒤 다시 재야 높이가 맞음 (처음엔 폭이 덜 잡혀 칸이 길어지던 문제)
-      if(window.ResizeObserver){var sro=new ResizeObserver(function(){if(ta.isConnected)sayFit(); else sro.disconnect()}); sro.observe(form)}
+      if(window.ResizeObserver){var sro=new ResizeObserver(function(){if(ta.isConnected){var w=form.offsetWidth; if(w!==ta._fw){ta._fw=w; sayFit()}} else sro.disconnect()}); sro.observe(form)}
+      ta.addEventListener("blur",function(){setTimeout(sayFit,0)});
+      if(window.visualViewport){var svv=function(){if(!ta.isConnected){visualViewport.removeEventListener("resize",svv);return} if(document.activeElement===ta)setTimeout(sayFit,60)}; visualViewport.addEventListener("resize",svv)}
+      ta.addEventListener("focus",function(){[150,400,800].forEach(function(d){setTimeout(sayFit,d)})});
       ta.addEventListener("focus",function(){setTimeout(function(){var rw=form.querySelector(".sayrow2:last-of-type")||form; try{rw.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}},350)});   // 키보드가 올라오면 아래 단추 줄까지 보이게
       var row=document.createElement("div"); row.className="sayrow2";
       var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="v"?"구절 (예: 로마서 12:21)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
