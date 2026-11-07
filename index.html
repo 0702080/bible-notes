@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-iccnt">
+<meta name="app-build" content="2026-11-07-saypaste">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5695,6 +5695,22 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       t.dispatchEvent(new Event("input",{bubbles:true}));
     }
     function isSay(t){return t&&t.classList&&t.classList.contains("sayt")}
+    // 줄을 바꾸거나 적을 때 커서가 화면 아래로 내려가 가려지지 않게, 커서 줄이 보이도록 굴림 (글 칸이 글 길이만큼 늘어나서 브라우저가 따라가지 못함, 2026-11-07 사용자 요청)
+    var mir=null;
+    function caretShow(t){
+      if(!t||!t.isConnected||document.activeElement!==t)return;
+      var cs=getComputedStyle(t);
+      if(!mir){mir=document.createElement("div"); mir.setAttribute("aria-hidden","true"); mir.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;box-sizing:border-box"; document.body.appendChild(mir)}
+      ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","wordBreak","paddingLeft","paddingRight","paddingTop","borderLeftWidth","borderRightWidth","borderTopWidth"].forEach(function(k){mir.style[k]=cs[k]});
+      mir.style.borderStyle="solid"; mir.style.width=t.offsetWidth+"px";
+      mir.textContent=t.value.slice(0,t.selectionEnd); var mk=document.createElement("span"); mk.textContent="​"; mir.appendChild(mk);
+      var lh=parseFloat(cs.lineHeight)||24, r=t.getBoundingClientRect(), y=r.top+mk.offsetTop-t.scrollTop, yb=y+lh;
+      var top=0, bot=window.visualViewport?window.visualViewport.height:innerHeight, sc=null;
+      for(var pe=t.parentElement;pe&&pe!==document.body;pe=pe.parentElement){var ov=getComputedStyle(pe).overflowY; if((ov==="auto"||ov==="scroll")&&pe.scrollHeight>pe.clientHeight){sc=pe; var pr=pe.getBoundingClientRect(); top=Math.max(top,pr.top); bot=Math.min(bot,pr.bottom); break}}
+      var d=yb+24>bot?yb+24-bot:(y-8<top?y-8-top:0); if(!d)return;
+      if(sc)sc.scrollTop+=d; else window.scrollBy(0,d);
+    }
+    document.addEventListener("input",function(e){if(isSay(e.target)){var t=e.target; requestAnimationFrame(function(){requestAnimationFrame(function(){caretShow(t)})})}},true);
     document.addEventListener("keydown",function(e){
       if(e.key!=="Enter"&&e.keyCode!==13&&!(e.keyCode===229&&e.code==="Enter"))return;
       if(!e.shiftKey||!isSay(e.target))return;
@@ -14957,8 +14973,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     var t=String(raw||"").replace(/\r/g,"").trim();
     var m=t.match(/^([\s\S]+?)[\s]*[-–—]\s*([^\n\-–—]{1,24})\s*[-–—]?\s*$/);
     if(m&&m[2]&&/[가-힣A-Za-z]/.test(m[2]))return {t:m[1].trim(),who:m[2].trim()};
-    var lines=t.split("\n").map(function(x){return x.trim()}).filter(Boolean);
-    if(lines.length>1&&lines[lines.length-1].length<=24)return {t:lines.slice(0,-1).join("\n"),who:lines[lines.length-1].replace(/^[-–—\s]+|[-–—\s]+$/g,"")};
+    var lines=t.split("\n"), real=lines.filter(function(x){return x.trim()});   // 빈 줄은 그대로 둠 (2026-11-07)
+    if(real.length>1&&lines[lines.length-1].trim().length<=24)return {t:lines.slice(0,-1).join("\n").trim(),who:lines[lines.length-1].trim().replace(/^[-–—\s]+|[-–—\s]+$/g,"")};
     return {t:t,who:""};
   }
   // 오늘의 한 마디: 5분마다 바뀜. 📌 고정하면 그 한 마디가 하루(24시간) 동안 그대로 (2026-10-21 사용자 요청)
@@ -15113,6 +15129,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       sayDragInit();
       say.querySelector(".saybox").addEventListener("paste",function(e){
         var ta=e.target; if(!ta.classList||!ta.classList.contains("sayt"))return;
+        if(sayMode==="g"||ta.value.trim())return;   // 은혜(말한 분 칸 없음)·이미 적은 글이 있으면 붙여넣은 그대로 — 예전엔 빈 줄이 다 사라지고 마지막 줄이 빠졌음 (2026-11-07 사용자 요청)
         var txt=(e.clipboardData||window.clipboardData).getData("text"); if(!txt||!/[-–—]/.test(txt))return;
         var sp=saySplit(txt); if(!sp.who)return;
         e.preventDefault(); ta.value=sp.t;
