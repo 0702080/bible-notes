@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmpin2">
+<meta name="app-build" content="2026-11-08-srmshot2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12530,7 +12530,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     Object.keys(nx).forEach(function(k){x[k]=nx[k]}); x.u=Date.now(); srmSave(o);
   }
   function srmClick(e){
-    if(e.target.closest(".srmshot")){e.stopPropagation(); var sx=srmData().items.find(function(y){return y.id===srmEdit}); if(sx)srmShots(sx); return}
+    if(e.target.closest(".srmshot")){e.stopPropagation(); var sx=srmData().items.find(function(y){return y.id===srmEdit}); if(sx){try{srmShots(sx)}catch(err){toast("그림을 만들지 못했어요 😢 "+(err&&err.message||""))}} return}
     if(e.target.closest(".srmrgo")){e.stopPropagation(); if(!srmRead)srmCommit(); srmResp=true; srmDraw(); srmSlide("l"); return}
     if(e.target.closest(".srmrback")){e.stopPropagation(); srmRespFlush(); srmResp=false; srmDraw(); srmSlide("r"); return}
     if(e.target.closest(".srmrcopy")){e.stopPropagation(); var rt=srm.querySelector("textarea.srmresp"), rv=rt?rt.value:""; if(!rv.trim()){toast("복사할 글이 없어요");return}
@@ -12684,7 +12684,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       toks.forEach(function(k){if(!row.length&&k.t===" ")return; if(rw+k.w>maxW&&row.length){rows.push(row); row=[]; rw=0; if(k.t===" ")return} row.push(k); rw+=k.w});
       if(row.length)rows.push(row);
     });
-    var per=Math.max(4,Math.floor((H-top-bot)/rowH)), pages=Math.max(1,Math.ceil(rows.length/per)), files=[], done=0;
+    var per=Math.max(4,Math.floor((H-top-bot)/rowH)), pages=Math.max(1,Math.ceil(rows.length/per)), files=[];
     var COL={"금":"#E3BE72","분홍":"#F48FB6","하늘":"#6ECBF4","초록":"#6FD09A","보라":"#B79CF2","주황":"#F4A45E"};
     var title=(x.title||"").trim()||"설교 메모", meta=srmDateLabel(x.d)+(x.who?" · "+x.who:"");
     for(var p=0;p<pages;p++){
@@ -12703,13 +12703,26 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
         var xx=pad+4; r.forEach(function(k){g.font=fnt(k.b,16); g.fillStyle=k.c?COL[k.c]:"#F3E9D2"; g.fillText(k.t,xx,y); xx+=k.w});
       });
       g.fillStyle="rgba(232,229,238,.35)"; g.font=fnt(false,11); g.textAlign="center"; g.fillText("🎤 설교 메모",W/2,H-20); g.textAlign="left";
-      (function(idx,canvas){canvas.toBlob(function(b){files[idx]=new File([b],"설교메모-"+(x.d||"")+"-"+(idx+1)+".png",{type:"image/png"}); if(++done===pages)srmShotsSave(files,title)},"image/png")})(p,c);
+      files.push(srmPngFile(c,"설교메모-"+(x.d||"")+"-"+(p+1)+".png"));   // toBlob(비동기)을 쓰면 누른 손길이 끊겨 휴대폰 공유 창이 막힘 → 바로 만듦 (2026-11-08)
     }
+    srmShotsSave(files,title);
+  }
+  function srmPngFile(c,name){
+    var d=c.toDataURL("image/png"), bin=atob(d.slice(d.indexOf(",")+1)), u=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+    return new File([u],name,{type:"image/png"});
+  }
+  function srmShotsDownload(files){
+    files.forEach(function(f,i){setTimeout(function(){var a=document.createElement("a"); a.href=URL.createObjectURL(f); a.download=f.name; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove()},4000)},i*400)});
+    toast(files.length+"장 그림을 내려받았어요 📷 (갤러리 › Download)");
   }
   function srmShotsSave(files,title){
-    if(navigator.canShare&&navigator.share&&navigator.canShare({files:files})){navigator.share({files:files,title:title}).catch(function(){}); return}   // 휴대폰: 공유 창에서 '이미지 저장'·갤러리로
-    files.forEach(function(f,i){setTimeout(function(){var a=document.createElement("a"); a.href=URL.createObjectURL(f); a.download=f.name; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove()},1500)},i*350)});
-    toast(files.length+"장 그림으로 저장했어요 📷");
+    var ok=false; try{ok=!!(navigator.canShare&&navigator.share&&navigator.canShare({files:files}))}catch(e){}
+    if(ok){   // 휴대폰: 공유 창에서 '이미지 저장'·갤러리로. 공유가 안 되면 바로 내려받기
+      navigator.share({files:files,title:title}).catch(function(err){if(err&&err.name==="AbortError")return; srmShotsDownload(files)});
+      return;
+    }
+    srmShotsDownload(files);
   }
   function srmReadView(x){   // 📖 읽기: 고치는 화면과 같은 모양(색 칸·줄 칸·빈 줄 그대로)에서 글만 고칠 수 없게 (2026-11-07 사용자 요청)
     var v=document.createElement("article"); v.className="srmread srmrv";
