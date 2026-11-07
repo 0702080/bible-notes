@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-sayfoldall">
+<meta name="app-build" content="2026-11-07-rdbtn">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1309,6 +1309,7 @@ body.reorder .note .verse{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-o
 .rdpbar .rdcard[hidden]{display:none}
 .rdpbar .rdedit{border-color:color-mix(in srgb,var(--gold) 55%,#34333A);color:var(--gold);font-weight:700}
 .rdpbar .rdedit[hidden]{display:none}
+.rdpbar button[hidden]{display:none!important}
 .rdpform.editing .rdphint{display:none}
 .rdpform.editing .rdptext{min-height:55vh}
 .rdpbar .rdpaste{border-color:color-mix(in srgb,var(--mint) 55%,#34333A);color:var(--mint);font-weight:700}
@@ -17387,6 +17388,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
   function showMine(){
     var saved=myChapters()[rd.dataset.key], msg=rd.querySelector(".rdmsg");
     rd.querySelector(".rdpaste").textContent=saved?"📋 다시 붙여넣기":"📋 복사한 본문 붙여넣기";
+    rd.querySelector(".rdpaste").hidden=!!saved; rd.querySelector(".rdsrc").hidden=!!saved;   // 본문을 담은 뒤에는 다시 붙여넣기·홀리바이블 단추 숨김 (2026-11-07 사용자 요청)
     rd.querySelector(".rdedit").hidden=!saved;
     rd.querySelector(".rdchm").hidden=!(saved&&saved.v&&saved.v.length>=2);
     var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1], cardBtn=rd.querySelector(".rdcard");
