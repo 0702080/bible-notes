@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmhl">
+<meta name="app-build" content="2026-11-08-hlfloat2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5058,6 +5058,9 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .hlbtn.hlbold{font-weight:900}
 .hlbtn.hldot{width:28px;padding:0;background:var(--d);border-color:color-mix(in srgb,var(--d) 60%,#000)}
 .hlbtn.hlclr{font-size:12px;color:var(--muted)}
+.srmhl.srmhlfloat .hlclr{white-space:nowrap}
+.srmhl.srmhlfloat{position:fixed;left:50%;transform:translateX(-50%);z-index:120;margin:0;padding:6px 8px;gap:6px;flex-wrap:nowrap;border:1px solid #4A4953;border-radius:22px;background:rgba(24,23,30,.96);box-shadow:0 8px 24px rgba(0,0,0,.55)}
+.srmhl.srmhlfloat[hidden]{display:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12328,6 +12331,22 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     // ✨ 강조: 줄에서 글자를 고르고(안 고르면 그 줄 전체) 굵게·색 단추 (2026-11-08 사용자 요청)
     var hlTa=null;
     srm.addEventListener("focusin",function(e){if(e.target.classList&&e.target.classList.contains("srmli"))hlTa=e.target});
+    // 글자를 고르면 그 줄 바로 아래에 강조 단추가 떠서, 위의 강조 줄이 화면 밖이어도 바로 누를 수 있게 (2026-11-08 사용자 요청)
+    var hlF=document.createElement("div"); hlF.className="srmhl srmhlfloat"; hlF.hidden=true; hlF.setAttribute("role","toolbar"); hlF.setAttribute("aria-label","고른 글자 강조");
+    hlF.innerHTML='<button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button><button type="button" class="hlbtn hldot" data-hl="금" style="--d:var(--gold)" title="금색"></button><button type="button" class="hlbtn hldot" data-hl="분홍" style="--d:var(--pink)" title="분홍"></button><button type="button" class="hlbtn hldot" data-hl="하늘" style="--d:var(--sky)" title="하늘색"></button><button type="button" class="hlbtn hldot" data-hl="초록" style="--d:var(--green)" title="초록"></button><button type="button" class="hlbtn hldot" data-hl="주황" style="--d:var(--orange)" title="주황"></button><button type="button" class="hlbtn hlclr" data-hl="x" title="강조 지우기">지우기</button>';
+    srm.appendChild(hlF);
+    function hlPlace(){
+      var t=document.activeElement;
+      if(!t||!t.classList||!t.classList.contains("srmli")||!srm.contains(t)||t.selectionStart===t.selectionEnd||srm.hidden){hlF.hidden=true;return}
+      var r=t.getBoundingClientRect(), vv=window.visualViewport, vh=vv?vv.height+vv.offsetTop:innerHeight;
+      hlF.hidden=false; var h=hlF.offsetHeight||40, top=r.bottom+8;
+      if(top+h>vh-6)top=Math.max(8,r.top-h-60);   // 아래 자리가 없으면 줄 위로 (휴대폰 복사 메뉴보다 위)
+      hlF.style.top=Math.round(top)+"px";
+    }
+    document.addEventListener("selectionchange",function(){if(srm&&!srm.hidden)hlPlace()});
+    srm.addEventListener("scroll",hlPlace,true); window.addEventListener("resize",hlPlace); if(window.visualViewport)visualViewport.addEventListener("resize",hlPlace);
+    srm.addEventListener("focusout",function(){setTimeout(hlPlace,120)});
+    srm.addEventListener("input",function(){setTimeout(hlPlace,30)});   // 강조 기호가 들어가 줄이 길어지면 단추도 따라 내려감
     srm.addEventListener("pointerdown",function(e){if(e.target.closest(".hlbtn"))e.preventDefault()},true);   // 단추를 눌러도 고른 글자가 풀리지 않게
     srm.addEventListener("click",function(e){
       var hb=e.target.closest(".hlbtn"); if(!hb)return; e.stopPropagation();
