@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-gracerec">
+<meta name="app-build" content="2026-11-07-saydrag">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -15344,7 +15344,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       var ids=[].slice.call(list.querySelectorAll(".saycard")).map(function(c){return c.dataset.id});
       var o=sayData(), old=sayOrdered(o).map(function(x){return x.id}).filter(function(id){return ids.indexOf(id)>=0});
       if(old.join()===ids.join())return;
-      o.ord=ids.concat((Array.isArray(o.ord)?o.ord:[]).filter(function(x){return ids.indexOf(x)<0})); o.ordAt=Date.now();   // 다른 코너(한 마디/말씀) 순서는 그대로 saveSay(o); renderReviewBar(); toast("순서를 바꿨어요");
+      o.ord=ids.concat((Array.isArray(o.ord)?o.ord:[]).filter(function(x){return ids.indexOf(x)<0})); o.ordAt=Date.now(); saveSay(o); renderReviewBar(); toast("순서를 바꿨어요");   // 다른 코너(한 마디/말씀/은혜) 순서는 그대로 — 예전엔 이 줄이 주석에 묻혀 저장이 안 됐음 (2026-11-07)
     }
     // 카드를 두 번 누르면 바로 고치기 (2026-11-06 사용자 요청)
     var dtap={id:"",t:0};
@@ -15363,6 +15363,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       dtap={id:id,t:now};
     },true);
     list.addEventListener("pointerdown",function(e){
+      if(sayLocked&&!sayEdit&&e.button<=0&&e.target.closest(".saycard")&&!e.target.closest("button,a,input,textarea,select")){sx=e.clientX;sy=e.clientY;pend={lock:1};clearTimeout(hold);hold=setTimeout(function(){if(pend&&pend.lock){pend=null;buzz(10);toast("📌 고정을 끄면 끌어서 순서를 바꿀 수 있어요")}},450);return}   // 고정 ON에서 꾹 누르면 알려 줌 (2026-11-07)
       if(sayEdit||e.button>0||sayLocked||sayQ)return;   // 고정 ON이거나 찾는 중이면 끌지 않음
       var card=e.target.closest(".saycard"); if(!card||e.target.closest("button,a,input,textarea,select"))return;
       sx=e.clientX; sy=e.clientY;
@@ -15376,7 +15377,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     },{passive:false});
     document.addEventListener("touchmove",function(e){if(sayDrag)e.preventDefault()},{passive:false});   // 끄는 동안 화면이 같이 밀리지 않게
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(){if(sayDrag)end();clearTimeout(hold);pend=null});
-    list.addEventListener("contextmenu",function(e){if(sayDrag||pend)e.preventDefault()});
+    list.addEventListener("contextmenu",function(e){if(sayDrag||(pend&&!pend.lock))e.preventDefault()});
     // 카드를 옆으로 밀면 앞면 ↔ 뒷면(활용 적기) (2026-11-07 사용자 요청)
     // ✏️ 고치는 칸(.sayform)에서 두 번 누르면 저장하고 읽기 모드로 (2026-11-07 사용자 요청)
     var fdt={t:0,x:0,y:0};
