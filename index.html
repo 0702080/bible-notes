@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-07-saydrag">
+<meta name="app-build" content="2026-11-07-gracename">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3429,6 +3429,7 @@ textarea.lhpad{padding-left:28px!important}
 .saycard.saytint{border-color:color-mix(in srgb,var(--sc) 45%,#2A2930);border-left-color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,#18171B)}
 .saycard.saytint .sayf b{color:color-mix(in srgb,var(--sc) 80%,#fff)}
 .saycard{position:relative;touch-action:pan-y;padding-left:30px!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.saysheet.saygr .dltitle{font-size:14.5px!important;line-height:1.25!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;word-break:keep-all}
 .saygrip{position:absolute;left:4px;top:0;bottom:0;width:24px;display:grid;place-items:center;color:var(--faint);font-size:16px;cursor:grab;touch-action:none;opacity:.6}
 .saylist.saysorting .saycard:not(.saydragging){transition:transform .15s}
 .saycard.saydragging{position:relative;z-index:5;box-shadow:0 14px 30px rgba(0,0,0,.6);border-color:color-mix(in srgb,var(--gold) 60%,#232229);background:color-mix(in srgb,var(--gold) 10%,#16161b);cursor:grabbing}
@@ -5019,7 +5020,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
     <details class="menu" id="topMenu"><summary class="tbtn" aria-label="더보기">⋯</summary>
       <div class="pop">
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
-        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 나의 은혜</button>
+        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 내게 베푸신 주님의 은혜</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="rvAllBtn">🔁 오늘 복습</button>
         <button type="button" id="weekBtn">📅 한 주 돌아보기</button>
@@ -15116,7 +15117,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.srmsheet):not(.wksheet),#to
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&say&&!say.hidden)closeSay()});
     }
     sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value="";
-    say.querySelector(".dltitle").textContent=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 나의 은혜":"💬 믿음의 한 마디";
+    say.classList.toggle("saygr",sayMode==="g");   // 은혜 제목이 길어 글자를 조금 작게 (2026-11-07)
+    say.querySelector(".dltitle").innerHTML=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?'🌿 내게 베푸신 <span style="white-space:nowrap">주님의 은혜</span>':"💬 믿음의 한 마디";
     say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 기록':'+<span class="sayhidem"> 한 마디</span> 담기';
     say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawSay();
