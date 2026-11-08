@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmytpill">
+<meta name="app-build" content="2026-11-08-actshuf">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -14984,9 +14984,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
         var ap=document.createElement("p"); ap.className="dlacthint"; ap.textContent="말씀 카드의 ✓ 실천 탭에 '이 말씀으로 할 일'을 적으면 여기서 날마다 점검할 수 있어요.";
         asec.appendChild(ap);
       }
-      // 말씀 실천은 4개씩 차례로 (안 한 것 먼저), '다음 4개'로 넘김 (2026-11-04 사용자 요청)
+      // 말씀 실천은 4개씩, 날마다 무작위로 섞은 차례 (안 한 것 먼저), '다음 4개'로 넘김 (2026-11-04 사용자 요청)
       var acAll=acs.length, acPages=1, acPg=0;
       if(!fq&&acAll>4){
+        var ahs=function(t){var h=2166136261; for(var i=0;i<t.length;i++){h^=t.charCodeAt(i); h=Math.imul(h,16777619)} return h>>>0};
+        acs.sort(function(a,b){return ahs(dlDay+"|"+a.n.id+"|"+a.a.id)-ahs(dlDay+"|"+b.n.id+"|"+b.a.id)});   // 날마다 무작위 차례 — 같은 날은 늘 같음 (2026-11-08 사용자 요청)
         acs=acs.filter(function(x){return !x.on}).concat(acs.filter(function(x){return x.on}));
         acPages=Math.ceil(acAll/4);
         if(dlActGo){acs.forEach(function(y,yi){if(y.n.id+"|"+y.a.id===dlActGo)dlActPage=Math.floor(yi/4)})}   // 맨 위 칸에서 누른 실천이 있는 쪽으로
