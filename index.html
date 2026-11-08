@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-pgedge">
+<meta name="app-build" content="2026-11-08-pgfit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5088,7 +5088,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmhl.srmhlfloat .hlclr{white-space:nowrap}
 .srmhl.srmhlfloat{position:fixed;left:50%;transform:translateX(-50%);z-index:120;margin:0;padding:6px 8px;gap:6px;flex-wrap:nowrap;border:1px solid #4A4953;border-radius:22px;background:rgba(24,23,30,.96);box-shadow:0 8px 24px rgba(0,0,0,.55)}
 .srmhl.srmhlfloat[hidden]{display:none}
-.srmrv .srmrlines.srmpinned{scrollbar-width:none}   /* overscroll-behavior:contain 은 휴대폰에서 바깥으로 넘어가는 굴림을 막아 화면이 멈춰서 뺌 (2026-11-08) */
+.srmrv .srmrlines.srmpinned{scrollbar-width:none;padding-top:0;padding-bottom:0}   /* 메모 칸 높이 = 줄 칸 N개 딱 맞게 (위아래 여백 없앰, 2026-11-08) */   /* overscroll-behavior:contain 은 휴대폰에서 바깥으로 넘어가는 굴림을 막아 화면이 멈춰서 뺌 (2026-11-08) */
 .srmrv .srmrlines.srmpinned::-webkit-scrollbar{display:none}
 .srmrv .srmpgno{text-align:center;margin:8px 0 4px;font-size:13px;font-weight:700;color:color-mix(in srgb,var(--gold) 80%,#fff);letter-spacing:.5px;opacity:.85}   /* 지금 쪽 / 전체 쪽 (2026-11-08 사용자 요청) */
 .srmrv .srmpgno[hidden]{display:none}
@@ -12666,7 +12666,13 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       if(!bd.isConnected)return; bd.style.maxHeight=""; bd.style.overflowY="";
       var br=box.getBoundingClientRect(), bb=bd.getBoundingClientRect(), after=box.scrollHeight-(bb.bottom-br.top+box.scrollTop);
       var h=Math.floor(box.clientHeight-after);
-      if(bd.scrollHeight>h&&h>160){bd.style.maxHeight=h+"px"; bd.classList.add("srmpinned")} else bd.classList.remove("srmpinned");
+      if(bd.scrollHeight>h&&h>160){bd.style.maxHeight=h+"px"; bd.classList.add("srmpinned");
+        // 한 쪽 높이를 줄 칸 N개에 딱 맞춤 → 쪽 아래에 다음 쪽 줄이 걸쳐 보이지 않게 (2026-11-08 사용자 요청)
+        var ls=bd.querySelectorAll(".srmline");
+        if(ls.length>2){var r1=ls[1].getBoundingClientRect(), r2=ls[2].getBoundingClientRect(), pitch=r2.top-r1.top, gap=pitch-r1.height;
+          if(pitch>10){var n=Math.max(1,Math.floor((bd.clientHeight+gap)/pitch)), want=n*pitch-gap;
+            bd.style.maxHeight=Math.floor(h-(bd.clientHeight-want))+"px"}}
+      } else bd.classList.remove("srmpinned");
       pgTint(); sync();
     }
     var pg=v.querySelector(".srmpgno");
