@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-sayfab3d">
+<meta name="app-build" content="2026-11-08-srmhcopy">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5054,6 +5054,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmform textarea.srmli{padding-right:10px}
 /* 📋 설교 메모 전체 복사 단추 */
 .srmsheet .srmlab:has(.srmcopy){display:flex;align-items:center;gap:4px}
+.srmsheet .dlbar .srmhcopy{margin-left:auto;height:36px;padding:0 14px;border-radius:18px;font-size:14.5px;color:var(--ink)}   /* 맨 위 줄 📋 복사: 다른 단추와 같은 모양 */
 .srmcopy{margin-left:auto;height:28px;padding:0 12px;border:1px solid #4A4953;border-radius:14px;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.2) 100%);color:#E8E5EE;font-family:inherit;font-size:12.5px;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 2px 0 rgba(0,0,0,.4),0 3px 6px rgba(0,0,0,.3);transition:transform .08s,box-shadow .08s}
 .srmcopy:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
 /* 설교 메모 목록: 제목이 맨 위, 날짜·설교자는 그 아래 (2026-11-08) */
@@ -12473,7 +12474,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
   function openSermon(){
     if(!srm){
       srm=document.createElement("div"); srm.className="daily srmsheet"; srm.setAttribute("role","dialog"); srm.setAttribute("aria-modal","true"); srm.hidden=true;
-      srm.innerHTML='<div class="dlbar"><b class="dltitle">🎤 설교 메모</b><button type="button" class="dlclose srmnew">+ 새 메모</button><button type="button" class="dlclose srmreadbtn" hidden>📖 읽기</button><button type="button" class="dlclose srmclose">닫기</button></div><div class="dlbody srmbox"></div><div class="srmfoot" hidden></div>';
+      srm.innerHTML='<div class="dlbar"><b class="dltitle">🎤 설교 메모</b><button type="button" class="dlclose srmnew">+ 새 메모</button><button type="button" class="dlclose srmcopy srmhcopy" hidden title="설교 메모 전체 복사">📋 복사</button><button type="button" class="dlclose srmreadbtn" hidden>📖 읽기</button><button type="button" class="dlclose srmclose">닫기</button></div><div class="dlbody srmbox"></div><div class="srmfoot" hidden></div>';
       document.body.appendChild(srm);
       srm.querySelector(".srmclose").addEventListener("click",function(){if(srmEdit){srmRespFlush();srmCommit();srmEdit="";srmDraw()}else closeSermon()});
       srm.querySelector(".srmnew").addEventListener("click",srmNew);
@@ -12584,6 +12585,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     srm.querySelector(".srmclose").textContent=srmEdit?"목록":"닫기";
     if(!srmEdit)srmRead=false;
     srm.classList.toggle("srmreading",!!srmEdit&&srmRead);   // 읽기·고치기 바탕색을 다르게 (2026-11-07 사용자 요청)
+    var hcp=srm.querySelector(".srmhcopy"); if(hcp){var xh=srmEdit&&srmRead&&!srmResp?srmData().items.find(function(y){return y.id===srmEdit}):null; hcp.hidden=!(xh&&String(xh.body||"").trim())}   // 📋 전체 복사는 맨 위 줄로 (2026-11-08 사용자 요청)
     var rb=srm.querySelector(".srmreadbtn"); rb.hidden=!srmEdit; rb.textContent=srmRead?"✏️ 고치기":"📖 읽기"; rb.classList.toggle("on",srmRead);
     if(!srmEdit)srmResp=false;
     srm.classList.toggle("srmresping",!!srmEdit&&srmResp);
@@ -12780,7 +12782,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var nref=x.nid&&notes.has(x.nid)?(notes.get(x.nid).ref||""):"";
     if(x.ref||nref){var r2=el(v,"div","srmrow"); el(r2,"div","rbx rref"+(x.ref?"":" rempty"),x.ref||"본문"); if(nref)el(r2,"div","rbx rref","📖 "+nref)}
     if(srmYtUrl(x.yt)){var y=el(v,"div","rbx ryt srmytc","▶ 유튜브 설교 영상 보기"); y.dataset.u=x.yt}
-    var lab=el(v,"div","srmlab","📝 설교 메모 "); if(x.body.trim()){var cpb=el(lab,"button","srmcopy","📋 전체 복사"); cpb.type="button"; cpb.title="설교 메모 전체 복사"}
+    var lab=el(v,"div","srmlab","📝 설교 메모 "); /* 📋 전체 복사 단추는 맨 위 줄(.srmhcopy)로 옮김 (2026-11-08) */
     var bd=el(v,"div","srmlines srmrlines");
     var pgno=document.createElement("div"); pgno.className="srmpgno"; pgno.hidden=true;   // 📄 지금 쪽 / 전체 쪽 — 메모 칸 바로 아래 (2026-11-08 사용자 요청)
     var lines=x.body.replace(/\s+$/,"").split("\n");
