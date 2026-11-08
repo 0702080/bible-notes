@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-pgfit">
+<meta name="app-build" content="2026-11-08-sayrow">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3468,7 +3468,8 @@ textarea.sayuse:focus{outline:none;box-shadow:none;border-color:color-mix(in srg
 .sayusev{margin:0;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--sc) 10%,#101013);border:1px solid color-mix(in srgb,var(--sc) 30%,#2A2930);font-family:var(--serif);font-size:16.5px;line-height:1.8;color:var(--ink);white-space:pre-wrap;word-break:keep-all}
 .saybktip{margin:8px 2px 0;font-size:11.5px;color:var(--muted)}
 .saycard .sayfoldb{position:absolute;top:10px;right:10px;z-index:2;width:30px;height:30px;padding:0;border-radius:50%;border:1px solid color-mix(in srgb,var(--sc,var(--gold)) 45%,#3A3630);background:rgba(0,0,0,.22);color:color-mix(in srgb,var(--sc,var(--gold)) 70%,#fff);font-size:12px;line-height:1;font-family:inherit}
-.saycard:not(.sayback):not(.sayshort) .sayq{padding-right:30px}
+.saycard .sayf .sayfoldb{position:static;margin-left:auto;flex:none}   /* 접기 단추를 아래 줄 오른쪽, 삭제 왼쪽에 가로로 (2026-11-08 사용자 요청) */
+.saycard .sayf .sayfoldb+.saybtn{margin-left:14px}
 .saycard.sayfolded .sayq{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .saycard.sayfolded .sayusemark,.saycard.sayfolded .saynote{display:none}
 .saycard.sayback .sayfoldb{display:none}
@@ -15718,8 +15719,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       }
       // ▴ 카드 하나씩 접기·펼치기 (2026-11-07 사용자 요청) — 접으면 첫 줄만
       var sLong=String(x.t||"").trim().split("\n").filter(function(s){return s.trim()}).length>1||String(x.t||"").length>34;
-      var sfd=sLong&&!!sayFold[x.id]; if(sfd)c.classList.add("sayfolded");
-      if(sLong){var fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="fold"; fbn.textContent=sfd?"▾":"▴"; fbn.setAttribute("aria-label",sfd?"펼치기":"접기"); fbn.title=sfd?"펼치기":"접기"; c.appendChild(fbn)} else c.classList.add("sayshort");
+      var sfd=sLong&&!!sayFold[x.id], fbn=null; if(sfd)c.classList.add("sayfolded");
+      if(sLong){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="fold"; fbn.textContent=sfd?"▾":"▴"; fbn.setAttribute("aria-label",sfd?"펼치기":"접기"); fbn.title=sfd?"펼치기":"접기"} else c.classList.add("sayshort");   // 접기 단추는 아래 줄 삭제 옆에 가로로 (2026-11-08 사용자 요청)
       if(x.gr&&!sfd&&String(x.t||"").indexOf("\n")>=0){   // 🌿 은혜: 설교 메모처럼 한 줄씩 칸으로, 빈 줄도 그대로 (2026-11-08 사용자 요청)
         var q=document.createElement("div"); q.className="sayq saylines"; c.classList.add("saylined");
         c.appendChild(q);
@@ -15744,6 +15745,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
         nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
       }
       var ed=document.createElement("button"); ed.type="button"; ed.className="saybtn saydelc"; ed.dataset.act="del"; ed.textContent="삭제";   // 고치기는 카드 두 번 누르기로, 단추는 삭제 (2026-11-06 사용자 요청)
+      if(fbn)f.appendChild(fbn);
       if(!x.hv)f.appendChild(ed);   // 고치기·지우기를 한 단추로 — 지우기는 고치는 칸 안에 (2026-11-06 사용자 요청). 짧은 말씀 카드는 접기 단추 바로 밑이라 잘못 누르기 쉬워 뺌 — 두 번 눌러 고치는 칸의 🗑로 지움 (2026-11-08 사용자 요청)
       c.appendChild(f); list.appendChild(c);
     });
