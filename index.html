@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-prdbar">
+<meta name="app-build" content="2026-11-08-srmytlist">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5093,6 +5093,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmcdel:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
 .srmcdel.armed{color:#fff;background:#B23A48;border-color:#E5484D}
 .srmcard .srmmeta .srmcdel+.srmcfold{margin-left:6px}
+.srmcard .srmmeta .srmytc.srmytt{flex:0 0 auto;height:26px;margin:-4px 0 -4px 6px;padding:0 10px;border-radius:13px;display:inline-flex;align-items:center;white-space:nowrap}
 /* ✨ 설교 메모 강조 */
 .hlx.hlb{font-weight:800}
 .srmhl{display:flex;align-items:center;gap:6px;margin:6px 2px 2px;flex-wrap:wrap}
@@ -12824,12 +12825,12 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
       // 맨 위에 제목, 그 아래 줄에 날짜·설교자 (2026-11-08 사용자 요청)
       var gr=document.createElement("span"); gr.className="srmcgrip"; gr.textContent="⠿"; gr.title="끌어서 순서 바꾸기"; gr.setAttribute("aria-hidden","true"); m.appendChild(gr);
       var t=document.createElement("span"); t.className="srmttl"; t.textContent=x.title.trim()||"(제목 없음)"; m.appendChild(t);
+      if(srmYtUrl(x.yt)){var yv=document.createElement("span"); yv.className="srmytc srmytt"; yv.dataset.u=x.yt; yv.textContent="▶ 영상"; yv.title="유튜브로 보기"; m.appendChild(yv)}   // ▶ 영상은 삭제 왼쪽 (2026-11-08 사용자 요청)
       var dx=document.createElement("span"); dx.className="srmcdel"; dx.setAttribute("role","button"); dx.textContent="삭제"; dx.title="이 설교 메모 지우기"; m.appendChild(dx);   // 목록에서 바로 지우기 (2026-11-08 사용자 요청)
       var fb=document.createElement("span"); fb.className="srmcfold"; fb.setAttribute("role","button"); fb.title=fd?"펼치기":"접기"; fb.setAttribute("aria-label",fb.title); m.appendChild(fb);
       var brk=document.createElement("span"); brk.className="srmbr"; m.appendChild(brk);
       var d=document.createElement("span"); d.className="srmd"; d.textContent=srmDateLabel(x.d); m.appendChild(d);
       if(x.who){var w=document.createElement("span"); w.textContent=x.who; m.appendChild(w)}
-      if(srmYtUrl(x.yt)){var yv=document.createElement("span"); yv.className="srmytc"; yv.dataset.u=x.yt; yv.textContent="▶ 영상"; yv.title="유튜브로 보기"; m.appendChild(yv)}
       c.appendChild(m);
       if(x.ref){var r=document.createElement("span"); r.className="srmref"; r.textContent="📖 "+x.ref; c.appendChild(r)}
       if(x.body.trim()){var p=document.createElement("span"); p.className="srmprev"; var pt=hlStrip(x.body).trim();
