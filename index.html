@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmytlist">
+<meta name="app-build" content="2026-11-08-p1card">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3127,6 +3127,10 @@ button:active{filter:brightness(1.15)}
 .prdlist>.prdsec:not(.p1sec):nth-child(6n+5){--pc:var(--pink)}
 .prdlist>.prdsec:not(.p1sec):nth-child(6n+6){--pc:var(--orange)}
 .prdsec:not(.p1sec)::before{background:var(--pc)!important}
+/* 한 줄 기도 카드도 아래 말씀 카드와 같은 모양(옅은 색 바탕·테두리·왼쪽 띠·그림자) — 색만 '한 줄 기도' 제목의 라벤더 (2026-11-08 사용자 요청) */
+.p1sec .prdit{--pc:color-mix(in srgb,var(--violet) 70%,var(--pink));position:relative;overflow:hidden;border-radius:18px;padding-left:22px;border:1px solid color-mix(in srgb,var(--pc) 45%,#2A2930)!important;background:color-mix(in srgb,var(--pc) 22%,#121016)!important;box-shadow:0 6px 18px rgba(0,0,0,.35),inset 0 1px 0 color-mix(in srgb,var(--pc) 25%,transparent)}
+.p1sec .prdit::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--pc)}
+.p1sec .prdit .prdtext{color:color-mix(in srgb,var(--pc) 45%,#fff)}
 .prdsec:not(.p1sec) .prdref{color:color-mix(in srgb,var(--pc) 75%,#fff)}
 .prdsec:not(.p1sec) .prdword .prdverse{color:#F2EFF6}
 .prdsec:not(.p1sec) .prdtext{color:color-mix(in srgb,var(--pc) 55%,#fff)}
