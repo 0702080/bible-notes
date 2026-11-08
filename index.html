@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmnolab">
+<meta name="app-build" content="2026-11-08-srmyt">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5032,6 +5032,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmrv .rtitle{--fc:var(--gold);font-size:16.5px;font-weight:700;color:var(--gold)}
 .srmrv .rref{--fc:var(--orange)}
 .srmrv .ryt{--fc:#E5484D;cursor:pointer}
+.srmrv .srmrow>.rdate,.srmrv .srmrow>.rwho{flex:1 1 0;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.srmrv .srmrow>.ryt{flex:none;white-space:nowrap;justify-content:center;font-weight:700;color:#FFB4B6}
 .srmrv .rempty{color:var(--faint);font-weight:400}
 .srmrv .srmlab{margin-top:4px}
 .srmrv .srmrlines{min-height:0}
@@ -12778,10 +12780,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var r1=el(v,"div","srmrow");
     el(r1,"div","rbx rdate",srmDateLabel(x.d));
     el(r1,"div","rbx rwho"+(x.who?"":" rempty"),x.who||"설교자");
+    if(srmYtUrl(x.yt)){var y=el(r1,"div","rbx ryt srmytc","▶ 영상"); y.dataset.u=x.yt} /* 유튜브는 설교자 오른쪽 (2026-11-08) */
     el(v,"div","rbx rtitle"+(x.title.trim()?"":" rempty"),x.title.trim()||"(제목 없음)");
     var nref=x.nid&&notes.has(x.nid)?(notes.get(x.nid).ref||""):"";
     if(x.ref||nref){var r2=el(v,"div","srmrow"); el(r2,"div","rbx rref"+(x.ref?"":" rempty"),x.ref||"본문"); if(nref)el(r2,"div","rbx rref","📖 "+nref)}
-    if(srmYtUrl(x.yt)){var y=el(v,"div","rbx ryt srmytc","▶ 유튜브 설교 영상 보기"); y.dataset.u=x.yt}
     /* 📝 설교 메모 이름 줄은 없앰, 📋 복사는 맨 위 줄(.srmhcopy) (2026-11-08 사용자 요청) */
     var bd=el(v,"div","srmlines srmrlines");
     var pgno=document.createElement("div"); pgno.className="srmpgno"; pgno.hidden=true;   // 📄 지금 쪽 / 전체 쪽 — 메모 칸 바로 아래 (2026-11-08 사용자 요청)
