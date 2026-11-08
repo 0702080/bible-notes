@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-srmpin2">
+<meta name="app-build" content="2026-11-08-srmrow1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5110,6 +5110,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmhl.srmhlfloat .hlclr{white-space:nowrap}
 .srmhl.srmhlfloat{position:fixed;left:50%;transform:translateX(-50%);z-index:120;margin:0;padding:6px 8px;gap:6px;flex-wrap:nowrap;border:1px solid #4A4953;border-radius:22px;background:rgba(24,23,30,.96);box-shadow:0 8px 24px rgba(0,0,0,.55)}
 .srmhl.srmhlfloat[hidden]{display:none}
+.srmbox.srmpinbox{padding-bottom:8px!important}
 .srmrv .srmrlines.srmpinned{scrollbar-width:none;padding-top:0;padding-bottom:0}   /* 메모 칸 높이 = 줄 칸 N개 딱 맞게 (위아래 여백 없앰, 2026-11-08) */   /* overscroll-behavior:contain 은 휴대폰에서 바깥으로 넘어가는 굴림을 막아 화면이 멈춰서 뺌 (2026-11-08) */
 .srmrv .srmrlines.srmpinned::-webkit-scrollbar{display:none}
 .srmrv .srmpgno{text-align:center;margin:8px 0 4px;font-size:13px;font-weight:700;color:color-mix(in srgb,var(--gold) 80%,#fff);letter-spacing:.5px;opacity:.85}   /* 지금 쪽 / 전체 쪽 (2026-11-08 사용자 요청) */
@@ -12689,6 +12690,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     function size(){
       if(!bd.isConnected)return; bd.style.maxHeight=""; bd.style.overflowY="";
       var sp=v.querySelector(".srmpinsp"); if(sp)sp.style.height="0px";
+      box.classList.add("srmpinbox"); box.style.paddingBottom="";
       var pgn=v.querySelector(".srmpgno"); if(pgn){pgn.hidden=false; if(!pgn.textContent)pgn.textContent="1 / 1"}   // 쪽 번호 자리까지 넣고 재야 끝까지 굴렸을 때 메모 칸이 딱 맨 위에 옴
       var br=box.getBoundingClientRect(), bb=bd.getBoundingClientRect(), after=box.scrollHeight-(bb.bottom-br.top+box.scrollTop);
       var h=Math.floor(box.clientHeight-after);
@@ -12696,19 +12698,31 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
         // 한 쪽 높이를 줄 칸 N개에 딱 맞춤 → 쪽 아래에 다음 쪽 줄이 걸쳐 보이지 않게 (2026-11-08 사용자 요청)
         var ls=bd.querySelectorAll(".srmline");
         if(ls.length>2){var r1=ls[1].getBoundingClientRect(), r2=ls[2].getBoundingClientRect(), pitch=r2.top-r1.top, gap=pitch-r1.height;
+          bd._pitch=pitch>10?pitch:0;
           if(pitch>10){var n=Math.max(1,Math.floor((bd.clientHeight+gap)/pitch)), want=n*pitch-gap;
             bd.style.maxHeight=Math.floor(h-(bd.clientHeight-want))+"px"}}
       } else bd.classList.remove("srmpinned");
       pgTint(); sync();
-      if(bd.classList.contains("srmpinned")){   // 쪽 번호까지 보인 뒤에 재야 맞음
-        // 굴리면 메모 칸이 맨 위에 딱 붙어 제목 칸이 완전히 가려지게: 바깥이 그만큼 더 굴러가도록 아래 빈자리 (2026-11-08 사용자 요청)
-        if(!sp){sp=document.createElement("div"); sp.className="srmpinsp"; sp.setAttribute("aria-hidden","true"); v.appendChild(sp)}
-        var st0=box.scrollTop, sb0=box.style.scrollBehavior; box.style.scrollBehavior="auto"; box.scrollTop=box.scrollHeight;   // 끝까지 굴렸을 때 메모 칸 위끝이 창 위에서 6px 아래 오도록 빈자리 키를 바로 재서 맞춤
-        var off=bd.getBoundingClientRect().top-box.getBoundingClientRect().top-6;
-        if(off>0){sp.style.height=Math.ceil(off)+"px"; box.scrollTop=box.scrollHeight; off=bd.getBoundingClientRect().top-box.getBoundingClientRect().top-6; if(off<0)sp.style.height=Math.max(0,parseFloat(sp.style.height)+off)+"px"}
-        box.scrollTop=st0; box.style.scrollBehavior=sb0;
-      }
+      box.classList.toggle("srmpinbox",bd.classList.contains("srmpinned"));   // 메모 칸이 붙을 때는 아래 여백을 줄여 그 자리에 줄을 하나 더 (2026-11-08 사용자 요청)
+      fixPin();
     }
+    // 끝까지 굴렸을 때 메모 칸 위끝이 창 위 6px에 딱 오게: 남으면 줄을 더 넣거나 아래 빈자리, 넘치면 빈자리를 줄이거나 줄을 뺌 (2026-11-08 사용자 요청)
+    function pinOff(){box.scrollTop=box.scrollHeight; return bd.getBoundingClientRect().top-box.getBoundingClientRect().top-6}
+    function fixPin(){
+      if(!bd.isConnected||!bd.classList.contains("srmpinned"))return;
+      var sp=v.querySelector(".srmpinsp"); if(!sp){sp=document.createElement("div"); sp.className="srmpinsp"; sp.setAttribute("aria-hidden","true"); v.appendChild(sp)}
+      var st0=box.scrollTop, sb0=box.style.scrollBehavior; box.style.scrollBehavior="auto";
+      var P=bd._pitch||0, spH=function(){return parseFloat(sp.style.height)||0}, mh=function(d){bd.style.maxHeight=(parseFloat(bd.style.maxHeight)+d)+"px"; pgTint(); pgSync()};
+      var off=pinOff();
+      box.style.paddingBottom="";
+      if(off>0&&P&&spH()+off+12>=P){var k=Math.max(1,Math.floor((spH()+off+12)/P)); sp.style.height="0px"; mh(k*P); off=pinOff();   // 아래 여백(8px)·쪽 번호 틈까지 써서라도 한 줄 더
+        if(off<0){box.style.paddingBottom=Math.max(0,8+off)+"px"; off=pinOff()}
+        if(off<-1){var pgm=pg&&pg.style; if(pgm){pgm.marginBottom="0px"; off=pinOff()}}}
+      for(var g=0;g<4&&off<-1;g++){var c=spH(); if(c>=-off){sp.style.height=(c+off)+"px"} else if(P){sp.style.height="0px"; mh(-P*Math.ceil((-off-c)/P))} else break; off=pinOff()}
+      if(off>0)sp.style.height=(spH()+off)+"px";
+      box.scrollTop=st0; box.style.scrollBehavior=sb0;
+    }
+    box._fixPin=fixPin;
     var pg=v.querySelector(".srmpgno");
     function pgSync(){   // 📄 지금 쪽 / 전체 쪽: 메모 칸이 안에서 굴러가면 그 칸, 아니면 화면 높이로 셈
       if(!pg||!bd.isConnected)return;
@@ -12746,7 +12760,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var skey=function(){return box.clientWidth+"|"+box.clientHeight+"|"+bd.childElementCount};
     var lastKey="", sizeIf=function(){if(!bd.isConnected)return; var k=skey(); if(k===lastKey)return; lastKey=k; size()};
     sizeIf();   // 바로 한 번 (예전엔 0.15초·0.6초 뒤 두 번 다시 재서 처음 굴릴 때 멈칫했음, 2026-11-08 사용자 요청)
-    setTimeout(sizeIf,400);
+    setTimeout(function(){sizeIf(); fixPin()},400);
     if(document.fonts&&document.fonts.status!=="loaded")document.fonts.ready.then(function(){if(bd.isConnected){lineRows(bd); lastKey=""; sizeIf()}});   // 글꼴을 받는 중이었으면 받은 뒤 한 번만 다시
   }
   // 📷 설교 메모를 휴대폰 화면 크기 그림 여러 장으로 (2026-11-08 사용자 요청)
