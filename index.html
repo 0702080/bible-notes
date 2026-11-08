@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-sayusedbl">
+<meta name="app-build" content="2026-11-08-srmpin2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12324,6 +12324,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
   }
   function lineRows(box){
     if(!box||!box.isConnected||!box._lines)return;
+    box._pend=0;
     var mk=box._mk, lines=box._lines, sel=box._sel;
     box.textContent=""; var probe=mk([{t:"가"}]); box.appendChild(probe);
     var sp=probe.querySelector(sel), cs=getComputedStyle(sp), w=sp.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0), fs=cs.fontSize, ff=cs.fontFamily, fw=cs.fontWeight;   // 글꼴은 칸을 지우기 전에 읽어 둠 (지우면 값이 비어 버림)
@@ -12350,7 +12351,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     });
     if(box._after)box._after(box);   // 다시 나눈 뒤 찾은 낱말 표시 등 (2026-11-08)
   }
-  function lineRowsSet(box,lines,mk,sel){box._lines=lines; box._mk=mk; box._sel=sel; lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); setTimeout(function(){lineRows(box)},60)}
+  function lineRowsSet(box,lines,mk,sel,lazy){box._lines=lines; box._mk=mk; box._sel=sel; if(!lazy)lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); box._pend=1; setTimeout(function(){if(box._pend)lineRows(box)},60)}   // 이미 나눴으면 다시 안 함 (2026-11-08)
   window.addEventListener("resize",function(){clearTimeout(lineRows.t); lineRows.t=setTimeout(function(){document.querySelectorAll(".srmrlines,.saylines").forEach(lineRows)},150)});
   function srmFit(t){t.style.height="auto"; t.style.height=t.scrollHeight+"px"}
   function srmRow(txt){
@@ -12609,7 +12610,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     if(srmEdit&&srmResp){srm.classList.remove("srmreading"); var xr=srmData().items.find(function(y){return y.id===srmEdit}); if(!xr){srmEdit="";srmResp=false;return srmDraw()} rb.hidden=true; foot.hidden=true; box.appendChild(srmRespView(xr)); box.scrollTop=0; return}
     if(srmEdit){
       var x=srmData().items.find(function(y){return y.id===srmEdit}); if(!x){srmEdit="";return srmDraw()}
-      if(srmRead){foot.hidden=true; box.appendChild(srmReadView(x)); srmPinInit(box); return}
+      if(srmRead){foot.hidden=true; box.appendChild(srmReadView(x)); var rl0=box.querySelector(".srmrlines"); if(rl0&&rl0._pend)lineRows(rl0); srmPinInit(box); return}   // 줄 나누기·높이 맞추기를 한 번에 바로 → 처음 열고 굴릴 때 멈칫하지 않게 (2026-11-08)
       var f=document.createElement("div"); f.className="srmform"; f.dataset.id=x.id;
       f.innerHTML='<div class="srmrow"><input type="date" class="srmdate" aria-label="날짜"><input class="srmwho" maxlength="60" placeholder="설교자 (예: 담임목사님)" aria-label="설교자"></div>'+
         '<input class="srmtitle" maxlength="200" placeholder="설교 제목" aria-label="설교 제목">'+
@@ -12687,6 +12688,8 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var v=box.querySelector(".srmrv"), bd=v&&v.querySelector(".srmrlines"); if(!bd||!bd.querySelector(".srmline"))return;
     function size(){
       if(!bd.isConnected)return; bd.style.maxHeight=""; bd.style.overflowY="";
+      var sp=v.querySelector(".srmpinsp"); if(sp)sp.style.height="0px";
+      var pgn=v.querySelector(".srmpgno"); if(pgn){pgn.hidden=false; if(!pgn.textContent)pgn.textContent="1 / 1"}   // 쪽 번호 자리까지 넣고 재야 끝까지 굴렸을 때 메모 칸이 딱 맨 위에 옴
       var br=box.getBoundingClientRect(), bb=bd.getBoundingClientRect(), after=box.scrollHeight-(bb.bottom-br.top+box.scrollTop);
       var h=Math.floor(box.clientHeight-after);
       if(bd.scrollHeight>h&&h>160){bd.style.maxHeight=h+"px"; bd.classList.add("srmpinned");
@@ -12697,6 +12700,14 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
             bd.style.maxHeight=Math.floor(h-(bd.clientHeight-want))+"px"}}
       } else bd.classList.remove("srmpinned");
       pgTint(); sync();
+      if(bd.classList.contains("srmpinned")){   // 쪽 번호까지 보인 뒤에 재야 맞음
+        // 굴리면 메모 칸이 맨 위에 딱 붙어 제목 칸이 완전히 가려지게: 바깥이 그만큼 더 굴러가도록 아래 빈자리 (2026-11-08 사용자 요청)
+        if(!sp){sp=document.createElement("div"); sp.className="srmpinsp"; sp.setAttribute("aria-hidden","true"); v.appendChild(sp)}
+        var st0=box.scrollTop, sb0=box.style.scrollBehavior; box.style.scrollBehavior="auto"; box.scrollTop=box.scrollHeight;   // 끝까지 굴렸을 때 메모 칸 위끝이 창 위에서 6px 아래 오도록 빈자리 키를 바로 재서 맞춤
+        var off=bd.getBoundingClientRect().top-box.getBoundingClientRect().top-6;
+        if(off>0){sp.style.height=Math.ceil(off)+"px"; box.scrollTop=box.scrollHeight; off=bd.getBoundingClientRect().top-box.getBoundingClientRect().top-6; if(off<0)sp.style.height=Math.max(0,parseFloat(sp.style.height)+off)+"px"}
+        box.scrollTop=st0; box.style.scrollBehavior=sb0;
+      }
     }
     var pg=v.querySelector(".srmpgno");
     function pgSync(){   // 📄 지금 쪽 / 전체 쪽: 메모 칸이 안에서 굴러가면 그 칸, 아니면 화면 높이로 셈
@@ -12732,7 +12743,11 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     }
     if(!box._pinOn){box._pinOn=1; box.addEventListener("scroll",function(){if(box._pinSync)box._pinSync()},{passive:true}); window.addEventListener("resize",function(){if(box._pinSize)setTimeout(box._pinSize,200)})}
     box._pinSync=sync; box._pinSize=size;
-    setTimeout(size,150); setTimeout(size,600);
+    var skey=function(){return box.clientWidth+"|"+box.clientHeight+"|"+bd.childElementCount};
+    var lastKey="", sizeIf=function(){if(!bd.isConnected)return; var k=skey(); if(k===lastKey)return; lastKey=k; size()};
+    sizeIf();   // 바로 한 번 (예전엔 0.15초·0.6초 뒤 두 번 다시 재서 처음 굴릴 때 멈칫했음, 2026-11-08 사용자 요청)
+    setTimeout(sizeIf,400);
+    if(document.fonts&&document.fonts.status!=="loaded")document.fonts.ready.then(function(){if(bd.isConnected){lineRows(bd); lastKey=""; sizeIf()}});   // 글꼴을 받는 중이었으면 받은 뒤 한 번만 다시
   }
   // 📷 설교 메모를 휴대폰 화면 크기 그림 여러 장으로 (2026-11-08 사용자 요청)
   function srmShots(x){
@@ -12804,7 +12819,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
     var pgno=document.createElement("div"); pgno.className="srmpgno"; pgno.hidden=true;   // 📄 지금 쪽 / 전체 쪽 — 메모 칸 바로 아래 (2026-11-08 사용자 요청)
     var lines=x.body.replace(/\s+$/,"").split("\n");
     if(!x.body.trim()){el(bd,"div","srmrempty","아직 적은 메모가 없어요.")}
-    else lineRowsSet(bd,lines,function(t){var ln=document.createElement("div"); ln.className="srmline"; var g=document.createElement("span"); g.className="srmrgrip"; g.textContent="⠿"; ln.appendChild(g); var d=document.createElement("div"); d.className="srmrli"; hlFill(d,t); ln.appendChild(d); return ln},".srmrli");
+    else lineRowsSet(bd,lines,function(t){var ln=document.createElement("div"); ln.className="srmline"; var g=document.createElement("span"); g.className="srmrgrip"; g.textContent="⠿"; ln.appendChild(g); var d=document.createElement("div"); d.className="srmrli"; hlFill(d,t); ln.appendChild(d); return ln},".srmrli",1);
     v.insertBefore(pgno,bd.nextSibling);
     if(x.apply.trim()){el(v,"div","srmlab ap","💡 나의 적용 · 결단"); el(v,"div","rapply",x.apply.trim())}
     // ✍️ 기도·에세이 단추는 없앰 — 메모를 옆으로 밀어 엶 (2026-11-08 사용자 요청)
