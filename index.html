@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-08-pgeven2">
+<meta name="app-build" content="2026-11-08-pgedge">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5097,7 +5097,7 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmrv .srmrlines.pgflash{animation:srmPgFlash .6s ease-out}   /* 쪽이 바뀔 때 메모 칸 테두리에 금빛이 한 번 번짐 */
 @keyframes srmPgFlash{0%{box-shadow:0 0 0 0 transparent}30%{box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 55%,transparent),0 0 18px color-mix(in srgb,var(--gold) 35%,transparent)}100%{box-shadow:0 0 0 0 transparent}}
 .srmrv .srmrlines .srmline{--pgc:rgba(0,0,0,.2);background:var(--pgc)}
-.srmrv .srmrlines .srmline+.srmline{box-shadow:0 -4px 0 0 var(--pgc)}
+.srmrv .srmrlines .srmline:not(:last-child){box-shadow:0 4px 0 0 var(--pgc)}   /* 줄 사이 틈은 윗줄 색으로 메움 → 쪽 경계 색이 다음 줄 점선과 딱 맞음 (2026-11-08 사용자 요청) */
 .srmrv .srmrlines .srmline.srmpg2{--pgc:rgba(0,0,0,.36)}   /* 짝수 쪽만 아주 살짝 더 어둡게 (2026-11-08 사용자 요청) */   /* 줄 사이 4px 틈도 같은 색으로 메워 줄 위아래에 어두운 띠가 안 생기게 */   /* 줄 바탕은 모두 같은 어두운 색(쪽마다 번갈아 칠하던 것은 2026-11-08 사용자 요청으로 통일) */
 .srmrv .srmlab .srmshot{margin-left:6px}
 /* 한 마디·은혜 카드 ▾ 접기 단추: 입체, 오른쪽 끝을 아래 '삭제' 단추와 같은 줄에 (2026-11-08 사용자 요청) */
