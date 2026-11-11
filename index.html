@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-dl3d">
+<meta name="app-build" content="2026-11-11-rspsub">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -13149,7 +13149,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
     var v=document.createElement("div"); v.className="srmrsp";
     var hd=document.createElement("div"); hd.className="srmrhd";
     var h=document.createElement("b"); h.textContent="✍️ 이 설교를 듣고"; hd.appendChild(h);
-    var sub=document.createElement("span"); sub.className="srmrsub"; sub.textContent=[x.title.trim()||"(제목 없음)",srmDateLabel(x.d),x.who].filter(Boolean).join(" · "); hd.appendChild(sub);
+    // 제목·날짜·설교자 줄은 뺌 (2026-11-11 사용자 요청)
     v.appendChild(hd);
     if(String(x.apply||"").trim()){var apl=document.createElement("div"); apl.className="srmlab ap"; apl.textContent="💡 나의 적용 · 결단"; v.appendChild(apl); var apb=document.createElement("div"); apb.className="rapply srmrapb"; apb.textContent=x.apply.trim(); v.appendChild(apb)}   // 읽기에서 옮겨 옴 (2026-11-11)
     var ta=document.createElement("textarea"); ta.className="srmresp"; ta.dataset.id=x.id; ta.value=x.resp||"";
