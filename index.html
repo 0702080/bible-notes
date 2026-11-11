@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-rowfit">
+<meta name="app-build" content="2026-11-11-srmflat">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5241,6 +5241,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 /* 💬 한 마디·짧은 말씀: 위로 굴린 카드가 떠 있는 윗줄 위·뒤로 비치지 않게 — 검은 띠 없이 흐려지며 사라짐 (2026-11-11 사용자 요청) */
 .saysheet>.dlbody.saysc{-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--smk,58px) - 8px),#000 calc(var(--smk,58px) + 8px));mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--smk,58px) - 8px),#000 calc(var(--smk,58px) + 8px))}
 .srmrv .srmrlines.srmfit>.srmline{flex:0 0 var(--rh)!important;height:var(--rh)!important;min-height:0!important;box-sizing:border-box;align-items:center;overflow:hidden}
+.srmcard .srmcbtns{display:none!important}   /* 목록 카드: 펼치기·영상·삭제 단추 없음 (2026-11-11 사용자 요청) */
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -13143,7 +13144,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
       em.textContent=all.length?"찾는 설교 메모가 없어요.":"아직 적은 설교 메모가 없어요.\n위 [+ 새 메모]를 눌러 오늘 설교를 적어 보세요."; em.style.whiteSpace="pre-line"; list.appendChild(em); return}
     items.forEach(function(x){
       var c=document.createElement("button"); c.type="button"; c.className="srmcard"; c.dataset.id=x.id;
-      var fd=srmFold.has(x.id); if(fd)c.classList.add("srmfolded");
+      var fd=true; c.classList.add("srmfolded");   // 목록은 늘 접힌 모양(제목·날짜·설교자만), 누르면 바로 읽기 (2026-11-11 사용자 요청)
       var m=document.createElement("span"); m.className="srmmeta";
       // 맨 위에 제목, 그 아래 줄에 날짜·설교자 (2026-11-08 사용자 요청)
       var gr=document.createElement("span"); gr.className="srmcgrip"; gr.textContent="⠿"; gr.title="끌어서 순서 바꾸기"; gr.setAttribute("aria-hidden","true"); m.appendChild(gr);
