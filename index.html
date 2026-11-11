@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-pgbot">
+<meta name="app-build" content="2026-11-11-barclear">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5191,6 +5191,8 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
 /* 읽기: 쪽 단추 아래 여백을 넉넉히, 바깥 칸 흐림은 고치기에서만 (2026-11-11 사용자 요청) */
 .srmrv .srmpgno{margin-bottom:14px!important}
 .srmsheet.srmreading .srmbox{-webkit-mask-image:none;mask-image:none}
+/* 읽기: 맨 위 단추 줄 아래 선 없애고, 바탕은 옆 여백(창 바탕)과 같게 (2026-11-11 사용자 요청) */
+.srmsheet.srmreading>.dlbar{background:transparent!important;border-bottom:0!important;box-shadow:none!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
