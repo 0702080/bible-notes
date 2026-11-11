@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-pick">
+<meta name="app-build" content="2026-11-11-rowfit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5240,6 +5240,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 .srmrsp textarea.srmresp{padding-top:0!important;padding-bottom:0!important;line-height:44px!important;word-break:keep-all;overflow-wrap:break-word;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 43px,color-mix(in srgb,var(--pink) 18%,transparent) 43px,color-mix(in srgb,var(--pink) 18%,transparent) 44px)!important;background-attachment:local!important;background-origin:content-box}
 /* 💬 한 마디·짧은 말씀: 위로 굴린 카드가 떠 있는 윗줄 위·뒤로 비치지 않게 — 검은 띠 없이 흐려지며 사라짐 (2026-11-11 사용자 요청) */
 .saysheet>.dlbody.saysc{-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--smk,58px) - 8px),#000 calc(var(--smk,58px) + 8px));mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--smk,58px) - 8px),#000 calc(var(--smk,58px) + 8px))}
+.srmrv .srmrlines.srmfit>.srmline{flex:0 0 var(--rh)!important;height:var(--rh)!important;min-height:0!important;box-sizing:border-box;align-items:center;overflow:hidden}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12826,7 +12827,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
   function srmPinInit(box){
     var v=box.querySelector(".srmrv"), bd=v&&v.querySelector(".srmrlines"); if(!bd||!bd.querySelector(".srmline"))return;
     function size(){
-      if(!bd.isConnected)return; bd.style.maxHeight=""; bd.style.overflowY="";
+      if(!bd.isConnected)return; bd.style.maxHeight=""; bd.style.overflowY=""; bd.classList.remove("srmfit"); bd.style.removeProperty("--rh");
       var sp=v.querySelector(".srmpinsp"); if(sp)sp.style.height="0px";
       box.classList.add("srmpinbox"); box.style.paddingBottom="";
       var pgn=v.querySelector(".srmpgno"); if(pgn){pgn.hidden=false; pgBuild()}   // 쪽 번호 자리까지 넣고 재야 끝까지 굴렸을 때 메모 칸이 딱 맨 위에 옴
@@ -12851,12 +12852,14 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
       var sp=v.querySelector(".srmpinsp"); if(sp){sp.style.height="0px"; sp.style.display="none"}
       var st0=box.scrollTop, sb0=box.style.scrollBehavior; box.style.scrollBehavior="auto";
       box.style.setProperty("padding-bottom","0px","important");
-      if(pg){pg.style.setProperty("margin-top","4px","important"); pg.style.setProperty("margin-bottom","12px","important")}
+      if(pg){pg.hidden=false; pgBuild(); pg.style.setProperty("margin-top","10px","important"); pg.style.setProperty("margin-bottom","12px","important")}   // 쪽 단추 자리까지 넣고 잼
       var P=bd._pitch||0, gap=bd._gap||0;
       for(var g=0;g<3;g++){
         var off=pinOff(); if(Math.abs(off)<0.5)break;
         var mh=parseFloat(bd.style.maxHeight)||bd.clientHeight, diff=mh-bd.clientHeight, C=mh+off-diff;
-        if(P){var n=Math.max(1,Math.floor((C+gap+0.5)/P)), nc=n*P-gap; bd.style.maxHeight=(nc+diff)+"px"; if(pg)pg.style.setProperty("margin-top",(4+Math.max(0,C-nc))+"px","important")}
+        if(P){   // 줄 칸 높이를 1~6px 늘이거나 줄여 메모 칸을 빈틈없이 채움 — 줄일 만하면 한 줄 더 (2026-11-11 사용자 요청)
+          var n0=Math.max(1,Math.floor((C+gap+0.5)/P)), n1=n0+1, n=((n1*P-gap-C)/n1<=6)?n1:n0, rh=(C+gap)/n-gap;
+          bd.style.setProperty("--rh",rh.toFixed(2)+"px"); bd.classList.add("srmfit"); bd.style.maxHeight=(C+diff)+"px"}
         else bd.style.maxHeight=(mh+off)+"px";
       }
       pgTint(); pgSync();
