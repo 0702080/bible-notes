@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-roundbar">
+<meta name="app-build" content="2026-11-11-srmedge">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5177,6 +5177,12 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
 .srmrv .srmpgno{margin:4px 0 0}   /* 쪽 단추 줄을 낮춰 메모 칸에 줄 한 칸 더 (2026-11-11 사용자 요청) */
 .srmcard .srmmeta .srmytc.srmytt{border:1px solid color-mix(in srgb,#E5484D 55%,#3A2A2C)!important;background:#4A2328 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#FFC2C4!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 6px rgba(0,0,0,.34);font-size:12px}
 .srmcard .srmmeta .srmytc.srmytt:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
+/* 설교 메모: 굴러가는 칸 위아래 끝을 부드럽게 흐려서 줄이 칼로 잘린 듯 보이지 않게, 나의 적용 줄은 보랏빛 유리 (2026-11-11 사용자 요청) */
+.srmsheet .srmbox{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 12px,#000 calc(100% - 14px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 12px,#000 calc(100% - 14px),transparent 100%)}
+.srmsheet>.dlbar{box-shadow:0 6px 14px -8px rgba(0,0,0,.6);border-bottom:1px solid color-mix(in srgb,var(--violet) 18%,transparent)}
+.srmsheet .srmfoot{background:linear-gradient(180deg,rgba(40,34,58,.86),rgba(26,23,38,.94))!important;border-top:1px solid color-mix(in srgb,var(--violet) 32%,transparent)!important;box-shadow:0 -10px 22px -10px rgba(0,0,0,.55)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.srmsheet .srmfoot textarea{background:color-mix(in srgb,var(--green) 12%,rgba(20,18,30,.85))!important}
+.srmsheet.srmreading>.dlbar{border-bottom-color:color-mix(in srgb,var(--gold) 18%,transparent)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12925,7 +12931,8 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
   // ⌨️ 휴대폰 키보드가 올라와도 설교 메모 맨 위 줄은 늘 보이게: 창 높이를 키보드 위 보이는 부분에 맞춤 → 글만 그 안에서 굴러감 (2026-11-11 사용자 요청)
   function srmVV(){
     if(!srm)return; var vv=window.visualViewport;
-    if(srm.hidden||!vv||vv.height>=innerHeight-2){srm.style.height=""; srm.style.top=""; srm.style.bottom=""; return}
+    var ae=document.activeElement, typing=ae&&srm.contains(ae)&&(ae.tagName==="TEXTAREA"||ae.tagName==="INPUT");
+    if(srm.hidden||!vv||!typing||innerHeight-vv.height<120){srm.style.height=""; srm.style.top=""; srm.style.bottom=""; return}   // 키보드가 올라왔을 때만 (주소창·확대로 생긴 작은 차이에 위가 비던 것 고침, 2026-11-11)
     srm.style.top=Math.round(vv.offsetTop)+"px"; srm.style.bottom="auto"; srm.style.height=Math.round(vv.height)+"px";
     var a=document.activeElement; if(a&&srm.contains(a)&&a.tagName==="TEXTAREA")setTimeout(function(){caretInBox(a)},60);
   }
@@ -12936,6 +12943,7 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
     if(y>br.bottom-24)box.scrollTop+=y-(br.bottom-24); else if(y-lh<br.top+8)box.scrollTop-=(br.top+8)-(y-lh);
   }
   if(window.visualViewport){visualViewport.addEventListener("resize",srmVV); visualViewport.addEventListener("scroll",srmVV)}
+  document.addEventListener("focusout",function(){setTimeout(srmVV,200)});
   // 📖 읽기에서 문장을 꾹(0.45초) 눌러 끌면 그 줄(넘어간 칸까지 한 묶음)을 위아래로 옮김 (2026-11-11 사용자 요청)
   function srmReadDragInit(){
     if(srm._rdOn)return; srm._rdOn=1;
