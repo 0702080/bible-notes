@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-saytouch">
+<meta name="app-build" content="2026-11-11-saytri">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5242,6 +5242,10 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 .saysheet>.dlbody.saysc{-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--smk,58px) - 8px),#000 calc(var(--smk,58px) + 8px));mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--smk,58px) - 8px),#000 calc(var(--smk,58px) + 8px))}
 .srmrv .srmrlines.srmfit>.srmline{flex:0 0 var(--rh)!important;height:var(--rh)!important;min-height:0!important;box-sizing:border-box;align-items:center;overflow:hidden}
 .srmcard .srmcbtns{display:none!important}   /* 목록 카드: 펼치기·영상·삭제 단추 없음 (2026-11-11 사용자 요청) */
+.saycard .sayfoldb svg{display:block;margin:auto}
+.saycard .sayfoldb{display:inline-grid!important;place-items:center}
+/* 🌿 은혜 고치기 칸도 읽기처럼 줄마다 선 (2026-11-11 사용자 요청) */
+.saysheet.saygr .sayform .sayt{line-height:40px!important;padding-top:0!important;padding-bottom:0!important;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 39px,color-mix(in srgb,var(--sc,var(--violet)) 22%,transparent) 39px,color-mix(in srgb,var(--sc,var(--violet)) 22%,transparent) 40px)!important;background-attachment:local!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -16076,7 +16080,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
       // ▴ 카드 하나씩 접기·펼치기 (2026-11-07 사용자 요청) — 접으면 첫 줄만
       var sLong=String(x.t||"").trim().split("\n").filter(function(s){return s.trim()}).length>1||String(x.t||"").length>34;
       var sfd=sLong&&!!sayFold[x.id], fbn=null; if(sfd)c.classList.add("sayfolded");
-      if(sLong){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="fold"; fbn.textContent=sfd?"▾":"▴"; fbn.setAttribute("aria-label",sfd?"펼치기":"접기"); fbn.title=sfd?"펼치기":"접기"} else c.classList.add("sayshort");
+      if(sLong){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="fold"; fbn.innerHTML=sfd?'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 17.5 L19 7 L5 7 Z" fill="currentColor" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 6.5 L19 17 L5 17 Z" fill="currentColor" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>'; fbn.setAttribute("aria-label",sfd?"펼치기":"접기"); fbn.title=sfd?"펼치기":"접기"} else c.classList.add("sayshort");
       // 🔘 접기·삭제를 한 단추로 (2026-11-08 사용자 요청): 누르면 접기·펼치기(짧은 카드는 ⋯ 안내), 꾹(0.6초) 누르면 "지울까요?" → 한 번 더 누르면 지움
       if(!fbn){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="hint"; fbn.textContent="⋯"; fbn.title="꾹 누르면 지우기"}
       fbn.classList.add("sayone"); sayOneLP(fbn);
