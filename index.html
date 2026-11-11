@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-prgap">
+<meta name="app-build" content="2026-11-11-prnodrag">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -8210,7 +8210,7 @@ body.boardon #colAddQuick{display:none!important}
     list.addEventListener("pointermove",function(e){
       if(!sw||e.pointerId!==sw.id)return; var dx=e.clientX-sw.x, dy=e.clientY-sw.y;
       if(!sw.lock){if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.4)sw.lock="x"; else if(Math.abs(dy)>12)sw.lock="y"}
-      if(sw.lock==="x"){var v=sw.pri.querySelector(sw.pri.classList.contains("thxside")?".pthx":".prv"); if(v){v.style.transition="none"; v.style.transform="translateX("+Math.max(-60,Math.min(60,dx*.5))+"px)"}}
+      // 밀어도 카드는 손가락을 따라 움직이지 않음 — 다 밀고 손을 떼면 뒷면으로만 바뀜 (2026-11-11 사용자 요청)
     });
     function end(e){
       if(!sw||e.pointerId!==sw.id)return; var s0=sw; sw=null;
