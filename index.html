@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-srmkeep">
+<meta name="app-build" content="2026-11-12-apedit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5058,6 +5058,13 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmrgrip{flex:0 0 30px;height:40px;display:grid;place-items:center;color:var(--faint);font-size:17px;opacity:.35;-webkit-user-select:none;user-select:none}
 .srmrli{flex:1;min-width:0;min-height:40px;box-sizing:border-box;padding:8px 10px 8px 0;font-family:var(--serif);font-size:16px;line-height:1.5;color:var(--ink);white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word}
 .srmrv .srmrempty{padding:12px 14px;color:var(--muted);font-size:15px}
+.srmapw .srmlab.ap{display:flex;align-items:center}
+.srmapedit{margin-left:auto;height:28px;padding:0 12px;border:1px solid #4A4656;border-radius:14px;background:#2A2733 linear-gradient(180deg,rgba(255,255,255,.18),rgba(0,0,0,.2));color:#E8E5EE;font-size:12.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 2px 0 rgba(0,0,0,.45)}
+.srmapedit:active{transform:translateY(2px);box-shadow:inset 0 2px 3px rgba(0,0,0,.4)}
+.srmapedit[hidden]{display:none}
+.srmrapb.rempty{color:var(--muted);font-style:normal;cursor:pointer}
+.srmapta{display:block;width:100%;box-sizing:border-box;margin:6px 0 24px;padding:10px 14px;border:1px solid var(--green);border-radius:12px;background:color-mix(in srgb,var(--green) 13%,#16161C);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.5;resize:none;overflow:hidden}
+.srmapta:focus{outline:none}
 .srmrv .rapply{padding:10px 14px;border:1px solid color-mix(in srgb,var(--green) 35%,#2A2930);border-radius:12px;background:color-mix(in srgb,var(--green) 13%,#16161C);font-family:var(--serif);font-size:16px;line-height:1.5;white-space:pre-wrap;word-break:keep-all;margin-bottom:24px}
 /* 📖 읽기 모드는 따뜻한 금빛 바탕, ✏️ 고치기는 보랏빛 — 한눈에 구분 (2026-11-07 사용자 요청) */
 .srmsheet.srmreading{background:rgba(46,34,12,.62)}
@@ -12654,13 +12661,13 @@ body.boardon #colAddQuick{display:none!important}
       srm.addEventListener("click",srmClick); srmDragInit(); srmReadDragInit();
       (function(){var lt=0,lx=0,ly=0;   // ✍️ 뒷면 두 번 누르기: 휴대폰은 손가락 뗄 때(touchend)로 셈 (2026-11-11 사용자 요청: 고치기로 안 넘어가던 것)
         srm.addEventListener("touchend",function(e){
-          if(!srmEdit||!srmResp||e.touches.length||!e.target.closest(".srmrsp")||e.target.closest("button,select,input,a"))return;
+          if(!srmEdit||!srmResp||e.touches.length||!e.target.closest(".srmrsp")||e.target.closest("button,select,input,a,.srmapw"))return;
           var t=e.changedTouches[0], nw=Date.now();
           if(nw-lt<400&&Math.abs(t.clientX-lx)<40&&Math.abs(t.clientY-ly)<50){lt=0; srmTap.t=0; if(e.cancelable)e.preventDefault(); srmRespToggle(); buzz(10); return}
           lt=nw; lx=t.clientX; ly=t.clientY;
         },{passive:false});
       })();
-      srm.addEventListener("dblclick",function(e){if(srmEdit&&srmResp&&e.target.closest(".srmrsp")&&!e.target.closest("button,select,input,a")){try{window.getSelection().removeAllRanges()}catch(err){} srmRespToggle()}});   // PC
+      srm.addEventListener("dblclick",function(e){if(srmEdit&&srmResp&&e.target.closest(".srmrsp")&&!e.target.closest("button,select,input,a,.srmapw")){try{window.getSelection().removeAllRanges()}catch(err){} srmRespToggle()}});   // PC
       // ↔ 옆으로 밀기 (2026-11-08 사용자 요청): 메모에서 오른쪽→왼쪽 = ✍️ 이 설교를 듣고 쓰는 기도·에세이, 왼쪽→오른쪽 = 목록 (기도·에세이 쪽에서는 메모로)
       var srmSw=null;
       srm.addEventListener("touchstart",function(e){
@@ -13227,7 +13234,26 @@ body.boardon #colAddQuick{display:none!important}
     var h=document.createElement("b"); h.textContent="✍️ 이 설교를 듣고"; hd.appendChild(h);
     // 제목·날짜·설교자 줄은 뺌 (2026-11-11 사용자 요청)
     v.appendChild(hd);
-    if(String(x.apply||"").trim()){var apl=document.createElement("div"); apl.className="srmlab ap"; apl.textContent="💡 나의 적용 · 결단"; v.appendChild(apl); var apb=document.createElement("div"); apb.className="rapply srmrapb"; apb.textContent=x.apply.trim(); v.appendChild(apb)}   // 읽기에서 옮겨 옴 (2026-11-11)
+    // 💡 나의 적용 · 결단 — 뒷면에서 바로 고치기: ✏️ 단추나 글을 두 번 누르면 적는 칸, 적는 대로 저장, 칸을 나가면 다시 읽는 글 (2026-11-12 사용자 요청)
+    (function(){var w=document.createElement("div"); w.className="srmapw"; v.appendChild(w);
+      var apl=document.createElement("div"); apl.className="srmlab ap"; apl.appendChild(document.createTextNode("💡 나의 적용 · 결단"));
+      var eb=document.createElement("button"); eb.type="button"; eb.className="srmapedit"; eb.textContent="✏️ 고치기"; apl.appendChild(eb); w.appendChild(apl);
+      var T=0, lt=0;
+      function show(){var cur=(srmData().items.find(function(y){return y.id===x.id})||x).apply||""; [].slice.call(w.querySelectorAll(".srmrapb,.srmapta")).forEach(function(e){e.remove()}); eb.hidden=false;
+        var apb=document.createElement("div"); apb.className="rapply srmrapb"+(cur.trim()?"":" rempty"); apb.textContent=cur.trim()||"＋ 나의 적용을 적어 보세요"; w.appendChild(apb)}
+      function save(val){var o=srmData(), y=o.items.find(function(z){return z.id===x.id}); if(!y||y.apply===val)return; y.apply=val; y.u=Date.now(); srmSave(o)}
+      function edit(){var cur=(srmData().items.find(function(y){return y.id===x.id})||x).apply||""; var old=w.querySelector(".srmrapb"); if(old)old.remove(); eb.hidden=true;
+        var t=document.createElement("textarea"); t.className="srmapta"; t.value=cur; t.placeholder="이번 주에 이렇게 살아 보겠습니다"; t.setAttribute("aria-label","나의 적용"); w.appendChild(t);
+        function fit(){t.style.height="auto"; t.style.height=Math.max(72,t.scrollHeight+2)+"px"} fit();
+        t.addEventListener("input",function(){fit(); clearTimeout(T); T=setTimeout(function(){save(t.value)},500)});
+        t.addEventListener("blur",function(){clearTimeout(T); save(t.value); setTimeout(function(){if(w.isConnected&&document.activeElement!==t)show()},0)});
+        setTimeout(function(){try{t.focus({preventScroll:true}); t.setSelectionRange(t.value.length,t.value.length)}catch(e){}},0)}
+      eb.addEventListener("click",function(e){e.stopPropagation(); edit()});
+      w.addEventListener("click",function(e){if(e.target.closest(".srmrapb.rempty"))edit()});
+      w.addEventListener("dblclick",function(e){if(e.target.closest(".srmrapb")){e.stopPropagation(); edit()}});
+      w.addEventListener("touchend",function(e){if(!e.target.closest(".srmrapb"))return; var nw=Date.now(); if(nw-lt<400){lt=0; if(e.cancelable)e.preventDefault(); e.stopPropagation(); edit()} else lt=nw});
+      show();
+    })();
     var ta=document.createElement("textarea"); ta.className="srmresp"; ta.dataset.id=x.id; ta.value=x.resp||"";
     ta.placeholder="이 설교를 듣고 드리는 기도나 에세이를 자유롭게 적어 보세요.\n\n예) 주님, 오늘 말씀을 통해…"; ta.setAttribute("aria-label","이 설교를 듣고 쓰는 기도·에세이");
     var fit=function(){   // 칸을 접었다 재지 않고(숨은 거울 칸으로 글 높이를 잼), 늘 아래에 한 줄 여유 → 새 줄로 넘어갈 때 글이 위아래로 흔들리지 않게 (2026-11-11 사용자 요청)
