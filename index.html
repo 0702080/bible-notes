@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-pgswipe">
+<meta name="app-build" content="2026-11-11-dl3d">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5211,6 +5211,14 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 .srmsheet .dlbar .srmrgob{margin-left:auto}
 .srmrv .srmrlines.pgslL{animation:pgslL .32s cubic-bezier(.2,.8,.3,1)}
 .srmrv .srmrlines.pgslR{animation:pgslR .32s cubic-bezier(.2,.8,.3,1)}
+/* 🌙 하루 돌아보기: 달력을 다 접으면 손잡이 줄도 없앰 · 고치기 단추들 입체 (2026-11-11 사용자 요청) */
+.daily .dlfix:has(.dlcal.dlchide){display:none!important}
+.daily .dlbar .dltitle{cursor:pointer}
+.daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dledit.on,.daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dlclose,.daily .dltop .dladd button[type=submit],.daily .dltop .dlnewg button[type=submit]{position:relative;border-radius:999px!important;border:1px solid #4A4656!important;background:#2A2733 linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#EEEAF6!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1px 0 rgba(0,0,0,.25),0 3px 0 rgba(0,0,0,.45),0 4px 8px rgba(0,0,0,.35)!important;transition:transform .08s,box-shadow .08s}
+.daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dledit.on{border-color:color-mix(in srgb,var(--gold) 60%,#3A2E14)!important;background:#4A3A1C linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.06) 55%,rgba(0,0,0,.24) 100%)!important;color:#FBE7B8!important}
+.daily .dltop .dladd button[type=submit]{border-color:color-mix(in srgb,var(--gold) 70%,#5A4520)!important;background:var(--gold) linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.1) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.2) 100%)!important;color:#20180A!important;font-weight:800;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.2),0 3px 0 color-mix(in srgb,var(--gold) 40%,#120C02),0 5px 10px rgba(0,0,0,.4)!important}
+.daily .dltop .dlnewg button[type=submit]{border-color:color-mix(in srgb,var(--gold) 50%,#3A2E14)!important;color:#F3D58E!important}
+.daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dledit.on:active,.daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dlclose:active,.daily .dltop button[type=submit]:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -13994,6 +14002,11 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
           var gg=dl.querySelector(".dlcg"); if(gg){gg.classList.remove("dlcin-u","dlcin-d"); void gg.offsetWidth; gg.classList.add(want?"dlcin-u":"dlcin-d")}
         });
         window.addEventListener("pointercancel",function(){vy=null});
+        (function(){var bar=dl.querySelector(".dlbar"), by=null;   // 달력이 다 숨었을 때: 제목 줄을 아래로 끌거나 제목을 누르면 다시 이번 주 (2026-11-11 사용자 요청)
+          bar.addEventListener("pointerdown",function(e){by=dlCalHide&&!e.target.closest("button")?e.clientY:null});
+          window.addEventListener("pointerup",function(e){if(by==null)return; var dy=e.clientY-by; by=null; if(dy>30&&dlCalHide){dlCalHideSet(false); dlCalEat=Date.now(); buzz(10); drawDaily()}});
+          bar.querySelector(".dltitle").addEventListener("click",function(){if(dlCalHide&&Date.now()-dlCalEat>350){dlCalHideSet(false); buzz(10); drawDaily()}});
+        })();
         cal.addEventListener("click",function(e){if(Date.now()-dlCalEat<350){e.stopPropagation(); e.preventDefault()}},true);
       })();   // 요일 줄을 좌우로 끌면 날짜가 넘어감 (2026-10-22 사용자 요청)
       dl.addEventListener("click",function(e){
@@ -15431,6 +15444,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
     if(fq&&!fcount){var nh=document.createElement("p");nh.className="dlnohit";nh.textContent="“"+fq+"”이(가) 든 묶음·항목·기록이 없어요.";outer.appendChild(nh)}
     dl.querySelector(".dladd").hidden=!dlEdit; dl.querySelector(".dlnewg").hidden=!dlEdit; dl.querySelector(".dltop").hidden=!dlEdit;
     var eb=dl.querySelector(".dledit:not(.dlfocusbtn)"); eb.textContent=dlEdit?"고치기 끝":"✏️ 항목 고치기"; eb.classList.toggle("on",dlEdit);
+    var fcb=dl.querySelector(".dlfocusbtn"); if(fcb)fcb.hidden=!!dlEdit;   // 고치기 중에는 🎯 집중 숨김 (2026-11-11 사용자 요청)
   }
 
   // 체크 항목 글에 있는 성경 구절(예: 시편 91편, 요한복음 3장, 로마서 8:28)을 눌러서 읽을 수 있게
