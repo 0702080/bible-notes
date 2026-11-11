@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-iconctr2">
+<meta name="app-build" content="2026-11-11-pgbot">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5188,6 +5188,9 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
 .srmsheet.srmiconbar>.dlbar .srmhcopy,.srmsheet.srmiconbar>.dlbar .srmreadbtn,.srmsheet.srmiconbar>.dlbar .srmclose{position:relative}
 .srmsheet.srmiconbar>.dlbar .srmhcopy::before,.srmsheet.srmiconbar>.dlbar .srmreadbtn::before,.srmsheet.srmiconbar>.dlbar .srmclose::before{position:absolute;inset:0;display:grid;place-items:center;font-size:14px!important;line-height:1}   /* 숨긴 글자와 따로 원 한가운데에 */
 .srmsheet.srmiconbar>.dlbar .srmfbtn,.srmsheet.srmiconbar>.dlbar .srmhshot{display:inline-grid;place-items:center;font-size:14px!important;line-height:1!important;padding:0!important}
+/* 읽기: 쪽 단추 아래 여백을 넉넉히, 바깥 칸 흐림은 고치기에서만 (2026-11-11 사용자 요청) */
+.srmrv .srmpgno{margin-bottom:14px!important}
+.srmsheet.srmreading .srmbox{-webkit-mask-image:none;mask-image:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12783,7 +12786,7 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
       fixPin(); fixPin();   // 두 번째에 남은 빈자리를 보고 줄 한 칸 더 (2026-11-11)
     }
     // 끝까지 굴렸을 때 메모 칸 위끝이 창 위 6px에 딱 오게: 남으면 줄을 더 넣거나 아래 빈자리, 넘치면 빈자리를 줄이거나 줄을 뺌 (2026-11-08 사용자 요청)
-    function pinOff(){box.scrollTop=box.scrollHeight; return bd.getBoundingClientRect().top-box.getBoundingClientRect().top-6}
+    function pinOff(){box.scrollTop=box.scrollHeight; return bd.getBoundingClientRect().top-box.getBoundingClientRect().top-1}   // 메모 칸 위끝을 윗줄 바로 아래에 (틈에 위 칸 테두리가 비치던 것 없앰, 2026-11-11)
     function fixPin(){
       if(!bd.isConnected||!bd.classList.contains("srmpinned"))return;
       var sp=v.querySelector(".srmpinsp"); if(!sp){sp=document.createElement("div"); sp.className="srmpinsp"; sp.setAttribute("aria-hidden","true"); v.appendChild(sp)}
@@ -12794,7 +12797,7 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
       box.style.paddingBottom="";
       if(off>=-1&&P&&spH()+Math.max(0,off)+30>=P){var k=1; sp.style.height="0px"; sp.style.display="none"; mh(k*P); off=pinOff();   // 아래 여백(8px)·쪽 번호 위아래 틈까지 써서라도 한 줄 더 (2026-11-11 사용자 요청)
         if(off<0){box.style.setProperty("padding-bottom",Math.max(0,8+off)+"px","important"); off=pinOff()}   // !important 규칙을 이겨야 줄어듦
-        if(off<-1){var pgm=pg&&pg.style; if(pgm){pgm.marginBottom="0px"; off=pinOff()}}
+        
         if(off<-1){var pgm2=pg&&pg.style; if(pgm2){pgm2.marginTop=Math.max(-8,4+off)+"px"; off=pinOff()}}
         if(off<0&&off>=-1)off=0;}   // 쪽 단추 줄을 메모 칸 쪽으로 바짝
       for(var g=0;g<4&&off<-1;g++){var c=spH(); if(c>=-off){sp.style.height=(c+off)+"px"} else if(P){sp.style.height="0px"; mh(-P*Math.ceil((-off-c)/P))} else break; off=pinOff()}
