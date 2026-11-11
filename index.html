@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-shotclean">
+<meta name="app-build" content="2026-11-11-nolistresp">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -13065,8 +13065,7 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
       if(x.body.trim()){var p=document.createElement("span"); p.className="srmprev"; var pt=hlStrip(x.body).trim();
         if(q){var fi=-1; srmWords().forEach(function(w){var m=matchAll(pt,w,true); if(m.length&&(fi<0||m[0][0]<fi))fi=m[0][0]}); if(fi>24){var st=pt.lastIndexOf("\n",fi); st=st>=fi-40?st+1:fi-20; pt="…"+pt.slice(st)}}   // 찾은 낱말이 뒤에 있으면 그 근처부터 보이게
         p.textContent=pt; c.appendChild(p)}
-      if(x.apply.trim()){var a=document.createElement("span"); a.className="srmap"; a.style.display="block"; a.textContent="💡 "+x.apply.trim(); c.appendChild(a)}
-      if((x.resp||"").trim()){var rs=document.createElement("span"); rs.className="srmap srmrspc"; rs.style.display="block"; rs.textContent="✍️ "+x.resp.trim(); c.appendChild(rs)}
+            // ✍️ 기도·에세이와 💡 나의 적용은 목록 카드(앞면)에 안 보이고 뒷면에서만 (2026-11-11 사용자 요청)
       list.appendChild(c);
     });
     if(q)srmMarkIn(list);
