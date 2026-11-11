@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-pgtop">
+<meta name="app-build" content="2026-11-11-pinfit">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5238,7 +5238,8 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 .daily .dltop .dlnewg button[type=submit],.daily .dltop .dladd button[type=submit]{font-weight:400!important}   /* + 묶음 글자 가늘게 (2026-11-11 사용자 요청) */
 /* ✍️ 설교 메모 뒷면 기도문 쓰기: 줄마다 위아래 선 (읽기 칸과 같게, 2026-11-11 사용자 요청) */
 .srmrsp textarea.srmresp{padding-top:0!important;padding-bottom:0!important;line-height:44px!important;word-break:keep-all;overflow-wrap:break-word;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 43px,color-mix(in srgb,var(--pink) 18%,transparent) 43px,color-mix(in srgb,var(--pink) 18%,transparent) 44px)!important;background-attachment:local!important;background-origin:content-box}
-.srmrv .srmpgno{margin-top:12px!important}   /* 쪽 단추 위 여백 넉넉히 (2026-11-11 사용자 요청) */
+/* 💬 한 마디·짧은 말씀: 위로 굴린 카드가 떠 있는 윗줄 위·뒤로 비치지 않게 — 검은 띠 없이 흐려지며 사라짐 (2026-11-11 사용자 요청) */
+.saysheet>.dlbody{-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent calc(50px + env(safe-area-inset-top,0px)),#000 calc(66px + env(safe-area-inset-top,0px)));mask-image:linear-gradient(to bottom,transparent 0,transparent calc(50px + env(safe-area-inset-top,0px)),#000 calc(66px + env(safe-area-inset-top,0px)))}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12835,7 +12836,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
         // 한 쪽 높이를 줄 칸 N개에 딱 맞춤 → 쪽 아래에 다음 쪽 줄이 걸쳐 보이지 않게 (2026-11-08 사용자 요청)
         var ls=bd.querySelectorAll(".srmline");
         if(ls.length>2){var r1=ls[1].getBoundingClientRect(), r2=ls[2].getBoundingClientRect(), pitch=r2.top-r1.top, gap=pitch-r1.height;
-          bd._pitch=pitch>10?pitch:0;
+          bd._pitch=pitch>10?pitch:0; bd._gap=gap;
           if(pitch>10){var n=Math.max(1,Math.floor((bd.clientHeight+gap)/pitch)), want=n*pitch-gap;
             bd.style.maxHeight=Math.ceil(h-(bd.clientHeight-want))+"px"}}
       } else bd.classList.remove("srmpinned");
@@ -12845,21 +12846,20 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
     }
     // 끝까지 굴렸을 때 메모 칸 위끝이 창 위 6px에 딱 오게: 남으면 줄을 더 넣거나 아래 빈자리, 넘치면 빈자리를 줄이거나 줄을 뺌 (2026-11-08 사용자 요청)
     function pinOff(){box.scrollTop=box.scrollHeight; return bd.getBoundingClientRect().top-box.getBoundingClientRect().top-1}   // 메모 칸 위끝을 윗줄 바로 아래에 (틈에 위 칸 테두리가 비치던 것 없앰, 2026-11-11)
-    function fixPin(){
+    function fixPin(){   // 끝까지 굴렸을 때: 메모 칸 위끝은 윗줄 바로 아래, 쪽 단추 아래 여백은 윗줄 단추 위 여백(12px)과 같게. 남는 자리는 줄 칸으로, 줄이 안 되는 자투리만 쪽 단추 위로 (2026-11-11 사용자 요청)
       if(!bd.isConnected||!bd.classList.contains("srmpinned"))return;
-      var sp=v.querySelector(".srmpinsp"); if(!sp){sp=document.createElement("div"); sp.className="srmpinsp"; sp.setAttribute("aria-hidden","true"); v.appendChild(sp)}
+      var sp=v.querySelector(".srmpinsp"); if(sp){sp.style.height="0px"; sp.style.display="none"}
       var st0=box.scrollTop, sb0=box.style.scrollBehavior; box.style.scrollBehavior="auto";
-      var P=bd._pitch||0, spH=function(){return parseFloat(sp.style.height)||0}, mh=function(d){bd.style.maxHeight=(parseFloat(bd.style.maxHeight)+d)+"px"; pgTint(); pgSync()};
-      sp.style.display=""; if(pg)pg.style.marginTop="";
-      var off=pinOff();
-      box.style.paddingBottom="";
-      if(off>=-1&&P&&spH()+Math.max(0,off)+30>=P){var k=1; sp.style.height="0px"; sp.style.display="none"; mh(k*P); off=pinOff();   // 아래 여백(8px)·쪽 번호 위아래 틈까지 써서라도 한 줄 더 (2026-11-11 사용자 요청)
-        if(off<0){box.style.setProperty("padding-bottom",Math.max(0,8+off)+"px","important"); off=pinOff()}   // !important 규칙을 이겨야 줄어듦
-        
-        if(off<-1){var pgm2=pg&&pg.style; if(pgm2){pgm2.marginTop=Math.max(-8,4+off)+"px"; off=pinOff()}}
-        if(off<0&&off>=-1)off=0;}   // 쪽 단추 줄을 메모 칸 쪽으로 바짝
-      for(var g=0;g<4&&off<-1;g++){var c=spH(); if(c>=-off){sp.style.height=(c+off)+"px"} else if(P){sp.style.height="0px"; mh(-P*Math.ceil((-off-c)/P))} else break; off=pinOff()}
-      if(off>0)sp.style.height=(spH()+off)+"px";
+      box.style.setProperty("padding-bottom","0px","important");
+      if(pg){pg.style.setProperty("margin-top","10px","important"); pg.style.setProperty("margin-bottom","12px","important")}
+      var P=bd._pitch||0, gap=bd._gap||0;
+      for(var g=0;g<3;g++){
+        var off=pinOff(); if(Math.abs(off)<0.5)break;
+        var mh=parseFloat(bd.style.maxHeight)||bd.clientHeight, diff=mh-bd.clientHeight, C=mh+off-diff;
+        if(P){var n=Math.max(1,Math.floor((C+gap+0.5)/P)), nc=n*P-gap; bd.style.maxHeight=(nc+diff)+"px"; if(pg)pg.style.setProperty("margin-top",(10+Math.max(0,C-nc))+"px","important")}
+        else bd.style.maxHeight=(mh+off)+"px";
+      }
+      pgTint(); pgSync();
       box.scrollTop=st0; box.style.scrollBehavior=sb0;
     }
     box._fixPin=fixPin;
