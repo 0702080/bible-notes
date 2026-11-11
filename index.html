@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-srmtop0">
+<meta name="app-build" content="2026-11-11-pgfix">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5173,7 +5173,7 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
 .srmsheet.srmiconbar>.dlbar .srmreadbtn::before{content:"✏️";font-size:17px}
 .srmsheet.srmiconbar>.dlbar .srmclose{white-space:nowrap}
 .srmpgb{min-width:54px;width:auto!important;padding:0 12px!important;font-size:14px!important;font-weight:700;white-space:nowrap}
-.srmrv .srmpgno .srmpgb{height:26px}
+.srmrv .srmpgno .srmpgb{height:32px}
 .srmrv .srmpgno{margin:4px 0 0}   /* 쪽 단추 줄을 낮춰 메모 칸에 줄 한 칸 더 (2026-11-11 사용자 요청) */
 .srmcard .srmmeta .srmytc.srmytt{border:1px solid color-mix(in srgb,#E5484D 55%,#3A2A2C)!important;background:#4A2328 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#FFC2C4!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 6px rgba(0,0,0,.34);font-size:12px}
 .srmcard .srmmeta .srmytc.srmytt:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
@@ -5202,7 +5202,7 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
 .srmsheet .srmfoot .srmbtns button:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 0 0 rgba(0,0,0,0)!important}
 body:not(.boardon) .fwrap.fstuck::before{opacity:1}
 /* 🔍 찾기 칸 위·옆으로 굴러간 카드가 비치지 않게: 화면 폭 전체 유리 띠 (2026-11-11 사용자 요청) */
-body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:-16px;top:0;bottom:-4px;opacity:0;transition:opacity .15s;z-index:-1;pointer-events:none;background:rgba(12,12,16,.86);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);-webkit-mask-image:linear-gradient(#000 calc(100% - 12px),transparent);mask-image:linear-gradient(#000 calc(100% - 12px),transparent)}
+body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:-16px;top:0;bottom:-4px;opacity:0;transition:opacity .15s;z-index:-1;pointer-events:none;background:var(--abgbg,none) center/cover no-repeat fixed,#0b0b0d;-webkit-mask-image:linear-gradient(#000 calc(100% - 12px),transparent);mask-image:linear-gradient(#000 calc(100% - 12px),transparent)}
 /* 🙏 읽기 윗줄 기도문 단추 + 밀어 쪽 넘길 때 미끄러지기 (2026-11-11 사용자 요청) */
 .srmsheet>.dlbar .srmrgob{width:36px;min-width:36px;flex:0 0 36px;height:36px;padding:0!important;border-radius:50%!important;display:inline-grid;place-items:center;font-size:15px!important;line-height:1!important}
 @keyframes pgslL{from{transform:translateX(60px);opacity:.15}to{transform:none;opacity:1}}
@@ -5222,6 +5222,9 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 /* 🎤 설교 메모: 맨 위 빈 띠(상태 표시줄 자리 여백) 없애고 그만큼 위로 (2026-11-11 사용자 요청) */
 .daily.srmsheet{padding-top:0!important}
 .srmsheet .srmfind{top:64px!important}
+/* 암송 코치: 숫자·영문 가린 칸은 ○와 진짜 글자 중 넓은 쪽이 칸 너비 — 영어 말씀이 벌어지거나 겹치지 않게 (2026-11-11 사용자 요청) */
+.ccverse .ccw.hid.ccdig{display:inline-grid!important;justify-items:center;align-items:center;vertical-align:bottom}
+.ccverse .ccw.hid.ccdig>.ccg,.ccverse .ccw.hid.ccdig>.ccm{grid-area:1/1;position:static!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12820,7 +12823,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
         if(ls.length>2){var r1=ls[1].getBoundingClientRect(), r2=ls[2].getBoundingClientRect(), pitch=r2.top-r1.top, gap=pitch-r1.height;
           bd._pitch=pitch>10?pitch:0;
           if(pitch>10){var n=Math.max(1,Math.floor((bd.clientHeight+gap)/pitch)), want=n*pitch-gap;
-            bd.style.maxHeight=Math.floor(h-(bd.clientHeight-want))+"px"}}
+            bd.style.maxHeight=Math.ceil(h-(bd.clientHeight-want))+"px"}}
       } else bd.classList.remove("srmpinned");
       pgTint(); sync();
       box.classList.toggle("srmpinbox",bd.classList.contains("srmpinned"));   // 메모 칸이 붙을 때는 아래 여백을 줄여 그 자리에 줄을 하나 더 (2026-11-08 사용자 요청)
@@ -12880,7 +12883,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
       var top0=sc.getBoundingClientRect().top-sc.scrollTop, P=[0], start=0, rows=[];
       bd.querySelectorAll(".srmline").forEach(function(ln){var r=ln.getBoundingClientRect(); rows.push({el:ln,t:r.top-top0,b:r.bottom-top0})});
       if(pinned){
-        rows.forEach(function(r){if(r.b>start+ch+0.5&&r.t>start+1){start=Math.round(r.t); P.push(start)}});
+        rows.forEach(function(r){if(r.b>start+ch+3&&r.t>start+1){start=Math.round(r.t); P.push(start)}});   // 소수점 줄 높이로 마지막 줄이 다음 쪽으로 넘어가던 것 고침 (2026-11-11)
         bd._P=P; rows.forEach(function(r){r.el.classList.toggle("srmpg2",pgIdx(r.t)%2===1)});
       }else{bd._P=null; rows.forEach(function(r){r.el.classList.toggle("srmpg2",Math.floor((r.t+2)/ch)%2===1)})}
     }
@@ -17538,7 +17541,9 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
     pool.slice(0,k).forEach(function(i){set[i]=1});
     return set;
   }
-  function circles(word){return Array.from(word).map(function(ch){return /[가-힣A-Za-z0-9]/.test(ch)?"○":ch}).join("")}
+  function circles(word){   // 영어는 글자가 좁아서 두세 글자에 ○ 하나 (영어 말씀이 넓게 벌어지던 것 고침, 2026-11-11 사용자 요청)
+    return String(word).replace(/[A-Za-z]+/g,function(m){return "\u0001".repeat(Math.max(1,Math.round(m.length/2.6)))}).split("").map(function(ch){return ch==="\u0001"||/[가-힣0-9]/.test(ch)?"○":ch}).join("");
+  }
   function renderRandInto(box,text,seed,peek,style){
     var solid=style==="box";
     box.textContent=""; var mask=solid?null:randMask(text,seed), wi=0;
@@ -21064,7 +21069,9 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 <script>
 /* 🔍 찾기 칸이 맨 위에 붙었을 때만 뒤 띠를 보임 (2026-11-11) */
 (function(){var f=document.querySelector(".fwrap"); if(!f)return; var q=0;
-function chk(){q=0; var t=f.getBoundingClientRect().top; f.classList.toggle("fstuck",t<=1&&window.scrollY>0)}
+function chk(){q=0; var t=f.getBoundingClientRect().top, on=t<=1&&window.scrollY>0;
+  if(on&&!f.classList.contains("fstuck")){var ab=document.getElementById("appbg"); if(ab)f.style.setProperty("--abgbg",getComputedStyle(ab).backgroundImage)}   // 뒤 띠는 화면 배경 사진과 똑같이 (2026-11-11 사용자 요청)
+  f.classList.toggle("fstuck",on)}
 window.addEventListener("scroll",function(){if(!q)q=requestAnimationFrame(chk)},{passive:true}); chk()})();
 </script>
 </body></html>
