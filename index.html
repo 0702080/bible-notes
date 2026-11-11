@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-srmicon2">
+<meta name="app-build" content="2026-11-11-shotclean">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12836,7 +12836,7 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
   // 📷 설교 메모를 휴대폰 화면 크기 그림 여러 장으로 (2026-11-08 사용자 요청)
   function srmShots(x){
     var W=Math.min(window.innerWidth,520), H=window.innerHeight, sc=Math.min(3,Math.max(2,window.devicePixelRatio||2));
-    var ff=getComputedStyle(document.body).fontFamily, pad=22, rowH=40, top=96, bot=46;
+    var ff=getComputedStyle(document.body).fontFamily, pad=22, rowH=40, side=pad-8, top=72, bot=side+6;   // 날짜·설교자 줄과 아래 '설교 메모' 글은 빼고, 메모 칸 아래 여백 = 양옆 여백 (2026-11-11 사용자 요청)
     var lines=String(x.body||"").replace(/\s+$/,"").split("\n"), maxW=W-pad*2-8;
     var cv=document.createElement("canvas"), cx=cv.getContext("2d");
     function fnt(b,sz){return (b?"800 ":"400 ")+sz+"px "+ff}
@@ -12855,10 +12855,9 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
       var c=document.createElement("canvas"); c.width=Math.round(W*sc); c.height=Math.round(H*sc); var g=c.getContext("2d"); g.scale(sc,sc);
       var gr=g.createLinearGradient(0,0,0,H); gr.addColorStop(0,"#241C10"); gr.addColorStop(1,"#15120C"); g.fillStyle=gr; g.fillRect(0,0,W,H);
       g.textBaseline="middle";
-      g.fillStyle="#E3BE72"; g.font=fnt(true,19); var tt=title; while(g.measureText(tt).width>W-pad*2-60&&tt.length>2)tt=tt.slice(0,-2)+"…"; g.fillText(tt,pad,38);
-      g.fillStyle="rgba(232,229,238,.6)"; g.font=fnt(false,13); g.fillText(meta,pad,64);
-      g.textAlign="right"; g.fillText((p+1)+" / "+pages,W-pad,38); g.textAlign="left";
-      var bx=pad-8, by=top-12, bw=W-bx*2, bh=Math.min(per,rows.length-p*per)*rowH+12;
+      g.fillStyle="#E3BE72"; g.font=fnt(true,19); var tt=title; while(g.measureText(tt).width>W-pad*2-60&&tt.length>2)tt=tt.slice(0,-2)+"…"; g.fillText(tt,pad,34);
+      g.fillStyle="rgba(232,229,238,.6)"; g.font=fnt(false,13); g.textAlign="right"; g.fillText((p+1)+" / "+pages,W-pad,34); g.textAlign="left";
+      var bx=side, by=top-12, bw=W-bx*2, nr=Math.min(per,rows.length-p*per), bh=nr>=per?H-side-by:nr*rowH+12;   // 꽉 찬 쪽은 칸이 아래 여백(양옆과 같음)까지
       g.fillStyle="rgba(227,190,114,.08)"; g.strokeStyle="rgba(227,190,114,.35)"; g.lineWidth=1;
       if(g.roundRect){g.beginPath(); g.roundRect(bx,by,bw,bh,12); g.fill(); g.stroke()} else {g.fillRect(bx,by,bw,bh); g.strokeRect(bx,by,bw,bh)}
       rows.slice(p*per,(p+1)*per).forEach(function(r,i){
@@ -12866,7 +12865,6 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
         if(i>0){g.save(); g.strokeStyle="rgba(227,190,114,.16)"; g.setLineDash([3,3]); g.beginPath(); g.moveTo(bx+1,y-rowH/2); g.lineTo(bx+bw-1,y-rowH/2); g.stroke(); g.restore()}
         var xx=pad+4; r.forEach(function(k){g.font=fnt(k.b,16); g.fillStyle=k.c?COL[k.c]:"#F3E9D2"; g.fillText(k.t,xx,y); xx+=k.w});
       });
-      g.fillStyle="rgba(232,229,238,.35)"; g.font=fnt(false,11); g.textAlign="center"; g.fillText("🎤 설교 메모",W/2,H-20); g.textAlign="left";
       files.push(srmPngFile(c,"설교메모-"+(x.d||"")+"-"+(p+1)+".png"));   // toBlob(비동기)을 쓰면 누른 손길이 끊겨 휴대폰 공유 창이 막힘 → 바로 만듦 (2026-11-08)
     }
     srmShotsSave(files,title);
