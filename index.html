@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-fwrapbg">
+<meta name="app-build" content="2026-11-11-fstuck">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5200,8 +5200,9 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
 .srmsheet .srmfoot .srmbtns button:not(.srmdone){border:1px solid #4A4656!important;background:#2A2733 linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#E8E5EE!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -1px 0 rgba(0,0,0,.25),0 3px 0 rgba(0,0,0,.45),0 4px 8px rgba(0,0,0,.35)!important}
 .srmsheet .srmfoot .srmbtns button.srmdone{border:1px solid color-mix(in srgb,var(--sky) 70%,#0A2A3A)!important;background:var(--sky) linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.12) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.18) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(0,0,0,.2),0 3px 0 color-mix(in srgb,var(--sky) 45%,#06141C),0 5px 10px rgba(0,0,0,.4)!important}
 .srmsheet .srmfoot .srmbtns button:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 0 0 rgba(0,0,0,0)!important}
+body:not(.boardon) .fwrap.fstuck::before{opacity:1}
 /* 🔍 찾기 칸 위·옆으로 굴러간 카드가 비치지 않게: 화면 폭 전체 유리 띠 (2026-11-11 사용자 요청) */
-body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:-16px;top:-60px;bottom:-4px;z-index:-1;pointer-events:none;background:rgba(12,12,16,.86);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);-webkit-mask-image:linear-gradient(#000 calc(100% - 12px),transparent);mask-image:linear-gradient(#000 calc(100% - 12px),transparent)}
+body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:-16px;top:0;bottom:-4px;opacity:0;transition:opacity .15s;z-index:-1;pointer-events:none;background:rgba(12,12,16,.86);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);-webkit-mask-image:linear-gradient(#000 calc(100% - 12px),transparent);mask-image:linear-gradient(#000 calc(100% - 12px),transparent)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -21029,5 +21030,11 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
     render();
   },function(){switchToLocal()});
 })();
+</script>
+<script>
+/* 🔍 찾기 칸이 맨 위에 붙었을 때만 뒤 띠를 보임 (2026-11-11) */
+(function(){var f=document.querySelector(".fwrap"); if(!f)return; var q=0;
+function chk(){q=0; var t=f.getBoundingClientRect().top; f.classList.toggle("fstuck",t<=1&&window.scrollY>0)}
+window.addEventListener("scroll",function(){if(!q)q=requestAnimationFrame(chk)},{passive:true}); chk()})();
 </script>
 </body></html>
