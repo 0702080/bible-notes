@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-pinfit">
+<meta name="app-build" content="2026-11-11-pick">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5223,7 +5223,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 .daily.srmsheet{padding-top:0!important}
 .srmsheet .srmfind{top:64px!important}
 /* 암송 코치: 숫자·영문 가린 칸은 ○와 진짜 글자 중 넓은 쪽이 칸 너비 — 영어 말씀이 벌어지거나 겹치지 않게 (2026-11-11 사용자 요청) */
-.ccverse .ccw.hid.ccdig{display:inline-grid!important;justify-items:center;align-items:center;vertical-align:bottom}
+.ccverse .ccw.hid.ccdig{display:inline-grid!important;justify-items:center;align-items:center;vertical-align:baseline}
 .ccverse .ccw.hid.ccdig>.ccg,.ccverse .ccw.hid.ccdig>.ccm{grid-area:1/1;position:static!important}
 /* 🎤 설교 메모 목록 카드: 접기·영상·삭제 단추를 오른쪽에 세로로, 제목은 넓게 (2026-11-11 사용자 요청) */
 .srmlist>.srmcard{display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:start}
@@ -5239,7 +5239,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 /* ✍️ 설교 메모 뒷면 기도문 쓰기: 줄마다 위아래 선 (읽기 칸과 같게, 2026-11-11 사용자 요청) */
 .srmrsp textarea.srmresp{padding-top:0!important;padding-bottom:0!important;line-height:44px!important;word-break:keep-all;overflow-wrap:break-word;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 43px,color-mix(in srgb,var(--pink) 18%,transparent) 43px,color-mix(in srgb,var(--pink) 18%,transparent) 44px)!important;background-attachment:local!important;background-origin:content-box}
 /* 💬 한 마디·짧은 말씀: 위로 굴린 카드가 떠 있는 윗줄 위·뒤로 비치지 않게 — 검은 띠 없이 흐려지며 사라짐 (2026-11-11 사용자 요청) */
-.saysheet>.dlbody{-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent calc(50px + env(safe-area-inset-top,0px)),#000 calc(66px + env(safe-area-inset-top,0px)));mask-image:linear-gradient(to bottom,transparent 0,transparent calc(50px + env(safe-area-inset-top,0px)),#000 calc(66px + env(safe-area-inset-top,0px)))}
+.saysheet>.dlbody.saysc{-webkit-mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--smk,58px) - 8px),#000 calc(var(--smk,58px) + 8px));mask-image:linear-gradient(to bottom,transparent 0,transparent calc(var(--smk,58px) - 8px),#000 calc(var(--smk,58px) + 8px))}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -8984,8 +8984,8 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
     }
     if(b.classList.contains("fopen")){
       if(focusOpen.has(id)||focusMode.get(id)){focusOpen.delete(id);focusMode.delete(id);setFmsg(card,"")}
-      else{focusOpen.add(id); memView.delete(id); memStep.delete(id); memPeek.delete(id)}
-      render(); var fr1=card.querySelector(".focusrow"); if(fr1&&focusOpen.has(id))setTimeout(function(){var r=fr1.getBoundingClientRect();if(r.top<0||r.bottom>window.innerHeight)fr1.scrollIntoView({block:"center",behavior:"smooth"})},60);
+      else{focusOpen.add(id); focusMode.set(id,"P"); memView.delete(id); memStep.delete(id); memPeek.delete(id)}   // 열면 '직접 고르기'가 골라진 채로 (2026-11-11 사용자 요청)
+      render(); if(focusMode.get(id)==="P"){var pc=cards.get(id)||card; if(!hasMarks(n))setFmsg(pc,"낱말을 누르거나, 진하게 할 글자만 드래그해서 고르세요. 다시 하면 빠져요.")} var fr1=card.querySelector(".focusrow"); if(fr1&&focusOpen.has(id))setTimeout(function(){var r=fr1.getBoundingClientRect();if(r.top<0||r.bottom>window.innerHeight)fr1.scrollIntoView({block:"center",behavior:"smooth"})},60);
       return;
     }
     if(b.classList.contains("fbtn")){ toggleFocus(card,n,b.dataset.f); return }
@@ -12851,12 +12851,12 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
       var sp=v.querySelector(".srmpinsp"); if(sp){sp.style.height="0px"; sp.style.display="none"}
       var st0=box.scrollTop, sb0=box.style.scrollBehavior; box.style.scrollBehavior="auto";
       box.style.setProperty("padding-bottom","0px","important");
-      if(pg){pg.style.setProperty("margin-top","10px","important"); pg.style.setProperty("margin-bottom","12px","important")}
+      if(pg){pg.style.setProperty("margin-top","4px","important"); pg.style.setProperty("margin-bottom","12px","important")}
       var P=bd._pitch||0, gap=bd._gap||0;
       for(var g=0;g<3;g++){
         var off=pinOff(); if(Math.abs(off)<0.5)break;
         var mh=parseFloat(bd.style.maxHeight)||bd.clientHeight, diff=mh-bd.clientHeight, C=mh+off-diff;
-        if(P){var n=Math.max(1,Math.floor((C+gap+0.5)/P)), nc=n*P-gap; bd.style.maxHeight=(nc+diff)+"px"; if(pg)pg.style.setProperty("margin-top",(10+Math.max(0,C-nc))+"px","important")}
+        if(P){var n=Math.max(1,Math.floor((C+gap+0.5)/P)), nc=n*P-gap; bd.style.maxHeight=(nc+diff)+"px"; if(pg)pg.style.setProperty("margin-top",(4+Math.max(0,C-nc))+"px","important")}
         else bd.style.maxHeight=(mh+off)+"px";
       }
       pgTint(); pgSync();
@@ -21091,5 +21091,10 @@ function chk(){q=0; var t=f.getBoundingClientRect().top, on=t<=1&&window.scrollY
     var hb=Math.ceil(f.getBoundingClientRect().bottom-4); tp.style.clipPath="inset(0 0 calc(100% - "+hb+"px) 0)"}
   tp.classList.toggle("on",on); f.classList.toggle("fstuck",on)}
 window.addEventListener("scroll",function(){if(!q)q=requestAnimationFrame(chk)},{passive:true}); chk()})();
+</script>
+<script>
+/* 💬 한 마디 창: 굴렸을 때만 윗줄 아래까지 흐리게 (맨 위에서는 찾기 칸이 흐려지지 않게, 2026-11-11 사용자 요청) */
+document.addEventListener("scroll",function(e){var b=e.target; if(!b||!b.classList||!b.classList.contains("dlbody"))return; var sh=b.parentNode; if(!sh||!sh.classList||!sh.classList.contains("saysheet"))return;
+  var on=b.scrollTop>2; b.classList.toggle("saysc",on); if(on){var bar=sh.querySelector(".dlbar"); if(bar)b.style.setProperty("--smk",Math.round(bar.getBoundingClientRect().bottom-b.getBoundingClientRect().top)+"px")}},true);
 </script>
 </body></html>
