@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-grpthin">
+<meta name="app-build" content="2026-11-11-pgtop">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5218,8 +5218,6 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 .daily .dlbar .dltitle{cursor:pointer}
 .daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dledit.on,.daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dlclose,.daily .dltop .dladd button[type=submit],.daily .dltop .dlnewg button[type=submit]{position:relative;border-radius:999px!important;border:1px solid #4A4656!important;background:#2A2733 linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#EEEAF6!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1px 0 rgba(0,0,0,.25),0 3px 0 rgba(0,0,0,.45),0 4px 8px rgba(0,0,0,.35)!important;transition:transform .08s,box-shadow .08s}
 .daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dledit.on{border-color:color-mix(in srgb,var(--gold) 60%,#3A2E14)!important;background:#4A3A1C linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.06) 55%,rgba(0,0,0,.24) 100%)!important;color:#FBE7B8!important}
-.daily .dltop .dladd button[type=submit]{border-color:color-mix(in srgb,var(--gold) 70%,#5A4520)!important;background:var(--gold) linear-gradient(180deg,rgba(255,255,255,.42) 0%,rgba(255,255,255,.1) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.2) 100%)!important;color:#20180A!important;font-weight:800;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(0,0,0,.2),0 3px 0 color-mix(in srgb,var(--gold) 40%,#120C02),0 5px 10px rgba(0,0,0,.4)!important}
-.daily .dltop .dlnewg button[type=submit]{border-color:color-mix(in srgb,var(--gold) 50%,#3A2E14)!important;color:#F3D58E!important}
 .daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dledit.on:active,.daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dlclose:active,.daily .dltop button[type=submit]:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35)!important}
 /* 🎤 설교 메모: 맨 위 빈 띠(상태 표시줄 자리 여백) 없애고 그만큼 위로 (2026-11-11 사용자 요청) */
 .daily.srmsheet{padding-top:0!important}
@@ -5236,8 +5234,11 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 .srmcard .srmcbtns .srmytc.srmytt{flex:0 0 auto;height:28px;padding:0 10px;border-radius:14px;display:inline-flex;align-items:center;white-space:nowrap;font-size:12px}
 .srmcard .srmcbtns .srmytc.srmytt{border:1px solid color-mix(in srgb,#E5484D 60%,#3A2A2C)!important;background:#5A262C linear-gradient(180deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;color:#FFC9CB!important;font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.25),0 3px 0 rgba(0,0,0,.45),0 4px 8px rgba(0,0,0,.35);transition:transform .08s,box-shadow .08s}
 .srmcard .srmcbtns .srmytc.srmytt:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
-.srmcard.srmfolded .srmcbtns .srmcdel{display:none!important}   /* 접은 카드에는 삭제 단추 숨김 (2026-11-11 사용자 요청) */
-.daily .dltop .dlnewg button[type=submit]{font-weight:400!important}   /* + 묶음 글자 가늘게 (2026-11-11 사용자 요청) */
+.srmcard.srmfolded .srmcbtns .srmcdel,.srmcard.srmfolded .srmcbtns .srmytc{display:none!important}   /* 접은 카드에는 삭제 단추 숨김 (2026-11-11 사용자 요청) */
+.daily .dltop .dlnewg button[type=submit],.daily .dltop .dladd button[type=submit]{font-weight:400!important}   /* + 묶음 글자 가늘게 (2026-11-11 사용자 요청) */
+/* ✍️ 설교 메모 뒷면 기도문 쓰기: 줄마다 위아래 선 (읽기 칸과 같게, 2026-11-11 사용자 요청) */
+.srmrsp textarea.srmresp{padding-top:0!important;padding-bottom:0!important;line-height:44px!important;word-break:keep-all;overflow-wrap:break-word;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 43px,color-mix(in srgb,var(--pink) 18%,transparent) 43px,color-mix(in srgb,var(--pink) 18%,transparent) 44px)!important;background-attachment:local!important;background-origin:content-box}
+.srmrv .srmpgno{margin-top:12px!important}   /* 쪽 단추 위 여백 넉넉히 (2026-11-11 사용자 요청) */
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
