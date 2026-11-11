@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-srmedge">
+<meta name="app-build" content="2026-11-11-iconctr2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5183,6 +5183,11 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
 .srmsheet .srmfoot{background:linear-gradient(180deg,rgba(40,34,58,.86),rgba(26,23,38,.94))!important;border-top:1px solid color-mix(in srgb,var(--violet) 32%,transparent)!important;box-shadow:0 -10px 22px -10px rgba(0,0,0,.55)!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .srmsheet .srmfoot textarea{background:color-mix(in srgb,var(--green) 12%,rgba(20,18,30,.85))!important}
 .srmsheet.srmreading>.dlbar{border-bottom-color:color-mix(in srgb,var(--gold) 18%,transparent)}
+/* 읽기 윗줄 동그란 단추: 아이콘을 원 한가운데에, 조금 작게 (2026-11-11 사용자 요청) */
+.srmsheet.srmiconbar>.dlbar>button{line-height:0!important}
+.srmsheet.srmiconbar>.dlbar .srmhcopy,.srmsheet.srmiconbar>.dlbar .srmreadbtn,.srmsheet.srmiconbar>.dlbar .srmclose{position:relative}
+.srmsheet.srmiconbar>.dlbar .srmhcopy::before,.srmsheet.srmiconbar>.dlbar .srmreadbtn::before,.srmsheet.srmiconbar>.dlbar .srmclose::before{position:absolute;inset:0;display:grid;place-items:center;font-size:14px!important;line-height:1}   /* 숨긴 글자와 따로 원 한가운데에 */
+.srmsheet.srmiconbar>.dlbar .srmfbtn,.srmsheet.srmiconbar>.dlbar .srmhshot{display:inline-grid;place-items:center;font-size:14px!important;line-height:1!important;padding:0!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
