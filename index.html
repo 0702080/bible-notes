@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-ccnum">
+<meta name="app-build" content="2026-11-11-ccvn">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5252,6 +5252,8 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 #colAddQuick span{font-weight:800}
 #colAddQuick:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
 body.boardon #colAddQuick{display:none!important}
+.ccverse .ccw.hid.ccvn .ccm{font-size:.62em;letter-spacing:-.04em}
+.ccverse .ccw.hid.ccvn{padding-right:2px!important;margin-right:-2px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -11003,7 +11005,8 @@ body.boardon #colAddQuick{display:none!important}
     if(sp.dataset.f){var b=document.createElement("b");b.textContent=sp.dataset.f;m.appendChild(b);m.appendChild(document.createTextNode(sp.dataset.m))}
     else m.textContent=sp.dataset.m;
     sp.appendChild(g); sp.appendChild(m);
-    sp.classList.toggle("ccdig",/[0-9A-Za-z]/.test(g.textContent));   // 숫자·영문은 글자가 좁아 칸이 ○보다 작아짐 → ○가 칸 너비를 잡게 (2026-10-29 사용자 요청)
+    sp.classList.toggle("ccdig",/[0-9A-Za-z]/.test(g.textContent));
+    sp.classList.toggle("ccvn",/^\d{1,3}[.)]?$/.test(String(sp.dataset.w||g.textContent).trim()));   // 절 번호: ○를 작게 해 번호와 말씀 사이가 넓지 않게 (2026-11-11 사용자 요청)   // 숫자·영문은 글자가 좁아 칸이 ○보다 작아짐 → ○가 칸 너비를 잡게 (2026-10-29 사용자 요청)
   }
   function ccPaintLbl(b,on){b.querySelector("i").textContent=on?"✓":"🎨"; b.querySelector("span").textContent=on?"완료":"색"}   // 단계 줄처럼 동그라미 + 아래 글자 (2026-11-05)
   function ccWords(text,mode,frac,seed,opt){   // mode: all | first | hide(frac) | none | got(색 입혀 다 보기)
