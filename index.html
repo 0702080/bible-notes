@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-vnoalign2">
+<meta name="app-build" content="2026-11-11-ccnum">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -2493,7 +2493,7 @@ button:active{filter:brightness(1.15)}
 .ccdres .dw.near{color:var(--hi);text-decoration:underline dotted 2px}
 .ccdres .dw.miss{color:var(--pink);background:color-mix(in srgb,var(--pink) 16%,transparent);border-radius:5px;padding:0 3px}
 .ccsc{color:var(--gold);font-size:17px}
-.ccverse.big{font-size:22px}
+.ccverse.big{font-size:20px}   /* 조금 작게 (22→20, 2026-11-11 사용자 요청) */
 .ccw.hid{position:relative;color:var(--faint);cursor:pointer;border-radius:6px}
 .ccw.hid .ccg{visibility:hidden}
 .ccverse .ccw.hid .ccm{-webkit-text-stroke:.2px currentColor}   /* ○ 선을 조금 가늘게 (.75→.2px, 2026-10-31 사용자 요청) */
@@ -5223,7 +5223,7 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 .daily.srmsheet{padding-top:0!important}
 .srmsheet .srmfind{top:64px!important}
 /* 암송 코치: 숫자·영문 가린 칸은 ○와 진짜 글자 중 넓은 쪽이 칸 너비 — 영어 말씀이 벌어지거나 겹치지 않게 (2026-11-11 사용자 요청) */
-.ccverse .ccw.hid.ccdig{display:inline-grid!important;justify-items:center;align-items:center;vertical-align:baseline}
+.ccverse .ccw.hid.ccdig{display:inline-grid!important;justify-items:start;align-items:center;vertical-align:baseline}
 .ccverse .ccw.hid.ccdig>.ccg,.ccverse .ccw.hid.ccdig>.ccm{grid-area:1/1;position:static!important}
 /* 🎤 설교 메모 목록 카드: 접기·영상·삭제 단추를 오른쪽에 세로로, 제목은 넓게 (2026-11-11 사용자 요청) */
 .srmlist>.srmcard{display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:start}
