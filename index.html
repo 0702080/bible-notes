@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-prnodrag">
+<meta name="app-build" content="2026-11-12-apfold">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3355,6 +3355,10 @@ mark.srmhit{background:rgba(255,205,80,.5);color:inherit;border-radius:4px;paddi
 .srmfoot{flex:0 0 auto;border-top:1px solid #222128;background:#0B0B0D;padding:8px max(16px,calc((100% - var(--dlw,608px)) / 2)) 10px;box-shadow:0 -10px 24px rgba(0,0,0,.5)}
 .srmfoot[hidden]{display:none}
 .srmfin{display:flex;flex-direction:column;gap:6px}
+.srmfin .srmlab.ap{align-items:center;cursor:pointer;-webkit-user-select:none;user-select:none}
+.srmapfold{flex:none;width:28px;height:28px;margin-left:8px;padding:0;border:1px solid #4A4656;border-radius:50%;background:#2A2733 linear-gradient(180deg,rgba(255,255,255,.2),rgba(0,0,0,.22));color:#E8E5EE;font-size:12px;line-height:1;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 0 rgba(0,0,0,.45),0 3px 6px rgba(0,0,0,.35)}
+.srmapfold:active{transform:translateY(2px);box-shadow:inset 0 2px 3px rgba(0,0,0,.4)}
+.srmfin.apfolded>textarea,.srmfin.apfolded>.srmbtns{display:none}   /* 나의 적용 접기 (2026-11-12) */
 .srmread{max-width:640px;margin:6px auto 40px;padding:4px 6px}
 .srmrmeta{font-size:13.5px;color:var(--sky)}
 .srmrttl{margin:6px 0 10px;font-size:22px;line-height:1.4;font-weight:800;color:var(--gold);word-break:keep-all}
@@ -12788,8 +12792,14 @@ body.boardon #colAddQuick{display:none!important}
         '<div class="srmlab">📝 설교 메모 <span class="srmhint">· ⠿를 잡고 끌면 줄을 옮겨요</span><button type="button" class="srmcopy" title="설교 메모 전체 복사">📋 전체 복사</button></div><div class="srmhl" role="toolbar" aria-label="강조"><span class="srmhlt">✨ 강조</span><button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button><button type="button" class="hlbtn hldot" data-hl="금" style="--d:var(--gold)" title="금색"></button><button type="button" class="hlbtn hldot" data-hl="분홍" style="--d:var(--pink)" title="분홍"></button><button type="button" class="hlbtn hldot" data-hl="하늘" style="--d:var(--sky)" title="하늘색"></button><button type="button" class="hlbtn hldot" data-hl="초록" style="--d:var(--green)" title="초록"></button><button type="button" class="hlbtn hldot" data-hl="주황" style="--d:var(--orange)" title="주황"></button><button type="button" class="hlbtn hlclr" data-hl="x" title="강조 지우기">지우기</button></div><div class="srmlines"></div><textarea class="srmbody" hidden placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
         '';
       // 💡 나의 적용과 단추들은 화면 아래에 고정 (2026-10-31 사용자 요청)
-      foot.innerHTML='<div class="srmfin"><div class="srmlab ap">💡 나의 적용 · 결단<span class="srmsaved" aria-live="polite"></span></div><textarea class="srmapply" placeholder="이번 주에 이렇게 살아 보겠습니다" aria-label="나의 적용"></textarea>'+
+      foot.innerHTML='<div class="srmfin"><div class="srmlab ap">💡 나의 적용 · 결단<span class="srmsaved" aria-live="polite"></span><button type="button" class="srmapfold" aria-label="나의 적용 접기·펼치기"></button></div><textarea class="srmapply" placeholder="이번 주에 이렇게 살아 보겠습니다" aria-label="나의 적용"></textarea>'+
         '<div class="srmbtns"><button type="button" class="srmdel">지우기</button><button type="button" class="srmopen" hidden>📖 말씀 카드 보기</button><button type="button" class="srmdone">다 적었어요</button></div></div>';
+      // ▴ 나의 적용 칸 접기·펼치기 — 머리 줄만 남김, 이 기기에 기억 (2026-11-12 사용자 요청)
+      (function(){var fin=foot.querySelector(".srmfin"), fb=foot.querySelector(".srmapfold"), lab=foot.querySelector(".srmlab.ap");
+        function setF(on){fin.classList.toggle("apfolded",on); fb.textContent=on?"▾":"▴"; fb.title=on?"펼치기":"접기"; fb.setAttribute("aria-expanded",String(!on))}
+        var on0=false; try{on0=localStorage.getItem("bible-srm-apfold")==="1"}catch(e){} setF(on0);
+        lab.addEventListener("click",function(e){var on=!fin.classList.contains("apfolded"); setF(on); try{localStorage.setItem("bible-srm-apfold",on?"1":"0")}catch(err){} if(!on){var ta=fin.querySelector(".srmapply"); if(ta&&e.target===fb)setTimeout(function(){try{ta.focus({preventScroll:true})}catch(er){}},0)}});
+      })();
       f.querySelector(".srmdate").value=x.d; f.querySelector(".srmwho").value=x.who; f.querySelector(".srmtitle").value=x.title;
       f.querySelector(".srmrefin").value=x.ref; f.querySelector(".srmbody").value=x.body;
       var yti=f.querySelector(".srmyt"), ytb=f.querySelector(".srmytgo"); yti.value=x.yt||""; ytb.hidden=!srmYtUrl(yti.value);
