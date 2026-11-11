@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-srmflat">
+<meta name="app-build" content="2026-11-11-saytapfold">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -16191,6 +16191,10 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
       dtap={id:id,t:now};
       // 접힌 카드를 한 번 누르면 펼쳐서 읽기 (두 번 누르면 고치기, 2026-11-08 사용자 요청)
       if(card.classList.contains("sayfolded")&&sayFold[id]){dtap.ot=setTimeout(function(){if(dtap.id!==id)return; delete sayFold[id]; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); buzz(6)},390)}
+      else if(!sayBack[id]&&card.querySelector('.sayfoldb[data-act="fold"]')){   // 펼친 긴 카드는 한 번 누르면 접힘 (2026-11-11 사용자 요청)
+        try{var sl0=window.getSelection(); if(sl0&&String(sl0).length)return}catch(err){}
+        dtap.ot=setTimeout(function(){if(dtap.id!==id)return; sayFold[id]=1; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); buzz(6);
+          var nc=say.querySelector('.saycard[data-id="'+id+'"]'); if(nc){var r=nc.getBoundingClientRect(); if(r.top<70||r.bottom>innerHeight)nc.scrollIntoView({block:"center"})}},390)}
     },true);
     list.addEventListener("pointerdown",function(e){
       if(sayLocked&&!sayEdit&&e.button<=0&&e.target.closest(".saycard")&&!e.target.closest("button,a,input,textarea,select")){sx=e.clientX;sy=e.clientY;pend={lock:1};clearTimeout(hold);hold=setTimeout(function(){if(pend&&pend.lock){pend=null;buzz(10);toast("📌 고정을 끄면 끌어서 순서를 바꿀 수 있어요")}},450);return}   // 고정 ON에서 꾹 누르면 알려 줌 (2026-11-07)
