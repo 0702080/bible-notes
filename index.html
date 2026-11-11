@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-nojitter2">
+<meta name="app-build" content="2026-11-11-prgap">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4261,7 +4261,7 @@ body.carddrag #reviewBar{display:none!important}
 .note .qbtns .mpriv{height:28px;padding:0;border:0;border-radius:0;background:transparent;color:#8E889A;font-size:12.5px;font-weight:400}
 .note .qbtns .mpriv.on{background:transparent;color:var(--gold)}
 /* 기도 탭 맨 위 줄(+ 기도·읽기 모드·전체 접기·친구 공개)은 모두 같은 입체 알약 단추 (2026-11-08 사용자 요청) */
-.note .pane[data-pane="p"] .qbtns{margin-left:0;gap:4px;align-items:center;flex-wrap:nowrap}
+.note .pane[data-pane="p"] .qbtns{margin-left:0;margin-bottom:14px;gap:4px;align-items:center;flex-wrap:nowrap}   /* 단추 줄과 첫 기도문 사이 여백 (2026-11-11 사용자 요청) */
 .note .pane[data-pane="p"] .qbtns .addbtn.s,.note .pane[data-pane="p"] .qbtns .mpriv{flex:none;height:30px;padding:0 8px;border:1px solid #45434F!important;border-radius:16px;background-color:#2A2933!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.30),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.45)!important;color:var(--sky);font-size:12px;font-weight:700;white-space:nowrap;transition:transform .08s,box-shadow .08s}
 .note .pane[data-pane="p"] .qbtns .mpriv{margin-left:auto;color:#C9C3D6;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .note .pane[data-pane="p"] .qbtns .mpriv.on{color:var(--gold)}
