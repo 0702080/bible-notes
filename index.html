@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-coladd">
+<meta name="app-build" content="2026-11-11-vnoalign2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -18712,6 +18712,13 @@ body.boardon #colAddQuick{display:none!important}
       // 빈 줄 표시(vb)는 남겨 둬야 다음 절에 여백이 또 붙지 않는다 (편집기와 같은 한 줄 공백, 2026-10-15)
       if(!/^[ 	]*\d{1,3}[.)]?[ 	]/.test(ln.textContent||"")){ln.classList.add("cont");var f0=ln.firstChild;if(f0&&f0.nodeType===3)f0.data=String(f0.data).replace(/^[ 	　]+/,"");return}   // 이어지는 줄 앞의 띄어쓰기는 지워서 첫 글자 자리에 딱 맞춤
       var f=ln.firstChild;   // 절 번호를 고정폭 칸에 넣어 본문 시작 자리를 똑같이 맞춘다
+      var mlead=String(ln.textContent||"").match(/^[ \t]*(\d{1,3})[.)]?[ \t]+/);
+      if(mlead&&!(f&&f.nodeType===3&&/^[ \t]*\d{1,3}[.)]?[ \t]+/.test(f.data))){   // 번호가 강조 칸에 들어 있거나 여러 조각으로 나뉘어 있어도 번호 칸에 (2026-11-11 사용자 요청: 줄 맞추기)
+        var left=mlead[0].length, tw=document.createTreeWalker(ln,NodeFilter.SHOW_TEXT,null), tn, kill=[];
+        while(left>0&&(tn=tw.nextNode())){var L=tn.data.length; if(L<=left){left-=L; kill.push(tn)} else {tn.data=tn.data.slice(left); left=0}}
+        kill.forEach(function(k){var pa=k.parentNode; k.remove(); while(pa&&pa!==ln&&!pa.textContent){var up=pa.parentNode; pa.remove(); pa=up}});
+        var sp2=document.createElement("span"); sp2.className="vno"; sp2.textContent=mlead[1]; ln.insertBefore(sp2,ln.firstChild); return;
+      }
       if(f&&f.nodeType===3){
         var mm=String(f.data).match(/^[ 	]*(\d{1,3})[.)]?[ 	]+/);
         if(mm){
