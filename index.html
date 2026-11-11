@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-apedit">
+<meta name="app-build" content="2026-11-12-apgrip">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5065,6 +5065,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmrapb.rempty{color:var(--muted);font-style:normal;cursor:pointer}
 .srmapta{display:block;width:100%;box-sizing:border-box;margin:6px 0 24px;padding:10px 14px;border:1px solid var(--green);border-radius:12px;background:color-mix(in srgb,var(--green) 13%,#16161C);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.5;resize:none;overflow:hidden}
 .srmapta:focus{outline:none}
+.srmapw .srmapta{margin-bottom:0;border-bottom-left-radius:0;border-bottom-right-radius:0}
+.srmapgrip{display:flex;justify-content:center;align-items:center;height:26px;margin:0 0 24px;border:1px solid var(--green);border-top:0;border-radius:0 0 12px 12px;background:color-mix(in srgb,var(--green) 20%,#16161C);touch-action:none;cursor:ns-resize;-webkit-user-select:none;user-select:none}
+.srmapgrip i{display:block;width:44px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--green) 70%,#fff)}
+.srmapgrip.on{background:color-mix(in srgb,var(--green) 35%,#16161C)}
 .srmrv .rapply{padding:10px 14px;border:1px solid color-mix(in srgb,var(--green) 35%,#2A2930);border-radius:12px;background:color-mix(in srgb,var(--green) 13%,#16161C);font-family:var(--serif);font-size:16px;line-height:1.5;white-space:pre-wrap;word-break:keep-all;margin-bottom:24px}
 /* 📖 읽기 모드는 따뜻한 금빛 바탕, ✏️ 고치기는 보랏빛 — 한눈에 구분 (2026-11-07 사용자 요청) */
 .srmsheet.srmreading{background:rgba(46,34,12,.62)}
@@ -13239,12 +13243,30 @@ body.boardon #colAddQuick{display:none!important}
       var apl=document.createElement("div"); apl.className="srmlab ap"; apl.appendChild(document.createTextNode("💡 나의 적용 · 결단"));
       var eb=document.createElement("button"); eb.type="button"; eb.className="srmapedit"; eb.textContent="✏️ 고치기"; apl.appendChild(eb); w.appendChild(apl);
       var T=0, lt=0;
-      function show(){var cur=(srmData().items.find(function(y){return y.id===x.id})||x).apply||""; [].slice.call(w.querySelectorAll(".srmrapb,.srmapta")).forEach(function(e){e.remove()}); eb.hidden=false;
+      function show(){var cur=(srmData().items.find(function(y){return y.id===x.id})||x).apply||""; [].slice.call(w.querySelectorAll(".srmrapb,.srmapta,.srmapgrip")).forEach(function(e){e.remove()}); eb.hidden=false;
         var apb=document.createElement("div"); apb.className="rapply srmrapb"+(cur.trim()?"":" rempty"); apb.textContent=cur.trim()||"＋ 나의 적용을 적어 보세요"; w.appendChild(apb)}
       function save(val){var o=srmData(), y=o.items.find(function(z){return z.id===x.id}); if(!y||y.apply===val)return; y.apply=val; y.u=Date.now(); srmSave(o)}
       function edit(){var cur=(srmData().items.find(function(y){return y.id===x.id})||x).apply||""; var old=w.querySelector(".srmrapb"); if(old)old.remove(); eb.hidden=true;
         var t=document.createElement("textarea"); t.className="srmapta"; t.value=cur; t.placeholder="이번 주에 이렇게 살아 보겠습니다"; t.setAttribute("aria-label","나의 적용"); w.appendChild(t);
-        function fit(){t.style.height="auto"; t.style.height=Math.max(72,t.scrollHeight+2)+"px"} fit();
+        // ↕ 아래 손잡이를 끌어 적는 칸 높이 늘이기·줄이기 — 정한 높이는 이 기기에 기억 (2026-11-12 사용자 요청)
+        var uh=0; try{uh=+localStorage.getItem("bible-srm-aph")||0}catch(e){}
+        function fit(){t.style.height="auto"; t.style.height=Math.max(72,uh,t.scrollHeight+2)+"px"} fit();
+        var gp=document.createElement("div"); gp.className="srmapgrip"; gp.title="끌어서 칸 크기 바꾸기"; gp.innerHTML="<i></i>"; w.appendChild(gp);
+        var gd=null;
+        function gStart(y){gd={y:y,h:t.getBoundingClientRect().height}; gp.classList.add("on")}
+        function gMove(y){if(!gd)return; uh=Math.max(72,Math.min(window.innerHeight*0.85,gd.h+(y-gd.y))); t.style.height=Math.max(uh,72)+"px"}
+        function gEnd(){if(!gd)return; gd=null; gp.classList.remove("on"); try{localStorage.setItem("bible-srm-aph",String(Math.round(uh)))}catch(e){} fit()}
+        gp.addEventListener("touchstart",function(e){e.preventDefault(); e.stopPropagation(); gStart(e.touches[0].clientY)},{passive:false});
+        gp.addEventListener("touchmove",function(e){e.preventDefault(); e.stopPropagation(); gMove(e.touches[0].clientY)},{passive:false});
+        gp.addEventListener("touchend",function(e){e.stopPropagation(); gEnd()});
+        gp.addEventListener("mousedown",function(e){e.preventDefault(); gStart(e.clientY);
+          function mm(ev){gMove(ev.clientY)} function mu(){document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); gEnd()}
+          document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu)});
+        // 적는 칸을 두 번 누르면 저장하고 읽기로 (2026-11-12 사용자 요청)
+        var dt={t:0,x:0,y:0};
+        t.addEventListener("touchend",function(e){var c=e.changedTouches[0], nw=Date.now(); e.stopPropagation();
+          if(nw-dt.t<480&&Math.abs(c.clientX-dt.x)<60&&Math.abs(c.clientY-dt.y)<80){dt.t=0; if(e.cancelable)e.preventDefault(); t.blur(); buzz(10)} else dt={t:nw,x:c.clientX,y:c.clientY}});
+        t.addEventListener("dblclick",function(e){e.stopPropagation(); t.blur()});
         t.addEventListener("input",function(){fit(); clearTimeout(T); T=setTimeout(function(){save(t.value)},500)});
         t.addEventListener("blur",function(){clearTimeout(T); save(t.value); setTimeout(function(){if(w.isConnected&&document.activeElement!==t)show()},0)});
         setTimeout(function(){try{t.focus({preventScroll:true}); t.setSelectionRange(t.value.length,t.value.length)}catch(e){}},0)}
