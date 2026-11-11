@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-ccvn">
+<meta name="app-build" content="2026-11-11-nojitter">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -13036,10 +13036,17 @@ body.boardon #colAddQuick{display:none!important}
     srm.style.top="0px"; srm.style.bottom="auto"; srm.style.height=Math.round(vv.height+Math.max(0,vv.offsetTop))+"px";   // 위를 비우지 않음 (2026-11-11 사용자 요청: 맨 위 빈 띠 없애기)
     var a=document.activeElement; if(a&&srm.contains(a)&&a.tagName==="TEXTAREA")setTimeout(function(){caretInBox(a)},60);
   }
-  function caretInBox(t){   // 커서 줄이 키보드 위로 오게 창 안쪽만 굴림
+  function caretTop(t){   // 커서가 있는 줄의 아래끝(칸 안 글 기준) — 줄바꿈된 줄까지 숨은 거울 칸으로 잼 (2026-11-11)
+    var cs=getComputedStyle(t), m=caretTop.m||(caretTop.m=document.createElement("div"));
+    m.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;box-sizing:border-box";
+    ["width","fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","wordBreak","paddingLeft","paddingRight","paddingTop","borderLeftWidth","borderRightWidth","borderTopWidth","borderStyle"].forEach(function(k){m.style[k]=cs[k]});
+    m.style.paddingBottom="0px"; m.style.borderBottomWidth="0px"; m.textContent=t.value.slice(0,t.selectionEnd)+"\u200b"; document.body.appendChild(m);
+    var h=m.offsetHeight; m.remove(); return h;
+  }
+  function caretInBox(t){   // 커서 줄이 키보드 위로 오게 창 안쪽만 굴림 (줄바꿈까지 정확히 재서 위아래로 흔들리지 않게)
     var box=srm.querySelector(".srmbox"); if(!box||!t.isConnected)return;
-    var cs=getComputedStyle(t), lh=parseFloat(cs.lineHeight)||26, before=t.value.slice(0,t.selectionEnd).split("\n").length, rows=Math.max(1,Math.round((t.scrollHeight-(parseFloat(cs.paddingTop)||0)-(parseFloat(cs.paddingBottom)||0))/lh));
-    var tr=t.getBoundingClientRect(), y=tr.top+(parseFloat(cs.paddingTop)||0)+Math.min(rows,before)*lh, br=box.getBoundingClientRect();
+    var cs=getComputedStyle(t), lh=parseFloat(cs.lineHeight)||26;
+    var tr=t.getBoundingClientRect(), y=tr.top+caretTop(t)-t.scrollTop, br=box.getBoundingClientRect();
     if(y>br.bottom-24)box.scrollTop+=y-(br.bottom-24); else if(y-lh<br.top+8)box.scrollTop-=(br.top+8)-(y-lh);
   }
   if(window.visualViewport){visualViewport.addEventListener("resize",srmVV); visualViewport.addEventListener("scroll",srmVV)}
@@ -13205,7 +13212,11 @@ body.boardon #colAddQuick{display:none!important}
     if(String(x.apply||"").trim()){var apl=document.createElement("div"); apl.className="srmlab ap"; apl.textContent="💡 나의 적용 · 결단"; v.appendChild(apl); var apb=document.createElement("div"); apb.className="rapply srmrapb"; apb.textContent=x.apply.trim(); v.appendChild(apb)}   // 읽기에서 옮겨 옴 (2026-11-11)
     var ta=document.createElement("textarea"); ta.className="srmresp"; ta.dataset.id=x.id; ta.value=x.resp||"";
     ta.placeholder="이 설교를 듣고 드리는 기도나 에세이를 자유롭게 적어 보세요.\n\n예) 주님, 오늘 말씀을 통해…"; ta.setAttribute("aria-label","이 설교를 듣고 쓰는 기도·에세이");
-    var fit=function(){ta.style.height="auto"; ta.style.height=Math.max(ta.scrollHeight+2,Math.round(innerHeight*0.5))+"px"};
+    var fit=function(){   // 높이를 다시 잴 때 칸이 잠깐 줄어 화면이 위아래로 흔들리지 않게: 굴린 자리를 지키고, 늘어날 때만 바로 키움 (2026-11-11 사용자 요청)
+      var bx=srm.querySelector(".srmbox"), st=bx?bx.scrollTop:0, minH=Math.round(innerHeight*0.5);
+      if(ta.scrollHeight>ta.clientHeight){ta.style.height=Math.max(ta.scrollHeight+2,minH)+"px"}
+      else{ta.style.height="auto"; ta.style.height=Math.max(ta.scrollHeight+2,minH)+"px"; if(bx)bx.scrollTop=st}
+    };
     ta.addEventListener("input",function(){fit(); var sv=v.querySelector(".srmrsaved"); if(sv)sv.textContent="적는 중…"; clearTimeout(srmRespT); srmRespT=setTimeout(function(){srmRespSave(x.id,ta.value); var s2=v.querySelector(".srmrsaved"); if(s2)s2.textContent="저장됨 ✓"},600)});
     ta.addEventListener("blur",srmRespFlush);
     ta.addEventListener("input",function(){if(window.visualViewport&&visualViewport.height<innerHeight-2)setTimeout(function(){caretInBox(ta)},30)});
