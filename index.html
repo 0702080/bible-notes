@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-11-srmvv">
+<meta name="app-build" content="2026-11-11-resprd">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5160,6 +5160,9 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
 .srmgal .srmpgb{width:auto;padding:0 14px;font-size:14px;height:36px}
 .srmsheet>.dlbar .dltitle{flex:1 1 auto;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .srmsheet>.dlbar .srmfbtn,.srmsheet>.dlbar .srmhshot{width:36px;padding:0!important;flex:0 0 auto}
+.srmrsp .srmresplines{min-height:30vh;padding:4px 0;border:1px solid color-mix(in srgb,var(--pink) 30%,#2A2930);border-radius:12px;background:color-mix(in srgb,color-mix(in srgb,var(--pink) 8%,#141419) 82%,transparent)}
+.srmrsp .srmresplines .srmrli{padding-left:14px;-webkit-user-select:none;user-select:none}
+.srmrsp .srmresplines .srmline+.srmline{border-top:1px dashed color-mix(in srgb,var(--pink) 16%,transparent)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12538,6 +12541,7 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
       });
       srm.addEventListener("focusin",function(e){if(e.target.classList&&e.target.classList.contains("srmli")){var al=[].slice.call(srm.querySelectorAll(".srmform .srmlines .srmli")); srmLastLi=al.indexOf(e.target)}});
       srm.addEventListener("click",srmClick); srmDragInit(); srmReadDragInit();
+      srm.addEventListener("dblclick",function(e){if(srmEdit&&srmResp&&e.target.closest(".srmrsp")&&!e.target.closest("button,select,input,a")){try{window.getSelection().removeAllRanges()}catch(err){} srmRespToggle()}});   // PC
       // ↔ 옆으로 밀기 (2026-11-08 사용자 요청): 메모에서 오른쪽→왼쪽 = ✍️ 이 설교를 듣고 쓰는 기도·에세이, 왼쪽→오른쪽 = 목록 (기도·에세이 쪽에서는 메모로)
       var srmSw=null;
       srm.addEventListener("touchstart",function(e){
@@ -12550,13 +12554,17 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
         if(Date.now()-sw.t>900||Math.abs(dx)<70||Math.abs(dx)<Math.abs(dy)*2)return;
         try{var sl=window.getSelection(); if(sl&&String(sl).length)return}catch(err){}   // 글자를 고르던 중이면 넘기지 않음
         var ae=document.activeElement; if(ae&&srm.contains(ae)&&ae.blur)ae.blur();
-        if(dx<0){if(srmResp)return; if(!srmRead)srmCommit(); srmResp=true; srmDraw(); srmSlide("l"); buzz(10)}
+        if(dx<0){if(srmResp)return; if(!srmRead)srmCommit(); srmResp=true; srmRespEd=false; srmDraw(); srmSlide("l"); buzz(10)}
         else if(srmResp){srmRespFlush(); srmResp=false; srmDraw(); srmSlide("r"); buzz(10)}
         else{srmCommit(); srmEdit=""; srmDraw(); srmSlide("r"); buzz(10)}
       },{passive:true});
       // 휴대폰: 메모를 빠르게 두 번 누르면 고치기 ↔ 읽기 (2026-11-07 사용자 요청)
       var srmTap={t:0,x:0,y:0};
       srm.addEventListener("pointerup",function(e){
+        if(e.pointerType==="touch"&&srmEdit&&srmResp&&e.target.closest(".srmrsp")&&!e.target.closest("button,select,input,a")){   // ✍️ 뒷면: 두 번 누르면 고치기 ↔ 읽기 (2026-11-11 사용자 요청)
+          var nw=Date.now(); if(nw-srmTap.t<350&&Math.abs(e.clientX-srmTap.x)<30&&Math.abs(e.clientY-srmTap.y)<40){srmTap.t=0; e.preventDefault(); srmRespToggle(); buzz(10); return}
+          srmTap={t:nw,x:e.clientX,y:e.clientY}; return;
+        }
         if(e.pointerType!=="touch"||!srmEdit||srmResp||!e.target.closest(".srmbox")||e.target.closest("button,select,input,a,.srmytc,.srmgrip"))return;
         var now=Date.now();
         if(now-srmTap.t<350&&Math.abs(e.clientX-srmTap.x)<30&&Math.abs(e.clientY-srmTap.y)<30){
@@ -12605,7 +12613,7 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
   function srmClick(e){
     if(e.target.closest(".srmfbtn")){e.stopPropagation(); srmFindToggle(); return}
     if(e.target.closest(".srmshot")){e.stopPropagation(); var sx=srmData().items.find(function(y){return y.id===srmEdit}); if(sx){try{srmShots(sx)}catch(err){toast("그림을 만들지 못했어요 😢 "+(err&&err.message||""))}} return}
-    if(e.target.closest(".srmrgo")){e.stopPropagation(); if(!srmRead)srmCommit(); srmResp=true; srmDraw(); srmSlide("l"); return}
+    if(e.target.closest(".srmrgo")){e.stopPropagation(); if(!srmRead)srmCommit(); srmResp=true; srmRespEd=false; srmDraw(); srmSlide("l"); return}
     if(e.target.closest(".srmrback")){e.stopPropagation(); srmRespFlush(); srmResp=false; srmDraw(); srmSlide("r"); return}
     if(e.target.closest(".srmrcopy")){e.stopPropagation(); var rt=srm.querySelector("textarea.srmresp"), rv=rt?rt.value:""; if(!rv.trim()){toast("복사할 글이 없어요");return}
       var ok=function(){toast("📋 복사했어요")}; if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(rv).then(ok,function(){try{rt.select();document.execCommand("copy");ok()}catch(err){toast("복사하지 못했어요")}}); else{try{rt.select();document.execCommand("copy");ok()}catch(err){toast("복사하지 못했어요")}} return}
@@ -12886,7 +12894,11 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
     }
     srmShotsGallery(files,title);
   }
-  var srmLastLi=-1, srmReadAt=null;
+  var srmLastLi=-1, srmReadAt=null, srmRespEd=false;
+  function srmRespToggle(){   // 뒷면: 고치기 ↔ 읽기
+    if(srmRespEd){srmRespFlush(); var a=document.activeElement; if(a&&srm.contains(a))a.blur(); srmRespEd=false; srmDraw(); return}
+    srmRespEd=true; srmDraw(); var t=srm.querySelector("textarea.srmresp"); if(t)setTimeout(function(){try{t.focus({preventScroll:true}); t.setSelectionRange(t.value.length,t.value.length)}catch(e){}},40);
+  }
   // ⌨️ 휴대폰 키보드가 올라와도 설교 메모 맨 위 줄은 늘 보이게: 창 높이를 키보드 위 보이는 부분에 맞춤 → 글만 그 안에서 굴러감 (2026-11-11 사용자 요청)
   function srmVV(){
     if(!srm)return; var vv=window.visualViewport;
@@ -13066,13 +13078,17 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
     ta.addEventListener("input",function(){fit(); var sv=v.querySelector(".srmrsaved"); if(sv)sv.textContent="적는 중…"; clearTimeout(srmRespT); srmRespT=setTimeout(function(){srmRespSave(x.id,ta.value); var s2=v.querySelector(".srmrsaved"); if(s2)s2.textContent="저장됨 ✓"},600)});
     ta.addEventListener("blur",srmRespFlush);
     ta.addEventListener("input",function(){if(window.visualViewport&&visualViewport.height<innerHeight-2)setTimeout(function(){caretInBox(ta)},30)});
-    v.appendChild(ta); requestAnimationFrame(fit);
+    // 📖 뒷면도 읽기·고치기: 적어 둔 글은 읽기로 보이고, 두 번 누르면 고치기 ↔ 읽기 (2026-11-11 사용자 요청)
+    if(!srmRespEd&&String(x.resp||"").trim()){
+      var rd=document.createElement("div"); rd.className="srmlines srmresplines"; v.appendChild(rd);
+      lineRowsSet(rd,String(x.resp).replace(/\s+$/,"").split("\n"),function(t){var ln=document.createElement("div"); ln.className="srmline"; var d=document.createElement("div"); d.className="srmrli"; hlFill(d,t); ln.appendChild(d); return ln},".srmrli");
+    }else{v.appendChild(ta); requestAnimationFrame(fit)}
     var row=document.createElement("div"); row.className="srmrrow";
     var bk=document.createElement("button"); bk.type="button"; bk.className="srmrback"; bk.textContent="← 설교 메모"; row.appendChild(bk);
     var sv=document.createElement("span"); sv.className="srmrsaved"; sv.setAttribute("aria-live","polite"); row.appendChild(sv);
     var cp=document.createElement("button"); cp.type="button"; cp.className="srmrcopy"; cp.textContent="📋 복사"; row.appendChild(cp);
     v.appendChild(row);
-    var hint=document.createElement("p"); hint.className="srmrhint"; hint.textContent="← 오른쪽으로 밀면 설교 메모로 돌아가요"; v.appendChild(hint);
+    var hint=document.createElement("p"); hint.className="srmrhint"; hint.textContent=(String(x.resp||"").trim()?(srmRespEd?"두 번 누르면 읽기 · ":"두 번 누르면 고치기 · "):"")+"← 오른쪽으로 밀면 설교 메모로 돌아가요"; v.appendChild(hint);
     return v;
   }
   // 🔍 찾은 낱말 표시: 금빛 사각형이 부드럽게 깜박임 (2026-11-08 사용자 요청)
