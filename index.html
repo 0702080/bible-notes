@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-prdcol">
+<meta name="app-build" content="2026-11-12-dl3d">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5337,6 +5337,10 @@ body.boardon #colAddQuick{display:none!important}
 .prd .dlbar .prdclose{background-color:color-mix(in srgb,var(--pink) 42%,#2A2933)!important;border-color:color-mix(in srgb,var(--pink) 60%,#4A4855)!important;color:#fff!important}
 .prd .prdfil .prdall{background-color:color-mix(in srgb,var(--sky) 40%,#2A2933)!important;border-color:color-mix(in srgb,var(--sky) 60%,#4A4855)!important;color:#fff!important}
 .prd .p1go{background-color:color-mix(in srgb,var(--orange) 80%,#2A2933)!important;border-color:color-mix(in srgb,var(--orange) 85%,#fff)!important;color:#1A1208!important;font-weight:800!important}
+
+/* 🧊 하루 돌아보기 맨 위 🎯 집중·✏️ 항목 고치기도 닫기와 같은 입체 알약 (2026-11-12 사용자 요청) */
+.daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dledit:not(.on){position:relative;border-radius:999px!important;border:1px solid #4A4656!important;background:#2A2733 linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#EEEAF6!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1px 0 rgba(0,0,0,.25),0 3px 0 rgba(0,0,0,.45),0 4px 8px rgba(0,0,0,.35)!important;transition:transform .08s,box-shadow .08s}
+.daily:has(>.dlbar>.dlfocusbtn)>.dlbar .dledit:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
