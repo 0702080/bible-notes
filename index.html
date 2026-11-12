@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-prdrecent">
+<meta name="app-build" content="2026-11-12-prdsimple">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5282,6 +5282,20 @@ body.boardon #colAddQuick{display:none!important}
 .ccverse .ccw.hid.ccvn{padding-right:2px!important;margin-right:-2px}
 .srmsheet .srmbox{overflow-anchor:none}
 .srmrsp textarea.srmresp{overflow:hidden!important}
+
+/* 🙏 기도 읽기 윗부분 간단하게 (2026-11-12 사용자 요청): 응답 수 숨김, 닫기 ✕ 동그라미, 보기 고르기는 밑줄 글자 탭, 모두 접기는 작은 ▴, 한 줄 기도는 칸 안 ＋ */
+.prd .prdcnt{display:none!important}
+.prd .dlbar .prdclose{width:36px;height:36px;padding:0!important;border-radius:50%!important;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08)!important;background-image:none!important;border:0!important;box-shadow:none!important;color:var(--ink)}
+.prd .prdfil{gap:4px;margin-bottom:12px;border-bottom:1px solid rgba(255,255,255,.10)}
+.prd .prdseg{flex:1;padding:0;gap:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.prd .prdseg button,.prd .prdseg button[aria-pressed="true"],.prd .prdseg button:not([aria-pressed="true"]){flex:0 0 auto;height:38px;padding:0 12px;border-radius:0!important;background:transparent!important;background-image:none!important;box-shadow:none!important;font-size:14px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent!important;margin-bottom:-1px}
+.prd .prdseg button[aria-pressed="true"]{color:var(--orange);font-weight:700;border-bottom-color:var(--orange)!important}
+.prd .prdfil .prdall{width:30px;height:30px;padding:0!important;border-radius:50%!important;font-size:13px;background:transparent!important;background-image:none!important;box-shadow:none!important;border:1px solid rgba(255,255,255,.14)!important;color:var(--muted)}
+.prd .p1add{position:relative;margin:0 0 16px}
+.prd .p1in{height:42px;padding-right:50px;border:1px solid rgba(255,255,255,.12);border-radius:21px;background:rgba(0,0,0,.28);font-size:15px}
+.prd .p1go{position:absolute;right:4px;top:4px;width:34px;height:34px;padding:0;border-radius:50%;font-size:20px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;background-image:none!important;box-shadow:none!important}
+.prd .p1go:active{transform:scale(.92)!important}
+@media (max-width:380px){.prd .prdseg button,.prd .prdseg button[aria-pressed="true"]{padding:0 8px;font-size:13px}}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -6997,9 +7011,9 @@ body.boardon #colAddQuick{display:none!important}
     prdNote=nid; prdFilter="all";
     if(!prd){
       prd=document.createElement("div"); prd.className="rvq prd"; prd.setAttribute("role","dialog"); prd.setAttribute("aria-modal","true"); prd.hidden=true;
-      prd.innerHTML='<div class="dlbar"><b class="dltitle">🙏 기도 읽기</b><span class="rqcnt prdcnt"></span><button type="button" class="dlclose prdclose">닫기</button></div>'+
+      prd.innerHTML='<div class="dlbar"><b class="dltitle">🙏 기도 읽기</b><span class="rqcnt prdcnt"></span><button type="button" class="dlclose prdclose" aria-label="닫기" title="닫기">✕</button></div>'+
         '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><div class="prdseg"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button></div><button type="button" class="prdall"></button></div>'+
-        '<form class="p1add" autocomplete="off"><input class="p1in" type="text" maxlength="500" enterkeyhint="done" placeholder="✏️ 한 줄 기도 적기" aria-label="한 줄 기도"><button type="submit" class="p1go">추가</button></form>'+
+        '<form class="p1add" autocomplete="off"><input class="p1in" type="text" maxlength="500" enterkeyhint="done" placeholder="✏️ 한 줄 기도 적기" aria-label="한 줄 기도"><button type="submit" class="p1go" aria-label="한 줄 기도 추가" title="추가">＋</button></form>'+
         '<div class="prdlist"></div></div>';
       document.body.appendChild(prd);
       prd.querySelector(".prdclose").addEventListener("click",closePrayRead);
@@ -7062,7 +7076,7 @@ body.boardon #colAddQuick{display:none!important}
   function prdFoldSync(){
     if(!prd)return; var secs=prd.querySelectorAll(".prdsec[data-fk]"), b=prd.querySelector(".prdall");
     secs.forEach(function(x){var f=x.querySelector(".prdfold"); if(f)f.setAttribute("aria-expanded",String(!x.classList.contains("fold")))});
-    b.hidden=secs.length<2; b.textContent=Array.prototype.every.call(secs,function(x){return x.classList.contains("fold")})?"모두 펼치기":"모두 접기";
+    b.hidden=secs.length<2; var allShut=Array.prototype.every.call(secs,function(x){return x.classList.contains("fold")}); b.textContent=allShut?"▾":"▴"; b.title=b.ariaLabel=allShut?"모두 펼치기":"모두 접기";
   }
   function prdFoldBtn(sec,key,n){
     sec.dataset.fk=key; if(prdFold[key])sec.classList.add("fold");
