@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-bibletext">
+<meta name="app-build" content="2026-11-12-pgbuzz1">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12974,7 +12974,8 @@ body.boardon #colAddQuick{display:none!important}
       if(P){tot=P.length; cur=end?tot:pgIdx(sc.scrollTop)+1}   // 줄 경계로 나눈 쪽
       else{tot=Math.max(1,Math.ceil((sc.scrollHeight-4)/ch)); cur=end?tot:Math.min(tot,Math.floor((sc.scrollTop+4)/ch)+1)}
       pg.hidden=tot<2; pgBuild(); pg.querySelector(".srmpgt").textContent=cur+" / "+tot; var pbs=pg.querySelectorAll(".srmpgb"); pbs[0].disabled=cur<=1; pbs[1].disabled=cur>=tot; pbs[0].textContent=cur>1?"◀ "+(cur-1):"◀"; pbs[1].textContent=cur<tot?(cur+1)+" ▶":"▶";   // 단추 위에 갈 쪽 숫자 (2026-11-11 사용자 요청)
-      if(pg._cur&&pg._cur!==cur&&tot>1){buzz(12);   // 쪽이 바뀌면 짧게 진동 + 숫자 톡·테두리 금빛 (2026-11-08 사용자 요청)
+      if(pg._cur&&pg._cur!==cur&&tot>1){if(Date.now()-lastBuzz>700)buzz(12);   // 쪽 넘김 진동은 한 번만 — 단추를 누를 때 이미 울렸거나 굴리는 동안 쪽 숫자가 오가도 0.7초 안엔 다시 안 울림 (2026-11-12 사용자 요청)
+          // 쪽이 바뀌면 짧게 진동 + 숫자 톡·테두리 금빛 (2026-11-08 사용자 요청)
         [[pg,"pgpop"],[bd,"pgflash"]].forEach(function(a){a[0].classList.remove(a[1]); void a[0].offsetWidth; a[0].classList.add(a[1])});
       }
       pg._cur=cur;
