@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-biblehang">
+<meta name="app-build" content="2026-11-12-findhide">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4598,6 +4598,8 @@ body:not(.boardon) .fwrap .filter::placeholder{color:#C9C4DA}
 body:not(.boardon) .fwrap .filter{margin:0}
 body:not(.boardon) .fwrap .fx{top:50%;left:6px}
 body:not(.boardon) .note.open .chead{top:46px}
+body.findhide:not(.boardon) .fwrap,body.findhide:not(.boardon) #fScopeRow{display:none!important}   /* 찾은 카드를 펼친 동안 찾기 칸 숨김 (2026-11-12) */
+body.findhide:not(.boardon) .note.open .chead{top:0}
 body:not(.boardon) .solobar{position:relative;top:auto}   /* '이 말씀만 보는 중' 띠는 위에 붙지 않고 같이 굴러감 — 붙으면 카드 머리를 가려 겹쳐 보였음 (2026-11-07 사용자 요청) */
 .fx{position:absolute;left:7px;top:calc(50% + 4px);transform:translateY(-50%);z-index:1;width:30px;height:30px;padding:0;border:0;border-radius:15px;background:#34333A;color:var(--ink);font-size:15px;line-height:30px;text-align:center}
 .fx[hidden]{display:none}
@@ -6582,6 +6584,7 @@ body.boardon #colAddQuick{display:none!important}
     setTopics([]);
     if(boardOn){boardOn=false;applyBoard();soloId=id;soloFrom="board"}   // 설정은 칸반 그대로
     if(tab)tabOf.set(id,tab);
+    findLeave(id);
     openIds.clear(); openIds.add(id); try{localStorage.setItem("bible-last-open",id)}catch(e){}
     spotId=id; render();
     var c=cards.get(id); if(c)setTimeout(function(){c.scrollIntoView({block:"start",behavior:"smooth"})},60);
@@ -7517,7 +7520,16 @@ body.boardon #colAddQuick{display:none!important}
       all.push(el.animate([{transform:"scale(.985)"},{transform:"scale(1.006)"},{transform:"none"}],{duration:320,easing:"ease-out"}));
     }
   }
+  // 🔍 찾은 말씀 카드를 펼치면 찾기 칸을 비우고 그 카드를 보는 동안 숨김 (2026-11-12 사용자 요청)
+  var findOpenId=null;
+  function findLeave(id){
+    if(boardOn||!String(filterText||"").trim())return;
+    var f=$("filter"); if(f){f.value="";f.blur()} var bf=$("bFilter"); if(bf)bf.value="";
+    var x=$("filterX"); if(x)x.hidden=true; if(f)f.classList.remove("has");
+    filterText=""; findOpenId=id; document.body.classList.add("findhide");
+  }
   function openOne(id){
+    findLeave(id);
     openIds.clear(); openIds.add(id); try{localStorage.setItem("bible-last-open",id)}catch(e){}
     setTimeout(function(){var el=cards.get(id); if(!el)return; var r=el.getBoundingClientRect(); if(r.top<0||r.top>window.innerHeight*0.45)el.scrollIntoView({block:"start",behavior:"smooth"})},60);
   }
@@ -7558,6 +7570,7 @@ body.boardon #colAddQuick{display:none!important}
   function render(){
     if(drag||actDrag)return;
     parseQuery();
+    if(findOpenId&&(!openIds.has(findOpenId)||String(filterText||"").trim())){findOpenId=null; document.body.classList.remove("findhide")}
     document.body.classList.toggle("finding",!!filterText);   // 찾는 중엔 '오늘' 카드를 숨김 (2026-11-07 사용자 요청)
     renderTopicBar(); renderColBar(); renderReviewBar(); renderTodayMini(); refreshXrefs(); renderSoloBar();
     var list=$("list"), order=sorted(), shown=0;
