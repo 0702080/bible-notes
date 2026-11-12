@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-lpdrag">
+<meta name="app-build" content="2026-11-12-lpdrag2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -12666,6 +12666,7 @@ body.boardon #colAddQuick{display:none!important}
     var lp={t:0,row:null,x:0,y:0,fired:false};
     srm.addEventListener("touchstart",function(e){
       var ta=e.target.closest&&e.target.closest(".srmform .srmlines .srmli"); if(!ta||e.touches.length!==1||srmDrag)return;
+      if(ta===document.activeElement)return;   // 커서가 들어가 있는(고치는 중인) 줄은 꾹 누르면 휴대폰 글 고르기 → 강조 색 (2026-11-12 사용자 요청)
       var t0=e.touches[0]; clearTimeout(lp.t); lp={row:ta.parentNode,x:t0.clientX,y:t0.clientY,fired:false,t:0};
       lp.t=setTimeout(function(){if(!lp.row||!lp.row.isConnected)return; lp.fired=true; try{window.getSelection().removeAllRanges()}catch(err){} start(lp.row,lp.y); srmDrag.lastY=lp.y},400);
     },{passive:true});
