@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-hlm2">
+<meta name="app-build" content="b20261113-icchev">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5377,6 +5377,11 @@ body.boardon #colAddQuick{display:none!important}
 .srmsheet.hlmulti .srmhl{position:sticky;top:0;z-index:6;padding:6px 0;background:rgba(24,23,30,.96);border-radius:14px}
 .srmsheet.hlmulti .srmform .srmlines .srmline{cursor:pointer}
 .srmsheet.hlmulti .srmform .srmlines .srmline.hlsel{background:color-mix(in srgb,var(--sky) 22%,transparent);box-shadow:inset 3px 0 0 var(--sky)}
+/* 🙏 기도제목 카드 접기 단추: 제목 첫 줄 높이에 맞춘 둥근 입체 단추, 가운데 ⌄ 기호는 그대로 (2026-11-13 사용자 요청) */
+.icv .icp .ictop .icchev{align-self:start;position:relative;width:30px;height:30px;margin:-3px 0 0 4px;border:1px solid #4A4953;border-radius:50%;transform:none!important;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.4);transition:transform .08s,box-shadow .08s}
+.icv .icp .ictop .icchev::before{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translate(-50%,-70%) rotate(45deg);transition:transform .2s}
+.icv .icp.open .ictop .icchev::before{transform:translate(-50%,-30%) rotate(-135deg)}
+.icv .icp .ictop:active .icchev{transform:translateY(2px)!important;box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
