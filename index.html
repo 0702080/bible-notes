@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-prdthx">
+<meta name="app-build" content="2026-11-12-prdswipe">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5314,6 +5314,13 @@ body.boardon #colAddQuick{display:none!important}
 .prd .prdflipin{animation:prdFlipIn .42s cubic-bezier(.2,.8,.3,1)}
 @keyframes prdFlipIn{from{transform:perspective(900px) rotateY(-75deg);opacity:.3}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.prd .prdflipin{animation:none}}
+
+.prd .prdflipinr{animation:prdFlipInR .42s cubic-bezier(.2,.8,.3,1)}
+@keyframes prdFlipInR{from{transform:perspective(900px) rotateY(75deg);opacity:.3}to{transform:none;opacity:1}}
+.prd .prdthans{display:block;margin:6px auto 4px;height:40px;padding:0 18px;border:1px dashed color-mix(in srgb,var(--gold) 55%,#34333A);border-radius:20px;background:transparent;color:var(--gold);font-family:inherit;font-size:14px;font-weight:700;background-image:none!important;box-shadow:none!important}
+.prd .prdthx:not(.answered){background:color-mix(in srgb,var(--gold) 6%,#1C1A1F)!important}
+.prd .prdcard:not(.prdthx){touch-action:pan-y}
+@media (prefers-reduced-motion:reduce){.prd .prdflipinr{animation:none}}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -7074,6 +7081,10 @@ body.boardon #colAddQuick{display:none!important}
           drawPrayRead();
           if(ax.ans){var bk=prd.querySelector('.prdcard[data-pid="'+ax.id+'"]'); if(bk){bk.classList.add("prdflipin"); var ta0=bk.querySelector(".prdth"); try{bk.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(err){} if(ta0&&!ta0.value)setTimeout(function(){try{ta0.focus({preventScroll:true})}catch(err){}},320)}}
           return}
+        var ta1=e.target.closest(".prdthans");   // 뒷면(응답 전): 응답 표시하고 바로 감사 기도
+        if(ta1){var c1=ta1.closest(".prdcard"), n1=notes.get(c1.dataset.nid), x1=n1&&(n1.prays||[]).find(function(y){return y.id===c1.dataset.pid}); if(!x1)return;
+          x1.ans=Date.now(); scheduleSave(n1.id); buzz([12,40,18]); drawPrayRead(); var t1=prd.querySelector('.prdcard[data-pid="'+x1.id+'"] .prdth'); if(t1)setTimeout(function(){try{t1.focus({preventScroll:true})}catch(err){}},60); return}
+        if(prd._swAt&&Date.now()-prd._swAt<450)return;   // 옆으로 민 손길은 누르기로 세지 않음
         var tg=e.target.closest(".prdthgo,.prdthback");   // 앞면 ↔ 뒷면(응답 감사 기도)
         if(tg){var tc=tg.closest(".prdcard"); prdThx=tg.classList.contains("prdthgo")?{nid:tc.dataset.nid,pid:tc.dataset.pid}:{nid:"",pid:""}; var ae0=document.activeElement; if(ae0&&ae0.blur)ae0.blur(); drawPrayRead(); var nc=prd.querySelector('.prdcard[data-pid="'+tc.dataset.pid+'"]'); if(nc)nc.classList.add("prdflipin"); return}
         if(e.target.closest(".prdedok")){prdEdSave();return}
@@ -7084,6 +7095,19 @@ body.boardon #colAddQuick{display:none!important}
         prdTap={k:k,t:now};
       });
       prd.querySelector(".prdlist").addEventListener("input",function(e){if(e.target.classList.contains("prded"))grow(e.target)});
+      (function(){   // ↔ 말씀 카드 기도문을 옆으로 밀면 뒷면(응답 감사 기도)·다시 밀면 앞면 (2026-11-12 사용자 요청)
+        var L=prd.querySelector(".prdlist"), sw=null;
+        L.addEventListener("touchstart",function(e){var c=e.target.closest(".prdcard"); if(!c||e.touches.length!==1||e.target.closest("textarea,input")){sw=null;return} var t=e.touches[0]; sw={c:c,x:t.clientX,y:t.clientY,t:Date.now()}},{passive:true});
+        L.addEventListener("touchend",function(e){if(!sw)return; var t=e.changedTouches[0], dx=t.clientX-sw.x, dy=t.clientY-sw.y, c=sw.c; sw=null;
+          if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;
+          var back=c.classList.contains("prdthx"), pid=c.dataset.pid;
+          prd._swAt=Date.now(); prdThx=back?{nid:"",pid:""}:{nid:c.dataset.nid,pid:pid};
+          var ae=document.activeElement; if(ae&&ae.blur&&prd.contains(ae))ae.blur();
+          buzz(10); drawPrayRead();
+          var nc=prd.querySelector('.prdcard[data-pid="'+pid+'"]'); if(nc){nc.classList.add(dx<0?"prdflipin":"prdflipinr"); if(!back){var ta=nc.querySelector(".prdth"); if(ta&&!ta.hidden&&!ta.value)setTimeout(function(){try{ta.focus({preventScroll:true})}catch(err){}},320)}}
+        },{passive:true});
+        L.addEventListener("touchcancel",function(){sw=null},{passive:true});
+      })();
       (function(){var thT=0;   // 감사 기도는 적는 대로 0.5초 뒤 저장
         function grow(t){t.style.height="auto"; t.style.height=Math.max(120,t.scrollHeight+4)+"px"}
         prd.querySelector(".prdlist").addEventListener("input",function(e){var t=e.target; if(!t.classList||!t.classList.contains("prdth"))return; grow(t);
@@ -7172,12 +7196,13 @@ body.boardon #colAddQuick{display:none!important}
       if(prdNote)sec.querySelector(".prdgo").remove();
       var hd0=sec.querySelector(".prdhd"); hd0.insertBefore(prdFoldBtn(sec,n.id,ps.length),hd0.querySelector(".prdgo"));
       ps.forEach(function(x,pi){
-        if(prdThx.nid===n.id&&prdThx.pid===x.id&&x.ans){   // 🙏 뒷면: 응답 감사 기도 적기 (2026-11-12 사용자 요청)
-          var bk=document.createElement("article"); bk.className="prdit prdcard prdthx answered"; bk.dataset.nid=n.id; bk.dataset.pid=x.id;
+        if(prdThx.nid===n.id&&prdThx.pid===x.id){   // 🙏 뒷면: 응답 감사 기도 적기 (2026-11-12 사용자 요청)
+          var bk=document.createElement("article"); bk.className="prdit prdcard prdthx"+(x.ans?" answered":""); bk.dataset.nid=n.id; bk.dataset.pid=x.id;
           bk.style.setProperty("--ic",ANSCOL[(pi+list.children.length)%ANSCOL.length]);
-          bk.innerHTML='<div class="prdmeta"><span class="prdthh">🙏 응답 감사 기도</span><button type="button" class="prdthback">← 기도문</button></div><p class="prdthq"></p><textarea class="prdth" rows="5" placeholder="응답해 주신 하나님께 감사 기도를 적어 보세요" aria-label="응답 감사 기도"></textarea><div class="prdthsv"></div>';
+          bk.innerHTML='<div class="prdmeta"><span class="prdthh">🙏 응답 감사 기도</span><button type="button" class="prdthback">← 기도문</button></div><p class="prdthq"></p><textarea class="prdth" rows="5" placeholder="응답해 주신 하나님께 감사 기도를 적어 보세요" aria-label="응답 감사 기도"></textarea><div class="prdthsv"></div><button type="button" class="prdthans">🙌 응답됐어요 · 감사 기도 쓰기</button>';
           var fl=String(x.t||"").split("\n").map(function(l){return l.trim()}).filter(function(l){return l&&!/^전능하신/.test(l)})[0]||x.t;
-          bk.querySelector(".prdthq").textContent="🙌 "+dlabel(dkey(x.ans))+" 응답 · "+fl;
+          bk.querySelector(".prdthq").textContent=(x.ans?"🙌 "+dlabel(dkey(x.ans))+" 응답 · ":"기다리는 기도 · ")+fl;
+          if(!x.ans){bk.querySelector(".prdth").hidden=true; bk.querySelector(".prdthsv").hidden=true} else bk.querySelector(".prdthans").remove();
           bk.querySelector(".prdth").value=x.th||"";
           sec.appendChild(bk); return;
         }
