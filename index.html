@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-sayalign">
+<meta name="app-build" content="2026-11-12-srmlab">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5346,6 +5346,9 @@ body.boardon #colAddQuick{display:none!important}
 .daily .dlactrow .dlt{font-size:13.5px}
 .saysheet .saysrow .sayfab{margin-right:8px}   /* 짧은 말씀·한 마디 창: 닫기·모두 접기·카드 단추 오른쪽 끝을 한 줄로 (2026-11-12 사용자 요청) */
 .saysheet .saycard .sayf .sayone,.saysheet .saycard .sayf .sayfoldb{margin-right:-9px}
+.srmsheet .srmlab.srmlabm{justify-content:flex-end}   /* 설교 메모 이름·⠿ 안내 글 지움 (2026-11-12 사용자 요청) */
+.srmytgo{background-color:#E5484D!important;background-image:linear-gradient(180deg,rgba(255,255,255,.28) 0%,rgba(255,255,255,.08) 45%,rgba(0,0,0,.06) 55%,rgba(0,0,0,.22) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.42),inset 0 -2px 0 rgba(0,0,0,.28),0 2px 0 #8E2226,0 4px 8px rgba(0,0,0,.42)!important;border-radius:12px;transition:transform .08s,box-shadow .08s}   /* ▶ 보기 입체 (2026-11-12 사용자 요청) */
+.srmytgo:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 0 0 #8E2226!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12996,7 +12999,7 @@ body.boardon #colAddQuick{display:none!important}
         '<input class="srmtitle" maxlength="200" placeholder="설교 제목" aria-label="설교 제목">'+
         '<div class="srmrow"><input class="srmrefin" maxlength="120" placeholder="본문 (예: 요한복음 15:1-8)" aria-label="본문"><select class="srmnote" aria-label="내 말씀 카드와 잇기"></select></div>'+
         '<div class="srmytrow"><input class="srmyt" type="url" inputmode="url" maxlength="500" placeholder="▶ 유튜브 설교 영상 링크 붙여넣기" aria-label="유튜브 링크"><button type="button" class="srmytgo" hidden>▶ 보기</button></div>'+
-        '<div class="srmlab">📝 설교 메모 <span class="srmhint">· ⠿를 잡고 끌면 줄을 옮겨요</span><button type="button" class="srmcopy" title="설교 메모 전체 복사">📋 전체 복사</button></div><div class="srmhl" role="toolbar" aria-label="강조"><span class="srmhlt">✨ 강조</span><button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button><button type="button" class="hlbtn hldot" data-hl="금" style="--d:var(--gold)" title="금색"></button><button type="button" class="hlbtn hldot" data-hl="분홍" style="--d:var(--pink)" title="분홍"></button><button type="button" class="hlbtn hldot" data-hl="하늘" style="--d:var(--sky)" title="하늘색"></button><button type="button" class="hlbtn hldot" data-hl="초록" style="--d:var(--green)" title="초록"></button><button type="button" class="hlbtn hldot" data-hl="주황" style="--d:var(--orange)" title="주황"></button><button type="button" class="hlbtn hldot" data-hl="보라" style="--d:#C9A8FF" title="밝은 보라 (예수님 말씀)"></button><button type="button" class="hlbtn hlclr" data-hl="x" title="강조 지우기">지우기</button></div><div class="srmlines"></div><textarea class="srmbody" hidden placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
+        '<div class="srmlab srmlabm"><button type="button" class="srmcopy" title="설교 메모 전체 복사">📋 전체 복사</button></div><div class="srmhl" role="toolbar" aria-label="강조"><span class="srmhlt">✨ 강조</span><button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button><button type="button" class="hlbtn hldot" data-hl="금" style="--d:var(--gold)" title="금색"></button><button type="button" class="hlbtn hldot" data-hl="분홍" style="--d:var(--pink)" title="분홍"></button><button type="button" class="hlbtn hldot" data-hl="하늘" style="--d:var(--sky)" title="하늘색"></button><button type="button" class="hlbtn hldot" data-hl="초록" style="--d:var(--green)" title="초록"></button><button type="button" class="hlbtn hldot" data-hl="주황" style="--d:var(--orange)" title="주황"></button><button type="button" class="hlbtn hldot" data-hl="보라" style="--d:#C9A8FF" title="밝은 보라 (예수님 말씀)"></button><button type="button" class="hlbtn hlclr" data-hl="x" title="강조 지우기">지우기</button></div><div class="srmlines"></div><textarea class="srmbody" hidden placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
         '';
       // 💡 나의 적용과 단추들은 화면 아래에 고정 (2026-10-31 사용자 요청)
       foot.innerHTML='<div class="srmfin"><div class="srmlab ap">💡 나의 적용 · 결단<span class="srmsaved" aria-live="polite"></span><button type="button" class="srmapfold" aria-label="나의 적용 접기·펼치기"></button></div><textarea class="srmapply" placeholder="이번 주에 이렇게 살아 보겠습니다" aria-label="나의 적용"></textarea>'+
