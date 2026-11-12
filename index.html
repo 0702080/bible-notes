@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-ytgold">
+<meta name="app-build" content="b20261113-ic">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5098,6 +5098,10 @@ body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull
 .srmsheet .srmlab:has(.srmcopy){display:flex;align-items:center;gap:4px}
 .srmsheet .dlbar .srmhcopy{margin-left:auto;height:36px;padding:0 14px;border-radius:18px;font-size:14.5px;color:var(--ink)}   /* 맨 위 줄 📋 복사: 다른 단추와 같은 모양 */
 .srmcopy{margin-left:auto;height:28px;padding:0 12px;border:1px solid #4A4953;border-radius:14px;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.2) 100%);color:#E8E5EE;font-family:inherit;font-size:12.5px;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 2px 0 rgba(0,0,0,.4),0 3px 6px rgba(0,0,0,.3);transition:transform .08s,box-shadow .08s}
+.srmwipe{margin-left:auto;height:28px;padding:0 12px;border:1px solid #5A3F4C;border-radius:14px;background:#3A2A33 linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.04) 45%,rgba(0,0,0,.07) 55%,rgba(0,0,0,.2) 100%);color:#F2C6D8;font-family:inherit;font-size:12.5px;white-space:nowrap;box-shadow:0 2px 0 rgba(0,0,0,.4),0 3px 6px rgba(0,0,0,.25);cursor:pointer}
+.srmwipe.armed{background:var(--pink);color:#2A1520;border-color:var(--pink)}
+.srmwipe:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
+.srmlabm .srmwipe+.srmcopy{margin-left:6px}
 .srmcopy:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
 /* 설교 메모 목록: 제목이 맨 위, 날짜·설교자는 그 아래 (2026-11-08) */
 .srmcard .srmmeta .srmttl{flex:1 1 0;min-width:0;margin:0}
@@ -5351,6 +5355,17 @@ body.boardon #colAddQuick{display:none!important}
 .srmytgo:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 0 0 #8E2226!important}
 .srmsheet .srmytgo{height:36px;align-self:center;padding:0 12px;border:1px solid #A8853E!important;border-radius:18px!important;background-color:#6B5424!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#FFF3D6!important;font-size:13.5px;font-weight:400;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.3),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.45)!important}   /* ▶ 보기 = 📖 읽기 단추와 같은 금빛 알약 (2026-11-12 사용자 요청) */
 .srmsheet .srmytgo:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.45)!important}
+/* 🙏 기도제목 카드 정리 (2026-11-13 사용자 요청: 배치가 어설픔) — 제목·정보·기도문·아래 줄의 왼쪽 끝을 한 줄로, 아래 줄은 날짜 + 단추 둘을 한 줄에 */
+.icv .icp{padding:14px 14px 12px}
+.icv .icp .ictop{padding-left:22px}
+.icv .icp .icgrip{top:15px}
+.icv .icp>.icmemo,.icv .icp>.icverse,.icv .icp>.icbtns{margin-left:22px}
+.icv .icp>.icmemo{margin-top:10px}
+.icv .icp .icbtns{flex-wrap:nowrap;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)}
+.icv .icp .icdate{flex:1 1 auto;min-width:0}.icv .icp .icdate:empty+.icthmark{margin-left:-8px}
+.icv .icp .icthmark{order:-1;flex:none;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.icv .icp .icbtns button{flex:none;height:34px;min-width:0;padding:0 14px;font-size:13px;white-space:nowrap}
+.icv .icp .icbtns .icpray{padding:0 16px;font-size:13.5px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -12948,6 +12963,15 @@ body.boardon #colAddQuick{display:none!important}
     if(e.target.closest(".srmrback")){e.stopPropagation(); srmRespFlush(); srmResp=false; srmDraw(); srmSlide("r"); return}
     if(e.target.closest(".srmrcopy")){e.stopPropagation(); var rt=srm.querySelector("textarea.srmresp"), rv=rt?rt.value:""; if(!rv.trim()){toast("복사할 글이 없어요");return}
       var ok=function(){toast("📋 복사했어요")}; if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(rv).then(ok,function(){try{rt.select();document.execCommand("copy");ok()}catch(err){toast("복사하지 못했어요")}}); else{try{rt.select();document.execCommand("copy");ok()}catch(err){toast("복사하지 못했어요")}} return}
+    // 🗑 내용 전체 지우기: 다시 붙여넣기 전에 한 번에 비움, 한 번 더 눌러 확인 (2026-11-13 사용자 요청)
+    var wp=e.target.closest(".srmwipe"); if(wp){e.stopPropagation();
+      var wf=srm.querySelector(".srmform"), wta=wf&&wf.querySelector(".srmbody"); if(!wta)return; srmLinesApply();
+      if(!wta.value.trim()){toast("지울 내용이 없어요");return}
+      if(!wp.classList.contains("armed")){wp.classList.add("armed"); wp.textContent="한 번 더 누르면 지워요"; buzz(8); clearTimeout(wp._t); wp._t=setTimeout(function(){if(wp.isConnected){wp.classList.remove("armed"); wp.textContent="🗑 전체 지우기"}},3000); return}
+      clearTimeout(wp._t); wp.classList.remove("armed"); wp.textContent="🗑 전체 지우기";
+      wta.value=""; srmLinesDraw(); srmCommit(); var sv=srm.querySelector(".srmsaved"); if(sv)sv.textContent="저장됨 ✓";
+      var f1=wf.querySelector(".srmlines .srmli"); if(f1){try{f1.focus()}catch(err){}}
+      toast(srmCat==="b"?"본문을 모두 지웠어요 — 바로 붙여넣으세요":"메모를 모두 지웠어요"); return}
     // 📋 설교 메모 전체 복사: 줄·빈 줄 그대로 (2026-11-07 사용자 요청)
     var cpy=e.target.closest(".srmcopy"); if(cpy){e.stopPropagation(); if(!srmRead)srmCommit();
       var cx=srmData().items.find(function(y){return y.id===srmEdit}), ct=cx?hlStrip(String(cx.body||"")).replace(/\s+$/,"").replace(/^\n+/,""):"";
@@ -13001,7 +13025,7 @@ body.boardon #colAddQuick{display:none!important}
         '<input class="srmtitle" maxlength="200" placeholder="설교 제목" aria-label="설교 제목">'+
         '<div class="srmrow"><input class="srmrefin" maxlength="120" placeholder="본문 (예: 요한복음 15:1-8)" aria-label="본문"><select class="srmnote" aria-label="내 말씀 카드와 잇기"></select></div>'+
         '<div class="srmytrow"><input class="srmyt" type="url" inputmode="url" maxlength="500" placeholder="▶ 유튜브 설교 영상 링크 붙여넣기" aria-label="유튜브 링크"><button type="button" class="srmytgo" hidden>▶ 보기</button></div>'+
-        '<div class="srmlab srmlabm"><button type="button" class="srmcopy" title="설교 메모 전체 복사">📋 전체 복사</button></div><div class="srmhl" role="toolbar" aria-label="강조"><span class="srmhlt">✨ 강조</span><button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button><button type="button" class="hlbtn hldot" data-hl="금" style="--d:var(--gold)" title="금색"></button><button type="button" class="hlbtn hldot" data-hl="분홍" style="--d:var(--pink)" title="분홍"></button><button type="button" class="hlbtn hldot" data-hl="하늘" style="--d:var(--sky)" title="하늘색"></button><button type="button" class="hlbtn hldot" data-hl="초록" style="--d:var(--green)" title="초록"></button><button type="button" class="hlbtn hldot" data-hl="주황" style="--d:var(--orange)" title="주황"></button><button type="button" class="hlbtn hldot" data-hl="보라" style="--d:#C9A8FF" title="밝은 보라 (예수님 말씀)"></button><button type="button" class="hlbtn hlclr" data-hl="x" title="강조 지우기">지우기</button></div><div class="srmlines"></div><textarea class="srmbody" hidden placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
+        '<div class="srmlab srmlabm"><button type="button" class="srmwipe" title="내용 전체 지우기 (두 번 눌러 확인)">🗑 전체 지우기</button><button type="button" class="srmcopy" title="설교 메모 전체 복사">📋 전체 복사</button></div><div class="srmhl" role="toolbar" aria-label="강조"><span class="srmhlt">✨ 강조</span><button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button><button type="button" class="hlbtn hldot" data-hl="금" style="--d:var(--gold)" title="금색"></button><button type="button" class="hlbtn hldot" data-hl="분홍" style="--d:var(--pink)" title="분홍"></button><button type="button" class="hlbtn hldot" data-hl="하늘" style="--d:var(--sky)" title="하늘색"></button><button type="button" class="hlbtn hldot" data-hl="초록" style="--d:var(--green)" title="초록"></button><button type="button" class="hlbtn hldot" data-hl="주황" style="--d:var(--orange)" title="주황"></button><button type="button" class="hlbtn hldot" data-hl="보라" style="--d:#C9A8FF" title="밝은 보라 (예수님 말씀)"></button><button type="button" class="hlbtn hlclr" data-hl="x" title="강조 지우기">지우기</button></div><div class="srmlines"></div><textarea class="srmbody" hidden placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
         '';
       // 💡 나의 적용과 단추들은 화면 아래에 고정 (2026-10-31 사용자 요청)
       foot.innerHTML='<div class="srmfin"><div class="srmlab ap">💡 나의 적용 · 결단<span class="srmsaved" aria-live="polite"></span><button type="button" class="srmapfold" aria-label="나의 적용 접기·펼치기"></button></div><textarea class="srmapply" placeholder="이번 주에 이렇게 살아 보겠습니다" aria-label="나의 적용"></textarea>'+
@@ -13745,9 +13769,11 @@ body.boardon #colAddQuick{display:none!important}
     var vn=x.nid&&notes.get(x.nid); if(vn){var v=d.querySelector(".icverse"); v.hidden=false; v.innerHTML='<b></b><span></span>'; v.querySelector("b").textContent="📖 "+vn.ref; v.querySelector("span").textContent=String(vn.text||"").replace(/\s+/g," ").slice(0,140)}
     var bt=d.querySelector(".icbtns");
     var dt=document.createElement("span"); dt.className="icdate"; var ad=new Date(x.at);   // 기도를 적은 날 (2026-10-24 사용자 요청)
-    dt.textContent=(ad.getFullYear()!==new Date().getFullYear()?ad.getFullYear()+". ":"")+dayName(dkey(x.at))+" 적음"; bt.appendChild(dt);
+    var adt=(ad.getFullYear()!==new Date().getFullYear()?ad.getFullYear()+". ":"")+dlabel(dkey(x.at))+" 적음";
+    var mt=d.querySelector(".icmeta"); mt.textContent+=" · "+adt;   // 적은 날은 정보 줄 끝으로, 아래 줄은 단추만 (2026-11-13 사용자 요청)
+    dt.textContent=""; bt.appendChild(dt);
     function B(cls,t){var b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=t; bt.appendChild(b); return b}
-    if(x.th.trim()){var tm=document.createElement("span"); tm.className="icthmark"; tm.textContent="🙏 감사 기도 있음"; bt.appendChild(tm)}
+    if(x.th.trim()){var tm=document.createElement("span"); tm.className="icthmark"; tm.textContent="🙏 감사"; tm.title="감사 기도 있음 · 옆으로 밀면 보여요"; bt.appendChild(tm)}
     if(big&&!x.ans)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
     var ansB=B("icans"+(x.ans?" on":""),x.ans?"🙌 응답됨 ✓":"응답 표시"); ansB.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답을 받았으면 눌러 표시해요";   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
     // 뒷면: 응답 감사 기도 — 적은 게 있으면 읽는 글, 없으면 바로 적는 칸 (2026-11-06 사용자 요청)
