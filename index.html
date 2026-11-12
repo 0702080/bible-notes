@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-apgap36">
+<meta name="app-build" content="2026-11-12-bibletext">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3288,6 +3288,11 @@ textarea.lhpad{padding-left:28px!important}
 .lhmirror{position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;padding:0;border:0;box-sizing:content-box;overflow:hidden;height:auto}
 /* 🎤 설교 메모 (2026-10-31 사용자 요청) */
 .srmtop{display:flex;gap:8px;align-items:center;margin:2px 0 12px}
+.srmcats{display:flex;gap:4px;margin:2px 0 10px;padding:4px;border-radius:14px;background:rgba(0,0,0,.35);box-shadow:inset 0 2px 4px rgba(0,0,0,.45)}
+.srmcats .srmcatb{flex:1 1 0;height:36px;border:0;border-radius:10px;background:transparent;color:var(--muted);font:inherit;font-size:14.5px}
+.srmcats .srmcatb[aria-pressed="true"]{background:#3A3446 linear-gradient(180deg,rgba(255,255,255,.2),rgba(0,0,0,.2));color:var(--gold);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 0 rgba(0,0,0,.45)}
+.srmbform>.srmrow:first-child,.srmbform>.srmytrow{display:none}   /* 성경 본문: 날짜·설교자·유튜브 칸 숨김 */
+.srmbv>.srmrow:first-child{display:none}
 .srmq{flex:1;min-width:0;height:40px;padding:0 14px;border:1px solid #2A2930;border-radius:20px;background:var(--sheet);color:var(--ink);font:inherit;font-size:14px}
 .srmq:focus{outline:none;border-color:var(--sky)}
 .srmlist{display:flex;flex-direction:column;gap:10px}
@@ -5310,6 +5315,7 @@ body.boardon #colAddQuick{display:none!important}
         <button type="button" id="appBgBtn">🖼️ 앱 배경 바꾸기</button>
         <button type="button" id="openGraphBtn"><svg class="grico" viewBox="0 0 24 24" aria-hidden="true"><g stroke="currentColor" stroke-width="1.7" stroke-linecap="round" fill="none"><path d="M12 4 4.5 18.5h15Z"/><path d="M12 4v9M4.5 18.5 12 13l7.5 5.5"/></g><g fill="currentColor"><circle cx="12" cy="4" r="2.6"/><circle cx="4.5" cy="18.5" r="2.6"/><circle cx="19.5" cy="18.5" r="2.6"/><circle cx="12" cy="13" r="2.2"/></g></svg> 말씀 연결 지도</button>
         <button type="button" id="sermonBtn">🎤 설교 메모</button>
+        <button type="button" id="bibleTextBtn">📖 성경 본문</button>
         <button type="button" id="ledgerBtn">💰 하늘나라 재무제표</button>
         <button type="button" id="prayReadBtn">🙏 기도 모아 읽기</button>
         <button type="button" id="icBtn">🙏 기도제목</button>
@@ -12436,7 +12442,7 @@ body.boardon #colAddQuick{display:none!important}
     if(!o.del||typeof o.del!=="object")o.del={};
     o.items=o.items.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),d:/^\d{4}-\d{2}-\d{2}$/.test(x.d||"")?x.d:dkey(+x.at||Date.now()),
       who:String(x.who||"").slice(0,60),title:String(x.title||"").slice(0,200),ref:String(x.ref||"").slice(0,120),nid:String(x.nid||""),
-      body:String(x.body||"").slice(0,40000),apply:String(x.apply||"").slice(0,8000),yt:String(x.yt||"").slice(0,500),resp:String(x.resp||"").slice(0,40000),at:+x.at||Date.now(),u:+x.u||+x.at||0,ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
+      body:String(x.body||"").slice(0,40000),apply:String(x.apply||"").slice(0,8000),yt:String(x.yt||"").slice(0,500),resp:String(x.resp||"").slice(0,40000),cat:x.cat==="b"?"b":"",at:+x.at||Date.now(),u:+x.u||+x.at||0,ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
     return o;
   }
   function srmSave(o){try{localStorage.setItem(SRM_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__sermons")}
@@ -12444,6 +12450,19 @@ body.boardon #colAddQuick{display:none!important}
   // ▶ 유튜브 설교 영상 링크 (2026-11-01 사용자 요청): 붙여넣은 글에서 주소만 골라 열기
   function srmYtUrl(t){t=String(t||"").trim(); if(!t)return ""; var m=t.match(/https?:\/\/\S+/); if(m)return m[0]; if(/^(www\.|m\.)?(youtube\.com|youtu\.be)\//i.test(t))return "https://"+t.split(/\s/)[0]; return ""}
   function srmYtOpen(t){var u=srmYtUrl(t); if(!u){toast("유튜브 링크를 확인해 주세요");return} window.open(u,"_blank","noopener")}
+  // 📖 성경 본문 칸 (2026-11-12 사용자 요청): 설교 메모와 같은 창·저장, 항목의 cat:"b". 맨 위 [🎤 설교 | 📖 성경 본문]으로 바꿈
+  var srmCat="s"; try{srmCat=localStorage.getItem("bible-srm-cat")==="b"?"b":"s"}catch(e){}
+  function srmCatOf(x){return x&&x.cat==="b"?"b":"s"}
+  function bibleFmt(t){   // 장 전체를 붙여넣으면 절 번호(1, 2, 3…) 앞에서 줄을 나눠 한 절씩 한 줄로
+    t=String(t||"").replace(/\r/g,"").replace(/(^|[\s])\d{1,3}:(\d{1,3})(?=[\s.])/g,"$1$2");
+    var cuts=[], from=0, n=1;
+    while(n<200){var re=new RegExp("(^|[^\\d:])("+n+")(?![\\d:장절편])\\.?(?=\\s|[가-힣A-Za-z\"“‘(])","g"); re.lastIndex=from; var m=re.exec(t); if(!m)break;
+      var at=m.index+m[1].length; cuts.push(at); from=at+String(n).length; n++}
+    if(cuts.length<3)return t;
+    var out=[], head=t.slice(0,cuts[0]).replace(/\s+/g," ").trim(); if(head)out.push(head);
+    for(var i=0;i<cuts.length;i++){var seg=t.slice(cuts[i],i+1<cuts.length?cuts[i+1]:t.length).replace(/\s+/g," ").trim(); seg=seg.replace(/^(\d+)\.?\s*/,"$1 "); if(seg)out.push(seg)}
+    return out.join("\n");
+  }
   function srmMerge(src){
     if(!src||!Array.isArray(src.items))return false;
     var o=srmData(), changed=false;
@@ -12651,7 +12670,8 @@ body.boardon #colAddQuick{display:none!important}
     srm.addEventListener("touchmove",function(e){if(srmDrag)e.preventDefault()},{passive:false});
   }
   function srmDateLabel(d){var t=new Date(d+"T12:00:00"); return (t.getFullYear()!==new Date().getFullYear()?t.getFullYear()+"년 ":"")+(t.getMonth()+1)+"월 "+t.getDate()+"일 ("+WD[t.getDay()]+")"}
-  function openSermon(){
+  function openSermon(cat){
+    if(cat==="b"||cat==="s"){srmCat=cat; try{localStorage.setItem("bible-srm-cat",cat)}catch(e){} if(srm&&!srm.hidden&&srmEdit){srmCommit(); srmEdit=""}}
     if(!srm){
       srm=document.createElement("div"); srm.className="daily srmsheet"; srm.setAttribute("role","dialog"); srm.setAttribute("aria-modal","true"); srm.hidden=true;
       srm.innerHTML='<div class="dlbar"><b class="dltitle">🎤 설교 메모</b><button type="button" class="dlclose srmnew">+ 새 메모</button><button type="button" class="dlclose srmfbtn" hidden title="이 메모에서 찾기" aria-label="이 메모에서 찾기">🔍</button><button type="button" class="dlclose srmshot srmhshot" hidden title="화면 크기 그림으로 저장" aria-label="그림으로 저장">📷</button><button type="button" class="dlclose srmrgob" hidden title="이 설교를 듣고 기도문 쓰기 (카드 뒷면)" aria-label="기도문 쓰기">🙏</button><button type="button" class="dlclose srmcopy srmhcopy" hidden title="설교 메모 전체 복사">📋 복사</button><button type="button" class="dlclose srmreadbtn" hidden>📖 읽기</button><button type="button" class="dlclose srmclose">닫기</button></div><div class="dlbody srmbox"></div><div class="srmfoot" hidden></div>';
@@ -12665,6 +12685,15 @@ body.boardon #colAddQuick{display:none!important}
       });
       srm.addEventListener("focusin",function(e){if(e.target.classList&&e.target.classList.contains("srmli")){var al=[].slice.call(srm.querySelectorAll(".srmform .srmlines .srmli")); srmLastLi=al.indexOf(e.target)}});
       srm.addEventListener("click",srmClick); srmDragInit(); srmReadDragInit();
+      // 📖 성경 본문: 줄 칸에 장 전체를 붙여넣으면 절마다 한 줄로 나눠 넣음 (2026-11-12 사용자 요청)
+      srm.addEventListener("paste",function(e){
+        var t=e.target; if(!t||!t.classList||!t.classList.contains("srmli")||!srm.querySelector(".srmform.srmbform"))return;
+        var tx=(e.clipboardData||window.clipboardData); tx=tx?tx.getData("text"):""; if(!tx)return;
+        var fm=bibleFmt(tx); if(fm===tx)return; e.preventDefault();
+        var ok=false; try{ok=document.execCommand("insertText",false,fm)}catch(err){}
+        if(!ok){var a=t.selectionStart,b=t.selectionEnd; t.value=t.value.slice(0,a)+fm+t.value.slice(b); t.selectionStart=t.selectionEnd=a+fm.length; t.dispatchEvent(new Event("input",{bubbles:true}))}
+        toast("📖 절마다 한 줄씩 나눴어요");
+      },true);
       (function(){var lt=0,lx=0,ly=0;   // ✍️ 뒷면 두 번 누르기: 휴대폰은 손가락 뗄 때(touchend)로 셈 (2026-11-11 사용자 요청: 고치기로 안 넘어가던 것)
         srm.addEventListener("touchend",function(e){
           if(!srmEdit||!srmResp||e.touches.length||!e.target.closest(".srmrsp")||e.target.closest("button,select,input,a,.srmapw"))return;
@@ -12729,7 +12758,7 @@ body.boardon #colAddQuick{display:none!important}
     if(srmEdit)srmCommit();
     var o=srmData(), id="srm"+Date.now().toString(36)+Math.random().toString(36).slice(2,6), now=Date.now();
     var last=o.items.slice().sort(srmByDate)[0];   // 설교자는 지난번 것을 그대로 (보통 같은 목사님)
-    o.items.push({id:id,d:dkey(now),who:last?last.who:"",title:"",ref:"",nid:"",body:"",apply:"",at:now,u:now});
+    o.items.push({id:id,d:dkey(now),who:srmCat==="b"?"":(last?last.who:""),title:"",ref:"",nid:"",body:"",apply:"",cat:srmCat==="b"?"b":"",at:now,u:now});
     try{localStorage.setItem(SRM_KEY,JSON.stringify(o))}catch(e){}
     srmEdit=id; srmRead=false; srmDraw();
     setTimeout(function(){var t=srm.querySelector(".srmtitle"); if(t)t.focus()},40);
@@ -12745,6 +12774,7 @@ body.boardon #colAddQuick{display:none!important}
     Object.keys(nx).forEach(function(k){x[k]=nx[k]}); x.u=Date.now(); srmSave(o);
   }
   function srmClick(e){
+    var cb=e.target.closest(".srmcatb"); if(cb){e.stopPropagation(); srmCat=cb.dataset.c==="b"?"b":"s"; try{localStorage.setItem("bible-srm-cat",srmCat)}catch(err){} srmQ=""; srmDraw(); return}
     if(e.target.closest(".srmfbtn")){e.stopPropagation(); srmFindToggle(); return}
     if(e.target.closest(".srmshot")){e.stopPropagation(); var sx=srmData().items.find(function(y){return y.id===srmEdit}); if(sx){try{srmShots(sx)}catch(err){toast("그림을 만들지 못했어요 😢 "+(err&&err.message||""))}} return}
     if(e.target.closest(".srmrgo,.srmrgob")){e.stopPropagation(); if(!srmRead)srmCommit(); srmResp=true; srmRespEd=false; srmDraw(); srmSlide("l"); return}
@@ -12771,7 +12801,7 @@ body.boardon #colAddQuick{display:none!important}
     if(b.classList.contains("srmdone")){
       srmCommit(); var x=srmData().items.find(function(y){return y.id===srmEdit});
       if(x&&srmEmpty(x)){var o2=srmData(); o2.items=o2.items.filter(function(y){return y.id!==x.id}); try{localStorage.setItem(SRM_KEY,JSON.stringify(o2))}catch(err){}}
-      else toast("설교 메모를 저장했어요 🎤");
+      else toast(srmCatOf(x)==="b"?"성경 본문을 저장했어요 📖":"설교 메모를 저장했어요 🎤");
       srmEdit=""; srmDraw(); return;
     }
     if(b.classList.contains("srmdel")){
@@ -12784,6 +12814,8 @@ body.boardon #colAddQuick{display:none!important}
   function srmDraw(){
     var box=srm.querySelector(".srmbox"), foot=srm.querySelector(".srmfoot"); box.textContent=""; foot.textContent=""; foot.hidden=!srmEdit;
     srm.querySelector(".srmnew").hidden=!!srmEdit;
+    var cx0=srmEdit?srmData().items.find(function(y){return y.id===srmEdit}):null, isB=cx0?srmCatOf(cx0)==="b":srmCat==="b";
+    srm.classList.toggle("srmbible",isB); var dtt=srm.querySelector(".dltitle"); if(dtt)dtt.textContent=isB?"📖 성경 본문":"🎤 설교 메모"; srm.querySelector(".srmnew").textContent=isB?"+ 새 본문":"+ 새 메모";
     srm.querySelector(".srmclose").textContent=srmEdit?"목록":"닫기";
     if(!srmEdit)srmRead=false;
     srm.classList.toggle("srmreading",!!srmEdit&&srmRead);   // 읽기·고치기 바탕색을 다르게 (2026-11-07 사용자 요청)
@@ -12814,6 +12846,7 @@ body.boardon #colAddQuick{display:none!important}
         lab.addEventListener("click",function(e){var on=!fin.classList.contains("apfolded"); setF(on); try{localStorage.setItem("bible-srm-apfold",on?"1":"0")}catch(err){} if(!on){var ta=fin.querySelector(".srmapply"); if(ta&&e.target===fb)setTimeout(function(){try{ta.focus({preventScroll:true})}catch(er){}},0)}});
       })();
       f.querySelector(".srmdate").value=x.d; f.querySelector(".srmwho").value=x.who; f.querySelector(".srmtitle").value=x.title;
+      if(srmCatOf(x)==="b"){f.classList.add("srmbform"); f.querySelector(".srmtitle").placeholder="장 이름 (예: 요한복음 1장)"; var lb=f.querySelector(".srmlab"); if(lb&&lb.firstChild&&lb.firstChild.nodeType===3)lb.firstChild.nodeValue="📖 본문 "; var hn=f.querySelector(".srmhint"); if(hn)hn.textContent="· 장 전체를 붙여넣으면 절마다 한 줄씩 나뉘어요"}
       f.querySelector(".srmrefin").value=x.ref; f.querySelector(".srmbody").value=x.body;
       var yti=f.querySelector(".srmyt"), ytb=f.querySelector(".srmytgo"); yti.value=x.yt||""; ytb.hidden=!srmYtUrl(yti.value);
       yti.addEventListener("input",function(){ytb.hidden=!srmYtUrl(yti.value)}); foot.querySelector(".srmapply").value=x.apply;
@@ -12824,8 +12857,11 @@ body.boardon #colAddQuick{display:none!important}
       sel.addEventListener("change",function(){ob.hidden=!sel.value; ob.dataset.nid=sel.value; var ri=f.querySelector(".srmrefin"); if(sel.value&&!ri.value.trim())ri.value=notes.get(sel.value).ref||""});
       box.appendChild(f); srmLinesDraw(); return;
     }
+    var cats=document.createElement("div"); cats.className="srmcats";
+    cats.innerHTML='<button type="button" class="srmcatb" data-c="s">🎤 설교 메모</button><button type="button" class="srmcatb" data-c="b">📖 성경 본문</button>';
+    [].forEach.call(cats.children,function(b){b.setAttribute("aria-pressed",String(b.dataset.c===srmCat))}); box.appendChild(cats);
     var top=document.createElement("div"); top.className="srmtop";
-    top.innerHTML='<input class="srmq" type="search" placeholder="🔍 제목 · 설교자 · 본문 · 메모 찾기 (초성도 돼요)" aria-label="설교 메모 찾기">';
+    top.innerHTML='<input class="srmq" type="search" placeholder="'+(srmCat==="b"?"🔍 장 · 본문 낱말 찾기 (초성도 돼요)":"🔍 제목 · 설교자 · 본문 · 메모 찾기 (초성도 돼요)")+'" aria-label="찾기">';
     top.querySelector(".srmq").value=srmQ; box.appendChild(top);
     var list=document.createElement("div"); list.className="srmlist"; box.appendChild(list);
     srmDrawList();
@@ -13174,7 +13210,7 @@ body.boardon #colAddQuick{display:none!important}
     if(box._pinSync)box._pinSync();
   }
   function srmReadView(x){   // 📖 읽기: 고치는 화면과 같은 모양(색 칸·줄 칸·빈 줄 그대로)에서 글만 고칠 수 없게 (2026-11-07 사용자 요청)
-    var v=document.createElement("article"); v.className="srmread srmrv";
+    var v=document.createElement("article"); v.className="srmread srmrv"+(srmCatOf(x)==="b"?" srmbv":"");
     function el(par,tag,cls,txt){var e=document.createElement(tag); e.className=cls; if(txt!=null)e.textContent=txt; par.appendChild(e); return e}
     var r1=el(v,"div","srmrow");
     el(r1,"div","rbx rdate",srmDateLabel(x.d));
@@ -13202,10 +13238,10 @@ body.boardon #colAddQuick{display:none!important}
   var srmFold=new Set(); try{(JSON.parse(localStorage.getItem("bible-srm-fold")||"[]")||[]).forEach(function(x){srmFold.add(String(x))})}catch(e){}
   function srmDrawList(){
     var list=srm&&srm.querySelector(".srmlist"); if(!list)return; list.textContent="";
-    var all=srmSorted(srmData()).filter(function(x){return !srmEmpty(x)}), q=srmQ.trim();
+    var all=srmSorted(srmData()).filter(function(x){return !srmEmpty(x)&&srmCatOf(x)===srmCat}), q=srmQ.trim();
     var items=q?all.filter(function(x){var hay=hlStrip([x.title,x.who,x.ref,x.body,x.apply,x.resp||""].join(" \n ")); return q.split(/\s+/).every(function(w){return hit1(hay,w)})}):all;
     if(!items.length){var em=document.createElement("p"); em.className="srmempty";
-      em.textContent=all.length?"찾는 설교 메모가 없어요.":"아직 적은 설교 메모가 없어요.\n위 [+ 새 메모]를 눌러 오늘 설교를 적어 보세요."; em.style.whiteSpace="pre-line"; list.appendChild(em); return}
+      em.textContent=srmCat==="b"?(all.length?"찾는 성경 본문이 없어요.":"아직 담은 성경 본문이 없어요.\n위 [+ 새 본문]을 누르고 장 전체를 붙여넣어 보세요.\n절마다 한 줄씩 나뉘어 들어가요."):(all.length?"찾는 설교 메모가 없어요.":"아직 적은 설교 메모가 없어요.\n위 [+ 새 메모]를 눌러 오늘 설교를 적어 보세요."); em.style.whiteSpace="pre-line"; list.appendChild(em); return}
     items.forEach(function(x){
       var c=document.createElement("button"); c.type="button"; c.className="srmcard"; c.dataset.id=x.id;
       var fd=true; c.classList.add("srmfolded");   // 목록은 늘 접힌 모양(제목·날짜·설교자만), 누르면 바로 읽기 (2026-11-11 사용자 요청)
@@ -21017,7 +21053,8 @@ body.boardon #colAddQuick{display:none!important}
   $("openProgBtn").addEventListener("click",openProg);
   $("prayReadBtn").addEventListener("click",function(){$("topMenu").open=false;openPrayRead(null)});
   $("icBtn").addEventListener("click",function(){$("topMenu").open=false;openIntercede()});
-  $("sermonBtn").addEventListener("click",function(){$("topMenu").open=false;openSermon()});
+  $("sermonBtn").addEventListener("click",function(){$("topMenu").open=false;openSermon("s")});
+  $("bibleTextBtn").addEventListener("click",function(){$("topMenu").open=false;openSermon("b")});
   $("ledgerBtn").addEventListener("click",function(){$("topMenu").open=false;openLedger()});
   $("ledgerQuick").addEventListener("click",function(){$("topMenu").open=false;openLedger()});
   $("dailyQuick").addEventListener("click",function(){$("topMenu").open=false;openDaily()});
