@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-prdsimple">
+<meta name="app-build" content="2026-11-12-prdans">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5296,6 +5296,10 @@ body.boardon #colAddQuick{display:none!important}
 .prd .p1go{position:absolute;right:4px;top:4px;width:34px;height:34px;padding:0;border-radius:50%;font-size:20px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;background-image:none!important;box-shadow:none!important}
 .prd .p1go:active{transform:scale(.92)!important}
 @media (max-width:380px){.prd .prdseg button,.prd .prdseg button[aria-pressed="true"]{padding:0 8px;font-size:13px}}
+
+/* 기도 읽기 응답 단추: 기다리는 기도=흐린 점선 '응답 표시', 응답된 기도=금빛 채움 '🙌 응답됨 ✓' (누르면 취소) — 기도 탭·기도제목과 같게 (2026-11-12 사용자 요청) */
+.prd .prdansb,.prd .p1foot [data-p1="ans"]{border:1px dashed rgba(255,255,255,.22)!important;background:transparent!important;background-image:none!important;box-shadow:none!important;color:var(--faint)!important;font-weight:500!important}
+.prd .answered .prdansb,.prd .answered .p1foot [data-p1="ans"]{border:1px solid var(--gold)!important;background:color-mix(in srgb,var(--gold) 85%,#2A1F08)!important;color:#1A1208!important;font-weight:700!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -7115,7 +7119,7 @@ body.boardon #colAddQuick{display:none!important}
             '<div class="p1foot"><button type="button" data-p1="ans"></button><button type="button" data-p1="edit">고치기</button><button type="button" data-p1="del">지우기</button></div>';
           a.querySelector(".prdmeta").textContent=dateLabel(x.at)+(x.ans?"  ·  🙌 응답 "+dlabel(dkey(x.ans)):"  ·  기다리는 기도");
           if(p1Edit===x.id)a.querySelector(".p1ed").value=x.t; else a.querySelector(".prdtext").textContent=x.t;
-          a.querySelector('[data-p1="ans"]').textContent=x.ans?"응답 취소":"🙌 응답됐어요";
+          a.querySelector('[data-p1="ans"]').textContent=x.ans?"🙌 응답됨 ✓":"응답 표시";
           osec.appendChild(a);
         });
         list.appendChild(osec);
@@ -7144,7 +7148,7 @@ body.boardon #colAddQuick{display:none!important}
         a.innerHTML='<div class="prdmeta"></div>'+(ed?'<textarea class="prded" aria-label="기도 고치기"></textarea><div class="prdedb"><button type="button" class="prdedno">취소</button><button type="button" class="prdedok">저장</button></div>':'<p class="prdtext"></p>')+(x.ans?'<div class="prdans"><b>🙌 응답 <span></span></b><p></p></div>':'')+(ed?'':'<div class="prdfoot"><button type="button" class="prdansb"></button></div>');
         a.querySelector(".prdmeta").innerHTML='<span></span>'+(ed?'':'<button type="button" class="prdtf"></button>');
         a.querySelector(".prdmeta span").textContent=dateLabel(x.at)+(x.ans?"":"  ·  기다리는 기도");
-        if(!ed){a.querySelector(".prdtf").textContent=prdTF.has(x.id)?"펼치기 ▾":"접기 ▴"; a.querySelector(".prdansb").textContent=x.ans?"응답 취소":"🙌 응답됐어요"}
+        if(!ed){a.querySelector(".prdtf").textContent=prdTF.has(x.id)?"펼치기 ▾":"접기 ▴"; a.querySelector(".prdansb").textContent=x.ans?"🙌 응답됨 ✓":"응답 표시"}
         if(ed)a.querySelector(".prded").value=x.t; else a.querySelector(".prdtext").textContent=x.t;
         if(x.ans){a.querySelector(".prdans span").textContent=dlabel(dkey(x.ans));var ap=a.querySelector(".prdans p");if((x.an||"").trim())ap.textContent=x.an;else ap.remove()}
         sec.appendChild(a);
