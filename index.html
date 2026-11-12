@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-prd30">
+<meta name="app-build" content="2026-11-12-prdcol">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5331,6 +5331,12 @@ body.boardon #colAddQuick{display:none!important}
 .prd .dlbar .prdclose{width:30px!important;height:30px!important;font-size:14px!important}
 .prd .p1go{width:30px!important;height:30px!important;top:6px!important;right:6px!important;font-size:17px!important;font-weight:600!important;color:var(--ink)!important;background:#2E2D37!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;border:1px solid #4A4855!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -2px 0 rgba(0,0,0,.3),0 3px 0 rgba(0,0,0,.5),0 5px 9px rgba(0,0,0,.45)!important}
 .prd .p1in{padding-right:44px}
+
+/* 기도 읽기 ✕·▾·＋ 세로 줄 맞춤(가운데가 한 줄) + 단추마다 다른 색 (2026-11-12 사용자 요청) */
+.prd .dlbar .prdclose,.prd .prdfil .prdall{margin-right:6px!important}
+.prd .dlbar .prdclose{background-color:color-mix(in srgb,var(--pink) 42%,#2A2933)!important;border-color:color-mix(in srgb,var(--pink) 60%,#4A4855)!important;color:#fff!important}
+.prd .prdfil .prdall{background-color:color-mix(in srgb,var(--sky) 40%,#2A2933)!important;border-color:color-mix(in srgb,var(--sky) 60%,#4A4855)!important;color:#fff!important}
+.prd .p1go{background-color:color-mix(in srgb,var(--orange) 80%,#2A2933)!important;border-color:color-mix(in srgb,var(--orange) 85%,#fff)!important;color:#1A1208!important;font-weight:800!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
