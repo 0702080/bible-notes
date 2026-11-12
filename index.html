@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-sayv">
+<meta name="app-build" content="b20261113-srmback">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -13022,7 +13022,7 @@ body.boardon #colAddQuick{display:none!important}
     }
     srmEdit=""; srm.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true; srmDraw();
   }
-  function closeSermon(){if(!srm||srm.hidden)return; if(srmEdit){srmCommit();srmEdit=""} srm.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
+  function closeSermon(){if(!srm||srm.hidden)return; if(srmEdit){srmCommit();srmEdit=""} srm.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; srmHistSync()}
   function srmNew(){
     if(srmEdit)srmCommit();
     var o=srmData(), id="srm"+Date.now().toString(36)+Math.random().toString(36).slice(2,6), now=Date.now();
@@ -13092,7 +13092,24 @@ body.boardon #colAddQuick{display:none!important}
     }
     if(b.classList.contains("srmopen")){var nid=b.dataset.nid; srmCommit(); closeSermon(); if(notes.has(nid))openNoteFocus(nid); return}
   }
+  // ◁ 휴대폰 '뒤로 가기': 메모 하나를 열면 기록 한 칸을 넣어 두고, 뒤로 가기를 누르면 뒷면→앞면, 고치기→읽기, 읽기→목록 (2026-11-13 사용자 요청)
+  var srmHist=false, srmPopIgnore=false;
+  function srmHistSync(){
+    var want=!!(srm&&!srm.hidden&&srmEdit);
+    if(want&&!srmHist){try{history.pushState({srm:1},""); srmHist=true}catch(e){}}
+    else if(!want&&srmHist){srmHist=false; srmPopIgnore=true; try{history.back()}catch(e){srmPopIgnore=false}}
+  }
+  window.addEventListener("popstate",function(){
+    if(srmPopIgnore){srmPopIgnore=false; return}
+    if(!srmHist)return; srmHist=false;
+    if(!srm||srm.hidden||!srmEdit)return;
+    if(srmResp){srmRespFlush(); srmResp=false; srmDraw(); srmSlide("r")}
+    else if(!srmRead){srmCommit(); srmRead=true; srmDraw()}
+    else{srmEdit=""; srmDraw(); srmSlide("r")}
+    buzz(10);
+  });
   function srmDraw(){
+    setTimeout(srmHistSync,0);
     var box=srm.querySelector(".srmbox"), foot=srm.querySelector(".srmfoot"); box.textContent=""; foot.textContent=""; foot.hidden=!srmEdit;
     srm.querySelector(".srmnew").hidden=!!srmEdit;
     var cx0=srmEdit?srmData().items.find(function(y){return y.id===srmEdit}):null, isB=cx0?srmCatOf(cx0)==="b":srmCat==="b";
