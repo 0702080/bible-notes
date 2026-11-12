@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-lpdrag2">
+<meta name="app-build" content="2026-11-12-rdnodrag">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -13133,6 +13133,7 @@ body.boardon #colAddQuick{display:none!important}
   document.addEventListener("focusout",function(){setTimeout(srmVV,200)});
   // 📖 읽기에서 문장을 꾹(0.45초) 눌러 끌면 그 줄(넘어간 칸까지 한 묶음)을 위아래로 옮김 (2026-11-11 사용자 요청)
   function srmReadDragInit(){
+    return;   // 📖 읽기에서는 꾹 눌러 줄 옮기기를 아예 끔 (2026-11-12 사용자 요청) — 줄 옮기기는 고치기에서만
     if(srm._rdOn)return; srm._rdOn=1;
     var D=null, hold=0, sx=0, sy=0;
     function groupOf(bd,li){return [].slice.call(bd.querySelectorAll('.srmline[data-li="'+li+'"]'))}
