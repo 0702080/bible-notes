@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-saydel">
+<meta name="app-build" content="b20261113-saydbl">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -16749,7 +16749,7 @@ body.boardon #colAddQuick{display:none!important}
       var card=e.target.closest(".saycard"); if(!card||e.target.closest("button,a,input,textarea,select,label"))return;
       var now=Date.now(), id=card.dataset.id;
       if(Date.now()-saySwAt<450){e.preventDefault(); e.stopPropagation(); return}   // 옆으로 민 끝의 누름은 무시
-      if(dtap.id===id&&now-dtap.t<380){
+      if(dtap.id===id&&now-dtap.t<520){   // 휴대폰 두 번 누르기는 손가락 누르는 시간까지 들어가 0.38초로는 짧았음 (2026-11-13 사용자 요청)
         clearTimeout(dtap.ot); dtap={id:"",t:0}; e.preventDefault(); e.stopPropagation();
         try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
         if(sayBack[id]){sayUseEd=id; drawSay(); var ut=say.querySelector('.sayuse[data-id="'+id+'"]'); if(ut){try{ut.focus({preventScroll:true}); ut.setSelectionRange(ut.value.length,ut.value.length)}catch(err){}} return}
@@ -16759,11 +16759,11 @@ body.boardon #colAddQuick{display:none!important}
       }
       dtap={id:id,t:now};
       // 접힌 카드를 한 번 누르면 펼쳐서 읽기 (두 번 누르면 고치기, 2026-11-08 사용자 요청)
-      if(card.classList.contains("sayfolded")&&sayFold[id]){dtap.ot=setTimeout(function(){if(dtap.id!==id)return; delete sayFold[id]; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); buzz(6)},390)}
+      if(card.classList.contains("sayfolded")&&sayFold[id]){dtap.ot=setTimeout(function(){if(dtap.id!==id)return; delete sayFold[id]; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); buzz(6)},530)}
       else if(!sayBack[id]&&card.querySelector('.sayfoldb[data-act="fold"]')){   // 펼친 긴 카드는 한 번 누르면 접힘 (2026-11-11 사용자 요청)
         try{var sl0=window.getSelection(); if(sl0&&String(sl0).length)return}catch(err){}
         dtap.ot=setTimeout(function(){if(dtap.id!==id)return; sayFold[id]=1; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); buzz(6);
-          var nc=say.querySelector('.saycard[data-id="'+id+'"]'); if(nc){var r=nc.getBoundingClientRect(); if(r.top<70||r.bottom>innerHeight)nc.scrollIntoView({block:"center"})}},390)}
+          var nc=say.querySelector('.saycard[data-id="'+id+'"]'); if(nc){var r=nc.getBoundingClientRect(); if(r.top<70||r.bottom>innerHeight)nc.scrollIntoView({block:"center"})}},530)}
     }
     list.addEventListener("pointerdown",function(e){
       if(sayLocked&&!sayEdit&&e.button<=0&&e.target.closest(".saycard")&&!e.target.closest("button,a,input,textarea,select")){sx=e.clientX;sy=e.clientY;pend={lock:1};clearTimeout(hold);hold=setTimeout(function(){if(pend&&pend.lock){pend=null;buzz(10);toast("📌 고정을 끄면 끌어서 순서를 바꿀 수 있어요")}},450);return}   // 고정 ON에서 꾹 누르면 알려 줌 (2026-11-07)
