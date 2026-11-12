@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-12-findhide">
+<meta name="app-build" content="2026-11-12-prdrecent">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7090,7 +7090,7 @@ body.boardon #colAddQuick{display:none!important}
     {   // 한 줄 기도는 메뉴로 열든, 말씀 카드의 "읽기 모드"로 열든 늘 맨 위에 (2026-10-15)
       var ones=p1Data().items.filter(function(x){return x.t.trim()});
       ones.forEach(function(x){total++;if(x.ans)ansN++});
-      ones=ones.filter(function(x){return prdFilter==="all"||(prdFilter==="ans"?!!x.ans:!x.ans)}).sort(function(a,b){return (a.ans?1:0)-(b.ans?1:0)||b.at-a.at});
+      ones=ones.filter(function(x){return prdFilter==="all"||(prdFilter==="ans"?!!x.ans:!x.ans)}).sort(function(a,b){return (+b.at||0)-(+a.at||0)});   // 최근 것이 맨 위 (2026-11-12)
       if(ones.length){
         var osec=document.createElement("section"); osec.className="prdsec p1sec";
         osec.innerHTML='<div class="prdhd"><b class="prdref">🙏 한 줄 기도</b></div>';
@@ -7107,11 +7107,17 @@ body.boardon #colAddQuick{display:none!important}
         list.appendChild(osec);
       }
     }
+    // 최근에 적은 기도가 있는 말씀이 맨 위로 (2026-11-12 사용자 요청)
+    var groups=[];
     src.forEach(function(n){
       var ps=(n.prays||[]).filter(function(x){return x.t.trim()});
       ps.forEach(function(x){total++;if(x.ans)ansN++});
-      ps=ps.filter(function(x){return prdFilter==="all"||(prdFilter==="ans"?!!x.ans:!x.ans)}).sort(function(a,b){return b.at-a.at});
-      if(!ps.length)return;
+      ps=ps.filter(function(x){return prdFilter==="all"||(prdFilter==="ans"?!!x.ans:!x.ans)}).sort(function(a,b){return (+b.at||0)-(+a.at||0)});
+      if(ps.length)groups.push({n:n,ps:ps,t:+ps[0].at||0});
+    });
+    groups.sort(function(a,b){return b.t-a.t});
+    groups.forEach(function(g){
+      var n=g.n, ps=g.ps;
       var sec=document.createElement("section"); sec.className="prdsec";
       sec.innerHTML='<div class="prdword"><div class="prdhd"><b class="prdref"></b><button type="button" class="prdgo">카드로 가기</button></div><p class="prdverse"></p></div>';
       sec.querySelector(".prdref").textContent=n.ref; sec.querySelector(".prdverse").textContent=n.text; sec.querySelector(".prdgo").dataset.id=n.id;
