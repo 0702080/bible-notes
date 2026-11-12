@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-srmsw">
+<meta name="app-build" content="b20261113-saydel">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5400,6 +5400,9 @@ body.boardon #colAddQuick{display:none!important}
 .icv .icp{touch-action:pan-y}
 .icv .icp.icswarm{border-color:var(--pink)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--pink) 55%,transparent)!important}
 .srmlist>.srmcard.srmswback{border-color:var(--gold)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 55%,transparent)}
+/* 🌿 주님의 은혜 카드 오른쪽 밀어 지우기 (2026-11-13) */
+.saysheet.saygr .saycard{touch-action:pan-y}
+.saysheet .saycard.srmswarm{border-color:var(--pink)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--pink) 55%,transparent)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -16569,7 +16572,7 @@ body.boardon #colAddQuick{display:none!important}
     if(!items.length&&!sayEdit){
       var em=document.createElement("p"); em.className="sayempty";
       em.textContent=sayMode==="g"?"아직 기록한 은혜가 없어요. 위 [+ 기록]으로 하나님께 받은 은혜를 적어 두세요.":sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 10분마다(00·10·20…분) 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
-      list.appendChild(em); return;
+      list.appendChild(em); sayTrashDraw(list); return;
     }
     // ▴▾ 모두 접기·펼치기 (2026-11-07 사용자 요청)
     var sLongF=function(x){return String(x.t||"").trim().split("\n").filter(function(s){return s.trim()}).length>1||String(x.t||"").length>34};
@@ -16632,6 +16635,35 @@ body.boardon #colAddQuick{display:none!important}
       f.appendChild(fbn);   // 삭제 오른쪽에 접기 (2026-11-08 사용자 요청)   // 고치기·지우기를 한 단추로 — 지우기는 고치는 칸 안에 (2026-11-06 사용자 요청). 짧은 말씀 카드는 접기 단추 바로 밑이라 잘못 누르기 쉬워 뺌 — 두 번 눌러 고치는 칸의 🗑로 지움 (2026-11-08 사용자 요청)
       c.appendChild(f); list.appendChild(c);
     });
+    sayTrashDraw(list);
+  }
+  // 🌿 주님의 은혜: 카드를 오른쪽으로 밀어 지우기 → 되돌리기·지운 것 복구 (2026-11-13 사용자 요청, 기도제목·설교 메모와 같은 밀기)
+  var sayTrashOpen=false, SAY_TRASH="bible-say-trash";
+  function sayTrash(){try{var a=JSON.parse(localStorage.getItem(SAY_TRASH)||"[]"); return Array.isArray(a)?a.filter(function(t){return t&&t.x&&t.x.id&&Date.now()-t.at<60*864e5}):[]}catch(e){return []}}
+  function sayTrashSet(a){try{localStorage.setItem(SAY_TRASH,JSON.stringify(a.slice(0,60)))}catch(e){}}
+  function sayTrashDraw(list){
+    if(sayMode!=="g"||sayQ)return; var tr=sayTrash().filter(function(t){return t.x.gr}); if(!tr.length)return;
+    var tb=document.createElement("div"); tb.className="srmtrash saytrash";
+    var th=document.createElement("button"); th.type="button"; th.className="srmtrashh"; th.dataset.act="trash"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(sayTrashOpen?"▴":"▾"); tb.appendChild(th);
+    if(sayTrashOpen)tr.forEach(function(t){var r=document.createElement("div"); r.className="srmtrow";
+      var nm=document.createElement("span"); nm.className="srmtnm"; nm.textContent=String(t.x.t||"").trim().split("\n")[0]||"(빈 글)"; r.appendChild(nm);
+      var rb=document.createElement("button"); rb.type="button"; rb.className="srmtres"; rb.dataset.act="restore"; rb.dataset.id=t.x.id; rb.textContent="↩ 복구"; r.appendChild(rb); tb.appendChild(r)});
+    list.appendChild(tb);
+  }
+  function sayDelete(id){
+    var o=sayData(), x=o.items.find(function(y){return y.id===id}); if(!x)return;
+    sayTrashSet([{x:JSON.parse(JSON.stringify(x)),at:Date.now()}].concat(sayTrash().filter(function(t){return t.x.id!==id})));
+    o.items=o.items.filter(function(y){return y.id!==id}); delete sayBack[id]; saveSay(o); buzz([10,30,10]); drawSay(); renderReviewBar();
+    var ub=say.querySelector(".sayundo");
+    if(!ub){ub=document.createElement("div"); ub.className="srmundo sayundo"; ub.innerHTML='<span>🗑 지웠어요</span><button type="button" class="srmundob" data-act="undo">↩ 되돌리기</button>'; (say.querySelector(".saybox")||say).appendChild(ub)}
+    ub.dataset.id=id; ub.hidden=false; clearTimeout(ub._t); ub._t=setTimeout(function(){ub.hidden=true},6000);
+  }
+  function sayRestore(id){
+    var tr=sayTrash(), t=tr.find(function(y){return y.x.id===id}); if(!t)return;
+    var o=sayData(); if(!o.items.some(function(y){return y.id===id}))o.items.push(t.x); saveSay(o);
+    sayTrashSet(tr.filter(function(y){return y.x.id!==id}));
+    var ub=say.querySelector(".sayundo"); if(ub)ub.hidden=true;
+    buzz(10); toast("↩ 되살렸어요"); drawSay(); renderReviewBar();
   }
   // 끌어서 바꾼 순서(o.ord: id 목록). 목록에 없는 것(새로 담은 것)은 맨 위에 최근순으로 (2026-10-23 사용자 요청)
   function sayOrdered(o){
@@ -16764,9 +16796,24 @@ body.boardon #colAddQuick{display:none!important}
     // 휴대폰은 손가락이 움직이면 브라우저가 pointer를 끊어서(pointercancel) touch 이벤트로 잼
     var sw=null;
     function swStart(c,x,y,t){sw=c?{c:c,x:x,y:y,t:t}:null}
+    function swDelOK(c){return sayMode==="g"&&c&&!sayBack[c.dataset.id]&&!sayEdit&&!sayDrag}
+    function swSnap(c){c.style.transition="transform .2s,opacity .2s"; c.style.transform=""; c.style.opacity=""; c.classList.remove("srmswarm"); setTimeout(function(){c.style.transition=""},220)}
+    list.addEventListener("touchmove",function(e){   // 은혜 앞면: 오른쪽으로 미는 동안 카드가 손가락을 따라감
+      var w=sw; if(!w||!w.t||!swDelOK(w.c))return; var t=e.touches[0]; if(!t)return;
+      var dx=t.clientX-w.x, dy=t.clientY-w.y;
+      if(!w.on){if(dx>14&&dx>Math.abs(dy)*1.5){w.on=true; w.c.style.transition="none"; clearTimeout(hold); pend=null} else return}
+      if(e.cancelable)e.preventDefault();
+      var xx=Math.max(0,dx); w.c.style.transform="translateX("+xx+"px)"; w.c.style.opacity=String(Math.max(.3,1-xx/340));
+      var arm=xx>110; if(arm!==!!w.arm){w.arm=arm; w.c.classList.toggle("srmswarm",arm); if(arm)buzz(8)}
+    },{passive:false,capture:true});
     function swEnd(x,y){
       var w=sw; sw=null; if(!w||sayDrag||sayEdit)return;
-      var dx=x-w.x, dy=y-w.y; if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.3)return;
+      var dx=x-w.x, dy=y-w.y;
+      if(w.on){saySwAt=Date.now(); var dc=w.c;
+        if(dx>110){dc.style.transition="transform .2s ease-in,opacity .2s"; dc.style.transform="translateX(110%)"; dc.style.opacity="0"; setTimeout(function(){sayDelete(dc.dataset.id)},190)} else swSnap(dc);
+        return}
+      if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.3)return;
+      if(dx>0&&swDelOK(w.c)){if(!w.t&&dx>110){saySwAt=Date.now(); sayDelete(w.c.dataset.id)} return}   // 은혜 앞면은 왼쪽으로 밀어야 뒷면 (PC 마우스는 오른쪽으로 크게 끌면 지움)
       var id=w.c.dataset.id; saySwAt=Date.now(); clearTimeout(hold); pend=null;
       var ua=document.activeElement; if(ua&&ua.classList&&ua.classList.contains("sayuse")){sayUseSave(ua); ua.blur()}
       if(sayBack[id])delete sayBack[id]; else sayBack[id]=1;
@@ -16775,7 +16822,7 @@ body.boardon #colAddQuick{display:none!important}
     }
     list.addEventListener("touchstart",function(e){if(e.touches.length!==1){sw=null;return} var c=e.target.closest(".saycard"); swStart(c&&!e.target.closest("textarea,input,select")?c:null,e.touches[0].clientX,e.touches[0].clientY,1)},{passive:true,capture:true});
     list.addEventListener("touchend",function(e){if(!sw||!sw.t)return; var t=e.changedTouches[0]; swEnd(t.clientX,t.clientY)},{passive:true,capture:true});
-    list.addEventListener("touchcancel",function(){sw=null},{passive:true});
+    list.addEventListener("touchcancel",function(){if(sw&&sw.on)swSnap(sw.c); sw=null},{passive:true});
     list.addEventListener("pointerdown",function(e){if(e.pointerType==="touch")return; var c=e.target.closest(".saycard"); swStart(c&&!e.target.closest("textarea,input,select")?c:null,e.clientX,e.clientY,0)},true);
     document.addEventListener("pointerup",function(e){if(e.pointerType==="touch"||!sw||sw.t)return; swEnd(e.clientX,e.clientY)});
     // ✍️ 뒷면 활용 칸에 적다가 두 번 누르면 저장하고 읽는 글로 (2026-11-08 사용자 요청)
@@ -16841,6 +16888,9 @@ body.boardon #colAddQuick{display:none!important}
     var fb=e.target.closest&&e.target.closest('[data-act="front"]'); if(fb){var fc=fb.closest(".saycard"); if(fc){delete sayBack[fc.dataset.id]; sayUseEd=""; drawSay()} return}
     var b=e.target.closest("button"); if(!b)return;
     var act=b.dataset.act||"", card=b.closest(".saycard"), id=card?card.dataset.id:(b.dataset.id||"");
+    if(act==="trash"){sayTrashOpen=!sayTrashOpen; drawSay(); return}
+    if(act==="restore"){sayRestore(b.dataset.id); return}
+    if(act==="undo"){var ub0=b.closest(".sayundo"); if(ub0&&ub0.dataset.id)sayRestore(ub0.dataset.id); return}
     if(act==="cancel"){sayEdit="";drawSay();return}
     if(act==="foldall"){var ids=(b.dataset.ids||"").split(",").filter(Boolean), unf=b.dataset.on==="1"; ids.forEach(function(i){if(unf)delete sayFold[i]; else sayFold[i]=1}); try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
     if(act==="hint"){toast("꾹 누르면 지울 수 있어요");return}
