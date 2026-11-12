@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-icchev">
+<meta name="app-build" content="b20261113-srmdel">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5382,6 +5382,17 @@ body.boardon #colAddQuick{display:none!important}
 .icv .icp .ictop .icchev::before{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translate(-50%,-70%) rotate(45deg);transition:transform .2s}
 .icv .icp.open .ictop .icchev::before{transform:translate(-50%,-30%) rotate(-135deg)}
 .icv .icp .ictop:active .icchev{transform:translateY(2px)!important;box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
+/* 🗑 설교 메모·성경 본문 목록: 오른쪽으로 밀어 지우기·되돌리기·지운 것 복구 (2026-11-13 사용자 요청) */
+.srmlist>.srmcard.srmswipe{transition:none}
+.srmlist>.srmcard.srmswarm{border-color:var(--pink)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--pink) 55%,transparent)}
+.srmundo{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:130;display:flex;align-items:center;gap:12px;padding:8px 8px 8px 16px;border:1px solid #4A4953;border-radius:24px;background:rgba(24,23,30,.97);box-shadow:0 8px 24px rgba(0,0,0,.55);color:var(--ink);font-size:14px;white-space:nowrap}
+.srmundo[hidden]{display:none}
+.srmundob,.srmtres{height:32px;padding:0 14px;border:1px solid color-mix(in srgb,var(--gold) 60%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--gold) 18%,#1C1B22) linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.22) 100%);color:var(--gold);font-family:inherit;font-size:13px;font-weight:700;box-shadow:0 2px 0 rgba(0,0,0,.45);white-space:nowrap}
+.srmundob:active,.srmtres:active{transform:translateY(2px);box-shadow:none}
+.srmtrash{margin:18px 0 8px}
+.srmtrashh{display:block;margin:0 auto;padding:6px 14px;border:0;background:transparent;color:var(--faint);font-family:inherit;font-size:13px}
+.srmtrow{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 12px;border:1px dashed #3A3940;border-radius:12px;background:rgba(0,0,0,.25)}
+.srmtnm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:14px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -13045,9 +13056,12 @@ body.boardon #colAddQuick{display:none!important}
       copyText(ct).then(function(ok){toast(ok?"설교 메모를 복사했어요 📋":"복사하지 못했어요")}); return}
     var yc=e.target.closest(".srmytc"); if(yc){e.stopPropagation(); srmYtOpen(yc.dataset.u); return}
     if(e.target.closest(".srmcgrip"))return;
+    if(e.target.closest(".srmtrashh")){e.stopPropagation(); srmTrashOpen=!srmTrashOpen; srmDrawList(); return}
+    var trs=e.target.closest(".srmtres"); if(trs){e.stopPropagation(); srmRestore(trs.dataset.id); return}
+    if(e.target.closest(".srmundob")){e.stopPropagation(); var ub=srm.querySelector(".srmundo"); if(ub&&ub.dataset.id)srmRestore(ub.dataset.id); return}
     var cdl=e.target.closest(".srmcdel"); if(cdl){e.stopPropagation(); var dcard=cdl.closest(".srmcard"), did=dcard&&dcard.dataset.id; if(!did)return;
       if(!cdl.classList.contains("armed")){cdl.classList.add("armed"); cdl.textContent="한 번 더 누르면 지워요"; buzz(8); setTimeout(function(){if(cdl.isConnected){cdl.classList.remove("armed"); cdl.textContent="삭제"}},3000); return}
-      var od=srmData(); od.items=od.items.filter(function(y){return y.id!==did}); od.del=od.del||{}; od.del[did]=Date.now(); srmSave(od); toast("지웠어요"); srmDrawList(); return}
+      srmDelete(did); return}
     var cf=e.target.closest(".srmcfold"); if(cf){var cc=cf.closest(".srmcard"), fid=cc&&cc.dataset.id; if(!fid)return; e.stopPropagation(); try{buzz(8)}catch(err){}
       if(srmFold.has(fid))srmFold.delete(fid); else srmFold.add(fid); try{localStorage.setItem("bible-srm-fold",JSON.stringify(Array.from(srmFold).slice(-500)))}catch(err){}
       cc.classList.toggle("srmfolded",srmFold.has(fid)); cf.title=srmFold.has(fid)?"펼치기":"접기"; cf.setAttribute("aria-label",cf.title); return}
@@ -13123,6 +13137,53 @@ body.boardon #colAddQuick{display:none!important}
     var list=document.createElement("div"); list.className="srmlist"; box.appendChild(list);
     srmDrawList();
   }
+  // 🗑 목록 카드를 오른쪽으로 밀면 지움 → 아래 '↩ 되돌리기', 목록 맨 아래 '🗑 지운 것'에서 언제든 복구 (2026-11-13 사용자 요청)
+  var srmTrashOpen=false, SRM_TRASH="bible-srm-trash";
+  function srmTrash(){try{var a=JSON.parse(localStorage.getItem(SRM_TRASH)||"[]"); return Array.isArray(a)?a.filter(function(t){return t&&t.x&&t.x.id&&Date.now()-t.at<60*864e5}):[]}catch(e){return []}}
+  function srmTrashSet(a){try{localStorage.setItem(SRM_TRASH,JSON.stringify(a.slice(0,60)))}catch(e){}}
+  function srmDelete(id){
+    var od=srmData(), x=od.items.find(function(y){return y.id===id}); if(!x)return;
+    srmTrashSet([{x:JSON.parse(JSON.stringify(x)),at:Date.now()}].concat(srmTrash().filter(function(t){return t.x.id!==id})));
+    od.items=od.items.filter(function(y){return y.id!==id}); od.del=od.del||{}; od.del[id]=Date.now(); srmSave(od); buzz([10,30,10]);
+    srmDrawList(); srmUndoShow(id);
+  }
+  function srmRestore(id){
+    var tr=srmTrash(), t=tr.find(function(y){return y.x.id===id}); if(!t)return;
+    var od=srmData(); if(od.del)delete od.del[id];
+    var x=t.x; x.u=Date.now(); if(!od.items.some(function(y){return y.id===id}))od.items.push(x); srmSave(od);
+    srmTrashSet(tr.filter(function(y){return y.x.id!==id}));
+    var ub=srm.querySelector(".srmundo"); if(ub)ub.hidden=true;
+    buzz(10); toast("↩ 되살렸어요"); srmDrawList();
+  }
+  function srmUndoShow(id){
+    var ub=srm.querySelector(".srmundo");
+    if(!ub){ub=document.createElement("div"); ub.className="srmundo"; ub.innerHTML='<span>🗑 지웠어요</span><button type="button" class="srmundob">↩ 되돌리기</button>'; srm.appendChild(ub)}
+    ub.dataset.id=id; ub.hidden=false; clearTimeout(ub._t); ub._t=setTimeout(function(){ub.hidden=true},6000);
+  }
+  (function(){
+    var sw=null;
+    document.addEventListener("touchstart",function(e){
+      if(!srm||srm.hidden||srmEdit||e.touches.length!==1)return;
+      var c=e.target.closest&&e.target.closest(".srmlist>.srmcard"); if(!c)return;
+      var t=e.touches[0]; sw={c:c,x0:t.clientX,y0:t.clientY,on:false,dx:0};
+    },{passive:true});
+    document.addEventListener("touchmove",function(e){
+      if(!sw)return; var t=e.touches[0]; if(!t)return;
+      if(srmCD&&srmCD.on){sw=null;return}
+      var dx=t.clientX-sw.x0, dy=t.clientY-sw.y0;
+      if(!sw.on){if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){sw=null;return} if(dx>12&&dx>Math.abs(dy)*1.5){sw.on=true; sw.c.classList.add("srmswipe"); if(srmCD){clearTimeout(srmCD.t); srmCD=null}} else return}
+      if(e.cancelable)e.preventDefault();
+      sw.dx=Math.max(0,dx); sw.c.style.transform="translateX("+sw.dx+"px)"; sw.c.style.opacity=String(Math.max(.25,1-sw.dx/320));
+      var arm=sw.dx>110; if(arm!==!!sw.arm){sw.arm=arm; sw.c.classList.toggle("srmswarm",arm); if(arm)buzz(8)}
+    },{passive:false});
+    function end(){
+      if(!sw)return; var d=sw; sw=null; if(!d.on)return; srmCardDragAt=Date.now();
+      var c=d.c; c.classList.remove("srmswipe");
+      if(d.dx>110){c.style.transition="transform .2s ease-in,opacity .2s"; c.style.transform="translateX(110%)"; c.style.opacity="0"; setTimeout(function(){srmDelete(c.dataset.id)},190)}
+      else{c.style.transition="transform .2s,opacity .2s"; c.style.transform=""; c.style.opacity=""; c.classList.remove("srmswarm"); setTimeout(function(){c.style.transition=""},220)}
+    }
+    document.addEventListener("touchend",end); document.addEventListener("touchcancel",end);
+  })();
   /* ↕️ 설교 메모 카드 순서 바꾸기: 카드를 꾹(0.35초) 눌렀다가 위아래로 끌기 (2026-11-01 사용자 요청). 찾는 중에는 안 됨 */
   var srmCD=null, srmCardDragAt=0;
   (function(){
@@ -13523,6 +13584,16 @@ body.boardon #colAddQuick{display:none!important}
             // ✍️ 기도·에세이와 💡 나의 적용은 목록 카드(앞면)에 안 보이고 뒷면에서만 (2026-11-11 사용자 요청)
       list.appendChild(c);
     });
+    // 🗑 지운 것 다시 살리기 (2026-11-13 사용자 요청)
+    var tr=srmTrash().filter(function(t){return srmCatOf(t.x)===srmCat});
+    if(tr.length&&!q){
+      var tb=document.createElement("div"); tb.className="srmtrash"+(srmTrashOpen?" open":"");
+      var th=document.createElement("button"); th.type="button"; th.className="srmtrashh"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(srmTrashOpen?"▴":"▾"); tb.appendChild(th);
+      if(srmTrashOpen)tr.forEach(function(t){var r=document.createElement("div"); r.className="srmtrow";
+        var nm=document.createElement("span"); nm.className="srmtnm"; nm.textContent=(t.x.title||"").trim()||"(제목 없음)"; r.appendChild(nm);
+        var rb=document.createElement("button"); rb.type="button"; rb.className="srmtres"; rb.dataset.id=t.x.id; rb.textContent="↩ 복구"; r.appendChild(rb); tb.appendChild(r)});
+      list.appendChild(tb);
+    }
     if(q)srmMarkIn(list);
   }
   // ✍️ 이 설교를 듣고 쓰는 기도·에세이 (2026-11-08 사용자 요청): 메모를 오른쪽→왼쪽으로 밀면 이 쪽. 항목의 resp 필드, 적는 대로 0.6초 뒤 저장
