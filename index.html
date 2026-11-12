@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-srmdel">
+<meta name="app-build" content="b20261113-icfold">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5393,6 +5393,9 @@ body.boardon #colAddQuick{display:none!important}
 .srmtrashh{display:block;margin:0 auto;padding:6px 14px;border:0;background:transparent;color:var(--faint);font-family:inherit;font-size:13px}
 .srmtrow{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 12px;border:1px dashed #3A3940;border-radius:12px;background:rgba(0,0,0,.25)}
 .srmtnm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:14px}
+/* 🙏 기도제목 카드 접었을 때는 제목·접기 단추만 — 정보 줄·기도문·아래 단추 줄 숨김 (2026-11-13 사용자 요청) */
+.icv .icp:not(.open):not(.thx) .ictop .icmeta,.icv .icp:not(.open):not(.thx)>.icmemo,.icv .icp:not(.open):not(.thx)>.icverse,.icv .icp:not(.open):not(.thx)>.icbtns{display:none!important}
+.icv .icp:not(.open):not(.thx){padding-bottom:14px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
