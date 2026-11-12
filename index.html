@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-icfold">
+<meta name="app-build" content="b20261113-icdel">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5396,6 +5396,9 @@ body.boardon #colAddQuick{display:none!important}
 /* 🙏 기도제목 카드 접었을 때는 제목·접기 단추만 — 정보 줄·기도문·아래 단추 줄 숨김 (2026-11-13 사용자 요청) */
 .icv .icp:not(.open):not(.thx) .ictop .icmeta,.icv .icp:not(.open):not(.thx)>.icmemo,.icv .icp:not(.open):not(.thx)>.icverse,.icv .icp:not(.open):not(.thx)>.icbtns{display:none!important}
 .icv .icp:not(.open):not(.thx){padding-bottom:14px}
+/* 🙏 기도제목 카드 오른쪽으로 밀어 지우기 (2026-11-13 사용자 요청) */
+.icv .icp{touch-action:pan-y}
+.icv .icp.icswarm{border-color:var(--pink)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--pink) 55%,transparent)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -13769,17 +13772,34 @@ body.boardon #colAddQuick{display:none!important}
         var c=e.target.closest(".icp"); if(!c||e.target.closest(".icgrip,.icform,input,select,textarea.icfm"))return;
         sw={c:c,x:e.clientX,y:e.clientY,id:e.pointerId};
       });
+      // 왼쪽으로 밀면 뒷면(감사 기도), 오른쪽으로 밀면 지우기 — 카드가 손가락을 따라가고 분홍 테두리가 뜨면 손 떼기 (2026-11-13 사용자 요청)
+      icv.addEventListener("pointermove",function(e){
+        var d=sw; if(!d||e.pointerId!==d.id||icThx[d.c.dataset.id])return;
+        var dx=e.clientX-d.x, dy=e.clientY-d.y;
+        if(!d.on){if(dx>14&&dx>Math.abs(dy)*1.5){d.on=true; d.c.style.transition="none"} else return}
+        var x=Math.max(0,dx); d.c.style.transform="translateX("+x+"px)"; d.c.style.opacity=String(Math.max(.3,1-x/340));
+        var arm=x>110; if(arm!==!!d.arm){d.arm=arm; d.c.classList.toggle("icswarm",arm); if(arm)buzz(8)}
+      });
+      function icSnap(c){c.style.transition="transform .2s,opacity .2s"; c.style.transform=""; c.style.opacity=""; c.classList.remove("icswarm"); setTimeout(function(){c.style.transition=""},220)}
       icv.addEventListener("pointerup",function(e){
         var d=sw; sw=null; if(!d||e.pointerId!==d.id)return;
-        var dx=e.clientX-d.x, dy=e.clientY-d.y; if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;
-        var id=d.c.dataset.id; icSwAt=Date.now();
+        var dx=e.clientX-d.x, dy=e.clientY-d.y;
+        if(d.on){icSwAt=Date.now();
+          if(dx>110){var dc=d.c; dc.style.transition="transform .2s ease-in,opacity .2s"; dc.style.transform="translateX(110%)"; dc.style.opacity="0"; setTimeout(function(){icDelete(dc.dataset.id)},190)}
+          else icSnap(d.c);
+          return}
+        if(Math.abs(dx)<50||Math.abs(dx)<Math.abs(dy)*1.5)return;
+        var id=d.c.dataset.id; if(dx>0&&!icThx[id])return; icSwAt=Date.now();
         var ta=d.c.querySelector("textarea.ictht"); if(ta){clearTimeout(icThxT); thxSave(ta)}
         if(icThx[id])delete icThx[id]; else icThx[id]=1;
         buzz(10); icDraw();
         if(icThx[id]){var nt=icv.querySelector('.icp[data-id="'+id+'"] textarea.ictht'); if(nt){grow(nt); try{nt.focus({preventScroll:true})}catch(err){}}}
       });
-      icv.addEventListener("pointercancel",function(){sw=null});
+      icv.addEventListener("pointercancel",function(){if(sw&&sw.on)icSnap(sw.c); sw=null});
       icv.addEventListener("click",function(e){
+        if(e.target.closest(".ictrashh")){e.stopPropagation(); icTrashOpen=!icTrashOpen; icDraw(); return}
+        var rsb=e.target.closest(".ictres"); if(rsb){e.stopPropagation(); icRestore(rsb.dataset.id); return}
+        if(e.target.closest(".icundob")){e.stopPropagation(); var ub=icv.querySelector(".icundo"); if(ub&&ub.dataset.id)icRestore(ub.dataset.id); return}
         if(e.target.closest("button,input,textarea,select,.icform,.icgrip,.icthx"))return;
         if(Date.now()-icSwAt<450)return;   // 옆으로 민 손길은 펼치기·고치기로 세지 않음
         var c=e.target.closest(".icp"); if(!c)return; var id=c.dataset.id;
@@ -13983,6 +14003,31 @@ body.boardon #colAddQuick{display:none!important}
       body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,false));
     });
     ansBtn();
+    var tr=icTrash();   // 🗑 지운 기도제목 다시 살리기 (2026-11-13 사용자 요청)
+    if(tr.length){var tb=document.createElement("div"); tb.className="srmtrash ictrash";
+      var th=document.createElement("button"); th.type="button"; th.className="srmtrashh ictrashh"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(icTrashOpen?"▴":"▾"); tb.appendChild(th);
+      if(icTrashOpen)tr.forEach(function(t){var r=document.createElement("div"); r.className="srmtrow";
+        var nm=document.createElement("span"); nm.className="srmtnm"; nm.textContent=t.x.name; r.appendChild(nm);
+        var rb=document.createElement("button"); rb.type="button"; rb.className="srmtres ictres"; rb.dataset.id=t.x.id; rb.textContent="↩ 복구"; r.appendChild(rb); tb.appendChild(r)});
+      body.appendChild(tb)}
+  }
+  var icTrashOpen=false, IC_TRASH="bible-ic-trash";
+  function icTrash(){try{var a=JSON.parse(localStorage.getItem(IC_TRASH)||"[]"); return Array.isArray(a)?a.filter(function(t){return t&&t.x&&t.x.id&&Date.now()-t.at<60*864e5}):[]}catch(e){return []}}
+  function icTrashSet(a){try{localStorage.setItem(IC_TRASH,JSON.stringify(a.slice(0,60)))}catch(e){}}
+  function icDelete(id){
+    var o=icData(), x=o.items.find(function(y){return y.id===id}); if(!x)return;
+    icTrashSet([{x:JSON.parse(JSON.stringify(x)),at:Date.now()}].concat(icTrash().filter(function(t){return t.x.id!==id})));
+    o.items=o.items.filter(function(y){return y.id!==id}); o.del[id]=Date.now(); icSave(o); delete icThx[id]; buzz([10,30,10]); icDraw();
+    var ub=icv.querySelector(".icundo");
+    if(!ub){ub=document.createElement("div"); ub.className="srmundo icundo"; ub.innerHTML='<span>🗑 지웠어요</span><button type="button" class="srmundob icundob">↩ 되돌리기</button>'; icv.appendChild(ub)}
+    ub.dataset.id=id; ub.hidden=false; clearTimeout(ub._t); ub._t=setTimeout(function(){ub.hidden=true},6000);
+  }
+  function icRestore(id){
+    var tr=icTrash(), t=tr.find(function(y){return y.x.id===id}); if(!t)return;
+    var o=icData(); delete o.del[id]; var x=t.x; x.u=Date.now(); if(!o.items.some(function(y){return y.id===id}))o.items.push(x); icSave(o);
+    icTrashSet(tr.filter(function(y){return y.x.id!==id}));
+    var ub=icv.querySelector(".icundo"); if(ub)ub.hidden=true;
+    buzz(10); toast("↩ 되살렸어요"); icDraw();
   }
   // 고치는 칸의 글을 명단에 저장 (저장 단추·칸 밖 누르기·창 닫기 모두 여기로). 바뀐 게 없으면 그대로
   function icCommit(f){
