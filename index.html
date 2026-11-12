@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-icdel">
+<meta name="app-build" content="b20261113-srmsw">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5399,6 +5399,7 @@ body.boardon #colAddQuick{display:none!important}
 /* 🙏 기도제목 카드 오른쪽으로 밀어 지우기 (2026-11-13 사용자 요청) */
 .icv .icp{touch-action:pan-y}
 .icv .icp.icswarm{border-color:var(--pink)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--pink) 55%,transparent)!important}
+.srmlist>.srmcard.srmswback{border-color:var(--gold)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 55%,transparent)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -13177,15 +13178,18 @@ body.boardon #colAddQuick{display:none!important}
       if(!sw)return; var t=e.touches[0]; if(!t)return;
       if(srmCD&&srmCD.on){sw=null;return}
       var dx=t.clientX-sw.x0, dy=t.clientY-sw.y0;
-      if(!sw.on){if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){sw=null;return} if(dx>12&&dx>Math.abs(dy)*1.5){sw.on=true; sw.c.classList.add("srmswipe"); if(srmCD){clearTimeout(srmCD.t); srmCD=null}} else return}
+      if(!sw.on){if(Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){sw=null;return} if(Math.abs(dx)>12&&Math.abs(dx)>Math.abs(dy)*1.5){sw.on=true; sw.c.classList.add("srmswipe"); if(srmCD){clearTimeout(srmCD.t); srmCD=null}} else return}
       if(e.cancelable)e.preventDefault();
-      sw.dx=Math.max(0,dx); sw.c.style.transform="translateX("+sw.dx+"px)"; sw.c.style.opacity=String(Math.max(.25,1-sw.dx/320));
+      // 오른쪽=지우기(손가락을 따라감), 왼쪽=뒷면(✍️ 이 설교를 듣고) 열기 — 기도제목 카드와 같은 밀기 (2026-11-13 사용자 요청)
+      sw.dx=dx>0?dx:Math.max(dx,-90); sw.c.style.transform="translateX("+sw.dx+"px)"; sw.c.style.opacity=dx>0?String(Math.max(.25,1-sw.dx/320)):"";
       var arm=sw.dx>110; if(arm!==!!sw.arm){sw.arm=arm; sw.c.classList.toggle("srmswarm",arm); if(arm)buzz(8)}
+      var bk=sw.dx<-60; if(bk!==!!sw.bk){sw.bk=bk; sw.c.classList.toggle("srmswback",bk); if(bk)buzz(6)}
     },{passive:false});
     function end(){
       if(!sw)return; var d=sw; sw=null; if(!d.on)return; srmCardDragAt=Date.now();
       var c=d.c; c.classList.remove("srmswipe");
       if(d.dx>110){c.style.transition="transform .2s ease-in,opacity .2s"; c.style.transform="translateX(110%)"; c.style.opacity="0"; setTimeout(function(){srmDelete(c.dataset.id)},190)}
+      else if(d.dx<-60){c.classList.remove("srmswback"); c.style.transform=""; buzz(10); srmEdit=c.dataset.id; srmRead=true; srmResp=true; srmRespEd=false; srmDraw(); var bx=srm.querySelector(".srmbox"); if(bx)bx.scrollTop=0; srmSlide("l")}
       else{c.style.transition="transform .2s,opacity .2s"; c.style.transform=""; c.style.opacity=""; c.classList.remove("srmswarm"); setTimeout(function(){c.style.transition=""},220)}
     }
     document.addEventListener("touchend",end); document.addEventListener("touchcancel",end);
