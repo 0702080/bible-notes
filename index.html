@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-saydbl">
+<meta name="app-build" content="b20261113-sayv">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5401,7 +5401,7 @@ body.boardon #colAddQuick{display:none!important}
 .icv .icp.icswarm{border-color:var(--pink)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--pink) 55%,transparent)!important}
 .srmlist>.srmcard.srmswback{border-color:var(--gold)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--gold) 55%,transparent)}
 /* 🌿 주님의 은혜 카드 오른쪽 밀어 지우기 (2026-11-13) */
-.saysheet.saygr .saycard{touch-action:pan-y}
+.saysheet .saycard{touch-action:pan-y}
 .saysheet .saycard.srmswarm{border-color:var(--pink)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--pink) 55%,transparent)!important}
 </style>
 </head>
@@ -16637,12 +16637,12 @@ body.boardon #colAddQuick{display:none!important}
     });
     sayTrashDraw(list);
   }
-  // 🌿 주님의 은혜: 카드를 오른쪽으로 밀어 지우기 → 되돌리기·지운 것 복구 (2026-11-13 사용자 요청, 기도제목·설교 메모와 같은 밀기)
+  // 🌿 주님의 은혜·📖 짧은 말씀: 카드를 오른쪽으로 밀어 지우기 → 되돌리기·지운 것 복구 (2026-11-13 사용자 요청, 기도제목·설교 메모와 같은 밀기)
   var sayTrashOpen=false, SAY_TRASH="bible-say-trash";
   function sayTrash(){try{var a=JSON.parse(localStorage.getItem(SAY_TRASH)||"[]"); return Array.isArray(a)?a.filter(function(t){return t&&t.x&&t.x.id&&Date.now()-t.at<60*864e5}):[]}catch(e){return []}}
   function sayTrashSet(a){try{localStorage.setItem(SAY_TRASH,JSON.stringify(a.slice(0,60)))}catch(e){}}
   function sayTrashDraw(list){
-    if(sayMode!=="g"||sayQ)return; var tr=sayTrash().filter(function(t){return t.x.gr}); if(!tr.length)return;
+    if((sayMode!=="g"&&sayMode!=="v")||sayQ)return; var tr=sayTrash().filter(function(t){return sayMode==="v"?!!t.x.hv:(!!t.x.gr&&!t.x.hv)}); if(!tr.length)return;
     var tb=document.createElement("div"); tb.className="srmtrash saytrash";
     var th=document.createElement("button"); th.type="button"; th.className="srmtrashh"; th.dataset.act="trash"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(sayTrashOpen?"▴":"▾"); tb.appendChild(th);
     if(sayTrashOpen)tr.forEach(function(t){var r=document.createElement("div"); r.className="srmtrow";
@@ -16681,6 +16681,7 @@ body.boardon #colAddQuick{display:none!important}
     var v=ta.value.replace(/\s+$/,""); if((x.use||"")===v)return;
     x.use=v; x.at=Date.now(); saveSay(o);
   }
+  var sayEditAt=0;   // 두 번 눌러 고치기를 연 때 — 휴대폰이 뒤따라 보내는 dblclick이 열자마자 저장해 버리던 것 막기 (2026-11-13)
   var sayDrag=null, sayQ="", sayLocked=false; try{sayLocked=localStorage.getItem("bible-say-lock")==="1"}catch(e){}
   function sayOneLP(btn){   // 한 단추: 꾹 누르면 지우기 확인으로 바뀜, 그 뒤 한 번 더 누르면 지움 (2026-11-08)
     var t=0, eat=0;
@@ -16753,7 +16754,7 @@ body.boardon #colAddQuick{display:none!important}
         clearTimeout(dtap.ot); dtap={id:"",t:0}; e.preventDefault(); e.stopPropagation();
         try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
         if(sayBack[id]){sayUseEd=id; drawSay(); var ut=say.querySelector('.sayuse[data-id="'+id+'"]'); if(ut){try{ut.focus({preventScroll:true}); ut.setSelectionRange(ut.value.length,ut.value.length)}catch(err){}} return}
-        sayEdit=id; drawSay(); var ta=say.querySelector(".sayt");
+        sayEdit=id; sayEditAt=Date.now(); drawSay(); var ta=say.querySelector(".sayt");
         if(ta){ta.scrollIntoView({block:"center"}); setTimeout(function(){try{ta.focus({preventScroll:true}); ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}},30)}
         return;
       }
@@ -16786,17 +16787,18 @@ body.boardon #colAddQuick{display:none!important}
     var fdt={t:0,x:0,y:0};
     function formDbl(x,y,tg){
       if(!sayEdit||!tg.closest(".sayform")||tg.closest("button,select,input:not(.sayt)"))return false;
+      if(Date.now()-sayEditAt<900)return false;
       var now=Date.now(), hit=now-fdt.t<480&&Math.abs(x-fdt.x)<60&&Math.abs(y-fdt.y)<80;   // 휴대폰에서 첫 누름에 키보드가 올라와 자리가 밀려도 두 번으로 셈 (2026-11-07)
       fdt={t:hit?0:now,x:x,y:y}; if(!hit)return false;
       var sv=tg.closest(".sayform").querySelector(".saysave"); if(sv){try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(e){} if(document.activeElement)document.activeElement.blur(); sv.click()} return true;
     }
     var fhost=list.closest(".saysheet")||list.parentElement;
     fhost.addEventListener("touchend",function(e){if(e.changedTouches.length!==1)return; var t=e.changedTouches[0]; if(formDbl(t.clientX,t.clientY,e.target))e.preventDefault()},{passive:false});
-    fhost.addEventListener("dblclick",function(e){if(sayEdit&&e.target.closest(".sayform")&&!e.target.closest("button,select,input:not(.sayt)")){fdt={t:0,x:0,y:0}; var sv=e.target.closest(".sayform").querySelector(".saysave"); if(sv)sv.click()}});
+    fhost.addEventListener("dblclick",function(e){if(Date.now()-sayEditAt<900)return; if(sayEdit&&e.target.closest(".sayform")&&!e.target.closest("button,select,input:not(.sayt)")){fdt={t:0,x:0,y:0}; var sv=e.target.closest(".sayform").querySelector(".saysave"); if(sv)sv.click()}});
     // 휴대폰은 손가락이 움직이면 브라우저가 pointer를 끊어서(pointercancel) touch 이벤트로 잼
     var sw=null;
     function swStart(c,x,y,t){sw=c?{c:c,x:x,y:y,t:t}:null}
-    function swDelOK(c){return sayMode==="g"&&c&&!sayBack[c.dataset.id]&&!sayEdit&&!sayDrag}
+    function swDelOK(c){return (sayMode==="g"||sayMode==="v")&&c&&!sayBack[c.dataset.id]&&!sayEdit&&!sayDrag}
     function swSnap(c){c.style.transition="transform .2s,opacity .2s"; c.style.transform=""; c.style.opacity=""; c.classList.remove("srmswarm"); setTimeout(function(){c.style.transition=""},220)}
     list.addEventListener("touchmove",function(e){   // 은혜 앞면: 오른쪽으로 미는 동안 카드가 손가락을 따라감
       var w=sw; if(!w||!w.t||!swDelOK(w.c))return; var t=e.touches[0]; if(!t)return;
