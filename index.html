@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-pftri2">
+<meta name="app-build" content="b20261113-fab">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -1733,6 +1733,10 @@ body.reorder .note .useopen,body.reorder .note .vedit,body.reorder .note .vtopic
 body.typing .fab{opacity:0;pointer-events:none;transform:translateY(20px)}
 .fab{transition:opacity .15s,transform .15s}
 .fab,.fab *{font-weight:400!important}   /* 말씀 담기 버튼 글자는 가늘게 */
+/* 말씀 담기 단추: 더 작게, 입체로 (2026-11-13 사용자 요청) */
+.fab{height:42px;padding:0 16px 0 13px;border-radius:21px;font-size:14.5px;gap:6px;background-color:rgba(232,227,217,.9)!important;background-image:linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.12) 48%,rgba(0,0,0,.04) 52%,rgba(0,0,0,.16) 100%)!important;border:1px solid rgba(255,255,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -2px 0 rgba(0,0,0,.18),0 3px 0 rgba(90,80,65,.85),0 6px 14px rgba(0,0,0,.45)}
+.fab:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.25),0 0 0 rgba(90,80,65,.85),0 2px 6px rgba(0,0,0,.4)}
+.fab .fabplus{font-size:19px}
 /* 빙그레체 '살짝 굵게': 굵은 글꼴 대신 보통 글꼴 + 아주 얇은 테두리 (제목, 주제 칩, 오늘 카드 버튼, 카드 버튼 줄) */
 h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!important;-webkit-text-stroke:.35px currentColor;paint-order:stroke fill}
 /* 카드 안 굵은 글자도 같은 '살짝 굵게'로 통일 (암송 N 표시, 실천 진도표, 탭 숫자, 새 묵상 버튼 등) */
