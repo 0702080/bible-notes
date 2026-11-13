@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-ghui">
+<meta name="app-build" content="b20261113-nodaily">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5505,7 +5505,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
   <div class="toolbar">
     <h2><button type="button" class="homebtn" id="homeBtn" aria-label="처음 화면으로">담은 말씀</button> <span id="count" style="color:var(--muted);font-size:15px;font-family:var(--sans);font-weight:400"></span></h2>
     <div class="todaymini" id="todayMini" aria-label="오늘 할 일"></div>
-    <span class="bfwrap"><button type="button" class="bfx" id="bFilterX" aria-label="찾기 지우기" title="지우기" hidden>✕</button><input class="bfilter" id="bFilter" type="search" placeholder="🔍" aria-label="말씀에서 찾기"><span class="bfchips"><button type="button" class="fsd bfscope" aria-pressed="false" title="누르면 하루 돌아보기 기록은 찾기에서 빼요">하루 제외</button><button type="button" class="fsc bfscope" aria-pressed="false" title="누르면 내가 적은 기록까지 찾아요">내 기록도</button></span></span>
+    <span class="bfwrap"><button type="button" class="bfx" id="bFilterX" aria-label="찾기 지우기" title="지우기" hidden>✕</button><input class="bfilter" id="bFilter" type="search" placeholder="🔍" aria-label="말씀에서 찾기"><span class="bfchips"><button type="button" class="fsd bfscope" aria-pressed="false" title="누르면 하루 돌아보기 기록도 찾아요">하루 포함</button><button type="button" class="fsc bfscope" aria-pressed="false" title="누르면 내가 적은 기록까지 찾아요">내 기록도</button></span></span>
     <button class="tbtn tadd" id="topAdd" type="button">＋ 말씀 담기</button>
     <div class="viewseg" id="viewSeg" role="group" aria-label="보기 방식"><button type="button" data-v="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="2.2"/><rect x="3" y="13" width="18" height="7" rx="2.2"/><path d="M7 7.5h6M7 16.5h4"/></svg>목록</button><button type="button" data-v="board" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3.5" width="18" height="17" rx="3"/><path d="M7.5 7.5v8M12 7.5v4.5M16.5 7.5v6.5"/></svg>칸반 보드</button></div>
     <div class="viewseg bmodeseg" id="bModeSeg" role="group" aria-label="칸반 순서" hidden><button type="button" data-m="list" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4v15M2.5 16.5L5 19l2.5-2.5"/><path d="M11 6h10M11 12h7M11 18h4"/></svg>목록 순서</button><button type="button" data-m="stage" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-4M10 20v-7M15 20v-10"/><path d="M19.5 3.5l.9 1.9 2 .3-1.45 1.4.35 2-1.8-.95-1.8.95.35-2-1.45-1.4 2-.3z" stroke-width="1.3" stroke-linejoin="round"/></svg>암송 단계</button></div>
@@ -5554,7 +5554,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
   <div class="topicbar" id="topicBar" role="toolbar" aria-label="주제"></div>
   <div class="colbar" id="colBar" role="toolbar" aria-label="칸" hidden></div>
   <div class="fwrap"><button type="button" class="fx" id="filterX" aria-label="찾기 지우기" title="지우기" hidden>✕</button><input class="filter" id="filter" type="search" placeholder="🔍 말씀 찾기 (초성 예: ㄱㅅ)" aria-label="노트에서 찾기"></div>
-  <div class="fscrow" id="fScopeRow" hidden><button type="button" class="fsc" aria-pressed="false">📝 내 기록까지 찾기</button><button type="button" class="fsd" aria-pressed="false">🌙 하루 돌아보기 빼기</button></div>
+  <div class="fscrow" id="fScopeRow" hidden><button type="button" class="fsc" aria-pressed="false">📝 내 기록까지 찾기</button><button type="button" class="fsd" aria-pressed="false">🌙 하루 돌아보기도</button></div>
   <div class="reviewbar" id="reviewBar" hidden></div>
   <div class="recentfind" id="recentFind" hidden></div>
   <div class="dlfind" id="dlFind" hidden></div>
@@ -6476,7 +6476,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
   }
   // 찾기 범위: 말씀만(구절 이름·본문) ↔ 내가 적은 것까지 (2026-11-04 사용자 요청)
   var findWordOnly=true; try{findWordOnly=localStorage.getItem("bible-find-all")!=="1"}catch(e){}   // 기본은 말씀만, "내 기록까지"를 켜면 내가 적은 글도 (2026-11-06 사용자 요청)
-  var findNoDaily=false; try{findNoDaily=localStorage.getItem("bible-find-nodaily")==="1"}catch(e){}   // 찾기에서 하루 돌아보기 기록 빼기 (2026-11-04 사용자 요청)
+  var findNoDaily=true; try{findNoDaily=localStorage.getItem("bible-find-daily")!=="1"}catch(e){}   // 하루 돌아보기 기록은 기본으로 빼고, '하루 포함'을 켰을 때만 찾음 (2026-11-13 사용자 요청)   // 찾기에서 하루 돌아보기 기록 빼기 (2026-11-04 사용자 요청)
   function noteFields(n){   // 이 말씀에서 찾아볼 모든 글
     var a=[n.ref,n.text];
     if(findWordOnly)return a;
@@ -21672,11 +21672,11 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
   });
   function fscSync(){
     document.querySelectorAll(".fsc").forEach(function(b){b.setAttribute("aria-pressed",String(!findWordOnly)); b.classList.toggle("on",!findWordOnly)});
-    document.querySelectorAll(".fsd").forEach(function(b){b.setAttribute("aria-pressed",String(findNoDaily)); b.classList.toggle("on",findNoDaily); b.hidden=findWordOnly});
+    document.querySelectorAll(".fsd").forEach(function(b){b.setAttribute("aria-pressed",String(!findNoDaily)); b.classList.toggle("on",!findNoDaily); b.hidden=findWordOnly});
   }
   document.addEventListener("click",function(e){
     var b=e.target.closest&&e.target.closest(".fsd"); if(!b)return;
-    findNoDaily=!findNoDaily; try{localStorage.setItem("bible-find-nodaily",findNoDaily?"1":"")}catch(err){}
+    findNoDaily=!findNoDaily; try{localStorage.setItem("bible-find-daily",findNoDaily?"":"1")}catch(err){}
     fscSync(); render(); toast(findNoDaily?"하루 돌아보기 기록은 찾기에서 빼요":"하루 돌아보기 기록도 찾아요");
   });
   document.addEventListener("click",function(e){
