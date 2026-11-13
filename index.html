@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-nodaily">
+<meta name="app-build" content="b20261113-wordonly">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -6475,7 +6475,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
     return false;
   }
   // 찾기 범위: 말씀만(구절 이름·본문) ↔ 내가 적은 것까지 (2026-11-04 사용자 요청)
-  var findWordOnly=true; try{findWordOnly=localStorage.getItem("bible-find-all")!=="1"}catch(e){}   // 기본은 말씀만, "내 기록까지"를 켜면 내가 적은 글도 (2026-11-06 사용자 요청)
+  var findWordOnly=true;   // 앱을 열 때마다 말씀만 찾음 — 내 기록(아래 결과 칸)은 '내 기록도'를 그때 켰을 때만, 켠 것을 기억하지 않음 (2026-11-13 사용자 요청)   // 기본은 말씀만, "내 기록까지"를 켜면 내가 적은 글도 (2026-11-06 사용자 요청)
   var findNoDaily=true; try{findNoDaily=localStorage.getItem("bible-find-daily")!=="1"}catch(e){}   // 하루 돌아보기 기록은 기본으로 빼고, '하루 포함'을 켰을 때만 찾음 (2026-11-13 사용자 요청)   // 찾기에서 하루 돌아보기 기록 빼기 (2026-11-04 사용자 요청)
   function noteFields(n){   // 이 말씀에서 찾아볼 모든 글
     var a=[n.ref,n.text];
@@ -21681,7 +21681,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
   });
   document.addEventListener("click",function(e){
     var b=e.target.closest&&e.target.closest(".fsc"); if(!b)return;
-    findWordOnly=!findWordOnly; try{localStorage.setItem("bible-find-all",findWordOnly?"":"1")}catch(err){}
+    findWordOnly=!findWordOnly;
     exKey=""; fscSync(); render(); toast(findWordOnly?"말씀에서만 찾아요":"내가 적은 기록까지 찾아요");
   });
   fscSync();
