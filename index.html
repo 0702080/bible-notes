@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-qk">
+<meta name="app-build" content="b20261113-tbdrag">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5479,6 +5479,10 @@ body:not(.boardon) #addQuick{margin:0!important}
 body.boardon .toolbar .qk{display:none!important}
 body:not(.boardon) #sermonBtn,body:not(.boardon) #icBtn,body:not(.boardon) #openSayBtn,body:not(.boardon) #openVerseBtn{display:none!important}
 @media (max-width:380px){body:not(.boardon) .toolbar .qk,body:not(.boardon) #colAddQuick,body:not(.boardon) #addQuick,body:not(.boardon) #dailyQuick,body:not(.boardon) #ledgerQuick,body:not(.boardon) #topMenu>summary{width:32px!important;min-width:32px;height:32px!important}}
+/* ↔ 맨 위 단추 끌기 (2026-11-13) */
+body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,body:not(.boardon) .toolbar #dailyQuick,body:not(.boardon) .toolbar #ledgerQuick,body:not(.boardon) .toolbar .qk{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.toolbar .tbdrag{transform:scale(1.18) translateY(-3px)!important;z-index:5;filter:brightness(1.12);box-shadow:0 8px 16px rgba(0,0,0,.55),0 0 0 2px rgba(255,255,255,.55)!important;transition:transform .12s!important}
+.toolbar.tbdragging{touch-action:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -21700,6 +21704,39 @@ body:not(.boardon) #sermonBtn,body:not(.boardon) #icBtn,body:not(.boardon) #open
   $("ledgerBtn").addEventListener("click",function(){$("topMenu").open=false;openLedger()});
   $("ledgerQuick").addEventListener("click",function(){$("topMenu").open=false;openLedger()});
   $("dailyQuick").addEventListener("click",function(){$("topMenu").open=false;openDaily()});
+  /* ↔ 맨 위 동그라미 단추 끌어서 자리 바꾸기 (2026-11-13 사용자 요청): 꾹(0.35초) 누른 뒤 좌우로 끌기, 한 칸 옮길 때마다 진동. ⋯는 맨 끝 고정. 저장 bible-tb-order (이 기기만) */
+  (function(){
+    var TB_KEY="bible-tb-order", bar=$("addQuick")&&$("addQuick").parentElement; if(!bar)return;
+    function keyOf(b){return b.id||("qk:"+b.dataset.for)}
+    function movables(){return Array.prototype.filter.call(bar.children,function(b){return b.matches("#colAddQuick,#addQuick,#dailyQuick,#ledgerQuick,.qk")})}
+    function anchor(){return $("filterBtn")||$("topMenu")}
+    function apply(){var o=[];try{o=JSON.parse(localStorage.getItem(TB_KEY)||"[]")}catch(e){} if(!Array.isArray(o)||!o.length)return;
+      var ms=movables(), by={}; ms.forEach(function(b){by[keyOf(b)]=b});
+      var list=o.map(function(k){return by[k]}).filter(Boolean); ms.forEach(function(b){if(list.indexOf(b)<0)list.push(b)});
+      var an=anchor(); list.forEach(function(b){bar.insertBefore(b,an)})}
+    function save(){try{localStorage.setItem(TB_KEY,JSON.stringify(movables().map(keyOf)))}catch(e){}}
+    apply();
+    var d=null, eat=0;
+    function start(b,x){d={b:b,x0:x,armed:false,t:setTimeout(function(){if(!d)return;d.armed=true;b.classList.add("tbdrag");bar.classList.add("tbdragging");buzz(15)},350)}}
+    function move(x,e){
+      if(!d)return;
+      if(!d.armed){if(Math.abs(x-d.x0)>10){clearTimeout(d.t);d=null}return}
+      if(e&&e.cancelable)e.preventDefault();
+      var ms=movables(), i=ms.indexOf(d.b);
+      var prev=ms[i-1], next=ms[i+1];
+      if(next){var r=next.getBoundingClientRect(); if(x>r.left+r.width/2){bar.insertBefore(next,d.b);buzz(12);return}}
+      if(prev){var r2=prev.getBoundingClientRect(); if(x<r2.left+r2.width/2){bar.insertBefore(d.b,prev);buzz(12)}}
+    }
+    function end(){if(!d)return; clearTimeout(d.t); if(d.armed){d.b.classList.remove("tbdrag");bar.classList.remove("tbdragging");save();eat=Date.now()} d=null}
+    bar.addEventListener("touchstart",function(e){var b=e.target.closest&&e.target.closest("button"); if(!b||movables().indexOf(b)<0||e.touches.length>1)return; start(b,e.touches[0].clientX)},{passive:true});
+    bar.addEventListener("touchmove",function(e){if(d)move(e.touches[0].clientX,e)},{passive:false});
+    bar.addEventListener("touchend",end); bar.addEventListener("touchcancel",end);
+    bar.addEventListener("contextmenu",function(e){if(d&&d.armed)e.preventDefault()});
+    bar.addEventListener("mousedown",function(e){var b=e.target.closest&&e.target.closest("button"); if(!b||movables().indexOf(b)<0||e.button)return; start(b,e.clientX);
+      function mm(ev){move(ev.clientX,ev)} function mu(){document.removeEventListener("mousemove",mm);document.removeEventListener("mouseup",mu);end()}
+      document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu)});
+    document.addEventListener("click",function(e){if(Date.now()-eat<500&&e.target.closest&&e.target.closest(".toolbar")){e.stopPropagation();e.preventDefault()}},true);   // 끌고 난 손길은 누름으로 안 셈
+  })();
   $("medqBtn").addEventListener("click",function(){$("topMenu").open=false;openMedq()});   // 내가 묻고 내가 답하는 묵상 (⋯ 메뉴, 2026-10-25 사용자 요청)
   $("ansBtn").addEventListener("click",function(){$("topMenu").open=false;openAnswers()});
   $("smartBtn").addEventListener("click",function(){$("topMenu").open=false;openSmart()});
