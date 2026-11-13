@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261114-saydots">
+<meta name="app-build" content="nb-20261114a">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4529,10 +4529,12 @@ body.boardon .fscrow{display:none}
 .dltsum{margin:6px 0 0;color:var(--muted);font-size:13px}
 .dltdue .dltsum{margin-top:14px;color:color-mix(in srgb,var(--tc0) 70%,#fff);font-size:15px;font-weight:700}   /* 위 "오늘 아침 꼭 볼 것" 제목과 같은 글자·색 (2026-11-06 사용자 요청) */
 .dltduel{list-style:none;margin:6px 0 0;padding:0 0 0 24px;display:flex;flex-direction:column;gap:3px}
-.dltduel li{color:var(--ink);font-size:14px;line-height:1.45}
-.dltduel li::before{content:"·";color:var(--muted);margin-right:8px}
+.dltduel li{color:var(--ink);font-size:14px;line-height:1.45;display:flex}
+.dltduel li::before,.dltlist li::before{content:"·";color:var(--muted);flex:none;width:14px}   /* 위 실천 줄과 아래 복습 말씀 줄의 점·글 시작을 한 세로줄로 (2026-11-14 사용자 요청) */
 .dltmore{margin:4px 0 0 24px;color:var(--muted);font-size:12.5px}
-.dltlist{margin:6px 0 0;padding-left:18px;font-size:13.5px;line-height:1.6}
+.dltlist{list-style:none;margin:6px 0 0;padding:0 0 0 24px;font-size:14px;line-height:1.6}
+.dltlist li{display:flex}
+.dltlist li .dltgo{flex:1;min-width:0}
 .dltin{display:block;width:100%;box-sizing:border-box;margin-top:8px;padding:8px 10px;border:1px solid #34333A;border-radius:10px;background:#0F0E12;color:var(--ink);font:inherit;font-size:14px;resize:vertical}
 /* 27 짧은 말씀 카드 왼쪽 선 두께 = 한 마디 카드와 같게 */
 .saycard.hv{border-left-width:3px!important}
