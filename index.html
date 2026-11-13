@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-addq5">
+<meta name="app-build" content="b20261113-addq6">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5307,6 +5307,9 @@ body:not(.boardon) #colAddQuick{margin-right:0}
 #addQuick:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.25)!important}
 body.boardon #addQuick{display:none!important}
 body:not(.boardon) .fab{display:none!important}
+/* 맨 위 단추 다섯 개(새 칸·말씀 담기·🌙·💰·⋯)를 같은 간격으로 고르게 (2026-11-13 사용자 요청) */
+body:not(.boardon) .toolbar{justify-content:space-between}
+body:not(.boardon) #addQuick{margin:0!important}
 
 .ccverse .ccw.hid.ccvn .ccm{font-size:.62em;letter-spacing:-.04em}
 .ccverse .ccw.hid.ccvn{padding-right:2px!important;margin-right:-2px}
