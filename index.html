@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-mchalign">
+<meta name="app-build" content="b20261114-saydots">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -16760,7 +16760,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
       var sfd=sLong&&!!sayFold[x.id], fbn=null; if(sfd)c.classList.add("sayfolded");
       if(sLong){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="fold"; fbn.innerHTML=sfd?'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 17.5 L19 7 L5 7 Z" fill="currentColor" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 6.5 L19 17 L5 17 Z" fill="currentColor" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>'; fbn.setAttribute("aria-label",sfd?"펼치기":"접기"); fbn.title=sfd?"펼치기":"접기"} else c.classList.add("sayshort");
       // 🔘 접기·삭제를 한 단추로 (2026-11-08 사용자 요청): 누르면 접기·펼치기(짧은 카드는 ⋯ 안내), 꾹(0.6초) 누르면 "지울까요?" → 한 번 더 누르면 지움
-      if(!fbn){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="hint"; fbn.textContent="⋯"; fbn.title="꾹 누르면 지우기"}
+      if(!fbn){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="hint"; fbn.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="5" cy="12" r="2.1" fill="currentColor"/><circle cx="12" cy="12" r="2.1" fill="currentColor"/><circle cx="19" cy="12" r="2.1" fill="currentColor"/></svg>'; fbn.title="꾹 누르면 지우기"}
       fbn.classList.add("sayone"); sayOneLP(fbn);
       if(x.gr&&!sfd&&String(x.t||"").indexOf("\n")>=0){   // 🌿 은혜: 설교 메모처럼 한 줄씩 칸으로, 빈 줄도 그대로 (2026-11-08 사용자 요청)
         var q=document.createElement("div"); q.className="sayq saylines"; c.classList.add("saylined");
@@ -16841,8 +16841,8 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
     var t=0, eat=0;
     btn.addEventListener("pointerdown",function(e){if(e.button>0)return; clearTimeout(t); t=setTimeout(function(){
       t=0; eat=1; buzz([15,40,15]);
-      var a0=btn.dataset.act, tx=btn.textContent; btn.dataset.act="del"; btn.dataset.sure="1"; btn.textContent="지울까요?"; btn.classList.add("sure","sayonewide");
-      setTimeout(function(){if(btn.isConnected&&btn.dataset.sure){delete btn.dataset.sure; btn.dataset.act=a0; btn.textContent=tx; btn.classList.remove("sure","sayonewide")}},3000);
+      var a0=btn.dataset.act, tx=btn.innerHTML; btn.dataset.act="del"; btn.dataset.sure="1"; btn.textContent="지울까요?"; btn.classList.add("sure","sayonewide");
+      setTimeout(function(){if(btn.isConnected&&btn.dataset.sure){delete btn.dataset.sure; btn.dataset.act=a0; btn.innerHTML=tx; btn.classList.remove("sure","sayonewide")}},3000);
     },600)});
     ["pointerup","pointercancel","pointerleave"].forEach(function(ev){btn.addEventListener(ev,function(){clearTimeout(t); if(eat===1)eat=Date.now()+400})});
     btn.addEventListener("click",function(e){if(eat===1||Date.now()<eat){eat=0; e.stopPropagation(); e.preventDefault()}});   // 꾹 누른 뒤 떼는 손길은 버림
