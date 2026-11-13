@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-cndlg">
+<meta name="app-build" content="b20261113-xc">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5440,6 +5440,9 @@ body:not(.boardon) #addQuick{margin:0!important}
 #sheetClose{width:34px!important;height:34px!important;min-width:34px;padding:0!important;border-radius:50%!important;font-size:0!important;display:grid;place-items:center;color:#fff!important;border:1px solid color-mix(in srgb,var(--pink) 60%,#3A2A30)!important;background:color-mix(in srgb,var(--pink) 42%,#2A2026) linear-gradient(180deg,rgba(255,255,255,.26) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.1) 55%,rgba(0,0,0,.3) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.3),0 3px 0 rgba(0,0,0,.45),0 4px 8px rgba(0,0,0,.4)!important}
 #sheetClose::before{content:"";width:13px;height:13px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5L5 19' stroke='%23000' stroke-width='3.6' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5L5 19' stroke='%23000' stroke-width='3.6' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
 #sheetClose:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
+/* ✕ 정가운데: 글자(닫기)는 휴대폰 최소 글자 크기 설정 때문에 자리를 차지해 ✕를 밀어 올림 → ✕를 겹쳐 놓고 글자는 투명 (2026-11-13) */
+#sheetClose{position:relative;color:transparent!important;line-height:0!important;overflow:hidden}
+#sheetClose::before{position:absolute;inset:0;margin:auto;background:#fff}
 .sheet .bkopen{background:color-mix(in srgb,var(--sky) 22%,#1C2A33) linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;border:1px solid color-mix(in srgb,var(--sky) 50%,#2A3A44)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.42),0 4px 8px rgba(0,0,0,.36)!important;transition:transform .08s,box-shadow .08s}
 .sheet .bkopen:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
 .sheet form .primary{background:#E3DDD1 linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.12) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.16) 100%)!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -2px 0 rgba(0,0,0,.18),0 3px 0 rgba(90,80,65,.85),0 5px 10px rgba(0,0,0,.4)!important;transition:transform .08s,box-shadow .08s}
