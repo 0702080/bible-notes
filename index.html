@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-wordonly">
+<meta name="app-build" content="b20261113-icno2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5490,6 +5490,14 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
 .ghsheet .ghclose{height:34px;border-radius:17px!important}
 .ghsheet .ghrset{height:44px}
 .ghsheet .ghclose:active,.ghsheet .ghout:active,.ghsheet .ghrset:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
+/* 🕊 응답 안 된 기도 (2026-11-13 사용자 요청) */
+.icv .icbtns .icno{height:34px;padding:0 13px;border-radius:17px;font:inherit;font-size:13.5px;border:1px dashed rgba(170,176,196,.45)!important;background:rgba(255,255,255,.04) linear-gradient(180deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.03) 45%,rgba(0,0,0,.06) 55%,rgba(0,0,0,.2) 100%)!important;color:#A9AEC0!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),inset 0 -2px 0 rgba(0,0,0,.25),0 2px 0 rgba(0,0,0,.4)!important}
+.icv .icbtns .icno.on{border:1px solid #8E95AD!important;background-color:#3A3F52!important;color:#E4E7F2!important;font-weight:700}
+.icv .icbtns .icno:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
+.icbody .icp.noans{background:#2A2C35!important;border:1px solid #5B6075!important}
+.icbody .icp.noans .icname{color:#C3C7D6!important}
+.icv .icnohd{margin-top:18px}.icv .icnohd b{color:#AEB4CB}
+@media (max-width:400px){.icv .icbtns .icpray,.icv .icbtns .icno,.icv .icbtns .icans{padding:0 10px!important;font-size:13px!important}.icv .icbtns{gap:6px!important}}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -13846,7 +13854,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
     if(!o.del||typeof o.del!=="object")o.del={};
     o.per=Math.max(1,Math.min(10,+o.per||3));
     o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,100),memo:String(x.memo||"").slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
-      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
+      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,no:+x.no||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
     return o;
   }
   function icSave(o){try{localStorage.setItem(IC_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__icp")}
@@ -13866,7 +13874,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
   }
   function icLastBefore(x,day){var l=(x.log||[]).filter(function(d){return d<day}); return l.length?l[l.length-1]:""}
   function icPick(o,day,skip){   // 그날 기도할 사람: 그날 이미 기도한 사람 + 오래 못 한 사람부터 per명까지 (skip=옆으로 넘긴 수)
-    var live=o.items.filter(function(x){return !x.ans});
+    var live=o.items.filter(function(x){return !x.ans&&!x.no});
     var done=live.filter(function(x){return x.log.indexOf(day)>=0});
     var rest=live.filter(function(x){return x.log.indexOf(day)<0}).sort(function(a,b){var la=icLastBefore(a,day), lb=icLastBefore(b,day); return la<lb?-1:la>lb?1:a.at-b.at});
     if(skip&&rest.length){var sk=((skip%rest.length)+rest.length)%rest.length; rest=rest.slice(sk).concat(rest.slice(0,sk))}
@@ -14063,14 +14071,14 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
     return '<option value="">붙들 말씀 (선택)</option>'+arr.map(function(n){return '<option value="'+n.id+'"'+(n.id===sel?" selected":"")+'>'+String(n.ref).replace(/[<&"]/g,"")+'</option>'}).join("");
   }
   function icPerson(x,today,big){
-    var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":""); d.dataset.id=x.id; d.title="한 번 누르면 펼치고 접어요 · 두 번 누르면 고쳐요";
+    var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":"")+(x.no?" noans":""); d.dataset.id=x.id; d.title="한 번 누르면 펼치고 접어요 · 두 번 누르면 고쳐요";
     var did=x.log.indexOf(today)>=0, last=icLastBefore(x,today);
     var op=!!icOpen[x.id]; if(op)d.classList.add("open");
     var gp=document.createElement("span"); gp.className="icgrip"; gp.textContent="⠿"; gp.title="끌어서 위아래로 옮기기"; gp.setAttribute("aria-hidden","true");
     d.innerHTML='<button type="button" class="ictop icfold" aria-expanded="'+op+'" title="눌러서 '+(op?"접기":"펼치기")+'"><b class="icname"></b><span class="icmeta"></span><span class="icchev" aria-hidden="true"></span></button><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
     d.insertBefore(gp,d.firstChild);
     d.querySelector(".icname").textContent=x.name;
-    d.querySelector(".icmeta").textContent=x.ans?"🙌 응답 "+dlabel(dkey(x.ans)):(x.log.length?x.log.length+"번 기도"+(last?" · 마지막 "+dlabel(last):""):"아직 기도 전");
+    d.querySelector(".icmeta").textContent=x.ans?"🙌 응답 "+dlabel(dkey(x.ans)):x.no?"🕊 응답 안 됨 "+dlabel(dkey(x.no)):(x.log.length?x.log.length+"번 기도"+(last?" · 마지막 "+dlabel(last):""):"아직 기도 전");
     var mm=d.querySelector(".icmemo"); if(x.memo.trim())mm.textContent=x.memo; else mm.remove();
     var vn=x.nid&&notes.get(x.nid); if(vn){var v=d.querySelector(".icverse"); v.hidden=false; v.innerHTML='<b></b><span></span>'; v.querySelector("b").textContent="📖 "+vn.ref; v.querySelector("span").textContent=String(vn.text||"").replace(/\s+/g," ").slice(0,140)}
     var bt=d.querySelector(".icbtns");
@@ -14080,8 +14088,10 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
     dt.textContent=""; bt.appendChild(dt);
     function B(cls,t){var b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=t; bt.appendChild(b); return b}
     if(x.th.trim()){var tm=document.createElement("span"); tm.className="icthmark"; tm.textContent="🙏 감사"; tm.title="감사 기도 있음 · 옆으로 밀면 보여요"; bt.appendChild(tm)}
-    if(big&&!x.ans)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
-    var ansB=B("icans"+(x.ans?" on":""),x.ans?"🙌 응답됨 ✓":"응답 표시"); ansB.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답을 받았으면 눌러 표시해요";   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
+    if(big&&!x.ans&&!x.no)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
+    var ansB=B("icans"+(x.ans?" on":""),x.ans?"🙌 응답됨 ✓":"응답 표시"); ansB.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답을 받았으면 눌러 표시해요";
+    if(!x.ans){var noB=B("icno"+(x.no?" on":""),x.no?"🕊 응답 안 됨 ✓":"응답 안 됨"); noB.title=x.no?"응답 안 된 기도로 표시했어요 · 누르면 다시 기다리는 기도로":"구한 대로 응답되지 않고 마무리된 기도면 눌러 표시해요";   // 응답 안 된 기도 표시 (2026-11-13 사용자 요청)
+      if(!x.no)bt.insertBefore(noB,ansB)}   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
     // 뒷면: 응답 감사 기도 — 적은 게 있으면 읽는 글, 없으면 바로 적는 칸 (2026-11-06 사용자 요청)
     var bk=document.createElement("div"); bk.className="icthx";
     bk.innerHTML='<div class="icthxh"><b>🙏 응답 감사 기도</b><button type="button" class="icthback">← 기도문</button></div>';
@@ -14121,7 +14131,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
   }
   function icDrawInner(){
     var o=icData(), today=dkey(Date.now()), body=icv.querySelector(".icbody"); body.textContent="";
-    var icLive=o.items.filter(function(x){return !x.ans}), icAns=o.items.filter(function(x){return x.ans}).sort(function(a,b){return b.ans-a.ans});
+    var icLive=o.items.filter(function(x){return !x.ans&&!x.no}), icAns=o.items.filter(function(x){return x.ans}).sort(function(a,b){return b.ans-a.ans}), icNo=o.items.filter(function(x){return !x.ans&&x.no}).sort(function(a,b){return b.no-a.no});
     if(!icAns.length)icShowAns=false;
     icv.querySelector(".iccnt").textContent=icLive.length?icLive.length+"개":"";   // "기도제목 10개" (2026-11-07 사용자 요청)
     if(icEdit==="new")body.appendChild(icForm(null));   // 새 사람은 맨 위에서 적기 (2026-10-24 사용자 요청: 넣기 단추는 위 제목줄에)
@@ -14149,6 +14159,8 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
       body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,false));
     });
     ansBtn();
+    if(icNo.length){var nh=document.createElement("div"); nh.className="ichead ichall icnohd"; nh.innerHTML='<b>🕊 응답 안 된 기도 '+icNo.length+'</b>'; body.appendChild(nh);   // (2026-11-13 사용자 요청)
+      icNo.forEach(function(x){body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,false))})}
     var tr=icTrash();   // 🗑 지운 기도제목 다시 살리기 (2026-11-13 사용자 요청)
     if(tr.length){var tb=document.createElement("div"); tb.className="srmtrash ictrash";
       var th=document.createElement("button"); th.type="button"; th.className="srmtrashh ictrashh"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(icTrashOpen?"▴":"▾"); tb.appendChild(th);
@@ -14200,7 +14212,8 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
     if(b.classList.contains("icadd")){icShowAns=false; icEdit="new"; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfn"); if(f)f.focus()},30); return}
     if(b.classList.contains("icedit")){icEdit=id; icDraw(); return}
     if(b.classList.contains("iccancel")){icEdit=""; icDraw(); return}
-    if(b.classList.contains("icans")&&x){if(x.ans){x.ans=0}else{x.ans=Date.now(); toast("🙌 응답된 기도로 옮겼어요")} icTouch(x); icSave(o); icDraw(); return}
+    if(b.classList.contains("icans")&&x){if(x.ans){x.ans=0}else{x.ans=Date.now(); x.no=0; toast("🙌 응답된 기도로 옮겼어요")} icTouch(x); icSave(o); icDraw(); return}
+    if(b.classList.contains("icno")&&x){if(x.no){x.no=0; toast("다시 기다리는 기도로 옮겼어요")}else{x.no=Date.now(); x.ans=0; toast("🕊 응답 안 된 기도로 옮겼어요")} icTouch(x); icSave(o); icDraw(); return}
     if(b.classList.contains("icdel")){
       if(!b.dataset.sure){b.dataset.sure="1"; b.textContent="정말 지울까요?"; return}
       o.items=o.items.filter(function(y){return y.id!==id}); o.del[id]=Date.now(); icSave(o); icEdit=""; icDraw(); return;
