@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-sheetbtn">
+<meta name="app-build" content="b20261113-cndlg">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5444,6 +5444,30 @@ body:not(.boardon) #addQuick{margin:0!important}
 .sheet .bkopen:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
 .sheet form .primary{background:#E3DDD1 linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.12) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.16) 100%)!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -2px 0 rgba(0,0,0,.18),0 3px 0 rgba(90,80,65,.85),0 5px 10px rgba(0,0,0,.4)!important;transition:transform .08s,box-shadow .08s}
 .sheet form .primary:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.25)!important}
+/* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
+.cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
+.cndlg.out{opacity:0;transition:opacity .15s}
+@keyframes cnIn{from{opacity:0}to{opacity:1}}
+.cnbox{width:100%;max-width:380px;background:#22212A;border:1px solid #3B3947;border-radius:20px;padding:18px 18px 16px;box-shadow:0 18px 50px rgba(0,0,0,.55);animation:cnUp .22s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes cnUp{from{transform:translateY(14px) scale(.97);opacity:.4}to{transform:none;opacity:1}}
+.cnhd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.cnhd b{flex:1;font-size:17px;color:#F1EEE6}
+.cnic{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:17px;background:#244233;border:1px solid color-mix(in srgb,var(--green) 55%,#2A3A30)}
+.cnx{width:30px;height:30px;min-width:30px;padding:0!important;border-radius:50%;display:grid;place-items:center;font-size:0;color:#fff;border:1px solid color-mix(in srgb,var(--pink) 60%,#3A2A30);background:color-mix(in srgb,var(--pink) 42%,#2A2026) linear-gradient(180deg,rgba(255,255,255,.26),rgba(0,0,0,.28))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 0 rgba(0,0,0,.45)}
+.cnx::before{content:"";width:11px;height:11px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5L5 19' stroke='%23000' stroke-width='3.6' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 5l14 14M19 5L5 19' stroke='%23000' stroke-width='3.6' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.cnin{width:100%;box-sizing:border-box;height:48px;border-radius:14px;border:1px solid #4A4858;background:#15141B;color:#F1EEE6;font:inherit;font-size:16px;padding:0 14px;outline:none;transition:border-color .15s,box-shadow .15s}
+.cnin:focus{border-color:color-mix(in srgb,var(--green) 70%,#fff);box-shadow:0 0 0 3px color-mix(in srgb,var(--green) 22%,transparent)}
+.cntip{margin:14px 2px 8px;font-size:12.5px;color:#9C98AA}
+.cnchips{display:flex;flex-wrap:wrap;gap:7px}
+.cnchip{height:30px;padding:0 11px!important;border-radius:999px;border:1px solid #474556;background:#2C2B36!important;color:#D9D5E6;font:inherit;font-size:13px;display:inline-flex;align-items:center;gap:5px}
+.cnchip i{font-style:normal;font-size:11px;color:#8E8A9C}
+.cnchip.on{border-color:color-mix(in srgb,var(--green) 70%,#fff);background:#244233!important;color:#BFF0D3}
+.cnbtns{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+.cnbtns button{height:40px;padding:0 20px!important;border-radius:999px;font:inherit;font-size:14.5px;font-weight:600;transition:transform .08s,box-shadow .08s}
+.cncancel{border:1px solid #4A4858;background:#2C2B36 linear-gradient(180deg,rgba(255,255,255,.12),rgba(0,0,0,.2))!important;color:#CFCBDA;box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 3px 0 rgba(0,0,0,.45)}
+.cnok{border:1px solid color-mix(in srgb,var(--green) 55%,#2A3A30);background:#2E5A43 linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;color:#D6F7E3;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 0 rgba(0,0,0,.25),0 3px 0 rgba(0,0,0,.45),0 5px 10px rgba(0,0,0,.35)}
+.cnok:disabled{opacity:.45;box-shadow:none}
+.cnbtns button:not(:disabled):active,.cnx:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -6453,8 +6477,32 @@ body:not(.boardon) #addQuick{margin:0!important}
   var colDragging=false;
   var colFresh=[];
   // 📁 휴대폰 맨 위 '＋ 새 칸': 칸 만들기 — 같은 이름 #주제 말씀은 바로 모음 (2026-11-11 사용자 요청)
-  function colCreateAsk(){
-    var nm=window.prompt("새 칸 이름을 적어 주세요.\n이미 있는 주제 이름(예: 화, 분노)을 적으면 그 주제 말씀이 바로 이 칸에 모여요.",""); if(nm===null)return;
+  /* 📁 새 칸 만들기 창: 브라우저 기본 물음 창 대신 앱 모양 (2026-11-13 사용자 요청) */
+  function colNameDlg(done){
+    var old=document.querySelector(".cndlg"); if(old)old.remove();
+    var esc=function(x){return String(x).replace(/[&<>"]/g,function(c){return {"&":"&#38;","<":"&#60;",">":"&#62;",'"':"&#34;"}[c]})};
+    var tc={}; notes.forEach(function(n){(n.topics||[]).forEach(function(t){tc[t]=(tc[t]||0)+1})});
+    var have=myCols(), tops=Object.keys(tc).filter(function(t){return have.indexOf(t)<0}).sort(function(a,b){return tc[b]-tc[a]}).slice(0,8);
+    var d=document.createElement("div"); d.className="cndlg"; d.setAttribute("role","dialog"); d.setAttribute("aria-modal","true");
+    d.innerHTML='<div class="cnbox"><div class="cnhd"><span class="cnic">📁</span><b>새 칸 만들기</b><button type="button" class="cnx" aria-label="닫기"></button></div>'+
+      '<input class="cnin" maxlength="20" placeholder="칸 이름 (예: 감사, 기도 응답)" autocomplete="off" enterkeyhint="done">'+
+      (tops.length?'<div class="cntip">주제 이름을 고르면 그 주제 말씀이 바로 모여요</div><div class="cnchips">'+tops.map(function(t){return '<button type="button" class="cnchip" data-t="'+esc(t)+'">#'+esc(t)+' <i>'+tc[t]+'</i></button>'}).join("")+'</div>':'')+
+      '<div class="cnbtns"><button type="button" class="cncancel">취소</button><button type="button" class="cnok" disabled>만들기</button></div></div>';
+    document.body.appendChild(d);
+    var inp=d.querySelector(".cnin"), ok=d.querySelector(".cnok");
+    function close(v){d.classList.add("out"); setTimeout(function(){d.remove()},160); done(v)}
+    function sync(){ok.disabled=!inp.value.trim(); d.querySelectorAll(".cnchip").forEach(function(c){c.classList.toggle("on",c.dataset.t===inp.value.trim())})}
+    inp.addEventListener("input",sync);
+    inp.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.isComposing&&inp.value.trim()){e.preventDefault();close(inp.value)}else if(e.key==="Escape")close(null)});
+    d.addEventListener("click",function(e){
+      if(e.target===d||e.target.closest(".cnx,.cncancel")){close(null);return}
+      var c=e.target.closest(".cnchip"); if(c){inp.value=c.dataset.t; sync(); inp.focus(); return}
+      if(e.target.closest(".cnok")&&inp.value.trim())close(inp.value);
+    });
+    setTimeout(function(){inp.focus()},60);
+  }
+  function colCreateAsk(nm){
+    if(nm===undefined){colNameDlg(function(v){if(v!==null)colCreateAsk(v)});return}
     nm=String(nm).trim().slice(0,20); if(!nm){toast("칸 이름을 적어 주세요");return}
     var a=myCols(); if(a.indexOf(nm)>=0){toast("같은 이름의 칸이 있어요");return}
     a.unshift(nm); saveCols(a); colFresh.push(nm);
