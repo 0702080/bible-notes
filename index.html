@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-icno2">
+<meta name="app-build" content="b20261113-mchalign">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -261,7 +261,7 @@ body.boardon .toolbar{border-bottom:0}   /* PC 칸반: 맨 위 단추 줄 아래
 .note.vediting .editbox .etext:focus{outline:none;border-style:solid;box-shadow:none}   /* 바깥 두꺼운 빛 테두리 없앰 (2026-10-23 사용자 요청) */
 .note.vediting .editbox .donedit,.note.vediting .vedit{display:none}
 .lmvbar{display:none}
-.note.vediting .editbox .lmvbar:not([hidden]){display:flex;align-items:center;gap:10px;margin-top:8px}
+.note.vediting .editbox .lmvbar:not([hidden]){display:none!important;align-items:center;gap:10px;margin-top:8px}
 .lmvbtn{height:32px;padding:0 14px;border:1px solid color-mix(in srgb,var(--orange) 40%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--orange) 10%,#17161b);color:var(--orange);font-size:13px;font-weight:700}
 .lmvtip{font-size:11.5px;color:var(--faint)}
 @media (hover:none){.lmvtip{display:none}}
@@ -1799,7 +1799,7 @@ h2,.tchip,.rvchip,.tdh,.ctopic,.note .focusrow button,.ref{font-weight:400!impor
 .chml.peek .chmt{color:var(--hi);letter-spacing:0}
 .chmv{font-size:12px;color:var(--faint);padding-top:6px;text-align:right}
 .chmres{text-align:center;padding:20px 0}
-.mchmem{display:inline-flex;align-items:baseline;gap:8px;height:38px;margin:10px 0 4px 8px;padding:0 14px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);border-radius:19px;background:color-mix(in srgb,var(--sky) 12%,transparent);color:var(--sky);line-height:36px;white-space:nowrap}
+.mchmem{display:inline-flex;align-items:baseline;gap:8px;height:38px;margin:10px 0 4px 0;padding:0 14px;border:1px solid color-mix(in srgb,var(--sky) 55%,#34333A);border-radius:19px;background:color-mix(in srgb,var(--sky) 12%,transparent);color:var(--sky);line-height:36px;white-space:nowrap}
 .mchmem b{font-weight:400;-webkit-text-stroke:.3px currentColor;font-size:14.5px}
 .mchmem small{font-size:12px;color:var(--muted)}
 .mloci{border-color:color-mix(in srgb,var(--green) 55%,#34333A);background:color-mix(in srgb,var(--green) 12%,transparent);color:var(--green)}
