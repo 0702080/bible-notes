@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-dltdot">
+<meta name="app-build" content="b20261113-ghmenu">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5516,6 +5516,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
     <button class="tbtn" id="filterBtn" type="button" aria-label="노트에서 찾기" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
     <details class="menu" id="topMenu"><summary class="tbtn" aria-label="더보기">⋯</summary>
       <div class="pop">
+        <button type="button" id="ghSyncBtn">☁️ GitHub 자동 저장</button>
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
         <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 주님의 은혜</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
@@ -5541,7 +5542,6 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
         <button type="button" id="backupLoad">📥 백업 불러오기</button>
         <button type="button" id="sbBtn">☁️ 로그인 · 동기화</button>
         <button type="button" id="frBtn">👥 친구</button>
-        <button type="button" id="ghSyncBtn">🔄 GitHub 동기화 (예전)</button>
       </div>
     </details>
   </div>
@@ -20074,7 +20074,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
     st.textContent=ghBusy?"맞추는 중이에요…":(ghState.ok===false?"⚠️ "+ghState.msg:(ghState.at?"✓ "+ghState.msg+" · "+ghTime(ghState.at):"아직 맞추지 않았어요"));
     st.classList.toggle("bad",ghState.ok===false&&!ghBusy);
     var rs=gh.querySelector(".ghrst"), rin=gh.querySelector(".ghrrin");
-    if(rs){var rr=recRepo(); if(rin&&document.activeElement!==rin&&!rin.value)rin.value=rr;
+    if(rs){var rr=recRepo(); if(rin&&document.activeElement!==rin&&!rin.value)rin.value=rr||"0702080/bible-notes-records";   // 만들어 둔 비공개 저장소를 미리 채움 (2026-11-13)
       gh.querySelector(".ghrset").textContent=rr?"바꾸기":"연결";
       rs.textContent=!rr?"아직 연결하지 않았어요":(recBusy?"기록 올리는 중…":(recState.ok===false?"⚠️ "+recState.msg:(recState.at?"✓ "+recState.msg+" · "+ghTime(recState.at):"연결됨: "+rr)));
       rs.classList.toggle("bad",recState.ok===false&&!recBusy)}
@@ -20090,7 +20090,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
         '<button type="button" class="ghconnect">연결하고 맞추기</button></div>'+
         '<div class="ghon" hidden><div class="ghrepo"></div><div class="ghst"></div><div class="ghbtns"><button type="button" class="ghnow">지금 맞추기</button><button type="button" class="ghout">연결 끊기</button></div>'+
         '<div class="ghrec"><label class="ghl">📤 기록 저장소 (비공개)</label><p class="ghtip">설교 메모·한 마디·은혜·기도제목·한 줄 기도·재무제표는 공개 노트 저장소에 넣지 않아요. <b>비공개(Private)</b> 저장소를 하나 만들어 적으면, 고칠 때마다 3초 뒤 <b>records.json</b>으로 올라가요. 토큰이 그 저장소에도 쓰기 권한이 있어야 해요.</p>'+
-        '<div class="ghrrow"><input class="field ghrrin" placeholder="0702080/bible-records" autocapitalize="off" autocomplete="off" spellcheck="false"><button type="button" class="ghrset">연결</button></div><div class="ghst ghrst"></div></div></div></div>';
+        '<div class="ghrrow"><input class="field ghrrin" placeholder="0702080/bible-notes-records" autocapitalize="off" autocomplete="off" spellcheck="false"><button type="button" class="ghrset">연결</button></div><div class="ghst ghrst"></div></div></div></div>';
       document.body.appendChild(gh);
       gh.addEventListener("click",async function(e){
         if(e.target===gh){closeGh();return}
