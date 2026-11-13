@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261113-ghmenu">
+<meta name="app-build" content="b20261113-ghui">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5484,6 +5484,12 @@ body:not(.boardon) #sermonBtn,body:not(.boardon) #icBtn,body:not(.boardon) #open
 body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,body:not(.boardon) .toolbar #dailyQuick,body:not(.boardon) .toolbar #ledgerQuick,body:not(.boardon) .toolbar .qk{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .toolbar .tbdrag{transform:scale(1.18) translateY(-3px)!important;z-index:5;filter:brightness(1.12);box-shadow:0 8px 16px rgba(0,0,0,.55),0 0 0 2px rgba(255,255,255,.55)!important;transition:transform .12s!important}
 .toolbar.tbdragging{touch-action:none}
+/* ☁️ GitHub 자동 저장 창: 연결되면 설명 글 숨김, 닫기·연결 끊기·바꾸기는 같은 입체 단추 (2026-11-13 사용자 요청) */
+.ghsheet.ghconn .ghbox>.ghtip,.ghsheet.ghrconn .ghrec .ghtip{display:none}
+.ghsheet .ghclose,.ghsheet .ghout,.ghsheet .ghrset{flex:0 0 auto;height:40px;padding:0 16px!important;border:1px solid #4A4656!important;border-radius:12px!important;background:#2A2733 linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#D9D5E3!important;font-size:13.5px!important;font-weight:600;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1px 0 rgba(0,0,0,.25),0 3px 0 rgba(0,0,0,.45),0 4px 8px rgba(0,0,0,.35)!important;transition:transform .08s,box-shadow .08s}
+.ghsheet .ghclose{height:34px;border-radius:17px!important}
+.ghsheet .ghrset{height:44px}
+.ghsheet .ghclose:active,.ghsheet .ghout:active,.ghsheet .ghrset:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -20073,6 +20079,7 @@ body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,b
     if(c){gh.querySelector(".ghrepo").textContent=c.repo+" / "+(c.path||"notes.json")}
     st.textContent=ghBusy?"맞추는 중이에요…":(ghState.ok===false?"⚠️ "+ghState.msg:(ghState.at?"✓ "+ghState.msg+" · "+ghTime(ghState.at):"아직 맞추지 않았어요"));
     st.classList.toggle("bad",ghState.ok===false&&!ghBusy);
+    gh.classList.toggle("ghconn",!!ghCfg()); gh.classList.toggle("ghrconn",!!recRepo());   // 연결되면 설명 글은 숨겨 간단하게 (2026-11-13 사용자 요청)
     var rs=gh.querySelector(".ghrst"), rin=gh.querySelector(".ghrrin");
     if(rs){var rr=recRepo(); if(rin&&document.activeElement!==rin&&!rin.value)rin.value=rr||"0702080/bible-notes-records";   // 만들어 둔 비공개 저장소를 미리 채움 (2026-11-13)
       gh.querySelector(".ghrset").textContent=rr?"바꾸기":"연결";
