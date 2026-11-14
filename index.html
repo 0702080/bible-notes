@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114q">
+<meta name="app-build" content="nb-20261114r">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5433,6 +5433,12 @@ body:not(.boardon) #addQuick{margin:0!important}
 .srmtrash{margin:18px 0 8px}
 .srmtrashh{display:block;margin:0 auto;padding:6px 14px;border:0;background:transparent;color:var(--faint);font-family:inherit;font-size:13px}
 .srmtrow{display:flex;align-items:center;gap:10px;margin-top:8px;padding:10px 12px;border:1px dashed #3A3940;border-radius:12px;background:rgba(0,0,0,.25)}
+.trpurge{flex:0 0 auto;height:32px;padding:0 12px;border:1px solid color-mix(in srgb,var(--pink) 55%,#34333A);border-radius:16px;background:color-mix(in srgb,var(--pink) 14%,#1C1B22) linear-gradient(180deg,rgba(255,255,255,.16),rgba(0,0,0,.18));color:color-mix(in srgb,var(--pink) 75%,#fff);font-family:inherit;font-size:12.5px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 2px 0 rgba(0,0,0,.4)}
+.trpurge:active{transform:translateY(2px);box-shadow:none}
+.trpurge.arm{background:var(--pink);color:#2A1520;border-color:var(--pink);font-weight:700}
+.trpall{display:flex;justify-content:center;margin-top:12px}
+.trpall .trpurge{height:34px;padding:0 16px;font-size:13px}
+.srmtrow .srmtres{flex:0 0 auto}
 .srmtnm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:14px}
 /* 🙏 기도제목 카드 접었을 때는 제목·접기 단추만 — 정보 줄·기도문·아래 단추 줄 숨김 (2026-11-13 사용자 요청) */
 .icv .icp:not(.open):not(.thx) .ictop .icmeta,.icv .icp:not(.open):not(.thx)>.icmemo,.icv .icp:not(.open):not(.thx)>.icverse,.icv .icp:not(.open):not(.thx)>.icbtns{display:none!important}
@@ -13775,7 +13781,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var all=srmSorted(srmData()).filter(function(x){return !srmEmpty(x)&&srmCatOf(x)===srmCat}), q=srmQ.trim();
     var items=q?all.filter(function(x){var hay=hlStrip([x.title,x.who,x.ref,x.body,x.apply,x.resp||""].join(" \n ")); return q.split(/\s+/).every(function(w){return hit1(hay,w)})}):all;
     if(!items.length){var em=document.createElement("p"); em.className="srmempty";
-      em.textContent=srmCat==="b"?(all.length?"찾는 성경 본문이 없어요.":"아직 담은 성경 본문이 없어요.\n위 [+ 새 본문]을 누르고 장 전체를 붙여넣어 보세요.\n절마다 한 줄씩 나뉘어 들어가요."):(all.length?"찾는 설교 메모가 없어요.":"아직 적은 설교 메모가 없어요.\n위 [+ 새 메모]를 눌러 오늘 설교를 적어 보세요."); em.style.whiteSpace="pre-line"; list.appendChild(em); return}
+      em.textContent=srmCat==="b"?(all.length?"찾는 성경 본문이 없어요.":"아직 담은 성경 본문이 없어요.\n위 [+ 새 본문]을 누르고 장 전체를 붙여넣어 보세요.\n절마다 한 줄씩 나뉘어 들어가요."):(all.length?"찾는 설교 메모가 없어요.":"아직 적은 설교 메모가 없어요.\n위 [+ 새 메모]를 눌러 오늘 설교를 적어 보세요."); em.style.whiteSpace="pre-line"; list.appendChild(em)}   // 비어 있어도 아래 🗑 지운 것은 보이게 (2026-11-14)
     items.forEach(function(x){
       var c=document.createElement("button"); c.type="button"; c.className="srmcard"; c.dataset.id=x.id;
       var fd=true; c.classList.add("srmfolded");   // 목록은 늘 접힌 모양(제목·날짜·설교자만), 누르면 바로 읽기 (2026-11-11 사용자 요청)
@@ -13808,7 +13814,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var th=document.createElement("button"); th.type="button"; th.className="srmtrashh"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(srmTrashOpen?"▴":"▾"); tb.appendChild(th);
       if(srmTrashOpen)tr.forEach(function(t){var r=document.createElement("div"); r.className="srmtrow";
         var nm=document.createElement("span"); nm.className="srmtnm"; nm.textContent=(t.x.title||"").trim()||"(제목 없음)"; r.appendChild(nm);
-        var rb=document.createElement("button"); rb.type="button"; rb.className="srmtres"; rb.dataset.id=t.x.id; rb.textContent="↩ 복구"; r.appendChild(rb); tb.appendChild(r)});
+        var rb=document.createElement("button"); rb.type="button"; rb.className="srmtres"; rb.dataset.id=t.x.id; rb.textContent="↩ 복구"; r.appendChild(rb); r.appendChild(trPurgeBtn("srm",t.x.id)); tb.appendChild(r)});
+      if(srmTrashOpen)tb.appendChild(trPurgeAll("srm",tr));
       list.appendChild(tb);
     }
     if(q)srmMarkIn(list);
@@ -14223,7 +14230,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var th=document.createElement("button"); th.type="button"; th.className="srmtrashh ictrashh"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(icTrashOpen?"▴":"▾"); tb.appendChild(th);
       if(icTrashOpen)tr.forEach(function(t){var r=document.createElement("div"); r.className="srmtrow";
         var nm=document.createElement("span"); nm.className="srmtnm"; nm.textContent=t.x.name; r.appendChild(nm);
-        var rb=document.createElement("button"); rb.type="button"; rb.className="srmtres ictres"; rb.dataset.id=t.x.id; rb.textContent="↩ 복구"; r.appendChild(rb); tb.appendChild(r)});
+        var rb=document.createElement("button"); rb.type="button"; rb.className="srmtres ictres"; rb.dataset.id=t.x.id; rb.textContent="↩ 복구"; r.appendChild(rb); r.appendChild(trPurgeBtn("ic",t.x.id)); tb.appendChild(r)});
+      if(icTrashOpen)tb.appendChild(trPurgeAll("ic",tr));
       body.appendChild(tb)}
   }
   var icTrashOpen=false, IC_TRASH="bible-ic-trash";
@@ -16870,7 +16878,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var th=document.createElement("button"); th.type="button"; th.className="srmtrashh"; th.dataset.act="trash"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(sayTrashOpen?"▴":"▾"); tb.appendChild(th);
     if(sayTrashOpen)tr.forEach(function(t){var r=document.createElement("div"); r.className="srmtrow";
       var nm=document.createElement("span"); nm.className="srmtnm"; nm.textContent=String(t.x.t||"").trim().split("\n")[0]||"(빈 글)"; r.appendChild(nm);
-      var rb=document.createElement("button"); rb.type="button"; rb.className="srmtres"; rb.dataset.act="restore"; rb.dataset.id=t.x.id; rb.textContent="↩ 복구"; r.appendChild(rb); tb.appendChild(r)});
+      var rb=document.createElement("button"); rb.type="button"; rb.className="srmtres"; rb.dataset.act="restore"; rb.dataset.id=t.x.id; rb.textContent="↩ 복구"; r.appendChild(rb); r.appendChild(trPurgeBtn("say",t.x.id)); tb.appendChild(r)});
+    if(sayTrashOpen)tb.appendChild(trPurgeAll("say",tr));
     list.appendChild(tb);
   }
   function sayDelete(id){
@@ -16888,6 +16897,19 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var ub=say.querySelector(".sayundo"); if(ub)ub.hidden=true;
     buzz(10); toast("↩ 되살렸어요"); drawSay(); renderReviewBar();
   }
+  /* 🗑 지운 것 완전히 지우기 (2026-11-14 사용자 요청): 휴지통 줄마다 '완전히 지우기', 펼친 휴지통 맨 아래 '모두 완전히 지우기'. 한 번 누르면 분홍 '한 번 더 누르면 지워요'(3초), 또 누르면 휴지통에서 없앰 — 되돌릴 수 없음. 설교 메모·성경 본문·기도제목·은혜·짧은 말씀 모두 */
+  function trPurgeBtn(k,id){var b=document.createElement("button"); b.type="button"; b.className="trpurge"; b.dataset.k=k; b.dataset.ids=id; b.textContent="완전히 지우기"; b.setAttribute("aria-label","완전히 지우기"); return b}
+  function trPurgeAll(k,tr){var w=document.createElement("div"); w.className="trpall"; var b=trPurgeBtn(k,tr.map(function(t){return t.x.id}).join(",")); b.textContent="🗑 모두 완전히 지우기"; w.appendChild(b); return w}
+  document.addEventListener("click",function(e){
+    var b=e.target.closest&&e.target.closest(".trpurge"); if(!b)return;
+    e.preventDefault(); e.stopPropagation();
+    if(!b.classList.contains("arm")){b.classList.add("arm"); b._txt=b.textContent; b.textContent="한 번 더 누르면 지워요"; buzz(12); clearTimeout(b._t); b._t=setTimeout(function(){b.classList.remove("arm"); b.textContent=b._txt},3000); return}
+    var ids=b.dataset.ids.split(","), k=b.dataset.k, keep=function(t){return ids.indexOf(t.x.id)<0};
+    if(k==="srm"){srmTrashSet(srmTrash().filter(keep)); srmDrawList()}
+    else if(k==="ic"){icTrashSet(icTrash().filter(keep)); icDraw()}
+    else{sayTrashSet(sayTrash().filter(keep)); drawSay()}
+    buzz([10,30,10]); toast(ids.length>1?"지운 것을 모두 완전히 지웠어요":"완전히 지웠어요");
+  },true);
   // 끌어서 바꾼 순서(o.ord: id 목록). 목록에 없는 것(새로 담은 것)은 맨 위에 최근순으로 (2026-10-23 사용자 요청)
   function sayOrdered(o){
     var byAt=o.items.slice().sort(function(a,b){return (+b.at||0)-(+a.at||0)});
