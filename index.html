@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115i">
+<meta name="app-build" content="nb-20261115j">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3483,6 +3483,8 @@ mark.srmhit{background:rgba(255,205,80,.5);color:inherit;border-radius:4px;paddi
 .saydelx.sure{background:color-mix(in srgb,var(--pink) 18%,transparent)!important}
 .saycancel{flex:0 0 auto;height:40px;padding:0 14px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
 .saylist{display:flex;flex-direction:column;gap:10px}
+.saylist.sayfocus>*:not(.sayfocused){display:none!important}
+.saysheet.sayfocusing .saysrow,.saysheet.sayfocusing .sayundo,.saysheet.sayfocusing .saytrash{display:none!important}
 .saycard{--sc:var(--gold);padding:14px 16px;border:1px solid color-mix(in srgb,var(--sc) 18%,#232229);border-left:3px solid color-mix(in srgb,var(--sc) 65%,transparent);border-radius:14px;   /* 왼쪽 모서리도 둥글게 (2026-10-18 사용자 요청) */background:color-mix(in srgb,var(--sc) 9%,#131317)}
 .saythm{padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--sc) 18%,transparent);color:var(--sc);font-size:11.5px}   /* 내용이 비슷한 한 마디는 같은 색 (2026-10-31 사용자 요청) */
 .saycard.saytint{border-color:color-mix(in srgb,var(--sc) 45%,#2A2930);border-left-color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,#18171B)}
@@ -16913,6 +16915,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 10분마다 나옴
   var sayMode="s";
   function openSay(focus,mode){
+    sayFocusId="";
     sayMode=mode==="v"?"v":mode==="g"?"g":mode==="m"?"m":"s";
     if(!say){
       say=document.createElement("div"); say.className="daily saysheet"; say.setAttribute("role","dialog"); say.setAttribute("aria-modal","true"); say.hidden=true;
@@ -17076,7 +17079,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       row2.appendChild(cn); row2.appendChild(sv); form.appendChild(row2);
     }
     if(keep&&keep.focus){var nt=form.querySelector(".sayt"); if(nt){try{nt.focus({preventScroll:true}); nt.setSelectionRange(keep.ss,keep.se)}catch(e){}}}
-    list.textContent="";
+    list.textContent=""; sayFocusOff();
     var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:sayMode==="m"?(!x.hv&&!!x.sc):sayMode==="g"?(!x.hv&&!!x.gr&&!x.sc):(!x.hv&&!x.gr)});   // 🌄 장면 묵상(sc:1, gr:1도 붙어 한 마디 돌림에서 빠짐)은 따로   // 🌿 나의 은혜(gr:1)는 따로
     var lb=say.querySelector(".saylock"); lb.innerHTML='📌<span class="sayhidem"> 고정 '+(sayLocked?"ON":"OFF")+'</span>'; lb.setAttribute("aria-label",sayLocked?"고정 켜짐":"고정 꺼짐"); lb.classList.toggle("on",sayLocked); lb.setAttribute("aria-pressed",String(sayLocked)); lb.title=sayLocked?"끄면 카드를 끌어서 옮길 수 있어요":"켜면 카드가 움직이지 않아요";
     list.classList.toggle("saylocked",sayLocked||!!sayQ);
@@ -17118,7 +17121,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       }
       // ▴ 카드 하나씩 접기·펼치기 (2026-11-07 사용자 요청) — 접으면 첫 줄만
       var sLong=String(x.t||"").trim().split("\n").filter(function(s){return s.trim()}).length>1||String(x.t||"").length>34;
-      var sfd=sLong&&!!sayFold[x.id]&&!sayQ, fbn=null;   // 찾는 중엔 접힌 카드도 펼쳐 찾은 낱말이 보이게 if(sfd)c.classList.add("sayfolded");
+      var sfd=sLong&&!!sayFold[x.id]&&!sayQ, fbn=null; if(sfd)c.classList.add("sayfolded");   // 찾는 중엔 접힌 카드도 펼쳐 찾은 낱말이 보이게 (주석에 묻혀 접힌 표시가 빠져 있던 것, 2026-11-15)
       if(sLong){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="fold"; fbn.innerHTML=sfd?'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 17.5 L19 7 L5 7 Z" fill="currentColor" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 6.5 L19 17 L5 17 Z" fill="currentColor" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>'; fbn.setAttribute("aria-label",sfd?"펼치기":"접기"); fbn.title=sfd?"펼치기":"접기"} else c.classList.add("sayshort");
       // 🔘 접기·삭제를 한 단추로 (2026-11-08 사용자 요청): 누르면 접기·펼치기(짧은 카드는 ⋯ 안내), 꾹(0.6초) 누르면 "지울까요?" → 한 번 더 누르면 지움
       if(!fbn){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="hint"; fbn.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="5" cy="12" r="2.1" fill="currentColor"/><circle cx="12" cy="12" r="2.1" fill="currentColor"/><circle cx="19" cy="12" r="2.1" fill="currentColor"/></svg>'; fbn.title="꾹 누르면 지우기"}
@@ -17221,7 +17224,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var tot=P.length, pg=c.querySelector(".saypgno");
     var sf=c.querySelector(".sayf");
     function giveBack(){if(!pg||!sf)return; var cb=pg.querySelector(".sayccp"), ob=pg.querySelector(".sayone"); if(cb)sf.appendChild(cb); if(ob)sf.appendChild(ob); sf.classList.remove("sayfempty")}
-    if(tot<2){if(pg){giveBack(); pg.remove()} box._pgGo=null; return}
+    if(tot<2){if(pg){giveBack(); pg.remove()} box._pgGo=null; if(id===sayFocusId){sayFocusId=""; sayFocusOff()} return}
+    if(id===sayFocusId&&!sayQ&&!sayEdit&&!c.classList.contains("sayfolded")&&!c.classList.contains("sayfocused")){var fl=c.parentNode; fl.classList.add("sayfocus"); say.classList.add("sayfocusing"); c.classList.add("sayfocused"); var bx0=say.querySelector(".dlbody"); if(bx0)bx0.scrollTop=0; requestAnimationFrame(function(){if(box.isConnected)sayPage(box)})}
     var cur=Math.max(0,Math.min(sayPg[id]||0,tot-1)); sayPg[id]=cur;
     rows.forEach(function(r,i){var k=0; while(k+1<P.length&&P[k+1]<=i)k++; r.style.display=k===cur?"":"none"; r.style.borderTop=i===P[cur]&&i>0?"none":""});
     box.style.minHeight=Math.max(H,Math.max.apply(null,PH)+8)+"px";   // 쪽마다 칸 높이를 같게, 화면 아래까지 꽉 채움 → 쪽 단추가 제자리 (2026-11-14)
@@ -17234,6 +17238,9 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     pg.onclick=function(e){var b=e.target.closest(".srmpgb"); if(!b||b.disabled)return; e.stopPropagation(); go(+b.dataset.d,1)};
     box._pgGo=go;
   }
+  var sayFocusId="";   // 📖 긴 카드를 펼치면 그 카드만 보임 (2026-11-15 사용자 요청)
+  function sayFoldBack(id){setTimeout(function(){var nc=say&&say.querySelector('.saycard[data-id="'+id+'"]'); if(nc)nc.scrollIntoView({block:"center"})},30)}
+  function sayFocusOff(){if(!say)return; var l=say.querySelector(".saylist"); if(l)l.classList.remove("sayfocus"); say.classList.remove("sayfocusing"); say.querySelectorAll(".saycard.sayfocused").forEach(function(c){c.classList.remove("sayfocused")})}
   var sayFold={}; try{sayFold=JSON.parse(localStorage.getItem("bible-say-fold")||"{}")||{}}catch(e){sayFold={}}
   // 📐 뒷면 적는 칸을 화면 끝(키보드 위)까지 세로로 꽉 채움 — 카드를 윗줄 바로 아래로 올리고 칸 아래끝을 보이는 화면 아래 12px에 (2026-11-14 사용자 요청)
   function sayUseFill(t){
@@ -17402,10 +17409,10 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       }
       dtap={id:id,t:now};
       // 접힌 카드를 한 번 누르면 펼쳐서 읽기 (두 번 누르면 고치기, 2026-11-08 사용자 요청)
-      if(card.classList.contains("sayfolded")&&sayFold[id]){dtap.ot=setTimeout(function(){if(dtap.id!==id)return; delete sayFold[id]; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); buzz(6)},530)}
+      if(card.classList.contains("sayfolded")&&sayFold[id]){dtap.ot=setTimeout(function(){if(dtap.id!==id)return; delete sayFold[id]; sayFocusId=id; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); buzz(6)},530)}
       else if(!sayBack[id]&&card.querySelector('.sayfoldb[data-act="fold"]')){   // 펼친 긴 카드는 한 번 누르면 접힘 (2026-11-11 사용자 요청)
         try{var sl0=window.getSelection(); if(sl0&&String(sl0).length)return}catch(err){}
-        dtap.ot=setTimeout(function(){if(dtap.id!==id)return; sayFold[id]=1; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); buzz(6);
+        dtap.ot=setTimeout(function(){if(dtap.id!==id)return; sayFold[id]=1; var wasF=sayFocusId===id; sayFocusId=""; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); buzz(6); if(wasF){sayFoldBack(id);return}
           var nc=say.querySelector('.saycard[data-id="'+id+'"]'); if(nc){var r=nc.getBoundingClientRect(); if(r.top<70||r.bottom>innerHeight)nc.scrollIntoView({block:"center"})}},530)}
     }
     list.addEventListener("pointerdown",function(e){
@@ -17542,10 +17549,10 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     if(act==="restore"){sayRestore(b.dataset.id); return}
     if(act==="undo"){var ub0=b.closest(".sayundo"); if(ub0&&ub0.dataset.id)sayRestore(ub0.dataset.id); return}
     if(act==="cancel"){sayEdit="";drawSay();return}
-    if(act==="foldall"){var ids=(b.dataset.ids||"").split(",").filter(Boolean), unf=b.dataset.on==="1"; ids.forEach(function(i){if(unf)delete sayFold[i]; else sayFold[i]=1}); try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
+    if(act==="foldall"){var ids=(b.dataset.ids||"").split(",").filter(Boolean), unf=b.dataset.on==="1"; ids.forEach(function(i){if(unf)delete sayFold[i]; else sayFold[i]=1}); sayFocusId=""; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
     if(act==="copyall"){var ci=sayData().items.filter(function(y){return y.id===id})[0]; if(ci){copyText(hlStrip(String(ci.t||"")).replace(/\s+$/,"")).then(function(ok){if(ok===false){toast("복사하지 못했어요");return} b.classList.add("done"); setTimeout(function(){b.classList.remove("done")},1200); toast("글 전체를 복사했어요 📋")})} return}
     if(act==="hint"){toast("꾹 누르면 지울 수 있어요");return}
-    if(act==="fold"){if(sayFold[id])delete sayFold[id]; else sayFold[id]=1; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
+    if(act==="fold"){if(sayFold[id]){delete sayFold[id]; sayFocusId=id} else {sayFold[id]=1; if(sayFocusId===id){sayFocusId=""; sayFoldBack(id)}} try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
     if(act==="hvclear"){e.preventDefault(); var oo=sayData(), xx=oo.items.filter(function(y){return y.id===id})[0]; if(xx){xx.tm="";xx.at=Date.now();saveSay(oo);drawSay();renderReviewBar();toast("10분마다 돌아가며 나와요")} return}
     if(act==="save"){
       var t=say.querySelector(".sayt").value.trim();
