@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zh">
+<meta name="app-build" content="nb-20261114zi">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5499,6 +5499,7 @@ body:not(.boardon) #addQuick{margin:0!important}
 @media (min-width:900px){#addSheet .sheetpanel{border:1px solid #4E4672}}
 /* 💬 한 마디 카드 글도 설교 메모 읽기처럼 줄 칸(⠿ 없이) + 길면 쪽 넘기기 (2026-11-14 사용자 요청) */
 .saylines.sayplain .saylg{display:none}
+.saycard.saylined>.sayq.saylines{margin-top:8px}   /* 카드 위 빈자리를 줄여 한 화면에 더 (2026-11-14) */
 .saylines.sayplain .saylt{padding-left:16px}
 .saylines .sayln{background:rgba(0,0,0,.08)}
 .saypgno{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 6px;font-size:13px;font-weight:700;color:color-mix(in srgb,var(--gold) 80%,#fff);letter-spacing:.5px}
@@ -16995,7 +16996,11 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var c=box.closest(".saycard"); if(!c||!box.isConnected)return; var id=c.dataset.id;
     if(sayQ&&!box.querySelector("mark.srmhit"))srmMarkIn(box,sayQ.split(/\s+/));   // 🔍 찾은 낱말 노란 배경으로 부드럽게 깜빡 (2026-11-14 사용자 요청)
     var rows=[].slice.call(box.children); rows.forEach(function(r){r.style.display=""; r.style.borderTop=""}); box.style.minHeight="";
-    var H=Math.max(240,Math.round(window.innerHeight*.6)), P=[0], PH=[0], acc=0;
+    // 쪽 높이 = 찾기 칸 아래부터 화면 아래까지에 카드 전체(머리·쪽 단추·아래 줄)가 다 들어가게 (2026-11-14 사용자 요청: 찾기 칸이 보이면 아래가 잘리고, 아래가 보이면 찾기 칸이 잘림)
+    var vh=window.visualViewport?visualViewport.height:innerHeight, bar=say&&say.querySelector(".dlbar"), sr=say&&say.querySelector(".saysearch");
+    var top=(bar?bar.getBoundingClientRect().bottom:60)+(sr&&!sr.hidden&&sr.offsetHeight?sr.offsetHeight+16:0)+10;
+    var chrome=c.offsetHeight-box.offsetHeight+52+14;
+    var H=Math.max(200,Math.round(vh-top-chrome)), P=[0], PH=[0], acc=0;
     rows.forEach(function(r,i){var h=r.offsetHeight; if(acc+h>H&&acc>0){P.push(i); PH.push(0); acc=0} acc+=h; PH[PH.length-1]=acc});
     if(sayQ&&box._qk!==sayQ){box._qk=sayQ; var fm=box.querySelector("mark.srmhit"); if(fm){var ri=rows.indexOf(fm.closest(".sayln")), kk=0; while(kk+1<P.length&&P[kk+1]<=ri)kk++; sayPg[id]=kk}}   // 찾은 낱말이 있는 쪽을 먼저 보여 줌
     var tot=P.length, pg=c.querySelector(".saypgno");
