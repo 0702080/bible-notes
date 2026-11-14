@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zw">
+<meta name="app-build" content="nb-20261114zy">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5559,6 +5559,9 @@ body:not(.boardon) #addQuick{margin:0!important}
 .srmsheet.srmone .srmlabm .srmonebtn{background:var(--sky);color:#0B0B0D;font-weight:700}
 .srmsheet.srmone .srmlabm .hlmb,.srmsheet.srmone .srmhl,.srmsheet.srmone .srmhlfloat{display:none!important}
 .srmsheet.srmone .srmform textarea.srmbody{display:block!important;width:100%;box-sizing:border-box;font-size:16px;line-height:40px;padding:0 12px 0 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--sky) 35%,#2A3240);background-color:rgba(120,170,220,.07);background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 39px,rgba(183,156,242,.22) 39px,rgba(183,156,242,.22) 40px);background-attachment:local;color:var(--ink);font-family:inherit;resize:none;overflow:hidden;-webkit-user-select:text;user-select:text}
+.mselfloat{position:fixed;right:18px;z-index:130;height:34px;padding:0 14px;border-radius:17px;border:1px solid color-mix(in srgb,var(--sky) 70%,#0A2A3A);background:var(--sky) linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.12) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.18) 100%)!important;color:#0B1A24;font-family:inherit;font-size:13.5px;font-weight:700;white-space:nowrap;box-shadow:0 3px 0 color-mix(in srgb,var(--sky) 45%,#06141C),0 6px 16px rgba(0,0,0,.5)}
+.mselfloat[hidden]{display:none}
+.mselfloat:active{transform:translateY(2px)}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
@@ -8398,7 +8401,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var mirror=document.createElement("div"); mirror.className="lhmirror"; mirror.setAttribute("aria-hidden","true"); document.body.appendChild(mirror);
     var ta=null, geo=[], drag=null, raf=0;
     var COPY=["fontFamily","fontSize","fontWeight","fontStyle","fontVariant","letterSpacing","lineHeight","wordBreak","wordSpacing","textIndent","textTransform","tabSize","overflowWrap","wordWrap","whiteSpace"];
-    function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&!t.classList.contains("mqa")&&!t.classList.contains("sayeta")&&!t.classList.contains("sayle")&&t.offsetParent!==null}   // 묵상 질문 답 칸은 자기 손잡이(.mqgut)가 있어 뺌 (2026-11-01)
+    function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&!t.classList.contains("mqa")&&!t.classList.contains("sayeta")&&!t.classList.contains("sayle")&&!t.classList.contains("sayall")&&!t.classList.contains("srmbody")&&t.offsetParent!==null}   // 묵상 질문 답 칸은 자기 손잡이(.mqgut)가 있어 뺌 (2026-11-01)
     var mKey="", mLines=null;
     function measure(){
       var cs=getComputedStyle(ta), key=ta.value+"\u0001"+ta.clientWidth+"\u0001"+cs.fontSize+"\u0001"+cs.paddingLeft;
@@ -13073,11 +13076,50 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   }
   function srmLinesDraw(){
     var f=srm.querySelector(".srmform"), ta=f.querySelector(".srmbody"), ls=f.querySelector(".srmlines");
+    if(!ls._msel)ls._msel=mselAttach(ls,"textarea.srmli",function(){srmOne(true); return srm.querySelector(".srmform .srmbody")});
     if(srm.classList.contains("srmone")){srm.classList.remove("srmone"); ta.hidden=true; ta.style.height=""; ls.style.display=""; var ob=srm.querySelector(".srmonebtn"); if(ob)ob.textContent="▤ 선택"}
     srmMulti(false); ls.textContent="";
     ta.value.split("\n").forEach(function(t){ls.appendChild(srmRow(t))});
     var first=ls.querySelector(".srmli"); if(first&&!ta.value)first.placeholder="들으며 떠오르는 대로 적어 보세요 (엔터 = 다음 줄)";
     requestAnimationFrame(function(){[].forEach.call(ls.querySelectorAll(".srmli"),srmFit); bibleHangEdit(ls)});
+  }
+  /* ↕ 줄 칸에서 글자를 고르면 그 줄 바로 아래(강조 단추가 있으면 그 아래)에 '↕ 여러 줄 고르기'가 떠서, 누르면 한 칸 모드로 바꾸고 고른 자리·화면 위치를 그대로 이어 줌 — 맨 위 단추까지 올라가지 않아도 되게 (2026-11-14 사용자 요청) */
+  var mselBtn=null, mselCur=null, mselAll=[];
+  function mselAttach(box,sel,expand){
+    if(!mselBtn){
+      mselBtn=document.createElement("button"); mselBtn.type="button"; mselBtn.className="mselfloat"; mselBtn.textContent="↕ 여러 줄 고르기"; mselBtn.hidden=true; document.body.appendChild(mselBtn);
+      mselBtn.addEventListener("pointerdown",function(e){e.preventDefault()});
+      mselBtn.addEventListener("mousedown",function(e){e.preventDefault()});
+      mselBtn.addEventListener("click",function(e){e.preventDefault(); e.stopPropagation(); var c=mselCur; mselBtn.hidden=true; if(c)c.go()});
+      document.addEventListener("selectionchange",function(){mselAll=mselAll.filter(function(m){return m.box.isConnected}); var a=document.activeElement, hit=null; mselAll.forEach(function(m){if(a&&m.box.contains(a))hit=m}); if(hit)hit.place(); else if(mselCur)mselCur.place()});
+      window.addEventListener("scroll",function(){if(mselCur&&!mselBtn.hidden)mselCur.place()},true);
+      if(window.visualViewport)visualViewport.addEventListener("resize",function(){if(mselCur&&!mselBtn.hidden)mselCur.place()});
+    }
+    var me={box:box,
+      place:function(){
+        var a=document.activeElement;
+        if(!box.isConnected||!a||!a.matches||!a.matches(sel)||!box.contains(a)||a.selectionEnd<=a.selectionStart){if(mselCur===me)mselBtn.hidden=true; return}
+        mselCur=me; var r=a.getBoundingClientRect(), y=r.bottom+6, hl=document.querySelector(".srmhlfloat");
+        if(hl&&!hl._mselObs){hl._mselObs=1; try{new MutationObserver(function(){if(mselCur)setTimeout(function(){mselCur&&mselCur.place()},0)}).observe(hl,{attributes:true,attributeFilter:["hidden","style"]})}catch(e){}}
+        if(hl&&!hl.hidden&&hl.getClientRects().length){var hr=hl.getBoundingClientRect(); if(hr.top>=r.top-4)y=Math.max(y,hr.bottom+6)}
+        var vv=window.visualViewport, vb=vv?vv.offsetTop+vv.height:innerHeight;
+        mselBtn.hidden=false; var bh=mselBtn.offsetHeight||34; if(y+bh>vb-4)y=Math.max(4,r.top-bh-6);
+        mselBtn.style.top=Math.round(y)+"px";
+      },
+      go:function(){
+        var a=document.activeElement; if(!a||!box.contains(a)||!a.matches(sel))return;
+        var rows=[].slice.call(box.querySelectorAll(sel)), i=rows.indexOf(a), off=0, prevH=0;
+        for(var k=0;k<i;k++){off+=rows[k].value.length+1; prevH+=rows[k].offsetHeight}
+        var gs=off+a.selectionStart, ge=off+a.selectionEnd, oldTop=a.getBoundingClientRect().top;
+        var ta=expand(); if(!ta)return;
+        try{ta.focus({preventScroll:true}); ta.setSelectionRange(gs,ge)}catch(err){}
+        function fix(){var d=ta.getBoundingClientRect().top+prevH-oldTop;
+          for(var el=ta.parentElement;el&&Math.abs(d)>1;el=el.parentElement){if(el.scrollHeight>el.clientHeight+2&&/auto|scroll/.test(getComputedStyle(el).overflowY)){var b0=el.scrollTop; el.scrollTop=b0+d; d-=el.scrollTop-b0}}
+          if(Math.abs(d)>1)window.scrollBy(0,d)}
+        fix(); requestAnimationFrame(function(){fix(); setTimeout(fix,80); setTimeout(fix,250)});   // 글 칸 높이 맞추기·커서 따라가기가 한 번 더 굴려도 고른 줄이 제자리에
+      }
+    };
+    mselAll.push(me); return me;
   }
   function srmOneFit(ta){taAuto(ta,function(h){return Math.max(160,Math.ceil(h/40)*40)})}
   function srmOne(on){
@@ -17108,6 +17150,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       else{form.classList.remove("saymall"); ta.classList.add("sayhid"); ta.classList.remove("sayall"); ta.style.height=""; box.innerHTML=""; String(ta.value).split("\n").forEach(function(l){box.appendChild(mk(l))}); box.style.display=""; msb.textContent="☰ 여러 줄 고르기"; BASE=null; requestAnimationFrame(hang)}
     });
     ta.addEventListener("input",function(){if(form.classList.contains("saymall"))taAuto(ta,function(h){return Math.max(80,Math.ceil(h/40)*40)})});
+    mselAttach(box,"textarea.sayle",function(){if(!form.classList.contains("saymall"))msb.click(); return ta});
     var cv=document.createElement("canvas").getContext("2d"), BASE=null;
     function rows(){return [].slice.call(box.querySelectorAll("textarea.sayle"))}
     function sync(){var v=rows().map(function(r){return r.value}).join("\n"); if(ta.value!==v){ta.value=v; ta.dispatchEvent(new Event("input",{bubbles:true}))}}
