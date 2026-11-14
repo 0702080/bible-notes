@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114z">
+<meta name="app-build" content="nb-20261114za">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -16989,7 +16989,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     box._pgGo=go;
   }
   var sayFold={}; try{sayFold=JSON.parse(localStorage.getItem("bible-say-fold")||"{}")||{}}catch(e){sayFold={}}
-  var sayBack={}, sayUseEd="", sayUsePend=false, sayUseT=0, saySwAt=0;
+  var sayUseEdAt=0, sayBack={}, sayUseEd="", sayUsePend=false, sayUseT=0, saySwAt=0;
   function sayUseSave(ta){
     var o=sayData(), x=o.items.find(function(y){return y.id===ta.dataset.id}); if(!x)return;
     var v=ta.value.replace(/\s+$/,""); if((x.use||"")===v)return;
@@ -17067,7 +17067,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       if(dtap.id===id&&now-dtap.t<520){   // 휴대폰 두 번 누르기는 손가락 누르는 시간까지 들어가 0.38초로는 짧았음 (2026-11-13 사용자 요청)
         clearTimeout(dtap.ot); dtap={id:"",t:0}; e.preventDefault(); e.stopPropagation();
         try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
-        if(sayBack[id]){sayUseEd=id; drawSay(); var ut=say.querySelector('.sayuse[data-id="'+id+'"]'); if(ut){try{ut.focus({preventScroll:true}); ut.setSelectionRange(ut.value.length,ut.value.length)}catch(err){}} return}
+        if(sayBack[id]){sayUseEd=id; sayUseEdAt=Date.now(); drawSay(); var ut=say.querySelector('.sayuse[data-id="'+id+'"]'); if(ut){try{ut.focus({preventScroll:true}); ut.setSelectionRange(ut.value.length,ut.value.length)}catch(err){}} return}
         sayEdit=id; sayEditAt=Date.now(); drawSay(); var ta=say.querySelector(".sayt");
         if(ta){ta.scrollIntoView({block:"center"}); setTimeout(function(){try{ta.focus({preventScroll:true}); ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}},30)}
         return;
@@ -17144,7 +17144,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     document.addEventListener("pointerup",function(e){if(e.pointerType==="touch"||!sw||sw.t)return; swEnd(e.clientX,e.clientY)});
     // ✍️ 뒷면 활용 칸에 적다가 두 번 누르면 저장하고 읽는 글로 (2026-11-08 사용자 요청)
     (function(){var lt=0,lx=0,ly=0;
-      function done(t){clearTimeout(sayUseT); sayUseSave(t); try{t.blur()}catch(err){} if(sayUseEd===t.dataset.id)sayUseEd=""; sayUsePend=false; setTimeout(drawSay,0)}
+      function done(t){if(Date.now()-sayUseEdAt<900)return;   // 두 번 눌러 연 바로 뒤 휴대폰이 보내는 click·dblclick이 새 적는 칸에 떨어져 바로 닫히던 것 (2026-11-14)
+        clearTimeout(sayUseT); sayUseSave(t); try{t.blur()}catch(err){} if(sayUseEd===t.dataset.id)sayUseEd=""; sayUsePend=false; setTimeout(drawSay,0)}
       list.addEventListener("touchend",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse")||document.activeElement!==t)return; var p=e.changedTouches&&e.changedTouches[0]; if(!p)return; var now=Date.now();
         if(now-lt<480&&Math.abs(p.clientX-lx)<60&&Math.abs(p.clientY-ly)<80){lt=0; if(t.value.trim()){e.preventDefault(); done(t)} return}
         lt=now; lx=p.clientX; ly=p.clientY},{passive:false});
