@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zm">
+<meta name="app-build" content="nb-20261114zn">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3516,6 +3516,7 @@ textarea.sayuse:focus{outline:none;box-shadow:none;border-color:color-mix(in srg
 @keyframes sayFlipR{from{transform:translateX(-36px);opacity:.3}to{transform:none;opacity:1}}
 .sayf{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:8px;font-size:12.5px}
 .sayf b{color:var(--gold);font-weight:700}
+.sayscttl{font-size:17px;font-weight:700;line-height:1.45;color:#F2C879;margin:0 0 8px;word-break:keep-all}
 .saytag{padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--violet) 14%,transparent);color:var(--violet);font-size:11.5px}
 .saynotebtn{padding:3px 10px;border:1px solid color-mix(in srgb,var(--violet) 40%,#232229);border-radius:12px;background:transparent;color:var(--violet);font:inherit;font-size:11.5px;font-weight:700}
 .saybtn{margin-left:auto;height:26px;padding:0 10px;border:1px solid #34333A;border-radius:13px;background:transparent;color:var(--faint);font:inherit;font-size:11.5px}
@@ -16853,7 +16854,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       ta.addEventListener("focus",function(){setTimeout(function(){var rw=form.querySelector(".sayrow2:last-of-type")||form; try{rw.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}},350)});   // 키보드가 올라오면 아래 단추 줄까지 보이게
       var row=document.createElement("div"); row.className="sayrow2";
       var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="m"?"본문 (예: 요한복음 6:1-15)":sayMode==="v"?"구절 (예: 로마서 12:21)":sayMode==="g"?"어디서·누구에게 (예: 주일 예배)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
-      var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
+      var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=sayMode==="m"?40:16; ti.value=cur.topic||""; ti.placeholder=sayMode==="m"?"제목 (선택)":"주제 (선택)"; ti.setAttribute("aria-label","주제");
       row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
       if(sayMode==="g")row.hidden=true;   // 은혜: 어디서·누구에게·주제 칸 숨김 (2026-11-07 사용자 요청, 값은 그대로 둠)
       if(sayMode==="v"||sayMode==="m")form.insertBefore(bookPicker(wi),row);
@@ -16938,10 +16939,11 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       }else{
       var q=document.createElement("p"); q.className="sayq"; q.textContent=sfd?String(x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean)[0]||"":(x.t||""); c.appendChild(q); if(sayQ)srmMarkIn(q,sayQ.split(/\s+/));
       }
-      if(x.use){var um=document.createElement("span"); um.className="sayusemark"; um.textContent="💡 활용"; um.title="옆으로 밀면 이 말을 어떻게 활용할지 적은 글이 보여요"; c.appendChild(um)}
+      // '💡 활용' 표시는 지움 (2026-11-14 사용자 요청)
       var f=document.createElement("div"); f.className="sayf";
       if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
-      if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
+      if(x.topic&&x.sc){var sct=document.createElement("div"); sct.className="sayscttl"; sct.textContent=x.topic; c.insertBefore(sct,c.firstChild)}   // 🌄 장면 묵상: 주제 칸 = 제목, 카드 맨 위에 (2026-11-14 사용자 요청)
+      else if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
       if(cth){var thb=document.createElement("span"); thb.className="saythm"; thb.textContent=cth.n; f.appendChild(thb)}
       if(x.hv){   // ⏰ 누르면 시계가 떠서 나올 시각을 정함 (비우면 10분마다)
         var hvt=document.createElement("label"); hvt.className="saytag sayhvtag"+(x.tm?" set":""); hvt.title="눌러서 이 말씀이 나올 시각 정하기";
