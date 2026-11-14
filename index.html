@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115j">
+<meta name="app-build" content="nb-20261115k">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3489,8 +3489,8 @@ mark.srmhit{background:rgba(255,205,80,.5);color:inherit;border-radius:4px;paddi
 .saythm{padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--sc) 18%,transparent);color:var(--sc);font-size:11.5px}   /* 내용이 비슷한 한 마디는 같은 색 (2026-10-31 사용자 요청) */
 .saycard.saytint{border-color:color-mix(in srgb,var(--sc) 45%,#2A2930);border-left-color:var(--sc);background:color-mix(in srgb,var(--sc) 16%,#18171B)}
 .saycard.saytint .sayf b{color:color-mix(in srgb,var(--sc) 80%,#fff)}
-.saycard{position:relative;touch-action:pan-y;padding-left:30px!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-.saygrip{position:absolute;left:4px;top:0;bottom:0;width:24px;display:grid;place-items:center;color:var(--faint);font-size:16px;cursor:grab;touch-action:none;opacity:.6}
+.saycard{position:relative;touch-action:pan-y;padding-left:16px!important;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.saygrip{display:none!important;position:absolute;left:4px;top:0;bottom:0;width:24px;display:grid;place-items:center;color:var(--faint);font-size:16px;cursor:grab;touch-action:none;opacity:.6}
 .saylist.saysorting .saycard:not(.saydragging){transition:transform .15s}
 .saycard.saydragging{position:relative;z-index:5;box-shadow:0 14px 30px rgba(0,0,0,.6);border-color:color-mix(in srgb,var(--gold) 60%,#232229);background:color-mix(in srgb,var(--gold) 10%,#16161b);cursor:grabbing}
 .sayq{margin:0;font-family:var(--serif);font-size:16.5px;line-height:1.8;color:var(--ink);word-break:keep-all;white-space:pre-wrap}
@@ -4607,7 +4607,12 @@ body.boardon .fscrow{display:none}
 .saysheet .sayfab{background-color:#3B3947!important;border-color:#55526A!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.34),inset 0 -2px 0 rgba(0,0,0,.3),0 2px 0 rgba(0,0,0,.5),0 4px 8px rgba(0,0,0,.42)!important;transition:transform .08s,box-shadow .08s}   /* 모두 접기·펼치기 입체 (2026-11-08 사용자 요청) */
 .saysheet .sayfab:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
 .saysheet .dlbar .dlclose.saylock{color:var(--muted)}
-.saysheet .dlbar .dlclose.saylock.on{background-color:#3A3220!important;border-color:#6B5A30!important;color:var(--gold)}
+/* 📌 위치 이동(고정 OFF)=하늘빛 기울어진 빈 핀, 고정(ON)=빨간 채운 핀 — 한눈에 구분 (2026-11-15 사용자 요청) */
+.saysheet .dlbar .dlclose.saylock:not(.on){background-color:#1E3446!important;border-color:#4C86AE!important;color:#8CCBF2!important}
+.saysheet .dlbar .dlclose.saylock.on{color:#FF6B6B!important}
+.saylock .saylkpin{width:18px;height:18px;vertical-align:-3px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;transform:rotate(35deg)}
+.saylock.on .saylkpin{fill:currentColor;transform:none}
+.saysheet .dlbar .dlclose.saylock.on{background-color:#3E1E22!important;border-color:#A8474F!important}
 .saylist.saylocked .saygrip{display:none}
 .saylist.saylocked .saycard{padding-left:16px!important}
 .daily.dlhascal .dlcal.dlchide{padding:6px 20px;cursor:grab;max-width:220px!important}
@@ -17081,7 +17086,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     if(keep&&keep.focus){var nt=form.querySelector(".sayt"); if(nt){try{nt.focus({preventScroll:true}); nt.setSelectionRange(keep.ss,keep.se)}catch(e){}}}
     list.textContent=""; sayFocusOff();
     var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:sayMode==="m"?(!x.hv&&!!x.sc):sayMode==="g"?(!x.hv&&!!x.gr&&!x.sc):(!x.hv&&!x.gr)});   // 🌄 장면 묵상(sc:1, gr:1도 붙어 한 마디 돌림에서 빠짐)은 따로   // 🌿 나의 은혜(gr:1)는 따로
-    var lb=say.querySelector(".saylock"); lb.innerHTML='📌<span class="sayhidem"> 고정 '+(sayLocked?"ON":"OFF")+'</span>'; lb.setAttribute("aria-label",sayLocked?"고정 켜짐":"고정 꺼짐"); lb.classList.toggle("on",sayLocked); lb.setAttribute("aria-pressed",String(sayLocked)); lb.title=sayLocked?"끄면 카드를 끌어서 옮길 수 있어요":"켜면 카드가 움직이지 않아요";
+    var lb=say.querySelector(".saylock"); lb.innerHTML='<svg class="saylkpin" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg><span class="sayhidem"> 고정 '+(sayLocked?"ON":"OFF")+'</span>'; lb.setAttribute("aria-label",sayLocked?"고정 켜짐":"고정 꺼짐"); lb.classList.toggle("on",sayLocked); lb.setAttribute("aria-pressed",String(sayLocked)); lb.title=sayLocked?"끄면 카드를 끌어서 옮길 수 있어요":"켜면 카드가 움직이지 않아요";
     list.classList.toggle("saylocked",sayLocked||!!sayQ);
     if(sayQ){
       items=items.filter(function(x){return sayQ.split(/\s+/).every(function(w){return hit1([x.t,x.who,x.topic,x.use].join(" "),w)})});   // 뒷면 글도 찾음
@@ -17428,7 +17433,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       if(pend&&(Math.abs(e.clientX-sx)>8||Math.abs(e.clientY-sy)>8)){clearTimeout(hold);pend=null}
       if(sayDrag){e.preventDefault();move(e.clientY)}
     },{passive:false});
-    document.addEventListener("touchmove",function(e){if(sayDrag)e.preventDefault()},{passive:false});   // 끄는 동안 화면이 같이 밀리지 않게
+    document.addEventListener("touchmove",function(e){if(sayDrag){e.preventDefault(); if(e.touches[0])move(e.touches[0].clientY)} else if(pend&&!pend.lock&&e.touches[0]&&(Math.abs(e.touches[0].clientX-sx)>8||Math.abs(e.touches[0].clientY-sy)>8)){clearTimeout(hold);pend=null}},{passive:false}); document.addEventListener("touchend",function(){if(sayDrag)end()});   /* 휴대폰: ⠿ 없이 꾹 눌러 끌기 — 손가락 위치는 touch로도 따라감 (2026-11-15) */   // 끄는 동안 화면이 같이 밀리지 않게
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(){if(sayDrag)end();clearTimeout(hold);pend=null});
     list.addEventListener("contextmenu",function(e){if(sayDrag||(pend&&!pend.lock))e.preventDefault()});
     // 카드를 옆으로 밀면 앞면 ↔ 뒷면(활용 적기) (2026-11-07 사용자 요청)
