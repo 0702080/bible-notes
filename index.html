@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zs">
+<meta name="app-build" content="nb-20261114zt">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5542,6 +5542,10 @@ body:not(.boardon) #addQuick{margin:0!important}
 .sayform.saymall .saymsel{color:#10202C;background-color:var(--sky)!important}
 .sayform textarea.sayt.sayall{display:block!important;width:100%;box-sizing:border-box;font-size:16px!important;line-height:40px!important;padding:0 10px 0 16px!important;border-radius:12px;border:1px solid color-mix(in srgb,var(--sky) 30%,#2A3240)!important;background-color:rgba(120,170,220,.07)!important;background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 39px,rgba(183,156,242,.22) 39px,rgba(183,156,242,.22) 40px)!important;background-attachment:local;resize:none;overflow:hidden;-webkit-user-select:text;user-select:text}
 .srmsheet.srmtyping .srmfoot{display:none!important}
+/* 📖 성경 읽기 창: 성서공회 단추·홀리바이블·설명 글 지우고 붙여넣는 칸을 제목 줄 아래 화면 가득 (2026-11-14 사용자 요청) */
+.reader .rdhb,.reader .rdalt,.reader .rdsrc,.reader .rdphint,.reader .rdmsg{display:none!important}
+.reader .rdpform{top:var(--rdbarh,61px);border-radius:0;border-left:0;border-right:0;border-bottom:0;box-shadow:none;max-width:none;padding:12px max(14px,calc((100% - 720px) / 2)) calc(12px + env(safe-area-inset-bottom,0px))}
+.reader .rdpform .rdptext,.reader .rdpform.editing .rdptext{flex:1 1 auto;min-height:0!important;height:auto;resize:none;font-size:16px}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
@@ -18853,12 +18857,12 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         var rk=rd.dataset.key.split("-"), bk=USFM.indexOf(rk[0]), ch=+rk[1];
         openChMem(rd.dataset.key, (bk>=0?BOOKS[bk]+" "+ch+(bk===18?"편":"장"):rd.dataset.key), sv.v);
       });
-      rd.querySelector(".rdpaste").addEventListener("click",function(){var f=rd.querySelector(".rdpform");f.hidden=false;f.classList.remove("editing");var t=f.querySelector(".rdptext");t.value="";t.focus()});
+      rd.querySelector(".rdpaste").addEventListener("click",function(){var f=rd.querySelector(".rdpform");f.hidden=false;f.classList.remove("editing");rdFormFit();var t=f.querySelector(".rdptext");t.value="";t.focus()});
       // 저장해 둔 본문 고치기: 지금 본문을 "절번호 본문" 줄로 채워 두고 고친 뒤 저장
       rd.querySelector(".rdedit").addEventListener("click",function(){
         var sv=myChapters()[rd.dataset.key]; if(!sv)return;
         var f=rd.querySelector(".rdpform"), t=f.querySelector(".rdptext");
-        f.hidden=false; f.classList.add("editing"); t.value=sv.v.map(function(x){return x.v+" "+x.t}).join("\n");
+        f.hidden=false; f.classList.add("editing"); rdFormFit(); t.value=sv.v.map(function(x){return x.v+" "+x.t}).join("\n");
         var hl=+rd.dataset.hl||0, line=hl>1?sv.v.findIndex(function(x){return x.v===hl}):-1;
         setTimeout(function(){t.focus();var pos=line>0?t.value.split("\n").slice(0,line).join("\n").length+1:0;try{t.setSelectionRange(pos,pos)}catch(e){}},80);
       });
@@ -19390,8 +19394,10 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     // 아직 저장한 본문이 없으면: 바로 읽을 수 있는 큰 링크를 맨 위에 (붙여넣기 칸은 저절로 열지 않음, 2026-10-25 사용자 요청)
     var nm=rd.querySelector(".rdname").textContent;
     rd.querySelector(".rdhb").textContent="📖 "+nm+" 읽기 (대한성서공회 개역개정) ↗";
-    msg.textContent="위 단추를 누르면 새 탭에서 "+nm+"을(를) 바로 읽을 수 있어요. 본문을 복사해 아래 [붙여넣기]로 저장해 두면 다음부터는 이 창에서 바로 읽혀요.";
+    msg.textContent="";   // 설명 글·성서공회 단추는 지움 — 본문 붙여넣는 칸을 바로 크게 (2026-11-14 사용자 요청)
+    var pf=rd.querySelector(".rdpform"); pf.classList.remove("editing"); pf.hidden=false; rdFormFit();
   }
+  function rdFormFit(){var bar=rd&&rd.querySelector(".rdbar"); if(bar)rd.style.setProperty("--rdbarh",bar.offsetHeight+"px")}
   function closeReader(){if(!rd)return; if(rdCtl)rdCtl.abort(); rd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
   function drawReader(verses,hl){
     var ol=rd.querySelector(".rdlist"); ol.textContent="";
