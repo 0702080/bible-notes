@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115d">
+<meta name="app-build" content="nb-20261115e">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -13109,6 +13109,18 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       window.addEventListener("scroll",function(){if(mselCur&&!mselBtn.hidden)mselCur.place()},true);
       if(window.visualViewport)visualViewport.addEventListener("resize",function(){if(mselCur&&!mselBtn.hidden)mselCur.place()});
     }
+    // ☑ 한 줄에서 글자를 고른 채 다른 줄을 누르면 바로 줄 고르기 — 두 줄이 골라지고, 이어서 줄을 탁탁 눌러 더 고름 (2026-11-15 사용자 요청)
+    var tryPick=function(e){
+      if(lnPick)return; var r=e.target.closest&&e.target.closest(sel); if(!r||!box.contains(r))return;
+      var a=document.activeElement, L=me.last, src=null;
+      if(a&&a!==r&&box.contains(a)&&a.matches&&a.matches(sel)&&a.selectionEnd>a.selectionStart)src=a;
+      else if(L&&L.el!==r&&L.el.isConnected&&box.contains(L.el)&&Date.now()-L.t<1500)src=L.el;
+      if(!src)return;
+      e.preventDefault(); e.stopPropagation();
+      lnPickStart(box,sel,src); r.classList.add("lnsel"); if(lnPick){lnPick.skip=r; lnPick.skipAt=Date.now(); lnPick.cnt()} buzz(10);
+    };
+    box.addEventListener("touchstart",tryPick,{passive:false,capture:true});
+    box.addEventListener("mousedown",tryPick,true);
     var me={box:box,
       place:function(){
         var a=document.activeElement;
@@ -13118,7 +13130,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         if(hl&&!hl._mselObs){hl._mselObs=1; try{new MutationObserver(function(){if(mselCur)setTimeout(function(){mselCur&&mselCur.place()},0)}).observe(hl,{attributes:true,attributeFilter:["hidden","style"]})}catch(e){}}
         if(hl&&!hl.hidden&&hl.getClientRects().length){var hr=hl.getBoundingClientRect(); if(hr.top>=r.top-4)y=Math.max(y,hr.bottom+6)}
         var vv=window.visualViewport, vb=vv?vv.offsetTop+vv.height:innerHeight;
-        mselBtn.hidden=false; var bh=mselBtn.offsetHeight||34; if(y+bh>vb-4)y=Math.max(4,r.top-bh-6);
+        mselBtn.hidden=true; return; var bh=mselBtn.offsetHeight||34; if(y+bh>vb-4)y=Math.max(4,r.top-bh-6);
         mselBtn.style.top=Math.round(y)+"px";
       },
       go:function(){
@@ -13139,14 +13151,14 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   }
   function lnPickStart(box,sel,first){
     lnPickEnd();
-    var rows0=[].slice.call(box.querySelectorAll(sel)), top0=first.getBoundingClientRect().top;
+    var rows0=[].slice.call(box.querySelectorAll(sel)), anc=first||rows0[0], top0=anc?anc.getBoundingClientRect().top:0;
     function scroller(el){for(var p=el.parentElement;p&&p!==document.body;p=p.parentElement){var o=getComputedStyle(p).overflowY; if((o==="auto"||o==="scroll")&&p.scrollHeight>p.clientHeight+2)return p} return null}
-    function fix(){if(!first.isConnected)return; var d=first.getBoundingClientRect().top-top0; if(Math.abs(d)<1)return; var sc=scroller(first); if(sc)sc.scrollTop+=d; else window.scrollBy(0,d)}
+    function fix(){if(!anc||!anc.isConnected)return; var d=anc.getBoundingClientRect().top-top0; if(Math.abs(d)<1)return; var sc=scroller(anc); if(sc)sc.scrollTop+=d; else window.scrollBy(0,d)}
     try{var gs=window.getSelection(); if(gs)gs.removeAllRanges()}catch(e){}
-    try{first.setSelectionRange(first.selectionStart,first.selectionStart)}catch(e){}
+    try{if(first)first.setSelectionRange(first.selectionStart,first.selectionStart)}catch(e){}
     rows0.forEach(function(r){r._ro0=r.readOnly; r.readOnly=true});
     var ae=document.activeElement; if(ae&&ae.blur)ae.blur();
-    box.classList.add("lnpick"); document.body.classList.add("lnpicking"); first.classList.add("lnsel");
+    box.classList.add("lnpick"); document.body.classList.add("lnpicking"); if(first)first.classList.add("lnsel");
     var bar=document.createElement("div"); bar.className="lnbar";
     bar.innerHTML='<span class="lncnt"></span><button type="button" data-a="all">모두</button><button type="button" data-a="cut">✂ 잘라내기</button><button type="button" data-a="copy">📋 복사</button><button type="button" data-a="end">✕</button>';
     document.body.appendChild(bar);
@@ -13155,7 +13167,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     function txt(){return picked().map(function(r){return r.value}).join("\n")}
     function copy(t,ok){function done(){ok&&ok()} function old(){var x=document.createElement("textarea"); x.value=t; x.style.cssText="position:fixed;left:-9999px;top:0"; document.body.appendChild(x); x.select(); try{document.execCommand("copy")}catch(e){} x.remove(); done()} if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,old); else old()}
     var onDown=function(e){if(e.target.closest&&e.target.closest(sel))e.preventDefault()};   // 눌러도 칸에 들어가지 않게(키보드·화면 움직임 없음)
-    var onClick=function(e){var r=e.target.closest&&e.target.closest(sel); if(!r||!box.contains(r)){e.stopPropagation(); return} e.preventDefault(); e.stopPropagation(); r.classList.toggle("lnsel"); buzz(8); cnt()};
+    var onClick=function(e){var r=e.target.closest&&e.target.closest(sel); if(!r||!box.contains(r)){e.stopPropagation(); return} e.preventDefault(); e.stopPropagation(); if(lnPick&&lnPick.skip===r&&Date.now()-lnPick.skipAt<700){lnPick.skip=null; return} r.classList.toggle("lnsel"); buzz(8); cnt()};
     box.addEventListener("mousedown",onDown,true); box.addEventListener("click",onClick,true);
     bar.addEventListener("pointerdown",function(e){e.preventDefault()});
     bar.addEventListener("click",function(e){
@@ -13174,7 +13186,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         toast("✂ "+n+"줄을 잘라냈어요 (붙여넣기로 옮길 수 있어요)"); return;
       }
     });
-    lnPick={box:box,sel:sel,bar:bar,onClick:onClick,onDown:onDown}; cnt();
+    lnPick={box:box,sel:sel,bar:bar,onClick:onClick,onDown:onDown,cnt:cnt}; cnt();
     fix(); requestAnimationFrame(fix); [80,200,400,700].forEach(function(ms){setTimeout(fix,ms)});   // 키보드가 내려가도 고르던 줄이 제자리에
   }
   function srmOneFit(ta){taAuto(ta,function(h){return Math.max(160,Math.ceil(h/40)*40)})}
@@ -17218,10 +17230,11 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     form.classList.add("sayledf"); ta.classList.add("sayhid");
     var box=document.createElement("div"); box.className="sayq saylines sayles"+(sayMode==="g"?"":" sayplain"); form.insertBefore(box,ta);
     // ☰ 여러 줄 고르기: 줄 칸은 칸마다 따로라 한 줄씩만 골라짐 → 켜면 한 칸(.sayt)으로 바꿔 여러 줄을 한 번에 고르고 복사·잘라내기 (2026-11-14 사용자 요청)
-    var msb=document.createElement("button"); msb.type="button"; msb.className="saymsel"; msb.textContent="☰ 여러 줄 고르기"; form.insertBefore(msb,box);
+    var msb=document.createElement("button"); msb.type="button"; msb.className="saymsel"; msb.textContent="☰ 줄 골라 복사"; form.insertBefore(msb,box);
     msb.addEventListener("pointerdown",function(e){e.preventDefault()});
     msb.addEventListener("click",function(e){
       e.preventDefault(); e.stopPropagation(); var all=!form.classList.contains("saymall");
+      if(all&&!form.classList.contains("saymall")){if(lnPick&&lnPick.box===box)lnPickEnd(); else lnPickStart(box,"textarea.sayle",null); return}   // ☰ 맨 위 단추도 줄을 탁탁 눌러 고르는 방식으로 (2026-11-15)
       if(all){sync(); form.classList.add("saymall"); ta.classList.remove("sayhid"); ta.classList.add("sayall"); box.style.display="none"; msb.textContent="✓ 줄 칸으로 돌아가기"; taAuto(ta,function(h){return Math.max(80,Math.ceil(h/40)*40)}); toast("이제 꾹 눌러 여러 줄을 고를 수 있어요")}
       else{form.classList.remove("saymall"); ta.classList.add("sayhid"); ta.classList.remove("sayall"); ta.style.height=""; box.innerHTML=""; String(ta.value).split("\n").forEach(function(l){box.appendChild(mk(l))}); box.style.display=""; msb.textContent="☰ 여러 줄 고르기"; BASE=null; requestAnimationFrame(hang)}
     });
