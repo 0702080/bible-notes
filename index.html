@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114k">
+<meta name="app-build" content="nb-20261114l">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4731,6 +4731,12 @@ textarea.ictht:focus{outline:none;border-color:color-mix(in srgb,var(--ic0) 75%,
 .pfone::before,.pfline b::before{content:"";width:13px;height:13px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 6.5 19 17.5H5Z' fill='%23000' stroke='%23000' stroke-width='3.4' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 6.5 19 17.5H5Z' fill='%23000' stroke='%23000' stroke-width='3.4' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
 .pfline b::before{transform:rotate(180deg)}
 .prays>.pri.thxside>.pfone.pf1,.prays>.pri.editing>.pfone.pf1{display:none}
+/* 📋 말씀 카드 기도문 전체 복사 (2026-11-14 사용자 요청): ▴ 접기 바로 아래 같은 28px 입체 동그라미, 감사 기도 쪽이면 감사 기도를 복사 */
+.prays>.pri>.pcopy{position:absolute;top:44px;right:8px;z-index:2;width:28px;height:28px;padding:0;border-radius:50%;font-size:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid color-mix(in srgb,var(--prc,var(--gold)) 60%,#3A3630);background-color:color-mix(in srgb,var(--prc,var(--gold)) 30%,#2A2520)!important;background-image:linear-gradient(180deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.1) 55%,rgba(0,0,0,.28) 100%)!important;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 rgba(0,0,0,.3),0 2px 0 rgba(0,0,0,.4),0 3px 6px rgba(0,0,0,.35);transition:transform .08s}
+.prays>.pri>.pcopy::before{content:"";width:14px;height:14px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2.5'/%3E%3Cpath d='M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2.5'/%3E%3Cpath d='M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5'/%3E%3C/svg%3E") center/contain no-repeat}
+.prays>.pri>.pcopy:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)}
+.prays>.pri>.pcopy.done{background-color:#3E7A52!important}
+.prays>.pri.editing>.pcopy,.prays>.pri.thxside>.pcopy{display:none}
 .prays>.pri:not(.thxside) .prv{padding-right:42px}
 .pthxh .pfone{margin-left:auto}
 .pthxh .pfone+.pthxback{margin-left:0}
@@ -7186,7 +7192,7 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
       var d=have.get(x.id); have.delete(x.id);
       if(!d){
         d=document.createElement("div"); d.className="pri"; d.dataset.pid=x.id;
-        d.innerHTML='<div class="pfline" role="button" title="눌러서 펼치기"><span class="pflt"></span><b>▾</b></div><button type="button" class="pfone pf1" title="이 기도만 접기" aria-label="이 기도 접기">▴</button><div class="prv" title="두 번 누르면 고치기"><p class="prvt"></p><div class="prva"><b>🙌 응답</b><p></p></div></div>'+
+        d.innerHTML='<div class="pfline" role="button" title="눌러서 펼치기"><span class="pflt"></span><b>▾</b></div><button type="button" class="pfone pf1" title="이 기도만 접기" aria-label="이 기도 접기">▴</button><button type="button" class="pcopy" title="이 기도문 전체 복사" aria-label="이 기도문 전체 복사"></button><div class="prv" title="두 번 누르면 고치기"><p class="prvt"></p><div class="prva"><b>🙌 응답</b><p></p></div></div>'+
           '<textarea class="pt" rows="1" placeholder="기도 제목 (예: 이 말씀처럼 가족을 하나님께 맡기게 하소서)" aria-label="기도"></textarea>'+
           '<div class="pans" hidden><span class="panl">🙌 응답</span><textarea class="pan" rows="1" placeholder="어떻게 응답하셨는지 적어 보세요" aria-label="응답"></textarea></div>'+
           '<div class="pthx" hidden><div class="pthxh"><b>🙏 응답 감사 기도</b><span class="pthxd"></span><button type="button" class="pfone" title="이 기도만 접기" aria-label="이 기도 접기">▴</button><button type="button" class="pthxback">← 기도문</button></div><div class="pthxask"><p>아직 응답 표시가 안 된 기도예요.</p><button type="button" class="pthxmark" title="응답된 기도로 표시하고 응답 감사 기도를 적어요">🙌 기도문 쓰기</button></div><p class="pthv" title="두 번 누르면 고치기"></p><textarea class="pth" rows="3" placeholder="응답해 주신 하나님께 감사 기도를 적어 보세요" aria-label="응답 감사 기도"></textarea><p class="pthxtip">두 번 누르면 고치기 · 옆으로 밀면 기도문</p></div>'+
@@ -8521,6 +8527,17 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
   list.addEventListener("keydown",function(e){var t=e.target; if(e.key==="Enter"&&!e.isComposing&&t.classList&&t.classList.contains("xlref")&&t.value.trim()){e.preventDefault();var m=t.form&&t.form.querySelector(".xlmemo");if(m)m.focus()}});
   list.addEventListener("click",function(e){
     var bk=e.target.closest&&e.target.closest(".pthxback"); if(bk){prFlip(bk.closest(".pri"),false);return}
+    var pcb=e.target.closest&&e.target.closest(".pcopy");
+    if(pcb&&pcb.closest(".prays")){   // 📋 기도문 전체 복사 (2026-11-14 사용자 요청)
+      var pcn=pcb.closest(".note"), pcx=null, pcid=pcb.closest(".pri").dataset.pid;
+      var pnn=pcn&&notes.get(pcn.dataset.id); (pnn&&pnn.prays||[]).forEach(function(x){if(x.id===pcid)pcx=x});
+      var pct=pcx?String(pcx.t||""):(pcb.closest(".pri").querySelector(".prvt")||{}).textContent||"";
+      if(!pct.trim()){toast("복사할 기도문이 없어요");return}
+      var pok=function(){buzz([10,30,10]); toast("📋 기도문을 복사했어요"); pcb.classList.add("done"); setTimeout(function(){pcb.classList.remove("done")},900)};
+      var pold=function(){var ta=document.createElement("textarea"); ta.value=pct; ta.setAttribute("readonly",""); ta.style.cssText="position:fixed;top:-1000px;opacity:0"; document.body.appendChild(ta); ta.select(); var r=false; try{r=document.execCommand("copy")}catch(err){} ta.remove(); r?pok():toast("복사하지 못했어요")};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(pct).then(pok,pold); else pold();
+      return;
+    }
     var f1b=e.target.closest&&e.target.closest(".pfone,.pfline");
     if(f1b&&f1b.closest(".prays")){var f1p=f1b.closest(".pri").dataset.pid; if(f1b.classList.contains("pfline"))prFold1.delete(f1p); else{prFold1.add(f1p); if(document.activeElement&&f1b.closest(".pri").contains(document.activeElement))document.activeElement.blur()} prFold1Save(); render(); return}
     var tv=e.target.closest&&e.target.closest(".pthv");
