@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zu">
+<meta name="app-build" content="nb-20261114zv">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5532,11 +5532,11 @@ body:not(.boardon) #addQuick{margin:0!important}
 .sayles:not(.sayplain) textarea.sayle{padding-left:30px}
 .sayles textarea.sayle+textarea.sayle{border-top:1px dashed color-mix(in srgb,var(--sc,var(--violet)) 18%,transparent)}
 .sayles textarea.sayle:focus{background-color:rgba(255,255,255,.03)}
-.saycard .sayf .sayccp{margin-left:auto;flex:none;width:30px;height:30px;padding:0;border-radius:50%;font-size:0;display:inline-grid;place-items:center;border:1px solid #45434F;background-color:#2A2933!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:var(--gold);box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 6px rgba(0,0,0,.34);transition:transform .08s}
-.saycard .sayf .sayccp::before{content:"";width:15px;height:15px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2.5'/%3E%3Cpath d='M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2.5'/%3E%3Cpath d='M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5'/%3E%3C/svg%3E") center/contain no-repeat}
-.saycard .sayf .sayccp:active{transform:translateY(2px)}
-.saycard .sayf .sayccp.done{color:#7FD99A;border-color:#7FD99A}
-.saycard .sayf .sayccp+.sayfoldb{margin-left:10px}
+.saycard .sayccp{margin-left:auto;flex:none;width:30px;height:30px;padding:0;border-radius:50%;font-size:0;display:inline-grid;place-items:center;border:1px solid #45434F;background-color:#2A2933!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:var(--gold);box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 6px rgba(0,0,0,.34);transition:transform .08s}
+.saycard .sayccp::before{content:"";width:15px;height:15px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2.5'/%3E%3Cpath d='M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2.5'/%3E%3Cpath d='M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5'/%3E%3C/svg%3E") center/contain no-repeat}
+.saycard .sayccp:active{transform:translateY(2px)}
+.saycard .sayccp.done{color:#7FD99A;border-color:#7FD99A}
+.saycard .sayccp+.sayfoldb{margin-left:10px}
 .saycard.sayback .sayccp,.saycard.sayfolded .sayccp{display:none!important}
 .sayform .saymsel{display:block;margin:0 0 8px auto;height:30px;padding:0 12px;border-radius:15px;font-size:12.5px;font-family:inherit;color:var(--sky);border:1px solid color-mix(in srgb,var(--sky) 45%,#2A3240);background-color:#1F2836!important;background-image:linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.22) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 0 rgba(0,0,0,.4)}
 .sayform.saymall .saymsel{color:#10202C;background-color:var(--sky)!important}
@@ -5546,6 +5546,13 @@ body:not(.boardon) #addQuick{margin:0!important}
 .reader .rdhb,.reader .rdalt,.reader .rdsrc,.reader .rdphint,.reader .rdmsg{display:none!important}
 .reader .rdpform{top:var(--rdbarh,61px);border-radius:0;border-left:0;border-right:0;border-bottom:0;box-shadow:none;max-width:none;padding:12px max(14px,calc((100% - 720px) / 2)) calc(12px + env(safe-area-inset-bottom,0px))}
 .reader .rdpform .rdptext,.reader .rdpform.editing .rdptext{flex:1 1 auto;min-height:0!important;height:auto;resize:none;font-size:16px}
+.saypgno .saypgmid{display:flex;align-items:center;gap:10px}
+.saypgno .saypgmid.pgpop{animation:srmPgPop .45s cubic-bezier(.3,1.6,.5,1)}
+.saypgno.saypgside{justify-content:space-between;gap:6px}
+.saypgno .saypgsl,.saypgno .saypgsr{flex:0 0 32px;display:flex;align-items:center;justify-content:center}
+.saypgno .saypgsl:empty,.saypgno .saypgsr:empty{visibility:hidden}
+.saypgno .sayccp,.saypgno .sayone{position:static!important;margin:0!important;width:32px!important;height:32px!important}
+.saysheet .saycard .sayf.sayfempty{display:none}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
@@ -17044,13 +17051,18 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     rows.forEach(function(r,i){var h=r.offsetHeight; if(acc+h>H&&acc>0){P.push(i); PH.push(0); acc=0} acc+=h; PH[PH.length-1]=acc});
     if(sayQ&&box._qk!==sayQ){box._qk=sayQ; var fm=box.querySelector("mark.srmhit"); if(fm){var ri=rows.indexOf(fm.closest(".sayln")), kk=0; while(kk+1<P.length&&P[kk+1]<=ri)kk++; sayPg[id]=kk}}   // 찾은 낱말이 있는 쪽을 먼저 보여 줌
     var tot=P.length, pg=c.querySelector(".saypgno");
-    if(tot<2){if(pg)pg.remove(); box._pgGo=null; return}
+    var sf=c.querySelector(".sayf");
+    function giveBack(){if(!pg||!sf)return; var cb=pg.querySelector(".sayccp"), ob=pg.querySelector(".sayone"); if(cb)sf.appendChild(cb); if(ob)sf.appendChild(ob); sf.classList.remove("sayfempty")}
+    if(tot<2){if(pg){giveBack(); pg.remove()} box._pgGo=null; return}
     var cur=Math.max(0,Math.min(sayPg[id]||0,tot-1)); sayPg[id]=cur;
     rows.forEach(function(r,i){var k=0; while(k+1<P.length&&P[k+1]<=i)k++; r.style.display=k===cur?"":"none"; r.style.borderTop=i===P[cur]&&i>0?"none":""});
     box.style.minHeight=Math.max(H,Math.max.apply(null,PH)+8)+"px";   // 쪽마다 칸 높이를 같게, 화면 아래까지 꽉 채움 → 쪽 단추가 제자리 (2026-11-14)
     if(!pg){pg=document.createElement("div"); pg.className="saypgno"; box.parentNode.insertBefore(pg,box.nextSibling)}
-    pg.innerHTML='<button type="button" class="srmpgb" data-d="-1" aria-label="앞 쪽"'+(cur<1?" disabled":"")+'>'+(cur>0?"◀ "+cur:"◀")+'</button><span class="srmpgt">'+(cur+1)+' / '+tot+'</span><button type="button" class="srmpgb" data-d="1" aria-label="다음 쪽"'+(cur>=tot-1?" disabled":"")+'>'+(cur<tot-1?(cur+2)+" ▶":"▶")+'</button>';
-    function go(d,btn){var n=cur+d; if(n<0||n>=tot)return false; sayPg[id]=n; if(!btn&&Date.now()-lastBuzz>300)buzz(22); /* 쪽 넘김은 진동 한 번 — 단추는 전체 누르기 진동 하나, 밀기는 여기서 하나 (2026-11-14 사용자 요청) */ sayPage(box); var pn=c.querySelector(".saypgno"); if(pn){pn.classList.remove("pgpop"); void pn.offsetWidth; pn.classList.add("pgpop")} box.classList.remove("pgslL","pgslR"); void box.offsetWidth; box.classList.add(d>0?"pgslL":"pgslR"); var top=c.getBoundingClientRect().top; if(top<0)c.scrollIntoView({block:"start",behavior:"smooth"}); return true}
+    giveBack();
+    pg.innerHTML='<span class="saypgmid"><button type="button" class="srmpgb" data-d="-1" aria-label="앞 쪽"'+(cur<1?" disabled":"")+'>'+(cur>0?"◀ "+cur:"◀")+'</button><span class="srmpgt">'+(cur+1)+' / '+tot+'</span><button type="button" class="srmpgb" data-d="1" aria-label="다음 쪽"'+(cur>=tot-1?" disabled":"")+'>'+(cur<tot-1?(cur+2)+" ▶":"▶")+'</button></span>';
+    // 📋 복사·▴ 접기 단추를 쪽 단추 줄 양끝으로 — 아래 따로 떨어진 줄이 엉성해서 (2026-11-14 사용자 요청)
+    if(sf){var cb=sf.querySelector(".sayccp"), ob=sf.querySelector(".sayone"); if(cb||ob){pg.classList.add("saypgside"); var sp0=document.createElement("span"); sp0.className="saypgsl"; if(cb)sp0.appendChild(cb); pg.insertBefore(sp0,pg.firstChild); var sp1=document.createElement("span"); sp1.className="saypgsr"; if(ob)sp1.appendChild(ob); pg.appendChild(sp1); sf.classList.toggle("sayfempty",!sf.children.length)}}
+    function go(d,btn){var n=cur+d; if(n<0||n>=tot)return false; sayPg[id]=n; if(!btn&&Date.now()-lastBuzz>300)buzz(22); /* 쪽 넘김은 진동 한 번 — 단추는 전체 누르기 진동 하나, 밀기는 여기서 하나 (2026-11-14 사용자 요청) */ sayPage(box); var pn=c.querySelector(".saypgno .saypgmid"); if(pn){pn.classList.remove("pgpop"); void pn.offsetWidth; pn.classList.add("pgpop")} box.classList.remove("pgslL","pgslR"); void box.offsetWidth; box.classList.add(d>0?"pgslL":"pgslR"); var top=c.getBoundingClientRect().top; if(top<0)c.scrollIntoView({block:"start",behavior:"smooth"}); return true}
     pg.onclick=function(e){var b=e.target.closest(".srmpgb"); if(!b||b.disabled)return; e.stopPropagation(); go(+b.dataset.d,1)};
     box._pgGo=go;
   }
