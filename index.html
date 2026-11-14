@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zj">
+<meta name="app-build" content="nb-20261114zl">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5520,6 +5520,15 @@ body:not(.boardon) #addQuick{margin:0!important}
 .saysheet .saycard.sayback .saybktip{color:#A08A66}
 .saysheet .saycard.sayfound{animation:sayFound 1.6s ease-out}
 @keyframes sayFound{0%,40%{box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 80%,transparent),0 0 22px color-mix(in srgb,var(--gold) 45%,transparent)}100%{box-shadow:0 0 0 0 transparent}}
+/* ✍ 한 마디·은혜·장면 고치기 줄 칸 = 읽기 줄 칸 (2026-11-14) */
+.sayform textarea.sayt.sayhid{display:none!important}
+.sayform.sayledf{padding-left:16px;--sc:var(--violet)}
+.sayform.sayledf>.sayles{margin:0 0 4px}
+.sayles textarea.sayle{display:block;width:100%;box-sizing:border-box;margin:0;border:0;border-radius:0;outline:none;resize:none;overflow:hidden;background:transparent;color:var(--ink);font-family:var(--serif);font-size:16px;line-height:40px;min-height:40px;padding:0 10px 0 16px;white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word;
+  background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 38.5px,rgba(183,156,242,.2) 38.5px,rgba(183,156,242,.2) 40px);background-size:100% calc(100% - 40px);background-repeat:no-repeat}
+.sayles:not(.sayplain) textarea.sayle{padding-left:30px}
+.sayles textarea.sayle+textarea.sayle{border-top:1px dashed color-mix(in srgb,var(--sc,var(--violet)) 18%,transparent)}
+.sayles textarea.sayle:focus{background-color:rgba(255,255,255,.03)}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
@@ -8359,7 +8368,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var mirror=document.createElement("div"); mirror.className="lhmirror"; mirror.setAttribute("aria-hidden","true"); document.body.appendChild(mirror);
     var ta=null, geo=[], drag=null, raf=0;
     var COPY=["fontFamily","fontSize","fontWeight","fontStyle","fontVariant","letterSpacing","lineHeight","wordBreak","wordSpacing","textIndent","textTransform","tabSize","overflowWrap","wordWrap","whiteSpace"];
-    function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&!t.classList.contains("mqa")&&!t.classList.contains("sayeta")&&t.offsetParent!==null}   // 묵상 질문 답 칸은 자기 손잡이(.mqgut)가 있어 뺌 (2026-11-01)
+    function ok(t){return t&&t.tagName==="TEXTAREA"&&!t.readOnly&&!t.disabled&&!t.hidden&&!t.classList.contains("srmli")&&!t.classList.contains("ccdta")&&!t.classList.contains("mqa")&&!t.classList.contains("sayeta")&&!t.classList.contains("sayle")&&t.offsetParent!==null}   // 묵상 질문 답 칸은 자기 손잡이(.mqgut)가 있어 뺌 (2026-11-01)
     var mKey="", mLines=null;
     function measure(){
       var cs=getComputedStyle(ta), key=ta.value+"\u0001"+ta.clientWidth+"\u0001"+cs.fontSize+"\u0001"+cs.paddingLeft;
@@ -8491,7 +8500,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     function hide(){if(on)return; mic.hidden=true; ta=null}
     document.addEventListener("focusin",function(e){
       var t=e.target; if(!t||t.tagName!=="TEXTAREA"||!t.classList.contains("ccdta"))return;   // 🎤는 암송 코치 받아쓰기 칸에서만 — 다른 글 칸의 마이크는 없앰 (2026-11-07 사용자 요청)
-      if(t.readOnly||t.disabled||t.classList.contains("sayeta")||t.closest(".qa")||t.classList.contains("sayuse")||t.classList.contains("sayt"))return;   // 질문 탭의 질문·답 칸, 한 마디 뒷면 활용 칸은 뺌 (2026-11-07 사용자 요청)   // 오늘의 한 마디 고치기 칸은 글자를 가려서 뺌
+      if(t.readOnly||t.disabled||t.classList.contains("sayeta")||t.closest(".qa")||t.classList.contains("sayuse")||t.classList.contains("sayt")||t.classList.contains("sayle"))return;   // 질문 탭의 질문·답 칸, 한 마디 뒷면 활용 칸은 뺌 (2026-11-07 사용자 요청)   // 오늘의 한 마디 고치기 칸은 글자를 가려서 뺌
       if(on&&t!==ta)stop();
       ta=t; place();
     });
@@ -12972,7 +12981,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var mk=box._mk, lines=box._lines, sel=box._sel;
     box.textContent=""; var probe=mk([{t:"가"}]); box.appendChild(probe);
     var sp=probe.querySelector(sel), cs=getComputedStyle(sp), pl0=parseFloat(cs.paddingLeft)||0, w=sp.clientWidth-pl0-(parseFloat(cs.paddingRight)||0), fs=cs.fontSize, ff=cs.fontFamily, fw=cs.fontWeight;   // 글꼴은 칸을 지우기 전에 읽어 둠 (지우면 값이 비어 버림)
-    box.textContent=""; if(w<=20){lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); return}
+    box.textContent=""; if(w<=20){lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); if((box._retry=(box._retry||0)+1)<20){box._pend=1; setTimeout(function(){if(box._pend)lineRows(box)},150)} return}   // 아직 폭이 안 잡혔으면(창이 막 바뀌는 중) 조금 뒤 다시 나눔 — 저장 직후 줄 칸이 안 나뉘던 것
     if(!lnCv)lnCv=document.createElement("canvas"); var cx=lnCv.getContext("2d");
     var wd=function(t,bold){cx.font=(bold?"800":fw)+" "+fs+" "+ff; return cx.measureText(t).width};
     var hang=box._hang?bibleHang(lines,function(t){return wd(t)}):null;
@@ -16824,6 +16833,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=20000;   /* 예전 600자 — 긴 대언기도를 붙이면 중간에서 잘렸음 (2026-11-07 사용자 요청) */ ta.value=cur.t||"";
       ta.placeholder=sayMode==="m"?"말씀 속 장면으로 들어가 보세요\n· 무엇이 보이나요 · 무슨 소리가 들리나요\n· 나는 어디에 서 있나요\n· 예수님이 내게 하시는 말씀":sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":sayMode==="g"?"받은 은혜를 적어 보세요 (예: 오늘 기도 중에 마음이 평안해졌다)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
+      if(sayMode!=="v")sayLineEditor(form,ta);   // ✍ 고치기도 읽기와 똑같은 줄 칸·줄바꿈·절 번호 들여쓰기로 (2026-11-14 사용자 요청)
       var sayFit=function(){
         var h0=taAuto(ta,function(h){return h+2});   // 글 길이에 맞춰 높이
         // 휴대폰에서 적는 중이면 칸을 키보드 바로 위까지 늘림 — 아래 저장 줄이 키보드 바로 위에 오게 (2026-11-07 사용자 요청)
@@ -17036,6 +17046,64 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     }
     go(); setTimeout(go,120); setTimeout(go,450);
     if(window.visualViewport&&!t._vvf){t._vvf=1; var f=function(){if(!t.isConnected||document.activeElement!==t){visualViewport.removeEventListener("resize",f);return} go()}; visualViewport.addEventListener("resize",f)}
+  }
+  // ✍ 한 마디·은혜·장면 고치기 = 읽기와 같은 줄 칸 (2026-11-14 사용자 요청): 저장된 한 줄마다 글 칸 하나(textarea.sayle), 줄 높이 40px·칸 사이 점선이라 넘어간 줄도 읽기처럼 한 칸, 절 번호 뒤 들여쓰기(bibleHang)도 같게. 숨은 .sayt에 늘 이어 붙여 두어 저장·담기는 예전 그대로
+  function sayLineEditor(form,ta){
+    form.classList.add("sayledf"); ta.classList.add("sayhid");
+    var box=document.createElement("div"); box.className="sayq saylines sayles"+(sayMode==="g"?"":" sayplain"); form.insertBefore(box,ta);
+    var cv=document.createElement("canvas").getContext("2d"), BASE=null;
+    function rows(){return [].slice.call(box.querySelectorAll("textarea.sayle"))}
+    function sync(){var v=rows().map(function(r){return r.value}).join("\n"); if(ta.value!==v){ta.value=v; ta.dispatchEvent(new Event("input",{bubbles:true}))}}
+    function fit(r){taAuto(r,function(h){return Math.max(40,Math.ceil(h/40)*40)})}
+    function hang(){
+      var rs=rows(); if(!rs.length)return;
+      if(BASE==null){rs[0].style.paddingLeft=""; BASE=parseFloat(getComputedStyle(rs[0]).paddingLeft)||16}
+      var cs=getComputedStyle(rs[0]); cv.font=cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;
+      var info=bibleHang(rs.map(function(r){return r.value}),function(t){return cv.measureText(t).width});
+      rs.forEach(function(r,i){var h=info[i], pw=Math.round(h.pw); r.style.paddingLeft=(BASE+pw)+"px"; r.style.textIndent=h.first&&pw?(-pw)+"px":"0"; fit(r)});
+    }
+    function mk(v){var r=document.createElement("textarea"); r.className="sayle"; r.rows=1; r.value=v; r.setAttribute("aria-label","한 줄"); return r}
+    String(ta.value).split("\n").forEach(function(l){box.appendChild(mk(l))});
+    requestAnimationFrame(hang); setTimeout(hang,120);
+    function at(r,pos){try{r.focus({preventScroll:false}); r.setSelectionRange(pos,pos)}catch(e){}}
+    box.addEventListener("input",function(e){
+      var r=e.target; if(!r.classList||!r.classList.contains("sayle"))return;
+      if(r.value.indexOf("\n")>=0){   // 엔터·여러 줄 붙여넣기 → 줄 칸으로 나눔 (휴대폰 키보드도 input으로 잡음)
+        var c=r.selectionStart, parts=r.value.split("\n"), before=r.value.slice(0,c).split("\n").length-1, ref=r;
+        r.value=parts[0]; var made=[r];
+        for(var i=1;i<parts.length;i++){var n=mk(parts[i]); ref.parentNode.insertBefore(n,ref.nextSibling); ref=n; made.push(n)}
+        hang(); sync(); var tg=made[before]||made[made.length-1], off=c-(r.value.length+1); if(before>0){var acc=0; for(var k=0;k<before;k++)acc+=parts[k].length+1; off=c-acc} else off=c; at(tg,Math.max(0,Math.min(off,tg.value.length))); fill(); return;
+      }
+      hang(); sync(); fill();
+    });
+    function merge(r){var p=r.previousElementSibling; if(!p)return false; var pos=p.value.length; p.value+=r.value; r.remove(); hang(); sync(); at(p,pos); fill(); return true}
+    box.addEventListener("beforeinput",function(e){var r=e.target; if(!r.classList||!r.classList.contains("sayle"))return; if(e.inputType==="deleteContentBackward"&&r.selectionStart===0&&r.selectionEnd===0&&!e.isComposing){if(merge(r))e.preventDefault()}});
+    box.addEventListener("keydown",function(e){
+      var r=e.target; if(!r.classList||!r.classList.contains("sayle")||e.isComposing)return;
+      if(e.key==="Backspace"&&r.selectionStart===0&&r.selectionEnd===0){if(merge(r))e.preventDefault()}
+      else if(e.key==="ArrowUp"&&r.selectionStart===0&&r.previousElementSibling){e.preventDefault(); at(r.previousElementSibling,r.previousElementSibling.value.length)}
+      else if(e.key==="ArrowDown"&&r.selectionEnd===r.value.length&&r.nextElementSibling){e.preventDefault(); at(r.nextElementSibling,0)}
+    });
+    box.addEventListener("paste",function(e){   // 한 마디: 빈 칸에 '글 — 말한 분'을 붙이면 예전처럼 말한 분을 갈라 넣음
+      if(sayMode!=="s"||ta.value.trim())return; var txt=(e.clipboardData||window.clipboardData).getData("text"); if(!txt||!/[-–—]/.test(txt))return;
+      var sp=saySplit(txt); if(!sp.who)return; e.preventDefault(); var r=rows()[0]; r.value=sp.t; r.dispatchEvent(new Event("input",{bubbles:true}));
+      var wi=say.querySelector(".saywho"); if(wi&&!wi.value.trim())wi.value=sp.who; toast("말한 분을 갈라 넣었어요");
+    });
+    box.addEventListener("click",function(e){if(e.target===box){var rs=rows(), l=rs[rs.length-1]; if(l)at(l,l.value.length)}});   // 줄 아래 빈 곳을 누르면 마지막 줄 끝으로
+    // 📐 적는 동안 칸을 키보드 위까지 늘려 아래 단추 줄이 키보드 바로 위에 (휴대폰)
+    var on=false;
+    function fill(){
+      if(!on||(window.matchMedia&&matchMedia("(min-width:900px)").matches))return;
+      var vv=window.visualViewport, vbot=vv?vv.offsetTop+vv.height:innerHeight;
+      var keep=[]; for(var el=box.parentElement;el;el=el.parentElement){if(el.scrollTop)keep.push([el,el.scrollTop])}
+      box.style.minHeight=""; var extra=Math.round(vbot-12-form.getBoundingClientRect().bottom);
+      if(extra>0)box.style.minHeight=(box.offsetHeight+extra)+"px";
+      keep.forEach(function(k){if(k[0].scrollTop!==k[1])k[0].scrollTop=k[1]});
+    }
+    box.addEventListener("focusin",function(){on=true; [0,150,450].forEach(function(d){setTimeout(fill,d)})});
+    box.addEventListener("focusout",function(){setTimeout(function(){if(!box.contains(document.activeElement)){on=false; box.style.minHeight=""}},150)});
+    if(window.visualViewport){var vf=function(){if(!box.isConnected){visualViewport.removeEventListener("resize",vf);return} if(on)setTimeout(fill,60)}; visualViewport.addEventListener("resize",vf)}
+    window.addEventListener("resize",function rz(){if(!box.isConnected){window.removeEventListener("resize",rz);return} hang()});
   }
   var sayUseEdAt=0, sayBack={}, sayUseEd="", sayUsePend=false, sayUseT=0, saySwAt=0;
   function sayUseSave(ta){
