@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114r">
+<meta name="app-build" content="nb-20261114s">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5465,6 +5465,9 @@ body:not(.boardon) #addQuick{margin:0!important}
 .sheet .bkopen:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
 .sheet form .primary{background:#E3DDD1 linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.12) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.16) 100%)!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -2px 0 rgba(0,0,0,.18),0 3px 0 rgba(90,80,65,.85),0 5px 10px rgba(0,0,0,.4)!important;transition:transform .08s,box-shadow .08s}
 .sheet form .primary:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.25)!important}
+/* '추가' 단추: 또렷한 입체 알약 (2026-11-14 사용자 요청: '노트에 추가' → '추가') */
+.sheet form .primary{min-width:120px;height:46px;padding:0 30px!important;border-radius:23px!important;font-size:17px;font-weight:700;letter-spacing:.06em;color:#2A241C!important;background:#E8DFCC linear-gradient(180deg,rgba(255,255,255,.7) 0%,rgba(255,255,255,.18) 46%,rgba(0,0,0,.05) 54%,rgba(0,0,0,.2) 100%)!important;border:1px solid #F6F0E2!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.95),inset 0 -3px 0 rgba(0,0,0,.16),0 5px 0 #6E6250,0 9px 14px rgba(0,0,0,.5)!important}
+.sheet form .primary:active{transform:translateY(5px);box-shadow:inset 0 2px 5px rgba(0,0,0,.28),0 0 0 #6E6250!important}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
@@ -5631,7 +5634,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       <label for="mText">말씀</label>
       <textarea class="field" id="mText" placeholder="빛이 어둠에 비치되 어둠이 깨닫지 못하더라"></textarea>
       <p class="mhint">장 전체도 담을 수 있어요. 구절에 <b>시편 91편</b>처럼 장까지만 쓰고, 본문을 붙여 넣으세요. 절 번호가 없으면 한 줄을 한 절로 보고 번호를 붙여요.</p>
-      <button class="primary" type="submit">노트에 추가</button>
+      <button class="primary" type="submit">추가</button>
     </form>
   </section>
   </div>
