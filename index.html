@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zb">
+<meta name="app-build" content="nb-20261114zc">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3498,7 +3498,7 @@ mark.srmhit{background:rgba(255,205,80,.5);color:inherit;border-radius:4px;paddi
 .saybkq{margin:0 0 10px;font-size:13px;line-height:1.5;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 textarea.sayuse{display:block;width:100%;box-sizing:border-box;min-height:110px;padding:12px 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--sc) 45%,#34333A);background:color-mix(in srgb,var(--sc) 10%,#101013);color:var(--ink);font-family:inherit;font-size:16.5px;line-height:1.8;resize:none;word-break:keep-all;-webkit-user-select:text;user-select:text}
 textarea.sayuse:focus{outline:none;box-shadow:none;border-color:color-mix(in srgb,var(--sc) 80%,#fff)}   /* 테두리 한 줄만, 모서리 손잡이 없음 (2026-11-07 사용자 요청) */
-.sayusev{margin:0;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--sc) 10%,#101013);border:1px solid color-mix(in srgb,var(--sc) 30%,#2A2930);font-family:var(--serif);font-size:16.5px;line-height:1.8;color:var(--ink);white-space:pre-wrap;word-break:keep-all}
+.sayusev{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;margin:0;padding:12px 14px;border-radius:12px;background:color-mix(in srgb,var(--sc) 10%,#101013);border:1px solid color-mix(in srgb,var(--sc) 30%,#2A2930);font-family:var(--serif);font-size:16.5px;line-height:1.8;color:var(--ink);white-space:pre-wrap;word-break:keep-all}
 .saybktip{margin:8px 2px 0;font-size:11.5px;color:var(--muted)}
 .saycard .sayfoldb{position:absolute;top:10px;right:10px;z-index:2;width:30px;height:30px;padding:0;border-radius:50%;border:1px solid color-mix(in srgb,var(--sc,var(--gold)) 45%,#3A3630);background:rgba(0,0,0,.22);color:color-mix(in srgb,var(--sc,var(--gold)) 70%,#fff);font-size:12px;line-height:1;font-family:inherit}
 .saycard .sayf .sayfoldb{position:static;margin-left:auto;flex:none}   /* 접기 단추를 아래 줄 오른쪽, 삭제 왼쪽에 가로로 (2026-11-08 사용자 요청) */
@@ -16989,6 +16989,19 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     box._pgGo=go;
   }
   var sayFold={}; try{sayFold=JSON.parse(localStorage.getItem("bible-say-fold")||"{}")||{}}catch(e){sayFold={}}
+  // 📐 뒷면 적는 칸을 화면 끝(키보드 위)까지 세로로 꽉 채움 — 카드를 윗줄 바로 아래로 올리고 칸 아래끝을 보이는 화면 아래 12px에 (2026-11-14 사용자 요청)
+  function sayUseFill(t){
+    if(!t||!t.isConnected)return;
+    function go(){
+      if(!t.isConnected||document.activeElement!==t)return;
+      var bx=t.closest(".dlbody"), card=t.closest(".saycard"), bar=say&&say.querySelector(".dlbar");
+      if(bx&&card){var top0=(bar?bar.getBoundingClientRect().bottom:0)+8; bx.scrollTop+=card.getBoundingClientRect().top-top0}
+      var vv=window.visualViewport, bot=vv?vv.offsetTop+vv.height:innerHeight, r=t.getBoundingClientRect();
+      var want=Math.round(bot-12-r.top); if(want>110)t.style.minHeight=want+"px";
+    }
+    go(); setTimeout(go,120); setTimeout(go,450);
+    if(window.visualViewport&&!t._vvf){t._vvf=1; var f=function(){if(!t.isConnected||document.activeElement!==t){visualViewport.removeEventListener("resize",f);return} go()}; visualViewport.addEventListener("resize",f)}
+  }
   var sayUseEdAt=0, sayBack={}, sayUseEd="", sayUsePend=false, sayUseT=0, saySwAt=0;
   function sayUseSave(ta){
     var o=sayData(), x=o.items.find(function(y){return y.id===ta.dataset.id}); if(!x)return;
@@ -17054,8 +17067,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var c=sayTT.c; sayTT.c=null; if(!c||e.changedTouches.length!==1||sayDrag||sayEdit)return; var t=e.changedTouches[0];
       if(Date.now()-sayTT.t>450||Math.abs(t.clientX-sayTT.x)>12||Math.abs(t.clientY-sayTT.y)>12)return;
       if(e.target.closest("button,a,input,textarea,select,label"))return;
-      sayTouchTapAt=Date.now(); sayTapAct({target:e.target,preventDefault:function(){},stopPropagation:function(){}});
-    },{passive:true});
+      sayTouchTapAt=Date.now(); sayTapAct({target:e.target,preventDefault:function(){if(e.cancelable)e.preventDefault()},stopPropagation:function(){}});   // 두 번째 누름이면 휴대폰 기본 동작(낱말 고르기·뒤따르는 click)을 막음 — 엉뚱한 곳이 골라지고 고치는 칸이 바로 닫히던 것 (2026-11-14)
+    },{passive:false});
     list.addEventListener("click",function(e){
       if(Date.now()-sayTouchTapAt<700){var cc=e.target.closest(".saycard"); if(cc&&!e.target.closest("button,a,input,textarea,select,label")){e.preventDefault(); e.stopPropagation()} return}   // 손가락으로 이미 셈
       sayTapAct(e);
@@ -17067,7 +17080,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       if(dtap.id===id&&now-dtap.t<520){   // 휴대폰 두 번 누르기는 손가락 누르는 시간까지 들어가 0.38초로는 짧았음 (2026-11-13 사용자 요청)
         clearTimeout(dtap.ot); dtap={id:"",t:0}; e.preventDefault(); e.stopPropagation();
         try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
-        if(sayBack[id]){sayUseEd=id; sayUseEdAt=Date.now(); drawSay(); var ut=say.querySelector('.sayuse[data-id="'+id+'"]'); if(ut){try{ut.focus({preventScroll:true}); ut.setSelectionRange(ut.value.length,ut.value.length)}catch(err){}} return}
+        if(sayBack[id]){sayUseEd=id; sayUseEdAt=Date.now(); drawSay(); var ut=say.querySelector('.sayuse[data-id="'+id+'"]'); if(ut){try{ut.focus({preventScroll:true}); ut.setSelectionRange(ut.value.length,ut.value.length)}catch(err){}} sayUseFill(ut); return}
         sayEdit=id; sayEditAt=Date.now(); drawSay(); var ta=say.querySelector(".sayt");
         if(ta){ta.scrollIntoView({block:"center"}); setTimeout(function(){try{ta.focus({preventScroll:true}); ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}},30)}
         return;
@@ -17152,7 +17165,9 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       list.addEventListener("dblclick",function(e){var t=e.target; if(t.classList&&t.classList.contains("sayuse")&&t.value.trim())done(t)});
     })();
     list.addEventListener("input",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return; taAuto(t); clearTimeout(sayUseT); sayUseT=setTimeout(function(){sayUseSave(t)},500)});
-    list.addEventListener("focusout",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return; clearTimeout(sayUseT); sayUseSave(t);
+    list.addEventListener("focusout",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return;
+      if(Date.now()-sayUseEdAt<900&&t.isConnected){setTimeout(function(){if(t.isConnected&&document.activeElement!==t){try{t.focus({preventScroll:true})}catch(err){}}},0); return}   // 두 번 눌러 연 바로 뒤 휴대폰이 포커스를 빼앗으면 다시 칸으로
+      clearTimeout(sayUseT); sayUseSave(t); t.style.minHeight="";
       setTimeout(function(){var a=document.activeElement; if(a&&a.classList&&a.classList.contains("sayuse"))return; if(sayUseEd===t.dataset.id)sayUseEd=""; sayUsePend=false; drawSay()},120)});
   }
   document.addEventListener("click",function(e){var i=e.target.closest&&e.target.closest(".sayhvtm"); if(!i)return; if(window.matchMedia&&matchMedia("(hover:hover) and (pointer:fine)").matches){e.preventDefault();return} try{i.showPicker()}catch(err){}});
