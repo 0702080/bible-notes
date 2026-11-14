@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114n">
+<meta name="app-build" content="nb-20261114o">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -4512,7 +4512,7 @@ body.boardon .fscrow{display:none}
 .prdansb,.p1foot [data-p1="ans"]{height:30px;padding:0 13px;border:1px solid color-mix(in srgb,var(--gold) 55%,#34333A);border-radius:15px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-family:inherit;font-size:12.5px;font-weight:700;white-space:nowrap}
 .answered .prdansb,.answered .p1foot [data-p1="ans"]{border-color:#34333A;background:transparent;color:var(--faint);font-weight:500}
 /* 24 고치기 칸은 읽을 때와 똑같은 자리·글자 */
-.prded{min-height:0;margin:8px 0 0;padding:0;border:0;border-radius:0;background:transparent;outline:1px dashed color-mix(in srgb,var(--ic,var(--orange)) 55%,transparent);outline-offset:5px;font-size:16.5px;line-height:1.75;color:color-mix(in srgb,var(--ic,var(--orange)) 48%,#fff);word-break:keep-all;overflow-wrap:break-word;resize:none;overflow:hidden}
+.prded{min-height:0;margin:8px 0 0;padding:0;border:0;border-radius:8px;background:transparent;outline:1px dashed color-mix(in srgb,var(--ic,var(--orange)) 55%,transparent);outline-offset:5px;font-size:16.5px;line-height:1.75;color:color-mix(in srgb,var(--ic,var(--orange)) 48%,#fff);word-break:keep-all;overflow-wrap:break-word;resize:none;overflow:hidden}
 .prded:focus{outline-style:solid}
 .pri textarea.pt{padding:12px 14px;border-radius:12px;font-size:17px;line-height:1.8;word-break:keep-all;overflow-wrap:break-word}
 /* 12·22 걷기 암송 설정 */
@@ -7326,6 +7326,14 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
         prdTap={k:k,t:now};
       });
       prd.querySelector(".prdlist").addEventListener("input",function(e){if(e.target.classList.contains("prded"))grow(e.target)});
+      (function(){   // ✏️ 기도문 고치는 칸을 두 번 누르면 저장하고 읽기로 (2026-11-14 사용자 요청)
+        var L=prd.querySelector(".prdlist"), lt={t:0,x:0,y:0};
+        L.addEventListener("touchend",function(e){var t=e.target; if(!t.classList||!t.classList.contains("prded")||e.changedTouches.length!==1)return;
+          var c=e.changedTouches[0], now=Date.now();
+          if(Date.now()-(prd._edAt||0)>700&&now-lt.t<480&&Math.abs(c.clientX-lt.x)<60&&Math.abs(c.clientY-lt.y)<80){lt={t:0,x:0,y:0}; e.preventDefault(); try{var sl=getSelection(); if(sl)sl.removeAllRanges()}catch(err){} t.blur(); prdEdSave(); return}
+          lt={t:now,x:c.clientX,y:c.clientY}},{passive:false});
+        L.addEventListener("dblclick",function(e){if(Date.now()-(prd._edAt||0)<900)return; if(e.target.classList&&e.target.classList.contains("prded")){try{var sl=getSelection(); if(sl)sl.removeAllRanges()}catch(err){} e.target.blur(); prdEdSave()}});
+      })();
       (function(){   // ↔ 말씀 카드 기도문을 옆으로 밀면 뒷면(응답 감사 기도)·다시 밀면 앞면 (2026-11-12 사용자 요청)
         var L=prd.querySelector(".prdlist"), sw=null;
         L.addEventListener("touchstart",function(e){var c=e.target.closest(".prdcard"); if(!c||e.touches.length!==1||e.target.closest("textarea,input")){sw=null;return} var t=e.touches[0]; sw={c:c,x:t.clientX,y:t.clientY,t:Date.now()}},{passive:true});
@@ -7375,6 +7383,7 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
   var prdEd={nid:"",pid:""}, prdTap={k:"",t:0}, prdTF=new Set(), prdThx={nid:"",pid:""};   // prdThx: 뒷면(응답 감사 기도)을 연 기도 (2026-11-12)   // prdTF: 접어 둔 기도문
   try{JSON.parse(localStorage.getItem("bible-prd-tfold")||"[]").forEach(function(x){prdTF.add(String(x))})}catch(e){}
   function prdEdOpen(nid,pid){
+    if(prd)prd._edAt=Date.now();
     prdEd={nid:nid,pid:pid}; drawPrayRead();
     var t=prd.querySelector(".prded"); if(!t)return;
     grow(t); t.focus(); var cp=t.value.indexOf(PRAY_HEAD)===0?PRAY_HEAD.length:t.value.length; try{t.setSelectionRange(cp,cp)}catch(e){}
