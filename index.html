@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114u">
+<meta name="app-build" content="nb-20261114v">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5471,9 +5471,15 @@ body:not(.boardon) #addQuick{margin:0!important}
 /* '추가' 단추를 '📖 성경 책 고르기'와 같은 하늘색 입체 알약으로 (2026-11-14 사용자 요청) */
 .sheet form .primary{min-width:0;height:34px;padding:0 18px!important;border-radius:17px!important;font-family:inherit;font-size:13px;font-weight:400;letter-spacing:0;color:var(--sky)!important;background:color-mix(in srgb,var(--sky) 22%,#1C2A33) linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;border:1px solid color-mix(in srgb,var(--sky) 50%,#2A3A44)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.42),0 4px 8px rgba(0,0,0,.36)!important;transition:transform .08s,box-shadow .08s}
 .sheet form .primary:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
-/* 성경 책 고르기·추가 단추 바탕을 더 맑고 밝은 하늘색으로 (2026-11-14 사용자 요청: 칙칙함) */
-.sheet .bkopen,.sheet form .primary{color:#F4FBFF!important;background:#3C8FC0 linear-gradient(180deg,rgba(255,255,255,.32) 0%,rgba(255,255,255,.1) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.18) 100%)!important;border:1px solid #7CC4EC!important;text-shadow:0 1px 1px rgba(0,0,0,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -2px 0 rgba(0,0,0,.2),0 3px 0 #1F5878,0 5px 9px rgba(0,0,0,.4)!important}
-.sheet .bkopen:active,.sheet form .primary:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.3),0 0 0 #1F5878!important}
+/* 말씀 담기 창 바탕: 칙칙한 회검정 → 맑은 남보라 (2026-11-14 사용자 요청) */
+#addSheet .sheetpanel{background:#2A2640;border-top:1px solid #4E4672;box-shadow:0 -12px 40px rgba(0,0,0,.55)}
+#addSheet .sheetpanel::before{background:#5C5482}
+#addSheet .sheethint,#addSheet .mhint{color:#B9B2D6}
+#addSheet .manual{background:#34304F;border:1px solid #4E4672}
+#addSheet .manual label{color:#D9D3F2}
+#addSheet .field{background:#1F1C30;border-color:#4A4468}
+#addSheet .field:focus{border-color:var(--violet)}
+@media (min-width:900px){#addSheet .sheetpanel{border:1px solid #4E4672}}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
