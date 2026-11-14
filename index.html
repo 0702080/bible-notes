@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114ze">
+<meta name="app-build" content="nb-20261114zf">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3296,6 +3296,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind,body.soloon #co
 /* ⠿ 글 칸 줄 옮기기 (2026-10-31 사용자 요청) */
 .lhlayer{position:fixed;inset:0;z-index:490;pointer-events:none}
 .lhlayer[hidden]{display:none}
+.scnico{width:1.15em;height:1.15em;vertical-align:-.2em}   /* 🌄 장면 묵상: 해·산 그림 (2026-11-14 사용자 요청) */
+.toolbar .qk .scnico{width:62%;height:62%}
+.dltitle .scnico path:first-of-type{fill:#A9BBE8;stroke:#A9BBE8}   /* 어두운 제목 줄에서는 산을 밝게 */
 .lhlayer.inflow{position:absolute;inset:auto;left:0;top:0;width:0;height:0;overflow:visible}
 .lhlayer.inflow .lhgrip{position:absolute}
 .lhlayer.inflow.inrel{position:relative;display:block;height:0;margin:0;padding:0;float:none}
@@ -5616,7 +5619,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       <div class="pop">
         <button type="button" id="ghSyncBtn">☁️ GitHub 자동 저장</button>
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
-        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 주님의 은혜</button><button type="button" id="openSceneBtn">🌄 장면 묵상</button>
+        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 주님의 은혜</button><button type="button" id="openSceneBtn"><svg class="scnico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="16.5" cy="7.5" r="3.2" fill="#F08A5D"/><path d="M1.5 20 L8.5 10.5 L13 16.2 L15.6 13 L22.5 20 Z" fill="#4B5A82" stroke="#4B5A82" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10.5 L10.6 13.3 L9.4 13.9 L8.5 12.9 L7.4 14 L6.6 13.2 Z" fill="#fff" opacity=".85"/></svg> 장면 묵상</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="rvAllBtn">🔁 오늘 복습</button>
         <button type="button" id="weekBtn">📅 한 주 돌아보기</button>
@@ -7031,7 +7034,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       rb.appendChild(rt); rb.appendChild(rbd); lsr.appendChild(rb);
     }
     if(sh.length){   // 💬 한 마디·🌿 은혜·📖 짧은 말씀·🌄 장면 묵상 — 종류별로 따로, 맨 위 가까이 (2026-11-14 사용자 요청: 장면 묵상 글도 찾기에)
-      [["m","🌄","장면 묵상","var(--orange)"],["g","🌿","주님의 은혜","var(--green)"],["v","📖","짧은 말씀","var(--sky)"],["s","💬","믿음의 한 마디","var(--gold)"]].forEach(function(k){
+      [["m","⛰️","장면 묵상","var(--orange)"],["g","🌿","주님의 은혜","var(--green)"],["v","📖","짧은 말씀","var(--sky)"],["s","💬","믿음의 한 마디","var(--gold)"]].forEach(function(k){
         var arr=sh.filter(function(x){return (x.hv?"v":x.sc?"m":x.gr?"g":"s")===k[0]}); if(!arr.length)return;
         var lsq=col(k[1],k[2],arr.length);
         arr.forEach(function(x){
@@ -16735,7 +16738,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     }
     sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value="";
     say.classList.toggle("saygr",sayMode==="g"||sayMode==="m");   // 은혜 제목이 길어 글자를 조금 작게 (2026-11-07)
-    say.querySelector(".dltitle").innerHTML=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 주님의 은혜":sayMode==="m"?"🌄 장면 묵상":"💬 믿음의 한 마디";
+    say.querySelector(".dltitle").innerHTML=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 주님의 은혜":sayMode==="m"?'<svg class="scnico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="16.5" cy="7.5" r="3.2" fill="#F08A5D"/><path d="M1.5 20 L8.5 10.5 L13 16.2 L15.6 13 L22.5 20 Z" fill="#4B5A82" stroke="#4B5A82" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10.5 L10.6 13.3 L9.4 13.9 L8.5 12.9 L7.4 14 L6.6 13.2 Z" fill="#fff" opacity=".85"/></svg> 장면 묵상':"💬 믿음의 한 마디";
     say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 기록':sayMode==="m"?'+<span class="sayhidem"> 장면</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
     say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawSay();
@@ -21921,7 +21924,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   (function(){
     var SKIP={reorderBtn:1,ledgerBtn:1,foldAll:1};   // 💰는 맨 위에 따로 있음
     var ICON={openTongdokBtn:"📚",bibleTextBtn:"📜",ghSyncBtn:"📤",exportTxt:"📃"};   // 겹치는 그림은 바꿔서 구분
-    var COL={sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
+    var COL={openSceneBtn:"#F6D9B8",sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
     var bar=$("addQuick")&&$("addQuick").parentElement, pop=document.querySelector("#topMenu .pop"); if(!bar||!pop)return;
     function qkOf(id){return bar.querySelector('.qk[data-for="'+id+'"]')}
     function colorOf(id){if(COL[id])return COL[id]; var h=0; for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0; return PAL[h%PAL.length]}
