@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zl">
+<meta name="app-build" content="nb-20261114zm">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5524,6 +5524,8 @@ body:not(.boardon) #addQuick{margin:0!important}
 .sayform textarea.sayt.sayhid{display:none!important}
 .sayform.sayledf{padding-left:16px;--sc:var(--violet)}
 .sayform.sayledf>.sayles{margin:0 0 4px}
+.saysheet .sayform.sayledf{background:#1B2230!important;border-color:color-mix(in srgb,var(--sky) 38%,#2A3240)!important;border-left-color:var(--sky)!important}   /* ✏️ 고치는 중임을 알 수 있게 살짝 푸른 바탕 (2026-11-14 사용자 요청) */
+.saysheet .sayform.sayledf>.sayles{background:rgba(120,170,220,.07);border-color:color-mix(in srgb,var(--sky) 30%,#2A3240)}
 .sayles textarea.sayle{display:block;width:100%;box-sizing:border-box;margin:0;border:0;border-radius:0;outline:none;resize:none;overflow:hidden;background:transparent;color:var(--ink);font-family:var(--serif);font-size:16px;line-height:40px;min-height:40px;padding:0 10px 0 16px;white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word;
   background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 38.5px,rgba(183,156,242,.2) 38.5px,rgba(183,156,242,.2) 40px);background-size:100% calc(100% - 40px);background-repeat:no-repeat}
 .sayles:not(.sayplain) textarea.sayle{padding-left:30px}
