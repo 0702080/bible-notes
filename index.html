@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zd">
+<meta name="app-build" content="nb-20261114ze">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5511,6 +5511,8 @@ body:not(.boardon) #addQuick{margin:0!important}
 .saysheet .saycard.sayback .sayusev,.saysheet .saycard.sayback textarea.sayuse{background:#241C12!important;border-color:#6A5232!important;color:#F4E8D4}
 .saysheet .saycard.sayback textarea.sayuse:focus{border-color:#E2A85A!important}
 .saysheet .saycard.sayback .saybktip{color:#A08A66}
+.saysheet .saycard.sayfound{animation:sayFound 1.6s ease-out}
+@keyframes sayFound{0%,40%{box-shadow:0 0 0 3px color-mix(in srgb,var(--gold) 80%,transparent),0 0 22px color-mix(in srgb,var(--gold) 45%,transparent)}100%{box-shadow:0 0 0 0 transparent}}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
@@ -6902,9 +6904,9 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var out=[]; if(!filterText)return out;
     sayData().items.forEach(function(x){
       if(out.length>=max)return;
-      var t=String(x.t||""), w=String(x.who||""), tp=String(x.topic||"");
+      var t=String(x.t||""), w=String(x.who||""), tp=String(x.topic||""), u=String(x.use||"");
       if(!t.trim())return;
-      if(has(t)||has(w)||has(tp))out.push(x);
+      if(has(t)||has(w)||has(tp)||has(u))out.push(x);   // 뒷면(활용·받은 것)도 찾음 (2026-11-14)
     });
     return out;
   }
@@ -6959,7 +6961,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       box._wired=1;
       box.addEventListener("click",function(e){
         var r=e.target.closest(".dlfr"); if(!r)return;
-        if(r.dataset.say)openSay(null,r.dataset.say);
+        if(r.dataset.say){var sid=r.dataset.sid, sb=r.dataset.say; openSay(null,sb);
+          if(sid)setTimeout(function(){var sc=document.querySelector('.saysheet .saycard[data-id="'+sid+'"]'); if(!sc)return; sc.scrollIntoView({block:"center"}); sc.classList.remove("sayfound"); void sc.offsetWidth; sc.classList.add("sayfound")},180)}   // 찾은 그 카드로 굴리고 반짝 (2026-11-14)
         else if(r.dataset.read)openReader({book:+r.dataset.b,chapter:+r.dataset.c,verse:+r.dataset.v||0});
         else if(r.dataset.note)openNoteFocus(r.dataset.note,r.dataset.tab);
         else openDaily(r.dataset.day,r.dataset.id);
@@ -7027,6 +7030,21 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var rbd=document.createElement("span"); rbd.className="dlfrb"; rbd.textContent=rq.label+" ›";
       rb.appendChild(rt); rb.appendChild(rbd); lsr.appendChild(rb);
     }
+    if(sh.length){   // 💬 한 마디·🌿 은혜·📖 짧은 말씀·🌄 장면 묵상 — 종류별로 따로, 맨 위 가까이 (2026-11-14 사용자 요청: 장면 묵상 글도 찾기에)
+      [["m","🌄","장면 묵상","var(--orange)"],["g","🌿","주님의 은혜","var(--green)"],["v","📖","짧은 말씀","var(--sky)"],["s","💬","믿음의 한 마디","var(--gold)"]].forEach(function(k){
+        var arr=sh.filter(function(x){return (x.hv?"v":x.sc?"m":x.gr?"g":"s")===k[0]}); if(!arr.length)return;
+        var lsq=col(k[1],k[2],arr.length);
+        arr.forEach(function(x){
+          var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.say=k[0]; b.dataset.sid=x.id;
+          b.style.setProperty("--gc",k[3]);
+          b.setAttribute("aria-label",k[2]+" 보기");
+          var inT=has(String(x.t||""))||!has(String(x.use||""));
+          var top=document.createElement("span"); top.className="dlfrh"; top.textContent=(x.who||k[2])+(x.topic?"  ·  #"+x.topic:"")+(inT?"":"  ·  💡 뒷면");
+          var bd=document.createElement("span"); bd.className="dlfrb"; snipInto(bd,inT?x.t:x.use);
+          b.appendChild(top); b.appendChild(bd); lsq.appendChild(b);
+        });
+      });
+    }
     if(dh.length){
       var ls1=col("🌙","하루 돌아보기 기록",dh.length);
       dh.forEach(function(h){
@@ -7079,17 +7097,6 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     noteCol("✍️","묵상",th.med,"var(--violet)");
     noteCol("❓","질문·답",th.qa,"var(--blue)");
     noteCol("📄","설교 요약·글",th.doc,"var(--pink)");
-    if(sh.length){   // 💬 믿음의 한 마디
-      var lsq=col("💬","믿음의 한 마디",sh.length);
-      sh.forEach(function(x){
-        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.say=x.hv?"v":x.sc?"m":x.gr?"g":"s";
-        b.style.setProperty("--gc","var(--gold)");
-        b.setAttribute("aria-label","믿음의 한 마디 보기");
-        var top=document.createElement("span"); top.className="dlfrh"; top.textContent=(x.who||"한 마디")+(x.topic?"  ·  #"+x.topic:"");
-        var bd=document.createElement("span"); bd.className="dlfrb"; snipInto(bd,x.t);
-        b.appendChild(top); b.appendChild(bd); lsq.appendChild(b);
-      });
-    }
     return total;
   }
   // 내가 끌어서 정한 높이는 그대로 지킨다 (2026-10-17 사용자 요청)
