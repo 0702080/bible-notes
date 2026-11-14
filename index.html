@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114w">
+<meta name="app-build" content="nb-20261114x">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5593,7 +5593,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       <div class="pop">
         <button type="button" id="ghSyncBtn">☁️ GitHub 자동 저장</button>
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
-        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 주님의 은혜</button>
+        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 주님의 은혜</button><button type="button" id="openSceneBtn">🌄 장면 묵상</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="rvAllBtn">🔁 오늘 복습</button>
         <button type="button" id="weekBtn">📅 한 주 돌아보기</button>
@@ -7061,7 +7061,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     if(sh.length){   // 💬 믿음의 한 마디
       var lsq=col("💬","믿음의 한 마디",sh.length);
       sh.forEach(function(x){
-        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.say=x.hv?"v":x.gr?"g":"s";
+        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.say=x.hv?"v":x.sc?"m":x.gr?"g":"s";
         b.style.setProperty("--gc","var(--gold)");
         b.setAttribute("aria-label","믿음의 한 마디 보기");
         var top=document.createElement("span"); top.className="dlfrh"; top.textContent=(x.who||"한 마디")+(x.topic?"  ·  #"+x.topic:"");
@@ -16669,7 +16669,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 10분마다 나옴
   var sayMode="s";
   function openSay(focus,mode){
-    sayMode=mode==="v"?"v":mode==="g"?"g":"s";
+    sayMode=mode==="v"?"v":mode==="g"?"g":mode==="m"?"m":"s";
     if(!say){
       say=document.createElement("div"); say.className="daily saysheet"; say.setAttribute("role","dialog"); say.setAttribute("aria-modal","true"); say.hidden=true;
       say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose saylock"></button><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose">닫기</button></div>'+
@@ -16684,7 +16684,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       sayDragInit();
       say.querySelector(".saybox").addEventListener("paste",function(e){
         var ta=e.target; if(!ta.classList||!ta.classList.contains("sayt"))return;
-        if(sayMode==="g"||ta.value.trim())return;   // 은혜(말한 분 칸 없음)·이미 적은 글이 있으면 붙여넣은 그대로 — 예전엔 빈 줄이 다 사라지고 마지막 줄이 빠졌음 (2026-11-07 사용자 요청)
+        if(sayMode==="g"||sayMode==="m"||ta.value.trim())return;   // 은혜(말한 분 칸 없음)·이미 적은 글이 있으면 붙여넣은 그대로 — 예전엔 빈 줄이 다 사라지고 마지막 줄이 빠졌음 (2026-11-07 사용자 요청)
         var txt=(e.clipboardData||window.clipboardData).getData("text"); if(!txt||!/[-–—]/.test(txt))return;
         var sp=saySplit(txt); if(!sp.who)return;
         e.preventDefault(); ta.value=sp.t;
@@ -16694,9 +16694,9 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&say&&!say.hidden)closeSay()});
     }
     sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value="";
-    say.classList.toggle("saygr",sayMode==="g");   // 은혜 제목이 길어 글자를 조금 작게 (2026-11-07)
-    say.querySelector(".dltitle").innerHTML=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 주님의 은혜":"💬 믿음의 한 마디";
-    say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 기록':'+<span class="sayhidem"> 한 마디</span> 담기';
+    say.classList.toggle("saygr",sayMode==="g"||sayMode==="m");   // 은혜 제목이 길어 글자를 조금 작게 (2026-11-07)
+    say.querySelector(".dltitle").innerHTML=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 주님의 은혜":sayMode==="m"?"🌄 장면 묵상":"💬 믿음의 한 마디";
+    say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 기록':sayMode==="m"?'+<span class="sayhidem"> 장면</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
     say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawSay();
     if(sayEdit==="new"){var ta=say.querySelector(".sayt"); if(ta)setTimeout(function(){ta.focus()},40)}
@@ -16767,7 +16767,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var cur=sayEdit==="new"?{t:"",who:"",topic:"",note:""}:(o.items.filter(function(x){return x.id===sayEdit})[0]||{t:"",who:"",topic:"",note:""});
       if(keep)cur={t:keep.t,who:keep.who,topic:keep.topic,note:keep.note,hv:cur.hv};
       var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=20000;   /* 예전 600자 — 긴 대언기도를 붙이면 중간에서 잘렸음 (2026-11-07 사용자 요청) */ ta.value=cur.t||"";
-      ta.placeholder=sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":sayMode==="g"?"받은 은혜를 적어 보세요 (예: 오늘 기도 중에 마음이 평안해졌다)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
+      ta.placeholder=sayMode==="m"?"말씀 속 장면으로 들어가 보세요\n· 무엇이 보이나요 · 무슨 소리가 들리나요\n· 나는 어디에 서 있나요\n· 예수님이 내게 하시는 말씀":sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":sayMode==="g"?"받은 은혜를 적어 보세요 (예: 오늘 기도 중에 마음이 평안해졌다)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
       var sayFit=function(){
         ta.style.height="auto"; var h0=ta.scrollHeight+2; ta.style.height=h0+"px";   // 글 길이에 맞춰 높이
@@ -16785,11 +16785,11 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       ta.addEventListener("focus",function(){[150,400,800].forEach(function(d){setTimeout(sayFit,d)})});
       ta.addEventListener("focus",function(){setTimeout(function(){var rw=form.querySelector(".sayrow2:last-of-type")||form; try{rw.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}},350)});   // 키보드가 올라오면 아래 단추 줄까지 보이게
       var row=document.createElement("div"); row.className="sayrow2";
-      var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="v"?"구절 (예: 로마서 12:21)":sayMode==="g"?"어디서·누구에게 (예: 주일 예배)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
+      var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="m"?"본문 (예: 요한복음 6:1-15)":sayMode==="v"?"구절 (예: 로마서 12:21)":sayMode==="g"?"어디서·누구에게 (예: 주일 예배)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=16; ti.value=cur.topic||""; ti.placeholder="주제 (선택)"; ti.setAttribute("aria-label","주제");
       row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
       if(sayMode==="g")row.hidden=true;   // 은혜: 어디서·누구에게·주제 칸 숨김 (2026-11-07 사용자 요청, 값은 그대로 둠)
-      if(sayMode==="v")form.insertBefore(bookPicker(wi),row);
+      if(sayMode==="v"||sayMode==="m")form.insertBefore(bookPicker(wi),row);
       var hvl=document.createElement("label"); hvl.className="sayhvl";
       hvl.innerHTML='<input type="checkbox" class="sayhv"><span>⏰ 짧은 말씀 — 10분마다(12:00, 12:10 …) 나와요. 담은 뒤 ⏰를 눌러 시각을 정하면 매일 그 시각에 나와요. 말한 분 칸에 구절(예: 로마서 12:21)을 적어 주세요</span>';
       hvl.querySelector("input").checked=sayMode==="v"; hvl.hidden=true; form.appendChild(hvl);
@@ -16818,7 +16818,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     }
     if(keep&&keep.focus){var nt=form.querySelector(".sayt"); if(nt){try{nt.focus({preventScroll:true}); nt.setSelectionRange(keep.ss,keep.se)}catch(e){}}}
     list.textContent="";
-    var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:sayMode==="g"?(!x.hv&&!!x.gr):(!x.hv&&!x.gr)});   // 🌿 나의 은혜(gr:1)는 따로
+    var items=sayOrdered(o).filter(function(x){return sayMode==="v"?!!x.hv:sayMode==="m"?(!x.hv&&!!x.sc):sayMode==="g"?(!x.hv&&!!x.gr&&!x.sc):(!x.hv&&!x.gr)});   // 🌄 장면 묵상(sc:1, gr:1도 붙어 한 마디 돌림에서 빠짐)은 따로   // 🌿 나의 은혜(gr:1)는 따로
     var lb=say.querySelector(".saylock"); lb.innerHTML='📌<span class="sayhidem"> 고정 '+(sayLocked?"ON":"OFF")+'</span>'; lb.setAttribute("aria-label",sayLocked?"고정 켜짐":"고정 꺼짐"); lb.classList.toggle("on",sayLocked); lb.setAttribute("aria-pressed",String(sayLocked)); lb.title=sayLocked?"끄면 카드를 끌어서 옮길 수 있어요":"켜면 카드가 움직이지 않아요";
     list.classList.toggle("saylocked",sayLocked||!!sayQ);
     if(sayQ){
@@ -16827,7 +16827,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     }
     if(!items.length&&!sayEdit){
       var em=document.createElement("p"); em.className="sayempty";
-      em.textContent=sayMode==="g"?"아직 기록한 은혜가 없어요. 위 [+ 기록]으로 하나님께 받은 은혜를 적어 두세요.":sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 10분마다(00·10·20…분) 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
+      em.textContent=sayMode==="m"?"아직 담은 장면 묵상이 없어요. 위 [+ 장면 담기]로 말씀 속 장면을 떠올리며 적어 보세요.":sayMode==="g"?"아직 기록한 은혜가 없어요. 위 [+ 기록]으로 하나님께 받은 은혜를 적어 두세요.":sayMode==="v"?"아직 담은 말씀이 없어요. 위 [+ 말씀 담기]로 짧은 말씀 한 구절을 적어 두세요. 10분마다(00·10·20…분) 칸반 맨 아래 줄에 나와요.":"아직 담은 한 마디가 없어요. 위 [+ 한 마디 담기]로 마음에 남는 말을 적어 두세요.";
       list.appendChild(em); sayTrashDraw(list); return;
     }
     // ▴▾ 모두 접기·펼치기 (2026-11-07 사용자 요청)
@@ -16850,7 +16850,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       if(sayBack[x.id]){
         c.classList.add("sayback");
         var bh=document.createElement("div"); bh.className="saybkh";
-        bh.innerHTML='<b>'+(sayMode==="g"?"💡 은혜 위에 은혜":"💡 이 말을 이렇게 활용해요")+'</b><button type="button" class="saybtn saybkx" data-act="front">← 앞면</button>'; c.appendChild(bh);
+        bh.innerHTML='<b>'+(sayMode==="g"?"💡 은혜 위에 은혜":sayMode==="m"?"💡 이 장면에서 받은 것":"💡 이 말을 이렇게 활용해요")+'</b><button type="button" class="saybtn saybkx" data-act="front">← 앞면</button>'; c.appendChild(bh);
         var bq=document.createElement("p"); bq.className="saybkq"; bq.textContent=String(x.t||"").replace(/\s+/g," "); c.appendChild(bq);
         if(x.use&&sayUseEd!==x.id){var uv=document.createElement("p"); uv.className="sayusev"; uv.textContent=x.use; c.appendChild(uv)}
         else{var ut=document.createElement("textarea"); ut.className="sayuse"; ut.dataset.id=x.id; ut.maxLength=3000; ut.rows=4; ut.value=x.use||""; ut.placeholder="이 말을 내 삶에 어떻게 활용하면 좋을까요?\n(예: 아내에게, 친구에게, 일터에서…)"; c.appendChild(ut)}
@@ -16865,7 +16865,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       if(!fbn){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="hint"; fbn.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="5" cy="12" r="2.1" fill="currentColor"/><circle cx="12" cy="12" r="2.1" fill="currentColor"/><circle cx="19" cy="12" r="2.1" fill="currentColor"/></svg>'; fbn.title="꾹 누르면 지우기"}
       fbn.classList.add("sayone"); sayOneLP(fbn);
       if((x.gr||!x.hv)&&!sfd&&String(x.t||"").indexOf("\n")>=0){   // 🌿 은혜: 설교 메모처럼 한 줄씩 칸으로, 빈 줄도 그대로 (2026-11-08 사용자 요청) · 💬 한 마디도 같은 줄 칸 + 길면 쪽 넘기기 (2026-11-14 사용자 요청)
-        var q=document.createElement("div"); q.className="sayq saylines"+(x.gr?"":" sayplain"); c.classList.add("saylined");
+        var q=document.createElement("div"); q.className="sayq saylines"+(x.gr&&!x.sc?"":" sayplain"); c.classList.add("saylined");
         q._after=sayPage; c.appendChild(q);
         lineRowsSet(q,String(x.t||"").replace(/\s+$/,"").split("\n"),function(ln){var r=document.createElement("div"); r.className="sayln"; var g=document.createElement("span"); g.className="saylg"; g.textContent="⠿"; g.setAttribute("aria-hidden","true"); r.appendChild(g); var tx=document.createElement("span"); tx.className="saylt"; hlFill(tx,ln); r.appendChild(tx); return r},".saylt");
       }else{
@@ -16898,7 +16898,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   function sayTrash(){try{var a=JSON.parse(localStorage.getItem(SAY_TRASH)||"[]"); return Array.isArray(a)?a.filter(function(t){return t&&t.x&&t.x.id&&Date.now()-t.at<60*864e5}):[]}catch(e){return []}}
   function sayTrashSet(a){try{localStorage.setItem(SAY_TRASH,JSON.stringify(a.slice(0,60)))}catch(e){}}
   function sayTrashDraw(list){
-    if((sayMode!=="g"&&sayMode!=="v")||sayQ)return; var tr=sayTrash().filter(function(t){return sayMode==="v"?!!t.x.hv:(!!t.x.gr&&!t.x.hv)}); if(!tr.length)return;
+    if((sayMode!=="g"&&sayMode!=="v"&&sayMode!=="m")||sayQ)return; var tr=sayTrash().filter(function(t){return sayMode==="v"?!!t.x.hv:sayMode==="m"?(!!t.x.sc&&!t.x.hv):(!!t.x.gr&&!t.x.hv&&!t.x.sc)}); if(!tr.length)return;
     var tb=document.createElement("div"); tb.className="srmtrash saytrash";
     var th=document.createElement("button"); th.type="button"; th.className="srmtrashh"; th.dataset.act="trash"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(sayTrashOpen?"▴":"▾"); tb.appendChild(th);
     if(sayTrashOpen)tr.forEach(function(t){var r=document.createElement("div"); r.className="srmtrow";
@@ -17086,7 +17086,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     // 휴대폰은 손가락이 움직이면 브라우저가 pointer를 끊어서(pointercancel) touch 이벤트로 잼
     var sw=null;
     function swStart(c,x,y,t){sw=c?{c:c,x:x,y:y,t:t}:null}
-    function swDelOK(c){return (sayMode==="g"||sayMode==="v")&&c&&!sayBack[c.dataset.id]&&!sayEdit&&!sayDrag}
+    function swDelOK(c){return (sayMode==="g"||sayMode==="v"||sayMode==="m")&&c&&!sayBack[c.dataset.id]&&!sayEdit&&!sayDrag}
     function swSnap(c){c.style.transition="transform .2s,opacity .2s"; c.style.transform=""; c.style.opacity=""; c.classList.remove("srmswarm"); setTimeout(function(){c.style.transition=""},220)}
     list.addEventListener("touchmove",function(e){   // 은혜 앞면: 오른쪽으로 미는 동안 카드가 손가락을 따라감
       var w=sw; if(!w||!w.t||!swDelOK(w.c))return; var t=e.touches[0]; if(!t)return;
@@ -17191,12 +17191,12 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var t=say.querySelector(".sayt").value.trim();
       if(!t){toast("한 마디를 적어 주세요");return}
       var o=sayData(), who=say.querySelector(".saywho").value.trim(), tp=say.querySelector(".saytopic").value.trim(), nt=say.querySelector(".saynote").value, hv=say.querySelector(".sayhv").checked?1:0;
-      if(sayEdit==="new"){var nit={id:"s"+Date.now().toString(36),t:t,who:who,topic:tp,note:nt,hv:hv,at:Date.now()}; if(sayMode==="g"&&!hv)nit.gr=1; o.items.unshift(nit)}
+      if(sayEdit==="new"){var nit={id:"s"+Date.now().toString(36),t:t,who:who,topic:tp,note:nt,hv:hv,at:Date.now()}; if((sayMode==="g"||sayMode==="m")&&!hv)nit.gr=1; if(sayMode==="m"&&!hv)nit.sc=1; o.items.unshift(nit)}
       else{
         var it=o.items.filter(function(x){return x.id===sayEdit})[0];
         if(it){it.t=t;it.who=who;it.topic=tp;it.note=nt;it.hv=hv;it.at=Date.now()}
       }
-      saveSay(o); sayEdit=""; drawSay(); renderReviewBar(); toast(sayMode==="g"?"기록했어요 🌿":"담았어요 💬");
+      saveSay(o); sayEdit=""; drawSay(); renderReviewBar(); toast(sayMode==="g"?"기록했어요 🌿":sayMode==="m"?"담았어요 🌄":"담았어요 💬");
       return;
     }
     if(act==="edit"){sayEdit=id;drawSay();var ta=say.querySelector(".sayt");if(ta)setTimeout(function(){ta.focus()},30);return}
@@ -18273,6 +18273,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
 
   $("openVerseBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"v")});
   $("openGraceBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"g")});
+  $("openSceneBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"m")});   // 🌄 장면 묵상: 한 마디 창 그대로, 항목 sc:1 (2026-11-14 사용자 요청)
   /* ⋯ 메뉴의 "묵상 진도표"는 뺌 (2026-10-31 사용자 요청) — 카드 묵상 칸의 진도 단추로는 열림 */
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
   $("openGraphBtn").addEventListener("click",function(){openGraph(null)});
