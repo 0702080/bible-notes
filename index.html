@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zf">
+<meta name="app-build" content="nb-20261114zg">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -7008,10 +7008,12 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     if(!total)return 0;
     function snipInto(bd,txt){
       var sn=snippet(txt,filterText);
-      if(sn){
-        bd.appendChild(document.createTextNode(sn.pre));
-        var mk=document.createElement("mark"); mk.textContent=sn.hit; bd.appendChild(mk);
-        bd.appendChild(document.createTextNode(sn.post));
+      if(sn){   // 찾는 말이 여럿이면(룻의 가치) 발췌 안에 든 낱말을 모두 표시 (2026-11-14 사용자 요청)
+        var all=sn.pre+sn.hit+sn.post, rg=[];
+        (qList(filterText).length?qList(filterText):[filterText]).forEach(function(w){matchAll(all,w).forEach(function(r){rg.push(r)})});
+        rg.sort(function(a,b){return a[0]-b[0]}); var at=0;
+        rg.forEach(function(r){if(r[0]<at)return; if(r[0]>at)bd.appendChild(document.createTextNode(all.slice(at,r[0]))); var mk=document.createElement("mark"); mk.textContent=all.slice(r[0],r[1]); bd.appendChild(mk); at=r[1]});
+        if(at<all.length)bd.appendChild(document.createTextNode(all.slice(at)));
       }else bd.textContent=String(txt).replace(/\s+/g," ").slice(0,90)+(String(txt).length>90?"…":"");
     }
     function col(icon,name,n){
