@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114o">
+<meta name="app-build" content="nb-20261114p">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7390,6 +7390,7 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
   }
   function prdEdSave(){
     var t=prd&&prd.querySelector(".prded"), n=notes.get(prdEd.nid), x=n&&(n.prays||[]).find(function(y){return y.id===prdEd.pid});
+    if(t)t.value=prayEnd(t.value);   // 끝맺음 꼭 (2026-11-14)
     if(t&&x&&t.value!==x.t){x.t=t.value.slice(0,2000); scheduleSave(n.id); render(); toast("기도를 고쳤어요")}
     prdEd={nid:"",pid:""}; drawPrayRead();
   }
@@ -8151,6 +8152,12 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
     var card=t.closest(".note"), n=card&&notes.get(card.dataset.id); if(!n)return;
     if(t.classList.contains("uf-how"))addUse(card,n);
     else{var nx=t.classList.contains("uf-when")?".uf-why":".uf-how"; var f=card.querySelector(nx); if(f)f.focus()}
+  });
+  list.addEventListener("focusout",function(e){   // 카드 기도문 칸을 나가면 끝맺음(길이요 진리요 … 아멘)을 꼭 붙임 (2026-11-14 사용자 요청)
+    var t=e.target; if(!t.classList||!t.classList.contains("pt"))return;
+    var card=t.closest(".note"), pi=t.closest(".pri"), n=card&&notes.get(card.dataset.id); if(!n||!pi)return;
+    var pp=(n.prays||[]).find(function(x){return x.id===pi.dataset.pid}); if(!pp)return;
+    var v=prayEnd(t.value); if(v!==t.value){t.value=v; pp.t=v; scheduleSave(n.id)}
   });
   list.addEventListener("focusout",function(e){
     var card=e.target.closest&&e.target.closest(".note"); if(card)flushNow(card.dataset.id);
@@ -12305,7 +12312,7 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
   /* ---------- 🙌 기도 응답 연표 (2026-10-24 사용자 요청): 응답된 기도만 모아 언제 기도했고 며칠 만에 응답됐는지 ---------- */
   var ans=null;
   function prayClean(t){   // 기도문 틀(하나님 아버지 … 아멘)은 빼고 내가 적은 부분만
-    var tl=PRAY_TPL.split("\n").map(function(x){return x.trim()}).filter(Boolean).concat(["하나님 아버지"]);   // 예전 틀 첫 줄도 빼기
+    var tl=PRAY_TPL.split("\n").map(function(x){return x.trim()}).filter(Boolean).concat(["하나님 아버지"],PRAY_OLDTAIL);   // 예전 틀 첫 줄도 빼기
     return String(t||"").split("\n").filter(function(l){return tl.indexOf(l.trim())<0}).join("\n").trim();
   }
   function ansItems(){
@@ -14448,7 +14455,18 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
     return !t.split("\n").map(function(l){return l.replace(/^\s*(📖\s*)?S\s*말씀|^\s*(🔍\s*)?O\s*관찰|^\s*(🌱\s*)?A\s*적용|^\s*(🙏\s*)?P\s*기도/,"").replace(/^\s*[—:\-–]\s*/,"").trim()}).join("");
   }
   var PRAY_HEAD="전능하신 나의 아버지 하나님\n\n";   /* 기도문 첫 줄 (2026-10-30 사용자 요청, 전에는 "하나님 아버지") */
-  var PRAY_TPL="전능하신 나의 아버지 하나님\n\n\n\n길이요 진리요 생명 되신 나의 주\n예수님 이름으로 기도 합니다\n아멘";   // 빈 기록칸·카드 기도의 기도문 틀 (2026-10-24 사용자 요청)
+  var PRAY_TAIL="길이요 진리요\n내 인생의 빛이 되시며\n생명 되신 나의 주\n예수님 이름으로 기도합니다\n아멘";   // 기도문 끝맺음 — 기도문 칸 끝에 꼭 들어감 (2026-11-14 사용자 요청)
+  var PRAY_TPL=PRAY_HEAD+"\n\n"+PRAY_TAIL;
+  var PRAY_OLDTAIL=["길이요 진리요 생명 되신 나의 주","예수님 이름으로 기도 합니다","예수님 이름으로 기도합니다","아멘"];
+  function prayEnd(v){   // 적은 기도문 끝에 끝맺음이 없으면 붙임 (예전 끝맺음은 새 것으로 바꿈)
+    v=String(v||""); var nz=function(x){return x.replace(/\s+/g,"")};
+    if(!v.trim()||nz(v)===nz(PRAY_HEAD))return v;
+    if(nz(v).slice(-nz(PRAY_TAIL).length)===nz(PRAY_TAIL))return v;
+    var L=v.replace(/\s+$/,"").split("\n"), tl=PRAY_TAIL.split("\n").map(nz), ol=PRAY_OLDTAIL.map(nz);
+    while(L.length&&(ol.indexOf(nz(L[L.length-1]))>=0||tl.indexOf(nz(L[L.length-1]))>=0||!L[L.length-1].trim()))L.pop();
+    if(!L.length||nz(L.join(""))===nz(PRAY_HEAD))return v;
+    return L.join("\n")+"\n\n"+PRAY_TAIL;
+  }   // 빈 기록칸·카드 기도의 기도문 틀 (2026-10-24 사용자 요청)
   var DAILY_SOW=["돈을 하나님 나라를 위해 쓴 것이 있는가","시간을 하나님 나라를 위해 드렸는가","내 재능으로 누군가를 섬겼는가"];
   var DAILY_DEFAULT=[
     ["pray","대적 기도를 했는가"],["pray","필요한 것을 구하는 기도를 했는가"],["pray","버리는(내려놓는) 기도를 했는가"],["pray","회개 기도를 했는가"],["pray","누군가를 위해 중보 기도를 했는가"],
