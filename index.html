@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115f">
+<meta name="app-build" content="nb-20261115g">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -13175,7 +13175,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       if(A==="end"){lnPickEnd();return}
       if(A==="all"){var rs=[].slice.call(box.querySelectorAll(sel)), on=!rs.every(function(r){return r.classList.contains("lnsel")}); rs.forEach(function(r){r.classList.toggle("lnsel",on)}); cnt(); return}
       var t=txt(); if(!t&&!picked().length)return;
-      if(A==="copy"){copy(hlStrip?hlStrip(t):t,function(){toast("📋 "+picked().length+"줄을 복사했어요")}); lnPickEnd(); return}
+      if(A==="copy"){var nc=picked().length; copy(hlStrip?hlStrip(t):t,function(){toast("📋 "+nc+"줄을 복사했어요")}); lnPickEnd(); return}   // 줄 수는 끝내기 전에 셈 — 예전엔 끝낸 뒤에 세어 늘 0줄로 나왔음
       if(A==="cut"){
         var pk=picked(), n=pk.length; copy(hlStrip?hlStrip(t):t);
         var all=[].slice.call(box.querySelectorAll(sel)), keep=all.filter(function(r){return pk.indexOf(r)<0});
