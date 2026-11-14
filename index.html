@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115n">
+<meta name="app-build" content="nb-20261115p">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -4598,6 +4598,14 @@ body.boardon .fscrow{display:none}
 .saysrow{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .saysheet:not(.sayfinding) .saysrow,.saysheet:not(.sayfinding) .saybox>.saysearch{display:none!important}   /* 🔍 단추를 눌렀을 때만 찾기 칸 (2026-11-14) */
 .saysheet .dlbar .dlclose.saysbtn{color:var(--muted)}
+.saysheet .dlbar .dlclose.sayfoldtop{color:#BFE6C8;background-color:#1F3328!important;border-color:#4E8A62!important;display:inline-grid;place-items:center}
+.saysheet .dlbar .dlclose.sayfoldtop[hidden]{display:none}
+.saysheet .dlbar .dlclose.sayadd,.saysheet .dlbar .dlclose.sayclose{display:inline-grid;place-items:center}
+.saysheet .dlbar .dlclose.sayadd svg,.saysheet .dlbar .dlclose.sayclose svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+.saysheet .dlbar .dlclose.sayclose{color:#F2A7BE}
+body .saysheet>.dlbar{background:rgba(44,40,58,.9)!important;border:1px solid color-mix(in srgb,var(--violet) 32%,#3A3648)!important;box-shadow:0 6px 18px rgba(0,0,0,.35)!important}   /* 윗줄 바탕을 아래 카드(보라빛 짙은 바탕)와 어울리게 (2026-11-15 사용자 요청) */
+.saysheet .dlbar .dlclose.saysbtn,.saysheet .dlbar .dlclose.sayfoldtop,.saysheet .dlbar .dlclose.saylock,.saysheet .dlbar .dlclose.sayadd,.saysheet .dlbar .dlclose.sayclose{width:38px!important;min-width:38px;height:38px!important;padding:0!important;border-radius:50%!important;flex:none}   /* 맨 위 단추는 모두 같은 동그라미 (2026-11-15) */
+.sayfoldtop svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .saysheet .dlbar .dlclose.saysbtn.on{background-color:#2E2A40!important;border-color:#6A5FA0!important;color:#fff}
 .saysrow .saysearch{flex:1 1 auto;min-width:0;margin-bottom:0}
 .saysrow .sayfoldall{flex:0 0 auto;margin:0}
@@ -16924,7 +16932,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     sayMode=mode==="v"?"v":mode==="g"?"g":mode==="m"?"m":"s";
     if(!say){
       say=document.createElement("div"); say.className="daily saysheet"; say.setAttribute("role","dialog"); say.setAttribute("aria-modal","true"); say.hidden=true;
-      say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose saysbtn" aria-label="찾기" title="찾기">🔍</button><button type="button" class="dlclose saylock"></button><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose">닫기</button></div>'+
+      say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose saysbtn" aria-label="찾기" title="찾기">🔍</button><button type="button" class="dlclose sayfoldtop" hidden aria-label="모두 접기"></button><button type="button" class="dlclose saylock"></button><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose" aria-label="닫기" title="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'+
         '<div class="dlbody"><div class="saybox"><input class="field saysearch" type="search" placeholder="🔍 찾기 (초성 예: ㄱㅅ)" aria-label="한 마디 찾기 (글·말한 분·주제)"><div class="sayform" hidden></div><div class="saylist"></div></div></div>';
       document.body.appendChild(say);
       say.querySelector(".sayclose").addEventListener("click",closeSay);
@@ -16933,6 +16941,11 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         var si=say.querySelector(".saysearch");
         if(!sayFindOn&&sayQ){sayQ=""; if(si)si.value=""}
         drawSay(); if(sayFindOn&&si)setTimeout(function(){try{si.focus()}catch(e){}},30);
+      });
+      say.querySelector(".sayfoldtop").addEventListener("click",function(){   // ⇕ 맨 위 동그라미: 긴 카드 한꺼번에 접기·펼치기 (2026-11-15 사용자 요청)
+        var ids=(this.dataset.ids||"").split(",").filter(Boolean), unf=this.dataset.on==="1"; if(!ids.length)return;
+        ids.forEach(function(i){if(unf)delete sayFold[i]; else sayFold[i]=1}); sayFocusId=""; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(e){}
+        drawSay(); var bx=say.querySelector(".dlbody"); if(bx)bx.scrollTop=0;
       });
       say.querySelector(".saylock").addEventListener("click",function(){sayLocked=!sayLocked; try{localStorage.setItem("bible-say-lock",sayLocked?"1":"")}catch(e){} buzz(10); toast(sayLocked?"📌 카드를 고정했어요":"이제 카드를 끌어서 옮길 수 있어요"); drawSay()});
       say.querySelector(".saysearch").addEventListener("input",function(){sayQ=this.value.trim(); drawSay()});
@@ -16954,7 +16967,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     sayAutoSave(); sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value=""; sayFindOn=false; say.classList.remove("sayfinding"); say.querySelector(".saysbtn").classList.remove("on");
     say.classList.toggle("saygr",sayMode==="g"||sayMode==="m");   // 은혜 제목이 길어 글자를 조금 작게 (2026-11-07)
     say.querySelector(".dltitle").innerHTML=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 주님의 은혜":sayMode==="m"?'<svg class="scnico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="16.5" cy="7.5" r="3.2" fill="#F08A5D"/><path d="M1.5 20 L8.5 10.5 L13 16.2 L15.6 13 L22.5 20 Z" fill="#4B5A82" stroke="#4B5A82" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10.5 L10.6 13.3 L9.4 13.9 L8.5 12.9 L7.4 14 L6.6 13.2 Z" fill="#fff" opacity=".85"/></svg> 장면 묵상':"💬 믿음의 한 마디";
-    say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 기록':sayMode==="m"?'+<span class="sayhidem"> 장면</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
+    var sab=say.querySelector(".sayadd"); sab.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'; sab.setAttribute("aria-label",sayMode==="v"?"말씀 담기":sayMode==="g"?"은혜 기록":sayMode==="m"?"장면 담기":"한 마디 담기"); sab.title=sayMode==="v"?"말씀 담기":sayMode==="g"?"은혜 기록":sayMode==="m"?"장면 담기":"한 마디 담기";   // 맨 위 동그라미는 글자 없이 그림만 (2026-11-15 사용자 요청)
     say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawSay();
     say.scrollTop=0; say.querySelectorAll("*").forEach(function(el){if(el.scrollTop)el.scrollTop=0});   // 열 때마다 목록 맨 위부터 (2026-11-15 사용자 요청: 닫기 전 보던 자리로 가던 것)
@@ -17102,7 +17115,10 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     // ▴▾ 모두 접기·펼치기 (2026-11-07 사용자 요청)
     var sLongF=function(x){return String(x.t||"").trim().split("\n").filter(function(s){return s.trim()}).length>1||String(x.t||"").length>34};
     var longIds=items.filter(function(x){return sayEdit!==x.id&&!sayBack[x.id]&&sLongF(x)}).map(function(x){return x.id});
-    if(longIds.length>=2&&!sayEdit){   // 고치는 중엔 모두 접기 단추 숨김 (2026-11-07 사용자 요청)
+    var ftop=say.querySelector(".sayfoldtop");
+    if(ftop){var allF0=longIds.length&&longIds.every(function(i){return !!sayFold[i]}); ftop.hidden=!(longIds.length>=2&&!sayEdit); ftop.dataset.ids=longIds.join(","); ftop.dataset.on=allF0?"1":""; ftop.setAttribute("aria-label",allF0?"모두 펼치기":"모두 접기"); ftop.title=allF0?"모두 펼치기":"모두 접기";
+      ftop.innerHTML=allF0?'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l5 5 5-5"/><path d="M7 20l5-5 5 5"/></svg>':'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9l5-5 5 5"/><path d="M7 15l5 5 5-5"/></svg>'}
+    if(false&&longIds.length>=2&&!sayEdit){   // 찾기 줄의 '모두 접기' 글자 단추는 맨 위 동그라미(.sayfoldtop)로 옮김 (2026-11-15 사용자 요청)
       var allF=longIds.every(function(i){return !!sayFold[i]});
       var fr=document.createElement("div"); fr.className="sayfoldall";
       var fa=document.createElement("button"); fa.type="button"; fa.className="sayfab"; fa.dataset.act="foldall"; fa.dataset.ids=longIds.join(","); fa.dataset.on=allF?"1":"";
