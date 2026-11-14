@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115l">
+<meta name="app-build" content="nb-20261115m">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -17121,7 +17121,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         var bq=document.createElement("p"); bq.className="saybkq"; bq.textContent=String(x.t||"").replace(/\s+/g," "); c.appendChild(bq);
         if(x.use&&sayUseEd!==x.id){var uv=document.createElement("p"); uv.className="sayusev"; uv.textContent=x.use; c.appendChild(uv); if(sayQ)srmMarkIn(uv,sayQ.split(/\s+/))}
         else{var ut=document.createElement("textarea"); ut.className="sayuse"; ut.dataset.id=x.id; ut.maxLength=3000; ut.rows=4; ut.value=x.use||""; ut.placeholder="이 말을 내 삶에 어떻게 활용하면 좋을까요?\n(예: 아내에게, 친구에게, 일터에서…)"; c.appendChild(ut)}
-        var bt=document.createElement("p"); bt.className="saybktip"; bt.textContent=(x.use&&sayUseEd!==x.id)?"두 번 누르면 고치기 · 옆으로 밀면 앞면":"적는 대로 저장돼요 · 두 번 누르면 읽기 · 옆으로 밀면 앞면"; c.appendChild(bt);
+        /* 뒷면 아래 안내 글(.saybktip)은 지움 (2026-11-15 사용자 요청) */
         list.appendChild(c); return;
       }
       // ▴ 카드 하나씩 접기·펼치기 (2026-11-07 사용자 요청) — 접으면 첫 줄만
