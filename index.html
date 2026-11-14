@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115g">
+<meta name="app-build" content="nb-20261115h">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -13148,6 +13148,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     document.body.classList.remove("lnpicking"); P.box.classList.remove("lnpick");
     P.box.querySelectorAll(P.sel).forEach(function(r){r.readOnly=!!r._ro0; r.classList.remove("lnsel")});
     P.bar.remove(); P.box.removeEventListener("click",P.onClick,true); P.box.removeEventListener("mousedown",P.onDown,true);
+    if(typeof sayFormPend!=="undefined"&&sayFormPend)setTimeout(function(){var a=document.activeElement, f=say&&say.querySelector(".sayform"); if(sayFormPend&&!lnPick&&!(a&&f&&f.contains(a))){sayFormPend=false; drawSay()}},900);   // 미뤄 둔 다시 그리기는 잘라내기·저장이 끝난 뒤
   }
   function lnPickStart(box,sel,first){
     lnPickEnd();
@@ -16985,9 +16986,9 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     if(!say)return;
     var ua=document.activeElement; if(ua&&ua.classList&&ua.classList.contains("sayuse")&&say.contains(ua)){sayUsePend=true; return}   // 뒷면에 적는 중엔 다시 그리지 않음
     var fa=document.activeElement, fm0=say.querySelector(".sayform");
-    if(sayEdit&&fm0&&fa&&fm0.contains(fa)&&/^(TEXTAREA|INPUT)$/.test(fa.tagName)&&fm0.dataset.ed===sayEdit){   // 고치는 중(글 칸에 커서)엔 다시 그리지 않음 — 저절로 저장·동기화가 다시 그리면 칸이 새로 만들어져 키보드가 닫히던 문제 (2026-11-15 사용자 요청)
+    if(sayEdit&&fm0&&fm0.dataset.ed===sayEdit&&((fa&&fm0.contains(fa)&&/^(TEXTAREA|INPUT)$/.test(fa.tagName))||(lnPick&&fm0.contains(lnPick.box)))){   // 줄 골라 복사 중에도 다시 그리지 않음 — 다시 그리면 고르던 줄이 화면에서 떨어져 나가 잘라내기가 안 되던 문제 (2026-11-15)   // 고치는 중(글 칸에 커서)엔 다시 그리지 않음 — 저절로 저장·동기화가 다시 그리면 칸이 새로 만들어져 키보드가 닫히던 문제 (2026-11-15 사용자 요청)
       sayFormPend=true;
-      if(!fm0._pendW){fm0._pendW=1; fm0.addEventListener("focusout",function(){setTimeout(function(){var a=document.activeElement; if(sayFormPend&&!(a&&fm0.contains(a))){sayFormPend=false; drawSay()}},300)})}
+      if(!fm0._pendW){fm0._pendW=1; fm0.addEventListener("focusout",function(){setTimeout(function(){var a=document.activeElement; if(sayFormPend&&!(a&&fm0.contains(a))&&!(lnPick&&fm0.contains(lnPick.box))){sayFormPend=false; drawSay()}},300)})}
       return;
     }
     var o=sayData(), form=say.querySelector(".sayform"), list=say.querySelector(".saylist");
