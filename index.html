@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zy">
+<meta name="app-build" content="nb-20261114zz">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -16806,7 +16806,20 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var on=!(cur&&cur.id===id); toast(on?"📌 이 한 마디를 하루 동안 고정했어요":"고정을 풀었어요. 5분마다 바뀌어요"); buzz(10); renderReviewBar();
   }
   var say=null;
-  function closeSay(){if(!say)return; var sae=document.activeElement; if(sae&&say.contains(sae))sae.blur();   /* 뒷면 칸에 커서가 남은 채 닫으면 다음에 열 때 목록이 안 바뀌던 문제 (2026-11-07) */ say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
+  function sayAutoSave(){   // 고치던 글은 닫거나 나가도 남게 — 예전엔 저장을 안 누르고 닫으면 다음에 열 때 원래 글로 돌아갔음 (2026-11-14 사용자 요청)
+    if(!say||!sayEdit||sayEdit==="new")return;
+    var form=say.querySelector(".sayform"); if(!form||form.dataset.ed!==sayEdit)return;
+    var ft=form.querySelector(".sayt"); if(!ft)return; var t=ft.value.trim(); if(!t)return;
+    var q=function(c){var e=form.querySelector(c);return e?e.value.trim():null};
+    var o=sayData(), it=o.items.filter(function(x){return x.id===sayEdit})[0]; if(!it)return;
+    var who=q(".saywho"), tp=q(".saytopic"), ch=false;
+    if((it.t||"")!==t){it.t=t;ch=true} if(who!==null&&(it.who||"")!==who){it.who=who;ch=true} if(tp!==null&&(it.topic||"")!==tp){it.topic=tp;ch=true}
+    if(ch){it.at=Math.max(Date.now(),(+it.at||0)+1); saveSay(o)}
+  }
+  var sayAutoT=0;
+  document.addEventListener("visibilitychange",function(){if(document.hidden)sayAutoSave()});
+  window.addEventListener("pagehide",function(){sayAutoSave()});
+  function closeSay(){if(!say)return; clearTimeout(sayAutoT); sayAutoSave(); var sae=document.activeElement; if(sae&&say.contains(sae))sae.blur();   /* 뒷면 칸에 커서가 남은 채 닫으면 다음에 열 때 목록이 안 바뀌던 문제 (2026-11-07) */ say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
   // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 10분마다 나옴
   var sayMode="s";
   function openSay(focus,mode){
@@ -16840,7 +16853,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       });
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&say&&!say.hidden)closeSay()});
     }
-    sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value=""; sayFindOn=false; say.classList.remove("sayfinding"); say.querySelector(".saysbtn").classList.remove("on");
+    sayAutoSave(); sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value=""; sayFindOn=false; say.classList.remove("sayfinding"); say.querySelector(".saysbtn").classList.remove("on");
     say.classList.toggle("saygr",sayMode==="g"||sayMode==="m");   // 은혜 제목이 길어 글자를 조금 작게 (2026-11-07)
     say.querySelector(".dltitle").innerHTML=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 주님의 은혜":sayMode==="m"?'<svg class="scnico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="16.5" cy="7.5" r="3.2" fill="#F08A5D"/><path d="M1.5 20 L8.5 10.5 L13 16.2 L15.6 13 L22.5 20 Z" fill="#4B5A82" stroke="#4B5A82" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10.5 L10.6 13.3 L9.4 13.9 L8.5 12.9 L7.4 14 L6.6 13.2 Z" fill="#fff" opacity=".85"/></svg> 장면 묵상':"💬 믿음의 한 마디";
     say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 기록':sayMode==="m"?'+<span class="sayhidem"> 장면</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
@@ -16916,6 +16929,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var ta=document.createElement("textarea"); ta.className="sayt"; ta.maxLength=20000;   /* 예전 600자 — 긴 대언기도를 붙이면 중간에서 잘렸음 (2026-11-07 사용자 요청) */ ta.value=cur.t||"";
       ta.placeholder=sayMode==="m"?"말씀 속 장면으로 들어가 보세요\n· 무엇이 보이나요 · 무슨 소리가 들리나요\n· 나는 어디에 서 있나요\n· 예수님이 내게 하시는 말씀":sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":sayMode==="g"?"받은 은혜를 적어 보세요 (예: 오늘 기도 중에 마음이 평안해졌다)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
+      if(!form._autoIn){form._autoIn=1; form.addEventListener("input",function(){if(sayEdit&&sayEdit!=="new"){clearTimeout(sayAutoT); sayAutoT=setTimeout(sayAutoSave,800)}})}   // 적는 대로 0.8초 뒤 저장
       if(sayMode!=="v")sayLineEditor(form,ta);   // ✍ 고치기도 읽기와 똑같은 줄 칸·줄바꿈·절 번호 들여쓰기로 (2026-11-14 사용자 요청)
       var sayFit=function(){
         var h0=taAuto(ta,function(h){return h+2});   // 글 길이에 맞춰 높이
@@ -17440,7 +17454,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       if(sayEdit==="new"){var nit={id:"s"+Date.now().toString(36),t:t,who:who,topic:tp,note:nt,hv:hv,at:Date.now()}; if((sayMode==="g"||sayMode==="m")&&!hv)nit.gr=1; if(sayMode==="m"&&!hv)nit.sc=1; o.items.unshift(nit)}
       else{
         var it=o.items.filter(function(x){return x.id===sayEdit})[0];
-        if(it){it.t=t;it.who=who;it.topic=tp;it.note=nt;it.hv=hv;it.at=Date.now()}
+        if(it){it.t=t;it.who=who;it.topic=tp;it.note=nt;it.hv=hv;it.at=Math.max(Date.now(),(+it.at||0)+1)} clearTimeout(sayAutoT);
       }
       saveSay(o); sayEdit=""; drawSay(); renderReviewBar(); toast(sayMode==="g"?"기록했어요 🌿":sayMode==="m"?"담았어요 🌄":"담았어요 💬");
       return;
