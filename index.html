@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115p">
+<meta name="app-build" content="nb-20261115q">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6708,7 +6708,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   function renderColBar(){
     var bar=$("colBar"); if(!bar||colDragging)return;   // 칩을 끄는 중엔 다시 그리지 않음
     var cs=myCols().filter(function(c){var k=0; notes.forEach(function(n){if(n.col===c)k++}); return k>0||colFresh.indexOf(c)>=0});   // 방금 만든 빈 칸도 보임
-    if(colSel&&cs.indexOf(colSel)<0)setColSel("");
+    if(colSel&&cs.indexOf(colSel)<0&&notes.size)setColSel("");   // 노트를 아직 다 불러오기 전엔 고른 칸을 지우지 않음 — 다시 열면 '모든 칸'으로 풀리던 것 (2026-11-15)
     bar.hidden=boardOn||!cs.length; if(bar.hidden)return;
     bar.textContent="";
     var mk=function(c,label,cnt){var b=document.createElement("button"); b.type="button"; b.className="cchip"+(colSel===c?" on":""); b.dataset.col=c;
@@ -6720,7 +6720,16 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var pins=colPins().filter(function(c){return cs.indexOf(c)>=0});
     cs=pins.concat(cs.filter(function(c){return pins.indexOf(c)<0}));   // 📌 고정한 칸은 맨 앞 (2026-11-07 사용자 요청)
     cs.forEach(function(c){var k=0; notes.forEach(function(n){if(n.col===c)k++}); var pn=pins.indexOf(c)>=0; mk(c,(pn?"📌 ":"📁 ")+c,k); var el=bar.lastChild; el.classList.add("cctint"); if(pn)el.classList.add("ccpin"); el.style.setProperty("--cc",COLCC[allC.indexOf(c)%COLCC.length])});
-    bar.scrollLeft=0; colBarFit(); requestAnimationFrame(colBarFit);
+    bar.scrollLeft=0; colBarFit(); requestAnimationFrame(function(){colBarFit(); colBarShowSel()});
+  }
+  // 📁 고른 칸이 칩 줄 오른쪽 밖에 있으면 그 칩이 보이게 줄을 넘김 — 다른 칸 칩만 보여 헷갈리던 것 (2026-11-15 사용자 요청)
+  function colBarShowSel(){
+    var bar=$("colBar"); if(!bar||bar.hidden||!colSel)return; var b=bar.querySelector(".cchip.on"); if(!b)return;
+    b.style.maxWidth=""; b.classList.remove("ccfit");
+    var br=bar.getBoundingClientRect(), r=b.getBoundingClientRect(); if(r.right<=br.right-2&&r.left>=br.left)return;
+    [].slice.call(bar.children).forEach(function(c){c.style.maxWidth=""; c.classList.remove("ccfit")});
+    r=b.getBoundingClientRect(); var pl=parseFloat(getComputedStyle(bar).paddingLeft)||0;
+    bar.scrollLeft+=Math.round(r.left-br.left-pl);
   }
   function colPins(){try{var a=JSON.parse(localStorage.getItem("bible-m-colpin")||"[]");return Array.isArray(a)?a:[]}catch(e){return []}}
   function colPinsSave(a){try{localStorage.setItem("bible-m-colpin",JSON.stringify(a))}catch(e){}}
