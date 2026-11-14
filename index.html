@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115a">
+<meta name="app-build" content="nb-20261115b">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -16824,7 +16824,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     if((it.t||"")!==t){it.t=t;ch=true} if(who!==null&&(it.who||"")!==who){it.who=who;ch=true} if(tp!==null&&(it.topic||"")!==tp){it.topic=tp;ch=true}
     if(ch){it.at=Math.max(Date.now(),(+it.at||0)+1); saveSay(o)}
   }
-  var sayAutoT=0;
+  var sayAutoT=0, sayFormPend=false;
   document.addEventListener("visibilitychange",function(){if(document.hidden)sayAutoSave()});
   window.addEventListener("pagehide",function(){sayAutoSave()});
   function closeSay(){if(!say)return; clearTimeout(sayAutoT); sayAutoSave(); var sae=document.activeElement; if(sae&&say.contains(sae))sae.blur();   /* 뒷면 칸에 커서가 남은 채 닫으면 다음에 열 때 목록이 안 바뀌던 문제 (2026-11-07) */ say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
@@ -16923,6 +16923,12 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   function drawSay(){
     if(!say)return;
     var ua=document.activeElement; if(ua&&ua.classList&&ua.classList.contains("sayuse")&&say.contains(ua)){sayUsePend=true; return}   // 뒷면에 적는 중엔 다시 그리지 않음
+    var fa=document.activeElement, fm0=say.querySelector(".sayform");
+    if(sayEdit&&fm0&&fa&&fm0.contains(fa)&&/^(TEXTAREA|INPUT)$/.test(fa.tagName)&&fm0.dataset.ed===sayEdit){   // 고치는 중(글 칸에 커서)엔 다시 그리지 않음 — 저절로 저장·동기화가 다시 그리면 칸이 새로 만들어져 키보드가 닫히던 문제 (2026-11-15 사용자 요청)
+      sayFormPend=true;
+      if(!fm0._pendW){fm0._pendW=1; fm0.addEventListener("focusout",function(){setTimeout(function(){var a=document.activeElement; if(sayFormPend&&!(a&&fm0.contains(a))){sayFormPend=false; drawSay()}},300)})}
+      return;
+    }
     var o=sayData(), form=say.querySelector(".sayform"), list=say.querySelector(".saylist");
     // 적던 중에 화면이 다시 그려져도(동기화 등) 적던 글은 그대로 (2026-10-25 사용자 요청)
     var keep=null, ft=form.querySelector(".sayt");
