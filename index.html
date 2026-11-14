@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114v">
+<meta name="app-build" content="nb-20261114w">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5480,6 +5480,16 @@ body:not(.boardon) #addQuick{margin:0!important}
 #addSheet .field{background:#1F1C30;border-color:#4A4468}
 #addSheet .field:focus{border-color:var(--violet)}
 @media (min-width:900px){#addSheet .sheetpanel{border:1px solid #4E4672}}
+/* 💬 한 마디 카드 글도 설교 메모 읽기처럼 줄 칸(⠿ 없이) + 길면 쪽 넘기기 (2026-11-14 사용자 요청) */
+.saylines.sayplain .saylg{display:none}
+.saylines.sayplain .saylt{padding-left:16px}
+.saylines .sayln{background:rgba(0,0,0,.08)}
+.saypgno{display:flex;align-items:center;justify-content:center;gap:10px;margin:12px 0 6px;font-size:13px;font-weight:700;color:color-mix(in srgb,var(--gold) 80%,#fff);letter-spacing:.5px}
+.saypgno .srmpgt{min-width:56px;text-align:center;opacity:.9}
+.saypgno .srmpgb{height:32px}
+.saypgno.pgpop{animation:srmPgPop .45s cubic-bezier(.3,1.6,.5,1)}
+.saylines.pgslL{animation:pgslL .32s cubic-bezier(.2,.8,.3,1)}
+.saylines.pgslR{animation:pgslR .32s cubic-bezier(.2,.8,.3,1)}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
@@ -16854,9 +16864,9 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       // 🔘 접기·삭제를 한 단추로 (2026-11-08 사용자 요청): 누르면 접기·펼치기(짧은 카드는 ⋯ 안내), 꾹(0.6초) 누르면 "지울까요?" → 한 번 더 누르면 지움
       if(!fbn){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="hint"; fbn.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="5" cy="12" r="2.1" fill="currentColor"/><circle cx="12" cy="12" r="2.1" fill="currentColor"/><circle cx="19" cy="12" r="2.1" fill="currentColor"/></svg>'; fbn.title="꾹 누르면 지우기"}
       fbn.classList.add("sayone"); sayOneLP(fbn);
-      if(x.gr&&!sfd&&String(x.t||"").indexOf("\n")>=0){   // 🌿 은혜: 설교 메모처럼 한 줄씩 칸으로, 빈 줄도 그대로 (2026-11-08 사용자 요청)
-        var q=document.createElement("div"); q.className="sayq saylines"; c.classList.add("saylined");
-        c.appendChild(q);
+      if((x.gr||!x.hv)&&!sfd&&String(x.t||"").indexOf("\n")>=0){   // 🌿 은혜: 설교 메모처럼 한 줄씩 칸으로, 빈 줄도 그대로 (2026-11-08 사용자 요청) · 💬 한 마디도 같은 줄 칸 + 길면 쪽 넘기기 (2026-11-14 사용자 요청)
+        var q=document.createElement("div"); q.className="sayq saylines"+(x.gr?"":" sayplain"); c.classList.add("saylined");
+        q._after=sayPage; c.appendChild(q);
         lineRowsSet(q,String(x.t||"").replace(/\s+$/,"").split("\n"),function(ln){var r=document.createElement("div"); r.className="sayln"; var g=document.createElement("span"); g.className="saylg"; g.textContent="⠿"; g.setAttribute("aria-hidden","true"); r.appendChild(g); var tx=document.createElement("span"); tx.className="saylt"; hlFill(tx,ln); r.appendChild(tx); return r},".saylt");
       }else{
       var q=document.createElement("p"); q.className="sayq"; q.textContent=sfd?String(x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean)[0]||"":(x.t||""); c.appendChild(q);
@@ -16934,6 +16944,24 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     return fresh.concat(rest);
   }
   // 한 마디 카드 끌어서 순서 바꾸기: 카드를 꾹(0.35초) 누르거나 왼쪽 ⠿를 잡고 위아래로 끌기
+  // 📄 한 마디·은혜 카드 글이 길면 설교 메모 읽기처럼 쪽으로 나눔: ◀ 지금 / 전체 ▶, 옆으로 밀어도 넘김 (2026-11-14 사용자 요청)
+  var sayPg={};
+  function sayPage(box){
+    var c=box.closest(".saycard"); if(!c||!box.isConnected)return; var id=c.dataset.id;
+    var rows=[].slice.call(box.children); rows.forEach(function(r){r.style.display=""; r.style.borderTop=""}); box.style.minHeight="";
+    var H=Math.max(240,Math.round(window.innerHeight*.6)), P=[0], PH=[0], acc=0;
+    rows.forEach(function(r,i){var h=r.offsetHeight; if(acc+h>H&&acc>0){P.push(i); PH.push(0); acc=0} acc+=h; PH[PH.length-1]=acc});
+    var tot=P.length, pg=c.querySelector(".saypgno");
+    if(tot<2){if(pg)pg.remove(); box._pgGo=null; return}
+    var cur=Math.max(0,Math.min(sayPg[id]||0,tot-1)); sayPg[id]=cur;
+    rows.forEach(function(r,i){var k=0; while(k+1<P.length&&P[k+1]<=i)k++; r.style.display=k===cur?"":"none"; r.style.borderTop=i===P[cur]&&i>0?"none":""});
+    box.style.minHeight=Math.max.apply(null,PH)+8+"px";   // 쪽마다 칸 높이를 같게 → 쪽 단추가 제자리
+    if(!pg){pg=document.createElement("div"); pg.className="saypgno"; box.parentNode.insertBefore(pg,box.nextSibling)}
+    pg.innerHTML='<button type="button" class="srmpgb" data-d="-1" aria-label="앞 쪽"'+(cur<1?" disabled":"")+'>'+(cur>0?"◀ "+cur:"◀")+'</button><span class="srmpgt">'+(cur+1)+' / '+tot+'</span><button type="button" class="srmpgb" data-d="1" aria-label="다음 쪽"'+(cur>=tot-1?" disabled":"")+'>'+(cur<tot-1?(cur+2)+" ▶":"▶")+'</button>';
+    function go(d){var n=cur+d; if(n<0||n>=tot)return false; sayPg[id]=n; sayPage(box); var pn=c.querySelector(".saypgno"); if(pn){pn.classList.remove("pgpop"); void pn.offsetWidth; pn.classList.add("pgpop")} box.classList.remove("pgslL","pgslR"); void box.offsetWidth; box.classList.add(d>0?"pgslL":"pgslR"); var top=c.getBoundingClientRect().top; if(top<0)c.scrollIntoView({block:"start",behavior:"smooth"}); return true}
+    pg.onclick=function(e){var b=e.target.closest(".srmpgb"); if(!b||b.disabled)return; e.stopPropagation(); go(+b.dataset.d)};
+    box._pgGo=go;
+  }
   var sayFold={}; try{sayFold=JSON.parse(localStorage.getItem("bible-say-fold")||"{}")||{}}catch(e){sayFold={}}
   var sayBack={}, sayUseEd="", sayUsePend=false, sayUseT=0, saySwAt=0;
   function sayUseSave(ta){
@@ -17075,6 +17103,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         if(dx>110){dc.style.transition="transform .2s ease-in,opacity .2s"; dc.style.transform="translateX(110%)"; dc.style.opacity="0"; setTimeout(function(){sayDelete(dc.dataset.id)},190)} else swSnap(dc);
         return}
       if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.3)return;
+      if(!sayBack[w.c.dataset.id]){var pq=w.c.querySelector(".saylines"); if(pq&&pq._pgGo&&!(dx>0&&swDelOK(w.c))&&pq._pgGo(dx<0?1:-1)){saySwAt=Date.now(); return}}   // 📄 쪽이 있으면 밀어서 쪽 넘김, 끝 쪽에서 더 밀면 예전처럼 뒷면
       if(dx>0&&swDelOK(w.c)){if(!w.t&&dx>110){saySwAt=Date.now(); sayDelete(w.c.dataset.id)} return}   // 은혜 앞면은 왼쪽으로 밀어야 뒷면 (PC 마우스는 오른쪽으로 크게 끌면 지움)
       var id=w.c.dataset.id; saySwAt=Date.now(); clearTimeout(hold); pend=null;
       var ua=document.activeElement; if(ua&&ua.classList&&ua.classList.contains("sayuse")){sayUseSave(ua); ua.blur()}
