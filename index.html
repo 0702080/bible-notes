@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zg">
+<meta name="app-build" content="nb-20261114zh">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -13963,8 +13963,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   }
   // 🔍 찾은 낱말 표시: 금빛 사각형이 부드럽게 깜박임 (2026-11-08 사용자 요청)
   function srmWords(){return String(srmQ||"").trim().split(/\s+/).filter(Boolean)}
-  function srmMarkIn(root){
-    var ws=srmWords(); if(!root||!ws.length)return;
+  function srmMarkIn(root,wsIn){   // wsIn: 다른 창(한 마디·장면 등)의 찾는 말 (2026-11-14)
+    var ws=wsIn||srmWords(); if(!root||!ws.length)return;
     var tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:function(n){return n.nodeValue.trim()&&!(n.parentNode.closest&&n.parentNode.closest("mark.srmhit,.srmcopy,.srmcdel,.srmcfold,.srmcgrip,.srmrgrip"))?NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_REJECT}});
     var nodes=[]; while(tw.nextNode())nodes.push(tw.currentNode);
     nodes.forEach(function(n){
@@ -16867,7 +16867,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var lb=say.querySelector(".saylock"); lb.innerHTML='📌<span class="sayhidem"> 고정 '+(sayLocked?"ON":"OFF")+'</span>'; lb.setAttribute("aria-label",sayLocked?"고정 켜짐":"고정 꺼짐"); lb.classList.toggle("on",sayLocked); lb.setAttribute("aria-pressed",String(sayLocked)); lb.title=sayLocked?"끄면 카드를 끌어서 옮길 수 있어요":"켜면 카드가 움직이지 않아요";
     list.classList.toggle("saylocked",sayLocked||!!sayQ);
     if(sayQ){
-      items=items.filter(function(x){return sayQ.split(/\s+/).every(function(w){return hit1([x.t,x.who,x.topic].join(" "),w)})});
+      items=items.filter(function(x){return sayQ.split(/\s+/).every(function(w){return hit1([x.t,x.who,x.topic,x.use].join(" "),w)})});   // 뒷면 글도 찾음
       if(!items.length){var em0=document.createElement("p"); em0.className="sayempty"; em0.textContent="\u201C"+sayQ+"\u201D이(가) 든 글이 없어요."; list.appendChild(em0); return}
     }
     if(!items.length&&!sayEdit){
@@ -16897,14 +16897,14 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         var bh=document.createElement("div"); bh.className="saybkh";
         bh.innerHTML='<b>'+(sayMode==="g"?"💡 은혜 위에 은혜":sayMode==="m"?"💡 이 장면에서 받은 것":"💡 이 말을 이렇게 활용해요")+'</b><button type="button" class="saybtn saybkx" data-act="front">← 앞면</button>'; c.appendChild(bh);
         var bq=document.createElement("p"); bq.className="saybkq"; bq.textContent=String(x.t||"").replace(/\s+/g," "); c.appendChild(bq);
-        if(x.use&&sayUseEd!==x.id){var uv=document.createElement("p"); uv.className="sayusev"; uv.textContent=x.use; c.appendChild(uv)}
+        if(x.use&&sayUseEd!==x.id){var uv=document.createElement("p"); uv.className="sayusev"; uv.textContent=x.use; c.appendChild(uv); if(sayQ)srmMarkIn(uv,sayQ.split(/\s+/))}
         else{var ut=document.createElement("textarea"); ut.className="sayuse"; ut.dataset.id=x.id; ut.maxLength=3000; ut.rows=4; ut.value=x.use||""; ut.placeholder="이 말을 내 삶에 어떻게 활용하면 좋을까요?\n(예: 아내에게, 친구에게, 일터에서…)"; c.appendChild(ut)}
         var bt=document.createElement("p"); bt.className="saybktip"; bt.textContent=(x.use&&sayUseEd!==x.id)?"두 번 누르면 고치기 · 옆으로 밀면 앞면":"적는 대로 저장돼요 · 두 번 누르면 읽기 · 옆으로 밀면 앞면"; c.appendChild(bt);
         list.appendChild(c); return;
       }
       // ▴ 카드 하나씩 접기·펼치기 (2026-11-07 사용자 요청) — 접으면 첫 줄만
       var sLong=String(x.t||"").trim().split("\n").filter(function(s){return s.trim()}).length>1||String(x.t||"").length>34;
-      var sfd=sLong&&!!sayFold[x.id], fbn=null; if(sfd)c.classList.add("sayfolded");
+      var sfd=sLong&&!!sayFold[x.id]&&!sayQ, fbn=null;   // 찾는 중엔 접힌 카드도 펼쳐 찾은 낱말이 보이게 if(sfd)c.classList.add("sayfolded");
       if(sLong){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="fold"; fbn.innerHTML=sfd?'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 17.5 L19 7 L5 7 Z" fill="currentColor" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>':'<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M12 6.5 L19 17 L5 17 Z" fill="currentColor" stroke="currentColor" stroke-width="3.2" stroke-linejoin="round"/></svg>'; fbn.setAttribute("aria-label",sfd?"펼치기":"접기"); fbn.title=sfd?"펼치기":"접기"} else c.classList.add("sayshort");
       // 🔘 접기·삭제를 한 단추로 (2026-11-08 사용자 요청): 누르면 접기·펼치기(짧은 카드는 ⋯ 안내), 꾹(0.6초) 누르면 "지울까요?" → 한 번 더 누르면 지움
       if(!fbn){fbn=document.createElement("button"); fbn.type="button"; fbn.className="sayfoldb"; fbn.dataset.act="hint"; fbn.innerHTML='<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="5" cy="12" r="2.1" fill="currentColor"/><circle cx="12" cy="12" r="2.1" fill="currentColor"/><circle cx="19" cy="12" r="2.1" fill="currentColor"/></svg>'; fbn.title="꾹 누르면 지우기"}
@@ -16914,7 +16914,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         q._after=sayPage; q._hang=1; c.appendChild(q);   // 절 번호(3. …) 뒤 글자에 맞춰 넘어간 줄을 들여 씀 — 성경 본문처럼 (2026-11-14 사용자 요청)
         lineRowsSet(q,String(x.t||"").replace(/\s+$/,"").split("\n"),function(ln){var r=document.createElement("div"); r.className="sayln"; var g=document.createElement("span"); g.className="saylg"; g.textContent="⠿"; g.setAttribute("aria-hidden","true"); r.appendChild(g); var tx=document.createElement("span"); tx.className="saylt"; hlFill(tx,ln); r.appendChild(tx); return r},".saylt");
       }else{
-      var q=document.createElement("p"); q.className="sayq"; q.textContent=sfd?String(x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean)[0]||"":(x.t||""); c.appendChild(q);
+      var q=document.createElement("p"); q.className="sayq"; q.textContent=sfd?String(x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean)[0]||"":(x.t||""); c.appendChild(q); if(sayQ)srmMarkIn(q,sayQ.split(/\s+/));
       }
       if(x.use){var um=document.createElement("span"); um.className="sayusemark"; um.textContent="💡 활용"; um.title="옆으로 밀면 이 말을 어떻게 활용할지 적은 글이 보여요"; c.appendChild(um)}
       var f=document.createElement("div"); f.className="sayf";
@@ -16993,9 +16993,11 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   var sayPg={};
   function sayPage(box){
     var c=box.closest(".saycard"); if(!c||!box.isConnected)return; var id=c.dataset.id;
+    if(sayQ&&!box.querySelector("mark.srmhit"))srmMarkIn(box,sayQ.split(/\s+/));   // 🔍 찾은 낱말 노란 배경으로 부드럽게 깜빡 (2026-11-14 사용자 요청)
     var rows=[].slice.call(box.children); rows.forEach(function(r){r.style.display=""; r.style.borderTop=""}); box.style.minHeight="";
     var H=Math.max(240,Math.round(window.innerHeight*.6)), P=[0], PH=[0], acc=0;
     rows.forEach(function(r,i){var h=r.offsetHeight; if(acc+h>H&&acc>0){P.push(i); PH.push(0); acc=0} acc+=h; PH[PH.length-1]=acc});
+    if(sayQ&&box._qk!==sayQ){box._qk=sayQ; var fm=box.querySelector("mark.srmhit"); if(fm){var ri=rows.indexOf(fm.closest(".sayln")), kk=0; while(kk+1<P.length&&P[kk+1]<=ri)kk++; sayPg[id]=kk}}   // 찾은 낱말이 있는 쪽을 먼저 보여 줌
     var tot=P.length, pg=c.querySelector(".saypgno");
     if(tot<2){if(pg)pg.remove(); box._pgGo=null; return}
     var cur=Math.max(0,Math.min(sayPg[id]||0,tot-1)); sayPg[id]=cur;
