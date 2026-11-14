@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115e">
+<meta name="app-build" content="nb-20261115f">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -16927,6 +16927,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 기록':sayMode==="m"?'+<span class="sayhidem"> 장면</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
     say.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true;
     drawSay();
+    say.scrollTop=0; say.querySelectorAll("*").forEach(function(el){if(el.scrollTop)el.scrollTop=0});   // 열 때마다 목록 맨 위부터 (2026-11-15 사용자 요청: 닫기 전 보던 자리로 가던 것)
     if(sayEdit==="new"){var ta=say.querySelector(".sayt"); if(ta)setTimeout(function(){ta.focus()},40)}
   }
   // 📖 성경 책 고르기: 66권을 다 뒤지지 않게 — 초성·글자로 거르고 눌러 넣음 (2026-11-04 사용자 요청)
