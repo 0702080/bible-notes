@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zi">
+<meta name="app-build" content="nb-20261114zj">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -4593,6 +4593,9 @@ body.boardon .fscrow{display:none}
 .saysearch{width:100%;box-sizing:border-box;height:40px;margin-bottom:12px;font-size:14px}
 .sayfoldall{display:flex;justify-content:flex-end;margin:-4px 0 8px}
 .saysrow{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.saysheet:not(.sayfinding) .saysrow,.saysheet:not(.sayfinding) .saybox>.saysearch{display:none!important}   /* 🔍 단추를 눌렀을 때만 찾기 칸 (2026-11-14) */
+.saysheet .dlbar .dlclose.saysbtn{color:var(--muted)}
+.saysheet .dlbar .dlclose.saysbtn.on{background-color:#2E2A40!important;border-color:#6A5FA0!important;color:#fff}
 .saysrow .saysearch{flex:1 1 auto;min-width:0;margin-bottom:0}
 .saysrow .sayfoldall{flex:0 0 auto;margin:0}
 .saysrow .sayfab{height:40px;white-space:nowrap}
@@ -16718,10 +16721,16 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     sayMode=mode==="v"?"v":mode==="g"?"g":mode==="m"?"m":"s";
     if(!say){
       say=document.createElement("div"); say.className="daily saysheet"; say.setAttribute("role","dialog"); say.setAttribute("aria-modal","true"); say.hidden=true;
-      say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose saylock"></button><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose">닫기</button></div>'+
+      say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose saysbtn" aria-label="찾기" title="찾기">🔍</button><button type="button" class="dlclose saylock"></button><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose">닫기</button></div>'+
         '<div class="dlbody"><div class="saybox"><input class="field saysearch" type="search" placeholder="🔍 찾기 (초성 예: ㄱㅅ)" aria-label="한 마디 찾기 (글·말한 분·주제)"><div class="sayform" hidden></div><div class="saylist"></div></div></div>';
       document.body.appendChild(say);
       say.querySelector(".sayclose").addEventListener("click",closeSay);
+      say.querySelector(".saysbtn").addEventListener("click",function(){   // 🔍 누를 때만 찾기 칸이 나옴 — 평소엔 숨겨 카드가 화면을 꽉 채움 (2026-11-14 사용자 요청)
+        sayFindOn=!sayFindOn; say.classList.toggle("sayfinding",sayFindOn); this.classList.toggle("on",sayFindOn);
+        var si=say.querySelector(".saysearch");
+        if(!sayFindOn&&sayQ){sayQ=""; if(si)si.value=""}
+        drawSay(); if(sayFindOn&&si)setTimeout(function(){try{si.focus()}catch(e){}},30);
+      });
       say.querySelector(".saylock").addEventListener("click",function(){sayLocked=!sayLocked; try{localStorage.setItem("bible-say-lock",sayLocked?"1":"")}catch(e){} buzz(10); toast(sayLocked?"📌 카드를 고정했어요":"이제 카드를 끌어서 옮길 수 있어요"); drawSay()});
       say.querySelector(".saysearch").addEventListener("input",function(){sayQ=this.value.trim(); drawSay()});
       say.querySelector(".sayadd").addEventListener("pointerdown",function(e){var fm=say.querySelector(".sayform"); if(sayEdit&&fm&&!fm.hidden&&document.activeElement&&fm.contains(document.activeElement))e.preventDefault()});   /* 적는 중 담기를 눌러도 키보드가 먼저 내려가며 화면이 밀려 누름이 빗나가지 않게 (2026-11-14) */
@@ -16739,7 +16748,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       });
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&say&&!say.hidden)closeSay()});
     }
-    sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value="";
+    sayEdit=focus==="new"?"new":""; sayQ=""; say.querySelector(".saysearch").value=""; sayFindOn=false; say.classList.remove("sayfinding"); say.querySelector(".saysbtn").classList.remove("on");
     say.classList.toggle("saygr",sayMode==="g"||sayMode==="m");   // 은혜 제목이 길어 글자를 조금 작게 (2026-11-07)
     say.querySelector(".dltitle").innerHTML=sayMode==="v"?"📖 짧은 말씀 한 구절":sayMode==="g"?"🌿 주님의 은혜":sayMode==="m"?'<svg class="scnico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="16.5" cy="7.5" r="3.2" fill="#F08A5D"/><path d="M1.5 20 L8.5 10.5 L13 16.2 L15.6 13 L22.5 20 Z" fill="#4B5A82" stroke="#4B5A82" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10.5 L10.6 13.3 L9.4 13.9 L8.5 12.9 L7.4 14 L6.6 13.2 Z" fill="#fff" opacity=".85"/></svg> 장면 묵상':"💬 믿음의 한 마디";
     say.querySelector(".sayadd").innerHTML=sayMode==="v"?'+<span class="sayhidem"> 말씀</span> 담기':sayMode==="g"?'+<span class="sayhidem"> 은혜</span> 기록':sayMode==="m"?'+<span class="sayhidem"> 장면</span> 담기':'+<span class="sayhidem"> 한 마디</span> 담기';
@@ -16998,7 +17007,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var rows=[].slice.call(box.children); rows.forEach(function(r){r.style.display=""; r.style.borderTop=""}); box.style.minHeight="";
     // 쪽 높이 = 찾기 칸 아래부터 화면 아래까지에 카드 전체(머리·쪽 단추·아래 줄)가 다 들어가게 (2026-11-14 사용자 요청: 찾기 칸이 보이면 아래가 잘리고, 아래가 보이면 찾기 칸이 잘림)
     var vh=window.visualViewport?visualViewport.height:innerHeight, bar=say&&say.querySelector(".dlbar"), sr=say&&say.querySelector(".saysearch");
-    var top=(bar?bar.getBoundingClientRect().bottom:60)+(sr&&!sr.hidden&&sr.offsetHeight?sr.offsetHeight+16:0)+10;
+    var srw=sr&&(sr.closest(".saysrow")||sr), top=(bar?bar.getBoundingClientRect().bottom:60)+(srw&&srw.offsetHeight?srw.offsetHeight+12:0)+10;
     var chrome=c.offsetHeight-box.offsetHeight+52+14;
     var H=Math.max(200,Math.round(vh-top-chrome)), P=[0], PH=[0], acc=0;
     rows.forEach(function(r,i){var h=r.offsetHeight; if(acc+h>H&&acc>0){P.push(i); PH.push(0); acc=0} acc+=h; PH[PH.length-1]=acc});
@@ -17007,7 +17016,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     if(tot<2){if(pg)pg.remove(); box._pgGo=null; return}
     var cur=Math.max(0,Math.min(sayPg[id]||0,tot-1)); sayPg[id]=cur;
     rows.forEach(function(r,i){var k=0; while(k+1<P.length&&P[k+1]<=i)k++; r.style.display=k===cur?"":"none"; r.style.borderTop=i===P[cur]&&i>0?"none":""});
-    box.style.minHeight=Math.max.apply(null,PH)+8+"px";   // 쪽마다 칸 높이를 같게 → 쪽 단추가 제자리
+    box.style.minHeight=Math.max(H,Math.max.apply(null,PH)+8)+"px";   // 쪽마다 칸 높이를 같게, 화면 아래까지 꽉 채움 → 쪽 단추가 제자리 (2026-11-14)
     if(!pg){pg=document.createElement("div"); pg.className="saypgno"; box.parentNode.insertBefore(pg,box.nextSibling)}
     pg.innerHTML='<button type="button" class="srmpgb" data-d="-1" aria-label="앞 쪽"'+(cur<1?" disabled":"")+'>'+(cur>0?"◀ "+cur:"◀")+'</button><span class="srmpgt">'+(cur+1)+' / '+tot+'</span><button type="button" class="srmpgb" data-d="1" aria-label="다음 쪽"'+(cur>=tot-1?" disabled":"")+'>'+(cur<tot-1?(cur+2)+" ▶":"▶")+'</button>';
     function go(d){var n=cur+d; if(n<0||n>=tot)return false; sayPg[id]=n; sayPage(box); var pn=c.querySelector(".saypgno"); if(pn){pn.classList.remove("pgpop"); void pn.offsetWidth; pn.classList.add("pgpop")} box.classList.remove("pgslL","pgslR"); void box.offsetWidth; box.classList.add(d>0?"pgslL":"pgslR"); var top=c.getBoundingClientRect().top; if(top<0)c.scrollIntoView({block:"start",behavior:"smooth"}); return true}
@@ -17035,7 +17044,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     x.use=v; x.at=Date.now(); saveSay(o);
   }
   var sayEditAt=0;   // 두 번 눌러 고치기를 연 때 — 휴대폰이 뒤따라 보내는 dblclick이 열자마자 저장해 버리던 것 막기 (2026-11-13)
-  var sayDrag=null, sayQ="", sayLocked=false; try{sayLocked=localStorage.getItem("bible-say-lock")==="1"}catch(e){}
+  var sayDrag=null, sayQ="", sayFindOn=false, sayLocked=false; try{sayLocked=localStorage.getItem("bible-say-lock")==="1"}catch(e){}
   function sayOneLP(btn){   // 한 단추: 꾹 누르면 지우기 확인으로 바뀜, 그 뒤 한 번 더 누르면 지움 (2026-11-08)
     var t=0, eat=0;
     btn.addEventListener("pointerdown",function(e){if(e.button>0)return; clearTimeout(t); t=setTimeout(function(){
