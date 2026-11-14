@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114x">
+<meta name="app-build" content="nb-20261114y">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -3285,6 +3285,9 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind,body.soloon #co
 /* ⠿ 글 칸 줄 옮기기 (2026-10-31 사용자 요청) */
 .lhlayer{position:fixed;inset:0;z-index:490;pointer-events:none}
 .lhlayer[hidden]{display:none}
+.lhlayer.inflow{position:absolute;inset:auto;left:0;top:0;width:0;height:0;overflow:visible}
+.lhlayer.inflow .lhgrip{position:absolute}
+.lhlayer.inflow.inrel{position:relative;display:block;height:0;margin:0;padding:0;float:none}
 .lhgrip{position:fixed;width:24px;height:28px;display:grid;place-items:center;border-radius:6px;color:var(--sky);font-size:16px;line-height:1;opacity:.55;pointer-events:auto;touch-action:none;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 .lhgrip.on{opacity:1;background:color-mix(in srgb,var(--sky) 22%,transparent);cursor:grabbing}
 .lhlayer.dragging .lhgrip:not(.on){opacity:.25}
@@ -8356,6 +8359,15 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
           var pr=pe.getBoundingClientRect(); if(pr.left<r.left-1){var pl=pr.left+(parseFloat(getComputedStyle(pe).borderLeftWidth)||0), gw=r.left-pl; if(gw>=6&&gw<=90)x=pl+gw/2-12; break}   // 좁은 여백(14px 남짓)도 가운데로
         }
       }
+      // ⠿ 손잡이 층을 칸과 같은 굴림 상자(offsetParent) 안에 둠 → 화면을 굴릴 때 브라우저가 글과 함께 바로 움직여 늦게 따라오지 않음 (2026-11-14 사용자 요청)
+      // 칸과 offsetParent 사이에 굴림 상자가 있으면(예: 창 .dlbody) 그 안 맨 앞에 높이 0 상자로 넣어 함께 구르게
+      var op=ta.offsetParent||document.body, host=op, rel=false;
+      for(var se=ta.parentElement;se&&se!==op&&se!==document.body;se=se.parentElement){var oy=getComputedStyle(se).overflowY; if((oy==="auto"||oy==="scroll")&&se.scrollHeight>se.clientHeight+1){host=se; rel=true; break}}
+      if(layer.parentNode!==host||(rel&&host.firstChild!==layer)){if(rel)host.insertBefore(layer,host.firstChild); else host.appendChild(layer)}
+      layer.classList.add("inflow"); layer.classList.toggle("inrel",rel);
+      var hb; if(rel){var lr=layer.getBoundingClientRect(); hb={x:lr.left,y:lr.top}}
+      else if(host===document.body&&getComputedStyle(host).position==="static")hb={x:-window.scrollX,y:-window.scrollY};
+      else{var hr=host.getBoundingClientRect(); hb={x:hr.left+host.clientLeft-host.scrollLeft,y:hr.top+host.clientTop-host.scrollTop}}
       var st=ta.scrollTop, frag=document.createDocumentFragment();   // scrollTop은 한 번만 읽음 — 줄마다 읽으면 글자마다 화면 계산이 수십 번 일어나 타이핑이 느려짐 (2026-11-07)
       layer.textContent=""; layer.hidden=false;
       geo.forEach(function(g){
@@ -8363,7 +8375,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         var y=r.top+bt+pt+g.top-st+g.lh/2;
         if(y<r.top+4||y>r.bottom-4)return;   // 칸 밖으로 굴러간 줄은 숨김
         var h=document.createElement("span"); h.className="lhgrip"+(drag&&drag.i===g.i?" on":""); h.textContent="⠿"; h.dataset.i=g.i;
-        h.style.left=x+"px"; h.style.top=(y-14)+"px"; frag.appendChild(h);
+        h.style.left=(x-hb.x)+"px"; h.style.top=(y-14-hb.y)+"px"; frag.appendChild(h);
       });
       layer.appendChild(frag);
     }
@@ -8375,7 +8387,10 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     function schedIdle(){typing=true; clearTimeout(typT); typT=setTimeout(function(){typing=false; sched()},350)}   // 글자를 치는 동안은 손잡이를 다시 그리지 않고 손을 멈추면 그림 (2026-11-07 타이핑이 느리던 문제)
     document.addEventListener("input",function(e){if(e.target===ta&&!drag)schedIdle(); else if(e.target===ta)sched()},true);
     document.addEventListener("selectionchange",function(){if(ta&&!typing)sched()});
-    window.addEventListener("scroll",function(){if(ta)sched()},true);
+    window.addEventListener("scroll",function(e){   // 바깥 화면이 구르면 손잡이 층도 함께 구르므로 다시 그리지 않음 — 칸 안이 구를 때만
+      if(!ta)return; var t=e.target, hs=layer.parentNode;
+      if(t===ta||(t&&t.nodeType===1&&hs&&t!==hs&&hs.contains(t)&&t.contains(ta)))sched();
+    },true);
     window.addEventListener("resize",function(){if(ta)sched()});
     if(window.ResizeObserver){var ro=new ResizeObserver(function(){if(ta)sched()}); document.addEventListener("focusin",function(e){if(ok(e.target)){ro.disconnect(); ro.observe(e.target)}})}
     function mid(g){var r=ta.getBoundingClientRect(), cs=getComputedStyle(ta); return r.top+(parseFloat(cs.borderTopWidth)||0)+(parseFloat(cs.paddingTop)||0)+g.top-ta.scrollTop+g.h/2}
