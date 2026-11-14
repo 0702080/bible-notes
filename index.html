@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zq">
+<meta name="app-build" content="nb-20261114zr">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5538,6 +5538,9 @@ body:not(.boardon) #addQuick{margin:0!important}
 .saycard .sayf .sayccp.done{color:#7FD99A;border-color:#7FD99A}
 .saycard .sayf .sayccp+.sayfoldb{margin-left:10px}
 .saycard.sayback .sayccp,.saycard.sayfolded .sayccp{display:none!important}
+.sayform .saymsel{display:block;margin:0 0 8px auto;height:30px;padding:0 12px;border-radius:15px;font-size:12.5px;font-family:inherit;color:var(--sky);border:1px solid color-mix(in srgb,var(--sky) 45%,#2A3240);background-color:#1F2836!important;background-image:linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.22) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 0 rgba(0,0,0,.4)}
+.sayform.saymall .saymsel{color:#10202C;background-color:var(--sky)!important}
+.sayform textarea.sayt.sayall{display:block!important;width:100%;box-sizing:border-box;font-size:16px!important;line-height:40px!important;padding:0 10px 0 16px!important;border-radius:12px;border:1px solid color-mix(in srgb,var(--sky) 30%,#2A3240)!important;background-color:rgba(120,170,220,.07)!important;background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 39px,rgba(183,156,242,.22) 39px,rgba(183,156,242,.22) 40px)!important;background-attachment:local;resize:none;overflow:hidden;-webkit-user-select:text;user-select:text}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
@@ -17062,6 +17065,15 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   function sayLineEditor(form,ta){
     form.classList.add("sayledf"); ta.classList.add("sayhid");
     var box=document.createElement("div"); box.className="sayq saylines sayles"+(sayMode==="g"?"":" sayplain"); form.insertBefore(box,ta);
+    // ☰ 여러 줄 고르기: 줄 칸은 칸마다 따로라 한 줄씩만 골라짐 → 켜면 한 칸(.sayt)으로 바꿔 여러 줄을 한 번에 고르고 복사·잘라내기 (2026-11-14 사용자 요청)
+    var msb=document.createElement("button"); msb.type="button"; msb.className="saymsel"; msb.textContent="☰ 여러 줄 고르기"; form.insertBefore(msb,box);
+    msb.addEventListener("pointerdown",function(e){e.preventDefault()});
+    msb.addEventListener("click",function(e){
+      e.preventDefault(); e.stopPropagation(); var all=!form.classList.contains("saymall");
+      if(all){sync(); form.classList.add("saymall"); ta.classList.remove("sayhid"); ta.classList.add("sayall"); box.style.display="none"; msb.textContent="✓ 줄 칸으로 돌아가기"; taAuto(ta,function(h){return Math.max(80,Math.ceil(h/40)*40)}); toast("이제 꾹 눌러 여러 줄을 고를 수 있어요")}
+      else{form.classList.remove("saymall"); ta.classList.add("sayhid"); ta.classList.remove("sayall"); ta.style.height=""; box.innerHTML=""; String(ta.value).split("\n").forEach(function(l){box.appendChild(mk(l))}); box.style.display=""; msb.textContent="☰ 여러 줄 고르기"; BASE=null; requestAnimationFrame(hang)}
+    });
+    ta.addEventListener("input",function(){if(form.classList.contains("saymall"))taAuto(ta,function(h){return Math.max(80,Math.ceil(h/40)*40)})});
     var cv=document.createElement("canvas").getContext("2d"), BASE=null;
     function rows(){return [].slice.call(box.querySelectorAll("textarea.sayle"))}
     function sync(){var v=rows().map(function(r){return r.value}).join("\n"); if(ta.value!==v){ta.value=v; ta.dispatchEvent(new Event("input",{bubbles:true}))}}
