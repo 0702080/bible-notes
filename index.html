@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zv">
+<meta name="app-build" content="nb-20261114zw">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5553,6 +5553,12 @@ body:not(.boardon) #addQuick{margin:0!important}
 .saypgno .saypgsl:empty,.saypgno .saypgsr:empty{visibility:hidden}
 .saypgno .sayccp,.saypgno .sayone{position:static!important;margin:0!important;width:32px!important;height:32px!important}
 .saysheet .saycard .sayf.sayfempty{display:none}
+.srmlabm>button{padding:0 9px!important}
+@media (max-width:380px){.srmlabm>button{padding:0 6px!important;font-size:11.5px!important}.srmlabm .srmonebtn,.srmlabm .srmwipe+.srmcopy{margin-left:4px!important}}
+.srmlabm .srmonebtn{height:28px;padding:0 10px;margin-left:6px;border:1px solid color-mix(in srgb,var(--sky) 45%,#2A3240);border-radius:14px;background:#1F2836;color:var(--sky);font-family:inherit;font-size:12.5px;white-space:nowrap}
+.srmsheet.srmone .srmlabm .srmonebtn{background:var(--sky);color:#0B0B0D;font-weight:700}
+.srmsheet.srmone .srmlabm .hlmb,.srmsheet.srmone .srmhl,.srmsheet.srmone .srmhlfloat{display:none!important}
+.srmsheet.srmone .srmform textarea.srmbody{display:block!important;width:100%;box-sizing:border-box;font-size:16px;line-height:40px;padding:0 12px 0 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--sky) 35%,#2A3240);background-color:rgba(120,170,220,.07);background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 39px,rgba(183,156,242,.22) 39px,rgba(183,156,242,.22) 40px);background-attachment:local;color:var(--ink);font-family:inherit;resize:none;overflow:hidden;-webkit-user-select:text;user-select:text}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
 .cndlg.out{opacity:0;transition:opacity .15s}
@@ -13067,13 +13073,21 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   }
   function srmLinesDraw(){
     var f=srm.querySelector(".srmform"), ta=f.querySelector(".srmbody"), ls=f.querySelector(".srmlines");
+    if(srm.classList.contains("srmone")){srm.classList.remove("srmone"); ta.hidden=true; ta.style.height=""; ls.style.display=""; var ob=srm.querySelector(".srmonebtn"); if(ob)ob.textContent="▤ 선택"}
     srmMulti(false); ls.textContent="";
     ta.value.split("\n").forEach(function(t){ls.appendChild(srmRow(t))});
     var first=ls.querySelector(".srmli"); if(first&&!ta.value)first.placeholder="들으며 떠오르는 대로 적어 보세요 (엔터 = 다음 줄)";
     requestAnimationFrame(function(){[].forEach.call(ls.querySelectorAll(".srmli"),srmFit); bibleHangEdit(ls)});
   }
+  function srmOneFit(ta){taAuto(ta,function(h){return Math.max(160,Math.ceil(h/40)*40)})}
+  function srmOne(on){
+    var f=srm&&srm.querySelector(".srmform"); if(!f)return; var ta=f.querySelector(".srmbody"), ls=f.querySelector(".srmlines"), bt=srm.querySelector(".srmonebtn");
+    if(on){srmMulti(false); srmLinesApply(); srm.classList.add("srmone"); ls.style.display="none"; ta.hidden=false; if(bt)bt.textContent="✓ 줄 칸으로"; srmOneFit(ta); if(!ta._oneW){ta._oneW=1; ta.addEventListener("input",function(){if(srm.classList.contains("srmone"))srmOneFit(ta)})} toast("꾹 눌러 여러 줄을 한 번에 고를 수 있어요")}
+    else{srm.classList.remove("srmone"); ta.hidden=true; ta.style.height=""; ls.style.display=""; if(bt)bt.textContent="▤ 선택"; srmLinesDraw(); srmCommit()}
+  }
   function srmLinesApply(){
     var f=srm&&srm.querySelector(".srmform"); if(!f)return;
+    if(srm.classList.contains("srmone"))return;   // 한 칸 모드에서는 글 칸(.srmbody)이 바로 저장됨
     var ta=f.querySelector(".srmbody"), ls=f.querySelector(".srmlines");
     var rows=[].slice.call(ls.querySelectorAll(".srmli")); if(!rows.length)return;
     ta.value=rows.map(function(r){return r.value}).join("\n");
@@ -13143,6 +13157,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     srm.addEventListener("pointerdown",function(e){if(e.target.closest(".hlbtn"))e.preventDefault()},true);   // 단추를 눌러도 고른 글자가 풀리지 않게
     // ☰ 여러 줄 골라 한 번에 굵게·색 (2026-11-13 사용자 요청): 켜면 줄을 눌러도 키보드가 안 뜨고 누른 줄이 골라짐
     srm.addEventListener("click",function(e){
+      var ob1=e.target.closest(".srmonebtn"); if(ob1){e.stopPropagation(); srmOne(!srm.classList.contains("srmone")); return}   // ▤ 줄 칸은 칸마다 따로라 한 줄씩만 골라짐 → 한 칸으로 바꿔 여러 줄 고르기 (2026-11-14 사용자 요청)
       var mb=e.target.closest(".hlmb"); if(mb){e.stopPropagation(); var on=!srm.classList.contains("hlmulti"); srmMulti(on); if(on)toast("색을 바꿀 줄들을 눌러 고르세요"); return}
       if(!srm.classList.contains("hlmulti"))return;
       var li=e.target.closest(".srmform .srmlines .srmline"); if(!li)return;
@@ -13292,7 +13307,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
           var nw=Date.now(); if(nw-srmTap.t<350&&Math.abs(e.clientX-srmTap.x)<30&&Math.abs(e.clientY-srmTap.y)<40){srmTap.t=0; e.preventDefault(); srmRespToggle(); buzz(10); return}
           srmTap={t:nw,x:e.clientX,y:e.clientY}; return;
         }
-        if(e.pointerType!=="touch"||!srmEdit||srmResp||!e.target.closest(".srmbox")||e.target.closest("button,select,input,a,.srmytc,.srmgrip"))return;
+        if(e.pointerType!=="touch"||!srmEdit||srmResp||srm.classList.contains("srmone")||!e.target.closest(".srmbox")||e.target.closest("button,select,input,a,.srmytc,.srmgrip"))return;
         var now=Date.now();
         if(now-srmTap.t<350&&Math.abs(e.clientX-srmTap.x)<30&&Math.abs(e.clientY-srmTap.y)<30){
           srmTap.t=0; e.preventDefault(); var ae=document.activeElement; if(ae&&srm.contains(ae))ae.blur();
@@ -13431,7 +13446,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         '<input class="srmtitle" maxlength="200" placeholder="설교 제목" aria-label="설교 제목">'+
         '<div class="srmrow"><input class="srmrefin" maxlength="120" placeholder="본문 (예: 요한복음 15:1-8)" aria-label="본문"><select class="srmnote" aria-label="내 말씀 카드와 잇기"></select></div>'+
         '<div class="srmytrow"><input class="srmyt" type="url" inputmode="url" maxlength="500" placeholder="▶ 유튜브 설교 영상 링크 붙여넣기" aria-label="유튜브 링크"><button type="button" class="srmytgo" hidden>▶ 보기</button></div>'+
-        '<div class="srmlab srmlabm"><button type="button" class="hlmb" title="여러 줄을 골라 한 번에 색 바꾸기">☰ 여러 줄</button><button type="button" class="srmwipe" title="내용 전체 지우기 (두 번 눌러 확인)">🗑 전체 지우기</button><button type="button" class="srmcopy" title="설교 메모 전체 복사">📋 전체 복사</button></div><div class="srmhl" role="toolbar" aria-label="강조"><button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button><button type="button" class="hlbtn hldot" data-hl="금" style="--d:var(--gold)" title="금색"></button><button type="button" class="hlbtn hldot" data-hl="분홍" style="--d:var(--pink)" title="분홍"></button><button type="button" class="hlbtn hldot" data-hl="하늘" style="--d:var(--sky)" title="하늘색"></button><button type="button" class="hlbtn hldot" data-hl="초록" style="--d:var(--green)" title="초록"></button><button type="button" class="hlbtn hldot" data-hl="주황" style="--d:var(--orange)" title="주황"></button><button type="button" class="hlbtn hldot" data-hl="보라" style="--d:#C9A8FF" title="밝은 보라 (예수님 말씀)"></button><button type="button" class="hlbtn hlclr" data-hl="x" title="강조 지우기">지우기</button></div><div class="srmlines"></div><textarea class="srmbody" hidden placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
+        '<div class="srmlab srmlabm"><button type="button" class="hlmb" title="여러 줄을 골라 한 번에 색 바꾸기">☰ 여러 줄</button><button type="button" class="srmonebtn" title="한 칸으로 바꿔 여러 줄을 한 번에 고르기·복사">▤ 선택</button><button type="button" class="srmwipe" title="내용 전체 지우기 (두 번 눌러 확인)">🗑 전체 지우기</button><button type="button" class="srmcopy" title="설교 메모 전체 복사">📋 전체 복사</button></div><div class="srmhl" role="toolbar" aria-label="강조"><button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button><button type="button" class="hlbtn hldot" data-hl="금" style="--d:var(--gold)" title="금색"></button><button type="button" class="hlbtn hldot" data-hl="분홍" style="--d:var(--pink)" title="분홍"></button><button type="button" class="hlbtn hldot" data-hl="하늘" style="--d:var(--sky)" title="하늘색"></button><button type="button" class="hlbtn hldot" data-hl="초록" style="--d:var(--green)" title="초록"></button><button type="button" class="hlbtn hldot" data-hl="주황" style="--d:var(--orange)" title="주황"></button><button type="button" class="hlbtn hldot" data-hl="보라" style="--d:#C9A8FF" title="밝은 보라 (예수님 말씀)"></button><button type="button" class="hlbtn hlclr" data-hl="x" title="강조 지우기">지우기</button></div><div class="srmlines"></div><textarea class="srmbody" hidden placeholder="들으며 떠오르는 대로 적어 보세요&#10;· 대지 1&#10;· 대지 2&#10;· 마음에 남은 한 문장" aria-label="설교 메모"></textarea>'+
         '';
       // 💡 나의 적용과 단추들은 화면 아래에 고정 (2026-10-31 사용자 요청)
       foot.innerHTML='<div class="srmfin"><div class="srmlab ap">💡 나의 적용 · 결단<span class="srmsaved" aria-live="polite"></span><button type="button" class="srmapfold" aria-label="나의 적용 접기·펼치기"></button></div><textarea class="srmapply" placeholder="이번 주에 이렇게 살아 보겠습니다" aria-label="나의 적용"></textarea>'+
