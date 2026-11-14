@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114j">
+<meta name="app-build" content="nb-20261114k">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5488,6 +5488,8 @@ body.boardon .toolbar .qk{display:none!important}
 body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,body:not(.boardon) .toolbar #dailyQuick,body:not(.boardon) .toolbar #ledgerQuick,body:not(.boardon) .toolbar .qk{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .toolbar .tbdrag{transform:scale(1.18) translateY(-3px)!important;z-index:5;filter:brightness(1.12);box-shadow:0 8px 16px rgba(0,0,0,.55),0 0 0 2px rgba(255,255,255,.55)!important;transition:transform .12s!important}
 .toolbar.tbdragging{touch-action:none}
+/* 단추를 길게 눌러도 글자가 골라지지 않게 — 맨 위 ⋯ 등 모든 단추 (2026-11-14 사용자 요청) */
+button,summary,.tbtn,[role="button"]{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 /* 맨 위 동그라미 단추에서 시작한 손길은 화면이 굴러가지 않게 — 꾹 누른 뒤 끌기가 굴림에 빼앗기지 않음 (2026-11-14 사용자 요청: 끌어 옮기기가 안 됨) */
 body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,body:not(.boardon) .toolbar #dailyQuick,body:not(.boardon) .toolbar #ledgerQuick,body:not(.boardon) .toolbar .qk{touch-action:none}
 /* ＋ ⋯ 메뉴 항목을 맨 위 동그라미 단추로 넣기·빼기 (2026-11-14 사용자 요청): 메뉴 줄 오른쪽 작은 동그라미 ＋/−, 저장 bible-tb-qk (이 기기만) */
@@ -21824,7 +21826,7 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
     bar.addEventListener("touchstart",function(e){var b=e.target.closest&&e.target.closest("button"); if(!b||movables().indexOf(b)<0||e.touches.length>1)return; start(b,e.touches[0].clientX)},{passive:true});
     bar.addEventListener("touchmove",function(e){if(!d)return; if(d.armed&&e.cancelable)e.preventDefault(); move(e.touches[0].clientX,e)},{passive:false});
     bar.addEventListener("touchend",end); bar.addEventListener("touchcancel",end);
-    bar.addEventListener("contextmenu",function(e){if(d&&d.armed)e.preventDefault()});
+    bar.addEventListener("contextmenu",function(e){if((d&&d.armed)||(e.target.closest&&e.target.closest("#topMenu>summary")))e.preventDefault()});
     bar.addEventListener("mousedown",function(e){var b=e.target.closest&&e.target.closest("button"); if(!b||movables().indexOf(b)<0||e.button)return; start(b,e.clientX);
       function mm(ev){move(ev.clientX,ev)} function mu(){document.removeEventListener("mousemove",mm);document.removeEventListener("mouseup",mu);end()}
       document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu)});
