@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114p">
+<meta name="app-build" content="nb-20261114q">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -5507,6 +5507,13 @@ body.boardon #topMenu .pop>button .mnpin{display:none}
 .toolbar .qk svg{width:58%;height:58%}
 body:not(.boardon) .toolbar.tbfit .qk,body:not(.boardon) .toolbar.tbfit #colAddQuick,body:not(.boardon) .toolbar.tbfit #addQuick,body:not(.boardon) .toolbar.tbfit #dailyQuick,body:not(.boardon) .toolbar.tbfit #ledgerQuick,body:not(.boardon) .toolbar.tbfit #topMenu>summary{width:var(--tbs)!important;min-width:var(--tbs)!important;height:var(--tbs)!important;font-size:calc(var(--tbs) * .44)!important}
 body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.tbfit #addQuick svg{width:58%;height:58%}
+/* ↔ 휴대폰 맨 위 동그라미 줄 = ⋯ 메뉴 전부 (2026-11-14 사용자 요청): 좌우로 밀면 메뉴 항목이 다 나옴, 세로 ⋯ 메뉴는 없앰 */
+body:not(.boardon) .toolbar{flex-wrap:nowrap!important;overflow-x:auto;overflow-y:hidden;justify-content:flex-start!important;gap:10px!important;padding:8px 10px 14px!important;margin-left:-10px;margin-right:-10px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+body:not(.boardon) .toolbar::-webkit-scrollbar{display:none}
+body:not(.boardon) #topMenu{display:none!important}
+body:not(.boardon) .toolbar.tbfit .qk,body:not(.boardon) .toolbar #colAddQuick,body:not(.boardon) .toolbar #addQuick,body:not(.boardon) .toolbar #dailyQuick,body:not(.boardon) .toolbar #ledgerQuick,body:not(.boardon) .toolbar .qk{flex:0 0 auto;touch-action:pan-x!important}
+body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging button{touch-action:none!important}
+.toolbar .qk[hidden],.toolbar .qk.qkoff{display:none!important}
 /* ☁️ GitHub 자동 저장 창: 연결되면 설명 글 숨김, 닫기·연결 끊기·바꾸기는 같은 입체 단추 (2026-11-13 사용자 요청) */
 .ghsheet.ghconn .ghbox>.ghtip,.ghsheet.ghrconn .ghrec .ghtip{display:none}
 .ghsheet .ghclose,.ghsheet .ghout,.ghsheet .ghrset{flex:0 0 auto;height:40px;padding:0 16px!important;border:1px solid #4A4656!important;border-radius:12px!important;background:#2A2733 linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:#D9D5E3!important;font-size:13.5px!important;font-weight:600;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -1px 0 rgba(0,0,0,.25),0 3px 0 rgba(0,0,0,.45),0 4px 8px rgba(0,0,0,.35)!important;transition:transform .08s,box-shadow .08s}
@@ -21787,62 +21794,31 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
   $("ledgerBtn").addEventListener("click",function(){$("topMenu").open=false;openLedger()});
   $("ledgerQuick").addEventListener("click",function(){$("topMenu").open=false;openLedger()});
   $("dailyQuick").addEventListener("click",function(){$("topMenu").open=false;openDaily()});
-  /* ＋ ⋯ 메뉴 항목을 맨 위 동그라미 단추로 넣기·빼기 (2026-11-14 사용자 요청): 메뉴 줄 오른쪽 ＋를 누르면 맨 위 줄 끝(⋯ 앞)에 단추가 생기고, −를 누르면 빠짐. 저장 bible-tb-qk (이 기기만). 자리가 모자라면 단추를 고르게 줄이고(26px까지) 더 넘치면 안 넣음 */
+  /* ↔ ⋯ 메뉴 항목을 모두 맨 위 동그라미 단추로 (2026-11-14 사용자 요청): 휴대폰은 맨 위 줄을 좌우로 밀면 메뉴 항목이 다 나오고, 세로 ⋯ 메뉴는 없앰(CSS). 단추는 메뉴 항목을 대신 누름(.qk data-for). 칸반(PC)은 예전 ⋯ 메뉴 그대로 */
   (function(){
-    var QK_KEY="bible-tb-qk", DEF=["sermonBtn","icBtn","openSayBtn","openVerseBtn"], SKIP={reorderBtn:1,ledgerBtn:1,foldAll:1};
+    var SKIP={reorderBtn:1,ledgerBtn:1,foldAll:1};   // 💰는 맨 위에 따로 있음
+    var ICON={openTongdokBtn:"📚",bibleTextBtn:"📜",ghSyncBtn:"📤",exportTxt:"📃"};   // 겹치는 그림은 바꿔서 구분
     var COL={sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
     var bar=$("addQuick")&&$("addQuick").parentElement, pop=document.querySelector("#topMenu .pop"); if(!bar||!pop)return;
-    function load(){var o=null;try{o=JSON.parse(localStorage.getItem(QK_KEY)||"null")}catch(e){} return Array.isArray(o)?o:DEF.slice()}
-    function save(l){try{localStorage.setItem(QK_KEY,JSON.stringify(l))}catch(e){}}
     function qkOf(id){return bar.querySelector('.qk[data-for="'+id+'"]')}
     function colorOf(id){if(COL[id])return COL[id]; var h=0; for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0; return PAL[h%PAL.length]}
     function make(id){
       var src=$(id); if(!src)return null;
       var b=document.createElement("button"); b.type="button"; b.className="tbtn qk"; b.dataset.for=id; b.style.setProperty("--pb",colorOf(id));
-      var pin=src.querySelector(".mnpin"), txt=(src.textContent||"").replace(pin?pin.textContent:"","").trim(), sv=src.querySelector("svg");
+      var txt=(src.textContent||"").trim(), sv=src.querySelector("svg");
       var lbl=sv?txt:txt.replace(/^\S+\s*/,""); b.setAttribute("aria-label",lbl||txt); b.title=lbl||txt;
-      if(sv)b.appendChild(sv.cloneNode(true)); else b.textContent=txt.split(/\s+/)[0]||"•";
+      if(ICON[id])b.textContent=ICON[id]; else if(sv)b.appendChild(sv.cloneNode(true)); else b.textContent=txt.split(/\s+/)[0]||"•";
       return b;
     }
-    function tbKeys(){return Array.prototype.filter.call(bar.children,function(b){return b.matches("#colAddQuick,#addQuick,#dailyQuick,#ledgerQuick,.qk")}).map(function(b){return b.id||("qk:"+b.dataset.for)})}
-    function saveOrder(){try{localStorage.setItem("bible-tb-order",JSON.stringify(tbKeys()))}catch(e){}}
     function anchor(){return $("filterBtn")||$("topMenu")}
-    /* 맨 위 줄에 다 들어가게 크기 맞추기 */
-    function vis(){return Array.prototype.filter.call(bar.children,function(b){return b.offsetWidth>0&&b.tagName!=="H2"})}
-    function needSize(n){var cs=getComputedStyle(bar), W=bar.clientWidth-parseFloat(cs.paddingLeft||0)-parseFloat(cs.paddingRight||0), base=window.innerWidth<=380?32:34;
-      if(n*base+(n-1)*4<=W)return base; return Math.floor((W-(n-1)*4)/n)}
-    function fit(){
-      if(document.body.classList.contains("boardon")){bar.classList.remove("tbfit");return}
-      bar.classList.remove("tbfit"); var n=vis().length, base=window.innerWidth<=380?32:34, sz=needSize(n);
-      if(sz<base){bar.style.setProperty("--tbs",Math.max(24,sz)+"px"); bar.classList.add("tbfit")}
-    }
-    function sync(){   // 메뉴 줄 ＋/− 표시
-      var l=load();
-      Array.prototype.forEach.call(pop.querySelectorAll(":scope>button"),function(b){
-        if(!b.id||SKIP[b.id])return;
-        var p=b.querySelector(".mnpin"); if(!p){p=document.createElement("span"); p.className="mnpin"; p.setAttribute("role","button"); b.appendChild(p)}
-        var on=l.indexOf(b.id)>=0; p.classList.toggle("on",on); p.textContent=on?"−":"＋"; p.title=on?"맨 위 단추에서 빼기":"맨 위 단추로 넣기"; p.setAttribute("aria-label",p.title);
-      });
-    }
-    // 처음: 저장된 목록대로 넣고 뺌 (자리 차례는 아래 끌기 코드가 bible-tb-order로 맞춤)
-    var l0=load();
-    Array.prototype.forEach.call(bar.querySelectorAll(".qk"),function(b){if(l0.indexOf(b.dataset.for)<0)b.remove()});
-    l0.forEach(function(id){if(!qkOf(id)){var b=make(id); if(b)bar.insertBefore(b,anchor())}});
+    function off(src){return src.hidden||getComputedStyle(src).display==="none"}
+    function sync(){Array.prototype.forEach.call(pop.querySelectorAll(":scope>button"),function(src){var q=qkOf(src.id); if(q)q.classList.toggle("qkoff",off(src))})}
+    Array.prototype.forEach.call(pop.querySelectorAll(":scope>button"),function(src){
+      if(!src.id||SKIP[src.id]||qkOf(src.id))return; var b=make(src.id); if(b)bar.insertBefore(b,anchor());
+    });
     sync();
-    $("topMenu").addEventListener("toggle",function(){if($("topMenu").open)sync()});
-    pop.addEventListener("click",function(e){
-      var p=e.target.closest&&e.target.closest(".mnpin"); if(!p)return;
-      e.preventDefault(); e.stopPropagation(); buzz(12);
-      var id=p.parentElement.id, l=load(), i=l.indexOf(id);
-      if(i>=0){l.splice(i,1); var q=qkOf(id); if(q)q.remove(); toast("맨 위 단추에서 뺐어요")}
-      else{
-        if(needSize(vis().length+1)<24){toast("맨 위 줄에 자리가 없어요. 다른 단추를 먼저 빼 주세요");return}
-        var b=make(id); if(!b)return; l.push(id); bar.insertBefore(b,anchor()); toast("맨 위에 단추를 넣었어요")
-      }
-      save(l); saveOrder(); sync(); fit();
-    },true);
-    window.addEventListener("resize",fit); setTimeout(fit,0); setTimeout(fit,600);
-    if(window.ResizeObserver)try{new ResizeObserver(fit).observe(bar)}catch(e){}
+    try{new MutationObserver(sync).observe(pop,{subtree:true,attributes:true,attributeFilter:["hidden","style"]})}catch(e){}
+    window.addEventListener("resize",sync);
   })();
   /* ↔ 맨 위 동그라미 단추 끌어서 자리 바꾸기 (2026-11-13 사용자 요청): 꾹(0.35초) 누른 뒤 좌우로 끌기, 한 칸 옮길 때마다 진동. ⋯는 맨 끝 고정. 저장 bible-tb-order (이 기기만) */
   (function(){
@@ -21860,7 +21836,8 @@ body:not(.boardon) .toolbar.tbfit #colAddQuick svg,body:not(.boardon) .toolbar.t
     function start(b,x){d={b:b,x0:x,armed:false,t:setTimeout(function(){if(!d)return;d.armed=true;b.classList.add("tbdrag");bar.classList.add("tbdragging");buzz(15)},350)}}
     function move(x,e){
       if(!d)return;
-      if(!d.armed){if(Math.abs(x-d.x0)>14){clearTimeout(d.t);d=null}return}
+      if(!d.armed){if(Math.abs(x-d.x0)>8){clearTimeout(d.t);d=null}return}   // 움직이면 좌우 밀기(굴림)로
+      var br=bar.getBoundingClientRect(); if(x<br.left+40)bar.scrollLeft-=10; else if(x>br.right-40)bar.scrollLeft+=10;   // 끝으로 끌면 줄이 굴러감
       if(e&&e.cancelable)e.preventDefault();
       var ms=movables(), i=ms.indexOf(d.b);
       var prev=ms[i-1], next=ms[i+1];
