@@ -7,7 +7,18 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114y">
+<meta name="app-build" content="nb-20261114z">
+<script>
+/* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
+function taAuto(t,calc){
+  var keep=[]; for(var e=t.parentElement;e;e=e.parentElement){if(e.scrollTop)keep.push([e,e.scrollTop])}
+  var wy=window.scrollY;
+  t.style.height="auto"; var h=calc?calc(t.scrollHeight):t.scrollHeight; t.style.height=h+"px";
+  for(var i=0;i<keep.length;i++){if(keep[i][0].scrollTop!==keep[i][1])keep[i][0].scrollTop=keep[i][1]}
+  if(window.scrollY!==wy)window.scrollTo(window.scrollX,wy);
+  return h;
+}
+</script>
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 */
 (function(){try{
@@ -7084,7 +7095,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     if(!t||t.tagName!=="TEXTAREA"||!t.offsetParent||t.classList.contains("dlbig"))return;   // 크게 펼친 기록칸은 글자에 따라 줄이지 않음
     var h=manualH.get(taKey(t));
     if(h){t.style.height=h;return}
-    t.style.height="auto"; t.style.height=t.scrollHeight+"px";
+    taAuto(t);
   }
   document.addEventListener("pointerdown",function(e){   // 오른쪽 아래 손잡이를 잡으면 그 높이를 기억
     var t=e.target; if(!t||t.tagName!=="TEXTAREA")return;
@@ -7389,7 +7400,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         L.addEventListener("touchcancel",function(){sw=null},{passive:true});
       })();
       (function(){var thT=0;   // 감사 기도는 적는 대로 0.5초 뒤 저장
-        function grow(t){t.style.height="auto"; t.style.height=Math.max(120,t.scrollHeight+4)+"px"}
+        function grow(t){taAuto(t,function(h){return Math.max(120,h+4)})}
         prd.querySelector(".prdlist").addEventListener("input",function(e){var t=e.target; if(!t.classList||!t.classList.contains("prdth"))return; grow(t);
           var c=t.closest(".prdcard"), n=notes.get(c.dataset.nid), x=n&&(n.prays||[]).find(function(y){return y.id===c.dataset.pid}); if(!x)return;
           x.th=t.value; clearTimeout(thT); var sv=c.querySelector(".prdthsv"); thT=setTimeout(function(){scheduleSave(n.id); if(sv)sv.textContent="저장됨 ✓"},500)});
@@ -12966,7 +12977,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   }
   function lineRowsSet(box,lines,mk,sel,lazy){box._lines=lines; box._mk=mk; box._sel=sel; if(!lazy)lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); box._pend=1; setTimeout(function(){if(box._pend)lineRows(box)},60)}   // 이미 나눴으면 다시 안 함 (2026-11-08)
   window.addEventListener("resize",function(){clearTimeout(lineRows.t); lineRows.t=setTimeout(function(){document.querySelectorAll(".srmrlines,.saylines").forEach(lineRows)},150)});
-  function srmFit(t){t.style.height="auto"; t.style.height=t.scrollHeight+"px"; if(t.classList.contains("srmli"))srmLView(t)}
+  function srmFit(t){taAuto(t); if(t.classList.contains("srmli"))srmLView(t)}
   // ✨ 고치기에서도 강조 기호([[분홍:…]], **…**) 대신 색 글자로 보이게: 커서가 없는 줄은 색 글자 겹침(.srmlview), 고치는 줄만 기호 (2026-11-13 사용자 요청)
   function srmLView(t){
     var row=t.parentNode; if(!row||!row.classList.contains("srmline"))return;
@@ -13882,7 +13893,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         var t=document.createElement("textarea"); t.className="srmapta"; t.value=cur; t.placeholder="이번 주에 이렇게 살아 보겠습니다"; t.setAttribute("aria-label","나의 적용"); w.appendChild(t);
         // ↕ 아래 손잡이를 끌어 적는 칸 높이 늘이기·줄이기 — 정한 높이는 이 기기에 기억 (2026-11-12 사용자 요청)
         var uh=0; try{uh=+localStorage.getItem("bible-srm-aph")||0}catch(e){}
-        function fit(){t.style.height="auto"; t.style.height=Math.max(72,uh,t.scrollHeight+2)+"px"} fit();
+        function fit(){taAuto(t,function(h){return Math.max(72,uh,h+2)})} fit();
         var gp=document.createElement("div"); gp.className="srmapgrip"; gp.title="끌어서 칸 크기 바꾸기"; gp.innerHTML="<i></i>"; w.appendChild(gp);
         var gd=null;
         function gStart(y){gd={y:y,h:t.getBoundingClientRect().height}; gp.classList.add("on")}
@@ -16785,7 +16796,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       ta.placeholder=sayMode==="m"?"말씀 속 장면으로 들어가 보세요\n· 무엇이 보이나요 · 무슨 소리가 들리나요\n· 나는 어디에 서 있나요\n· 예수님이 내게 하시는 말씀":sayMode==="v"?"짧은 말씀 한 구절 (예: 악에게 지지 말고 선으로 악을 이기라)":sayMode==="g"?"받은 은혜를 적어 보세요 (예: 오늘 기도 중에 마음이 평안해졌다)":"한 마디를 적어 보세요 (복사해 온 \u201c… -하용조 목사님-\u201d 를 붙여넣어도 돼요)";
       ta.setAttribute("aria-label","한 마디"); form.appendChild(ta);
       var sayFit=function(){
-        ta.style.height="auto"; var h0=ta.scrollHeight+2; ta.style.height=h0+"px";   // 글 길이에 맞춰 높이
+        var h0=taAuto(ta,function(h){return h+2});   // 글 길이에 맞춰 높이
         // 휴대폰에서 적는 중이면 칸을 키보드 바로 위까지 늘림 — 아래 저장 줄이 키보드 바로 위에 오게 (2026-11-07 사용자 요청)
         if(document.activeElement===ta&&!(window.matchMedia&&matchMedia("(min-width:900px)").matches)){
           var vv=window.visualViewport, vbot=vv?vv.offsetTop+vv.height:innerHeight;
@@ -17139,7 +17150,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         lt=now; lx=p.clientX; ly=p.clientY},{passive:false});
       list.addEventListener("dblclick",function(e){var t=e.target; if(t.classList&&t.classList.contains("sayuse")&&t.value.trim())done(t)});
     })();
-    list.addEventListener("input",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return; t.style.height="auto"; t.style.height=t.scrollHeight+"px"; clearTimeout(sayUseT); sayUseT=setTimeout(function(){sayUseSave(t)},500)});
+    list.addEventListener("input",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return; taAuto(t); clearTimeout(sayUseT); sayUseT=setTimeout(function(){sayUseSave(t)},500)});
     list.addEventListener("focusout",function(e){var t=e.target; if(!t.classList||!t.classList.contains("sayuse"))return; clearTimeout(sayUseT); sayUseSave(t);
       setTimeout(function(){var a=document.activeElement; if(a&&a.classList&&a.classList.contains("sayuse"))return; if(sayUseEd===t.dataset.id)sayUseEd=""; sayUsePend=false; drawSay()},120)});
   }
@@ -22096,7 +22107,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         if(sc&&sc!==document.body)sc.scrollTop+=dy; else window.scrollBy(0,dy);
       }
     }
-    function sched(ta){clearTimeout(T); T=setTimeout(function(){follow(ta)},60)}
+    function sched(ta){clearTimeout(T); cancelAnimationFrame(T); T=requestAnimationFrame(function(){follow(ta)})}   // 0.06초 뒤에 따로 굴리면 브라우저가 커서를 보이게 굴린 다음 한 번 더 움직여 화면이 흔들렸음 → 같은 화면 그리기 안에서 한 번에 (2026-11-14 사용자 요청)
     document.addEventListener("input",function(e){if(e.target&&e.target.tagName==="TEXTAREA")sched(e.target)},true);
     document.addEventListener("focusin",function(e){var t=e.target; if(t&&t.tagName==="TEXTAREA"){setTimeout(function(){follow(t)},350); setTimeout(function(){follow(t)},800)}},true);
     if(window.visualViewport)visualViewport.addEventListener("resize",function(){var a=document.activeElement; if(a&&a.tagName==="TEXTAREA")sched(a)});
