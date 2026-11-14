@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114za">
+<meta name="app-build" content="nb-20261114zb">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -16892,7 +16892,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       fbn.classList.add("sayone"); sayOneLP(fbn);
       if((x.gr||!x.hv)&&!sfd&&String(x.t||"").indexOf("\n")>=0){   // 🌿 은혜: 설교 메모처럼 한 줄씩 칸으로, 빈 줄도 그대로 (2026-11-08 사용자 요청) · 💬 한 마디도 같은 줄 칸 + 길면 쪽 넘기기 (2026-11-14 사용자 요청)
         var q=document.createElement("div"); q.className="sayq saylines"+(x.gr&&!x.sc?"":" sayplain"); c.classList.add("saylined");
-        q._after=sayPage; c.appendChild(q);
+        q._after=sayPage; q._hang=1; c.appendChild(q);   // 절 번호(3. …) 뒤 글자에 맞춰 넘어간 줄을 들여 씀 — 성경 본문처럼 (2026-11-14 사용자 요청)
         lineRowsSet(q,String(x.t||"").replace(/\s+$/,"").split("\n"),function(ln){var r=document.createElement("div"); r.className="sayln"; var g=document.createElement("span"); g.className="saylg"; g.textContent="⠿"; g.setAttribute("aria-hidden","true"); r.appendChild(g); var tx=document.createElement("span"); tx.className="saylt"; hlFill(tx,ln); r.appendChild(tx); return r},".saylt");
       }else{
       var q=document.createElement("p"); q.className="sayq"; q.textContent=sfd?String(x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean)[0]||"":(x.t||""); c.appendChild(q);
