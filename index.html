@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115c">
+<meta name="app-build" content="nb-20261115d">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5561,6 +5561,16 @@ body:not(.boardon) #addQuick{margin:0!important}
 .srmsheet.srmone .srmform textarea.srmbody{display:block!important;width:100%;box-sizing:border-box;font-size:16px;line-height:40px;padding:0 12px 0 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--sky) 35%,#2A3240);background-color:rgba(120,170,220,.07);background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 39px,rgba(183,156,242,.22) 39px,rgba(183,156,242,.22) 40px);background-attachment:local;color:var(--ink);font-family:inherit;resize:none;overflow:hidden;-webkit-user-select:text;user-select:text}
 .mselfloat{position:fixed;right:18px;z-index:130;height:34px;padding:0 14px;border-radius:17px;border:1px solid color-mix(in srgb,var(--sky) 70%,#0A2A3A);background:var(--sky) linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.12) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.18) 100%)!important;color:#0B1A24;font-family:inherit;font-size:13.5px;font-weight:700;white-space:nowrap;box-shadow:0 3px 0 color-mix(in srgb,var(--sky) 45%,#06141C),0 6px 16px rgba(0,0,0,.5)}
 .mselfloat[hidden]{display:none}
+.lnpick textarea.lnsel{background:color-mix(in srgb,var(--sky) 26%,transparent)!important;box-shadow:inset 3px 0 0 var(--sky)}
+.lnpick textarea{caret-color:transparent;-webkit-user-select:none;user-select:none;cursor:pointer}
+.lnbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));z-index:140;display:flex;align-items:center;gap:6px;padding:6px 6px 6px 14px;border-radius:24px;background:rgba(24,30,40,.97);border:1px solid color-mix(in srgb,var(--sky) 55%,#123);box-shadow:0 8px 24px rgba(0,0,0,.6);white-space:nowrap;max-width:calc(100vw - 16px)}
+.lnbar .lncnt{color:var(--sky);font-size:13px;font-weight:700;margin-right:2px}
+.lnbar button{height:34px;padding:0 11px;border-radius:17px;border:1px solid #4A5566;background:#2C3646;color:#E8EEF6;font-family:inherit;font-size:13px;font-weight:700}
+.lnbar button[data-a="copy"]{background:var(--sky);color:#0B1A24;border-color:var(--sky)}
+.lnbar button[data-a="end"]{width:34px;padding:0}
+.lnbar button:disabled{opacity:.4}
+.lnbar button:active{transform:translateY(2px)}
+
 .mselfloat:active{transform:translateY(2px)}
 /* 📁 새 칸 만들기 창 (2026-11-13 사용자 요청) */
 .cndlg{position:fixed;inset:0;z-index:300;background:rgba(8,8,12,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-start;justify-content:center;padding:max(90px,calc(env(safe-area-inset-top,0px) + 70px)) 16px 16px;animation:cnIn .18s ease-out}
@@ -13112,22 +13122,60 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         mselBtn.style.top=Math.round(y)+"px";
       },
       go:function(){
-        var a=document.activeElement, L=me.last, s0, e0;
-        if(a&&box.contains(a)&&a.matches(sel)&&a.selectionEnd>a.selectionStart){s0=a.selectionStart; e0=a.selectionEnd}
-        else if(L&&L.el.isConnected&&box.contains(L.el)&&Date.now()-L.t<5000){a=L.el; s0=L.s; e0=L.e}   // 손길에 고른 글자가 풀렸으면 마지막으로 고른 자리로
-        else return;
-        var rows=[].slice.call(box.querySelectorAll(sel)), i=rows.indexOf(a), off=0, prevH=0;
-        for(var k=0;k<i;k++){off+=rows[k].value.length+1; prevH+=rows[k].offsetHeight}
-        var gs=off+s0, ge=off+e0, oldTop=a.getBoundingClientRect().top;
-        var ta=expand(); if(!ta)return;
-        try{ta.focus({preventScroll:true}); ta.setSelectionRange(gs,ge)}catch(err){}
-        function fix(){var d=ta.getBoundingClientRect().top+prevH-oldTop;
-          for(var el=ta.parentElement;el&&Math.abs(d)>1;el=el.parentElement){if(el.scrollHeight>el.clientHeight+2&&/auto|scroll/.test(getComputedStyle(el).overflowY)){var b0=el.scrollTop; el.scrollTop=b0+d; d-=el.scrollTop-b0}}
-          if(Math.abs(d)>1)window.scrollBy(0,d)}
-        fix(); requestAnimationFrame(function(){fix(); setTimeout(fix,80); setTimeout(fix,250)});   // 글 칸 높이 맞추기·커서 따라가기가 한 번 더 굴려도 고른 줄이 제자리에
+        var a=document.activeElement, L=me.last;
+        if(!(a&&box.contains(a)&&a.matches(sel))){if(L&&L.el.isConnected&&box.contains(L.el)&&Date.now()-L.t<5000)a=L.el; else return}
+        lnPickStart(box,sel,a);
       }
     };
     mselAll.push(me); return me;
+  }
+  /* ☑ 줄 골라 복사: '여러 줄 고르기'를 누르면 화면은 그대로 두고 줄을 탁탁 눌러 여러 줄을 고름 → 복사·잘라내기 (2026-11-15 사용자 요청) */
+  var lnPick=null;
+  function lnPickEnd(){
+    var P=lnPick; if(!P)return; lnPick=null;
+    document.body.classList.remove("lnpicking"); P.box.classList.remove("lnpick");
+    P.box.querySelectorAll(P.sel).forEach(function(r){r.readOnly=!!r._ro0; r.classList.remove("lnsel")});
+    P.bar.remove(); P.box.removeEventListener("click",P.onClick,true); P.box.removeEventListener("mousedown",P.onDown,true);
+  }
+  function lnPickStart(box,sel,first){
+    lnPickEnd();
+    var rows0=[].slice.call(box.querySelectorAll(sel)), top0=first.getBoundingClientRect().top;
+    function scroller(el){for(var p=el.parentElement;p&&p!==document.body;p=p.parentElement){var o=getComputedStyle(p).overflowY; if((o==="auto"||o==="scroll")&&p.scrollHeight>p.clientHeight+2)return p} return null}
+    function fix(){if(!first.isConnected)return; var d=first.getBoundingClientRect().top-top0; if(Math.abs(d)<1)return; var sc=scroller(first); if(sc)sc.scrollTop+=d; else window.scrollBy(0,d)}
+    try{var gs=window.getSelection(); if(gs)gs.removeAllRanges()}catch(e){}
+    try{first.setSelectionRange(first.selectionStart,first.selectionStart)}catch(e){}
+    rows0.forEach(function(r){r._ro0=r.readOnly; r.readOnly=true});
+    var ae=document.activeElement; if(ae&&ae.blur)ae.blur();
+    box.classList.add("lnpick"); document.body.classList.add("lnpicking"); first.classList.add("lnsel");
+    var bar=document.createElement("div"); bar.className="lnbar";
+    bar.innerHTML='<span class="lncnt"></span><button type="button" data-a="all">모두</button><button type="button" data-a="cut">✂ 잘라내기</button><button type="button" data-a="copy">📋 복사</button><button type="button" data-a="end">✕</button>';
+    document.body.appendChild(bar);
+    function picked(){return [].slice.call(box.querySelectorAll(sel)).filter(function(r){return r.classList.contains("lnsel")})}
+    function cnt(){var n=picked().length; bar.querySelector(".lncnt").textContent=n?n+"줄 골랐어요":"줄을 눌러 고르세요"; bar.querySelector('[data-a="copy"]').disabled=!n; bar.querySelector('[data-a="cut"]').disabled=!n}
+    function txt(){return picked().map(function(r){return r.value}).join("\n")}
+    function copy(t,ok){function done(){ok&&ok()} function old(){var x=document.createElement("textarea"); x.value=t; x.style.cssText="position:fixed;left:-9999px;top:0"; document.body.appendChild(x); x.select(); try{document.execCommand("copy")}catch(e){} x.remove(); done()} if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,old); else old()}
+    var onDown=function(e){if(e.target.closest&&e.target.closest(sel))e.preventDefault()};   // 눌러도 칸에 들어가지 않게(키보드·화면 움직임 없음)
+    var onClick=function(e){var r=e.target.closest&&e.target.closest(sel); if(!r||!box.contains(r)){e.stopPropagation(); return} e.preventDefault(); e.stopPropagation(); r.classList.toggle("lnsel"); buzz(8); cnt()};
+    box.addEventListener("mousedown",onDown,true); box.addEventListener("click",onClick,true);
+    bar.addEventListener("pointerdown",function(e){e.preventDefault()});
+    bar.addEventListener("click",function(e){
+      var b=e.target.closest("button"); if(!b)return; e.stopPropagation(); var A=b.dataset.a;
+      if(A==="end"){lnPickEnd();return}
+      if(A==="all"){var rs=[].slice.call(box.querySelectorAll(sel)), on=!rs.every(function(r){return r.classList.contains("lnsel")}); rs.forEach(function(r){r.classList.toggle("lnsel",on)}); cnt(); return}
+      var t=txt(); if(!t&&!picked().length)return;
+      if(A==="copy"){copy(hlStrip?hlStrip(t):t,function(){toast("📋 "+picked().length+"줄을 복사했어요")}); lnPickEnd(); return}
+      if(A==="cut"){
+        var pk=picked(), n=pk.length; copy(hlStrip?hlStrip(t):t);
+        var all=[].slice.call(box.querySelectorAll(sel)), keep=all.filter(function(r){return pk.indexOf(r)<0});
+        lnPickEnd();
+        if(!keep.length){pk[0].value=""; pk.slice(1).forEach(function(r){var w=r.closest(".srmline")||r; w.remove()}); keep=[pk[0]]}
+        else pk.forEach(function(r){var w=(r.parentNode&&r.parentNode.classList&&r.parentNode.classList.contains("srmline"))?r.parentNode:r; w.remove()});
+        keep[0].dispatchEvent(new Event("input",{bubbles:true}));
+        toast("✂ "+n+"줄을 잘라냈어요 (붙여넣기로 옮길 수 있어요)"); return;
+      }
+    });
+    lnPick={box:box,sel:sel,bar:bar,onClick:onClick,onDown:onDown}; cnt();
+    fix(); requestAnimationFrame(fix); [80,200,400,700].forEach(function(ms){setTimeout(fix,ms)});   // 키보드가 내려가도 고르던 줄이 제자리에
   }
   function srmOneFit(ta){taAuto(ta,function(h){return Math.max(160,Math.ceil(h/40)*40)})}
   function srmOne(on){
@@ -13276,7 +13324,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     // ✋ 고치기에서 ⠿ 없이 문장을 꾹(0.4초) 누르면 위아래로 끌어 줄 옮기기 (2026-11-12 사용자 요청) — 휴대폰 글 고르기(0.5초)보다 먼저 잡음
     var lp={t:0,row:null,x:0,y:0,fired:false};
     srm.addEventListener("touchstart",function(e){
-      var ta=e.target.closest&&e.target.closest(".srmform .srmlines .srmli"); if(!ta||e.touches.length!==1||srmDrag||srm.classList.contains("hlmulti"))return;
+      var ta=e.target.closest&&e.target.closest(".srmform .srmlines .srmli"); if(!ta||e.touches.length!==1||srmDrag||srm.classList.contains("hlmulti")||document.body.classList.contains("lnpicking"))return;
       if(ta===document.activeElement)return;   // 커서가 들어가 있는(고치는 중인) 줄은 꾹 누르면 휴대폰 글 고르기 → 강조 색 (2026-11-12 사용자 요청)
       var t0=e.touches[0]; clearTimeout(lp.t); lp={row:ta.parentNode,x:t0.clientX,y:t0.clientY,fired:false,t:0};
       lp.t=setTimeout(function(){if(!lp.row||!lp.row.isConnected)return; lp.fired=true; try{window.getSelection().removeAllRanges()}catch(err){} start(lp.row,lp.y); srmDrag.lastY=lp.y},400);
@@ -13357,7 +13405,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
           var nw=Date.now(); if(nw-srmTap.t<350&&Math.abs(e.clientX-srmTap.x)<30&&Math.abs(e.clientY-srmTap.y)<40){srmTap.t=0; e.preventDefault(); srmRespToggle(); buzz(10); return}
           srmTap={t:nw,x:e.clientX,y:e.clientY}; return;
         }
-        if(e.pointerType!=="touch"||!srmEdit||srmResp||srm.classList.contains("srmone")||!e.target.closest(".srmbox")||e.target.closest("button,select,input,a,.srmytc,.srmgrip"))return;
+        if(e.pointerType!=="touch"||!srmEdit||srmResp||srm.classList.contains("srmone")||document.body.classList.contains("lnpicking")||!e.target.closest(".srmbox")||e.target.closest("button,select,input,a,.srmytc,.srmgrip"))return;
         var now=Date.now();
         if(now-srmTap.t<350&&Math.abs(e.clientX-srmTap.x)<30&&Math.abs(e.clientY-srmTap.y)<30){
           srmTap.t=0; e.preventDefault(); var ae=document.activeElement; if(ae&&srm.contains(ae))ae.blur();
@@ -17229,7 +17277,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       keep.forEach(function(k){if(k[0].scrollTop!==k[1])k[0].scrollTop=k[1]});
     }
     box.addEventListener("focusin",function(){on=true; [0,150,450].forEach(function(d){setTimeout(fill,d)})});
-    box.addEventListener("focusout",function(){setTimeout(function(){if(!box.contains(document.activeElement)){on=false; box.style.minHeight=""}},150)});
+    box.addEventListener("focusout",function(){setTimeout(function(){if(!box.contains(document.activeElement)&&!box.classList.contains("lnpick")){on=false; box.style.minHeight=""}},150)});
     if(window.visualViewport){var vf=function(){if(!box.isConnected){visualViewport.removeEventListener("resize",vf);return} if(on)setTimeout(fill,60)}; visualViewport.addEventListener("resize",vf)}
     window.addEventListener("resize",function rz(){if(!box.isConnected){window.removeEventListener("resize",rz);return} hang()});
   }
@@ -22349,6 +22397,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     }
     function follow(ta){
       if(!ta||ta.tagName!=="TEXTAREA"||document.activeElement!==ta)return;
+      if(ta.readOnly||document.body.classList.contains("lnpicking"))return;
       if(ta.selectionEnd!==ta.selectionStart)return;   // 글자를 고르는 중엔 화면을 움직이지 않음 — 여러 줄을 고를 때 고른 끝으로 굴러가 엉뚱한 곳에 가던 문제 (2026-11-15 사용자 요청)
       var vv=window.visualViewport, vtop=vv?vv.offsetTop:0, vbot=vv?vtop+vv.height:innerHeight;
       var fullH=Math.max(innerHeight,(screen&&screen.height)||0); if(vv&&vv.height>fullH*0.8)vbot=vtop+Math.round(vv.height*0.55);   // 키보드가 보이는 높이를 안 줄이는 기기
