@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115m">
+<meta name="app-build" content="nb-20261115n">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -17021,6 +17021,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       return;
     }
     var o=sayData(), form=say.querySelector(".sayform"), list=say.querySelector(".saylist");
+    if(form.parentNode===list){var wasEd=form.dataset.ed, wasTop=form.getBoundingClientRect().top; list.parentNode.insertBefore(form,list);
+      if(wasEd&&!sayEdit){var fixB=function(){var c=say.querySelector('.saycard[data-id="'+wasEd+'"]'), bx=say.querySelector(".dlbody"); if(c&&bx)bx.scrollTop+=c.getBoundingClientRect().top-wasTop}; [0,120,300,600].forEach(function(ms){setTimeout(fixB,ms)})}}   // 저장·취소 뒤에도 그 카드가 같은 자리에   // 목록 안 제자리에서 고치던 칸을 먼저 꺼냄 — 목록을 비울 때 같이 지워지지 않게
     // 적던 중에 화면이 다시 그려져도(동기화 등) 적던 글은 그대로 (2026-10-25 사용자 요청)
     var keep=null, ft=form.querySelector(".sayt");
     if(ft&&sayEdit&&form.dataset.ed===sayEdit){var q=function(c){var e=form.querySelector(c);return e?e.value:""}; keep={t:ft.value,who:q(".saywho"),topic:q(".saytopic"),note:q(".saynote"),focus:document.activeElement===ft,ss:ft.selectionStart,se:ft.selectionEnd}}
@@ -17109,7 +17111,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     }
     var hvN=0, SAY_VCOL=["var(--violet)","var(--sky)","var(--green)","var(--gold)","var(--pink)","var(--orange)","#5FD3C4","#C9A27A"];
     items.forEach(function(x){
-      if(sayEdit===x.id)return;
+      if(sayEdit===x.id){list.appendChild(form); return}   // ✏️ 고치는 칸은 그 카드가 있던 자리에 (2026-11-15 사용자 요청: 맨 위에 떠서 불편)
       var c=document.createElement("article"); c.className="saycard"; c.dataset.id=x.id; var cth=x.hv?null:sayTheme(x);
       c.style.setProperty("--sc",SAY_VCOL[hvN%SAY_VCOL.length]); hvN++; if(!x.hv)c.classList.add("saytint");   // 목록 카드는 한 마디도 짧은 말씀처럼 카드마다 색이 차례로, 묶음은 이름표로만 (2026-11-05 사용자 요청)
       var gp=document.createElement("span"); gp.className="saygrip"; gp.setAttribute("aria-hidden","true"); gp.title="끌어서 순서 바꾸기"; gp.textContent="⠿"; c.appendChild(gp);
@@ -17408,8 +17410,11 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         clearTimeout(dtap.ot); dtap={id:"",t:0}; e.preventDefault(); e.stopPropagation();
         try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
         if(sayBack[id]){sayUseEd=id; sayUseEdAt=Date.now(); drawSay(); var ut=say.querySelector('.sayuse[data-id="'+id+'"]'); if(ut){try{ut.focus({preventScroll:true}); ut.setSelectionRange(ut.value.length,ut.value.length)}catch(err){}} sayUseFill(ut); return}
-        sayEdit=id; sayEditAt=Date.now(); drawSay(); var ta=say.querySelector(".sayt");
-        if(ta){ta.scrollIntoView({block:"center"}); setTimeout(function(){try{ta.focus({preventScroll:true}); ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}},30)}
+        var bx1=say.querySelector(".dlbody"), top1=card.getBoundingClientRect().top;
+        (function(){var o9=sayData(); if(!Array.isArray(o9.ord)||o9.ord.indexOf(id)<0){o9.ord=sayOrdered(o9).map(function(x){return x.id}); o9.ordAt=Date.now(); saveSay(o9)}})();   // 고친 시각(at)이 바뀌어도 카드가 맨 위로 튀지 않게 지금 차례를 붙잡아 둠
+        sayEdit=id; sayEditAt=Date.now(); drawSay(); var ta=say.querySelector(".sayt"), fm1=say.querySelector(".sayform");
+        if(bx1&&fm1){var dy=fm1.getBoundingClientRect().top-top1; if(dy)bx1.scrollTop+=dy}   // 두 번 누른 카드 자리 그대로 고치는 칸이 보이게
+        if(ta){ setTimeout(function(){try{ta.focus({preventScroll:true}); ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}},30)}
         return;
       }
       dtap={id:id,t:now};
