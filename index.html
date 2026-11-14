@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115h">
+<meta name="app-build" content="nb-20261115i">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -13094,8 +13094,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     requestAnimationFrame(function(){[].forEach.call(ls.querySelectorAll(".srmli"),srmFit); bibleHangEdit(ls)});
   }
   /* ↕ 줄 칸에서 글자를 고르면 그 줄 바로 아래(강조 단추가 있으면 그 아래)에 '↕ 여러 줄 고르기'가 떠서, 누르면 한 칸 모드로 바꾸고 고른 자리·화면 위치를 그대로 이어 줌 — 맨 위 단추까지 올라가지 않아도 되게 (2026-11-14 사용자 요청) */
-  var mselBtn=null, mselCur=null, mselAll=[], mselAt=0, mselHideT=0;
-  function mselAttach(box,sel,expand){
+  var mselBtn=null, mselCur=null, mselAll=[], mselAt=0, mselHideT=0, tpHint=0;
+  function mselAttach(box,sel,expand,opt){
     if(!mselBtn){
       mselBtn=document.createElement("button"); mselBtn.type="button"; mselBtn.className="mselfloat"; mselBtn.textContent="↕ 여러 줄 고르기"; mselBtn.hidden=true; document.body.appendChild(mselBtn);
       mselBtn.addEventListener("pointerdown",function(e){e.preventDefault()});
@@ -13121,6 +13121,22 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     };
     box.addEventListener("touchstart",tryPick,{passive:false,capture:true});
     box.addEventListener("mousedown",tryPick,true);
+    // ☑ 키보드가 없을 때(고치는 줄이 없을 때) 줄을 한 번 누르면 바로 줄 고르기 — 이어서 탁탁 눌러 여러 줄, 두 번 누르면 그 줄 고치기 (2026-11-15 사용자 요청)
+    if(opt&&opt.tapPick){
+      var tp=null, lastTouch=0;
+      var kbOpen=function(){var vv=window.visualViewport, h=vv?vv.height:innerHeight, H=Math.max((screen&&screen.height)||0,innerHeight); return h<H*0.68};
+      var editing=function(){var a=document.activeElement; return !!(a&&box.contains(a)&&a.matches&&a.matches(sel)&&(kbOpen()||!("ontouchstart" in window)))};
+      box.addEventListener("touchstart",function(e){if(lnPick||e.touches.length!==1){tp=null;return} var r=e.target.closest&&e.target.closest(sel); if(!r||!box.contains(r)){tp=null;return} var t=e.touches[0]; tp={r:r,x:t.clientX,y:t.clientY,t:Date.now()}},{passive:true,capture:true});
+      box.addEventListener("touchmove",function(e){if(!tp)return; var t=e.touches[0]; if(Math.abs(t.clientX-tp.x)>10||Math.abs(t.clientY-tp.y)>10)tp=null},{passive:true,capture:true});
+      box.addEventListener("touchend",function(e){
+        lastTouch=Date.now(); var T=tp; tp=null; if(!T||lnPick||Date.now()-T.t>350||editing()||!T.r.value.trim())return;   /* 빈 줄은 바로 적기 */
+        e.preventDefault(); lnPickStart(box,sel,T.r); if(lnPick){lnPick.lastTap={r:T.r,t:Date.now()}; lnPick.cnt()} buzz(10); if(!tpHint){tpHint=1; toast("줄을 더 누르면 같이 골라져요 · 두 번 누르면 그 줄 고치기")}
+      },{passive:false,capture:true});
+      box.addEventListener("mousedown",function(e){
+        if(Date.now()-lastTouch<800||lnPick||e.button>0||editing())return; var r=e.target.closest&&e.target.closest(sel); if(!r||!box.contains(r)||!r.value.trim())return;
+        e.preventDefault(); e.stopPropagation(); lnPickStart(box,sel,r); if(lnPick){lnPick.skip=r; lnPick.skipAt=Date.now(); lnPick.cnt()}
+      },true);
+    }
     var me={box:box,
       place:function(){
         var a=document.activeElement;
@@ -13164,11 +13180,16 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     bar.innerHTML='<span class="lncnt"></span><button type="button" data-a="all">모두</button><button type="button" data-a="cut">✂ 잘라내기</button><button type="button" data-a="copy">📋 복사</button><button type="button" data-a="end">✕</button>';
     document.body.appendChild(bar);
     function picked(){return [].slice.call(box.querySelectorAll(sel)).filter(function(r){return r.classList.contains("lnsel")})}
-    function cnt(){var n=picked().length; bar.querySelector(".lncnt").textContent=n?n+"줄 골랐어요":"줄을 눌러 고르세요"; bar.querySelector('[data-a="copy"]').disabled=!n; bar.querySelector('[data-a="cut"]').disabled=!n}
+    function cnt(){var n=picked().length; bar.querySelector(".lncnt").textContent=n?n+"줄":"줄을 눌러 고르세요"; bar.querySelector(".lncnt").title="두 번 누르면 그 줄 고치기"; bar.querySelector('[data-a="copy"]').disabled=!n; bar.querySelector('[data-a="cut"]').disabled=!n}
     function txt(){return picked().map(function(r){return r.value}).join("\n")}
     function copy(t,ok){function done(){ok&&ok()} function old(){var x=document.createElement("textarea"); x.value=t; x.style.cssText="position:fixed;left:-9999px;top:0"; document.body.appendChild(x); x.select(); try{document.execCommand("copy")}catch(e){} x.remove(); done()} if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(t).then(done,old); else old()}
     var onDown=function(e){if(e.target.closest&&e.target.closest(sel))e.preventDefault()};   // 눌러도 칸에 들어가지 않게(키보드·화면 움직임 없음)
-    var onClick=function(e){var r=e.target.closest&&e.target.closest(sel); if(!r||!box.contains(r)){e.stopPropagation(); return} e.preventDefault(); e.stopPropagation(); if(lnPick&&lnPick.skip===r&&Date.now()-lnPick.skipAt<700){lnPick.skip=null; return} r.classList.toggle("lnsel"); buzz(8); cnt()};
+    var onClick=function(e){var r=e.target.closest&&e.target.closest(sel); if(!r||!box.contains(r)){e.stopPropagation(); return} e.preventDefault(); e.stopPropagation();
+      var now=Date.now(), L=lnPick&&lnPick.lastTap;
+      if(lnPick&&lnPick.skip===r&&now-lnPick.skipAt<700){lnPick.skip=null; lnPick.lastTap={r:r,t:now}; return}
+      if(L&&L.r===r&&now-L.t<420){lnPickEnd(); try{r.focus(); var n=r.value.length; r.setSelectionRange(n,n)}catch(err){} return}   // 같은 줄을 두 번 누르면 그 줄 고치기
+      if(lnPick)lnPick.lastTap={r:r,t:now};
+      r.classList.toggle("lnsel"); buzz(8); cnt()};
     box.addEventListener("mousedown",onDown,true); box.addEventListener("click",onClick,true);
     bar.addEventListener("pointerdown",function(e){e.preventDefault()});
     bar.addEventListener("click",function(e){
@@ -17241,7 +17262,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       else{form.classList.remove("saymall"); ta.classList.add("sayhid"); ta.classList.remove("sayall"); ta.style.height=""; box.innerHTML=""; String(ta.value).split("\n").forEach(function(l){box.appendChild(mk(l))}); box.style.display=""; msb.textContent="☰ 여러 줄 고르기"; BASE=null; requestAnimationFrame(hang)}
     });
     ta.addEventListener("input",function(){if(form.classList.contains("saymall"))taAuto(ta,function(h){return Math.max(80,Math.ceil(h/40)*40)})});
-    mselAttach(box,"textarea.sayle",function(){if(!form.classList.contains("saymall"))msb.click(); return ta});
+    mselAttach(box,"textarea.sayle",function(){if(!form.classList.contains("saymall"))msb.click(); return ta},{tapPick:true});
     var cv=document.createElement("canvas").getContext("2d"), BASE=null;
     function rows(){return [].slice.call(box.querySelectorAll("textarea.sayle"))}
     function sync(){var v=rows().map(function(r){return r.value}).join("\n"); if(ta.value!==v){ta.value=v; ta.dispatchEvent(new Event("input",{bubbles:true}))}}
