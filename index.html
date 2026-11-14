@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zn">
+<meta name="app-build" content="nb-20261114zo">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -16941,10 +16941,10 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       }
       // '💡 활용' 표시는 지움 (2026-11-14 사용자 요청)
       var f=document.createElement("div"); f.className="sayf";
-      if(x.who){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}
+      if(x.who&&!x.sc){var w=document.createElement("b"); w.textContent="— "+x.who; f.appendChild(w)}   // 🌄 장면 묵상은 본문 줄을 안 보임 (2026-11-14 사용자 요청)
       if(x.topic&&x.sc){var sct=document.createElement("div"); sct.className="sayscttl"; sct.textContent=x.topic; c.insertBefore(sct,c.firstChild)}   // 🌄 장면 묵상: 주제 칸 = 제목, 카드 맨 위에 (2026-11-14 사용자 요청)
       else if(x.topic){var tp=document.createElement("span"); tp.className="saytag"; tp.textContent="#"+x.topic; f.appendChild(tp)}
-      if(cth){var thb=document.createElement("span"); thb.className="saythm"; thb.textContent=cth.n; f.appendChild(thb)}
+      if(cth&&!x.sc){var thb=document.createElement("span"); thb.className="saythm"; thb.textContent=cth.n; f.appendChild(thb)}
       if(x.hv){   // ⏰ 누르면 시계가 떠서 나올 시각을 정함 (비우면 10분마다)
         var hvt=document.createElement("label"); hvt.className="saytag sayhvtag"+(x.tm?" set":""); hvt.title="눌러서 이 말씀이 나올 시각 정하기";
         var hs=document.createElement("span"); hs.textContent=x.tm?"⏰ 매일 "+x.tm:"⏰ 10분마다 · 시각 정하기"; hvt.appendChild(hs);
