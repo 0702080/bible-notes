@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261114zz">
+<meta name="app-build" content="nb-20261114zza">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -13084,13 +13084,17 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     requestAnimationFrame(function(){[].forEach.call(ls.querySelectorAll(".srmli"),srmFit); bibleHangEdit(ls)});
   }
   /* ↕ 줄 칸에서 글자를 고르면 그 줄 바로 아래(강조 단추가 있으면 그 아래)에 '↕ 여러 줄 고르기'가 떠서, 누르면 한 칸 모드로 바꾸고 고른 자리·화면 위치를 그대로 이어 줌 — 맨 위 단추까지 올라가지 않아도 되게 (2026-11-14 사용자 요청) */
-  var mselBtn=null, mselCur=null, mselAll=[];
+  var mselBtn=null, mselCur=null, mselAll=[], mselAt=0, mselHideT=0;
   function mselAttach(box,sel,expand){
     if(!mselBtn){
       mselBtn=document.createElement("button"); mselBtn.type="button"; mselBtn.className="mselfloat"; mselBtn.textContent="↕ 여러 줄 고르기"; mselBtn.hidden=true; document.body.appendChild(mselBtn);
       mselBtn.addEventListener("pointerdown",function(e){e.preventDefault()});
       mselBtn.addEventListener("mousedown",function(e){e.preventDefault()});
-      mselBtn.addEventListener("click",function(e){e.preventDefault(); e.stopPropagation(); var c=mselCur; mselBtn.hidden=true; if(c)c.go()});
+      var fire=function(){var c=mselCur; clearTimeout(mselHideT); mselBtn.hidden=true; mselAt=Date.now(); if(c)c.go()};
+      // 휴대폰: 손가락을 대는 순간 고른 글자가 풀리고 단추가 숨어, 손길이 아래 줄에 떨어져 '두 번 누르기=저장'으로 목록으로 튕기던 문제 — touchstart를 막고 touchend에서 바로 (2026-11-14)
+      mselBtn.addEventListener("touchstart",function(e){e.preventDefault(); e.stopPropagation(); mselAt=Date.now()},{passive:false});
+      mselBtn.addEventListener("touchend",function(e){e.preventDefault(); e.stopPropagation(); fire()},{passive:false});
+      mselBtn.addEventListener("click",function(e){e.preventDefault(); e.stopPropagation(); if(Date.now()-mselAt<700)return; fire()});
       document.addEventListener("selectionchange",function(){mselAll=mselAll.filter(function(m){return m.box.isConnected}); var a=document.activeElement, hit=null; mselAll.forEach(function(m){if(a&&m.box.contains(a))hit=m}); if(hit)hit.place(); else if(mselCur)mselCur.place()});
       window.addEventListener("scroll",function(){if(mselCur&&!mselBtn.hidden)mselCur.place()},true);
       if(window.visualViewport)visualViewport.addEventListener("resize",function(){if(mselCur&&!mselBtn.hidden)mselCur.place()});
@@ -13098,7 +13102,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var me={box:box,
       place:function(){
         var a=document.activeElement;
-        if(!box.isConnected||!a||!a.matches||!a.matches(sel)||!box.contains(a)||a.selectionEnd<=a.selectionStart){if(mselCur===me)mselBtn.hidden=true; return}
+        if(!box.isConnected||!a||!a.matches||!a.matches(sel)||!box.contains(a)||a.selectionEnd<=a.selectionStart){if(mselCur===me&&!mselBtn.hidden){clearTimeout(mselHideT); mselHideT=setTimeout(function(){var b=document.activeElement; if(!(b&&b.matches&&b.matches(sel)&&box.contains(b)&&b.selectionEnd>b.selectionStart))mselBtn.hidden=true},500)} return}
+        clearTimeout(mselHideT); me.last={el:a,s:a.selectionStart,e:a.selectionEnd,t:Date.now()};
         mselCur=me; var r=a.getBoundingClientRect(), y=r.bottom+6, hl=document.querySelector(".srmhlfloat");
         if(hl&&!hl._mselObs){hl._mselObs=1; try{new MutationObserver(function(){if(mselCur)setTimeout(function(){mselCur&&mselCur.place()},0)}).observe(hl,{attributes:true,attributeFilter:["hidden","style"]})}catch(e){}}
         if(hl&&!hl.hidden&&hl.getClientRects().length){var hr=hl.getBoundingClientRect(); if(hr.top>=r.top-4)y=Math.max(y,hr.bottom+6)}
@@ -13107,10 +13112,13 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
         mselBtn.style.top=Math.round(y)+"px";
       },
       go:function(){
-        var a=document.activeElement; if(!a||!box.contains(a)||!a.matches(sel))return;
+        var a=document.activeElement, L=me.last, s0, e0;
+        if(a&&box.contains(a)&&a.matches(sel)&&a.selectionEnd>a.selectionStart){s0=a.selectionStart; e0=a.selectionEnd}
+        else if(L&&L.el.isConnected&&box.contains(L.el)&&Date.now()-L.t<5000){a=L.el; s0=L.s; e0=L.e}   // 손길에 고른 글자가 풀렸으면 마지막으로 고른 자리로
+        else return;
         var rows=[].slice.call(box.querySelectorAll(sel)), i=rows.indexOf(a), off=0, prevH=0;
         for(var k=0;k<i;k++){off+=rows[k].value.length+1; prevH+=rows[k].offsetHeight}
-        var gs=off+a.selectionStart, ge=off+a.selectionEnd, oldTop=a.getBoundingClientRect().top;
+        var gs=off+s0, ge=off+e0, oldTop=a.getBoundingClientRect().top;
         var ta=expand(); if(!ta)return;
         try{ta.focus({preventScroll:true}); ta.setSelectionRange(gs,ge)}catch(err){}
         function fix(){var d=ta.getBoundingClientRect().top+prevH-oldTop;
@@ -17332,13 +17340,14 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     function formDbl(x,y,tg){
       if(!sayEdit||!tg.closest(".sayform")||tg.closest("button,select,input:not(.sayt)"))return false;
       if(Date.now()-sayEditAt<900)return false;
+      if(Date.now()-mselAt<900){fdt={t:0,x:0,y:0}; return false}   // ↕ 여러 줄 고르기를 누른 손길은 두 번 누르기로 안 셈
       var now=Date.now(), hit=now-fdt.t<480&&Math.abs(x-fdt.x)<60&&Math.abs(y-fdt.y)<80;   // 휴대폰에서 첫 누름에 키보드가 올라와 자리가 밀려도 두 번으로 셈 (2026-11-07)
       fdt={t:hit?0:now,x:x,y:y}; if(!hit)return false;
       var sv=tg.closest(".sayform").querySelector(".saysave"); if(sv){try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(e){} if(document.activeElement)document.activeElement.blur(); sv.click()} return true;
     }
     var fhost=list.closest(".saysheet")||list.parentElement;
     fhost.addEventListener("touchend",function(e){if(e.changedTouches.length!==1)return; var t=e.changedTouches[0]; if(formDbl(t.clientX,t.clientY,e.target))e.preventDefault()},{passive:false});
-    fhost.addEventListener("dblclick",function(e){if(Date.now()-sayEditAt<900)return; if(sayEdit&&e.target.closest(".sayform")&&!e.target.closest("button,select,input:not(.sayt)")){fdt={t:0,x:0,y:0}; var sv=e.target.closest(".sayform").querySelector(".saysave"); if(sv)sv.click()}});
+    fhost.addEventListener("dblclick",function(e){if(Date.now()-sayEditAt<900||Date.now()-mselAt<900)return; if(sayEdit&&e.target.closest(".sayform")&&!e.target.closest("button,select,input:not(.sayt)")){fdt={t:0,x:0,y:0}; var sv=e.target.closest(".sayform").querySelector(".saysave"); if(sv)sv.click()}});
     // 휴대폰은 손가락이 움직이면 브라우저가 pointer를 끊어서(pointercancel) touch 이벤트로 잼
     var sw=null;
     function swStart(c,x,y,t){sw=c?{c:c,x:x,y:y,t:t}:null}
