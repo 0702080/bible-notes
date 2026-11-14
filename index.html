@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115b">
+<meta name="app-build" content="nb-20261115c">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -16959,7 +16959,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       ta.addEventListener("blur",function(){setTimeout(sayFit,0)});
       if(window.visualViewport){var svv=function(){if(!ta.isConnected){visualViewport.removeEventListener("resize",svv);return} if(document.activeElement===ta)setTimeout(sayFit,60)}; visualViewport.addEventListener("resize",svv)}
       ta.addEventListener("focus",function(){[150,400,800].forEach(function(d){setTimeout(sayFit,d)})});
-      ta.addEventListener("focus",function(){setTimeout(function(){var rw=form.querySelector(".sayrow2:last-of-type")||form; try{rw.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}},350)});   // 키보드가 올라오면 아래 단추 줄까지 보이게
+      ta.addEventListener("focus",function(){setTimeout(function(){if(form.classList.contains("saymall")||ta.selectionEnd!==ta.selectionStart||Date.now()-mselAt<1500)return; var rw=form.querySelector(".sayrow2:last-of-type")||form; try{rw.scrollIntoView({block:"nearest",behavior:"smooth"})}catch(e){}},350)});   // 키보드가 올라오면 아래 단추 줄까지 보이게
       var row=document.createElement("div"); row.className="sayrow2";
       var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="m"?"본문 (예: 요한복음 6:1-15)":sayMode==="v"?"구절 (예: 로마서 12:21)":sayMode==="g"?"어디서·누구에게 (예: 주일 예배)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=sayMode==="m"?40:16; ti.value=cur.topic||""; ti.placeholder=sayMode==="m"?"제목 (선택)":"주제 (선택)"; ti.setAttribute("aria-label","주제");
@@ -22349,6 +22349,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     }
     function follow(ta){
       if(!ta||ta.tagName!=="TEXTAREA"||document.activeElement!==ta)return;
+      if(ta.selectionEnd!==ta.selectionStart)return;   // 글자를 고르는 중엔 화면을 움직이지 않음 — 여러 줄을 고를 때 고른 끝으로 굴러가 엉뚱한 곳에 가던 문제 (2026-11-15 사용자 요청)
       var vv=window.visualViewport, vtop=vv?vv.offsetTop:0, vbot=vv?vtop+vv.height:innerHeight;
       var fullH=Math.max(innerHeight,(screen&&screen.height)||0); if(vv&&vv.height>fullH*0.8)vbot=vtop+Math.round(vv.height*0.55);   // 키보드가 보이는 높이를 안 줄이는 기기
       var r=ta.getBoundingClientRect(), y=r.top+caretY(ta)-ta.scrollTop, lh=parseFloat(getComputedStyle(ta).lineHeight)||26;
