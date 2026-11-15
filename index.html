@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115r">
+<meta name="app-build" content="nb-20261115s">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5673,7 +5673,10 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
 .hymrtop{display:flex;justify-content:space-between}
 .hymrt{margin:6px 0 0;font-size:21px;color:var(--gold)}
 .hymrs{margin:0;color:var(--muted);font-size:13.5px}
-.hymlyr{white-space:pre-wrap;font-family:var(--serif);font-size:17px;line-height:1.9;color:var(--ink);padding:14px 16px;border:1px solid #34303F;border-radius:14px;background:rgba(44,40,58,.6)}
+.hymlyr{white-space:pre-wrap;font-family:var(--serif);font-size:17px;line-height:1.9;color:var(--ink);padding:14px 16px;border:1px solid #6A5233;border-radius:14px;background:rgba(58,44,28,.82)}
+.hymyt{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;margin:0 0 10px;padding:9px 16px;border:0;border-radius:999px;background:#C4302B;color:#fff;font-weight:700;font-size:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 3px 0 #7A1A17;cursor:pointer}
+.hymyt:active{transform:translateY(2px);box-shadow:0 1px 0 #7A1A17}
+.hymcy{font-size:12px;color:#FF8A84;margin-left:8px}
 .hymimgs{display:flex;flex-direction:column;gap:10px}
 .hymimg{position:relative;min-height:60px;border-radius:12px;overflow:hidden;background:#fff;color:#777;font-size:13px;display:grid;place-items:center}
 .hymimg img{display:block;width:100%;height:auto}
@@ -22580,6 +22583,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var h=document.createElement("span"); h.className="hymct"; h.textContent=(x.kind==="h"&&x.no?"찬송가 "+x.no+"장 · ":x.no?x.no+" · ":"")+(x.title||"(제목 없음)"); c.appendChild(h);
       var p=document.createElement("span"); p.className="hymcp"; p.textContent=String(x.t||"").split("\n").filter(function(s){return s.trim()}).slice(0,2).join(" / ")||"가사 없음"; c.appendChild(p);
       if(x.imgs&&x.imgs.length){var m=document.createElement("span"); m.className="hymcm"; m.textContent="🎼 악보 "+x.imgs.length; c.appendChild(m)}
+      if(x.yt){var y=document.createElement("span"); y.className="hymcy"; y.textContent="▶ 유튜브"; c.appendChild(y)}
       box.appendChild(c);
     });
   }
@@ -22589,6 +22593,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     box.appendChild(top);
     var h=document.createElement("h3"); h.className="hymrt"; h.textContent=x.title||"(제목 없음)"; box.appendChild(h);
     if(x.no||x.kind==="h"){var s=document.createElement("p"); s.className="hymrs"; s.textContent=(x.kind==="h"?"찬송가":"찬양")+(x.no?" "+x.no+(x.kind==="h"?"장":""):""); box.appendChild(s)}
+    if(x.yt){var yb=document.createElement("button"); yb.type="button"; yb.className="hymyt"; yb.textContent="▶ 유튜브로 듣기"; yb.onclick=function(){srmYtOpen(x.yt)}; box.appendChild(yb)}
     if(x.imgs&&x.imgs.length){var g=document.createElement("div"); g.className="hymimgs"; x.imgs.forEach(function(iid){var d=document.createElement("div"); d.className="hymimg"; d.textContent="악보 불러오는 중…"; g.appendChild(d); hymImgInto(d,iid)}); box.appendChild(g)}
     if(String(x.t||"").trim()){var l=document.createElement("div"); l.className="hymlyr"; l.textContent=x.t; box.appendChild(l)}
   }
@@ -22596,9 +22601,9 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     var x=hymEdit==="new"?{id:"",title:"",no:"",kind:"p",t:"",imgs:[]}:(o.items.filter(function(i){return i.id===hymEdit})[0]); if(!x){hymEdit="";return hymDraw()}
     var imgs=(x.imgs||[]).slice(), fresh=[];
     var f=document.createElement("div"); f.className="hymform";
-    f.innerHTML='<div class="hymrow"><select class="field hymkind"><option value="p">찬양</option><option value="h">찬송가</option></select><input class="field hymno" placeholder="장·번호" inputmode="numeric" maxlength="12"></div><input class="field hymtitle" placeholder="제목" maxlength="80"><textarea class="field hymt" rows="10" placeholder="가사 (붙여넣기 가능)" maxlength="20000"></textarea><div class="hymimgs hymedimgs"></div><label class="hympick">🎼 악보 사진 넣기<input type="file" accept="image/*" multiple hidden></label><div class="hymfoot">'+(x.id?'<button type="button" class="saycancel hymdel">🗑</button>':'')+'<button type="button" class="saycancel hymcancel">취소</button><button type="button" class="saysave hymsave">저장</button></div>';
+    f.innerHTML='<div class="hymrow"><select class="field hymkind"><option value="p">찬양</option><option value="h">찬송가</option></select><input class="field hymno" placeholder="장·번호" inputmode="numeric" maxlength="12"></div><input class="field hymtitle" placeholder="제목" maxlength="80"><input class="field hymytin" placeholder="▶ 유튜브 링크 (선택)" inputmode="url" maxlength="300"><textarea class="field hymt" rows="10" placeholder="가사 (붙여넣기 가능)" maxlength="20000"></textarea><div class="hymimgs hymedimgs"></div><label class="hympick">🎼 악보 사진 넣기<input type="file" accept="image/*" multiple hidden></label><div class="hymfoot">'+(x.id?'<button type="button" class="saycancel hymdel">🗑</button>':'')+'<button type="button" class="saycancel hymcancel">취소</button><button type="button" class="saysave hymsave">저장</button></div>';
     box.appendChild(f);
-    f.querySelector(".hymkind").value=x.kind==="h"?"h":"p"; f.querySelector(".hymno").value=x.no||""; f.querySelector(".hymtitle").value=x.title||""; f.querySelector(".hymt").value=x.t||"";
+    f.querySelector(".hymkind").value=x.kind==="h"?"h":"p"; f.querySelector(".hymno").value=x.no||""; f.querySelector(".hymtitle").value=x.title||""; f.querySelector(".hymt").value=x.t||""; f.querySelector(".hymytin").value=x.yt||"";
     var g=f.querySelector(".hymedimgs");
     function drawImgs(){g.textContent=""; imgs.forEach(function(iid,k){var d=document.createElement("div"); d.className="hymimg"; g.appendChild(d); hymImgInto(d,iid); var xb=document.createElement("button"); xb.type="button"; xb.className="hymimx"; xb.textContent="✕"; xb.setAttribute("aria-label","이 사진 빼기"); xb.addEventListener("click",function(){imgs.splice(k,1); drawImgs()}); d.appendChild(xb)})}
     drawImgs();
@@ -22612,7 +22617,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var it=x.id?o2.items.filter(function(i){return i.id===x.id})[0]:null;
       if(!it){it={id:"hy"+Date.now().toString(36)}; o2.items.push(it)}
       (x.imgs||[]).forEach(function(iid){if(imgs.indexOf(iid)<0)hymImgDel(iid)});
-      it.title=title; it.no=f.querySelector(".hymno").value.trim(); it.kind=f.querySelector(".hymkind").value; it.t=t; it.imgs=imgs; it.at=Math.max(Date.now(),(+it.at||0)+1);
+      it.title=title; it.no=f.querySelector(".hymno").value.trim(); it.kind=f.querySelector(".hymkind").value; it.t=t; it.yt=f.querySelector(".hymytin").value.trim(); it.imgs=imgs; it.at=Math.max(Date.now(),(+it.at||0)+1);
       hymSave(o2); hymEdit=""; hymView=it.id; hymDraw(); toast("담았어요 🎵");
     });
     var del=f.querySelector(".hymdel"); if(del)del.addEventListener("click",function(){if(!del.dataset.sure){del.dataset.sure="1"; del.textContent="한 번 더"; setTimeout(function(){if(del.isConnected){delete del.dataset.sure; del.textContent="🗑"}},3000); return}
