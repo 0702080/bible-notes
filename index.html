@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115za">
+<meta name="app-build" content="nb-20261115zb">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5672,6 +5672,15 @@ body .hymnsheet .dlbar .dlclose.hymfind,body .hymnsheet .dlbar .dlclose.hymadd,b
 body .hymnsheet .dlbar .dlclose.hymadd{background:linear-gradient(180deg,#5A4A28,#3A2F17)!important;border-color:#7A6535!important;box-shadow:inset 0 1px 0 rgba(255,230,160,.25),inset 0 -2px 3px rgba(0,0,0,.25),0 3px 0 #1E180B,0 5px 10px rgba(0,0,0,.4)!important}
 body .hymnsheet .dlbar .dlclose.hymclose{background:linear-gradient(180deg,#4E3A48,#2E2330)!important;border-color:#64485A!important}
 body .hymnsheet .dlbar .dlclose.hymfind:active,body .hymnsheet .dlbar .dlclose.hymadd:active,body .hymnsheet .dlbar .dlclose.hymclose:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 #000!important}
+/* 🧊 더 또렷한 입체 (2026-11-15 사용자 요청): 위 반짝 빛·아래 5px 두께·바닥 그림자 */
+body .hymnsheet .dlbar .dlclose.hymfind,body .hymnsheet .dlbar .dlclose.hymadd,body .hymnsheet .dlbar .dlclose.hymclose{position:relative;overflow:hidden;transform:translateY(-2px);transition:transform .08s,box-shadow .08s}
+body .hymnsheet .dlbar .dlclose.hymfind{background:radial-gradient(120% 90% at 50% 0%,#6E6790 0%,#4A4466 45%,#2E2A40 100%)!important;border:1px solid #7A73A0!important;box-shadow:inset 0 2px 1px rgba(255,255,255,.35),inset 0 -3px 4px rgba(0,0,0,.35),0 5px 0 #1C1A28,0 8px 14px rgba(0,0,0,.55)!important}
+body .hymnsheet .dlbar .dlclose.hymadd{background:radial-gradient(120% 90% at 50% 0%,#9C8240 0%,#6E5826 45%,#463813 100%)!important;border:1px solid #B3964A!important;box-shadow:inset 0 2px 1px rgba(255,236,170,.45),inset 0 -3px 4px rgba(0,0,0,.35),0 5px 0 #2A2008,0 8px 14px rgba(0,0,0,.55)!important}
+body .hymnsheet .dlbar .dlclose.hymclose{background:radial-gradient(120% 90% at 50% 0%,#86607A 0%,#5E4256 45%,#3A2836 100%)!important;border:1px solid #9C7290!important;box-shadow:inset 0 2px 1px rgba(255,210,235,.35),inset 0 -3px 4px rgba(0,0,0,.35),0 5px 0 #24171F,0 8px 14px rgba(0,0,0,.55)!important}
+body .hymnsheet .dlbar .dlclose.hymfind:active,body .hymnsheet .dlbar .dlclose.hymadd:active,body .hymnsheet .dlbar .dlclose.hymclose:active{transform:translateY(3px)}
+body .hymnsheet .dlbar .dlclose.hymfind:active{box-shadow:inset 0 2px 3px rgba(0,0,0,.4),0 0 0 #1C1A28,0 2px 4px rgba(0,0,0,.4)!important}
+body .hymnsheet .dlbar .dlclose.hymadd:active{box-shadow:inset 0 2px 3px rgba(0,0,0,.4),0 0 0 #2A2008,0 2px 4px rgba(0,0,0,.4)!important}
+body .hymnsheet .dlbar .dlclose.hymclose:active{box-shadow:inset 0 2px 3px rgba(0,0,0,.4),0 0 0 #24171F,0 2px 4px rgba(0,0,0,.4)!important}
 .hymbtns svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
 .hymsearch{width:100%;margin-bottom:10px}
 .hymbox{display:flex;flex-direction:column;gap:10px}
