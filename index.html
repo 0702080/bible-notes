@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115zk">
+<meta name="app-build" content="nb-20261115zl">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5569,6 +5569,9 @@ body:not(.boardon) #addQuick{margin:0!important}
 .sayform .saymode button.on{color:#10202C;background:linear-gradient(180deg,#A8DBFF,#6FB8EE)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 0 #2E5A7A!important}
 .sayform .saymode button[data-m="p"].on{background:linear-gradient(180deg,#FFE19A,#E8B54E)!important;color:#2A1E05;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 0 #6B4F18!important}
 .sayform.saypicking .sayle{cursor:pointer}
+.sayform .saymode button[data-m="p"]{display:inline-flex;align-items:center;gap:6px;--smk:#141A24}
+.sayform .saymode button[data-m="p"].on{--smk:#FFE7AE}
+.sayform .saymode .smico{width:17px;height:17px;flex:0 0 17px;filter:drop-shadow(0 1px 0 rgba(0,0,0,.25))}
 .sayform textarea.sayt.sayall{display:block!important;width:100%;box-sizing:border-box;font-size:16px!important;line-height:40px!important;padding:0 10px 0 16px!important;border-radius:12px;border:1px solid color-mix(in srgb,var(--sky) 30%,#2A3240)!important;background-color:rgba(120,170,220,.07)!important;background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 39px,rgba(183,156,242,.22) 39px,rgba(183,156,242,.22) 40px)!important;background-attachment:local;resize:none;overflow:hidden;-webkit-user-select:text;user-select:text}
 .srmsheet.srmtyping .srmfoot{display:none!important}
 /* 📖 성경 읽기 창: 성서공회 단추·홀리바이블·설명 글 지우고 붙여넣는 칸을 제목 줄 아래 화면 가득 (2026-11-14 사용자 요청) */
@@ -17469,7 +17472,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     /* ✏️ 고치기 | ☑ 줄 고르기 — 한 번 누름이 무엇을 할지 위에서 정함 (2026-11-15 사용자 요청: 어떤 때는 줄 고르기, 어떤 때는 커서 자리가 헷갈림).
        고치기=누른 자리에 커서, 줄 고르기=누른 줄이 골라짐 → 아래 줄에서 복사·잘라내기. 키보드 여부로 저절로 바뀌던 것(tapPick)·글자 고른 채 다른 줄 누르기는 여기선 안 씀 */
     var seg=document.createElement("div"); seg.className="saymode";
-    seg.innerHTML='<button type="button" data-m="e" class="on">✏️ 고치기</button><button type="button" data-m="p">☑ 줄 고르기</button>';
+    seg.innerHTML='<button type="button" data-m="e" class="on">✏️ 고치기</button><button type="button" data-m="p"><svg class="smico" viewBox="0 0 20 20" aria-hidden="true"><rect x="1.5" y="2.5" width="7" height="7" rx="2.2" fill="currentColor"/><path d="M3.3 6.1l1.5 1.5 2.4-2.9" fill="none" stroke="var(--smk)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="1.5" y="11.5" width="7" height="7" rx="2.2" fill="currentColor"/><path d="M3.3 15.1l1.5 1.5 2.4-2.9" fill="none" stroke="var(--smk)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><rect x="11" y="5" width="7.5" height="2" rx="1" fill="currentColor" opacity=".75"/><rect x="11" y="14" width="7.5" height="2" rx="1" fill="currentColor" opacity=".75"/></svg>줄 고르기</button>';
     form.insertBefore(seg,box);
     function segSet(m){seg.querySelectorAll("button").forEach(function(b){b.classList.toggle("on",b.dataset.m===m)}); form.classList.toggle("saypicking",m==="p")}
     seg.addEventListener("pointerdown",function(e){e.preventDefault()});
