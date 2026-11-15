@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115y">
+<meta name="app-build" content="nb-20261115z">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5686,6 +5686,10 @@ body .hymrtop button:active{transform:translateY(3px);box-shadow:inset 0 1px 0 r
 body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!important;border-color:#4E9466!important}
 .hymrt{margin:6px 0 0;font-size:21px;color:var(--gold)}
 .hymrs{margin:0;color:var(--muted);font-size:13.5px}
+.hymlyr.hymlines{display:flex;flex-direction:column;padding:4px 0;white-space:normal;-webkit-user-select:none;user-select:none}
+.hymlines .srmline+.srmline{border-top:1px dashed color-mix(in srgb,var(--gold) 20%,transparent)}
+.hymlines .srmrli{padding-left:16px;font-size:17px;color:#F3E9D2;min-height:44px;line-height:28px}
+.hymform textarea.hymt{line-height:40px;padding-top:0;padding-bottom:0;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 39px,color-mix(in srgb,var(--gold) 18%,transparent) 39px,color-mix(in srgb,var(--gold) 18%,transparent) 40px);background-attachment:local;font-size:17px}
 .hymlyr{white-space:pre-wrap;font-family:var(--serif);font-size:17px;line-height:1.9;color:var(--ink);padding:14px 16px;border:1px solid #6A5233;border-radius:14px;background:rgba(58,44,28,.82)}
 .hymyt{display:inline-flex;align-self:flex-start;align-items:center;gap:6px;margin:0 0 10px;padding:9px 16px;border:0;border-radius:999px;background:#C4302B;color:#fff;font-weight:700;font-size:14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 3px 0 #7A1A17;cursor:pointer}
 .hymyt:active{transform:translateY(2px);box-shadow:0 1px 0 #7A1A17}
@@ -22682,7 +22686,19 @@ body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!
     if(x.no||x.kind==="h"){var s=document.createElement("p"); s.className="hymrs"; s.textContent=(x.kind==="h"?"찬송가":"찬양")+(x.no?" "+x.no+(x.kind==="h"?"장":""):""); box.appendChild(s)}
     if(x.yt){var yb=document.createElement("button"); yb.type="button"; yb.className="hymyt"; yb.textContent="▶ 유튜브로 듣기"; yb.onclick=function(){srmYtOpen(x.yt)}; box.appendChild(yb)}
     if(x.imgs&&x.imgs.length){var g=document.createElement("div"); g.className="hymimgs"; x.imgs.forEach(function(iid){var d=document.createElement("div"); d.className="hymimg"; d.textContent="악보 불러오는 중…"; g.appendChild(d); hymImgInto(d,iid)}); box.appendChild(g)}
-    if(String(x.t||"").trim()){var l=document.createElement("div"); l.className="hymlyr"; l.textContent=x.t; box.appendChild(l)}
+    if(String(x.t||"").trim()){   // 가사도 설교 메모 읽기처럼 한 줄씩 줄 칸 — 칸 폭을 넘으면 낱말 단위로 다음 칸 (2026-11-15 사용자 요청)
+      var l=document.createElement("div"); l.className="hymlyr hymlines"; box.appendChild(l);
+      lineRowsSet(l,String(x.t).replace(/\s+$/,"").split("\n"),function(t){var ln=document.createElement("div"); ln.className="srmline"; var d=document.createElement("div"); d.className="srmrli"; hlFill(d,t); ln.appendChild(d); return ln},".srmrli");
+      hymDbl(l,function(e){var row=e&&e.target&&e.target.closest&&e.target.closest("[data-li]"); hymEditLine=row?+row.dataset.li:-1; hymEdit=hymView; hymDraw()});
+    }
+  }
+  // 👆👆 두 번 누르기: 읽기 가사 → 고치기(누른 줄에 커서), 고치기 가사 칸 → 저장하고 읽기 (2026-11-15 사용자 요청)
+  var hymEditLine=-1;
+  function hymDbl(el,fn){
+    var dt={t:0,x:0,y:0};
+    el.addEventListener("touchend",function(e){var c=e.changedTouches[0]; if(!c||e.touches.length)return; var nw=Date.now();
+      if(nw-dt.t<480&&Math.abs(c.clientX-dt.x)<60&&Math.abs(c.clientY-dt.y)<80){dt.t=0; if(e.cancelable)e.preventDefault(); el._dblAt=nw; buzz(10); fn(e)} else dt={t:nw,x:c.clientX,y:c.clientY}},{passive:false});
+    el.addEventListener("dblclick",function(e){if(Date.now()-(el._dblAt||0)<800)return; e.preventDefault(); fn(e)});
   }
   function hymForm(box,o){
     var x=hymEdit==="new"?{id:"",title:"",no:"",kind:"p",t:"",imgs:[]}:(o.items.filter(function(i){return i.id===hymEdit})[0]); if(!x){hymEdit="";return hymDraw()}
@@ -22691,6 +22707,10 @@ body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!
     f.innerHTML='<div class="hymrow"><select class="field hymkind"><option value="p">찬양</option><option value="h">찬송가</option></select><input class="field hymno" placeholder="장·번호" inputmode="numeric" maxlength="12"></div><input class="field hymtitle" placeholder="제목" maxlength="80"><input class="field hymytin" placeholder="▶ 유튜브 링크 (선택)" inputmode="url" maxlength="300"><textarea class="field hymt" rows="10" placeholder="가사 (붙여넣기 가능)" maxlength="20000"></textarea><div class="hymimgs hymedimgs"></div><label class="hympick">🎼 악보 사진 넣기<input type="file" accept="image/*" multiple hidden></label><div class="hymfoot">'+(x.id?'<button type="button" class="saycancel hymdel">🗑</button>':'')+'<button type="button" class="saycancel hymcancel">취소</button><button type="button" class="saysave hymsave">저장</button></div>';
     box.appendChild(f);
     f.querySelector(".hymkind").value=x.kind==="h"?"h":"p"; f.querySelector(".hymno").value=x.no||""; f.querySelector(".hymtitle").value=x.title||""; f.querySelector(".hymt").value=x.t||""; f.querySelector(".hymytin").value=x.yt||"";
+    (function(){var ta=f.querySelector(".hymt"), li=hymEditLine; hymEditLine=-1;
+      if(x.id&&li>=0)setTimeout(function(){try{var ls=ta.value.split("\n"), at=ls.slice(0,li+1).join("\n").length; ta.focus({preventScroll:true}); ta.setSelectionRange(at,at);
+        var lh=parseFloat(getComputedStyle(ta).lineHeight)||40, bd=hym.querySelector(".dlbody"), tr=ta.getBoundingClientRect(); if(bd)bd.scrollTop+=tr.top+li*lh-innerHeight*0.3}catch(e){}},60);
+      var opened=Date.now(); hymDbl(ta,function(){if(Date.now()-opened<900)return; f.querySelector(".hymsave").click()})})();
     var g=f.querySelector(".hymedimgs");
     function drawImgs(){g.textContent=""; imgs.forEach(function(iid,k){var d=document.createElement("div"); d.className="hymimg"; g.appendChild(d); hymImgInto(d,iid); var xb=document.createElement("button"); xb.type="button"; xb.className="hymimx"; xb.textContent="✕"; xb.setAttribute("aria-label","이 사진 빼기"); xb.addEventListener("click",function(){imgs.splice(k,1); drawImgs()}); d.appendChild(xb)})}
     drawImgs();
