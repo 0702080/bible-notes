@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115v">
+<meta name="app-build" content="nb-20261115w">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3306,6 +3306,7 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind,body.soloon #co
 .lhgrip.on{opacity:1;background:color-mix(in srgb,var(--sky) 22%,transparent);cursor:grabbing}
 .lhlayer.dragging .lhgrip:not(.on){opacity:.25}
 textarea.lhpad{padding-left:28px!important}
+.lhbar{position:absolute;border-radius:8px;background:color-mix(in srgb,var(--sky) 22%,transparent);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--sky) 70%,transparent),0 6px 16px rgba(0,0,0,.35);pointer-events:none}
 .lhmirror{position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;padding:0;border:0;box-sizing:content-box;overflow:hidden;height:auto}
 /* 🎤 설교 메모 (2026-10-31 사용자 요청) */
 .srmtop{display:flex;gap:8px;align-items:center;margin:2px 0 12px}
@@ -8512,9 +8513,10 @@ body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!
       var m=measure(), lines=m.lines, cs=m.cs;
       var real=lines.filter(function(t){return t.trim()}).length;
       if(real<2&&!drag){layer.hidden=true; layer.textContent=""; ta.classList.remove("lhpad"); return}
+      var ng=nogrip(ta); if(ng&&!drag){layer.hidden=true; layer.textContent=""; ta.classList.remove("lhpad"); return}   // ⠿ 없는 칸: 꾹 눌러 끌 때만 그 줄에 빛 띠 (2026-11-15)
       var r=ta.getBoundingClientRect();
       // 칸 왼쪽 바깥에 자리가 있으면 거기에, 없으면 칸 안쪽 여백을 늘림
-      var outside=r.left>=26&&!ta.classList.contains("lhpad");
+      var outside=ng||r.left>=26&&!ta.classList.contains("lhpad");
       if(!outside&&!ta.classList.contains("lhpad")){ta.classList.add("lhpad"); m=measure(); cs=m.cs; r=ta.getBoundingClientRect()}
       var bt=parseFloat(cs.borderTopWidth)||0, pt=parseFloat(cs.paddingTop)||0, bl=parseFloat(cs.borderLeftWidth)||0;
       var x=outside?r.left-25:r.left+bl+2;
@@ -8538,12 +8540,37 @@ body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!
         if(g.empty&&!(drag&&drag.i===g.i))return;
         var y=r.top+bt+pt+g.top-st+g.lh/2;
         if(y<r.top+4||y>r.bottom-4)return;   // 칸 밖으로 굴러간 줄은 숨김
+        if(ng){if(drag.i!==g.i)return; var bb=document.createElement("span"); bb.className="lhbar"; bb.style.left=(r.left+2-hb.x)+"px"; bb.style.width=Math.max(10,r.width-4)+"px"; bb.style.top=(r.top+bt+pt+g.top-st-hb.y)+"px"; bb.style.height=g.h+"px"; frag.appendChild(bb); return}
         var h=document.createElement("span"); h.className="lhgrip"+(drag&&drag.i===g.i?" on":""); h.textContent="⠿"; h.dataset.i=g.i;
         h.style.left=(x-hb.x)+"px"; h.style.top=(y-14-hb.y)+"px"; frag.appendChild(h);
       });
       layer.appendChild(frag);
     }
     function sched(){if(!raf)raf=requestAnimationFrame(draw)}
+    function nogrip(t){return t&&t.classList.contains("srmresp")}   // ✍️ 설교를 듣고 칸: ⠿ 없이 문장을 꾹(0.4초) 눌러 위아래로 끎 (2026-11-15 사용자 요청)
+    var lpg={t:0};
+    document.addEventListener("touchstart",function(e){
+      var t=e.target; if(!ok(t)||!nogrip(t)||e.touches.length!==1||drag)return;
+      var p=e.touches[0]; clearTimeout(lpg.t); lpg={t:0,ta:t,x:p.clientX,y:p.clientY,fired:false};
+      lpg.t=setTimeout(function(){
+        lpg.t=0; var tt=lpg.ta; if(!tt||!tt.isConnected)return;
+        if(ta&&ta!==tt)ta.classList.remove("lhpad"); ta=tt; mKey=""; measure();
+        var best=null,bd=1e9; geo.forEach(function(g){if(g.empty)return; var d=Math.abs(mid(g)-lpg.y); if(d<bd){bd=d;best=g}});
+        if(!best||bd>best.h)return;
+        if(document.activeElement===tt){var ca=tt.selectionStart, st0=tt.value.split("\n").slice(0,best.i).join("\n").length+(best.i?1:0), en0=st0+mLines[best.i].length; if(ca>=st0&&ca<=en0&&tt.selectionStart===tt.selectionEnd)return}   // 커서가 있는 줄은 휴대폰 글 고르기 그대로
+        lpg.fired=true; try{window.getSelection().removeAllRanges()}catch(err){}
+        drag={i:best.i,y:lpg.y,moved:false,raf:0,touch:true,foc:document.activeElement===tt};
+        layer.classList.add("dragging"); buzz(14); draw(); drag.raf=requestAnimationFrame(tick);
+      },400);
+    },{passive:true,capture:true});
+    document.addEventListener("touchmove",function(e){
+      var p=e.touches[0]; if(!p)return;
+      if(drag&&drag.touch){if(e.cancelable)e.preventDefault(); drag.y=p.clientY; moveTo(p.clientY); return}
+      if(lpg.t&&(Math.abs(p.clientX-lpg.x)>8||Math.abs(p.clientY-lpg.y)>8)){clearTimeout(lpg.t); lpg.t=0}
+    },{passive:false,capture:true});
+    function lpgEnd(e){clearTimeout(lpg.t); lpg.t=0; if(lpg.fired){lpg.fired=false; if(e&&e.cancelable)e.preventDefault(); end()}}
+    document.addEventListener("touchend",lpgEnd,{passive:false,capture:true}); document.addEventListener("touchcancel",lpgEnd,true);
+    document.addEventListener("contextmenu",function(e){if(lpg.fired||drag&&drag.touch)e.preventDefault()},true);
     function hide(){if(drag)return; layer.hidden=true; layer.textContent=""; if(ta)ta.classList.remove("lhpad"); ta=null}
     document.addEventListener("focusin",function(e){var t=e.target; if(ok(t)){if(ta&&ta!==t)ta.classList.remove("lhpad"); ta=t; sched()} else if(ta&&!drag){hide()}});
     document.addEventListener("focusout",function(e){if(e.target===ta&&!drag)setTimeout(function(){if(document.activeElement!==ta&&!drag)hide()},120)});
@@ -8585,7 +8612,7 @@ body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!
       drag.raf=requestAnimationFrame(tick);
     });
     layer.addEventListener("pointermove",function(e){if(!drag)return; drag.y=e.clientY; moveTo(e.clientY)});
-    function end(){if(!drag)return; cancelAnimationFrame(drag.raf); drag=null; layer.classList.remove("dragging"); if(ta){try{ta.focus({preventScroll:true})}catch(err){} ta.dispatchEvent(new Event("change",{bubbles:true}))} sched()}
+    function end(){if(!drag)return; cancelAnimationFrame(drag.raf); var nof=drag.touch&&!drag.foc; drag=null; layer.classList.remove("dragging"); if(ta){if(!nof)try{ta.focus({preventScroll:true})}catch(err){} ta.dispatchEvent(new Event("change",{bubbles:true}))} sched()}
     layer.addEventListener("pointerup",end); layer.addEventListener("pointercancel",end);
     layer.addEventListener("touchmove",function(e){if(drag)e.preventDefault()},{passive:false});
     layer.addEventListener("mousedown",function(e){e.preventDefault()});
