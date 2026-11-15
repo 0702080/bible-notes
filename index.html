@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115zi">
+<meta name="app-build" content="nb-20261115zj">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3308,8 +3308,8 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind,body.soloon #co
 textarea.lhpad{padding-left:28px!important}
 textarea.tagrip{resize:none!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}
 .tagripbar{--tgc:color-mix(in srgb,var(--green) 70%,transparent);display:flex;justify-content:center;align-items:center;box-sizing:border-box;height:24px;max-width:100%;border:1px solid var(--tgc);border-top:0;border-radius:0 0 12px 12px;background:color-mix(in srgb,var(--green) 16%,#16161C);touch-action:none;cursor:ns-resize;-webkit-user-select:none;user-select:none;position:relative;z-index:2}
-.tagripbar i{display:block;width:44px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--green) 70%,#fff);pointer-events:none}
-.tagripbar.on{background:color-mix(in srgb,var(--green) 32%,#16161C)}
+.tagripbar i{display:block;width:44px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--tgc) 80%,#fff);pointer-events:none}
+.tagripbar.on{filter:brightness(1.35)}
 .lhbar{position:absolute;border-radius:8px;background:color-mix(in srgb,var(--sky) 22%,transparent);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--sky) 70%,transparent),0 6px 16px rgba(0,0,0,.35);pointer-events:none}
 .lhmirror{position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;padding:0;border:0;box-sizing:content-box;overflow:hidden;height:auto}
 /* 🎤 설교 메모 (2026-10-31 사용자 요청) */
@@ -8661,6 +8661,9 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
       gp=document.createElement("div"); gp.className="tagripbar"; gp.title="끌어서 칸 크기 바꾸기"; gp.innerHTML="<i></i>";
       var bc=cs.borderBottomColor, bw=parseFloat(cs.borderBottomWidth)||0;
       if(bw>0&&bc&&!/rgba\(0, 0, 0, 0\)/.test(bc))gp.style.setProperty("--tgc",bc);
+      // 손잡이 띠 바탕은 글 칸 바탕과 같게 — 칸이 투명하면 감싼 칸의 바탕 (2026-11-15 사용자 요청: 어두운 초록이 본문과 안 어울림)
+      var bgc=null; for(var el=t;el&&el!==document.body;el=el.parentElement){var b=getComputedStyle(el).backgroundColor; if(b&&!/rgba\(\d+, \d+, \d+, 0\)|transparent/.test(b)){bgc=b;break}}
+      if(bgc)gp.style.background=bgc;
       var mb=parseFloat(cs.marginBottom)||0;
       t.classList.add("tagrip");
       t.insertAdjacentElement("afterend",gp);
