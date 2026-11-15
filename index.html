@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115z">
+<meta name="app-build" content="nb-20261115za">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -8555,7 +8555,7 @@ body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!
       layer.appendChild(frag);
     }
     function sched(){if(!raf)raf=requestAnimationFrame(draw)}
-    function nogrip(t){return t&&t.classList.contains("srmresp")}   // ✍️ 설교를 듣고 칸: ⠿ 없이 문장을 꾹(0.4초) 눌러 위아래로 끎 (2026-11-15 사용자 요청)
+    function nogrip(t){return !!t}   // 2026-11-15 사용자 요청: 모든 글 칸에서 ⠿ 없이 문장을 꾹(0.4초) 눌러 위아래로 끎 (처음엔 설교를 듣고 칸만)   // ✍️ 설교를 듣고 칸: ⠿ 없이 문장을 꾹(0.4초) 눌러 위아래로 끎 (2026-11-15 사용자 요청)
     var lpg={t:0};
     document.addEventListener("touchstart",function(e){
       var t=e.target; if(!ok(t)||!nogrip(t)||e.touches.length!==1||drag)return;
