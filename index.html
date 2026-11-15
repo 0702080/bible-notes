@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115w">
+<meta name="app-build" content="nb-20261115y">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3306,6 +3306,10 @@ body.soloon #topicBar,body.soloon #reviewBar,body.soloon #dlFind,body.soloon #co
 .lhgrip.on{opacity:1;background:color-mix(in srgb,var(--sky) 22%,transparent);cursor:grabbing}
 .lhlayer.dragging .lhgrip:not(.on){opacity:.25}
 textarea.lhpad{padding-left:28px!important}
+textarea.tagrip{resize:none!important;border-bottom-left-radius:0!important;border-bottom-right-radius:0!important}
+.tagripbar{--tgc:color-mix(in srgb,var(--green) 70%,transparent);display:flex;justify-content:center;align-items:center;box-sizing:border-box;height:24px;max-width:100%;border:1px solid var(--tgc);border-top:0;border-radius:0 0 12px 12px;background:color-mix(in srgb,var(--green) 16%,#16161C);touch-action:none;cursor:ns-resize;-webkit-user-select:none;user-select:none;position:relative;z-index:2}
+.tagripbar i{display:block;width:44px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--green) 70%,#fff);pointer-events:none}
+.tagripbar.on{background:color-mix(in srgb,var(--green) 32%,#16161C)}
 .lhbar{position:absolute;border-radius:8px;background:color-mix(in srgb,var(--sky) 22%,transparent);box-shadow:0 0 0 1.5px color-mix(in srgb,var(--sky) 70%,transparent),0 6px 16px rgba(0,0,0,.35);pointer-events:none}
 .lhmirror{position:absolute;left:-9999px;top:0;visibility:hidden;pointer-events:none;padding:0;border:0;box-sizing:content-box;overflow:hidden;height:auto}
 /* 🎤 설교 메모 (2026-10-31 사용자 요청) */
@@ -8616,6 +8620,49 @@ body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!
     layer.addEventListener("pointerup",end); layer.addEventListener("pointercancel",end);
     layer.addEventListener("touchmove",function(e){if(drag)e.preventDefault()},{passive:false});
     layer.addEventListener("mousedown",function(e){e.preventDefault()});
+  })();
+  /* ---------- ↕ 모든 글 칸 높이 손잡이 (2026-11-15 사용자 요청: 설교 메모 '나의 적용' 칸의 초록 손잡이가 편해서 모든 입력·고치기 칸에) ----------
+     글 칸을 누르면 칸 바로 아래에 손잡이 띠가 붙고, 끌어 내리면 칸이 커지고 끌어 올리면 작아짐. 정한 높이는 칸 종류마다 이 기기에 기억(bible-ta-h) */
+  (function(){
+    var KEY="bible-ta-h", H={}; try{H=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){H={}}
+    var SKIP=["srmapta","srmli","sayle","sayall","sayeta","srmbody","sayhid","lhmirror"];
+    var cur=null, gp=null, gd=null, offT=0;
+    function key(t){var c=[].filter.call(t.classList,function(k){return !/^(lhpad|tagrip|ptbig|field|editing|on|sel)$/.test(k)}); var host=t.closest("[class]")&&t.parentElement&&t.parentElement.closest(".saysheet,.srmsheet,.daily,.prd,.icv,.note,.sheet,.hymnsheet,.medqsheet");
+      return (c[0]||t.name||"ta")+(host?"@"+(host.classList[0]||""):"")}
+    function ok(t){if(!t||t.tagName!=="TEXTAREA"||t.readOnly||t.disabled||t.hidden||t.offsetParent===null)return false;
+      for(var i=0;i<SKIP.length;i++)if(t.classList.contains(SKIP[i]))return false;
+      var pd=getComputedStyle(t.parentElement||document.body); if((pd.display==="flex"||pd.display==="inline-flex")&&pd.flexDirection.indexOf("row")===0)return false;   // 옆으로 늘어선 줄 안의 칸은 뺌
+      return t.offsetHeight>=36}
+    function apply(t){var v=+H[key(t)]||0; if(v>=48){t.style.minHeight=v+"px"; t.style.maxHeight="none"}}
+    function detach(){clearTimeout(offT); if(gp&&gp.parentNode)gp.remove(); if(cur)cur.classList.remove("tagrip"); gp=null; cur=null; gd=null}
+    function attach(t){
+      if(cur===t&&gp&&gp.isConnected)return; detach(); cur=t; apply(t);
+      var cs=getComputedStyle(t);
+      gp=document.createElement("div"); gp.className="tagripbar"; gp.title="끌어서 칸 크기 바꾸기"; gp.innerHTML="<i></i>";
+      var bc=cs.borderBottomColor, bw=parseFloat(cs.borderBottomWidth)||0;
+      if(bw>0&&bc&&!/rgba\(0, 0, 0, 0\)/.test(bc))gp.style.setProperty("--tgc",bc);
+      var mb=parseFloat(cs.marginBottom)||0;
+      t.classList.add("tagrip");
+      t.insertAdjacentElement("afterend",gp);
+      gp.style.width=t.offsetWidth+"px"; gp.style.marginTop=(-mb-(bw?0:0))+"px"; gp.style.marginBottom=mb+"px";
+      var tr=t.getBoundingClientRect(), gr=gp.getBoundingClientRect(); if(Math.abs(tr.left-gr.left)>0.5)gp.style.marginLeft=(tr.left-gr.left)+"px"; var gap=gr.top-tr.bottom; if(Math.abs(gap)>0.5)gp.style.marginTop=((parseFloat(gp.style.marginTop)||0)-gap)+"px";   // 감싼 칸의 gap·여백만큼 붙여 칸 바로 아래에
+      gp.addEventListener("touchstart",function(e){e.preventDefault(); e.stopPropagation(); start(e.touches[0].clientY)},{passive:false});
+      gp.addEventListener("touchmove",function(e){e.preventDefault(); e.stopPropagation(); move(e.touches[0].clientY)},{passive:false});
+      gp.addEventListener("touchend",function(e){e.stopPropagation(); if(e.cancelable)e.preventDefault(); end()});
+      gp.addEventListener("mousedown",function(e){e.preventDefault(); e.stopPropagation(); start(e.clientY);
+        function mm(ev){move(ev.clientY)} function mu(){document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); end()}
+        document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu)});
+      gp.addEventListener("click",function(e){e.stopPropagation()});
+    }
+    function start(y){if(!cur)return; gd={y:y,h:cur.getBoundingClientRect().height,ta:cur}; gp.classList.add("on"); buzz(10)}
+    function move(y){if(!gd)return; var t=gd.ta, v=Math.round(Math.max(48,Math.min(innerHeight*0.9,gd.h+(y-gd.y))));
+      t.style.maxHeight="none"; t.style.minHeight=v+"px"; t.style.height=v+"px"; gd.v=v}
+    function end(){if(!gd)return; var t=gd.ta, v=gd.v; gd=null; if(gp)gp.classList.remove("on");
+      if(v){H[key(t)]=v; try{localStorage.setItem(KEY,JSON.stringify(H))}catch(e){}
+        t.dispatchEvent(new Event("input",{bubbles:true}))}   // 칸마다의 높이 맞춤이 다시 돌게 (글은 그대로)
+      try{t.focus({preventScroll:true})}catch(e){}}
+    document.addEventListener("focusin",function(e){var t=e.target; if(ok(t))attach(t); else if(cur&&t!==cur&&!gd)detach()});
+    document.addEventListener("focusout",function(e){if(e.target!==cur)return; clearTimeout(offT); offT=setTimeout(function(){if(cur&&document.activeElement!==cur&&!gd)detach()},320)});   // 바로 떼면 아래 단추가 위로 밀려 누름이 빗나가서 잠깐 기다림
   })();
   /* ---------- 🎤 말로 적기 (2026-10-25 사용자 요청) ----------
      글 칸을 누르면 오른쪽 아래에 🎤 단추가 떠요. 누르고 말하면 커서 자리에 글로 들어가고, 한 번 더 누르면 멈춰요.
