@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115zf">
+<meta name="app-build" content="nb-20261115zg">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3869,6 +3869,8 @@ body.carddrag #reviewBar{display:none!important}
 @media (hover:hover){.icgrip:hover{color:var(--sky)}}
 .icp.icdragging{position:relative;z-index:5;opacity:.95;box-shadow:0 14px 34px rgba(0,0,0,.55);cursor:grabbing;transition:none}
 .icp.icdragging .icgrip{cursor:grabbing;color:var(--sky)}
+.icv .icp{-webkit-touch-callout:none}
+.icv .icp.icdragging{position:relative;z-index:5;transform-origin:center;box-shadow:0 14px 30px rgba(0,0,0,.55),0 0 0 2px color-mix(in srgb,var(--sky) 60%,transparent)!important;cursor:grabbing}
 .icp .icmemo{-webkit-user-select:text;user-select:text}
 .icp.big{border-color:color-mix(in srgb,var(--sky) 35%,#2A2930);background:color-mix(in srgb,var(--sky) 5%,#111014)}
 .icp.ans{opacity:.7}
@@ -5439,9 +5441,9 @@ body:not(.boardon) #addQuick{margin:0!important}
 .srmsheet .srmytgo:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(0,0,0,.45)!important}
 /* 🙏 기도제목 카드 정리 (2026-11-13 사용자 요청: 배치가 어설픔) — 제목·정보·기도문·아래 줄의 왼쪽 끝을 한 줄로, 아래 줄은 날짜 + 단추 둘을 한 줄에 */
 .icv .icp{padding:14px 14px 12px}
-.icv .icp .ictop{padding-left:22px}
+.icv .icp .ictop{padding-left:4px}
 .icv .icp .icgrip{top:15px}
-.icv .icp>.icmemo,.icv .icp>.icverse,.icv .icp>.icbtns{margin-left:22px}
+.icv .icp>.icmemo,.icv .icp>.icverse,.icv .icp>.icbtns{margin-left:4px}
 .icv .icp>.icmemo{margin-top:10px}
 .icv .icp .icbtns{flex-wrap:nowrap;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)}
 .icv .icp .icdate{flex:1 1 auto;min-width:0}.icv .icp .icdate:empty+.icthmark{margin-left:-8px}
@@ -14413,9 +14415,9 @@ body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!
       });
       // 왼쪽으로 밀면 뒷면(감사 기도), 오른쪽으로 밀면 지우기 — 카드가 손가락을 따라가고 분홍 테두리가 뜨면 손 떼기 (2026-11-13 사용자 요청)
       icv.addEventListener("pointermove",function(e){
-        var d=sw; if(!d||e.pointerId!==d.id||icThx[d.c.dataset.id])return;
+        var d=sw; if(icDrag){if(d&&d.on)icSnap(d.c); sw=null; return} if(!d||e.pointerId!==d.id||icThx[d.c.dataset.id])return;
         var dx=e.clientX-d.x, dy=e.clientY-d.y;
-        if(!d.on){if(dx>14&&dx>Math.abs(dy)*1.5){d.on=true; d.c.style.transition="none"} else return}
+        if(!d.on){if(dx>14&&dx>Math.abs(dy)*1.5){d.on=true; icLPcancel(); d.c.style.transition="none"} else return}
         var x=Math.max(0,dx); d.c.style.transform="translateX("+x+"px)"; d.c.style.opacity=String(Math.max(.3,1-x/340));
         var arm=x>110; if(arm!==!!d.arm){d.arm=arm; d.c.classList.toggle("icswarm",arm); if(arm)buzz(8)}
       });
@@ -14519,49 +14521,63 @@ body .hymrtop button.hymcpok{background:linear-gradient(180deg,#3E7A55,#285238)!
   })();
   // 새로 넣은 기도제목(끌어 옮긴 적 없는 것)은 맨 위, 가장 최근 것부터 (2026-11-01 사용자 요청)
   function icOrd(a,b){var oa=a.ord==null?-1e15-a.at:a.ord, ob=b.ord==null?-1e15-b.at:b.ord; return oa-ob}
-  document.addEventListener("pointerdown",function(e){
-    var g=e.target.closest&&e.target.closest(".icgrip"); if(!g||!icv||icv.hidden)return;
-    var c=g.closest(".icp"); if(!c)return;
-    e.preventDefault(); try{g.setPointerCapture(e.pointerId)}catch(err){}
-    var r=c.getBoundingClientRect();
-    icDrag={c:c,pid:e.pointerId,y0:e.clientY,dy:0}; c.classList.add("icdragging"); buzz(10);
-  });
-  document.addEventListener("pointermove",function(e){
-    if(!icDrag||e.pointerId!==icDrag.pid)return; e.preventDefault();
+  /* ⠿ 손잡이는 없앰 — 카드를 꾹(0.35초) 누른 채 위아래로 끌어 옮김 (2026-11-15 사용자 요청).
+     휴대폰은 touch 이벤트로(pointer는 손가락이 움직이면 화면 굴림에 빼앗겨 끊김), PC는 마우스 꾹 누르기 */
+  var icLP=null;
+  function icLPok(t){if(!icv||icv.hidden||icEdit)return null; var c=t.closest&&t.closest(".icbody .icp"); if(!c||c.classList.contains("thx"))return null;
+    if(t.closest("button,input,textarea,select,a,.icform,.icthx"))return null; return c}
+  function icLPstart(c,x,y,kind){clearTimeout(icLP&&icLP.t);
+    icLP={c:c,x:x,y:y,kind:kind,t:setTimeout(function(){if(!icLP||icLP.c!==c)return;
+      try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
+      icDrag={c:c,y0:icLP.y}; c.classList.add("icdragging"); c.style.transition="none"; buzz(18)},350)}}
+  function icLPcancel(){if(icLP){clearTimeout(icLP.t); icLP=null}}
+  function icDragMove(y){
     var c=icDrag.c, box=c.parentNode;
-    c.style.transform="translateY("+(e.clientY-icDrag.y0)+"px)";
+    c.style.transform="translateY("+(y-icDrag.y0)+"px)";
     var sibs=Array.prototype.filter.call(box.querySelectorAll(":scope>.icp"),function(x){return x!==c});
     for(var i=0;i<sibs.length;i++){
       var r=sibs[i].getBoundingClientRect(), mid=r.top+r.height/2;
       var before=c.compareDocumentPosition(sibs[i])&Node.DOCUMENT_POSITION_PRECEDING;
-      if(before&&e.clientY<mid){var y0=c.getBoundingClientRect().top; box.insertBefore(c,sibs[i]); icDrag.y0+=c.getBoundingClientRect().top-y0; c.style.transform="translateY("+(e.clientY-icDrag.y0)+"px)"; break}
-      if(!before&&e.clientY>mid){var y1=c.getBoundingClientRect().top; box.insertBefore(c,sibs[i].nextSibling); icDrag.y0+=c.getBoundingClientRect().top-y1; c.style.transform="translateY("+(e.clientY-icDrag.y0)+"px)"}
+      if(before&&y<mid){var y0=c.getBoundingClientRect().top; box.insertBefore(c,sibs[i]); icDrag.y0+=c.getBoundingClientRect().top-y0; c.style.transform="translateY("+(y-icDrag.y0)+"px)"; buzz(10); break}
+      if(!before&&y>mid){var y1=c.getBoundingClientRect().top; box.insertBefore(c,sibs[i].nextSibling); icDrag.y0+=c.getBoundingClientRect().top-y1; c.style.transform="translateY("+(y-icDrag.y0)+"px)"; buzz(10)}
     }
     var sc=icv.querySelector(".icbody"), br=sc.getBoundingClientRect();   // 끝에 닿으면 저절로 스크롤
-    if(e.clientY<br.top+40)sc.scrollTop-=12; else if(e.clientY>br.bottom-40)sc.scrollTop+=12;
-  },{passive:false});
-  function icDragEnd(e){
-    if(!icDrag||e.pointerId!==icDrag.pid)return;
-    var c=icDrag.c; icDrag=null; c.classList.remove("icdragging"); c.style.transform="";
+    if(y<br.top+50){var t0=sc.scrollTop; sc.scrollTop-=12; icDrag.y0+=t0-sc.scrollTop}
+    else if(y>br.bottom-50){var t1=sc.scrollTop; sc.scrollTop+=12; icDrag.y0+=t1-sc.scrollTop}
+  }
+  function icDragEnd(){
+    icLPcancel(); if(!icDrag)return;
+    var c=icDrag.c; icDrag=null; c.classList.remove("icdragging"); c.style.transform=""; c.style.transition=""; icSwAt=Date.now();
     var ids=Array.prototype.map.call(icv.querySelectorAll(".icbody .icp"),function(x){return x.dataset.id});
     var o=icData(), ch=false;
     ids.forEach(function(id,i){var x=o.items.find(function(y){return y.id===id}); if(x&&x.ord!==i*10){x.ord=i*10; icTouch(x); ch=true}});
     if(ch){icSave(o); buzz(8)}
     icDraw();
   }
-  document.addEventListener("pointerup",icDragEnd); document.addEventListener("pointercancel",icDragEnd);
+  document.addEventListener("touchstart",function(e){if(e.touches.length!==1){icLPcancel(); return} var c=icLPok(e.target); if(!c)return; var t=e.touches[0]; icLPstart(c,t.clientX,t.clientY,"t")},{passive:true});
+  document.addEventListener("touchmove",function(e){
+    var t=e.touches[0]; if(!t)return;
+    if(icDrag){e.preventDefault(); icDragMove(t.clientY); return}
+    if(icLP&&(Math.abs(t.clientX-icLP.x)>10||Math.abs(t.clientY-icLP.y)>10))icLPcancel();
+  },{passive:false});
+  document.addEventListener("touchend",function(e){if(icDrag){e.preventDefault(); icDragEnd()} else icLPcancel()},{passive:false});
+  document.addEventListener("touchcancel",icDragEnd);
+  document.addEventListener("pointerdown",function(e){if(e.pointerType!=="mouse"||e.button!==0)return; var c=icLPok(e.target); if(c)icLPstart(c,e.clientX,e.clientY,"m")});
+  document.addEventListener("pointermove",function(e){if(e.pointerType!=="mouse")return;
+    if(icDrag){e.preventDefault(); icDragMove(e.clientY); return}
+    if(icLP&&(Math.abs(e.clientX-icLP.x)>6||Math.abs(e.clientY-icLP.y)>6))icLPcancel()});
+  document.addEventListener("pointerup",function(e){if(e.pointerType==="mouse")icDragEnd()});
+  document.addEventListener("contextmenu",function(e){if(icDrag||(icLP&&icLP.kind==="t"))e.preventDefault()});
   function closeIntercede(){if(!icv||icv.hidden)return; var cf=icv.querySelector(".icform"); if(cf){icCommit(cf); icEdit=""} icv.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; if(dl&&!dl.hidden)drawDaily()}
   function icNoteOpts(sel){
     var arr=sorted().filter(function(n){return n.ref});
     return '<option value="">붙들 말씀 (선택)</option>'+arr.map(function(n){return '<option value="'+n.id+'"'+(n.id===sel?" selected":"")+'>'+String(n.ref).replace(/[<&"]/g,"")+'</option>'}).join("");
   }
   function icPerson(x,today,big){
-    var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":"")+(x.no?" noans":""); d.dataset.id=x.id; d.title="한 번 누르면 펼치고 접어요 · 두 번 누르면 고쳐요";
+    var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":"")+(x.no?" noans":""); d.dataset.id=x.id; d.title="한 번 누르면 펼치고 접어요 · 두 번 누르면 고쳐요 · 꾹 눌러 끌면 옮겨요";
     var did=x.log.indexOf(today)>=0, last=icLastBefore(x,today);
     var op=!!icOpen[x.id]; if(op)d.classList.add("open");
-    var gp=document.createElement("span"); gp.className="icgrip"; gp.textContent="⠿"; gp.title="끌어서 위아래로 옮기기"; gp.setAttribute("aria-hidden","true");
     d.innerHTML='<button type="button" class="ictop icfold" aria-expanded="'+op+'" title="눌러서 '+(op?"접기":"펼치기")+'"><b class="icname"></b><span class="icmeta"></span><span class="icchev" aria-hidden="true"></span></button><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
-    d.insertBefore(gp,d.firstChild);
     d.querySelector(".icname").textContent=x.name;
     d.querySelector(".icmeta").textContent=x.ans?"🙌 응답 "+dlabel(dkey(x.ans)):x.no?"🕊 응답 안 됨 "+dlabel(dkey(x.no)):(x.log.length?x.log.length+"번 기도"+(last?" · 마지막 "+dlabel(last):""):"아직 기도 전");
     var mm=d.querySelector(".icmemo"); if(x.memo.trim())mm.textContent=x.memo; else mm.remove();
