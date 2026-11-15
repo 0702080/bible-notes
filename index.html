@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115q">
+<meta name="app-build" content="nb-20261115r">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5656,6 +5656,38 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
 .icbody .icp.noans .icname{color:#C3C7D6!important}
 .icv .icnohd{margin-top:18px}.icv .icnohd b{color:#AEB4CB}
 @media (max-width:400px){.icv .icbtns .icpray,.icv .icbtns .icno,.icv .icbtns .icans{padding:0 10px!important;font-size:13px!important}.icv .icbtns{gap:6px!important}}
+
+/* 🎵 찬양·찬송 (2026-11-15 사용자 요청) */
+.hymnsheet .dlbar{background:rgba(44,40,58,.95)}
+.hymbtns{display:flex;gap:8px}
+.hymnsheet .dlbar .dlclose.hymfind,.hymnsheet .dlbar .dlclose.hymadd,.hymnsheet .dlbar .dlclose.hymclose{width:38px;height:38px;padding:0;border-radius:50%;display:inline-grid;place-items:center;background:#2A2933;border-color:#45434F}
+.hymnsheet .dlbar .dlclose.hymadd{color:var(--gold);border-color:#6B5A30;background:#3A3220}
+.hymnsheet .dlbar .dlclose.hymclose{color:#F2A7BE}
+.hymbtns svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+.hymsearch{width:100%;margin-bottom:10px}
+.hymbox{display:flex;flex-direction:column;gap:10px}
+.hymcard{--hc:var(--pink);display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;text-align:left;padding:14px 16px;border:1px solid color-mix(in srgb,var(--hc) 40%,#2A2930);border-left:3px solid var(--hc);border-radius:14px;background:color-mix(in srgb,var(--hc) 14%,#18171B);color:var(--ink);font:inherit}
+.hymct{font-size:16px;color:color-mix(in srgb,var(--hc) 75%,#fff);font-weight:600}
+.hymcp{font-size:13.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.hymcm{font-size:12px;color:var(--faint)}
+.hymrtop{display:flex;justify-content:space-between}
+.hymrt{margin:6px 0 0;font-size:21px;color:var(--gold)}
+.hymrs{margin:0;color:var(--muted);font-size:13.5px}
+.hymlyr{white-space:pre-wrap;font-family:var(--serif);font-size:17px;line-height:1.9;color:var(--ink);padding:14px 16px;border:1px solid #34303F;border-radius:14px;background:rgba(44,40,58,.6)}
+.hymimgs{display:flex;flex-direction:column;gap:10px}
+.hymimg{position:relative;min-height:60px;border-radius:12px;overflow:hidden;background:#fff;color:#777;font-size:13px;display:grid;place-items:center}
+.hymimg img{display:block;width:100%;height:auto}
+.hymedimgs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hymedimgs .hymimg{min-height:80px}
+.hymimx{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:13px}
+.hymform{display:flex;flex-direction:column;gap:10px}
+.hymrow{display:flex;gap:8px}.hymrow .hymkind{flex:0 0 110px}.hymrow .hymno{flex:1}
+.hymform .hymt{min-height:240px;font-size:16px;line-height:1.8}
+.hympick{align-self:flex-start;padding:10px 16px;border-radius:20px;border:1px dashed var(--pink);color:var(--pink);font-size:14px}
+.hymfoot{display:flex;gap:8px;justify-content:flex-end}
+.hymzoom{position:fixed;inset:0;z-index:200;background:#000;overflow:auto;touch-action:pan-x pan-y pinch-zoom;display:flex;align-items:flex-start;justify-content:center}
+.hymzoom img{width:100%;height:auto;background:#fff}
+.hymzx{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:10px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:18px;z-index:201}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -5690,7 +5722,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       <div class="pop">
         <button type="button" id="ghSyncBtn">☁️ GitHub 자동 저장</button>
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
-        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 주님의 은혜</button><button type="button" id="openSceneBtn"><svg class="scnico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="16.5" cy="7.5" r="3.2" fill="#F08A5D"/><path d="M1.5 20 L8.5 10.5 L13 16.2 L15.6 13 L22.5 20 Z" fill="#4B5A82" stroke="#4B5A82" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10.5 L10.6 13.3 L9.4 13.9 L8.5 12.9 L7.4 14 L6.6 13.2 Z" fill="#fff" opacity=".85"/></svg> 장면 묵상</button>
+        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 주님의 은혜</button><button type="button" id="openSceneBtn"><svg class="scnico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="16.5" cy="7.5" r="3.2" fill="#F08A5D"/><path d="M1.5 20 L8.5 10.5 L13 16.2 L15.6 13 L22.5 20 Z" fill="#4B5A82" stroke="#4B5A82" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10.5 L10.6 13.3 L9.4 13.9 L8.5 12.9 L7.4 14 L6.6 13.2 Z" fill="#fff" opacity=".85"/></svg> 장면 묵상</button><button type="button" id="hymnBtn">🎵 찬양·찬송</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="rvAllBtn">🔁 오늘 복습</button>
         <button type="button" id="weekBtn">📅 한 주 돌아보기</button>
@@ -7038,12 +7070,14 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   }
   function renderDailyHits(){
     var box=$("dlFind"); if(!box)return 0;
-    if(filterText&&findWordOnly){box.hidden=true;box.textContent="";var gr0=$("dlFGrip");if(gr0)gr0.hidden=true;return 0}
+    var wo=!!(filterText&&findWordOnly);   // 말씀만 찾을 때도 🎵 찬양 가사는 찾아 보여 줌 (2026-11-15 사용자 요청)
+    if(wo&&!hymHits(1).length){box.hidden=true;box.textContent="";var gr0=$("dlFGrip");if(gr0)gr0.hidden=true;return 0}
     if(filterText&&bookQ()){box.hidden=true;box.textContent="";return 0}   // 책 이름 초성으로 찾을 때는 기록 찾기 칸을 띄우지 않음
     if(!box._wired){
       box._wired=1;
       box.addEventListener("click",function(e){
         var r=e.target.closest(".dlfr"); if(!r)return;
+        if(r.dataset.hym){openHymn(r.dataset.hym);return}
         if(r.dataset.say){var sid=r.dataset.sid, sb=r.dataset.say; openSay(null,sb);
           if(sid)setTimeout(function(){var sc=document.querySelector('.saysheet .saycard[data-id="'+sid+'"]'); if(!sc)return; sc.scrollIntoView({block:"center"}); sc.classList.remove("sayfound"); void sc.offsetWidth; sc.classList.add("sayfound")},180)}   // 찾은 그 카드로 굴리고 반짝 (2026-11-14)
         else if(r.dataset.read)openReader({book:+r.dataset.b,chapter:+r.dataset.c,verse:+r.dataset.v||0});
@@ -7082,8 +7116,8 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     box.textContent=""; renderRecent();
     if(!filterText){box.hidden=true;if(grip)grip.hidden=true;return 0}
     pushRecent(filterText);
-    var dh=findNoDaily?[]:dailyHits(24), ph=prayHits(24), ah=actHits(24), th=textHits(24), sh=sayHits(24), rq=refQuery();
-    var total=dh.length+ph.length+ah.length+th.med.length+th.qa.length+th.doc.length+sh.length+(rq?1:0);
+    var dh=(wo||findNoDaily)?[]:dailyHits(24), ph=wo?[]:prayHits(24), ah=wo?[]:actHits(24), th=wo?{med:[],qa:[],doc:[]}:textHits(24), sh=wo?[]:sayHits(24), rq=wo?null:refQuery(), hh=hymHits(24);
+    var total=dh.length+ph.length+ah.length+th.med.length+th.qa.length+th.doc.length+sh.length+hh.length+(rq?1:0);
     box.hidden=!total; if(grip)grip.hidden=!total;
     if(!total)return 0;
     function snipInto(bd,txt){
@@ -7114,6 +7148,15 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
       var rt=document.createElement("span"); rt.className="dlfrh"; rt.textContent="성경에서 펼쳐 보기";
       var rbd=document.createElement("span"); rbd.className="dlfrb"; rbd.textContent=rq.label+" ›";
       rb.appendChild(rt); rb.appendChild(rbd); lsr.appendChild(rb);
+    }
+    if(hh.length){   // 🎵 찬양·찬송 가사 (2026-11-15 사용자 요청)
+      var lsh=col("🎵","찬양·찬송",hh.length);
+      hh.forEach(function(x){
+        var b=document.createElement("button"); b.type="button"; b.className="dlfr"; b.dataset.hym=x.id; b.style.setProperty("--gc","var(--pink)"); b.setAttribute("aria-label",(x.title||"찬양")+" 보기");
+        var top=document.createElement("span"); top.className="dlfrh"; top.textContent=(x.kind==="h"&&x.no?"찬송가 "+x.no+"장 · ":"")+(x.title||"찬양");
+        var bd=document.createElement("span"); bd.className="dlfrb"; snipInto(bd,has(String(x.t||""))?x.t:(x.title||""));
+        b.appendChild(top); b.appendChild(bd); lsh.appendChild(b);
+      });
     }
     if(sh.length){   // 💬 한 마디·🌿 은혜·📖 짧은 말씀·🌄 장면 묵상 — 종류별로 따로, 맨 위 가까이 (2026-11-14 사용자 요청: 장면 묵상 글도 찾기에)
       [["m","⛰️","장면 묵상","var(--orange)"],["g","🌿","주님의 은혜","var(--green)"],["v","📖","짧은 말씀","var(--sky)"],["s","💬","믿음의 한 마디","var(--gold)"]].forEach(function(k){
@@ -18675,6 +18718,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
 
   $("openVerseBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"v")});
   $("openGraceBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"g")});
+  $("hymnBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openHymn()});   // 🎵 찬양·찬송 (2026-11-15 사용자 요청)
   $("openSceneBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){}openSay(null,"m")});   // 🌄 장면 묵상: 한 마디 창 그대로, 항목 sc:1 (2026-11-14 사용자 요청)
   /* ⋯ 메뉴의 "묵상 진도표"는 뺌 (2026-10-31 사용자 요청) — 카드 묵상 칸의 진도 단추로는 열림 */
   // 성경 통독표: 같은 로그인·같은 친구로 진도를 함께 봄 (통독표 맨 위 ← 버튼으로 돌아옴)
@@ -22269,7 +22313,7 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
   (function(){
     var SKIP={reorderBtn:1,ledgerBtn:1,foldAll:1};   // 💰는 맨 위에 따로 있음
     var ICON={openTongdokBtn:"📚",bibleTextBtn:"📜",ghSyncBtn:"📤",exportTxt:"📃"};   // 겹치는 그림은 바꿔서 구분
-    var COL={openSceneBtn:"#F6D9B8",sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
+    var COL={hymnBtn:"#F2C1D9",openSceneBtn:"#F6D9B8",sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
     var bar=$("addQuick")&&$("addQuick").parentElement, pop=document.querySelector("#topMenu .pop"); if(!bar||!pop)return;
     function qkOf(id){return bar.querySelector('.qk[data-for="'+id+'"]')}
     function colorOf(id){if(COL[id])return COL[id]; var h=0; for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0; return PAL[h%PAL.length]}
@@ -22493,6 +22537,96 @@ body:not(.boardon) .toolbar.tbdragging,body:not(.boardon) .toolbar.tbdragging bu
     if(window.visualViewport)visualViewport.addEventListener("resize",function(){var a=document.activeElement; if(a&&a.tagName==="TEXTAREA")sched(a)});
   })();
 
+  /* ---------- 🎵 찬양·찬송 (2026-11-15 사용자 요청): 가사 + 악보 사진. 가사는 localStorage bible-hymns, 사진은 IndexedDB(bible-hymn-img, 이 기기만) ---------- */
+  var HYM_KEY="bible-hymns", hym=null, hymView="", hymEdit="", hymQ="";
+  function hymData(){var o; try{o=JSON.parse(localStorage.getItem(HYM_KEY)||"{}")||{}}catch(e){o={}} if(!Array.isArray(o.items))o.items=[]; if(!o.del||typeof o.del!=="object")o.del={}; return o}
+  function hymSave(o){try{localStorage.setItem(HYM_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")}}
+  function hymHits(max){var out=[]; if(!filterText)return out; hymData().items.forEach(function(x){if(out.length>=max)return; if(has(String(x.title||""))||has(String(x.t||""))||has(String(x.no||"")))out.push(x)}); return out}
+  var hymDB=null;
+  function hymDb(){if(hymDB)return hymDB; hymDB=new Promise(function(ok,no){try{var r=indexedDB.open("bible-hymn-img",1); r.onupgradeneeded=function(){r.result.createObjectStore("img")}; r.onsuccess=function(){ok(r.result)}; r.onerror=function(){no(r.error)}}catch(e){no(e)}}); return hymDB}
+  function hymImgPut(id,blob){return hymDb().then(function(db){return new Promise(function(ok,no){var tx=db.transaction("img","readwrite"); tx.objectStore("img").put(blob,id); tx.oncomplete=function(){ok()}; tx.onerror=function(){no(tx.error)}})})}
+  function hymImgGet(id){return hymDb().then(function(db){return new Promise(function(ok){var rq=db.transaction("img").objectStore("img").get(id); rq.onsuccess=function(){ok(rq.result||null)}; rq.onerror=function(){ok(null)}})})}
+  function hymImgDel(id){return hymDb().then(function(db){db.transaction("img","readwrite").objectStore("img").delete(id)}).catch(function(){})}
+  function hymShrink(file){   // 악보 사진은 긴 변 1800px JPEG로 줄여 저장
+    return new Promise(function(ok){var u=URL.createObjectURL(file), im=new Image(); im.onload=function(){var m=1800, w=im.naturalWidth, h=im.naturalHeight, k=Math.min(1,m/Math.max(w,h)); var cv=document.createElement("canvas"); cv.width=Math.round(w*k); cv.height=Math.round(h*k); var cx=cv.getContext("2d"); cx.fillStyle="#fff"; cx.fillRect(0,0,cv.width,cv.height); cx.drawImage(im,0,0,cv.width,cv.height); URL.revokeObjectURL(u); cv.toBlob(function(b){ok(b||file)},"image/jpeg",.85)}; im.onerror=function(){URL.revokeObjectURL(u); ok(file)}; im.src=u});
+  }
+  function hymImgInto(holder,id){hymImgGet(id).then(function(b){if(!b||!holder.isConnected)return; var im=document.createElement("img"); im.alt="악보"; im.src=URL.createObjectURL(b); im.dataset.iid=id; holder.textContent=""; holder.appendChild(im)})}
+  function openHymn(id){
+    if(!hym){
+      hym=document.createElement("div"); hym.className="daily hymnsheet"; hym.setAttribute("role","dialog"); hym.hidden=true;
+      hym.innerHTML='<div class="dlbar"><b class="dltitle">🎵 찬양·찬송</b><span class="hymbtns"><button type="button" class="dlclose hymfind" aria-label="찾기" title="찾기">🔍</button><button type="button" class="dlclose hymadd" aria-label="새 찬양 담기" title="새 찬양 담기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" class="dlclose hymclose" aria-label="닫기" title="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div><div class="dlbody"><input class="field hymsearch" type="search" placeholder="🔍 제목·가사 찾기" hidden><div class="hymbox"></div></div>';
+      document.body.appendChild(hym);
+      hym.querySelector(".hymclose").addEventListener("click",function(){if(hymEdit){hymEdit="";hymDraw();return} if(hymView){hymView="";hymDraw();return} hym.hidden=true; document.body.style.overflow=""});
+      hym.querySelector(".hymadd").addEventListener("click",function(){hymEdit="new"; hymView=""; hymDraw()});
+      var si=hym.querySelector(".hymsearch");
+      hym.querySelector(".hymfind").addEventListener("click",function(){si.hidden=!si.hidden; if(si.hidden){si.value="";hymQ="";hymDraw()} else si.focus()});
+      si.addEventListener("input",function(){hymQ=si.value.trim(); hymDraw()});
+      hym.addEventListener("click",hymClick);
+    }
+    hymEdit=""; hymView=id||""; hym.hidden=false; document.body.style.overflow="hidden"; hymDraw();
+    var bd=hym.querySelector(".dlbody"); if(bd)bd.scrollTop=0;
+  }
+  function hymMatch(x,q){if(!q)return true; q=norm(q); return norm(x.title||"").indexOf(q)>=0||norm(x.t||"").indexOf(q)>=0||String(x.no||"").indexOf(q)>=0||(typeof choMatch==="function"&&choMatch(x.title||"",q))}
+  function hymDraw(){
+    if(!hym)return; var box=hym.querySelector(".hymbox"), o=hymData(); box.textContent="";
+    hym.querySelector(".hymadd").hidden=!!(hymEdit||hymView); hym.querySelector(".hymfind").hidden=!!(hymEdit||hymView);
+    if(hymView||hymEdit)hym.querySelector(".hymsearch").hidden=true;
+    if(hymEdit){hymForm(box,o);return}
+    if(hymView){var x=o.items.filter(function(i){return i.id===hymView})[0]; if(!x){hymView="";return hymDraw()} hymRead(box,x);return}
+    var items=o.items.slice().sort(function(a,b){var na=parseInt(a.no,10),nb=parseInt(b.no,10); if(a.kind!==b.kind)return a.kind==="h"?-1:1; if(!isNaN(na)&&!isNaN(nb)&&na!==nb)return na-nb; return String(a.title||"").localeCompare(String(b.title||""),"ko")}).filter(function(x){return hymMatch(x,hymQ)});
+    if(!items.length){var em=document.createElement("p"); em.className="sayempty"; em.textContent=hymQ?"“"+hymQ+"”이(가) 든 찬양이 없어요.":"아직 담은 찬양이 없어요. 위 ＋로 찬양·찬송가 가사와 악보 사진을 담아 보세요."; box.appendChild(em); return}
+    items.forEach(function(x,i){
+      var c=document.createElement("button"); c.type="button"; c.className="hymcard"; c.dataset.open=x.id; c.style.setProperty("--hc",["var(--violet)","var(--sky)","var(--green)","var(--gold)","var(--pink)","var(--orange)"][i%6]);
+      var h=document.createElement("span"); h.className="hymct"; h.textContent=(x.kind==="h"&&x.no?"찬송가 "+x.no+"장 · ":x.no?x.no+" · ":"")+(x.title||"(제목 없음)"); c.appendChild(h);
+      var p=document.createElement("span"); p.className="hymcp"; p.textContent=String(x.t||"").split("\n").filter(function(s){return s.trim()}).slice(0,2).join(" / ")||"가사 없음"; c.appendChild(p);
+      if(x.imgs&&x.imgs.length){var m=document.createElement("span"); m.className="hymcm"; m.textContent="🎼 악보 "+x.imgs.length; c.appendChild(m)}
+      box.appendChild(c);
+    });
+  }
+  function hymRead(box,x){
+    var top=document.createElement("div"); top.className="hymrtop";
+    top.innerHTML='<button type="button" class="dlclose" data-act="list">← 목록</button><button type="button" class="dlclose" data-act="edit">✏️ 고치기</button>';
+    box.appendChild(top);
+    var h=document.createElement("h3"); h.className="hymrt"; h.textContent=x.title||"(제목 없음)"; box.appendChild(h);
+    if(x.no||x.kind==="h"){var s=document.createElement("p"); s.className="hymrs"; s.textContent=(x.kind==="h"?"찬송가":"찬양")+(x.no?" "+x.no+(x.kind==="h"?"장":""):""); box.appendChild(s)}
+    if(x.imgs&&x.imgs.length){var g=document.createElement("div"); g.className="hymimgs"; x.imgs.forEach(function(iid){var d=document.createElement("div"); d.className="hymimg"; d.textContent="악보 불러오는 중…"; g.appendChild(d); hymImgInto(d,iid)}); box.appendChild(g)}
+    if(String(x.t||"").trim()){var l=document.createElement("div"); l.className="hymlyr"; l.textContent=x.t; box.appendChild(l)}
+  }
+  function hymForm(box,o){
+    var x=hymEdit==="new"?{id:"",title:"",no:"",kind:"p",t:"",imgs:[]}:(o.items.filter(function(i){return i.id===hymEdit})[0]); if(!x){hymEdit="";return hymDraw()}
+    var imgs=(x.imgs||[]).slice(), fresh=[];
+    var f=document.createElement("div"); f.className="hymform";
+    f.innerHTML='<div class="hymrow"><select class="field hymkind"><option value="p">찬양</option><option value="h">찬송가</option></select><input class="field hymno" placeholder="장·번호" inputmode="numeric" maxlength="12"></div><input class="field hymtitle" placeholder="제목" maxlength="80"><textarea class="field hymt" rows="10" placeholder="가사 (붙여넣기 가능)" maxlength="20000"></textarea><div class="hymimgs hymedimgs"></div><label class="hympick">🎼 악보 사진 넣기<input type="file" accept="image/*" multiple hidden></label><div class="hymfoot">'+(x.id?'<button type="button" class="saycancel hymdel">🗑</button>':'')+'<button type="button" class="saycancel hymcancel">취소</button><button type="button" class="saysave hymsave">저장</button></div>';
+    box.appendChild(f);
+    f.querySelector(".hymkind").value=x.kind==="h"?"h":"p"; f.querySelector(".hymno").value=x.no||""; f.querySelector(".hymtitle").value=x.title||""; f.querySelector(".hymt").value=x.t||"";
+    var g=f.querySelector(".hymedimgs");
+    function drawImgs(){g.textContent=""; imgs.forEach(function(iid,k){var d=document.createElement("div"); d.className="hymimg"; g.appendChild(d); hymImgInto(d,iid); var xb=document.createElement("button"); xb.type="button"; xb.className="hymimx"; xb.textContent="✕"; xb.setAttribute("aria-label","이 사진 빼기"); xb.addEventListener("click",function(){imgs.splice(k,1); drawImgs()}); d.appendChild(xb)})}
+    drawImgs();
+    f.querySelector(".hympick input").addEventListener("change",function(){var fs=[].slice.call(this.files||[]); this.value=""; if(!fs.length)return; toast("악보를 넣는 중…");
+      fs.reduce(function(p,file){return p.then(function(){return hymShrink(file).then(function(b){var iid="hi"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); return hymImgPut(iid,b).then(function(){imgs.push(iid); fresh.push(iid)})})})},Promise.resolve()).then(drawImgs).catch(function(){toast("사진을 넣지 못했어요")})});
+    f.querySelector(".hymcancel").addEventListener("click",function(){fresh.forEach(hymImgDel); hymEdit=""; hymDraw()});
+    f.querySelector(".hymsave").addEventListener("click",function(){
+      var o2=hymData(), title=f.querySelector(".hymtitle").value.trim(), t=f.querySelector(".hymt").value.replace(/\s+$/,"");
+      if(!title&&!t.trim()&&!imgs.length){toast("제목이나 가사를 적어 주세요");return}
+      if(!title)title=(t.split("\n").filter(function(s){return s.trim()})[0]||"악보").slice(0,40);
+      var it=x.id?o2.items.filter(function(i){return i.id===x.id})[0]:null;
+      if(!it){it={id:"hy"+Date.now().toString(36)}; o2.items.push(it)}
+      (x.imgs||[]).forEach(function(iid){if(imgs.indexOf(iid)<0)hymImgDel(iid)});
+      it.title=title; it.no=f.querySelector(".hymno").value.trim(); it.kind=f.querySelector(".hymkind").value; it.t=t; it.imgs=imgs; it.at=Math.max(Date.now(),(+it.at||0)+1);
+      hymSave(o2); hymEdit=""; hymView=it.id; hymDraw(); toast("담았어요 🎵");
+    });
+    var del=f.querySelector(".hymdel"); if(del)del.addEventListener("click",function(){if(!del.dataset.sure){del.dataset.sure="1"; del.textContent="한 번 더"; setTimeout(function(){if(del.isConnected){delete del.dataset.sure; del.textContent="🗑"}},3000); return}
+      var o2=hymData(); o2.items=o2.items.filter(function(i){return i.id!==x.id}); o2.del[x.id]=Date.now(); (x.imgs||[]).forEach(hymImgDel); hymSave(o2); hymEdit=""; hymView=""; hymDraw(); toast("지웠어요")});
+  }
+  function hymClick(e){
+    var c=e.target.closest(".hymcard"); if(c){hymView=c.dataset.open; hymDraw(); var bd=hym.querySelector(".dlbody"); if(bd)bd.scrollTop=0; return}
+    var b=e.target.closest("[data-act]"); if(b&&hym.contains(b)){if(b.dataset.act==="list"){hymView="";hymDraw()} else if(b.dataset.act==="edit"){hymEdit=hymView;hymDraw()} return}
+    var im=e.target.closest(".hymimgs:not(.hymedimgs) img"); if(im){   // 악보를 누르면 크게 — 두 손가락으로 키워 볼 수 있음
+      var ov=document.createElement("div"); ov.className="hymzoom"; var i2=document.createElement("img"); i2.src=im.src; i2.alt="악보"; ov.appendChild(i2);
+      var xb=document.createElement("button"); xb.type="button"; xb.className="hymzx"; xb.textContent="✕"; xb.setAttribute("aria-label","닫기"); ov.appendChild(xb);
+      xb.addEventListener("click",function(){ov.remove()}); document.body.appendChild(ov);
+    }
+  }
   /* ---------- start ---------- */
   syncSortBtn();
   render();
