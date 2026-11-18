@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-calbg">
+<meta name="app-build" content="b20261118-calslide">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -23001,7 +23001,7 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
       document.body.appendChild(cal);
       cal.querySelector(".calx").addEventListener("click",closeCal);
       cal.querySelector(".calttl").addEventListener("click",function(){var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now()); calDraw()});
-      [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){calShift(+b.dataset.d)})});
+      [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){calSlide(+b.dataset.d,0)})});
       var grid=cal.querySelector(".calgrid");
       grid.addEventListener("click",function(e){if(Date.now()-(grid._sw||0)<350)return; var c=e.target.closest(".calc"); if(!c)return; calSel=c.dataset.d; buzz(10); var p=c.dataset.d.split("-"); if(+p[1]-1!==calM){calY=+p[0]; calM=+p[1]-1} calDraw()});
       // 손잡이 끌기 (휴대폰 touch, PC mouse)
@@ -23009,11 +23009,17 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
       // 달력 칸 위에서도: 옆으로 밀면 달 넘기기, 위아래로 끌면 달력 크기 조절 (2026-11-18 사용자 요청)
       var sx=0,sy=0,sw=0,gv=false;
       grid.addEventListener("touchstart",function(e){if(e.touches.length>1){sw=0;return} var t=e.touches[0]; sx=t.clientX; sy=t.clientY; sw=1; gv=false},{passive:true});
+      var gh=false;   // 옆으로 끄는 중: 달력이 손가락을 따라 움직이고, 놓으면 다음/이전 달이 미끄러져 들어옴 (2026-11-18 사용자 요청)
       grid.addEventListener("touchmove",function(e){if(!sw)return; var t=e.touches[0], dx=t.clientX-sx, dy=t.clientY-sy;
-        if(!gv&&Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){gv=true; gs(sy)}
-        if(gv){if(e.cancelable)e.preventDefault(); gm(t.clientY)}},{passive:false});
-      grid.addEventListener("touchend",function(e){if(!sw)return; sw=0; if(gv){gv=false; grid._sw=Date.now(); ge(); return} var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){grid._sw=Date.now(); calShift(dx<0?1:-1)}});
-      grid.addEventListener("touchcancel",function(){if(gv){gv=false; ge()} sw=0});
+        if(!gv&&!gh&&Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){gv=true; gs(sy)}
+        else if(!gv&&!gh&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)){gh=true; grid.style.transition="none"}
+        if(gv){if(e.cancelable)e.preventDefault(); gm(t.clientY)}
+        else if(gh){if(e.cancelable)e.preventDefault(); grid.style.transform="translateX("+dx+"px)"; grid.style.opacity=String(Math.max(.35,1-Math.abs(dx)/grid.offsetWidth*.9))}},{passive:false});
+      grid.addEventListener("touchend",function(e){if(!sw)return; sw=0; if(gv){gv=false; grid._sw=Date.now(); ge(); return}
+        var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+        if(gh){gh=false; grid._sw=Date.now(); if(Math.abs(dx)>50)calSlide(dx<0?1:-1,dx); else{grid.style.transition="transform .2s ease,opacity .2s ease"; grid.style.transform=""; grid.style.opacity=""} return}
+        if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){grid._sw=Date.now(); calSlide(dx<0?1:-1,0)}});
+      grid.addEventListener("touchcancel",function(){if(gv){gv=false; ge()} if(gh){gh=false; grid.style.transition="transform .2s ease,opacity .2s ease"; grid.style.transform=""; grid.style.opacity=""} sw=0});
       grid.addEventListener("mousedown",function(e){if(e.button)return; var y0=e.clientY, on=false;
         function mm(ev){if(!on&&Math.abs(ev.clientY-y0)>8){on=true; gs(y0)} if(on)gm(ev.clientY)}
         function mu(){document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); if(on){grid._sw=Date.now(); ge()}}
@@ -23033,6 +23039,15 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
     calIdx=calBuild(); cal.hidden=false; document.body.style.overflow="hidden"; calDraw();
   }
   function closeCal(){if(!cal||cal.hidden)return; cal.hidden=true; document.body.style.overflow=""}
+  function calSlide(d,from){   // 달 넘기기 미끄럼: 지금 달이 밀려 나가고 다음 달이 반대쪽에서 들어옴
+    var grid=cal&&cal.querySelector(".calgrid"); if(!grid||grid._anim)return calShift(d);
+    var W=grid.offsetWidth||360, out=d>0?-W:W; grid._anim=1;
+    grid.style.transition="none"; grid.style.transform="translateX("+(from||0)+"px)"; void grid.offsetWidth;
+    grid.style.transition="transform .17s ease-in,opacity .17s ease-in"; grid.style.transform="translateX("+out+"px)"; grid.style.opacity="0";
+    setTimeout(function(){calShift(d); grid.style.transition="none"; grid.style.transform="translateX("+(-out*.6)+"px)"; grid.style.opacity="0"; void grid.offsetWidth;
+      grid.style.transition="transform .24s cubic-bezier(.2,.8,.2,1),opacity .24s ease-out"; grid.style.transform="translateX(0)"; grid.style.opacity="1";
+      setTimeout(function(){grid.style.transition=""; grid.style.transform=""; grid.style.opacity=""; grid._anim=0},260)},170);
+  }
   function calShift(d){calM+=d; if(calM<0){calM=11;calY--} if(calM>11){calM=0;calY++} var sp=calSel.split("-"); if(!(+sp[0]===calY&&+sp[1]-1===calM)){var t=new Date(); calSel=(t.getFullYear()===calY&&t.getMonth()===calM)?dkey(Date.now()):dkey(new Date(calY,calM,1).getTime())} calDraw(); buzz(8)}
   function calAvail(){var bar=cal.querySelector(".calbar"), wk=cal.querySelector(".calwk"), gp=cal.querySelector(".calgrip"); return Math.max(200,cal.clientHeight-bar.offsetHeight-wk.offsetHeight-gp.offsetHeight)}
   function calRows(){var f=new Date(calY,calM,1).getDay(), n=new Date(calY,calM+1,0).getDate(); return Math.ceil((f+n)/7)}
