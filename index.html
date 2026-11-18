@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-icdrag">
+<meta name="app-build" content="b20261118-addsticky">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5733,6 +5733,10 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .hymzoom{position:fixed;inset:0;z-index:200;background:#000;overflow:auto;touch-action:pan-x pan-y pinch-zoom;display:flex;align-items:flex-start;justify-content:center}
 .hymzoom img{width:100%;height:auto;background:#fff}
 .hymzx{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:10px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:18px;z-index:201}
+/* ＋ 말씀 담기: 글이 길어도 '추가' 단추가 창 아래에 늘 떠 있게 (2026-11-18 사용자 요청) */
+#addSheet #manual .primary{position:sticky;bottom:12px;z-index:5;display:block;margin-left:auto;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25)!important}
+/* ⋯ 메뉴에서 뺌: 나의 묵상 질문·한 주 돌아보기·하루 세 번 말씀 알림 (2026-11-18 사용자 요청, 데이터·코드는 그대로) */
+#medqBtn,#weekBtn,#remindBtn{display:none!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
