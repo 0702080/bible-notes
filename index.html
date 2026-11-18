@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-cal">
+<meta name="app-build" content="b20261118-cal-anstab">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5791,6 +5791,10 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .calit small{flex:none;font-size:11.5px;color:#8F89A3}
 .calempty{color:#8F89A3;font-size:14px;padding:10px 6px 14px;border-left:4px solid #3A3846;padding-left:12px;margin:4px 4px 12px}
 .caldl{display:block;margin:10px auto 0;height:38px;padding:0 18px;border-radius:19px;border:1px solid #4A3F6A!important;background:#2A2440!important;color:#D7C8FF;font:inherit;font-size:13.5px}
+/* 🙌 기도 읽기 '응답 연표' 탭 (2026-11-18 사용자 요청) */
+.prd.prdtl .p1add,.prd.prdtl .prdlist,.prd.prdtl .prdfil .prdall{display:none!important}
+.prd .ccbody.prdtlbody{padding:4px 0 24px;overflow:visible;flex:none;height:auto}
+#ansBtn{display:none!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -7587,12 +7591,17 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     return changed;
   }
   var prd=null, prdNote=null, prdFilter="all", p1Edit="";
+  function prdTlShow(){   // 기도 응답 연표를 기도 읽기 안 탭으로: 연표 창을 만들어 그 몸통(.ccbody)만 이리로 옮겨 옴
+    openAnswers(); var cb=ans._cb||ans.querySelector(".ccbody"); ans._cb=cb; cb.classList.add("prdtlbody");
+    prd.querySelector(".prdbody").appendChild(cb); ans.hidden=true; prd.classList.add("prdtl"); document.body.style.overflow="hidden";
+  }
+  function prdTlHide(){if(typeof ans!=="undefined"&&ans&&ans._cb){ans._cb.classList.remove("prdtlbody"); ans.appendChild(ans._cb); ans._cb=null} if(prd)prd.classList.remove("prdtl")}
   function openPrayRead(nid){
-    prdNote=nid; prdFilter="all";
+    prdNote=nid; prdFilter="all"; prdTlHide();
     if(!prd){
       prd=document.createElement("div"); prd.className="rvq prd"; prd.setAttribute("role","dialog"); prd.setAttribute("aria-modal","true"); prd.hidden=true;
       prd.innerHTML='<div class="dlbar"><b class="dltitle">🙏 기도 읽기</b><span class="rqcnt prdcnt"></span><button type="button" class="dlclose prdclose" aria-label="닫기" title="닫기">✕</button></div>'+
-        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><div class="prdseg"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button></div><button type="button" class="prdall"></button></div>'+
+        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><div class="prdseg"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button><button type="button" data-f="tl">응답 연표</button></div><button type="button" class="prdall"></button></div>'+
         '<form class="p1add" autocomplete="off"><input class="p1in" type="text" maxlength="500" enterkeyhint="done" placeholder="✏️ 한 줄 기도 적기" aria-label="한 줄 기도"><button type="submit" class="p1go" aria-label="한 줄 기도 추가" title="추가">＋</button></form>'+
         '<div class="prdlist"></div></div>';
       document.body.appendChild(prd);
@@ -7602,7 +7611,8 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
           var secs=prd.querySelectorAll(".prdsec[data-fk]"), shut=!Array.prototype.every.call(secs,function(x){return x.classList.contains("fold")});
           secs.forEach(function(x){x.classList.toggle("fold",shut); if(shut)prdFold[x.dataset.fk]=1; else delete prdFold[x.dataset.fk]});
           prdFoldSave(); prdFoldSync(); return}
-        prdFilter=b.dataset.f;drawPrayRead()});
+        if(b.dataset.f==="tl"){prdFilter="tl"; prdTlShow(); prd.querySelectorAll(".prdfil button").forEach(function(x){x.setAttribute("aria-pressed",String(x.dataset.f==="tl"))}); return}   // 🙌 응답 연표 탭 (2026-11-18 사용자 요청)
+        prdTlHide(); prdFilter=b.dataset.f;drawPrayRead()});
       prd.querySelector(".prdlist").addEventListener("click",function(e){   // 말씀(또는 한 줄 기도) 칸 접기·펼치기
         var t=e.target.closest(".prdfold"); if(!t)return;
         var sec=t.closest(".prdsec"), on=!sec.classList.contains("fold"); sec.classList.toggle("fold",on);
@@ -7703,7 +7713,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     f.innerHTML='<span></span><i aria-hidden="true"></i>'; f.querySelector("span").textContent="기도 "+n;
     return f;
   }
-  function closePrayRead(){if(!prd)return; prd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
+  function closePrayRead(){if(!prd)return; prdTlHide(); prdFilter="all"; prd.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
   var prdEd={nid:"",pid:""}, prdTap={k:"",t:0}, prdTF=new Set(), prdThx={nid:"",pid:""};   // prdThx: 뒷면(응답 감사 기도)을 연 기도 (2026-11-12)   // prdTF: 접어 둔 기도문
   try{JSON.parse(localStorage.getItem("bible-prd-tfold")||"[]").forEach(function(x){prdTF.add(String(x))})}catch(e){}
   function prdEdOpen(nid,pid){
@@ -12767,15 +12777,16 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     else if(k==="p"){var o=p1Data(), x=o.items.find(function(y){return y.id===id}); if(x){x.ans=0; x.u=Date.now(); p1Save(o)}}
     else if(k==="i"){var o2=icData(), x2=o2.items.find(function(y){return y.id===id}); if(x2){x2.ans=0; icTouch(x2); icSave(o2)}}
   }
+  function ansQ(q){return ans.querySelector(q)||(ans._cb&&ans._cb.querySelector(q))}   // 연표 칸이 기도 읽기 탭으로 옮겨가 있어도 찾음 (2026-11-18)
   function ansFilter(){
-    var q=ans.querySelector(".ansq").value.trim().toLowerCase().replace(/\s+/g," "), shown=0, mon=null, monHit=false;
+    var q=ansQ(".ansq").value.trim().toLowerCase().replace(/\s+/g," "), shown=0, mon=null, monHit=false;
     var fin=function(){if(mon)mon.hidden=!monHit};
-    Array.prototype.forEach.call(ans.querySelectorAll(".anslist>*"),function(el){
+    Array.prototype.forEach.call((ans._cb||ans).querySelectorAll(".anslist>*"),function(el){
       if(el.classList.contains("ansmon")){fin(); mon=el; monHit=false; return}
       if(!el.classList.contains("ansit"))return;
       var hit=!q||el.dataset.q.indexOf(q)>=0; el.hidden=!hit; if(hit){shown++;monHit=true}
     }); fin();
-    ans.querySelector(".ansnone").hidden=!(q&&!shown);
+    ansQ(".ansnone").hidden=!(q&&!shown);
   }
   /* ---------- 💰 하늘나라 재무제표 (2026-11-05 사용자 요청)
      하나님 나라에 심은 돈(왼쪽)과 돌아온 돈(오른쪽)을 통장처럼 적는 표. 최근 것이 맨 위.
@@ -12932,8 +12943,8 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
       ans.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🙌 기도 응답 연표</b></div><div class="qbarbtns"><button type="button" class="ansclose" aria-label="닫기">✕</button></div></div>'+
         '<div class="ccbody"><div class="anssum"></div><div class="anssearch"><span aria-hidden="true">🔍</span><input type="search" class="ansq" placeholder="기도 찾기 — 내용·응답·말씀" autocomplete="off"></div><div class="anslist"></div><p class="ansnone" hidden>찾는 기도가 없어요</p></div>';
       document.body.appendChild(ans);
-      ans.querySelector(".ansclose").addEventListener("click",closeAnswers);
-      ans.querySelector(".anslist").addEventListener("click",function(e){
+      ansQ(".ansclose").addEventListener("click",closeAnswers);
+      ansQ(".anslist").addEventListener("click",function(e){
         // 잘못 응답 표시한 기도는 여기서 바로 되돌림 — 한 번 더 눌러 확인 (2026-10-31 사용자 요청)
         var u=e.target.closest(".ansundo");
         if(u){if(!u.dataset.sure){u.dataset.sure="1";u.textContent="한 번 더 누르면 취소";setTimeout(function(){if(u.isConnected){delete u.dataset.sure;u.textContent="응답 취소"}},4000);return}
@@ -12943,18 +12954,18 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
         // 긴 기도문은 접어 두고 눌러서 펼침 (2026-10-31 사용자 요청)
         var mo=e.target.closest(".ansmore,.ansit.long .anst");
         if(mo){var it2=mo.closest(".ansit"), op=it2.classList.toggle("open"); it2.querySelector(".ansmore").textContent=op?"접기 ⌃":"전체 기도 펼치기 ⌄"; return}
-        var b=e.target.closest(".ansgo"); if(!b)return; closeAnswers(); openNoteFocus(b.dataset.nid,"p")});
-      ans.querySelector(".ansq").addEventListener("input",ansFilter);
-      ans.querySelector(".anssum").addEventListener("click",function(e){var t=e.target.closest("[data-m]"); if(!t||t.dataset.m===ansMode)return; ansMode=t.dataset.m; openAnswers(true); ans.querySelector(".ccbody").scrollTop=0});
+        var b=e.target.closest(".ansgo"); if(!b)return; closeAnswers(); if(prd&&!prd.hidden)closePrayRead(); openNoteFocus(b.dataset.nid,"p")});
+      ansQ(".ansq").addEventListener("input",ansFilter);
+      ansQ(".anssum").addEventListener("click",function(e){var t=e.target.closest("[data-m]"); if(!t||t.dataset.m===ansMode)return; ansMode=t.dataset.m; openAnswers(true); ansQ(".ccbody").scrollTop=0});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&ans&&!ans.hidden)closeAnswers()});
     }
     if(keep!==true)ansMode="ans";
     var it=ansItems(), wl=waitItems(), wait=wl.length, W=ansMode==="wait";
     var days=it.map(function(x){return Math.max(0,Math.round((x.ans-x.at)/864e5))});
     var avg=days.length?Math.round(days.reduce(function(a,b){return a+b},0)/days.length):0;
-    ans.querySelector(".anssum").innerHTML='<button type="button" data-m="ans"'+(W?'':' class="on"')+'><b>'+it.length+'</b><span>응답된 기도</span></button><div><b>'+(it.length?avg+"일":"–")+'</b><span>평균 기다린 날</span></div><button type="button" data-m="wait"'+(W?' class="on"':'')+'><b>'+wait+'</b><span>기다리는 기도</span></button>';
-    ans.querySelector(".bqtitle b").textContent=W?"🙏 기다리는 기도":"🙌 기도 응답 연표";
-    var list=ans.querySelector(".anslist"); list.textContent="";
+    ansQ(".anssum").innerHTML='<button type="button" data-m="ans"'+(W?'':' class="on"')+'><b>'+it.length+'</b><span>응답된 기도</span></button><div><b>'+(it.length?avg+"일":"–")+'</b><span>평균 기다린 날</span></div><button type="button" data-m="wait"'+(W?' class="on"':'')+'><b>'+wait+'</b><span>기다리는 기도</span></button>';
+    ansQ(".bqtitle b").textContent=W?"🙏 기다리는 기도":"🙌 기도 응답 연표";
+    var list=ansQ(".anslist"); list.textContent="";
     var now=Date.now(), rows=W?wl:it;
     if(W&&!wl.length){var p0=document.createElement("p"); p0.className="ansempty"; p0.textContent="기다리는 기도가 없어요."; list.appendChild(p0)}
     if(!W&&!it.length){var p=document.createElement("p"); p.className="ansempty"; p.textContent="아직 응답 표시한 기도가 없어요. 카드 기도 탭이나 한 줄 기도에서 '🙌 응답됐어요'를 누르면 여기에 쌓여요."; list.appendChild(p)}
@@ -14502,7 +14513,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
   function openIntercede(){
     if(!icv){
       icv=document.createElement("div"); icv.className="cch icv"; icv.setAttribute("role","dialog"); icv.setAttribute("aria-modal","true"); icv.hidden=true;
-      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🙏 기도제목</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icadd icaddtop">＋ <span class="icaddlong">기도제목 </span>넣기</button><button type="button" class="icclose">닫기</button></div></div>'+
+      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🙏 기도제목</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icadd icaddtop">＋ 쓰기</button><button type="button" class="icclose">닫기</button></div></div>'+
         '<div class="ccbody icbody"></div>';
       document.body.appendChild(icv);
       icv.querySelector(".icclose").addEventListener("click",closeIntercede);
