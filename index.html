@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-addfit2">
+<meta name="app-build" content="b20261118-saygrip">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5740,6 +5740,8 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 /* 글 칸 아래 크기 조절 손잡이 줄: 칸보다 살짝 진하게 해서 끌어 늘이는 곳임을 또렷하게 (2026-11-18 사용자 요청) */
 .tagripbar{background:color-mix(in srgb,#000 42%,transparent)!important;box-shadow:inset 0 2px 4px rgba(0,0,0,.35)}
 .tagripbar i{background:rgba(255,255,255,.85)!important;width:48px!important}
+/* 한 마디·짧은 말씀·은혜 고치는 칸: 아래 크기 조절 줄과 이어지는 테두리 (칸에 테두리가 없어 아래 줄만 반쪽 틀처럼 보이던 것, 2026-11-18 사용자 요청) */
+.sayform textarea.sayt.tagrip{border:1px solid color-mix(in srgb,var(--green) 70%,transparent)!important;border-bottom:0!important;border-radius:12px 12px 0 0!important;padding:10px 12px 8px!important;box-sizing:border-box}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
