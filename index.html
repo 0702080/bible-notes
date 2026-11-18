@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-sayfpad">
+<meta name="app-build" content="b20261118-autoref2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5934,6 +5934,33 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     if(!m)return {book:-1,chapter:0,verse:0};
     return {book:bookIndex(m[1]),chapter:+m[2]||0,verse:+(m[3]||0)};
   }
+  // 📋 붙여 넣은 본문 맨 위 "(말라기 2장 / 개역개정)" 같은 머리 줄에서 구절 찾기 → {ref:"말라기 2:1"(여러 절이면 "말라기 2:1-17"), hi:머리 줄 번호} (2026-11-18 사용자 요청)
+  function refDetect(text){
+    var lines=String(text||"").split(/\r?\n/), hi=-1, bk=-1, ch=0;
+    for(var i=0;i<Math.min(lines.length,3);i++){
+      var L=lines[i].trim().replace(/^[\(\[【〔<]+|[\)\]】〕>]+$/g,"").trim(); if(!L)continue;
+      var m=L.match(/^([가-힣]+(?:\s*[일이삼]서|\s*[전후]서|\s*[상하])?)\s*(\d+)\s*(?:장|편|:\s*\d+)?/);
+      if(m){var b=bookIndex(m[1].replace(/\s+/g,"")); if(b>=0){bk=b; ch=+m[2]; hi=i; break}}
+      if(/^\d/.test(L))break;
+    }
+    if(bk<0||!ch)return null;
+    var vs=[]; lines.slice(hi+1).forEach(function(l){var m=l.trim().match(/^(\d{1,3})(?:\s*[.:)]|\s)/); if(m)vs.push(+m[1])});
+    var a=vs.length?vs[0]:1, z=vs.length?vs[vs.length-1]:a;
+    return {ref:BOOKS[bk]+" "+ch+":"+a+(z>a?"-"+z:""), hi:hi};
+  }
+  document.addEventListener("focusin",function(e){var t=e.target; if(!t||!t.classList||!t.classList.contains("etext"))return; var eb=t.closest(".editbox"), er=eb&&eb.querySelector(".eref"); if(!er||er.value.trim())return; try{if(refDetect(etText(t)))setTimeout(function(){t.dispatchEvent(new Event("input",{bubbles:true}))},0)}catch(x){}});   // 이미 붙여 넣어 둔 카드도 고치기 칸을 열면 채움
+  // 카드 말씀 고치기 칸: 구절이 비었거나 저절로 채운 값이면 구절을 채우고 머리 줄은 말씀에서 뺌
+  function refAutoCard(card,n,et){
+    var eref=card.querySelector(".eref"); if(!eref)return;
+    var cur=eref.value.trim(); if(cur&&cur!==eref._auto)return;
+    var d=refDetect(n.text); if(!d)return;
+    if(cur!==d.ref){eref.value=d.ref; eref._auto=d.ref; n.ref=d.ref; var p=parseRef(d.ref); n.book=p.book; n.chapter=p.chapter; n.verse=p.verse; var rf=card.querySelector(".ref"); if(rf)rf.textContent=n.ref}
+    var L=et.value.split("\n"), cut=d.hi+1; if(L.length<=cut)return;
+    var drop=L.slice(0,cut).join("\n").length+1, pos=et.selectionStart;
+    et.value=L.slice(cut).join("\n"); if(et._nums)et._nums.splice(0,cut); et._prev=et.value.split("\n");
+    try{var np=Math.max(0,pos-drop); et.setSelectionRange(np,np)}catch(e){}
+    n.text=etText(et); et._full=n.text; try{etGutter(et)}catch(e){}
+  }
   function mid(){return "m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
   function normMeds(n){
     if(Array.isArray(n.meds))return n.meds.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),text:String(x.text||""),at:+x.at||+n.createdAt||Date.now(),thx:String(x.thx||"").slice(0,1000),todo:String(x.todo||"").slice(0,1000),tact:x.tact?String(x.tact):"",o:(typeof x.o==="number"&&isFinite(x.o))?x.o:null,pin:+x.pin||0}});
@@ -8345,24 +8372,12 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
   (function(){
     var mt=$("mText"), mr=$("mRef"), autoRef="";
     function detect(){
-      var v=mt.value; if(!v.trim())return;
-      var lines=v.split(/\r?\n/), hi=-1, bk=-1, ch=0;
-      for(var i=0;i<Math.min(lines.length,3);i++){
-        var L=lines[i].trim().replace(/^[\(\[【〔<]+|[\)\]】〕>]+$/g,"").trim(); if(!L)continue;
-        var m=L.match(/^([가-힣]+(?:\s*[일이삼]서|\s*[전후]서|\s*[상하])?)\s*(\d+)\s*(?:장|편|:\s*\d+)?/);
-        if(m){var b=bookIndex(m[1].replace(/\s+/g,"")); if(b>=0){bk=b; ch=+m[2]; hi=i; break}}
-        if(/^\d/.test(L))break;
-      }
-      if(bk<0||!ch)return;
-      var body=lines.slice(hi+1), vs=[];
-      body.forEach(function(l){var m=l.trim().match(/^(\d{1,3})(?:\s*[.:)]|\s)/); if(m)vs.push(+m[1])});
-      var a=vs.length?vs[0]:1, z=vs.length?vs[vs.length-1]:a;
-      var ref=BOOKS[bk]+" "+ch+":"+a+(z>a?"-"+z:"");
-      if(!mr.value.trim()||mr.value.trim()===autoRef){mr.value=ref; autoRef=ref}
-      var rest=body.join("\n").replace(/^\s*\n+/,""); if(rest.trim()&&rest!==v){var pos=mt.selectionStart-(v.length-rest.length); mt.value=rest; try{if(pos>=0)mt.setSelectionRange(pos,pos)}catch(e){} mt.dispatchEvent(new Event("input",{bubbles:true}))}
+      var v=mt.value; if(!v.trim())return; var d=refDetect(v); if(!d)return;
+      if(!mr.value.trim()||mr.value.trim()===autoRef){mr.value=d.ref; autoRef=d.ref}
+      var lines=v.split(/\r?\n/), rest=lines.slice(d.hi+1).join("\n").replace(/^\s*\n+/,""); if(rest.trim()&&rest!==v){var pos=mt.selectionStart-(v.length-rest.length); mt.value=rest; try{if(pos>=0)mt.setSelectionRange(pos,pos)}catch(e){} mt.dispatchEvent(new Event("input",{bubbles:true}))}
     }
     mt.addEventListener("paste",function(){setTimeout(detect,0)});
-    mt.addEventListener("input",function(e){if(e.inputType==="insertFromPaste"||e.inputType==="insertReplacementText")detect()});
+    mt.addEventListener("input",function(e){if(e.inputType==="insertFromPaste"||e.inputType==="insertReplacementText"||!mr.value.trim()||mr.value.trim()===autoRef)detect()}); mt.addEventListener("focus",detect);
   })();
   $("manual").addEventListener("submit",function(e){
     e.preventDefault();
@@ -8425,7 +8440,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     }else if(t.classList.contains("eref")){
       n.ref=t.value; var p=parseRef(t.value); n.book=p.book; n.chapter=p.chapter; n.verse=p.verse;
       card.querySelector(".ref").textContent=n.ref||"구절 미입력";
-    }else if(t.classList.contains("etext")){n.text=etInput(t);focusMode.delete(n.id);renderVerse(card,n)}
+    }else if(t.classList.contains("etext")){n.text=etInput(t);refAutoCard(card,n,t);focusMode.delete(n.id);renderVerse(card,n)}
     else return;
     scheduleSave(n.id);
     syncCounts(card,n);
