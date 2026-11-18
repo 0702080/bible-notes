@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-iclike">
+<meta name="app-build" content="b20261118-prdtabs">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5819,6 +5819,12 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
 .caldl{display:block;margin:10px auto 0;height:38px;padding:0 18px;border-radius:19px;border:1px solid #4A3F6A!important;background:#2A2440!important;color:#D7C8FF;font:inherit;font-size:13.5px}
 /* 🙌 기도 읽기 '응답 연표' 탭 (2026-11-18 사용자 요청) */
 .prd.prdtl .p1add,.prd.prdtl .prdlist,.prd.prdtl .prdfil .prdall{display:none!important}
+/* 탭 4개(응답 연표 추가)가 오른쪽 모두 접기 단추와 겹치지 않게: 탭 칸 좁히고, 그래도 넘치면 탭 줄만 옆으로 굴림 (2026-11-18 사용자 요청) */
+.prd .prdseg{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.prd .prdseg::-webkit-scrollbar{display:none}
+.prd .prdseg button,.prd .prdseg button[aria-pressed="true"],.prd .prdseg button:not([aria-pressed="true"]){padding:0 7px!important;font-size:13.5px!important;white-space:nowrap}
+.prd .prdfil .prdall{flex:0 0 auto!important;margin-left:4px!important}
+@media (max-width:380px){.prd .prdseg button,.prd .prdseg button[aria-pressed="true"],.prd .prdseg button:not([aria-pressed="true"]){padding:0 5px!important;font-size:12.5px!important}}
 .prd .ccbody.prdtlbody{padding:4px 0 24px;overflow:visible;flex:none;height:auto}
 #ansBtn{display:none!important}
 </style>
