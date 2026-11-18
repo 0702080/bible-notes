@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-calslide">
+<meta name="app-build" content="20261118-094521">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5569,6 +5569,8 @@ body:not(.boardon) #addQuick{margin:0!important}
 .sayform .saymode button.on{color:#10202C;background:linear-gradient(180deg,#A8DBFF,#6FB8EE)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 0 #2E5A7A!important}
 .sayform .saymode button[data-m="p"].on{background:linear-gradient(180deg,#FFE19A,#E8B54E)!important;color:#2A1E05;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 2px 0 #6B4F18!important}
 .sayform.saypicking .sayle{cursor:pointer}
+.sayles textarea.sayle.sayledrag{position:relative;z-index:5;border-radius:8px;background:color-mix(in srgb,var(--sky) 22%,#1B2230)!important;box-shadow:0 0 0 1.5px color-mix(in srgb,var(--sky) 70%,transparent),0 8px 20px rgba(0,0,0,.45);-webkit-user-select:none;user-select:none;cursor:grabbing}
+.sayles.saylesort textarea.sayle{-webkit-user-select:none;user-select:none}
 .sayform .saymode button[data-m="p"]{display:inline-flex;align-items:center;gap:6px}
 .sayform .saymode .smico{width:17px;height:17px;flex:0 0 17px;filter:drop-shadow(0 1px 0 rgba(0,0,0,.25))}
 .sayform textarea.sayt.sayall{display:block!important;width:100%;box-sizing:border-box;font-size:16px!important;line-height:40px!important;padding:0 10px 0 16px!important;border-radius:12px;border:1px solid color-mix(in srgb,var(--sky) 30%,#2A3240)!important;background-color:rgba(120,170,220,.07)!important;background-image:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0px,rgba(0,0,0,0) 39px,rgba(183,156,242,.22) 39px,rgba(183,156,242,.22) 40px)!important;background-attachment:local;resize:none;overflow:hidden;-webkit-user-select:text;user-select:text}
@@ -17695,6 +17697,57 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
       var wi=say.querySelector(".saywho"); if(wi&&!wi.value.trim())wi.value=sp.who; toast("말한 분을 갈라 넣었어요");
     });
     box.addEventListener("click",function(e){if(e.target===box){var rs=rows(), l=rs[rs.length-1]; if(l)at(l,l.value.length)}});   // 줄 아래 빈 곳을 누르면 마지막 줄 끝으로
+    // ✋ 문장(줄 칸)을 꾹(0.4초) 누른 채 위아래로 끌어 옮기기 (2026-11-18 사용자 요청: 한 마디 고치기에서 줄 옮기기가 안 됨)
+    //    커서가 들어 있는 줄은 꾹 누르면 휴대폰 글 고르기, 줄 고르기 모드에선 안 함. 놓으면 숨은 .sayt에 이어 붙여 저장
+    var lv={t:0,row:null,x:0,y:0,on:false,y0:0,lastY:0,raf:0,sc:null,moved:0};
+    function lvScroller(){for(var el=box.parentElement;el;el=el.parentElement){var cs=getComputedStyle(el); if(/(auto|scroll)/.test(cs.overflowY)&&el.scrollHeight>el.clientHeight+2)return el} return document.scrollingElement}
+    function lvStart(){
+      var r=lv.row; if(!r||!r.isConnected)return; lv.on=true; lv.y0=lv.y; lv.lastY=lv.y; lv.moved=0; lv.sc=lvScroller();
+      try{window.getSelection().removeAllRanges()}catch(err){}
+      r.classList.add("sayledrag"); box.classList.add("saylesort"); buzz(15); lv.raf=requestAnimationFrame(lvTick);
+    }
+    function lvPlace(){
+      var r=lv.row, y=lv.lastY; r.style.transform="translateY("+(y-lv.y0)+"px)";
+      var cr=r.getBoundingClientRect(), mid=cr.top+cr.height/2, nx=r.nextElementSibling, pv=r.previousElementSibling;
+      if(nx&&nx.classList.contains("sayle")){var nr=nx.getBoundingClientRect(); if(mid>nr.top+nr.height/2){box.insertBefore(nx,r); lv.y0+=nr.height; r.style.transform="translateY("+(y-lv.y0)+"px)"; lv.moved++; buzz(8); return}}
+      if(pv&&pv.classList.contains("sayle")){var pr=pv.getBoundingClientRect(); if(mid<pr.top+pr.height/2){box.insertBefore(r,pv); lv.y0-=pr.height; r.style.transform="translateY("+(y-lv.y0)+"px)"; lv.moved++; buzz(8)}}
+    }
+    function lvTick(){   // 위·아래 끝 가까이면 저절로 굴러감
+      if(!lv.on)return; var sc=lv.sc;
+      if(sc){var rr=sc===document.scrollingElement?{top:0,bottom:(window.visualViewport?visualViewport.height:innerHeight)}:sc.getBoundingClientRect(), y=lv.lastY, sp=0;
+        if(y<rr.top+70)sp=-Math.ceil((rr.top+70-y)/6); else if(y>rr.bottom-70)sp=Math.ceil((y-(rr.bottom-70))/6);
+        if(sp){var b0=sc.scrollTop; sc.scrollTop+=sp; var dd=sc.scrollTop-b0; if(dd){lv.y0-=dd; lvPlace()}}}
+      lv.raf=requestAnimationFrame(lvTick);
+    }
+    function lvEnd(){
+      clearTimeout(lv.t); lv.t=0; if(!lv.on){lv.row=null; return false}
+      var r=lv.row; lv.on=false; lv.row=null; cancelAnimationFrame(lv.raf);
+      r.classList.remove("sayledrag"); r.style.transform=""; box.classList.remove("saylesort");
+      if(lv.moved){hang(); sync(); toast("줄을 옮겼어요")}
+      sayEditAt=Date.now();   // 뗀 손길이 두 번 누르기(저장)로 세지지 않게
+      return true;
+    }
+    function lvCan(r){return r&&r.classList&&r.classList.contains("sayle")&&r!==document.activeElement&&!(lnPick&&lnPick.box===box)&&!form.classList.contains("saypicking")&&!form.classList.contains("saymall")&&rows().length>1}
+    box.addEventListener("touchstart",function(e){
+      var r=e.target; if(e.touches.length!==1||lv.on||!lvCan(r))return;
+      var t0=e.touches[0]; clearTimeout(lv.t); lv.row=r; lv.x=t0.clientX; lv.y=t0.clientY;
+      lv.t=setTimeout(function(){lv.t=0; lvStart()},400);
+    },{passive:true});
+    box.addEventListener("touchmove",function(e){
+      var t=e.touches[0]; if(!t)return;
+      if(lv.on){if(e.cancelable)e.preventDefault(); e.stopPropagation(); lv.lastY=t.clientY; lvPlace(); return}
+      if(lv.t&&(Math.abs(t.clientX-lv.x)>8||Math.abs(t.clientY-lv.y)>8)){clearTimeout(lv.t); lv.t=0; lv.row=null}
+    },{passive:false});
+    box.addEventListener("touchend",function(e){if(lvEnd()){if(e.cancelable)e.preventDefault(); e.stopPropagation()}},{passive:false});
+    box.addEventListener("touchcancel",function(){lvEnd()});
+    box.addEventListener("contextmenu",function(e){if(lv.on||lv.t)e.preventDefault()});
+    box.addEventListener("mousedown",function(e){   // PC: 마우스로 꾹 누른 채 끌기
+      var r=e.target; if(e.button!==0||lv.on||!lvCan(r)||("ontouchstart" in window&&navigator.maxTouchPoints>0))return;
+      clearTimeout(lv.t); lv.row=r; lv.x=e.clientX; lv.y=e.clientY; lv.t=setTimeout(function(){lv.t=0; lvStart()},400);
+      function mm(ev){if(lv.on){ev.preventDefault(); lv.lastY=ev.clientY; lvPlace()} else if(lv.t&&(Math.abs(ev.clientX-lv.x)>6||Math.abs(ev.clientY-lv.y)>6)){clearTimeout(lv.t); lv.t=0; lv.row=null}}
+      function mu(){document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); lvEnd()}
+      document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu);
+    });
     // 📐 적는 동안 칸을 키보드 위까지 늘려 아래 단추 줄이 키보드 바로 위에 (휴대폰)
     var on=false;
     function fill(){
