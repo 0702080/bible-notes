@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-calvdrag">
+<meta name="app-build" content="b20261118-calbg">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5783,6 +5783,14 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
 .calbar .calnav::before{content:"";position:absolute;inset:0;margin:auto;width:18px;height:18px;background:#2E2250;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15 4 7 12l8 8' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15 4 7 12l8 8' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
 .calbar .calnav[data-d="1"]::before{transform:scaleX(-1)}
 .calit{border-left-width:2px!important}
+/* 달력 바탕 밝게 (2026-11-18 사용자 요청: 너무 어두움) */
+.calv{background:#2A2738!important}
+.calc{border-top-color:#3E3A50!important}
+.calgrip{border-top-color:#433F56!important}
+.calgrip i{background:#7A7494!important}
+.calit{background:color-mix(in srgb,var(--cc) 14%,#34303F)!important}
+.calchip{background:color-mix(in srgb,var(--cc) 26%,#2E2B3B)!important}
+.calwk{color:#CFC9E0!important}
 /* 달력 윗줄 ‹ › ✕ 단추를 한 마디 창 윗줄처럼 짙은 색 입체 동그라미로 (2026-11-18 사용자 요청) */
 .calbar .calnav,.calbar .calx{width:38px!important;height:38px!important;border-radius:50%!important;border:1px solid!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.34),inset 0 -2px 0 rgba(0,0,0,.3),0 2px 0 rgba(0,0,0,.5),0 4px 8px rgba(0,0,0,.42)!important;transition:transform .08s,box-shadow .08s}
 .calbar .calnav{background-color:#2E2A40!important;border-color:#6A5FA0!important}
