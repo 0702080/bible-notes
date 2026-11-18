@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-addsticky">
+<meta name="app-build" content="b20261118-addfit2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5734,9 +5734,12 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .hymzoom img{width:100%;height:auto;background:#fff}
 .hymzx{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:10px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:18px;z-index:201}
 /* ＋ 말씀 담기: 글이 길어도 '추가' 단추가 창 아래에 늘 떠 있게 (2026-11-18 사용자 요청) */
-#addSheet #manual .primary{position:sticky;bottom:12px;z-index:5;display:block;margin-left:auto;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25)!important}
+#addSheet #manual .primary{position:sticky;bottom:12px;z-index:5;display:block;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25)!important}
 /* ⋯ 메뉴에서 뺌: 나의 묵상 질문·한 주 돌아보기·하루 세 번 말씀 알림 (2026-11-18 사용자 요청, 데이터·코드는 그대로) */
 #medqBtn,#weekBtn,#remindBtn{display:none!important}
+/* 글 칸 아래 크기 조절 손잡이 줄: 칸보다 살짝 진하게 해서 끌어 늘이는 곳임을 또렷하게 (2026-11-18 사용자 요청) */
+.tagripbar{background:color-mix(in srgb,#000 42%,transparent)!important;box-shadow:inset 0 2px 4px rgba(0,0,0,.35)}
+.tagripbar i{background:rgba(255,255,255,.85)!important;width:48px!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -17900,6 +17903,12 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
       pn.style.top=Math.round(vtop)+"px"; pn.style.height=Math.round(vh)+"px"; pn.style.maxHeight="none";
       var lb=sh.querySelector('label[for="mRef"]'), dy=lb.getBoundingClientRect().top-(pn.getBoundingClientRect().top+8);
       if(Math.abs(dy)>2)pn.scrollTop+=dy;   // 구절 칸부터 위에 보이게
+      fit.maxVH=Math.max(fit.maxVH||0,vh); var kbd=vh<fit.maxVH-120;
+      if(!kbd){   // 키보드를 내렸을 때: 창 맨 위부터 보이고, 말씀 칸 아래 안내 글·추가 단추까지 한 화면에 (2026-11-18 사용자 요청)
+        pn.scrollTop=0;
+        var pr=pn.getBoundingClientRect(), tr=cur.getBoundingClientRect(), lc=pn.lastElementChild, rest=(lc?lc.getBoundingClientRect().bottom:tr.bottom)-tr.bottom+(parseFloat(getComputedStyle(pn).paddingBottom)||0);   // 말씀 칸 아래 글·단추 높이
+        var h2=Math.max(140,Math.round(vh-(tr.top-pr.top)-rest-4))+"px"; if(cur.style.height!==h2)cur.style.height=h2; return;
+      }
       var h=Math.max(140,Math.round(vtop+vh-cur.getBoundingClientRect().top-10))+"px";
       if(cur.style.height!==h)cur.style.height=h;
     }
