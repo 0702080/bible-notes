@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-cal-anstab">
+<meta name="app-build" content="b20261118-calnav">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5763,6 +5763,11 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .calbar .calnav{width:38px;height:38px;border-radius:50%;border:1px solid #3A3748!important;background:#25232E!important;color:#CFC8E8;font-size:22px;line-height:1;padding:0;box-shadow:0 2px 0 #0D0C12}
 .calbar .calx{width:38px;height:38px;border-radius:50%;border:0!important;padding:0;font-size:16px;color:#3A1424;background:linear-gradient(#F7C5D6,#E79BB6)!important;box-shadow:0 3px 0 #9A5670,0 5px 8px rgba(0,0,0,.4)!important;margin-left:4px}
 .calbar .calx:active,.calbar .calnav:active{transform:translateY(2px)}
+/* ‹ › 달 넘기기 단추를 또렷하게: 연보라 입체 동그라미 + 짙은 화살 (2026-11-18 사용자 요청) */
+.calbar .calnav{position:relative;color:transparent!important;font-size:0!important;border:0!important;background:linear-gradient(#D9C9FA,#B79BEE)!important;box-shadow:0 3px 0 #6E55A8,0 5px 8px rgba(0,0,0,.45)!important}
+.calbar .calnav::before{content:"";position:absolute;inset:0;margin:auto;width:18px;height:18px;background:#2E2250;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15 4 7 12l8 8' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15 4 7 12l8 8' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+.calbar .calnav[data-d="1"]::before{transform:scaleX(-1)}
+.calit{border-left-width:2px!important}
 .calwk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:13px;color:#BDB7CF;padding:4px 4px 6px}
 .calwk b:first-child{color:#FF7A92}.calwk b:last-child{color:#8EA6FF}
 .calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding:0 4px;overflow:hidden;flex:none;touch-action:pan-y}
