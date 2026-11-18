@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-prdtabs">
+<meta name="app-build" content="b20261118-tbdrag">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -22659,12 +22659,12 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
     function start(b,x){d={b:b,x0:x,armed:false,t:setTimeout(function(){if(!d)return;d.armed=true;b.classList.add("tbdrag");bar.classList.add("tbdragging");buzz(15)},350)}}
     function move(x,e){
       if(!d)return;
-      if(!d.armed){if(Math.abs(x-d.x0)>8){clearTimeout(d.t);d=null}return}   // 움직이면 좌우 밀기(굴림)로
+      if(!d.armed){if(Math.abs(x-d.x0)>14){clearTimeout(d.t);d=null}return}   // 움직이면 좌우 밀기(굴림)로
       var br=bar.getBoundingClientRect(); if(x<br.left+40)bar.scrollLeft-=10; else if(x>br.right-40)bar.scrollLeft+=10;   // 끝으로 끌면 줄이 굴러감
       if(e&&e.cancelable)e.preventDefault();
-      var ms=movables(), i=ms.indexOf(d.b);
+      var ms=movables().filter(function(b){return b===d.b||(b.offsetWidth>0&&getComputedStyle(b).display!=="none")}), i=ms.indexOf(d.b);   // 숨은 단추(메뉴에서 숨긴 항목)는 건너뜀 — 그 앞에서 멈춰 안 넘어가던 문제 (2026-11-18 사용자 요청: 달력 단추가 안 옮겨짐)
       var prev=ms[i-1], next=ms[i+1];
-      if(next){var r=next.getBoundingClientRect(); if(x>r.left+r.width/2){bar.insertBefore(next,d.b);buzz(12);return}}
+      if(next){var r=next.getBoundingClientRect(); if(x>r.left+r.width/2){bar.insertBefore(d.b,next.nextSibling);buzz(12);return}}
       if(prev){var r2=prev.getBoundingClientRect(); if(x<r2.left+r2.width/2){bar.insertBefore(d.b,prev);buzz(12)}}
     }
     function end(){if(!d)return; clearTimeout(d.t); if(d.armed){d.b.classList.remove("tbdrag");bar.classList.remove("tbdragging");save();eat=Date.now()} d=null}
