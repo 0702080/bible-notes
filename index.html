@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-calnav">
+<meta name="app-build" content="b20261118-calbtn3d">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5768,6 +5768,12 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .calbar .calnav::before{content:"";position:absolute;inset:0;margin:auto;width:18px;height:18px;background:#2E2250;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15 4 7 12l8 8' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15 4 7 12l8 8' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
 .calbar .calnav[data-d="1"]::before{transform:scaleX(-1)}
 .calit{border-left-width:2px!important}
+/* 달력 윗줄 ‹ › ✕ 단추를 한 마디 창 윗줄처럼 짙은 색 입체 동그라미로 (2026-11-18 사용자 요청) */
+.calbar .calnav,.calbar .calx{width:38px!important;height:38px!important;border-radius:50%!important;border:1px solid!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.34),inset 0 -2px 0 rgba(0,0,0,.3),0 2px 0 rgba(0,0,0,.5),0 4px 8px rgba(0,0,0,.42)!important;transition:transform .08s,box-shadow .08s}
+.calbar .calnav{background-color:#2E2A40!important;border-color:#6A5FA0!important}
+.calbar .calnav::before{background:#C9B6F2!important;width:16px;height:16px}
+.calbar .calx{background-color:#3E1E28!important;border-color:#A8475F!important;color:#F2A7BE!important;font-size:15px}
+.calbar .calnav:active,.calbar .calx:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
 .calwk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:13px;color:#BDB7CF;padding:4px 4px 6px}
 .calwk b:first-child{color:#FF7A92}.calwk b:last-child{color:#8EA6FF}
 .calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding:0 4px;overflow:hidden;flex:none;touch-action:pan-y}
