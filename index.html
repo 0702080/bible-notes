@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-10min">
+<meta name="app-build" content="b20261118-ictoday2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5742,6 +5742,8 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .tagripbar i{background:rgba(255,255,255,.85)!important;width:48px!important}
 /* 한 마디·짧은 말씀·은혜 고치는 칸: 아래 크기 조절 줄과 이어지는 테두리 (칸에 테두리가 없어 아래 줄만 반쪽 틀처럼 보이던 것, 2026-11-18 사용자 요청) */
 .sayform textarea.sayt.tagrip{border:1px solid color-mix(in srgb,var(--green) 70%,transparent)!important;border-bottom:0!important;border-radius:12px 12px 0 0!important;padding:10px 12px 8px!important;box-sizing:border-box}
+/* 기도제목 고치는 칸: 네모난 점선 테두리 대신 아래 크기 조절 줄과 이어지는 둥근 테두리 (2026-11-18 사용자 요청) */
+.icform.icinline .field.icfm.tagrip{outline:none!important;border:1px solid color-mix(in srgb,var(--green) 70%,transparent)!important;border-bottom:0!important;border-radius:12px 12px 0 0!important;padding:10px 12px 8px!important;box-sizing:border-box}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -13134,7 +13136,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     if(!o.del||typeof o.del!=="object")o.del={};
     o.items=o.items.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),d:/^\d{4}-\d{2}-\d{2}$/.test(x.d||"")?x.d:dkey(+x.at||Date.now()),
       who:String(x.who||"").slice(0,60),title:String(x.title||"").slice(0,200),ref:String(x.ref||"").slice(0,120),nid:String(x.nid||""),
-      body:String(x.body||"").slice(0,40000),apply:String(x.apply||"").slice(0,8000),yt:String(x.yt||"").slice(0,500),resp:String(x.resp||"").slice(0,40000),cat:x.cat==="b"?"b":"",at:+x.at||Date.now(),u:+x.u||+x.at||0,ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
+      body:String(x.body||"").slice(0,40000),apply:String(x.apply||"").slice(0,8000),yt:String(x.yt||"").slice(0,500),resp:String(x.resp||"").slice(0,40000),cat:x.cat==="b"?"b":"",at:+x.at||Date.now(),u:+x.u||+x.at||0,ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord,pinDay:/^\d{4}-\d{2}-\d{2}$/.test(x.pinDay||"")?x.pinDay:undefined,skipDay:/^\d{4}-\d{2}-\d{2}$/.test(x.skipDay||"")?x.skipDay:undefined}});
     return o;
   }
   function srmSave(o){try{localStorage.setItem(SRM_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__sermons")}
@@ -14368,7 +14370,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     if(!o.del||typeof o.del!=="object")o.del={};
     o.per=Math.max(1,Math.min(10,+o.per||3));
     o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,100),memo:String(x.memo||"").slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
-      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,no:+x.no||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord}});
+      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,no:+x.no||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord,pinDay:/^\d{4}-\d{2}-\d{2}$/.test(x.pinDay||"")?x.pinDay:undefined,skipDay:/^\d{4}-\d{2}-\d{2}$/.test(x.skipDay||"")?x.skipDay:undefined}});
     return o;
   }
   function icSave(o){try{localStorage.setItem(IC_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__icp")}
@@ -14388,11 +14390,13 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
   }
   function icLastBefore(x,day){var l=(x.log||[]).filter(function(d){return d<day}); return l.length?l[l.length-1]:""}
   function icPick(o,day,skip){   // 그날 기도할 사람: 그날 이미 기도한 사람 + 오래 못 한 사람부터 per명까지 (skip=옆으로 넘긴 수)
-    var live=o.items.filter(function(x){return !x.ans&&!x.no});
+    var live=o.items.filter(function(x){return !x.ans&&!x.no&&x.skipDay!==day});   // 그날 나머지로 뺀 것(skipDay)은 빼고
+    var pin=live.filter(function(x){return x.pinDay===day&&x.log.indexOf(day)<0});   // 그날 오늘 칸으로 끌어 넣은 것(pinDay)은 늘 들어감
+    live=live.filter(function(x){return pin.indexOf(x)<0});
     var done=live.filter(function(x){return x.log.indexOf(day)>=0});
     var rest=live.filter(function(x){return x.log.indexOf(day)<0}).sort(function(a,b){var la=icLastBefore(a,day), lb=icLastBefore(b,day); return la<lb?-1:la>lb?1:a.at-b.at});
     if(skip&&rest.length){var sk=((skip%rest.length)+rest.length)%rest.length; rest=rest.slice(sk).concat(rest.slice(0,sk))}
-    return done.concat(rest.slice(0,Math.max(0,o.per-done.length)));
+    return pin.concat(done,rest.slice(0,Math.max(0,o.per-done.length)));   // 끌어 넣은 것은 하루 몇 개에 세지 않고 더해짐
   }
   function icToggle(id,day){
     var o=icData(), x=o.items.find(function(y){return y.id===id}); if(!x)return false;
@@ -14577,6 +14581,13 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     var c=icDrag.c; icDrag=null; c.classList.remove("icdragging"); c.style.transform=""; c.style.transition=""; icSwAt=Date.now();
     var ids=Array.prototype.map.call(icv.querySelectorAll(".icbody .icp"),function(x){return x.dataset.id});
     var o=icData(), ch=false;
+    // 오늘 기도제목 ↔ 나머지 명단 사이로 옮기면 오늘 칸에 넣거나 뺌 (그날만, 2026-11-18 사용자 요청)
+    var day=dkey(Date.now()), hdr=icv.querySelector(".icbody .ichead.ichall:not(.icanshd):not(.icnohd)"), cx=o.items.find(function(y){return y.id===c.dataset.id});
+    if(cx&&!cx.ans&&!cx.no){
+      var wasToday=icPick(o,day).some(function(y){return y.id===cx.id}), nowToday=!hdr||!!(c.compareDocumentPosition(hdr)&Node.DOCUMENT_POSITION_FOLLOWING);
+      if(nowToday&&!wasToday){cx.pinDay=day; delete cx.skipDay; icTouch(cx); ch=true}
+      else if(!nowToday&&wasToday){cx.skipDay=day; delete cx.pinDay; icTouch(cx); ch=true}
+    }
     ids.forEach(function(id,i){var x=o.items.find(function(y){return y.id===id}); if(x&&x.ord!==i*10){x.ord=i*10; icTouch(x); ch=true}});
     if(ch){icSave(o); buzz(8)}
     icDraw();
