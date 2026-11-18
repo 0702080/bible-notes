@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="nb-20261115zm">
+<meta name="app-build" content="b20261118-icdrag">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14459,7 +14459,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
         if(e.target.closest(".ictrashh")){e.stopPropagation(); icTrashOpen=!icTrashOpen; icDraw(); return}
         var rsb=e.target.closest(".ictres"); if(rsb){e.stopPropagation(); icRestore(rsb.dataset.id); return}
         if(e.target.closest(".icundob")){e.stopPropagation(); var ub=icv.querySelector(".icundo"); if(ub&&ub.dataset.id)icRestore(ub.dataset.id); return}
-        if(e.target.closest("button,input,textarea,select,.icform,.icgrip,.icthx"))return;
+        if(e.target.closest("button:not(.icfold),input,textarea,select,.icform,.icgrip,.icthx"))return;   // 제목(접기 단추)도 한 번=접기·펼치기, 두 번=고치기 — 제목만 적은 기도도 두 번 눌러 고침 (2026-11-18 사용자 요청)
         if(Date.now()-icSwAt<450)return;   // 옆으로 민 손길은 펼치기·고치기로 세지 않음
         var c=e.target.closest(".icp"); if(!c)return; var id=c.dataset.id;
         if(icTap.id===id&&icTap.timer){clearTimeout(icTap.timer); icTap={id:"",timer:0};
@@ -14543,7 +14543,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
      휴대폰은 touch 이벤트로(pointer는 손가락이 움직이면 화면 굴림에 빼앗겨 끊김), PC는 마우스 꾹 누르기 */
   var icLP=null;
   function icLPok(t){if(!icv||icv.hidden||icEdit)return null; var c=t.closest&&t.closest(".icbody .icp"); if(!c||c.classList.contains("thx"))return null;
-    if(t.closest("button,input,textarea,select,a,.icform,.icthx"))return null; return c}
+    if(t.closest("button:not(.icfold),input,textarea,select,a,.icform,.icthx"))return null; return c}   // 제목(접기 단추) 위에서도 꾹 눌러 끌기 (2026-11-18 사용자 요청)
   function icLPstart(c,x,y,kind){clearTimeout(icLP&&icLP.t);
     icLP={c:c,x:x,y:y,kind:kind,t:setTimeout(function(){if(!icLP||icLP.c!==c)return;
       try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){}
@@ -14725,7 +14725,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
   function icClick(e){
     var b=e.target.closest("button"); if(!b||!icv.contains(b)||b.classList.contains("icclose"))return;
     var card=b.closest("[data-id]"), id=card?card.dataset.id:"", o=icData(), today=dkey(Date.now()), x=o.items.find(function(y){return y.id===id});
-    if(b.classList.contains("icfold")){if(icOpen[id])delete icOpen[id]; else icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){} icDraw(); return}
+    if(b.classList.contains("icfold"))return;   // 접기·펼치기는 카드 누르기(한 번/두 번 셈)에서
     if(b.classList.contains("icpm")){o.per=Math.max(1,Math.min(10,(o.per||3)+(+b.dataset.d))); o.perSet=1; icSave(o); buzz(6); icDraw(); return}   // 하루 몇 명 (2026-10-24 다듬음)
     if(b.classList.contains("icpray")){var on=icToggle(id,today); buzz(on?[12,40,18]:8); if(on)toast("🙏 "+(x?x.name:"")+"을(를) 위해 기도했어요"); icDraw(); return}
     if(b.classList.contains("icansv")){icShowAns=!icShowAns; icEdit=""; icv.querySelector(".icbody").scrollTop=0; icDraw(); return}
