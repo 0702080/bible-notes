@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-gripfit">
+<meta name="app-build" content="b20261118-cal">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5755,6 +5755,42 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 /* 기도제목 고치는 칸의 기도문 칸도 위아래 칸과 같은 세로줄·둥근 모서리 (점선 네모가 5px 바깥으로 튀어나와 있던 것, 2026-11-18 사용자 요청) */
 .icform.icinline .field.icfm{outline:none!important;border:1px solid #2B2A30;border-radius:8px;padding:10px 12px;background:#101013}
 .icform.icinline .field.icfm:focus{border-color:color-mix(in srgb,var(--sky) 60%,#2B2A30)}
+/* 🗓️ 달력 (2026-11-18 사용자 요청) */
+.calv{position:fixed;inset:0;z-index:9000;display:flex;flex-direction:column;background:#17161D;color:#ECEAF2;padding-top:env(safe-area-inset-top)}
+.calv[hidden]{display:none}
+.calbar{display:flex;align-items:center;gap:6px;padding:10px 12px 6px}
+.calbar .calttl{flex:1;background:none!important;border:0!important;box-shadow:none!important;color:#F2EEFA;font:inherit;font-size:22px;font-weight:800;letter-spacing:.5px;padding:6px 0}
+.calbar .calnav{width:38px;height:38px;border-radius:50%;border:1px solid #3A3748!important;background:#25232E!important;color:#CFC8E8;font-size:22px;line-height:1;padding:0;box-shadow:0 2px 0 #0D0C12}
+.calbar .calx{width:38px;height:38px;border-radius:50%;border:0!important;padding:0;font-size:16px;color:#3A1424;background:linear-gradient(#F7C5D6,#E79BB6)!important;box-shadow:0 3px 0 #9A5670,0 5px 8px rgba(0,0,0,.4)!important;margin-left:4px}
+.calbar .calx:active,.calbar .calnav:active{transform:translateY(2px)}
+.calwk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:13px;color:#BDB7CF;padding:4px 4px 6px}
+.calwk b:first-child{color:#FF7A92}.calwk b:last-child{color:#8EA6FF}
+.calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding:0 4px;overflow:hidden;flex:none;touch-action:pan-y}
+.calc{border-top:1px solid #2A2833;padding:4px 2px 2px;min-width:0;display:flex;flex-direction:column;align-items:center;overflow:hidden;cursor:pointer;-webkit-user-select:none;user-select:none}
+.calc .calno{font-size:15px;font-weight:700;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;flex:none}
+.calc.calsun .calno{color:#FF7A92}.calc.calsat .calno{color:#8EA6FF}
+.calc.calout{opacity:.38}
+.calc.calsel{background:rgba(164,94,229,.14);border-radius:10px}
+.calc.caltoday .calno{background:#A45EE5;color:#fff}
+.calev{display:flex;flex-direction:column;gap:2px;width:100%;margin-top:2px;min-height:0}
+.calchip{display:block;font-size:10.5px;line-height:15px;height:15px;padding:0 3px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:color-mix(in srgb,var(--cc) 85%,#fff);background:color-mix(in srgb,var(--cc) 22%,#1E1D25)}
+.calmore{font-size:10px;color:#A9A3BC;text-align:center;line-height:13px}
+.calgrid.caldots .calev{flex-direction:row;justify-content:center;gap:3px;margin-top:1px}
+.calgrid.caldots .calev i{display:block;width:5px;height:5px;border-radius:50%}
+.calgrip{flex:none;height:26px;display:flex;align-items:center;justify-content:center;border-top:1px solid #2E2C38;touch-action:none;cursor:ns-resize}
+.calgrip i{display:block;width:52px;height:5px;border-radius:3px;background:#57536A}
+.calgrip.on i{background:#A45EE5}
+.calday{flex:1;min-height:0;display:flex;flex-direction:column}
+.caldh{display:flex;align-items:baseline;gap:8px;padding:4px 18px 8px}
+.caldh b{font-size:20px}.caldh span{font-size:13px;color:#A9A3BC}
+.calls{flex:1;min-height:0;overflow-y:auto;padding:0 14px calc(18px + env(safe-area-inset-bottom))}
+.calit{display:flex;align-items:center;gap:8px;padding:10px 12px;margin-bottom:6px;border-radius:12px;background:color-mix(in srgb,var(--cc) 10%,#1F1E27);border-left:4px solid var(--cc);cursor:pointer}
+.calit:active{filter:brightness(1.2)}
+.calik{flex:none;font-size:12px;color:var(--cc);font-weight:700}
+.calitx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14.5px}
+.calit small{flex:none;font-size:11.5px;color:#8F89A3}
+.calempty{color:#8F89A3;font-size:14px;padding:10px 6px 14px;border-left:4px solid #3A3846;padding-left:12px;margin:4px 4px 12px}
+.caldl{display:block;margin:10px auto 0;height:38px;padding:0 18px;border-radius:19px;border:1px solid #4A3F6A!important;background:#2A2440!important;color:#D7C8FF;font:inherit;font-size:13.5px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -5789,7 +5825,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
       <div class="pop">
         <button type="button" id="ghSyncBtn">☁️ GitHub 자동 저장</button>
         <button type="button" id="openSayBtn">💬 믿음의 한 마디</button>
-        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 주님의 은혜</button><button type="button" id="openSceneBtn"><svg class="scnico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="16.5" cy="7.5" r="3.2" fill="#F08A5D"/><path d="M1.5 20 L8.5 10.5 L13 16.2 L15.6 13 L22.5 20 Z" fill="#4B5A82" stroke="#4B5A82" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10.5 L10.6 13.3 L9.4 13.9 L8.5 12.9 L7.4 14 L6.6 13.2 Z" fill="#fff" opacity=".85"/></svg> 장면 묵상</button><button type="button" id="hymnBtn">🎵 찬양·찬송</button>
+        <button type="button" id="openVerseBtn">📖 짧은 말씀 한 구절</button><button type="button" id="openGraceBtn">🌿 주님의 은혜</button><button type="button" id="openSceneBtn"><svg class="scnico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="16.5" cy="7.5" r="3.2" fill="#F08A5D"/><path d="M1.5 20 L8.5 10.5 L13 16.2 L15.6 13 L22.5 20 Z" fill="#4B5A82" stroke="#4B5A82" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.5 10.5 L10.6 13.3 L9.4 13.9 L8.5 12.9 L7.4 14 L6.6 13.2 Z" fill="#fff" opacity=".85"/></svg> 장면 묵상</button><button type="button" id="hymnBtn">🎵 찬양·찬송</button><button type="button" id="calBtn">🗓️ 달력</button>
         <button type="button" id="medqBtn">📝 나의 묵상 질문</button>
         <button type="button" id="rvAllBtn">🔁 오늘 복습</button>
         <button type="button" id="weekBtn">📅 한 주 돌아보기</button>
@@ -22542,7 +22578,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
   (function(){
     var SKIP={reorderBtn:1,ledgerBtn:1,foldAll:1};   // 💰는 맨 위에 따로 있음
     var ICON={openTongdokBtn:"📚",bibleTextBtn:"📜",ghSyncBtn:"📤",exportTxt:"📃"};   // 겹치는 그림은 바꿔서 구분
-    var COL={hymnBtn:"#F2C1D9",openSceneBtn:"#F6D9B8",sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
+    var COL={calBtn:"#C9B6F2",hymnBtn:"#F2C1D9",openSceneBtn:"#F6D9B8",sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
     var bar=$("addQuick")&&$("addQuick").parentElement, pop=document.querySelector("#topMenu .pop"); if(!bar||!pop)return;
     function qkOf(id){return bar.querySelector('.qk[data-for="'+id+'"]')}
     function colorOf(id){if(COL[id])return COL[id]; var h=0; for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0; return PAL[h%PAL.length]}
@@ -22879,6 +22915,106 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
       xb.addEventListener("click",function(){ov.remove()}); document.body.appendChild(ov);
     }
   }
+  /* ---------- 🗓️ 달력 (2026-11-18 사용자 요청) ----------
+     한 달 달력에 그날 담은 것(말씀·묵상·기도·응답·설교 메모·성경 본문·한 마디·은혜·장면·짧은 말씀·기도제목·한 줄 기도·찬양)을 색 이름표로 보여 줌.
+     달력과 아래 날짜 칸 사이 손잡이를 위아래로 끌면 달력 크기가 바뀜 — 크게 하면 칸마다 이름표가 더 많이, 작게 하면 점으로 (저장 bible-cal-h, 이 기기만).
+     달력을 옆으로 밀면 이전·다음 달, 맨 위 달 이름을 누르면 오늘. 날을 누르면 아래에 그날 담은 것 목록 → 누르면 그 자리로. */
+  var CALT={note:["📖","말씀","#8FB8F0"],med:["✍️","묵상","#B7A0F0"],pray:["🙏","기도","#F0B07A"],ans:["🙌","응답","#F2C94C"],srm:["🎤","설교","#E3A6BC"],btx:["📜","본문","#C9A8E8"],say:["💬","한 마디","#A9B6E8"],grace:["🌿","은혜","#93D3A2"],scene:["🌄","장면","#F6C79A"],verse:["📖","짧은 말씀","#8FD0CC"],ic:["🙏","기도제목","#93C9A3"],p1:["🙏","한 줄 기도","#E8A0C8"],hym:["🎵","찬양","#F2C1D9"]};
+  var cal=null, calY=0, calM=0, calSel="", calIdx=null;
+  function calLine(s,n){s=String(s||"").replace(/\*\*|\[\[[^:\]]*:|\]\]/g,"").split(/\r?\n/).map(function(x){return x.trim()}).filter(Boolean)[0]||""; return s.length>(n||40)?s.slice(0,n||40)+"…":s}
+  function calBuild(){
+    var M={}; function add(t,k,chip,txt,go){if(!t)return; var d=typeof t==="string"?t:dkey(t); (M[d]=M[d]||[]).push({k:k,chip:chip,txt:txt,go:go,at:typeof t==="number"?t:0})}
+    function ab(ref){var m=String(ref||"").match(/^([가-힣]+)\s*(.*)$/); if(!m)return ref; var b=bookIndex(m[1]); return b>=0&&ABBR[b]?ABBR[b]+" "+m[2]:ref}   // 이름표는 짧게: 마태복음 5:3 → 마 5:3
+    try{notes.forEach(function(n){var r=ab(n.ref)||calLine(n.text,10)||"말씀";
+      add(+n.createdAt,"note",r,(n.ref?n.ref+" · ":"")+calLine(n.text),function(){openNoteFocus(n.id)});
+      (n.meds||[]).forEach(function(m){if(String(m.text||"").trim())add(+m.at,"med",r,calLine(m.text),function(){openNoteFocus(n.id,"m")})});
+      (n.prays||[]).forEach(function(x){if(!String(x.t||"").trim())return; var tx=calLine(String(x.t).replace(/^전능하신[^\n]*\n/,""));
+        add(+x.at,"pray",r,tx,function(){openNoteFocus(n.id,"p")}); if(x.ans>1e12)add(+x.ans,"ans",r,tx,function(){openNoteFocus(n.id,"p")})});
+    })}catch(e){}
+    try{srmData().items.forEach(function(x){var b=x.cat==="b"; add(x.d,b?"btx":"srm",x.title||x.ref||(b?"본문":"설교"),[x.title,x.who,x.ref].filter(Boolean).join(" · ")||calLine(x.body),function(){openSermon(b?"b":"s"); srmEdit=x.id; srmRead=true; srmResp=false; srmDraw()})})}catch(e){}
+    try{sayData().items.forEach(function(x){if(!x||!x.id||!String(x.t||"").trim())return; var k=x.hv?"verse":x.sc?"scene":x.gr?"grace":"say", md=x.hv?"v":x.sc?"m":x.gr?"g":"s";
+      add(+x.at,k,(k==="scene"&&x.topic)||calLine(x.t,12),calLine(x.t),function(){openSay(null,md); setTimeout(function(){var sc=document.querySelector('.saysheet .saycard[data-id="'+x.id+'"]'); if(!sc)return; sc.scrollIntoView({block:"center"}); sc.classList.remove("sayfound"); void sc.offsetWidth; sc.classList.add("sayfound")},180)})})}catch(e){}
+    try{icData().items.forEach(function(x){add(+x.at,"ic",x.name,x.name+(x.memo?" · "+calLine(x.memo,30):""),function(){openIntercede()}); if(x.ans>1e12)add(+x.ans,"ans",x.name,x.name,function(){openIntercede()})})}catch(e){}
+    try{p1Data().items.forEach(function(x){if(!x.t.trim())return; add(+x.at,"p1",calLine(x.t,12),calLine(x.t),function(){openPrayRead()}); if(x.ans>1e12)add(+x.ans,"ans",calLine(x.t,12),calLine(x.t),function(){openPrayRead()})})}catch(e){}
+    try{hymData().items.forEach(function(x){add(+x.at,"hym",x.title||"찬양",(x.no?"찬송가 "+x.no+"장 · ":"")+(x.title||""),function(){openHymn(x.id)})})}catch(e){}
+    Object.keys(M).forEach(function(d){M[d].sort(function(a,b){return a.at-b.at})});
+    return M;
+  }
+  function calHGet(){var v=0; try{v=+localStorage.getItem("bible-cal-h")||0}catch(e){} return v>0.15&&v<1?v:0.5}
+  function openCal(){
+    if(!cal){
+      cal=document.createElement("div"); cal.className="calv"; cal.setAttribute("role","dialog"); cal.setAttribute("aria-modal","true"); cal.hidden=true;
+      cal.innerHTML='<div class="calbar"><button type="button" class="calnav" data-d="-1" aria-label="이전 달">‹</button><button type="button" class="calttl" title="오늘로"></button><button type="button" class="calnav" data-d="1" aria-label="다음 달">›</button><button type="button" class="calx" aria-label="닫기" title="닫기">✕</button></div>'+
+        '<div class="calwk"><b>일</b><b>월</b><b>화</b><b>수</b><b>목</b><b>금</b><b>토</b></div><div class="calgrid"></div><div class="calgrip" title="위아래로 끌어 달력 크기 바꾸기"><i></i></div><div class="calday"><div class="caldh"></div><div class="calls"></div></div>';
+      document.body.appendChild(cal);
+      cal.querySelector(".calx").addEventListener("click",closeCal);
+      cal.querySelector(".calttl").addEventListener("click",function(){var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now()); calDraw()});
+      [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){calShift(+b.dataset.d)})});
+      var grid=cal.querySelector(".calgrid");
+      grid.addEventListener("click",function(e){if(Date.now()-(grid._sw||0)<350)return; var c=e.target.closest(".calc"); if(!c)return; calSel=c.dataset.d; var p=c.dataset.d.split("-"); if(+p[1]-1!==calM){calY=+p[0]; calM=+p[1]-1} calDraw()});
+      var sx=0,sy=0,sw=0; grid.addEventListener("touchstart",function(e){var t=e.touches[0]; sx=t.clientX; sy=t.clientY; sw=1},{passive:true});
+      grid.addEventListener("touchend",function(e){if(!sw)return; sw=0; var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){grid._sw=Date.now(); calShift(dx<0?1:-1)}});
+      // 손잡이 끌기 (휴대폰 touch, PC mouse)
+      var gr=cal.querySelector(".calgrip"), g0=null;
+      function gs(y){g0={y:y,h:grid.getBoundingClientRect().height}; gr.classList.add("on")}
+      function gm(y){if(!g0)return; var mx=calMaxH(), mn=calMinH(), h=Math.max(mn,Math.min(mx,g0.h+(y-g0.y))); grid.style.height=h+"px"; calFill(h)}
+      function ge(){if(!g0)return; g0=null; gr.classList.remove("on"); var h=grid.getBoundingClientRect().height, avail=calAvail(); try{localStorage.setItem("bible-cal-h",String(Math.max(0.16,Math.min(0.99,h/avail))))}catch(e){} buzz(10)}
+      gr.addEventListener("touchstart",function(e){e.preventDefault(); gs(e.touches[0].clientY)},{passive:false});
+      gr.addEventListener("touchmove",function(e){e.preventDefault(); gm(e.touches[0].clientY)},{passive:false});
+      gr.addEventListener("touchend",function(e){if(e.cancelable)e.preventDefault(); ge()});
+      gr.addEventListener("mousedown",function(e){e.preventDefault(); gs(e.clientY); function mm(ev){gm(ev.clientY)} function mu(){document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); ge()} document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu)});
+      cal.querySelector(".calls").addEventListener("click",function(e){var r=e.target.closest(".calit"); if(r&&r._go){var go=r._go; closeCal(); setTimeout(go,30); return} if(e.target.closest(".caldl")){closeCal(); openDaily(calSel)}});
+      window.addEventListener("resize",function(){if(cal&&!cal.hidden)calDraw()});
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&cal&&!cal.hidden)closeCal()});
+    }
+    var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now());
+    calIdx=calBuild(); cal.hidden=false; document.body.style.overflow="hidden"; calDraw();
+  }
+  function closeCal(){if(!cal||cal.hidden)return; cal.hidden=true; document.body.style.overflow=""}
+  function calShift(d){calM+=d; if(calM<0){calM=11;calY--} if(calM>11){calM=0;calY++} var sp=calSel.split("-"); if(!(+sp[0]===calY&&+sp[1]-1===calM)){var t=new Date(); calSel=(t.getFullYear()===calY&&t.getMonth()===calM)?dkey(Date.now()):dkey(new Date(calY,calM,1).getTime())} calDraw(); buzz(8)}
+  function calAvail(){var bar=cal.querySelector(".calbar"), wk=cal.querySelector(".calwk"), gp=cal.querySelector(".calgrip"); return Math.max(200,cal.clientHeight-bar.offsetHeight-wk.offsetHeight-gp.offsetHeight)}
+  function calRows(){var f=new Date(calY,calM,1).getDay(), n=new Date(calY,calM+1,0).getDate(); return Math.ceil((f+n)/7)}
+  function calMinH(){return calRows()*40}
+  function calMaxH(){return calAvail()-56}
+  function calDraw(){
+    if(!cal||cal.hidden)return;
+    cal.querySelector(".calttl").textContent=calY+". "+(calM+1)+".";
+    var grid=cal.querySelector(".calgrid"); grid.textContent="";
+    var f=new Date(calY,calM,1).getDay(), rows=calRows(), today=dkey(Date.now());
+    grid.style.gridTemplateRows="repeat("+rows+",1fr)";
+    for(var i=0;i<rows*7;i++){
+      var dt=new Date(calY,calM,1-f+i), d=dkey(dt.getTime()), c=document.createElement("div");
+      c.className="calc"+(dt.getMonth()!==calM?" calout":"")+(d===today?" caltoday":"")+(d===calSel?" calsel":"")+(dt.getDay()===0?" calsun":dt.getDay()===6?" calsat":"");
+      c.dataset.d=d; var nb=document.createElement("span"); nb.className="calno"; nb.textContent=dt.getDate(); c.appendChild(nb);
+      var ev=document.createElement("div"); ev.className="calev"; c.appendChild(ev); c._ev=(calIdx&&calIdx[d])||[];
+      grid.appendChild(c);
+    }
+    var h=Math.max(calMinH(),Math.min(calMaxH(),Math.round(calAvail()*calHGet()))); grid.style.height=h+"px"; calFill(h); calDay();
+  }
+  function calFill(h){   // 칸 높이에 맞춰 이름표 몇 개 보일지 (작으면 점)
+    var grid=cal.querySelector(".calgrid"), rows=calRows(), rh=h/rows, n=Math.floor((rh-26)/17);
+    grid.classList.toggle("caldots",n<1);
+    [].forEach.call(grid.children,function(c){
+      var ev=c.querySelector(".calev"), L=c._ev, key=(n<1?"d":n)+":"+L.length; if(ev._k===key)return; ev._k=key; ev.textContent="";
+      if(!L.length)return;
+      if(n<1){var seen={}; L.forEach(function(x){var col=CALT[x.k][2]; if(seen[col]||Object.keys(seen).length>=4)return; seen[col]=1; var s=document.createElement("i"); s.style.background=col; ev.appendChild(s)}); return}
+      var show=L.length>n?n-1:L.length;
+      for(var i=0;i<show;i++){var x=L[i], s=document.createElement("span"); s.className="calchip"; s.style.setProperty("--cc",CALT[x.k][2]); s.textContent=x.chip; ev.appendChild(s)}
+      if(L.length>show){var m=document.createElement("span"); m.className="calmore"; m.textContent="+"+(L.length-show); ev.appendChild(m)}
+    });
+  }
+  function calDay(){
+    var dh=cal.querySelector(".caldh"), ls=cal.querySelector(".calls"), p=calSel.split("-"), dt=new Date(+p[0],+p[1]-1,+p[2]), WDK=["일","월","화","수","목","금","토"];
+    dh.innerHTML=""; var b=document.createElement("b"); b.textContent=(+p[1])+". "+(+p[2])+". "+WDK[dt.getDay()]; dh.appendChild(b);
+    var L=(calIdx&&calIdx[calSel])||[]; var s=document.createElement("span"); s.textContent=L.length?L.length+"개":""; dh.appendChild(s);
+    ls.textContent="";
+    if(!L.length){var em=document.createElement("div"); em.className="calempty"; em.textContent="담은 것이 없어요."; ls.appendChild(em)}
+    L.forEach(function(x){var t=CALT[x.k], r=document.createElement("div"); r.className="calit"; r.style.setProperty("--cc",t[2]); r._go=x.go;
+      var a=document.createElement("span"); a.className="calik"; a.textContent=t[0]+" "+t[1]; var tx=document.createElement("span"); tx.className="calitx"; tx.textContent=x.txt||x.chip;
+      r.appendChild(a); r.appendChild(tx); if(x.at){var tm=document.createElement("small"); var q=new Date(x.at); tm.textContent=("0"+q.getHours()).slice(-2)+":"+("0"+q.getMinutes()).slice(-2); r.appendChild(tm)} ls.appendChild(r)});
+    var dl=document.createElement("button"); dl.type="button"; dl.className="caldl"; dl.textContent="🌙 이 날 하루 돌아보기"; ls.appendChild(dl);
+  }
+  try{$("calBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){} openCal()})}catch(e){}
   /* ---------- start ---------- */
   syncSortBtn();
   render();
