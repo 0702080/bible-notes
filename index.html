@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-addhint2">
+<meta name="app-build" content="b20261118-autoref">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5849,7 +5849,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
       <div id="mBookSlot"></div>
       <input class="field" id="mRef" placeholder="요한복음 1:5">
       <label for="mText">말씀</label>
-      <textarea class="field" id="mText" placeholder="빛이 어둠에 비치되 어둠이 깨닫지 못하더라"></textarea>
+      <textarea class="field tagstick" id="mText" placeholder="빛이 어둠에 비치되 어둠이 깨닫지 못하더라"></textarea>
       <p class="mhint">장 전체도 담을 수 있어요. 구절에 <b>시편 91편</b>처럼 장까지만 쓰고, 본문을 붙여 넣으세요. 절 번호가 없으면 한 줄을 한 절로 보고 번호를 붙여요.</p>
       <button class="primary" type="submit">추가</button>
     </form>
@@ -8340,6 +8340,29 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
     $("manualToggle").textContent=v?"직접 입력 닫기":"찾지 않고 직접 입력하기";
   }
   $("manualToggle").addEventListener("click",function(){openManual($("manual").hidden)});
+  // 📋 말씀 칸에 "(말라기 2장 / 개역개정)\n1. …"처럼 붙여 넣으면 구절 칸에 "말라기 2:1"(여러 절이면 "말라기 2:1-17")을 저절로 채움, 머리 줄은 말씀에서 뺌 (2026-11-18 사용자 요청)
+  (function(){
+    var mt=$("mText"), mr=$("mRef"), autoRef="";
+    function detect(){
+      var v=mt.value; if(!v.trim())return;
+      var lines=v.split(/\r?\n/), hi=-1, bk=-1, ch=0;
+      for(var i=0;i<Math.min(lines.length,3);i++){
+        var L=lines[i].trim().replace(/^[\(\[【〔<]+|[\)\]】〕>]+$/g,"").trim(); if(!L)continue;
+        var m=L.match(/^([가-힣]+(?:\s*[일이삼]서|\s*[전후]서|\s*[상하])?)\s*(\d+)\s*(?:장|편|:\s*\d+)?/);
+        if(m){var b=bookIndex(m[1].replace(/\s+/g,"")); if(b>=0){bk=b; ch=+m[2]; hi=i; break}}
+        if(/^\d/.test(L))break;
+      }
+      if(bk<0||!ch)return;
+      var body=lines.slice(hi+1), vs=[];
+      body.forEach(function(l){var m=l.trim().match(/^(\d{1,3})(?:\s*[.:)]|\s)/); if(m)vs.push(+m[1])});
+      var a=vs.length?vs[0]:1, z=vs.length?vs[vs.length-1]:a;
+      var ref=BOOKS[bk]+" "+ch+":"+a+(z>a?"-"+z:"");
+      if(!mr.value.trim()||mr.value.trim()===autoRef){mr.value=ref; autoRef=ref}
+      var rest=body.join("\n").replace(/^\s*\n+/,""); if(rest.trim()&&rest!==v){var pos=mt.selectionStart-(v.length-rest.length); mt.value=rest; try{if(pos>=0)mt.setSelectionRange(pos,pos)}catch(e){} mt.dispatchEvent(new Event("input",{bubbles:true}))}
+    }
+    mt.addEventListener("paste",function(){setTimeout(detect,0)});
+    mt.addEventListener("input",function(e){if(e.inputType==="insertFromPaste"||e.inputType==="insertReplacementText")detect()});
+  })();
   $("manual").addEventListener("submit",function(e){
     e.preventDefault();
     var ref=$("mRef").value.trim(), text=$("mText").value.trim();
@@ -8714,8 +8737,13 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
       if(v){H[key(t)]=v; try{localStorage.setItem(KEY,JSON.stringify(H))}catch(e){}
         t.dispatchEvent(new Event("input",{bubbles:true}))}   // 칸마다의 높이 맞춤이 다시 돌게 (글은 그대로)
       try{t.focus({preventScroll:true})}catch(e){}}
-    document.addEventListener("focusin",function(e){var t=e.target; if(ok(t))attach(t); else if(cur&&t!==cur&&!gd)detach()});
-    document.addEventListener("focusout",function(e){if(e.target!==cur)return; clearTimeout(offT); offT=setTimeout(function(){if(cur&&document.activeElement!==cur&&!gd)detach()},320)});   // 바로 떼면 아래 단추가 위로 밀려 누름이 빗나가서 잠깐 기다림
+    function stick(){return cur&&cur.classList.contains("tagstick")&&cur.isConnected&&cur.offsetParent!==null}   // 늘 붙어 있는 손잡이(말씀 담기 말씀 칸, 2026-11-18 사용자 요청)
+    document.addEventListener("focusin",function(e){var t=e.target; if(ok(t))attach(t); else if(cur&&t!==cur&&!gd&&!stick())detach()});
+    document.addEventListener("focusout",function(e){if(e.target!==cur)return; clearTimeout(offT); offT=setTimeout(function(){if(cur&&document.activeElement!==cur&&!gd&&!stick())detach()},320)});
+    (function(){var sh=document.getElementById("addSheet"), mt=document.getElementById("mText"); if(!sh||!mt||!window.MutationObserver)return;
+      var go=function(){if(sh.hidden)return; [60,350].forEach(function(ms){setTimeout(function(){if(!sh.hidden&&ok(mt)&&(cur!==mt||!gp||!gp.isConnected))attach(mt); else if(cur===mt&&gp)gp.style.width=mt.offsetWidth+"px"},ms)})};
+      new MutationObserver(go).observe(sh,{attributes:true,attributeFilter:["hidden"]});
+      var man=document.getElementById("manual"); if(man)new MutationObserver(go).observe(man,{attributes:true,attributeFilter:["hidden"]})})();   // 바로 떼면 아래 단추가 위로 밀려 누름이 빗나가서 잠깐 기다림
   })();
   /* ---------- 🎤 말로 적기 (2026-10-25 사용자 요청) ----------
      글 칸을 누르면 오른쪽 아래에 🎤 단추가 떠요. 누르고 말하면 커서 자리에 글로 들어가고, 한 번 더 누르면 멈춰요.
