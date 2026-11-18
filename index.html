@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-calsel">
+<meta name="app-build" content="b20261118-calvdrag">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5791,7 +5791,7 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
 .calbar .calnav:active,.calbar .calx:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)!important}
 .calwk{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:13px;color:#BDB7CF;padding:4px 4px 6px}
 .calwk b:first-child{color:#FF7A92}.calwk b:last-child{color:#8EA6FF}
-.calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding:0 4px;overflow:hidden;flex:none;touch-action:pan-y}
+.calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));padding:0 4px;overflow:hidden;flex:none;touch-action:none}
 .calc{border-top:1px solid #2A2833;padding:4px 2px 2px;min-width:0;display:flex;flex-direction:column;align-items:center;overflow:hidden;cursor:pointer;-webkit-user-select:none;user-select:none}
 .calc .calno{font-size:15px;font-weight:700;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;flex:none}
 .calc.calsun .calno{color:#FF7A92}.calc.calsat .calno{color:#8EA6FF}
@@ -22996,10 +22996,20 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
       [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){calShift(+b.dataset.d)})});
       var grid=cal.querySelector(".calgrid");
       grid.addEventListener("click",function(e){if(Date.now()-(grid._sw||0)<350)return; var c=e.target.closest(".calc"); if(!c)return; calSel=c.dataset.d; buzz(10); var p=c.dataset.d.split("-"); if(+p[1]-1!==calM){calY=+p[0]; calM=+p[1]-1} calDraw()});
-      var sx=0,sy=0,sw=0; grid.addEventListener("touchstart",function(e){var t=e.touches[0]; sx=t.clientX; sy=t.clientY; sw=1},{passive:true});
-      grid.addEventListener("touchend",function(e){if(!sw)return; sw=0; var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){grid._sw=Date.now(); calShift(dx<0?1:-1)}});
       // 손잡이 끌기 (휴대폰 touch, PC mouse)
       var gr=cal.querySelector(".calgrip"), g0=null;
+      // 달력 칸 위에서도: 옆으로 밀면 달 넘기기, 위아래로 끌면 달력 크기 조절 (2026-11-18 사용자 요청)
+      var sx=0,sy=0,sw=0,gv=false;
+      grid.addEventListener("touchstart",function(e){if(e.touches.length>1){sw=0;return} var t=e.touches[0]; sx=t.clientX; sy=t.clientY; sw=1; gv=false},{passive:true});
+      grid.addEventListener("touchmove",function(e){if(!sw)return; var t=e.touches[0], dx=t.clientX-sx, dy=t.clientY-sy;
+        if(!gv&&Math.abs(dy)>10&&Math.abs(dy)>Math.abs(dx)){gv=true; gs(sy)}
+        if(gv){if(e.cancelable)e.preventDefault(); gm(t.clientY)}},{passive:false});
+      grid.addEventListener("touchend",function(e){if(!sw)return; sw=0; if(gv){gv=false; grid._sw=Date.now(); ge(); return} var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){grid._sw=Date.now(); calShift(dx<0?1:-1)}});
+      grid.addEventListener("touchcancel",function(){if(gv){gv=false; ge()} sw=0});
+      grid.addEventListener("mousedown",function(e){if(e.button)return; var y0=e.clientY, on=false;
+        function mm(ev){if(!on&&Math.abs(ev.clientY-y0)>8){on=true; gs(y0)} if(on)gm(ev.clientY)}
+        function mu(){document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); if(on){grid._sw=Date.now(); ge()}}
+        document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu)});
       function gs(y){g0={y:y,h:grid.getBoundingClientRect().height}; gr.classList.add("on")}
       function gm(y){if(!g0)return; var mx=calMaxH(), mn=calMinH(), h=Math.max(mn,Math.min(mx,g0.h+(y-g0.y))); grid.style.height=h+"px"; calFill(h)}
       function ge(){if(!g0)return; g0=null; gr.classList.remove("on"); var h=grid.getBoundingClientRect().height, avail=calAvail(); try{localStorage.setItem("bible-cal-h",String(Math.max(0.16,Math.min(0.99,h/avail))))}catch(e){} buzz(10)}
@@ -23042,7 +23052,7 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
       var ev=c.querySelector(".calev"), L=c._ev, key=(n<1?"d":n)+":"+L.length; if(ev._k===key)return; ev._k=key; ev.textContent="";
       if(!L.length)return;
       if(n<1){var seen={}; L.forEach(function(x){var col=CALT[x.k][2]; if(seen[col]||Object.keys(seen).length>=4)return; seen[col]=1; var s=document.createElement("i"); s.style.background=col; ev.appendChild(s)}); return}
-      var show=L.length>n?n-1:L.length;
+      var show=L.length>n?Math.max(1,n-1):L.length;   // 한 줄만 들어가면 +N 대신 이름표 하나 (2026-11-18)
       for(var i=0;i<show;i++){var x=L[i], s=document.createElement("span"); s.className="calchip"; s.style.setProperty("--cc",CALT[x.k][2]); s.textContent=x.chip; ev.appendChild(s)}
       if(L.length>show){var m=document.createElement("span"); m.className="calmore"; m.textContent="+"+(L.length-show); ev.appendChild(m)}
     });
