@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-vedgrip">
+<meta name="app-build" content="b20261118-icthdbl">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5845,6 +5845,7 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
 textarea.tagrip{border-bottom-width:0!important}
 /* 카드 말씀 고치기 칸은 틀보다 12px 넓게 그려져서, 크기 조절 줄도 폭 제한 없이 칸에 맞춤 (오른쪽 끝이 짧던 것, 2026-11-18 사용자 요청) */
 .editbox .tagripbar{max-width:none!important;flex:none}
+.icv .icthtip{display:none!important}   /* 감사 기도 쪽 안내 글(두 번 누르면 고치기 · 옆으로 밀면 기도문) 지움 (2026-11-18 사용자 요청) */
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -14593,6 +14594,13 @@ textarea.tagrip{border-bottom-width:0!important}
         if(icThxTap.id===id1&&now-icThxTap.t<350){icThxTap={id:"",t:0}; icThxEd[id1]=1; icDraw(); var ta=icv.querySelector('.icp[data-id="'+id1+'"] textarea.ictht'); if(ta){grow(ta); try{ta.focus({preventScroll:true}); ta.setSelectionRange(ta.value.length,ta.value.length)}catch(err){}}}
         else icThxTap={id:id1,t:now};
       });
+      // 감사 기도 적는 칸을 두 번 누르면 저장하고 읽기로 (휴대폰은 손가락 뗄 때 셈, 키보드로 밀려도 가로 60·세로 80px 안이면 두 번, 2026-11-18 사용자 요청)
+      (function(){var lt=0,lx=0,ly=0;
+        function done(ta){if(!ta.value.trim())return; try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){} var c=ta.closest(".icp"); clearTimeout(icThxT); thxSave(ta); if(c)delete icThxEd[c.dataset.id]; ta.blur(); icDraw()}
+        icv.addEventListener("touchend",function(e){var ta=e.target; if(!ta.classList||!ta.classList.contains("ictht")||e.changedTouches.length!==1)return; var t=e.changedTouches[0], now=Date.now();
+          if(now-lt<450&&Math.abs(t.clientX-lx)<60&&Math.abs(t.clientY-ly)<80){lt=0; if(e.cancelable)e.preventDefault(); done(ta)} else {lt=now; lx=t.clientX; ly=t.clientY}},{passive:false});
+        icv.addEventListener("dblclick",function(e){var ta=e.target; if(ta.classList&&ta.classList.contains("ictht"))done(ta)});
+      })();
       var sw=null, icThxTap={id:"",t:0};
       icv.addEventListener("pointerdown",function(e){
         sw=null; if(e.pointerType==="mouse"&&e.button!==0)return;
