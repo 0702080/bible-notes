@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-calscn">
+<meta name="app-build" content="b20261118-calsel">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5796,7 +5796,7 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
 .calc .calno{font-size:15px;font-weight:700;width:28px;height:28px;line-height:28px;text-align:center;border-radius:50%;flex:none}
 .calc.calsun .calno{color:#FF7A92}.calc.calsat .calno{color:#8EA6FF}
 .calc.calout{opacity:.38}
-.calc.calsel{background:rgba(164,94,229,.14);border-radius:10px}
+.calc.calsel{background:rgba(164,94,229,.34);border-radius:10px;box-shadow:inset 0 0 0 1px rgba(201,168,255,.45)}   /* 고른 날 더 밝게 (2026-11-18 사용자 요청) */
 .calc.caltoday .calno{background:#A45EE5;color:#fff}
 .calev{display:flex;flex-direction:column;gap:2px;width:100%;margin-top:2px;min-height:0}
 .calchip{display:block;font-size:10.5px;line-height:15px;height:15px;padding:0 3px;border-radius:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:color-mix(in srgb,var(--cc) 85%,#fff);background:color-mix(in srgb,var(--cc) 22%,#1E1D25)}
@@ -22995,7 +22995,7 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
       cal.querySelector(".calttl").addEventListener("click",function(){var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now()); calDraw()});
       [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){calShift(+b.dataset.d)})});
       var grid=cal.querySelector(".calgrid");
-      grid.addEventListener("click",function(e){if(Date.now()-(grid._sw||0)<350)return; var c=e.target.closest(".calc"); if(!c)return; calSel=c.dataset.d; var p=c.dataset.d.split("-"); if(+p[1]-1!==calM){calY=+p[0]; calM=+p[1]-1} calDraw()});
+      grid.addEventListener("click",function(e){if(Date.now()-(grid._sw||0)<350)return; var c=e.target.closest(".calc"); if(!c)return; calSel=c.dataset.d; buzz(10); var p=c.dataset.d.split("-"); if(+p[1]-1!==calM){calY=+p[0]; calM=+p[1]-1} calDraw()});
       var sx=0,sy=0,sw=0; grid.addEventListener("touchstart",function(e){var t=e.touches[0]; sx=t.clientX; sy=t.clientY; sw=1},{passive:true});
       grid.addEventListener("touchend",function(e){if(!sw)return; sw=0; var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.5){grid._sw=Date.now(); calShift(dx<0?1:-1)}});
       // 손잡이 끌기 (휴대폰 touch, PC mouse)
