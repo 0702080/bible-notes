@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-cardshot">
+<meta name="app-build" content="b20261119-sayshot">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5557,6 +5557,8 @@ body:not(.boardon) #addQuick{margin:0!important}
 .saycard .sayccp{margin-left:auto;flex:none;width:30px;height:30px;padding:0;border-radius:50%;font-size:0;display:inline-grid;place-items:center;border:1px solid #45434F;background-color:#2A2933!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;color:var(--gold);box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(0,0,0,.24),0 2px 0 rgba(0,0,0,.42),0 3px 6px rgba(0,0,0,.34);transition:transform .08s}
 .saycard .sayccp::before{content:"";width:15px;height:15px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2.5'/%3E%3Cpath d='M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8.5' y='8.5' width='12' height='12' rx='2.5'/%3E%3Cpath d='M15.5 8.5V6a2.5 2.5 0 0 0-2.5-2.5H6A2.5 2.5 0 0 0 3.5 6v7A2.5 2.5 0 0 0 6 15.5h2.5'/%3E%3C/svg%3E") center/contain no-repeat}
 .saycard .sayccp:active{transform:translateY(2px)}
+.saycard .sayshot+.sayccp{margin-left:10px}
+.saycard .sayshot::before{-webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='4.5' width='17' height='15' rx='3'/%3E%3Ccircle cx='9' cy='10' r='1.8'/%3E%3Cpath d='M20.5 15.5l-5-5-9 9'/%3E%3C/svg%3E")!important;mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3.5' y='4.5' width='17' height='15' rx='3'/%3E%3Ccircle cx='9' cy='10' r='1.8'/%3E%3Cpath d='M20.5 15.5l-5-5-9 9'/%3E%3C/svg%3E")!important}   /* 🖼 짧은 말씀 그림 저장 단추 (2026-11-19) */
 .saycard .sayccp.done{color:#7FD99A;border-color:#7FD99A}
 .saycard:not(.sayfolded):not(.sayback) .sayccp+.sayfoldb{margin-left:10px}   /* 접힌 카드는 복사 단추가 숨으니 접기 단추를 오른쪽 끝 그대로 (2026-11-15) */
 .saycard.sayback .sayccp,.saycard.sayfolded .sayccp{display:none!important}
@@ -14262,6 +14264,35 @@ body.boardon #toTop{display:none}
     var nm=(String(n.ref||"말씀").replace(/[\\/:*?"<>|\s]+/g,"_"))+".png";
     srmShotsSave([srmPngFile(c,nm)],rt);
   }
+  // 🖼 짧은 말씀 카드 하나를 그림으로 — 카드 색·왼쪽 띠·말씀 줄·— 구절 이름 그대로 (2026-11-19 사용자 요청)
+  function sayShot(x,card){
+    var W=380, sc=3, mar=18, padL=30, padR=26, padT=28, fs=20, lh=Math.round(fs*1.8), maxW=W-mar*2-padL-padR;
+    var tEl=card&&(card.querySelector(".saylt")||card.querySelector(".sayq")), wEl=card&&card.querySelector(".sayf>b");
+    var ff=getComputedStyle(tEl||document.body).fontFamily, tcol=tEl?getComputedStyle(tEl).color:"#F3E9D2";
+    var COL={"금":"#E3BE72","분홍":"#F48FB6","하늘":"#6ECBF4","초록":"#6FD09A","보라":"#C9A8FF","주황":"#F4A45E"};
+    var cx=document.createElement("canvas").getContext("2d"); function fnt(w,sz){return w+" "+sz+"px "+ff}
+    var rows=[];
+    String(x.t||"").replace(/\s+$/,"").split("\n").forEach(function(line){
+      var row=[], rw=0; if(!line.trim()){rows.push([]);return}
+      hlParse(line).forEach(function(gp){gp.t.split(/( )/).forEach(function(k){
+        if(!k)return; cx.font=fnt(gp.b?"800":"400",fs); var w=cx.measureText(k).width;
+        if(rw+w>maxW&&row.length){if(k===" ")return; rows.push(row); row=[]; rw=0}
+        if(!row.length&&k===" ")return; row.push({t:k,b:gp.b,c:gp.c,x:rw}); rw+=w;
+      })});
+      rows.push(row);
+    });
+    var who=String(x.who||"").trim(), footH=who?44:0, H=Math.round(mar+padT+rows.length*lh+(who?14:0)+footH+padT-6+mar);
+    var c=document.createElement("canvas"); c.width=W*sc; c.height=H*sc; var g=c.getContext("2d"); g.scale(sc,sc);
+    g.fillStyle="#15131A"; g.fillRect(0,0,W,H);
+    var cs=card?getComputedStyle(card):null, rr=function(){g.beginPath(); if(g.roundRect)g.roundRect(mar,mar,W-mar*2,H-mar*2,18); else g.rect(mar,mar,W-mar*2,H-mar*2)};
+    g.fillStyle="#2A2733"; try{if(cs&&!/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor))g.fillStyle=cs.backgroundColor}catch(e){} rr(); g.fill();
+    g.save(); rr(); g.clip(); g.fillStyle="#B79CFF"; try{if(cs)g.fillStyle=cs.borderLeftColor}catch(e){} g.fillRect(mar,mar,5,H-mar*2); g.restore();   // 왼쪽 색 띠
+    g.strokeStyle="rgba(255,255,255,.14)"; try{if(cs)g.strokeStyle=cs.borderTopColor}catch(e){} g.lineWidth=1.5; rr(); g.stroke();
+    g.textBaseline="middle";
+    rows.forEach(function(r,i){var y=mar+padT+i*lh+lh/2; r.forEach(function(k){g.font=fnt(k.b?"800":"400",fs); g.fillStyle=k.c?COL[k.c]:tcol; g.fillText(k.t,mar+padL+k.x,y)})});
+    if(who){g.font=fnt("700",17); g.fillStyle=wEl?getComputedStyle(wEl).color:"#B79CFF"; var wt="— "+who; while(g.measureText(wt).width>maxW&&wt.length>3)wt=wt.slice(0,-2)+"…"; g.fillText(wt,mar+padL,mar+padT+rows.length*lh+14+footH/2-6)}
+    srmShotsSave([srmPngFile(c,(who||"짧은말씀").replace(/[\\/:*?"<>|\s]+/g,"_")+".png")],who||"짧은 말씀");
+  }
   function srmPngFile(c,name){
     var d=c.toDataURL("image/png"), bin=atob(d.slice(d.indexOf(",")+1)), u=new Uint8Array(bin.length);
     for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
@@ -17614,6 +17645,7 @@ body.boardon #toTop{display:none}
         nb.textContent="📖 "+(notes.get(x.note).ref||"구절 미입력"); f.appendChild(nb);
       }
       var ed=null;   // 삭제 단추는 접기 단추와 하나로 합침 (2026-11-08) — 예전: "saybtn saydelc" 삭제   // 고치기는 카드 두 번 누르기로, 단추는 삭제 (2026-11-06 사용자 요청)
+      if(x.hv){var shb=document.createElement("button"); shb.type="button"; shb.className="sayccp sayshot"; shb.dataset.act="shot"; shb.title="이미지로 저장"; shb.setAttribute("aria-label","이미지로 저장"); f.appendChild(shb)}   // 🖼 짧은 말씀 카드를 그림으로 (2026-11-19 사용자 요청)
       if(String(x.t||"").indexOf("\n")>=0){var cpb2=document.createElement("button"); cpb2.type="button"; cpb2.className="sayccp"; cpb2.dataset.act="copyall"; cpb2.title="글 전체 복사 (모든 쪽)"; cpb2.setAttribute("aria-label","글 전체 복사"); f.appendChild(cpb2)}   // 📋 쪽 나눔과 상관없이 글 전체를 한 번에 복사 (2026-11-14 사용자 요청)
       f.appendChild(fbn);   // 삭제 오른쪽에 접기 (2026-11-08 사용자 요청)   // 고치기·지우기를 한 단추로 — 지우기는 고치는 칸 안에 (2026-11-06 사용자 요청). 짧은 말씀 카드는 접기 단추 바로 밑이라 잘못 누르기 쉬워 뺌 — 두 번 눌러 고치는 칸의 🗑로 지움 (2026-11-08 사용자 요청)
       c.appendChild(f); list.appendChild(c);
@@ -17686,7 +17718,7 @@ body.boardon #toTop{display:none}
     if(sayQ&&box._qk!==sayQ){box._qk=sayQ; var fm=box.querySelector("mark.srmhit"); if(fm){var ri=rows.indexOf(fm.closest(".sayln")), kk=0; while(kk+1<P.length&&P[kk+1]<=ri)kk++; sayPg[id]=kk}}   // 찾은 낱말이 있는 쪽을 먼저 보여 줌
     var tot=P.length, pg=c.querySelector(".saypgno");
     var sf=c.querySelector(".sayf");
-    function giveBack(){if(!pg||!sf)return; var cb=pg.querySelector(".sayccp"), ob=pg.querySelector(".sayone"); if(cb)sf.appendChild(cb); if(ob)sf.appendChild(ob); sf.classList.remove("sayfempty")}
+    function giveBack(){if(!pg||!sf)return; var cb=pg.querySelector(".sayccp:not(.sayshot)"), ob=pg.querySelector(".sayone"); if(cb)sf.appendChild(cb); if(ob)sf.appendChild(ob); sf.classList.remove("sayfempty")}
     if(tot<2){if(pg){giveBack(); pg.remove()} box._pgGo=null; if(id===sayFocusId){sayFocusId=""; sayFocusOff()} return}
     if(id===sayFocusId&&!sayQ&&!sayEdit&&!c.classList.contains("sayfolded")&&!c.classList.contains("sayfocused")){var fl=c.parentNode; fl.classList.add("sayfocus"); say.classList.add("sayfocusing"); c.classList.add("sayfocused"); var bx0=say.querySelector(".dlbody"); if(bx0)bx0.scrollTop=0; requestAnimationFrame(function(){if(box.isConnected)sayPage(box)})}
     var cur=Math.max(0,Math.min(sayPg[id]||0,tot-1)); sayPg[id]=cur;
@@ -17696,7 +17728,7 @@ body.boardon #toTop{display:none}
     giveBack();
     pg.innerHTML='<span class="saypgmid"><button type="button" class="srmpgb" data-d="-1" aria-label="앞 쪽"'+(cur<1?" disabled":"")+'>'+(cur>0?"◀ "+cur:"◀")+'</button><span class="srmpgt">'+(cur+1)+' / '+tot+'</span><button type="button" class="srmpgb" data-d="1" aria-label="다음 쪽"'+(cur>=tot-1?" disabled":"")+'>'+(cur<tot-1?(cur+2)+" ▶":"▶")+'</button></span>';
     // 📋 복사·▴ 접기 단추를 쪽 단추 줄 양끝으로 — 아래 따로 떨어진 줄이 엉성해서 (2026-11-14 사용자 요청)
-    if(sf){var cb=sf.querySelector(".sayccp"), ob=sf.querySelector(".sayone"); if(cb||ob){pg.classList.add("saypgside"); var sp0=document.createElement("span"); sp0.className="saypgsl"; if(cb)sp0.appendChild(cb); pg.insertBefore(sp0,pg.firstChild); var sp1=document.createElement("span"); sp1.className="saypgsr"; if(ob)sp1.appendChild(ob); pg.appendChild(sp1); sf.classList.toggle("sayfempty",!sf.children.length)}}
+    if(sf){var cb=sf.querySelector(".sayccp:not(.sayshot)"), ob=sf.querySelector(".sayone"); if(cb||ob){pg.classList.add("saypgside"); var sp0=document.createElement("span"); sp0.className="saypgsl"; if(cb)sp0.appendChild(cb); pg.insertBefore(sp0,pg.firstChild); var sp1=document.createElement("span"); sp1.className="saypgsr"; if(ob)sp1.appendChild(ob); pg.appendChild(sp1); sf.classList.toggle("sayfempty",!sf.children.length)}}
     function go(d,btn){var n=cur+d; if(n<0||n>=tot)return false; sayPg[id]=n; if(!btn&&Date.now()-lastBuzz>300)buzz(22); /* 쪽 넘김은 진동 한 번 — 단추는 전체 누르기 진동 하나, 밀기는 여기서 하나 (2026-11-14 사용자 요청) */ sayPage(box); var pn=c.querySelector(".saypgno .saypgmid"); if(pn){pn.classList.remove("pgpop"); void pn.offsetWidth; pn.classList.add("pgpop")} box.classList.remove("pgslL","pgslR"); void box.offsetWidth; box.classList.add(d>0?"pgslL":"pgslR"); var top=c.getBoundingClientRect().top; if(top<0)c.scrollIntoView({block:"start",behavior:"smooth"}); return true}
     pg.onclick=function(e){var b=e.target.closest(".srmpgb"); if(!b||b.disabled)return; e.stopPropagation(); go(+b.dataset.d,1)};
     box._pgGo=go;
@@ -18080,6 +18112,7 @@ body.boardon #toTop{display:none}
     if(act==="undo"){var ub0=b.closest(".sayundo"); if(ub0&&ub0.dataset.id)sayRestore(ub0.dataset.id); return}
     if(act==="cancel"){sayEdit="";drawSay();return}
     if(act==="foldall"){var ids=(b.dataset.ids||"").split(",").filter(Boolean), unf=b.dataset.on==="1"; ids.forEach(function(i){if(unf)delete sayFold[i]; else sayFold[i]=1}); sayFocusId=""; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
+    if(act==="shot"){var si=sayData().items.filter(function(y){return y.id===id})[0]; if(si)try{sayShot(si,b.closest(".saycard"))}catch(err){toast("그림을 만들지 못했어요")} return}
     if(act==="copyall"){var ci=sayData().items.filter(function(y){return y.id===id})[0]; if(ci){copyText(hlStrip(String(ci.t||"")).replace(/\s+$/,"")).then(function(ok){if(ok===false){toast("복사하지 못했어요");return} b.classList.add("done"); setTimeout(function(){b.classList.remove("done")},1200); toast("글 전체를 복사했어요 📋")})} return}
     if(act==="hint"){toast("꾹 누르면 지울 수 있어요");return}
     if(act==="fold"){if(sayFold[id]){delete sayFold[id]; sayFocusId=id} else {sayFold[id]=1; if(sayFocusId===id){sayFocusId=""; sayFoldBack(id)}} try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
