@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-sowcats">
+<meta name="app-build" content="b20261119-praybox">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5896,6 +5896,13 @@ body.boardon #toTop{display:none}
 .saysheet:not(.saygr) .sayform .tagripbar{max-width:none!important}
 .hymsearch:not([hidden])+.hymkb{position:relative;float:right;margin:-54px 6px 0 0;width:40px;height:34px;border-radius:17px;border:1px solid #4A4656;background:#2A2733;color:#E8E5EE;font-size:13px;font-weight:700;padding:0;z-index:2}
 .hymkb[hidden],.hymsearch[hidden]+.hymkb{display:none!important}
+/* ✨ 말씀 카드 기도문 적는 칸 깔끔하게 (2026-11-19 사용자 요청: 보라 포커스 줄과 칸 테두리가 두 겹, 모서리가 안 맞고 아래 손잡이 띠만 색이 다름)
+   → 보라 바깥 줄 없앰, 칸 테두리 한 줄(기도 색)이 아래 손잡이 띠까지 이어진 한 틀, 띠 바탕도 칸과 같은 색, 적는 동안은 테두리만 조금 밝게 */
+.prays>.pri textarea.pt,.prays>.pri textarea.pth{outline:none!important;box-shadow:none!important;border:1px solid color-mix(in srgb,var(--prc) 45%,#2E2D33)!important}
+.prays>.pri textarea.pt:focus,.prays>.pri textarea.pth:focus{border-color:color-mix(in srgb,var(--prc) 75%,#3A3630)!important}
+.prays>.pri textarea.pt.tagrip,.prays>.pri textarea.pth.tagrip{border-bottom:0!important;border-radius:12px 12px 0 0!important;padding-bottom:16px!important}
+.prays>.pri textarea.tagrip+.tagripbar{border:1px solid color-mix(in srgb,var(--prc) 75%,#3A3630)!important;border-top:0!important;border-radius:0 0 12px 12px!important;background:color-mix(in srgb,var(--prc) 10%,#101013)!important;box-shadow:none!important;height:22px}
+.prays>.pri textarea.tagrip+.tagripbar i{background:color-mix(in srgb,var(--prc) 55%,#fff)!important;opacity:.55;width:40px!important;height:4px}
 .hymsearch{padding-right:54px!important}
 </style>
 </head>
@@ -7576,6 +7583,7 @@ body.boardon #toTop{display:none}
       if(hd){var hr=hd.getBoundingClientRect(); if(getComputedStyle(hd).position==="sticky")hb=Math.max(0,Math.min(hr.height,hr.bottom-vtop))}
       // 칸 아래 끝이 키보드 바로 위(10px 띄움)에 오게. 날짜·응답 줄은 적는 동안 키보드 아래로 감 (2026-10-23 사용자 요청)
       var room=Math.round(vh-hb-12-10);
+      var gbar=cur.nextElementSibling; if(gbar&&gbar.classList.contains("tagripbar"))room-=gbar.offsetHeight;   // 아래 크기 조절 띠까지 키보드 위에 다 보이게 — 둥근 아래 모서리가 키보드에 가려지던 것 (2026-11-19 사용자 요청)
       var hpx=Math.max(140,room)+"px"; if(cur.style.height!==hpx)cur.style.height=hpx;
       // 기도 칸 위 메뉴 줄(+ 기도·읽기 모드·친구 공개)이 카드 머리 밑에 반쯤 가려지지 않게: 첫 기도면 메뉴 줄까지 다 보이게, 아니면 칸만 (2026-10-25 사용자 요청)
       var gap=4, pane=cur.closest(".pane"), qb=pane&&pane.querySelector(".qbtns"), fp=pane&&pane.querySelector(".pri");
