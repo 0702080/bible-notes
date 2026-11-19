@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-shotv">
+<meta name="app-build" content="b20261119-shotv2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -1573,9 +1573,10 @@ body.reorder .note .copyv{display:none}
 .chead .copyv:hover{color:var(--ink)}
 .chead .copyv.ok{color:var(--green);background:color-mix(in srgb,var(--green) 14%,transparent)}
 .note:not(.open) .chead .copyv{display:none}
-.chead .shotv{flex:0 0 auto;width:30px;height:30px;padding:0;border:0;border-radius:8px;background:transparent!important;background-image:none!important;box-shadow:none!important;display:grid;place-items:center;color:var(--faint)}
-.chead .shotv svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.chead .shotv:active{color:var(--ink)}
+.chead .shotv{flex:0 0 auto;align-self:center;width:30px!important;height:30px!important;padding:0;margin:0 4px;border:1px solid #4A4856;border-radius:50%;background-color:#2A2933!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 0 rgba(0,0,0,.45),0 3px 6px rgba(0,0,0,.3)!important;display:grid;place-items:center;color:var(--gold);transition:transform .08s}
+.chead .shotv svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.chead .shotv:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 rgba(0,0,0,.4)!important}
+.chead .shotv.ok{color:#7FD99A;border-color:#7FD99A}
 body.reorder .note .chead .shotv{display:none}   /* 🖼 말씀 카드 그림 저장 (접힌 카드에도 보임, 2026-11-19) */
 body.reorder .note .chead .copyv{display:none}
 .chead .ref{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -7889,7 +7890,6 @@ body.boardon #toTop{display:none}
         '<details class="menu cmenu"><summary class="more" aria-label="노트 메뉴">⋯</summary><div class="pop">'+
           '<button type="button" class="medit">본문 고치기</button>'+
           '<button type="button" class="mcopy">말씀 복사</button>'+
-          '<button type="button" class="mshot">🖼 이미지로 저장</button>'+
           '<button type="button" class="mtopic">주제 정하기</button>'+
           '<button type="button" class="mtop">⬆ 맨 위로 옮기기</button>'+
           '<button type="button" class="mpin">맨 위에 고정</button>'+
@@ -9578,7 +9578,7 @@ body.boardon #toTop{display:none}
     if(b.classList.contains("donedit")){exitVerseEdit(id);return}
     if(b.classList.contains("grip")){return}
     if(b.classList.contains("copyv")){copyVerse(n,b);return}
-    if(b.classList.contains("shotv")){try{cardShot(n)}catch(err){toast("그림을 만들지 못했어요")} return}   // 🖼 카드 머리의 그림 저장 단추 (2026-11-19 사용자 요청)
+    if(b.classList.contains("shotv")){try{cardShot(n); b.classList.add("ok"); setTimeout(function(){b.classList.remove("ok")},1200)}catch(err){toast("그림을 만들지 못했어요")} return}   // 🖼 카드 머리의 그림 저장 단추 (2026-11-19 사용자 요청)
     if(b.classList.contains("medprog")){openMedProgress();return}
     if(b.classList.contains("useopen")){if(useOpen.has(id)){useOpen.delete(id);useForm.delete(id)}else useOpen.add(id);render();return}
     if(b.classList.contains("uget")||b.classList.contains("uagain")){fetchUses(card,n);return}
