@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-shotv3">
+<meta name="app-build" content="b20261119-icshot">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5473,6 +5473,12 @@ body:not(.boardon) #addQuick{margin:0!important}
 .icv .icp .ictop .icchev::before{content:"";position:absolute;left:50%;top:50%;width:6.6px;height:6.6px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:translate(-50%,-70%) rotate(45deg);transition:transform .2s}
 .icv .icp.open .ictop .icchev::before{transform:translate(-50%,-30%) rotate(-135deg)}
 .icv .icp .ictop:active .icchev{transform:translateY(2px)!important;box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
+.icv .icp{position:relative}
+.icv .icp .icshot{display:none;position:absolute;top:44px;right:14px;width:24.2px;height:24.2px;padding:0;margin:0;border:1px solid #4A4953;border-radius:50%;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.4)!important;place-items:center;color:var(--gold);z-index:2;transition:transform .08s}
+.icv .icp.open:not(.thx) .icshot{display:grid}
+.icv .icp .icshot svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.icv .icp .icshot:active{transform:translateY(2px)}
+.icv .icp .icshot.ok{color:#7FD99A;border-color:#7FD99A}   /* 🖼 기도제목 카드 그림 저장: 펼친 카드의 접기 단추 바로 아래 (2026-11-19) */
 /* 🗑 설교 메모·성경 본문 목록: 오른쪽으로 밀어 지우기·되돌리기·지운 것 복구 (2026-11-13 사용자 요청) */
 .srmlist>.srmcard.srmswipe{transition:none}
 .srmlist>.srmcard.srmswarm{border-color:var(--pink)!important;box-shadow:0 0 0 2px color-mix(in srgb,var(--pink) 55%,transparent)}
@@ -14300,6 +14306,29 @@ body.boardon #toTop{display:none}
     if(who){g.font=fnt("700",17); g.fillStyle=wEl?getComputedStyle(wEl).color:"#B79CFF"; var wt="— "+who; while(g.measureText(wt).width>maxW&&wt.length>3)wt=wt.slice(0,-2)+"…"; g.fillText(wt,mar+padL,mar+padT+rows.length*lh+14+footH/2-6)}
     srmShotsSave([srmPngFile(c,(who||"짧은말씀").replace(/[\\/:*?"<>|\s]+/g,"_")+".png")],who||"짧은 말씀");
   }
+  // 🖼 기도제목 카드 하나를 그림으로 — 카드 바탕·테두리·제목 색·기도문(빈 줄 그대로) (2026-11-19 사용자 요청)
+  function icShot(x,card){
+    var W=380, sc=3, mar=18, pad=24, fs=17, lh=Math.round(fs*1.75), maxW=W-mar*2-pad*2;
+    var nEl=card&&card.querySelector(".icname"), mEl=card&&card.querySelector(".icmemo");
+    var ff=getComputedStyle(mEl||nEl||document.body).fontFamily, mcol=mEl?getComputedStyle(mEl).color:"#E8E2D6", ncol=nEl?getComputedStyle(nEl).color:"#7FC8F0";
+    var cx=document.createElement("canvas").getContext("2d"); function fnt(w,sz){return w+" "+sz+"px "+ff}
+    function wrap(text,w,sz){var out=[]; String(text||"").replace(/\s+$/,"").split("\n").forEach(function(line){
+      if(!line.trim()){out.push("");return} cx.font=fnt(w,sz); var cur="";
+      line.split(/(\s+)/).forEach(function(k){if(!k)return; var t=cur+k; if(cx.measureText(t).width>maxW&&cur.trim()){out.push(cur.replace(/\s+$/,"")); cur=k.trim()?k:""; while(cx.measureText(cur).width>maxW&&cur.length>1){var i=cur.length; while(i>1&&cx.measureText(cur.slice(0,i)).width>maxW)i--; out.push(cur.slice(0,i)); cur=cur.slice(i)}} else cur=t});
+      out.push(cur.replace(/\s+$/,""))}); return out}
+    var tl=wrap(x.name,"700",18), ml=wrap(x.memo,"400",fs), tlh=27;
+    var H=Math.round(mar+pad+tl.length*tlh+(ml.length?16+ml.length*lh:0)+pad-4+mar);
+    var c=document.createElement("canvas"); c.width=W*sc; c.height=H*sc; var g=c.getContext("2d"); g.scale(sc,sc);
+    g.fillStyle="#15131A"; g.fillRect(0,0,W,H);
+    var cs=card?getComputedStyle(card):null, rr=function(){g.beginPath(); if(g.roundRect)g.roundRect(mar,mar,W-mar*2,H-mar*2,18); else g.rect(mar,mar,W-mar*2,H-mar*2)};
+    g.fillStyle="#24303B"; try{if(cs&&!/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor))g.fillStyle=cs.backgroundColor}catch(e){} rr(); g.fill();
+    g.strokeStyle="rgba(127,200,240,.5)"; try{if(cs)g.strokeStyle=cs.borderTopColor}catch(e){} g.lineWidth=1.5; rr(); g.stroke();
+    g.textBaseline="middle";
+    g.fillStyle=ncol; g.font=fnt("700",18); tl.forEach(function(t,i){g.fillText(t,mar+pad,mar+pad+i*tlh+tlh/2)});
+    var y0=mar+pad+tl.length*tlh+16; g.fillStyle=mcol; g.font=fnt("400",fs); ml.forEach(function(t,i){if(t)g.fillText(t,mar+pad,y0+i*lh+lh/2)});
+    var nm=String(x.name||"기도제목").slice(0,30).replace(/[\\/:*?"<>|\s]+/g,"_")+".png";
+    srmShotsSave([srmPngFile(c,nm)],x.name||"기도제목");
+  }
   function srmPngFile(c,name){
     var d=c.toDataURL("image/png"), bin=atob(d.slice(d.indexOf(",")+1)), u=new Uint8Array(bin.length);
     for(var i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
@@ -14889,7 +14918,7 @@ body.boardon #toTop{display:none}
     var d=document.createElement("article"); d.className="icp"+(big?" big":"")+(x.ans?" ans":"")+(x.no?" noans":""); d.dataset.id=x.id; d.title="한 번 누르면 펼치고 접어요 · 두 번 누르면 고쳐요 · 꾹 눌러 끌면 옮겨요";
     var did=x.log.indexOf(today)>=0, last=icLastBefore(x,today);
     var op=!!icOpen[x.id]; if(op)d.classList.add("open");
-    d.innerHTML='<button type="button" class="ictop icfold" aria-expanded="'+op+'" title="눌러서 '+(op?"접기":"펼치기")+'"><b class="icname"></b><span class="icmeta"></span><span class="icchev" aria-hidden="true"></span></button><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
+    d.innerHTML='<button type="button" class="ictop icfold" aria-expanded="'+op+'" title="눌러서 '+(op?"접기":"펼치기")+'"><b class="icname"></b><span class="icmeta"></span><span class="icchev" aria-hidden="true"></span></button><button type="button" class="icshot" aria-label="이미지로 저장" title="이미지로 저장"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5l-5-5-9 9"/></svg></button><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
     d.querySelector(".icname").textContent=x.name;
     d.querySelector(".icmeta").textContent=x.ans?"🙌 응답 "+dlabel(dkey(x.ans)):x.no?"🕊 응답 안 됨 "+dlabel(dkey(x.no)):(x.log.length?x.log.length+"번 기도"+(last?" · 마지막 "+dlabel(last):""):"아직 기도 전");
     var mm=d.querySelector(".icmemo"); if(x.memo.trim())mm.textContent=x.memo; else mm.remove();
@@ -15019,6 +15048,7 @@ body.boardon #toTop{display:none}
   function icClick(e){
     var b=e.target.closest("button"); if(!b||!icv.contains(b)||b.classList.contains("icclose"))return;
     var card=b.closest("[data-id]"), id=card?card.dataset.id:"", o=icData(), today=dkey(Date.now()), x=o.items.find(function(y){return y.id===id});
+    if(b.classList.contains("icshot")&&x){try{icShot(x,card); b.classList.add("ok"); setTimeout(function(){b.classList.remove("ok")},1200)}catch(err){toast("그림을 만들지 못했어요")} return}   // 🖼 기도제목 카드 그림 저장 (2026-11-19 사용자 요청)
     if(b.classList.contains("icfold"))return;   // 접기·펼치기는 카드 누르기(한 번/두 번 셈)에서
     if(b.classList.contains("icpm")){o.per=Math.max(1,Math.min(10,(o.per||3)+(+b.dataset.d))); o.perSet=1; icSave(o); buzz(6); icDraw(); return}   // 하루 몇 명 (2026-10-24 다듬음)
     if(b.classList.contains("icpray")){var on=icToggle(id,today); buzz(on?[12,40,18]:8); if(on)toast("🙏 "+(x?x.name:"")+"을(를) 위해 기도했어요"); icDraw(); return}
