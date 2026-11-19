@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-calcol">
+<meta name="app-build" content="b20261119-radio2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5909,7 +5909,7 @@ body.boardon #toTop{display:none}
 .note.open .chead .memopen.on:active,.note.open .chead .fopen[aria-expanded="true"]:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)!important}
 .note.open .chead .memopen:not(.on),.note.open .chead .fopen:not([aria-expanded="true"]){background:transparent!important;box-shadow:none!important;border-color:transparent!important}
 /* 펼친 카드의 🖼 그림 저장 단추는 켜고 끄는 단추가 아니라서 평소엔 동그라미 없이 아이콘만 — 동그라미는 켜 둔 아이콘에만 (2026-11-19 사용자 요청: ⌖를 켜도 그림 단추 동그라미가 같이 보여 헷갈림). 누르는 순간·저장되면(초록) 잠깐 동그라미 */
-.note.open .chead .shotv:not(:active):not(.ok){background:transparent!important;background-image:none!important;box-shadow:none!important;border-color:transparent!important;color:var(--faint)}
+.note.open .chead .shotv:not(:active):not(.ok):not(.sel){background:transparent!important;background-image:none!important;box-shadow:none!important;border-color:transparent!important;color:var(--faint)}
 .note.open .chead .shotv svg{width:18px;height:18px;stroke-width:1.8}
 /* 기도문을 읽는 글로 돌아오면 손잡이 띠는 안 보이게 (2026-11-19 사용자 요청: 읽기 칸 아래 띠만 남음) */
 .prays>.pri:not(.editing)>textarea.pt+.tagripbar,textarea[hidden]+.tagripbar{display:none!important}
@@ -9362,7 +9362,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     var id=tap3.card, n=notes.get(id); if(!n)return;
     try{var sel=window.getSelection();if(sel)sel.removeAllRanges()}catch(err){}
     if(openIds.has(id)!==tap3.wasOpen)toggleCard(id,tap3.wasOpen);
-    if(!memOpen.has(id)){memOpen.add(id);focusMode.delete(id);focusOpen.delete(id)}
+    if(!memOpen.has(id)){memOpen.add(id);focusMode.delete(id);focusOpen.delete(id)} shotSel.delete(id);
     buzz([15,40,15]); openCoach(n);
   },true);
   // 세 번째 누름이 만드는 클릭은 버림 (카드가 또 펼쳐지거나 접히지 않게)
@@ -9630,7 +9630,8 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     if(b.classList.contains("donedit")){exitVerseEdit(id);return}
     if(b.classList.contains("grip")){return}
     if(b.classList.contains("copyv")){copyVerse(n,b);return}
-    if(b.classList.contains("shotv")){try{cardShot(n); b.classList.add("ok"); setTimeout(function(){b.classList.remove("ok")},1200)}catch(err){toast("그림을 만들지 못했어요")} return}   // 🖼 카드 머리의 그림 저장 단추 (2026-11-19 사용자 요청)
+    if(b.classList.contains("shotv")){shotSel.add(id); if(memOpen.has(id)||focusOpen.has(id)||focusMode.get(id)){memOpen.delete(id);focusOpen.delete(id);focusMode.delete(id);setFmsg(card,"");render()} else{var sv0=(cards.get(id)||card).querySelector(".chead .shotv"); if(sv0)sv0.classList.add("sel")}   // 라디오 단추처럼: 🖼를 고르면 🖼에만 동그라미, 🧠·⌖는 꺼짐 (2026-11-19 사용자 요청)
+      b=(cards.get(id)||card).querySelector(".chead .shotv")||b; try{cardShot(n); b.classList.add("ok"); setTimeout(function(){b.classList.remove("ok")},1200)}catch(err){toast("그림을 만들지 못했어요")} return}   // 🖼 카드 머리의 그림 저장 단추 (2026-11-19 사용자 요청)
     if(b.classList.contains("medprog")){openMedProgress();return}
     if(b.classList.contains("useopen")){if(useOpen.has(id)){useOpen.delete(id);useForm.delete(id)}else useOpen.add(id);render();return}
     if(b.classList.contains("uget")||b.classList.contains("uagain")){fetchUses(card,n);return}
@@ -9651,7 +9652,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     if(b.classList.contains("mcopy")){b.closest("details").open=false;copyVerse(n,null);return}
     if(b.classList.contains("memopen")||b.classList.contains("lcmem")){
       // 머리의 암송 아이콘: 아래 "암송 시작 / 한 번 더 떠올리기" 버튼과 똑같이 암송 코치를 엶 (닫으면 암송 칸이 펼쳐져 있음)
-      if(!memOpen.has(id)){memOpen.add(id);focusMode.delete(id);focusOpen.delete(id)}
+      if(!memOpen.has(id)){memOpen.add(id);focusMode.delete(id);focusOpen.delete(id)} shotSel.delete(id);
       // 카드의 "암송 N"은 한 번 누르면 바로 암송 코치, 두 번 누르기 없음 (2026-11-05 사용자 요청)
       if(b.classList.contains("lcmem")){lcmemEat=Date.now(); openCoach(n); return}
       memTapOpen(n); return;
@@ -9959,7 +9960,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     }
     if(b.classList.contains("fopen")){
       if(focusOpen.has(id)||focusMode.get(id)){focusOpen.delete(id);focusMode.delete(id);setFmsg(card,"")}
-      else{memOpen.delete(id); focusOpen.add(id); focusMode.set(id,"P"); memView.delete(id); memStep.delete(id); memPeek.delete(id)}   // 열면 '직접 고르기'가 골라진 채로 (2026-11-11 사용자 요청)
+      else{memOpen.delete(id); shotSel.delete(id); focusOpen.add(id); focusMode.set(id,"P"); memView.delete(id); memStep.delete(id); memPeek.delete(id)}   // 열면 '직접 고르기'가 골라진 채로 (2026-11-11 사용자 요청)
       render(); if(focusMode.get(id)==="P"){var pc=cards.get(id)||card; if(!hasMarks(n))setFmsg(pc,"낱말을 누르거나, 진하게 할 글자만 드래그해서 고르세요. 다시 하면 빠져요.")} var fr1=card.querySelector(".focusrow"); if(fr1&&focusOpen.has(id))setTimeout(function(){var r=fr1.getBoundingClientRect();if(r.top<0||r.bottom>window.innerHeight)fr1.scrollIntoView({block:"center",behavior:"smooth"})},60);
       return;
     }
@@ -19690,11 +19691,13 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     if(i===3&&s[2]&&!s[3]){var d=new Date(s[2]+864e5);return (d.getMonth()+1)+"/"+d.getDate()+"부터"}
     return "";
   }
+  var shotSel=new Set();   // 🖼 그림 단추를 마지막으로 고른 카드 (라디오처럼 동그라미)
   var memFolded=new Set();   // 접어 둔 '말씀 암송' 칸
   try{JSON.parse(localStorage.getItem("bible-notes-memfold")||"[]").forEach(function(x){memFolded.add(String(x))})}catch(e){}
   function saveMemFold(){try{localStorage.setItem("bible-notes-memfold",JSON.stringify(Array.from(memFolded).slice(-300)))}catch(e){}}
   function renderMem(el,n){
     if(!n.mem)n.mem={s:[0,0,0,0]};
+    var shb=el.querySelector(".chead .shotv"); if(shb)shb.classList.toggle("sel",shotSel.has(n.id));
     var btn=el.querySelector(".memopen"), panel=el.querySelector(".mempanel"), open=memOpen.has(n.id);
     var c=memCount(n);
     btn.setAttribute("aria-expanded",String(open)); btn.classList.toggle("on",open); btn.classList.toggle("done",memDone(n));
