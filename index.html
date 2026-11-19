@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-bk3d">
+<meta name="app-build" content="b20261119-say3d">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5542,6 +5542,12 @@ body:not(.boardon) #addQuick{margin:0!important}
 #sheetClose::before{position:absolute;inset:0;margin:auto;background:#fff}
 .bkopen{background:color-mix(in srgb,var(--sky) 22%,#1C2A33) linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;border:1px solid color-mix(in srgb,var(--sky) 50%,#2A3A44)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.42),0 4px 8px rgba(0,0,0,.36)!important;transition:transform .08s,box-shadow .08s}
 .bkopen:active{transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
+/* 한 마디·짧은 말씀·은혜·장면 고치는 칸 아래 🗑·취소·저장도 입체 (2026-11-19 사용자 요청) */
+body .saycancel{background:#2A2933 linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;border:1px solid #45434F!important;color:#C9C3D6;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.42),0 4px 8px rgba(0,0,0,.36)!important;transition:transform .08s,box-shadow .08s}
+body .saydelx{background:color-mix(in srgb,var(--pink) 16%,#2A2026) linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;border:1px solid color-mix(in srgb,var(--pink) 50%,#3A2A30)!important}
+body .saydelx.sure{background:color-mix(in srgb,var(--pink) 34%,#2A2026) linear-gradient(180deg,rgba(255,255,255,.2) 0%,rgba(255,255,255,.05) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important}
+body .saysave{background:var(--gold) linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.12) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.18) 100%)!important;border:1px solid color-mix(in srgb,var(--gold) 70%,#fff)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -2px 0 rgba(120,70,0,.3),0 3px 0 #7A5A1E,0 5px 10px rgba(0,0,0,.42)!important;transition:transform .08s,box-shadow .08s}
+body .saycancel:active,body .saysave:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.4)!important}
 .sheet form .primary{background:#E3DDD1 linear-gradient(180deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.12) 45%,rgba(0,0,0,.04) 55%,rgba(0,0,0,.16) 100%)!important;border:1px solid rgba(255,255,255,.55)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.8),inset 0 -2px 0 rgba(0,0,0,.18),0 3px 0 rgba(90,80,65,.85),0 5px 10px rgba(0,0,0,.4)!important;transition:transform .08s,box-shadow .08s}
 .sheet form .primary:active{transform:translateY(3px);box-shadow:inset 0 2px 4px rgba(0,0,0,.25)!important}
 /* '추가' 단추: 또렷한 입체 알약 (2026-11-14 사용자 요청: '노트에 추가' → '추가') */
