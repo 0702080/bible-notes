@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-tdsayonly">
+<meta name="app-build" content="b20261119-hymnum2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5856,6 +5856,9 @@ body.boardon #toTop{display:none}
 /* 한 마디·짧은 말씀 고치는 칸: 글 폭·왼쪽 자리를 목록 카드 글(.sayq)과 똑같이 — 칸을 양옆으로 12px씩 넓혀 안쪽 여백만큼 보탬 → 문장이 같은 자리에서 꺾임 (2026-11-19 사용자 요청) */
 .saysheet:not(.saygr) .sayform textarea.sayt{box-sizing:border-box!important;width:calc(100% + 24px)!important;max-width:none!important;margin-left:-11px!important;margin-right:-13px!important;padding-left:12px!important;padding-right:12px!important;border-left:1px solid transparent;border-right:1px solid transparent}
 .saysheet:not(.saygr) .sayform .tagripbar{max-width:none!important}
+.hymsearch:not([hidden])+.hymkb{position:relative;float:right;margin:-54px 6px 0 0;width:40px;height:34px;border-radius:17px;border:1px solid #4A4656;background:#2A2733;color:#E8E5EE;font-size:13px;font-weight:700;padding:0;z-index:2}
+.hymkb[hidden],.hymsearch[hidden]+.hymkb{display:none!important}
+.hymsearch{padding-right:54px!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -22956,13 +22959,21 @@ body.boardon #toTop{display:none}
   function openHymn(id){
     if(!hym){
       hym=document.createElement("div"); hym.className="daily hymnsheet"; hym.setAttribute("role","dialog"); hym.hidden=true;
-      hym.innerHTML='<div class="dlbar"><b class="dltitle">🎵 찬양·찬송</b><span class="hymbtns"><button type="button" class="dlclose hymfind" aria-label="찾기" title="찾기">🔍</button><button type="button" class="dlclose hymadd" aria-label="새 찬양 담기" title="새 찬양 담기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" class="dlclose hymclose" aria-label="닫기" title="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div><div class="dlbody"><input class="field hymsearch" type="search" placeholder="🔍 제목·가사 찾기" hidden><div class="hymbox"></div></div>';
+      hym.innerHTML='<div class="dlbar"><b class="dltitle">🎵 찬양·찬송</b><span class="hymbtns"><button type="button" class="dlclose hymfind" aria-label="찾기" title="찾기">🔍</button><button type="button" class="dlclose hymadd" aria-label="새 찬양 담기" title="새 찬양 담기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button><button type="button" class="dlclose hymclose" aria-label="닫기" title="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></span></div><div class="dlbody"><input class="field hymsearch" type="search" inputmode="numeric" placeholder="🔍 장 번호 (가사·제목은 오른쪽 가)" hidden><div class="hymbox"></div></div>';
       document.body.appendChild(hym);
       hym.querySelector(".hymclose").addEventListener("click",function(){if(hymEdit){hymEdit="";hymDraw();return} if(hymView){hymView="";hymDraw();return} hym.hidden=true; document.body.style.overflow=""});
       hym.querySelector(".hymadd").addEventListener("click",function(){hymEdit="new"; hymView=""; hymDraw()});
       var si=hym.querySelector(".hymsearch");
-      hym.querySelector(".hymfind").addEventListener("click",function(){si.hidden=!si.hidden; if(si.hidden){si.value="";hymQ="";hymDraw()} else si.focus()});
-      si.addEventListener("input",function(){hymQ=si.value.trim(); hymDraw()});
+      // 찾기 칸: 처음엔 숫자 자판, 오른쪽 '가'로 글자 자판 ↔ '123'으로 숫자 (2026-11-19 사용자 요청)
+      var kb=document.createElement("button"); kb.type="button"; kb.className="hymkb"; kb.textContent="가"; kb.title="글자로 찾기"; kb.hidden=true; si.insertAdjacentElement("afterend",kb);
+      kb.addEventListener("click",function(){var num=si.inputMode!=="text"; si.inputMode=num?"text":"numeric"; kb.textContent=num?"123":"가"; kb.title=num?"번호로 찾기":"글자로 찾기"; si.placeholder=num?"🔍 제목·가사 찾기":"🔍 장 번호 (가사·제목은 오른쪽 가)"; si.blur(); setTimeout(function(){si.focus()},30)});
+      hym.querySelector(".hymfind").addEventListener("click",function(){si.hidden=!si.hidden; kb.hidden=si.hidden; if(si.hidden){si.value="";hymQ="";hymDraw()} else {si.inputMode="numeric"; kb.textContent="가"; si.focus()}});
+      var hymJumpT=0;
+      si.addEventListener("input",function(){hymQ=si.value.trim(); hymDraw();
+        // 번호가 딱 맞는 찬양·찬송이 하나면 잠깐 뒤(더 칠 수 있게) 바로 펼침
+        clearTimeout(hymJumpT); var q=hymQ; if(!/^\d{1,4}$/.test(q))return;
+        hymJumpT=setTimeout(function(){if(si.value.trim()!==q)return; var hit=hymData().items.filter(function(x){return parseInt(x.no,10)===+q}); if(hit.length!==1)return; si.blur(); hymView=hit[0].id; hymDraw()},700);
+      });
       hym.addEventListener("click",hymClick);
     }
     hymEdit=""; hymView=id||""; hym.hidden=false; document.body.style.overflow="hidden"; hymDraw();
@@ -22972,7 +22983,7 @@ body.boardon #toTop{display:none}
   function hymDraw(){
     if(!hym)return; var box=hym.querySelector(".hymbox"), o=hymData(); box.textContent="";
     hym.querySelector(".hymadd").hidden=!!(hymEdit||hymView); hym.querySelector(".hymfind").hidden=!!(hymEdit||hymView);
-    if(hymView||hymEdit)hym.querySelector(".hymsearch").hidden=true;
+    if(hymView||hymEdit){hym.querySelector(".hymsearch").hidden=true; var hk=hym.querySelector(".hymkb"); if(hk)hk.hidden=true}
     if(hymEdit){hymForm(box,o);return}
     if(hymView){var x=o.items.filter(function(i){return i.id===hymView})[0]; if(!x){hymView="";return hymDraw()} hymRead(box,x);return}
     var items=o.items.slice().sort(function(a,b){var na=parseInt(a.no,10),nb=parseInt(b.no,10); if(a.kind!==b.kind)return a.kind==="h"?-1:1; if(!isNaN(na)&&!isNaN(nb)&&na!==nb)return na-nb; return String(a.title||"").localeCompare(String(b.title||""),"ko")}).filter(function(x){return hymMatch(x,hymQ)});
