@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-gripoff">
+<meta name="app-build" content="b20261119-headcirc">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5903,6 +5903,10 @@ body.boardon #toTop{display:none}
 .prays>.pri textarea.pt.tagrip,.prays>.pri textarea.pth.tagrip{border-bottom:0!important;border-radius:12px 12px 0 0!important;padding-bottom:16px!important}
 .prays>.pri textarea.tagrip+.tagripbar{border:1px solid color-mix(in srgb,var(--prc) 75%,#3A3630)!important;border-top:1px solid color-mix(in srgb,var(--prc) 35%,transparent)!important;border-radius:0 0 12px 12px!important;background:color-mix(in srgb,var(--prc) 32%,#1A1712)!important;box-shadow:none!important;height:24px}   /* 손잡이 띠는 글 칸보다 밝은 기도 색으로 또렷이 구분 (2026-11-19 사용자 요청) */
 .prays>.pri textarea.tagrip+.tagripbar i{background:color-mix(in srgb,var(--prc) 45%,#fff)!important;opacity:.85;width:44px!important;height:4px}
+/* ● 카드 머리 아이콘을 켜면(암송 🧠·낱말 고르기 ⌖) 그림 저장 단추처럼 둥근 입체 동그라미, 끄면 동그라미 없이 아이콘만 (2026-11-19 사용자 요청) */
+.note.open .chead .memopen.on,.note.open .chead .fopen[aria-expanded="true"]{align-self:center;width:30px!important;height:30px!important;border:1px solid #4A4856!important;border-radius:50%!important;background-color:#2A2933!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 0 rgba(0,0,0,.45),0 3px 6px rgba(0,0,0,.3)!important;transition:transform .08s}
+.note.open .chead .memopen.on:active,.note.open .chead .fopen[aria-expanded="true"]:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)!important}
+.note.open .chead .memopen:not(.on),.note.open .chead .fopen:not([aria-expanded="true"]){background:transparent!important;box-shadow:none!important;border-color:transparent!important}
 /* 기도문을 읽는 글로 돌아오면 손잡이 띠는 안 보이게 (2026-11-19 사용자 요청: 읽기 칸 아래 띠만 남음) */
 .prays>.pri:not(.editing)>textarea.pt+.tagripbar,textarea[hidden]+.tagripbar{display:none!important}
 /* ⬆ 맨 위로 단추는 글을 적는 동안(글 칸에 커서) 숨김 — 기도문 칸 아래를 가림 (2026-11-19 사용자 요청) */
