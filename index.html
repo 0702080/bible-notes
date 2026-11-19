@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-shotplain">
+<meta name="app-build" content="b20261119-radio">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -9958,7 +9958,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     }
     if(b.classList.contains("fopen")){
       if(focusOpen.has(id)||focusMode.get(id)){focusOpen.delete(id);focusMode.delete(id);setFmsg(card,"")}
-      else{focusOpen.add(id); focusMode.set(id,"P"); memView.delete(id); memStep.delete(id); memPeek.delete(id)}   // 열면 '직접 고르기'가 골라진 채로 (2026-11-11 사용자 요청)
+      else{memOpen.delete(id); focusOpen.add(id); focusMode.set(id,"P"); memView.delete(id); memStep.delete(id); memPeek.delete(id)}   // 열면 '직접 고르기'가 골라진 채로 (2026-11-11 사용자 요청)
       render(); if(focusMode.get(id)==="P"){var pc=cards.get(id)||card; if(!hasMarks(n))setFmsg(pc,"낱말을 누르거나, 진하게 할 글자만 드래그해서 고르세요. 다시 하면 빠져요.")} var fr1=card.querySelector(".focusrow"); if(fr1&&focusOpen.has(id))setTimeout(function(){var r=fr1.getBoundingClientRect();if(r.top<0||r.bottom>window.innerHeight)fr1.scrollIntoView({block:"center",behavior:"smooth"})},60);
       return;
     }
