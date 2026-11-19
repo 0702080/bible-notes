@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-saywrap">
+<meta name="app-build" content="b20261119-tdsayonly">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6233,7 +6233,7 @@ body.boardon #toTop{display:none}
   // → 다시 바꿈: PC(폭 900px 이상)에서는 무조건 칸반으로 연다 (2026-10-21 사용자 요청 세 번째). 휴대폰은 목록 그대로
   var boardOn=!!(window.matchMedia&&matchMedia("(min-width:900px)").matches);
   try{localStorage.setItem("bible-view",boardOn?"board":"list")}catch(e){}
-  var tdSayOnly=false;   // '오늘' 카드 머리 가운데 빈 곳을 누르면 오늘의 한 마디만 보이고 나머지는 숨김, 다시 누르면 돌아옴 (2026-11-01 사용자 요청)
+  var tdSayOnly=true;   // 앱을 열 때마다 한 마디만 보이는 접힌 모양으로 시작 (2026-11-19 사용자 요청)   // '오늘' 카드 머리 가운데 빈 곳을 누르면 오늘의 한 마디만 보이고 나머지는 숨김, 다시 누르면 돌아옴 (2026-11-01 사용자 요청)
   var tdFold=true;   // '오늘' 카드는 앱을 열 때마다 접힌 채로 시작, 누르면 펼침 (2026-10-22 사용자 요청)
   var BCOLS=[{k:"new",t:"새로 담음",e:"🌱",c:"var(--muted)",tip:"아직 암송을 시작하지 않은 말씀"},{k:"doing",t:"외우는 중",e:"✏️",c:"var(--sky)",tip:"도장을 모으는 중"},{k:"due",t:"복습할 차례",e:"🔁",c:"var(--gold)",tip:"오늘 다시 떠올릴 말씀"},{k:"done",t:"다 외움",e:"🏅",c:"var(--green)",tip:"도장 4개를 다 받은 말씀"}];
   function boardCol(n){
