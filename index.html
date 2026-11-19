@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-calkind">
+<meta name="app-build" content="b20261119-focustext">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -8489,7 +8489,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
   var lastAdded=null;
   function openSheet(){
     $("addSheet").hidden=false; $("fab").hidden=true; document.body.style.overflow="hidden";
-    setTimeout(function(){ if(!$("searchArea").hidden)$("q").focus(); else $("mRef").focus(); },80);
+    setTimeout(function(){ if(!$("searchArea").hidden)$("q").focus(); else $("mText").focus(); },80);   // 말씀 칸에 먼저 커서 (2026-11-19 사용자 요청)
   }
   function closeSheet(){
     $("addSheet").hidden=true; $("fab").hidden=reorderMode; document.body.style.overflow=""; addToCol="";
