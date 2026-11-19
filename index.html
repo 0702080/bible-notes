@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-hymnum2">
+<meta name="app-build" content="b20261119-cardshot">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -7883,6 +7883,7 @@ body.boardon #toTop{display:none}
         '<details class="menu cmenu"><summary class="more" aria-label="노트 메뉴">⋯</summary><div class="pop">'+
           '<button type="button" class="medit">본문 고치기</button>'+
           '<button type="button" class="mcopy">말씀 복사</button>'+
+          '<button type="button" class="mshot">🖼 이미지로 저장</button>'+
           '<button type="button" class="mtopic">주제 정하기</button>'+
           '<button type="button" class="mtop">⬆ 맨 위로 옮기기</button>'+
           '<button type="button" class="mpin">맨 위에 고정</button>'+
@@ -9658,6 +9659,7 @@ body.boardon #toTop{display:none}
       var fo=frOpen.get(id), want=b.classList.contains("frall")?"*":b.dataset.uid;
       if(fo===want)frOpen.delete(id); else frOpen.set(id,want); render(); return;
     }
+    if(b.classList.contains("mshot")){b.closest("details").open=false; try{cardShot(n)}catch(err){toast("그림을 만들지 못했어요")} return}   // 🖼 이 카드만 그림으로 (2026-11-19 사용자 요청)
     if(b.classList.contains("mtop")){   // ⋯ 메뉴: 맨 위로 한 번 옮기기 (2026-11-04 사용자 요청)
       b.closest("details").open=false;
       var ft0=sorted().filter(function(x){return visibleNote(x)})[0];
@@ -14208,6 +14210,57 @@ body.boardon #toTop{display:none}
       files.push(srmPngFile(c,"설교메모-"+(x.d||"")+"-"+(p+1)+".png"));   // toBlob(비동기)을 쓰면 누른 손길이 끊겨 휴대폰 공유 창이 막힘 → 바로 만듦 (2026-11-08)
     }
     srmShotsSave(files,title);
+  }
+  // 🖼 말씀 카드 하나를 그림(PNG)으로 — 화면의 카드 색·구절 이름·말씀 글자 색 그대로 (2026-11-19 사용자 요청)
+  function cardShot(n){
+    var el=cards.get(n.id), v=el&&el.querySelector(".verse"), rf=el&&el.querySelector(".ref");
+    var W=380, sc=3, pad=26, mar=18, fs=21, lh=Math.round(fs*1.75), maxW=W-mar*2-pad*2;
+    var vcs=v?getComputedStyle(v):null, ff=vcs?vcs.fontFamily:getComputedStyle(document.body).fontFamily;
+    var cx=document.createElement("canvas").getContext("2d");
+    function fnt(w,sz){return w+" "+sz+"px "+ff}
+    var segs=[];   // 화면 말씀의 글자마다 색·굵기
+    if(v&&v.textContent.trim()){
+      var tw=document.createTreeWalker(v,NodeFilter.SHOW_TEXT,null), t;
+      while((t=tw.nextNode())){var pe=t.parentElement; if(!pe||pe.closest("button,.hits,[hidden]"))continue; var cs=getComputedStyle(pe); if(cs.display==="none"||cs.visibility==="hidden")continue; segs.push({t:t.nodeValue,c:cs.color,w:+cs.fontWeight>=600?"800":"400"})}
+    }
+    if(!segs.length)segs=[{t:String(n.text||""),c:vcs?vcs.color:"#F4A45E",w:"400"}];
+    var rows=[[]], rw=0;
+    segs.forEach(function(sg){sg.t.split(/(\n| )/).forEach(function(k){
+      if(!k)return;
+      if(k==="\n"){rows.push([]); rw=0; return}
+      cx.font=fnt(sg.w,fs); var w=cx.measureText(k).width, row=rows[rows.length-1];
+      if(rw+w>maxW&&row.length){if(k===" ")return; rows.push(row=[]); rw=0}
+      if(!row.length&&k===" ")return;
+      row.push({t:k,c:sg.c,w:sg.w,x:rw,mw:w}); rw+=w;
+    })});
+    while(rows.length>1&&!rows[rows.length-1].length)rows.pop();
+    while(rows.length>1&&!rows[0].length)rows.shift();
+    var refH=34, top=mar+pad, H=Math.round(top+refH+14+rows.length*lh+pad-6+mar);
+    var c=document.createElement("canvas"); c.width=W*sc; c.height=H*sc; var g=c.getContext("2d"); g.scale(sc,sc);
+    g.fillStyle="#15131A"; g.fillRect(0,0,W,H);
+    var ecs=el?getComputedStyle(el):null, rr=function(){g.beginPath(); if(g.roundRect)g.roundRect(mar,mar,W-mar*2,H-mar*2,18); else g.rect(mar,mar,W-mar*2,H-mar*2)};
+    g.fillStyle="#2A2733"; try{if(ecs&&ecs.backgroundColor&&!/rgba\(0, 0, 0, 0\)|transparent/.test(ecs.backgroundColor))g.fillStyle=ecs.backgroundColor}catch(e){}
+    rr(); g.fill();
+    g.strokeStyle="rgba(255,255,255,.14)"; try{if(ecs&&ecs.borderTopColor)g.strokeStyle=ecs.borderTopColor}catch(e){} g.lineWidth=1.5; rr(); g.stroke();
+    g.textBaseline="middle";
+    var rcol="#B79CFF"; try{if(rf)rcol=getComputedStyle(rf).color}catch(e){}
+    g.fillStyle=rcol; g.font=fnt("700",19); var rt=String(n.ref||"").trim()||"말씀"; while(g.measureText(rt).width>maxW&&rt.length>2)rt=rt.slice(0,-2)+"…"; g.fillText(rt,mar+pad,top+refH/2);
+    var bxp=mar+pad+g.measureText(rt).width+12;   // 구절 이름 옆 '암송 N'·'듣기 N' 알약도 화면처럼 (2026-11-19 사용자 요청)
+    (rf?[].slice.call(rf.querySelectorAll(".logcnt")):[]).forEach(function(bd){
+      var bcs=getComputedStyle(bd); if(bcs.display==="none")return;
+      var nEl=bd.querySelector(".lcn"), num=nEl?nEl.textContent.trim():"", lab=bd.textContent.replace(num,"").trim();
+      g.font=fnt("600",16); var lw=g.measureText(lab).width, nw=num?g.measureText(" "+num).width:0, w2=lw+nw+24, h2=28, y0=top+refH/2-h2/2;
+      if(bxp+w2>W-mar-pad+4)return;
+      g.beginPath(); if(g.roundRect)g.roundRect(bxp,y0,w2,h2,h2/2); else g.rect(bxp,y0,w2,h2);
+      try{g.fillStyle="rgba(0,0,0,0)"; g.fillStyle=bcs.backgroundColor}catch(e){} g.fill();
+      g.save(); g.globalAlpha=.6; g.strokeStyle=bcs.color; g.lineWidth=1.3; g.stroke(); g.restore();
+      g.fillStyle=bcs.color; g.fillText(lab,bxp+12,top+refH/2+1);
+      if(num){g.fillStyle=nEl?getComputedStyle(nEl).color:"#fff"; g.fillText(" "+num,bxp+12+lw,top+refH/2+1)}
+      bxp+=w2+8;
+    });
+    rows.forEach(function(r,i){var y=top+refH+14+i*lh+lh/2; r.forEach(function(k){g.font=fnt(k.w,fs); g.fillStyle=k.c; g.fillText(k.t,mar+pad+k.x,y)})});
+    var nm=(String(n.ref||"말씀").replace(/[\\/:*?"<>|\s]+/g,"_"))+".png";
+    srmShotsSave([srmPngFile(c,nm)],rt);
   }
   function srmPngFile(c,name){
     var d=c.toDataURL("image/png"), bin=atob(d.slice(d.indexOf(",")+1)), u=new Uint8Array(bin.length);
