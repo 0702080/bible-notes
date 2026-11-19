@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-sowing">
+<meta name="app-build" content="b20261119-sowcats">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -4971,10 +4971,16 @@ body.reorder .ref .lclisten{display:none}
 .swtile span{display:block;margin-top:2px;font-size:12px;color:var(--muted);white-space:nowrap}
 .swtile.on{background:color-mix(in srgb,var(--sc) 30%,#1F1E25);border-color:var(--sc);box-shadow:0 0 0 1px var(--sc)}
 .swtile.swall{--sc:var(--gold)}
-.swcats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}
+.swcats{display:flex;flex-wrap:wrap;gap:6px;padding:2px 0 4px}
 .swcats::-webkit-scrollbar{display:none}
-.swchip{--sc:#C8C4D0;flex:0 0 auto;height:32px;padding:0 11px;border:1px solid color-mix(in srgb,var(--sc) 40%,#44434C);border-radius:16px;background:transparent;color:color-mix(in srgb,var(--sc) 75%,#fff);font-family:inherit;font-size:13px;white-space:nowrap}
+.swchip{--sc:#C8C4D0;flex:0 0 auto;height:30px;padding:0 10px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;border:1px solid color-mix(in srgb,var(--sc) 40%,#44434C);border-radius:16px;background:transparent;color:color-mix(in srgb,var(--sc) 75%,#fff);font-family:inherit;font-size:13px;white-space:nowrap}
 .swchip.on{background:color-mix(in srgb,var(--sc) 28%,#1F1E25);border-color:var(--sc);color:#fff;font-weight:700}
+.swchip.swaddc{border-style:dashed;border-color:#6E6A82;color:var(--gold)}
+.swchip.swarm{background:#5A2028;border-color:#B5525E;color:#fff}
+.swaddin{display:flex;gap:6px;align-items:center}
+.swaddin .ldin{flex:1}
+.swaddok{flex:0 0 auto;height:38px;padding:0 14px;border:0;border-radius:9px;background:var(--gold);color:#141416;font-family:inherit;font-weight:700;white-space:nowrap}
+.swaddx{flex:0 0 auto;width:38px;height:38px;border:1px solid #4A4953;border-radius:9px;background:transparent;color:var(--muted)}
 .swv .swt{height:auto;min-height:58px;padding:8px 10px;line-height:1.45;resize:none}
 .swv .ldnd{width:100%;flex:none}
 .swv .ldcell{height:auto;min-height:44px}
@@ -13042,12 +13048,19 @@ body.boardon #toTop{display:none}
      저장 bible-sowing {items:[{id,d,k:"s"|"r",c,t,at,u}],del}, 클라우드 "__sowing"(나만), 백업·기록 저장소 sowing */
   var SW_KEY="bible-sowing", sw=null, swEdit="", swDelId="", swRange="all", swCat="", swNewCat="";
   var SW_CATS=[["love","💗","사랑","#F28AB0"],["faith","✝️","믿음","#A99BF0"],["thanks","🌼","감사","#F2C94C"],["forgive","🕊️","용서","#8FCBEA"],["serve","🤝","섬김","#7FD99A"],["patience","⏳","인내","#E8A06A"],["word","📖","말씀","#8FD0CC"],["prayer","🙏","기도","#C9A8E8"],["joy","😊","기쁨","#F2B36B"],["peace","🌿","평안","#9CCB8C"],["humble","🙇","겸손","#B8B0D8"],["etc","✨","그 밖","#C8C4D0"]];
-  function swCatOf(k){for(var i=0;i<SW_CATS.length;i++)if(SW_CATS[i][0]===k)return SW_CATS[i]; return SW_CATS[SW_CATS.length-1]}
+  // 내가 더한 열매는 저장 o.cats [{k,e,n,col,at,x(지움)}] — 클라우드로 같이 맞춤 (2026-11-19 사용자 요청)
+  var SW_PAL=["#F2A27A","#7FC4E8","#B6D97A","#E89BD0","#D8C27A","#8FB0F0","#F08A8A","#9BD8C0"];
+  function swCats(o){o=o||swData(); var base=SW_CATS.slice(0,-1), etc=SW_CATS[SW_CATS.length-1];
+    (o.cats||[]).forEach(function(c){if(!c.x)base.push([c.k,c.e||"🌱",c.n,c.col||"#C8C4D0",1])}); base.push(etc); return base}
+  var swCatCache=null;
+  function swCatOf(k){var L=swCatCache||SW_CATS; for(var i=0;i<L.length;i++)if(L[i][0]===k)return L[i]; return SW_CATS[SW_CATS.length-1]}
   function swData(){
     var o=null; try{o=JSON.parse(localStorage.getItem(SW_KEY)||"null")}catch(e){}
     if(!o||!Array.isArray(o.items))o={items:[],del:{}};
     if(!o.del||typeof o.del!=="object")o.del={};
-    o.items=o.items.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),d:/^\d{4}-\d{2}-\d{2}$/.test(x.d||"")?x.d:dkey(+x.at||Date.now()),k:x.k==="r"?"r":"s",c:swCatOf(x.c)[0],t:String(x.t||"").slice(0,300),at:+x.at||Date.now(),u:+x.u||+x.at||0}});
+    if(!Array.isArray(o.cats))o.cats=[];
+    o.cats=o.cats.filter(function(c){return c&&c.k&&c.n}).map(function(c){return {k:String(c.k),e:String(c.e||"🌱").slice(0,8),n:String(c.n).slice(0,12),col:String(c.col||"#C8C4D0"),at:+c.at||0,x:c.x?1:0}});
+    o.items=o.items.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),d:/^\d{4}-\d{2}-\d{2}$/.test(x.d||"")?x.d:dkey(+x.at||Date.now()),k:x.k==="r"?"r":"s",c:String(x.c||"etc").slice(0,40),t:String(x.t||"").slice(0,300),at:+x.at||Date.now(),u:+x.u||+x.at||0}});
     return o;
   }
   function swSave(o){try{localStorage.setItem(SW_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__sowing")}
@@ -13057,6 +13070,7 @@ body.boardon #toTop{display:none}
     Object.keys(src.del||{}).forEach(function(id){var t=+src.del[id]||0; if(!o.del[id]||o.del[id]<t){o.del[id]=t;changed=true}});
     src.items.forEach(function(x){if(!x||!x.id)return; var i=o.items.findIndex(function(y){return y.id===x.id});
       if(i<0){o.items.push(x);changed=true} else if((+x.u||0)>(+o.items[i].u||0)){o.items[i]=x;changed=true}});
+    (src.cats||[]).forEach(function(c){if(!c||!c.k)return; var i=o.cats.findIndex(function(y){return y.k===c.k}); if(i<0){o.cats.push(c);changed=true} else if((+c.at||0)>(+o.cats[i].at||0)){o.cats[i]=c;changed=true}});
     var n0=o.items.length; o.items=o.items.filter(function(x){return !(o.del[x.id]&&o.del[x.id]>=(+x.u||+x.at||0))}); if(o.items.length!==n0)changed=true;
     if(changed){try{localStorage.setItem(SW_KEY,JSON.stringify(o))}catch(e){}}
     return changed;
@@ -13064,16 +13078,19 @@ body.boardon #toTop{display:none}
   function swInRange(x){var td=dkey(Date.now()), pre=swRange==="year"?td.slice(0,4):swRange==="month"?td.slice(0,7):""; return !pre||x.d.indexOf(pre)===0}
   function swChips(sel,cls){
     var w=ldEl("div","swcats "+(cls||""));
-    SW_CATS.forEach(function(c){var b=ldEl("button","swchip"+(c[0]===sel?" on":"")); b.type="button"; b.dataset.c=c[0]; b.style.setProperty("--sc",c[3]); b.textContent=c[1]+" "+c[2]; w.appendChild(b)});
+    swCatCache=swCats();
+    swCatCache.forEach(function(c){var b=ldEl("button","swchip"+(c[0]===sel?" on":"")+(c[4]?" swmine":"")); b.type="button"; b.dataset.c=c[0]; b.style.setProperty("--sc",c[3]); b.textContent=c[1]+" "+c[2]; if(c[4])b.title="꾹 누르면 지울 수 있어요"; w.appendChild(b)});
+    var ad=ldEl("button","swchip swaddc","＋ 추가"); ad.type="button"; ad.title="심고 거둘 것 더하기"; w.appendChild(ad);
     return w;
   }
   function swDraw(){
     if(!sw)return;
-    var o=swData(), rows=o.items.filter(swInRange);
+    var o=swData(), rows=o.items.filter(swInRange); swCatCache=swCats(o);
+    var cw=sw.querySelector(".swcatwrap"); if(cw&&!cw.querySelector(".swaddin")){cw.textContent=""; cw.appendChild(swChips(swNewCat))}
     // 위 묶음 판: 열매마다 🌱심음·🌾거둠 횟수 (돈이 아니라 횟수만), 누르면 그 열매만
     var sum=sw.querySelector(".swsum"); sum.textContent="";
     var cnt={}; rows.forEach(function(x){var c=cnt[x.c]||(cnt[x.c]={s:0,r:0}); c[x.k]++});
-    var used=SW_CATS.filter(function(c){return cnt[c[0]]});
+    var used=swCatCache.filter(function(c){return cnt[c[0]]}); Object.keys(cnt).forEach(function(k){if(!used.some(function(c){return c[0]===k})&&!swCatCache.some(function(c){return c[0]===k}))used.push(swCatOf(k))});
     if(swCat&&!cnt[swCat])used.push(swCatOf(swCat));
     var all=ldEl("button","swtile swall"+(swCat?"":" on")); all.type="button"; all.dataset.c="";
     var ts=0,tr=0; rows.forEach(function(x){if(x.k==="r")tr++; else ts++});
@@ -13084,7 +13101,8 @@ body.boardon #toTop{display:none}
     var nc=sw.querySelector(".swnew .swcats"); if(nc)nc.querySelectorAll(".swchip").forEach(function(b){b.classList.toggle("on",b.dataset.c===swNewCat)});
     // 표: 같은 열매끼리 오래된 것부터 N번째 심음 ↔ N번째 거둠을 한 줄에. 줄은 최근 것이 위
     var asc=function(a,b){return a.d<b.d?-1:a.d>b.d?1:(a.at-b.at)}, lines=[];
-    SW_CATS.forEach(function(c){
+    var keys={}; swCatCache.forEach(function(c){keys[c[0]]=1}); o.items.forEach(function(x){keys[x.c]=1});
+    Object.keys(keys).map(function(k){return [k]}).forEach(function(c){
       if(swCat&&swCat!==c[0])return;
       var S=o.items.filter(function(x){return x.c===c[0]&&x.k==="s"}).sort(asc), R=o.items.filter(function(x){return x.c===c[0]&&x.k==="r"}).sort(asc);
       for(var i=0;i<Math.max(S.length,R.length);i++){
@@ -13145,6 +13163,10 @@ body.boardon #toTop{display:none}
     var b=e.target.closest(".ldadd"); if(b){swAdd(b.dataset.k);return}
     b=e.target.closest(".ldrange button"); if(b){swRange=b.dataset.r; swEdit=""; swDelId=""; swDraw(); return}
     b=e.target.closest(".swtile"); if(b){swCat=(b.dataset.c&&swCat!==b.dataset.c)?b.dataset.c:""; if(swCat){swNewCat=swCat; try{localStorage.setItem("bible-sow-cat",swNewCat)}catch(err){}} swEdit=""; swDelId=""; swDraw(); return}
+    b=e.target.closest(".swaddc"); if(b){swAddCatOpen(b.closest(".swcats")); return}
+    b=e.target.closest(".swaddok"); if(b){swAddCatDo(b.closest(".swaddin")); return}
+    b=e.target.closest(".swaddx"); if(b){var ai=b.closest(".swaddin"); if(ai)ai.remove(); return}
+    b=e.target.closest(".swchip.swarm"); if(b&&Date.now()-(swArmAt||0)>350){swDelCat(b.dataset.c); return}
     b=e.target.closest(".swnew .swchip"); if(b){swNewCat=b.dataset.c; try{localStorage.setItem("bible-sow-cat",swNewCat)}catch(err){} swDraw(); return}
     var fr=e.target.closest(".ldedit");
     if(fr){
@@ -13171,6 +13193,40 @@ body.boardon #toTop{display:none}
     if(cl.dataset.c){swNewCat=cl.dataset.c; try{localStorage.setItem("bible-sow-cat",swNewCat)}catch(err){} swDraw()}
     sw.querySelector(".ldbody").scrollTop=0; var ti=sw.querySelector(".swnt"); ti.placeholder=cl.dataset.k==="r"?"무엇을 거두었나요?":"무엇을 심었나요?"; ti.focus();
   }
+  var swArmAt=0;
+  function swAddCatOpen(row){
+    var box=row.parentNode; if(box.querySelector(".swaddin")){box.querySelector(".swaddin input").focus(); return}
+    var f=ldEl("div","swaddin"); var inp=ldEl("input","ldin"); inp.maxLength=16; inp.placeholder="예: 온유, 🍇 오래 참음"; inp.setAttribute("aria-label","새로 심고 거둘 것");
+    var ok=ldEl("button","swaddok","더하기"); ok.type="button"; var x=ldEl("button","swaddx","✕"); x.type="button"; x.setAttribute("aria-label","닫기");
+    f.appendChild(inp); f.appendChild(ok); f.appendChild(x); box.insertBefore(f,row.nextSibling);
+    inp.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.isComposing){e.preventDefault(); swAddCatDo(f)}});
+    setTimeout(function(){inp.focus()},30);
+  }
+  function swAddCatDo(f){
+    var v=(f.querySelector("input").value||"").trim(); if(!v){toast("이름을 적어 주세요"); return}
+    var m=v.match(/^(\p{Extended_Pictographic}(?:\uFE0F|\u200D\p{Extended_Pictographic})*)\s*/u), e=m?m[1]:"🌱", n=(m?v.slice(m[0].length):v).trim().slice(0,12);
+    if(!n){toast("이름을 적어 주세요"); return}
+    var o=swData(); if(swCats(o).some(function(c){return c[2]===n})){toast("이미 있는 이름이에요"); return}
+    var k="u"+Date.now().toString(36), col=SW_PAL[o.cats.length%SW_PAL.length];
+    var old=o.cats.find(function(c){return c.n===n&&c.x}); if(old){old.x=0; old.e=e; old.at=Date.now(); k=old.k} else o.cats.push({k:k,e:e,n:n,col:col,at:Date.now(),x:0});
+    swSave(o); var inEdit=f.closest(".ldedit"); f.remove();
+    if(inEdit){var row=inEdit.querySelector(".swcats"), nr=swChips(k,"swedcats"); row.parentNode.replaceChild(nr,row)} else {swNewCat=k; try{localStorage.setItem("bible-sow-cat",k)}catch(err){} swDraw()}
+    var lc=n.charCodeAt(n.length-1); buzz(10); toast(e+" "+n+((lc>=0xAC00&&lc<=0xD7A3&&(lc-0xAC00)%28)?"을":"를")+" 더했어요");
+  }
+  function swDelCat(k){
+    var o=swData(), c=o.cats.find(function(y){return y.k===k}); if(!c)return;
+    c.x=1; c.at=Date.now(); swSave(o); if(swNewCat===k)swNewCat="love"; if(swCat===k)swCat=""; toast("'"+c.n+"'을(를) 목록에서 뺐어요 · 적어 둔 기록은 그대로예요"); swDraw();
+  }
+  function swLPInit(){   // 내가 더한 열매 칩을 꾹(0.6초) 누르면 분홍 '빼기?'로, 한 번 더 누르면 뺌
+    var t=null, sx=0, sy=0;
+    function start(b,x,y){clearTimeout(t); sx=x; sy=y; t=setTimeout(function(){sw.querySelectorAll(".swchip.swarm").forEach(function(z){z.classList.remove("swarm"); z.textContent=z._txt}); b._txt=b.textContent; b.classList.add("swarm"); b.textContent="빼기?"; swArmAt=Date.now(); buzz([10,30,10]); setTimeout(function(){if(b.classList.contains("swarm")){b.classList.remove("swarm"); b.textContent=b._txt}},3000)},600)}
+    sw.addEventListener("touchstart",function(e){var b=e.target.closest(".swchip.swmine"); if(b&&e.touches[0])start(b,e.touches[0].clientX,e.touches[0].clientY)},{passive:true});
+    sw.addEventListener("touchmove",function(e){var p=e.touches[0]; if(p&&(Math.abs(p.clientX-sx)>10||Math.abs(p.clientY-sy)>10))clearTimeout(t)},{passive:true});
+    sw.addEventListener("touchend",function(){clearTimeout(t)});
+    sw.addEventListener("mousedown",function(e){var b=e.target.closest(".swchip.swmine"); if(b)start(b,e.clientX,e.clientY)});
+    sw.addEventListener("mouseup",function(){clearTimeout(t)});
+    sw.addEventListener("contextmenu",function(e){if(e.target.closest(".swchip.swmine"))e.preventDefault()});
+  }
   function openSow(){
     if(!sw){
       sw=document.createElement("div"); sw.className="cch ldv swv"; sw.setAttribute("role","dialog"); sw.setAttribute("aria-modal","true"); sw.setAttribute("aria-label","심은 대로"); sw.hidden=true;
@@ -13186,7 +13242,7 @@ body.boardon #toTop{display:none}
       document.body.appendChild(sw);
       sw.querySelector(".swcatwrap").appendChild(swChips(swNewCat));
       sw.querySelector(".ldclose").addEventListener("click",closeSow);
-      sw.addEventListener("click",swClick);
+      sw.addEventListener("click",swClick); swLPInit();
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&sw&&!sw.hidden)closeSow()});
     }
     try{swNewCat=localStorage.getItem("bible-sow-cat")||"love"}catch(e){swNewCat="love"}
