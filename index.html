@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-icshot">
+<meta name="app-build" content="b20261119-sowing">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -4964,6 +4964,23 @@ body.reorder .ref .lclisten{display:none}
 .lddel.arm{background:#5A2028;border-color:#B5525E;color:#fff}
 .ldcancel{border:1px solid #4A4953;background:transparent;color:var(--muted)}
 .ldsave{border:0;background:var(--gold);color:#141416;font-weight:700}
+/* 🌾 심은 대로 (2026-11-19) — 재무제표 모양 그대로, 돈 대신 열매(사랑·믿음…) */
+.swsum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.swtile{--sc:#C8C4D0;min-width:0;padding:7px 8px;border:1px solid color-mix(in srgb,var(--sc) 45%,#3A3942);border-radius:12px;background:color-mix(in srgb,var(--sc) 12%,#1F1E25);color:#EDEBF0;font-family:inherit;text-align:left}
+.swtile b{display:block;font-size:13.5px;color:var(--sc);white-space:nowrap}
+.swtile span{display:block;margin-top:2px;font-size:12px;color:var(--muted);white-space:nowrap}
+.swtile.on{background:color-mix(in srgb,var(--sc) 30%,#1F1E25);border-color:var(--sc);box-shadow:0 0 0 1px var(--sc)}
+.swtile.swall{--sc:var(--gold)}
+.swcats{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}
+.swcats::-webkit-scrollbar{display:none}
+.swchip{--sc:#C8C4D0;flex:0 0 auto;height:32px;padding:0 11px;border:1px solid color-mix(in srgb,var(--sc) 40%,#44434C);border-radius:16px;background:transparent;color:color-mix(in srgb,var(--sc) 75%,#fff);font-family:inherit;font-size:13px;white-space:nowrap}
+.swchip.on{background:color-mix(in srgb,var(--sc) 28%,#1F1E25);border-color:var(--sc);color:#fff;font-weight:700}
+.swv .swt{height:auto;min-height:58px;padding:8px 10px;line-height:1.45;resize:none}
+.swv .ldnd{width:100%;flex:none}
+.swv .ldcell{height:auto;min-height:44px}
+.swv .ldcs,.swv .ldcr{background:color-mix(in srgb,var(--sc,#888) 9%,transparent)}
+.swbadge{flex:0 0 auto;font-size:11.5px;font-weight:700;color:var(--sc);white-space:nowrap}
+.swwait{font-size:11.5px;color:#6E6C78;line-height:1.4;word-break:keep-all}
 /* ⋯ 메뉴 끌기: 잡은 칸이 떠 보이게 (2026-11-05) */
 .pop>button.mndrag{position:relative;z-index:2;transform:scale(1.03);box-shadow:0 8px 22px rgba(0,0,0,.55);background:color-mix(in srgb,var(--gold) 26%,#1E1D24)!important;outline:1px solid color-mix(in srgb,var(--gold) 65%,transparent)}
 /* 말씀 카드 바탕색을 카드마다 차례로 (휴대폰 목록·PC 칸반). 구절 글자·칩의 주제 색(--tc)은 그대로 (2026-11-05 사용자 요청) */
@@ -5919,6 +5936,7 @@ body.boardon #toTop{display:none}
         <button type="button" id="sermonBtn">🎤 설교 메모</button>
         <button type="button" id="bibleTextBtn">📖 성경 본문</button>
         <button type="button" id="ledgerBtn">💰 하늘나라 재무제표</button>
+        <button type="button" id="sowBtn">🌾 심은 대로</button>
         <button type="button" id="prayReadBtn">🙏 기도 모아 읽기</button>
         <button type="button" id="icBtn">🙏 기도제목</button>
         <button type="button" id="ansBtn">🙌 기도 응답 연표</button>
@@ -13018,6 +13036,163 @@ body.boardon #toTop{display:none}
     ldEdit=""; ldDelId=""; ld.querySelector(".ldnd").value=dkey(Date.now()); ld.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true; ldDraw();
   }
   function closeLedger(){if(!ld||ld.hidden)return; ld.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
+
+  /* ---------- 🌾 심은 대로 (2026-11-19 사용자 요청): 하늘나라 재무제표를 본떠 돈 대신 사랑·믿음·감사… 을 심고 거둔 것을 적는 표.
+     숫자 합계 대신 열매(묶음)마다 심음·거둠 횟수, 표는 같은 열매끼리 오래된 것부터 짝지어(사랑을 심고 ↔ 사랑을 거두고) 한 줄에.
+     저장 bible-sowing {items:[{id,d,k:"s"|"r",c,t,at,u}],del}, 클라우드 "__sowing"(나만), 백업·기록 저장소 sowing */
+  var SW_KEY="bible-sowing", sw=null, swEdit="", swDelId="", swRange="all", swCat="", swNewCat="";
+  var SW_CATS=[["love","💗","사랑","#F28AB0"],["faith","✝️","믿음","#A99BF0"],["thanks","🌼","감사","#F2C94C"],["forgive","🕊️","용서","#8FCBEA"],["serve","🤝","섬김","#7FD99A"],["patience","⏳","인내","#E8A06A"],["word","📖","말씀","#8FD0CC"],["prayer","🙏","기도","#C9A8E8"],["joy","😊","기쁨","#F2B36B"],["peace","🌿","평안","#9CCB8C"],["humble","🙇","겸손","#B8B0D8"],["etc","✨","그 밖","#C8C4D0"]];
+  function swCatOf(k){for(var i=0;i<SW_CATS.length;i++)if(SW_CATS[i][0]===k)return SW_CATS[i]; return SW_CATS[SW_CATS.length-1]}
+  function swData(){
+    var o=null; try{o=JSON.parse(localStorage.getItem(SW_KEY)||"null")}catch(e){}
+    if(!o||!Array.isArray(o.items))o={items:[],del:{}};
+    if(!o.del||typeof o.del!=="object")o.del={};
+    o.items=o.items.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),d:/^\d{4}-\d{2}-\d{2}$/.test(x.d||"")?x.d:dkey(+x.at||Date.now()),k:x.k==="r"?"r":"s",c:swCatOf(x.c)[0],t:String(x.t||"").slice(0,300),at:+x.at||Date.now(),u:+x.u||+x.at||0}});
+    return o;
+  }
+  function swSave(o){try{localStorage.setItem(SW_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__sowing")}
+  function swMerge(src){
+    if(!src||!Array.isArray(src.items))return false;
+    var o=swData(), changed=false;
+    Object.keys(src.del||{}).forEach(function(id){var t=+src.del[id]||0; if(!o.del[id]||o.del[id]<t){o.del[id]=t;changed=true}});
+    src.items.forEach(function(x){if(!x||!x.id)return; var i=o.items.findIndex(function(y){return y.id===x.id});
+      if(i<0){o.items.push(x);changed=true} else if((+x.u||0)>(+o.items[i].u||0)){o.items[i]=x;changed=true}});
+    var n0=o.items.length; o.items=o.items.filter(function(x){return !(o.del[x.id]&&o.del[x.id]>=(+x.u||+x.at||0))}); if(o.items.length!==n0)changed=true;
+    if(changed){try{localStorage.setItem(SW_KEY,JSON.stringify(o))}catch(e){}}
+    return changed;
+  }
+  function swInRange(x){var td=dkey(Date.now()), pre=swRange==="year"?td.slice(0,4):swRange==="month"?td.slice(0,7):""; return !pre||x.d.indexOf(pre)===0}
+  function swChips(sel,cls){
+    var w=ldEl("div","swcats "+(cls||""));
+    SW_CATS.forEach(function(c){var b=ldEl("button","swchip"+(c[0]===sel?" on":"")); b.type="button"; b.dataset.c=c[0]; b.style.setProperty("--sc",c[3]); b.textContent=c[1]+" "+c[2]; w.appendChild(b)});
+    return w;
+  }
+  function swDraw(){
+    if(!sw)return;
+    var o=swData(), rows=o.items.filter(swInRange);
+    // 위 묶음 판: 열매마다 🌱심음·🌾거둠 횟수 (돈이 아니라 횟수만), 누르면 그 열매만
+    var sum=sw.querySelector(".swsum"); sum.textContent="";
+    var cnt={}; rows.forEach(function(x){var c=cnt[x.c]||(cnt[x.c]={s:0,r:0}); c[x.k]++});
+    var used=SW_CATS.filter(function(c){return cnt[c[0]]});
+    if(swCat&&!cnt[swCat])used.push(swCatOf(swCat));
+    var all=ldEl("button","swtile swall"+(swCat?"":" on")); all.type="button"; all.dataset.c="";
+    var ts=0,tr=0; rows.forEach(function(x){if(x.k==="r")tr++; else ts++});
+    all.appendChild(ldEl("b","","전체")); all.appendChild(ldEl("span","","🌱 "+ts+" · 🌾 "+tr)); sum.appendChild(all);
+    used.forEach(function(c){var n=cnt[c[0]]||{s:0,r:0}, b=ldEl("button","swtile"+(swCat===c[0]?" on":"")); b.type="button"; b.dataset.c=c[0]; b.style.setProperty("--sc",c[3]);
+      b.appendChild(ldEl("b","",c[1]+" "+c[2])); b.appendChild(ldEl("span","","🌱 "+n.s+" · 🌾 "+n.r)); sum.appendChild(b)});
+    sw.querySelectorAll(".ldrange button").forEach(function(b){b.classList.toggle("on",b.dataset.r===swRange)});
+    var nc=sw.querySelector(".swnew .swcats"); if(nc)nc.querySelectorAll(".swchip").forEach(function(b){b.classList.toggle("on",b.dataset.c===swNewCat)});
+    // 표: 같은 열매끼리 오래된 것부터 N번째 심음 ↔ N번째 거둠을 한 줄에. 줄은 최근 것이 위
+    var asc=function(a,b){return a.d<b.d?-1:a.d>b.d?1:(a.at-b.at)}, lines=[];
+    SW_CATS.forEach(function(c){
+      if(swCat&&swCat!==c[0])return;
+      var S=o.items.filter(function(x){return x.c===c[0]&&x.k==="s"}).sort(asc), R=o.items.filter(function(x){return x.c===c[0]&&x.k==="r"}).sort(asc);
+      for(var i=0;i<Math.max(S.length,R.length);i++){
+        var ps=S[i], pr=R[i];
+        if(!((ps&&swInRange(ps))||(pr&&swInRange(pr))))continue;
+        var lt=[ps,pr].filter(Boolean).sort(asc).pop();
+        lines.push({s:ps,r:pr,key:lt});
+      }
+    });
+    lines.sort(function(a,b){return -asc(a.key,b.key)});
+    var tb=sw.querySelector(".ldtb tbody"); tb.textContent="";
+    lines.forEach(function(L){
+      var tr2=ldEl("tr","ldline");
+      [["s",L.s],["r",L.r]].forEach(function(cc){
+        var x=cc[1], td=ldEl("td","ldcell ldc"+cc[0]);
+        if(x){
+          var c=swCatOf(x.c); td.dataset.id=x.id; td.title="눌러서 고치기"; td.style.setProperty("--sc",c[3]);
+          if(!swInRange(x))td.classList.add("ldout"); if(swEdit===x.id)td.classList.add("ldon");
+          var top=ldEl("div","ldctop"); top.appendChild(ldEl("span","ldcdate",ldDate(x.d))); top.appendChild(ldEl("span","swbadge",c[1]+" "+c[2])); td.appendChild(top);
+          if(x.t)td.appendChild(ldEl("div","ldct",x.t));
+        }else{
+          td.classList.add("ldblank"); td.dataset.k=cc[0]; var other=L.s||L.r;
+          if(other){td.dataset.c=other.c; td.appendChild(ldEl("div","swwait",cc[0]==="r"?"🌾 거둘 때를 기다려요":"🌱 이 열매의 씨앗은?"))}
+        }
+        tr2.appendChild(td);
+      });
+      tb.appendChild(tr2);
+      var ex=swEdit&&((L.s&&L.s.id===swEdit)?L.s:(L.r&&L.r.id===swEdit)?L.r:null);
+      if(ex)tb.appendChild(swEditRow(ex));
+    });
+    if(!lines.length){var er=ldEl("tr","ldempty"), etd=ldEl("td","",o.items.length?"이 기간·열매에는 적은 것이 없어요.":"아직 적은 것이 없어요. 위에서 열매를 고르고 무엇을 심었는지(거뒀는지) 적어 보세요."); etd.colSpan=2; er.appendChild(etd); tb.appendChild(er)}
+  }
+  function swEditRow(x){
+    var fr=ldEl("tr","ldedit"), ftd=ldEl("td"); ftd.colSpan=2; fr.dataset.id=x.id;
+    var box=ldEl("div","ldefrm");
+    var ed=ldEl("input","ldin lded"); ed.type="date"; ed.value=x.d; ed.setAttribute("aria-label","날짜"); box.appendChild(ed);
+    box.appendChild(swChips(x.c,"swedcats"));
+    var et=ldEl("textarea","ldin swt swet"); et.maxLength=300; et.rows=2; et.value=x.t; et.placeholder="무엇을 · 누구에게"; et.setAttribute("aria-label","내용"); box.appendChild(et);
+    var seg=ldEl("div","ldkseg");
+    [["s","🌱 심음"],["r","🌾 거둠"]].forEach(function(k){var b=ldEl("button","ldk ld"+k[0]+(x.k===k[0]?" on":""),k[1]); b.type="button"; b.dataset.k=k[0]; seg.appendChild(b)});
+    box.appendChild(seg);
+    var acts=ldEl("div","ldrow ldacts");
+    var del=ldEl("button","lddel",swDelId===x.id?"한 번 더 누르면 지워요":"지우기"); del.type="button"; acts.appendChild(del);
+    var cc=ldEl("button","ldcancel","취소"); cc.type="button"; acts.appendChild(cc);
+    var sv=ldEl("button","ldsave","저장"); sv.type="button"; acts.appendChild(sv);
+    box.appendChild(acts); ftd.appendChild(box); fr.appendChild(ftd); return fr;
+  }
+  function swAdd(k){
+    var di=sw.querySelector(".ldnd"), ti=sw.querySelector(".swnt"), t=ti.value.trim();
+    if(!t){toast(k==="r"?"무엇을 거두었는지 적어 주세요":"무엇을 심었는지 적어 주세요"); ti.focus(); return}
+    var o=swData(), now=Date.now();
+    o.items.push({id:"sw"+now.toString(36)+Math.random().toString(36).slice(2,6),d:/^\d{4}-\d{2}-\d{2}$/.test(di.value)?di.value:dkey(now),k:k,c:swNewCat||"love",t:t.slice(0,300),at:now,u:now});
+    swSave(o); ti.value=""; buzz(k==="r"?[12,40,18]:10);
+    var c=swCatOf(swNewCat), lc=c[2].charCodeAt(c[2].length-1), jo=(lc>=0xAC00&&lc<=0xD7A3&&(lc-0xAC00)%28)?"을":"를"; toast(k==="r"?"🌾 "+c[2]+jo+" 거두었어요":"🌱 "+c[2]+jo+" 심었어요");
+    swDraw();
+  }
+  function swClick(e){
+    var b=e.target.closest(".ldadd"); if(b){swAdd(b.dataset.k);return}
+    b=e.target.closest(".ldrange button"); if(b){swRange=b.dataset.r; swEdit=""; swDelId=""; swDraw(); return}
+    b=e.target.closest(".swtile"); if(b){swCat=(b.dataset.c&&swCat!==b.dataset.c)?b.dataset.c:""; if(swCat){swNewCat=swCat; try{localStorage.setItem("bible-sow-cat",swNewCat)}catch(err){}} swEdit=""; swDelId=""; swDraw(); return}
+    b=e.target.closest(".swnew .swchip"); if(b){swNewCat=b.dataset.c; try{localStorage.setItem("bible-sow-cat",swNewCat)}catch(err){} swDraw(); return}
+    var fr=e.target.closest(".ldedit");
+    if(fr){
+      var id=fr.dataset.id;
+      if(e.target.closest(".swchip")){fr.querySelectorAll(".swchip").forEach(function(x){x.classList.toggle("on",x===e.target.closest(".swchip"))}); return}
+      if(e.target.closest(".ldk")){fr.querySelectorAll(".ldk").forEach(function(x){x.classList.toggle("on",x===e.target.closest(".ldk"))}); return}
+      if(e.target.closest(".ldcancel")){swEdit=""; swDelId=""; swDraw(); return}
+      if(e.target.closest(".lddel")){
+        if(swDelId!==id){swDelId=id; e.target.closest(".lddel").textContent="한 번 더 누르면 지워요"; e.target.closest(".lddel").classList.add("arm"); return}
+        var od=swData(); od.items=od.items.filter(function(y){return y.id!==id}); od.del[id]=Date.now(); swSave(od); swEdit=""; swDelId=""; toast("지웠어요"); swDraw(); return;
+      }
+      if(e.target.closest(".ldsave")){
+        var t=fr.querySelector(".swet").value.trim(); if(!t){toast("내용을 적어 주세요");return}
+        var o=swData(), x=o.items.find(function(y){return y.id===id}); if(!x){swEdit="";swDraw();return}
+        var dv=fr.querySelector(".lded").value, kb=fr.querySelector(".ldk.on"), cb=fr.querySelector(".swchip.on");
+        if(/^\d{4}-\d{2}-\d{2}$/.test(dv))x.d=dv; x.t=t.slice(0,300); if(kb)x.k=kb.dataset.k; if(cb)x.c=cb.dataset.c; x.u=Date.now();
+        swSave(o); swEdit=""; swDelId=""; swDraw(); return;
+      }
+      return;
+    }
+    var cl=e.target.closest(".ldcell"); if(!cl)return;
+    if(cl.dataset.id){swEdit=swEdit===cl.dataset.id?"":cl.dataset.id; swDelId=""; swDraw(); var ee=sw.querySelector(".ldedit"); if(ee)ee.scrollIntoView({block:"nearest"}); return}
+    // 빈 칸: 그 줄의 열매를 골라 두고 위 적는 칸으로 (짝을 채우기 쉽게)
+    if(cl.dataset.c){swNewCat=cl.dataset.c; try{localStorage.setItem("bible-sow-cat",swNewCat)}catch(err){} swDraw()}
+    sw.querySelector(".ldbody").scrollTop=0; var ti=sw.querySelector(".swnt"); ti.placeholder=cl.dataset.k==="r"?"무엇을 거두었나요?":"무엇을 심었나요?"; ti.focus();
+  }
+  function openSow(){
+    if(!sw){
+      sw=document.createElement("div"); sw.className="cch ldv swv"; sw.setAttribute("role","dialog"); sw.setAttribute("aria-modal","true"); sw.setAttribute("aria-label","심은 대로"); sw.hidden=true;
+      sw.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🌾 심은 대로</b></div><div class="qbarbtns"><button type="button" class="ldclose" aria-label="닫기">✕</button></div></div>'+
+        '<div class="ldbody"><div class="ldinner">'+
+        '<div class="swsum" role="group" aria-label="열매별 심음·거둠"></div>'+
+        '<div class="ldrange" role="group" aria-label="기간"><button type="button" data-r="all">전체</button><button type="button" data-r="year">올해</button><button type="button" data-r="month">이번 달</button></div>'+
+        '<div class="ldnew swnew"><input type="date" class="ldin ldnd" aria-label="날짜"><div class="swcatwrap"></div><textarea class="ldin swt swnt" rows="2" maxlength="300" placeholder="무엇을 · 누구에게 (예: 어머니께 따뜻한 말 한마디)" aria-label="내용"></textarea>'+
+        '<div class="ldrow"><button type="button" class="ldadd lds" data-k="s">🌱 심었어요</button><button type="button" class="ldadd ldr" data-k="r">🌾 거뒀어요</button></div></div>'+
+        '<table class="ldtb"><thead><tr><th class="lds">🌱 심은 것</th><th class="ldr">🌾 거둔 것</th></tr></thead><tbody></tbody></table>'+
+        '</div></div>'+
+        '<div class="ldverse"><p>선을 행하되 낙심하지 말지니 포기하지 아니하면 때가 이르매 거두리라</p><small>갈라디아서 6:9</small></div>';
+      document.body.appendChild(sw);
+      sw.querySelector(".swcatwrap").appendChild(swChips(swNewCat));
+      sw.querySelector(".ldclose").addEventListener("click",closeSow);
+      sw.addEventListener("click",swClick);
+      document.addEventListener("keydown",function(e){if(e.key==="Escape"&&sw&&!sw.hidden)closeSow()});
+    }
+    try{swNewCat=localStorage.getItem("bible-sow-cat")||"love"}catch(e){swNewCat="love"}
+    swEdit=""; swDelId=""; swCat=""; sw.querySelector(".ldnd").value=dkey(Date.now()); sw.hidden=false; document.body.style.overflow="hidden"; $("fab").hidden=true; swDraw();
+  }
+  function closeSow(){if(!sw||sw.hidden)return; sw.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode}
   function openAnswers(keep){
     if(!ans){
       ans=document.createElement("div"); ans.className="cch ansv"; ans.setAttribute("role","dialog"); ans.setAttribute("aria-modal","true"); ans.hidden=true;
@@ -20913,7 +21088,7 @@ body.boardon #toTop{display:none}
   /* ---------- 백업 저장 / 불러오기 (claude.ai ↔ 내 GitHub 노트 옮기기) ---------- */
   function backupData(){
     flushAll();
-    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values()),chapters:myChapters(),daily:dailyData(),prays1:p1Data(),icp:icData(),sermons:srmData(),ledger:ldData(),clones:clData(),sayings:sayData(),medq:medqData()});
+    return JSON.stringify({app:"bible-meditation-notes",v:1,at:Date.now(),notes:Array.from(notes.values()),chapters:myChapters(),daily:dailyData(),prays1:p1Data(),icp:icData(),sermons:srmData(),ledger:ldData(),sowing:swData(),clones:clData(),sayings:sayData(),medq:medqData()});
   }
   $("backupSave").addEventListener("click",function(){
     var d=new Date(), name="말씀묵상노트_백업_"+d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2)+".json", data=backupData();
@@ -20997,6 +21172,7 @@ body.boardon #toTop{display:none}
         if(obj&&obj.icp)icMerge(obj.icp);
         if(obj&&obj.sermons)srmMerge(obj.sermons);
         if(obj&&obj.ledger)ldMerge(obj.ledger);
+        if(obj&&obj.sowing)swMerge(obj.sowing);
         if(obj&&obj.clones)clMerge(obj.clones);
         if(obj&&obj.sayings)sayMerge(obj.sayings);
         if(obj&&obj.medq)medqMerge(obj.medq);
@@ -21087,14 +21263,14 @@ body.boardon #toTop{display:none}
      노트 저장소(bible-notes-data)는 공개라 여기에 넣지 않음 — 비공개 저장소일 때만 올림 ---------- */
   var recBusy=false, recAgain=false, recTimer=0, recState={ok:null,msg:"",at:0}, recPriv={};
   function recRepo(){var c=ghCfg(); return c&&c.rrepo?c.rrepo:""}
-  function recBody(){return {app:"bible-meditation-records",v:1,sermons:srmData(),sayings:sayData(),icp:icData(),prays1:p1Data(),ledger:ldData(),clones:clData(),medq:medqData()}}
-  function recCanon(o){return JSON.stringify([o.sermons||null,o.sayings||null,o.icp||null,o.prays1||null,o.ledger||null,o.clones||null,o.medq||null])}
+  function recBody(){return {app:"bible-meditation-records",v:1,sermons:srmData(),sayings:sayData(),icp:icData(),prays1:p1Data(),ledger:ldData(),sowing:swData(),clones:clData(),medq:medqData()}}
+  function recCanon(o){return JSON.stringify([o.sermons||null,o.sayings||null,o.icp||null,o.prays1||null,o.ledger||null,o.clones||null,o.medq||null,o.sowing||null])}
   function recQueue(){if(ghMerging||!recRepo())return; clearTimeout(recTimer); recTimer=setTimeout(function(){recSync("auto")},3000)}
   function recMerge(o){
     ghMerging=true;
     try{
       if(o.sermons)srmMerge(o.sermons); if(o.sayings)sayMerge(o.sayings); if(o.icp)icMerge(o.icp);
-      if(o.prays1)p1Merge(o.prays1); if(o.ledger)ldMerge(o.ledger); if(o.clones)clMerge(o.clones); if(o.medq)medqMerge(o.medq);
+      if(o.prays1)p1Merge(o.prays1); if(o.ledger)ldMerge(o.ledger); if(o.sowing)swMerge(o.sowing); if(o.clones)clMerge(o.clones); if(o.medq)medqMerge(o.medq);
     }finally{ghMerging=false}
   }
   async function recSync(why){
@@ -21307,11 +21483,11 @@ body.boardon #toTop{display:none}
     detail=String(detail||"").replace(/\s+/g," ").trim().slice(0,140);
     return {msg:what+" ("+r.status+(detail?": "+detail:"")+")",short:what+" "+r.status};
   }
-  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__icp");sbDirty.add("__sermons");sbDirty.add("__ledger");sbDirty.add("__clones");sbDirty.add("__sayings");sbDirty.add("__medq");sbDirty.add("__sort");sbDirty.add("__ccgap");try{localStorage.removeItem(SB_LAST)}catch(e){}}
+  function sbMarkAll(){sbDirty.add("__me");notes.forEach(function(n){sbDirty.add(n.id)});Object.keys(tombs()).forEach(function(id){sbDirty.add(id)});sbDirty.add("__daily");sbDirty.add("__chapters");sbDirty.add("__prays1");sbDirty.add("__icp");sbDirty.add("__sermons");sbDirty.add("__ledger");sbDirty.add("__sowing");sbDirty.add("__clones");sbDirty.add("__sayings");sbDirty.add("__medq");sbDirty.add("__sort");sbDirty.add("__ccgap");try{localStorage.removeItem(SB_LAST)}catch(e){}}
   var SB_DIRTY="bible-sb-dirty";
   try{(JSON.parse(localStorage.getItem(SB_DIRTY)||"[]")||[]).forEach(function(id){sbDirty.add(String(id))})}catch(e){}
   function sbSaveDirty(){try{if(sbDirty.size)localStorage.setItem(SB_DIRTY,JSON.stringify(Array.from(sbDirty)));else localStorage.removeItem(SB_DIRTY)}catch(e){}}
-  function sbMark(id){if(!sbApplying&&typeof recQueue==="function"&&/^__(sermons|sayings|icp|prays1|ledger|clones|medq)$/.test(id))recQueue(); if(sbApplying||!sbSession())return; sbDirty.add(id); sbSaveDirty(); clearTimeout(sbTimer); sbTimer=setTimeout(function(){sbSync("auto")},1500)}
+  function sbMark(id){if(!sbApplying&&typeof recQueue==="function"&&/^__(sermons|sayings|icp|prays1|ledger|sowing|clones|medq)$/.test(id))recQueue(); if(sbApplying||!sbSession())return; sbDirty.add(id); sbSaveDirty(); clearTimeout(sbTimer); sbTimer=setTimeout(function(){sbSync("auto")},1500)}
   async function sbSync(why){
     if(!sbSession())return false;
     if(typeof backend==="undefined"||!backend){setTimeout(function(){sbSync(why)},500);return false}   // 노트를 다 불러온 뒤에
@@ -21347,6 +21523,12 @@ body.boardon #toTop{display:none}
         if(id==="__icp"){
           var icd=icData(), icjs=JSON.stringify(icd);
           if(sbLastJson.__icp!==icjs){rows.push({user_id:uid,id:"__icp",data:icd,updated_at:now,deleted:false});sbLastJson.__icp=icjs}
+          return;
+        }
+        if(id==="__sowing"){
+          var swd=swData(), swjs=JSON.stringify(swd);
+          if(!swd.items.length&&!Object.keys(swd.del).length)return;
+          if(sbLastJson.__sowing!==swjs){rows.push({user_id:uid,id:"__sowing",data:swd,updated_at:now,deleted:false});sbLastJson.__sowing=swjs}
           return;
         }
         if(id==="__ledger"){
@@ -21415,6 +21597,7 @@ body.boardon #toTop{display:none}
           }
           if(r.id==="__clones"){if(clMerge(r.data))setTimeout(render,0);sbLastJson.__clones=JSON.stringify(clData());return}
           if(r.id==="__icp"){if(icMerge(r.data)&&icv&&!icv.hidden)icDraw();sbLastJson.__icp=JSON.stringify(icData());return}
+          if(r.id==="__sowing"){if(swMerge(r.data)&&sw&&!sw.hidden&&!swEdit)swDraw();sbLastJson.__sowing=JSON.stringify(swData());return}
           if(r.id==="__ledger"){if(ldMerge(r.data)&&ld&&!ld.hidden&&!ldEdit)ldDraw();sbLastJson.__ledger=JSON.stringify(ldData());return}
           if(r.id==="__sermons"){if(srmMerge(r.data)&&srm&&!srm.hidden&&!srmEdit){if(srm.querySelector(".srmlist"))srmDrawList(); else srmDraw()}   // 목록만 다시 — 찾기 칸을 새로 만들면 적던 글·키보드가 끊김 (2026-11-08)
           sbLastJson.__sermons=JSON.stringify(srmData());return}
@@ -22836,12 +23019,13 @@ body.boardon #toTop{display:none}
   $("bibleTextBtn").addEventListener("click",function(){$("topMenu").open=false;openSermon("b")});
   $("ledgerBtn").addEventListener("click",function(){$("topMenu").open=false;openLedger()});
   $("ledgerQuick").addEventListener("click",function(){$("topMenu").open=false;openLedger()});
+  $("sowBtn").addEventListener("click",function(){$("topMenu").open=false;openSow()});
   $("dailyQuick").addEventListener("click",function(){$("topMenu").open=false;openDaily()});
   /* ↔ ⋯ 메뉴 항목을 모두 맨 위 동그라미 단추로 (2026-11-14 사용자 요청): 휴대폰은 맨 위 줄을 좌우로 밀면 메뉴 항목이 다 나오고, 세로 ⋯ 메뉴는 없앰(CSS). 단추는 메뉴 항목을 대신 누름(.qk data-for). 칸반(PC)은 예전 ⋯ 메뉴 그대로 */
   (function(){
     var SKIP={reorderBtn:1,ledgerBtn:1,foldAll:1};   // 💰는 맨 위에 따로 있음
     var ICON={openTongdokBtn:"📚",bibleTextBtn:"📜",ghSyncBtn:"📤",exportTxt:"📃"};   // 겹치는 그림은 바꿔서 구분
-    var COL={calBtn:"#C9B6F2",hymnBtn:"#F2C1D9",openSceneBtn:"#F6D9B8",sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
+    var COL={sowBtn:"#F4B6C8",calBtn:"#C9B6F2",hymnBtn:"#F2C1D9",openSceneBtn:"#F6D9B8",sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
     var bar=$("addQuick")&&$("addQuick").parentElement, pop=document.querySelector("#topMenu .pop"); if(!bar||!pop)return;
     function qkOf(id){return bar.querySelector('.qk[data-for="'+id+'"]')}
     function colorOf(id){if(COL[id])return COL[id]; var h=0; for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))>>>0; return PAL[h%PAL.length]}
