@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261118-nothxmark">
+<meta name="app-build" content="b20261119-icfdbl">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -8834,10 +8834,10 @@ textarea.tagrip{border-bottom-width:0!important}
       var mb=parseFloat(cs.marginBottom)||0;
       t.classList.add("tagrip");
       t.insertAdjacentElement("afterend",gp);
-      gp.style.width=t.offsetWidth+"px"; gp.style.marginTop=(-mb-(bw?0:0))+"px"; gp.style.marginBottom=mb+"px";
+      var xw=t.closest(".icform")?1:0; gp.style.width=(t.offsetWidth+xw)+"px"; gp.style.marginTop=(-mb-(bw?0:0))+"px"; gp.style.marginBottom=mb+"px";
       var tr=t.getBoundingClientRect(), gr=gp.getBoundingClientRect(); if(Math.abs(tr.left-gr.left)>0.5)gp.style.marginLeft=(tr.left-gr.left)+"px"; var gap=gr.top-tr.bottom; if(Math.abs(gap)>0.5)gp.style.marginTop=((parseFloat(gp.style.marginTop)||0)-gap)+"px";   // 감싼 칸의 gap·여백만큼 붙여 칸 바로 아래에
       // 칸 폭·자리가 나중에 바뀌어도(고치기 칸이 넓어지는 등) 손잡이 줄을 칸에 딱 맞춤 (2026-11-18 사용자 요청: 오른쪽 끝이 안 맞음)
-      var fit=function(){if(!gp||cur!==t||!t.isConnected)return; var w=t.offsetWidth; if(w&&gp.style.width!==w+"px")gp.style.width=w+"px"; var a=t.getBoundingClientRect(), b=gp.getBoundingClientRect(); if(a.width&&Math.abs(a.left-b.left)>0.5)gp.style.marginLeft=((parseFloat(gp.style.marginLeft)||0)+(a.left-b.left))+"px"};
+      var fit=function(){if(!gp||cur!==t||!t.isConnected)return; var w=t.offsetWidth+(t.closest(".icform")?1:0);   /* 기도제목 칸은 1px 모자라 보여 더함 (2026-11-19 사용자 요청) */ if(w&&gp.style.width!==w+"px")gp.style.width=w+"px"; var a=t.getBoundingClientRect(), b=gp.getBoundingClientRect(); if(a.width&&Math.abs(a.left-b.left)>0.5)gp.style.marginLeft=((parseFloat(gp.style.marginLeft)||0)+(a.left-b.left))+"px"};
       if(window.ResizeObserver){var gro=new ResizeObserver(function(){if(cur!==t||!gp){gro.disconnect();return} fit()}); gro.observe(t); if(t.parentElement)gro.observe(t.parentElement)}
       [60,250,600].forEach(function(ms){setTimeout(fit,ms)});
       gp.addEventListener("touchstart",function(e){e.preventDefault(); e.stopPropagation(); start(e.touches[0].clientY)},{passive:false});
@@ -14601,6 +14601,13 @@ textarea.tagrip{border-bottom-width:0!important}
         icv.addEventListener("touchend",function(e){var ta=e.target; if(!ta.classList||!ta.classList.contains("ictht")||e.changedTouches.length!==1)return; var t=e.changedTouches[0], now=Date.now();
           if(now-lt<450&&Math.abs(t.clientX-lx)<60&&Math.abs(t.clientY-ly)<80){lt=0; if(e.cancelable)e.preventDefault(); done(ta)} else {lt=now; lx=t.clientX; ly=t.clientY}},{passive:false});
         icv.addEventListener("dblclick",function(e){var ta=e.target; if(ta.classList&&ta.classList.contains("ictht"))done(ta)});
+      })();
+      // 기도제목 고치는 칸(제목·기도문)을 두 번 누르면 저장하고 읽기로 (2026-11-19 사용자 요청)
+      (function(){var lt=0,lx=0,ly=0;
+        function go(el){var f=el.closest(".icform.icinline"); if(!f)return; var ok=f.querySelector(".icok"); if(!ok)return; try{var sl=window.getSelection(); if(sl)sl.removeAllRanges()}catch(err){} if(document.activeElement&&document.activeElement.blur)document.activeElement.blur(); ok.click()}
+        icv.addEventListener("touchend",function(e){var el=e.target; if(!el.closest||!el.closest(".icform.icinline .icfm,.icform.icinline .icfn")||e.changedTouches.length!==1)return; var t=e.changedTouches[0], now=Date.now();
+          if(now-lt<450&&Math.abs(t.clientX-lx)<60&&Math.abs(t.clientY-ly)<80){lt=0; if(e.cancelable)e.preventDefault(); go(el)} else {lt=now; lx=t.clientX; ly=t.clientY}},{passive:false});
+        icv.addEventListener("dblclick",function(e){if(e.target.closest&&e.target.closest(".icform.icinline .icfm,.icform.icinline .icfn"))go(e.target)});
       })();
       var sw=null, icThxTap={id:"",t:0};
       icv.addEventListener("pointerdown",function(e){
