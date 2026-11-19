@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-icfdbl">
+<meta name="app-build" content="b20261119-totop">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5847,6 +5847,12 @@ textarea.tagrip{border-bottom-width:0!important}
 .editbox .tagripbar{max-width:none!important;flex:none}
 .icv .icthtip{display:none!important}   /* 감사 기도 쪽 안내 글(두 번 누르면 고치기 · 옆으로 밀면 기도문) 지움 (2026-11-18 사용자 요청) */
 .icv .icp .icthmark{display:none!important}   /* 카드 아래 줄 '🙏 감사' 표시 지움 — 카드 밖으로 튀어나옴 (2026-11-18 사용자 요청) */
+/* ⬆ 맨 위로: 첫 화면을 많이 내렸을 때 오른쪽 아래 동그라미 (2026-11-19 사용자 요청) */
+#toTop{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:30;width:46px;height:46px;border-radius:50%;border:1px solid #55526A;background:#3B3947 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%);color:#F2EFFA;display:grid;place-items:center;padding:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 3px 0 rgba(0,0,0,.45),0 6px 14px rgba(0,0,0,.45);opacity:0;transform:translateY(12px);pointer-events:none;transition:opacity .2s,transform .2s}
+#toTop.on{opacity:.92;transform:none;pointer-events:auto}
+#toTop:active{transform:translateY(2px)}
+#toTop svg{width:20px;height:20px}
+body.boardon #toTop{display:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -23209,5 +23215,13 @@ window.addEventListener("scroll",function(){if(!q)q=requestAnimationFrame(chk)},
 /* 💬 한 마디 창: 굴렸을 때만 윗줄 아래까지 흐리게 (맨 위에서는 찾기 칸이 흐려지지 않게, 2026-11-11 사용자 요청) */
 document.addEventListener("scroll",function(e){var b=e.target; if(!b||!b.classList||!b.classList.contains("dlbody"))return; var sh=b.parentNode; if(!sh||!sh.classList||!sh.classList.contains("saysheet"))return;
   var on=b.scrollTop>2; b.classList.toggle("saysc",on); if(on){var bar=sh.querySelector(".dlbar"); if(bar)b.style.setProperty("--smk",Math.round(bar.getBoundingClientRect().bottom-b.getBoundingClientRect().top)+"px")}},true);
+</script>
+<button type="button" id="toTop" aria-label="맨 위로" title="맨 위로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+<script>
+/* ⬆ 맨 위로 (2026-11-19 사용자 요청): 첫 화면을 한 화면 넘게 내리면 보이고, 누르면 맨 위로 */
+(function(){var b=document.getElementById("toTop"); if(!b)return; var q=0;
+  function chk(){q=0; b.classList.toggle("on",window.scrollY>innerHeight*1.2)}
+  window.addEventListener("scroll",function(){if(!q)q=requestAnimationFrame(chk)},{passive:true});
+  b.addEventListener("click",function(){window.scrollTo(0,0); var se=document.scrollingElement; if(se)se.scrollTop=0; b.classList.remove("on")});   /* 바로 맨 위로 */ chk()})();
 </script>
 </body></html>
