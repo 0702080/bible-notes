@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-scenedbl">
+<meta name="app-build" content="b20261119-gripoff">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5903,6 +5903,8 @@ body.boardon #toTop{display:none}
 .prays>.pri textarea.pt.tagrip,.prays>.pri textarea.pth.tagrip{border-bottom:0!important;border-radius:12px 12px 0 0!important;padding-bottom:16px!important}
 .prays>.pri textarea.tagrip+.tagripbar{border:1px solid color-mix(in srgb,var(--prc) 75%,#3A3630)!important;border-top:1px solid color-mix(in srgb,var(--prc) 35%,transparent)!important;border-radius:0 0 12px 12px!important;background:color-mix(in srgb,var(--prc) 32%,#1A1712)!important;box-shadow:none!important;height:24px}   /* 손잡이 띠는 글 칸보다 밝은 기도 색으로 또렷이 구분 (2026-11-19 사용자 요청) */
 .prays>.pri textarea.tagrip+.tagripbar i{background:color-mix(in srgb,var(--prc) 45%,#fff)!important;opacity:.85;width:44px!important;height:4px}
+/* 기도문을 읽는 글로 돌아오면 손잡이 띠는 안 보이게 (2026-11-19 사용자 요청: 읽기 칸 아래 띠만 남음) */
+.prays>.pri:not(.editing)>textarea.pt+.tagripbar,textarea[hidden]+.tagripbar{display:none!important}
 /* ⬆ 맨 위로 단추는 글을 적는 동안(글 칸에 커서) 숨김 — 기도문 칸 아래를 가림 (2026-11-19 사용자 요청) */
 body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!important}
 .hymsearch{padding-right:54px!important}
@@ -8898,7 +8900,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
       var xw=t.closest(".icform")?1:0; gp.style.width=(t.offsetWidth+xw)+"px"; gp.style.marginTop=(-mb-(bw?0:0))+"px"; gp.style.marginBottom=mb+"px";
       var tr=t.getBoundingClientRect(), gr=gp.getBoundingClientRect(); if(Math.abs(tr.left-gr.left)>0.5)gp.style.marginLeft=(tr.left-gr.left)+"px"; var gap=gr.top-tr.bottom; if(Math.abs(gap)>0.5)gp.style.marginTop=((parseFloat(gp.style.marginTop)||0)-gap)+"px";   // 감싼 칸의 gap·여백만큼 붙여 칸 바로 아래에
       // 칸 폭·자리가 나중에 바뀌어도(고치기 칸이 넓어지는 등) 손잡이 줄을 칸에 딱 맞춤 (2026-11-18 사용자 요청: 오른쪽 끝이 안 맞음)
-      var fit=function(){if(!gp||cur!==t||!t.isConnected)return; var w=t.offsetWidth+(t.closest(".icform")?1:0);   /* 기도제목 칸은 1px 모자라 보여 더함 (2026-11-19 사용자 요청) */ if(w&&gp.style.width!==w+"px")gp.style.width=w+"px"; var a=t.getBoundingClientRect(), b=gp.getBoundingClientRect(); if(a.width&&Math.abs(a.left-b.left)>0.5)gp.style.marginLeft=((parseFloat(gp.style.marginLeft)||0)+(a.left-b.left))+"px"};
+      var fit=function(){if(!gp||cur!==t)return; if(!t.isConnected||t.offsetParent===null){if(!gd)detach(); return}   /* 칸이 숨겨지면(두 번 눌러 읽기로 등) 손잡이 띠도 떼어 냄 — 휴대폰은 숨은 칸에서 focusout이 안 와서 읽는 글 아래 띠만 남던 것 (2026-11-19 사용자 요청) */ var w=t.offsetWidth+(t.closest(".icform")?1:0);   /* 기도제목 칸은 1px 모자라 보여 더함 (2026-11-19 사용자 요청) */ if(w&&gp.style.width!==w+"px")gp.style.width=w+"px"; var a=t.getBoundingClientRect(), b=gp.getBoundingClientRect(); if(a.width&&Math.abs(a.left-b.left)>0.5)gp.style.marginLeft=((parseFloat(gp.style.marginLeft)||0)+(a.left-b.left))+"px"};
       if(window.ResizeObserver){var gro=new ResizeObserver(function(){if(cur!==t||!gp){gro.disconnect();return} fit()}); gro.observe(t); if(t.parentElement)gro.observe(t.parentElement)}
       [60,250,600].forEach(function(ms){setTimeout(fit,ms)});
       gp.addEventListener("touchstart",function(e){e.preventDefault(); e.stopPropagation(); start(e.touches[0].clientY)},{passive:false});
