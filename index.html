@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-noprtoast">
+<meta name="app-build" content="2026-11-20-icone">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5989,7 +5989,7 @@ body.tafocus #toTop{display:none!important}
         <button type="button" id="ledgerBtn">💰 하늘나라 재무제표</button>
         <button type="button" id="sowBtn">🌾 심은 대로</button>
         <button type="button" id="prayReadBtn">🙏 기도 모아 읽기</button>
-        <button type="button" id="icBtn">🙏 기도제목</button>
+        <button type="button" id="icBtn">🙏 기도</button>
         <button type="button" id="ansBtn">🙌 기도 응답 연표</button>
         <button type="button" id="smartBtn">🧠 스마트 말씀</button>
         <button type="button" id="remindBtn">⏰ 하루 세 번 말씀 알림</button>
@@ -14996,11 +14996,12 @@ body.tafocus #toTop{display:none!important}
     icTouch(x); icSave(o); return i<0;
   }
   var icShowAns=false, icv=null, icEdit="", icOpen={}, icThx={}, icThxEd={}, icSwAt=0, icThxT=0;   // 펼친 카드 (기본은 접힘: 기도 제목 3줄만)
-  try{icOpen=JSON.parse(localStorage.getItem("bible-ic-open")||"{}")||{}}catch(e){}
+  // 기도는 열 때마다 모두 접힌 채로 시작 (2026-11-20 사용자 요청)
   function openIntercede(){
+    icOpen={};
     if(!icv){
       icv=document.createElement("div"); icv.className="cch icv"; icv.setAttribute("role","dialog"); icv.setAttribute("aria-modal","true"); icv.hidden=true;
-      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🙏 기도제목</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icadd icaddtop">＋ 쓰기</button><button type="button" class="icclose">닫기</button></div></div>'+
+      icv.innerHTML='<div class="bqbar"><div class="bqtitle"><b>🙏 기도</b><span class="iccnt"></span></div><div class="qbarbtns"><button type="button" class="icadd icaddtop">＋ 쓰기</button><button type="button" class="icclose">닫기</button></div></div>'+
         '<div class="ccbody icbody"></div>';
       document.body.appendChild(icv);
       icv.querySelector(".icclose").addEventListener("click",closeIntercede);
@@ -15082,7 +15083,7 @@ body.tafocus #toTop{display:none!important}
         if(Date.now()-icSwAt<450)return;   // 옆으로 민 손길은 펼치기·고치기로 세지 않음
         var c=e.target.closest(".icp"); if(!c)return; var id=c.dataset.id;
         if(icTap.id===id&&icTap.timer){clearTimeout(icTap.timer); icTap={id:"",timer:0};
-          icOpen[id]=1; try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){}
+          icOpen={}; icOpen[id]=1;
           var mm0=c.querySelector(".icmemo"), myT=(mm0||c).getBoundingClientRect().top;
           icEdit=id; icDraw();
           var f0=icv.querySelector(".icfm");
@@ -15096,8 +15097,10 @@ body.tafocus #toTop{display:none!important}
         clearTimeout(icTap.timer);
         icTap={id:id,timer:setTimeout(function(){icTap={id:"",timer:0};
           if(window.getSelection&&String(window.getSelection()).length)return;   // 글을 고르는 중이면 그대로
-          if(icOpen[id])delete icOpen[id]; else icOpen[id]=1;   // 한 번 누르면 펼치고, 펼친 것은 한 번 누르면 접음
-          try{localStorage.setItem("bible-ic-open",JSON.stringify(icOpen))}catch(err){} icDraw();
+          var was=!!icOpen[id], y0=c.getBoundingClientRect().top;
+          icOpen={}; if(!was)icOpen[id]=1;   // 한 번에 하나만 펼침 — 다른 기도를 열면 앞의 것은 접힘 (2026-11-20 사용자 요청)
+          icDraw();
+          var nc=icv.querySelector('.icp[data-id="'+id+'"]'), bd=icv.querySelector(".icbody"); if(nc&&bd){var dy=nc.getBoundingClientRect().top-y0; if(Math.abs(dy)>0.5)bd.scrollTop+=dy}   // 누른 카드는 화면 같은 자리에
         },300)};
       });
       icv.addEventListener("change",function(e){if(e.target.classList.contains("icper")){var o=icData();o.per=+e.target.value||3;o.perSet=1;icSave(o);icDraw()}});
@@ -15292,7 +15295,7 @@ body.tafocus #toTop{display:none!important}
     }
     var pick=icPick(o,today), done=pick.filter(function(x){return x.log.indexOf(today)>=0}).length;
     var h=document.createElement("div"); h.className="ichead";
-    h.innerHTML='<b>오늘 기도제목</b><span class="icprog"></span><span class="icperl" title="명단이 많을 때, 하루에 몇 명씩 돌아가며 보여 줄지 정해요 (오래 기도하지 못한 사람부터)">하루<span class="icstep"><button type="button" class="icpm" data-d="-1" aria-label="한 명 줄이기">−</button><b>'+o.per+'</b><button type="button" class="icpm" data-d="1" aria-label="한 명 늘리기">+</button></span>명씩</span>';
+    h.innerHTML='<b>오늘의 기도</b><span class="icprog"></span><span class="icperl" title="명단이 많을 때, 하루에 몇 명씩 돌아가며 보여 줄지 정해요 (오래 기도하지 못한 사람부터)">하루<span class="icstep"><button type="button" class="icpm" data-d="-1" aria-label="한 명 줄이기">−</button><b>'+o.per+'</b><button type="button" class="icpm" data-d="1" aria-label="한 명 늘리기">+</button></span>명씩</span>';
     h.querySelector(".icprog").textContent=pick.length?done+" / "+pick.length:"";
     body.appendChild(h);
     if(!icLive.length){var e=document.createElement("p"); e.className="icempty"; e.textContent="기도해 줄 사람을 명단에 넣어 보세요. 하루에 몇 명씩, 오래 기도하지 못한 사람부터 차례로 보여 드려요."; body.appendChild(e)}
@@ -15349,7 +15352,7 @@ body.tafocus #toTop{display:none!important}
     if(!nm&&!memo)return false;   // 새 칸이 비어 있으면 그냥 닫음
     if(!nm)nm=memo.split("\n")[0].slice(0,40);
     memo=memo?IC_HEAD+"\n\n"+memo:"";   // 제목 없이 기도 제목만 적었으면 첫 줄을 제목으로
-    o.items.push({id:qid(),name:nm,memo:memo,nid:nid,at:Date.now(),u:Date.now(),log:[],ans:0,an:"",pinDay:dkey(Date.now())}); icSave(o); toast("오늘 기도제목에 넣었어요"); return true;   // 새로 쓴 기도는 그날 '오늘 기도제목'에 바로 (2026-11-20 사용자 요청)
+    o.items.push({id:qid(),name:nm,memo:memo,nid:nid,at:Date.now(),u:Date.now(),log:[],ans:0,an:"",pinDay:dkey(Date.now())}); icSave(o); toast("오늘의 기도에 넣었어요"); return true;   // 새로 쓴 기도는 그날 '오늘 기도제목'에 바로 (2026-11-20 사용자 요청)
   }
   function icClick(e){
     var b=e.target.closest("button"); if(!b||!icv.contains(b)||b.classList.contains("icclose"))return;
@@ -17229,7 +17232,7 @@ body.tafocus #toTop{display:none!important}
       }
     }
     // 🤲 오늘 중보기도: 명단에서 그날 기도할 사람 (2026-10-24 사용자 요청)
-    var iGHit=fq&&dlHit("🙏 오늘 기도제목");
+    var iGHit=fq&&dlHit("🙏 오늘의 기도");
     if(!dlEdit){
       var ico=icData(), ipk=icPick(ico,dlDay,dlIcSkip[dlDay]||0).sort(icOrd), icAnsAll=ico.items.filter(function(y){return y.ans}).sort(function(a,b){return b.ans-a.ans});
       // 응답된 기도는 목록에서 빠지고, '🙌 응답 N'을 눌렀을 때만 그것만 보임 (2026-11-04 사용자 요청)
@@ -17241,8 +17244,8 @@ body.tafocus #toTop{display:none!important}
       var isec=document.createElement("section"); isec.className="dlgrp dlacts dlic"; isec.dataset.g="__ic"; isec.style.setProperty("--gc","var(--sky)");
       var ih=document.createElement("div"); ih.className="dlgh";
       var it2=document.createElement("button"); it2.type="button"; it2.className="dlgname dlactname"; it2.dataset.g="__ic";
-      var iOpen=fq||!dlGFold.has("__ic"); it2.setAttribute("aria-expanded",String(iOpen)); it2.setAttribute("aria-label","오늘 기도제목 "+(iOpen?"접기":"펼치기"));
-      it2.textContent=icAV?"🙌 응답된 기도":"🙏 오늘 기도제목"+(ipk.length?"  "+ipk.filter(function(x){return x.log.indexOf(dlDay)>=0}).length+"/"+ipk.length:"");
+      var iOpen=fq||!dlGFold.has("__ic"); it2.setAttribute("aria-expanded",String(iOpen)); it2.setAttribute("aria-label","오늘의 기도 "+(iOpen?"접기":"펼치기"));
+      it2.textContent=icAV?"🙌 응답된 기도":"🙏 오늘의 기도"+(ipk.length?"  "+ipk.filter(function(x){return x.log.indexOf(dlDay)>=0}).length+"/"+ipk.length:"");
       if(fq)dlMarkIn(it2,fq);
       var ich=document.createElement("span"); ich.className="dlgchev"; ich.setAttribute("aria-hidden","true"); it2.appendChild(ich);
       ih.appendChild(it2);
