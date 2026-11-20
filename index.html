@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261120-srmrefit">
+<meta name="app-build" content="ab-20261120-nobtx">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -23196,7 +23196,7 @@ body.tafocus #toTop{display:none!important}
   $("dailyQuick").addEventListener("click",function(){$("topMenu").open=false;openDaily()});
   /* ↔ ⋯ 메뉴 항목을 모두 맨 위 동그라미 단추로 (2026-11-14 사용자 요청): 휴대폰은 맨 위 줄을 좌우로 밀면 메뉴 항목이 다 나오고, 세로 ⋯ 메뉴는 없앰(CSS). 단추는 메뉴 항목을 대신 누름(.qk data-for). 칸반(PC)은 예전 ⋯ 메뉴 그대로 */
   (function(){
-    var SKIP={reorderBtn:1,ledgerBtn:1,foldAll:1};   // 💰는 맨 위에 따로 있음
+    var SKIP={reorderBtn:1,ledgerBtn:1,foldAll:1,bibleTextBtn:1};   // 💰는 맨 위에 따로 있음, 📜 성경 본문 동그라미는 뺌(2026-11-20 사용자 요청)
     var ICON={openTongdokBtn:"📚",bibleTextBtn:"📜",ghSyncBtn:"📤",exportTxt:"📃"};   // 겹치는 그림은 바꿔서 구분
     var COL={sowBtn:"#F4B6C8",calBtn:"#C9B6F2",hymnBtn:"#F2C1D9",openSceneBtn:"#F6D9B8",sermonBtn:"#E3A6BC",icBtn:"#93C9A3",openSayBtn:"#A9B6E8",openVerseBtn:"#8FD0CC"}, PAL=["#E8C48F","#C9A8E8","#E8A98F","#B8D88F","#9FC3E8","#E8A0C8","#D8D08F","#8FD8B4","#C8B4A0","#A0B4D8"];
     var bar=$("addQuick")&&$("addQuick").parentElement, pop=document.querySelector("#topMenu .pop"); if(!bar||!pop)return;
