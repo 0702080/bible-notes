@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-shot">
+<meta name="app-build" content="2026-11-20-addkbd">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -867,6 +867,13 @@ html,body,button,input,textarea,select{font-family:"Binggrae","Noto Sans KR","Ap
 #addSheet.mtbig .sheetpanel{bottom:auto;border-radius:0}
 #addSheet.mtbig #mText{resize:none;overflow-y:auto}
 #addSheet.mtbig .sheethint{display:none}
+/* 키보드가 올라와 있는 동안: 말씀 칸 바로 아래에 '추가' 단추 (구절 칸은 그 아래로, 2026-11-20 사용자 요청) */
+#addSheet.mtkbd #manual{display:flex;flex-direction:column}
+#addSheet.mtkbd #manual>*{order:5}
+#addSheet.mtkbd #manual>label[for="mText"]{order:0}
+#addSheet.mtkbd #manual>#mText{order:1;min-height:0!important}
+#addSheet.mtkbd #manual>.tagripbar{order:2}
+#addSheet.mtkbd #manual>.primary{order:3;margin-bottom:14px}
 .sheetpanel{position:absolute;left:0;right:0;bottom:0;max-height:88vh;overflow:auto;-webkit-overflow-scrolling:touch;background:var(--sheet);
   border-radius:20px 20px 0 0;border-top:1px solid var(--rule);padding:14px 18px calc(22px + env(safe-area-inset-bottom,0px));max-width:680px;margin:0 auto;box-shadow:0 -12px 40px rgba(0,0,0,.5)}
 /* PC: 말씀 담기 창을 크게, 화면 가운데에 (2026-10-24 사용자 요청) */
@@ -18559,12 +18566,14 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
       var lb=sh.querySelector('label[for="mText"]'), dy=lb.getBoundingClientRect().top-(pn.getBoundingClientRect().top+8);
       if(Math.abs(dy)>2)pn.scrollTop+=dy;   // 말씀 칸부터 위에 보이게 (2026-11-19 사용자 요청: 말씀 칸이 위, 성경 구절이 아래)
       fit.maxVH=Math.max(fit.maxVH||0,vh); var kbd=vh<fit.maxVH-120;
+      sh.classList.toggle("mtkbd",kbd);   // 키보드가 올라와 있으면 '추가' 단추를 말씀 칸 바로 아래로 (2026-11-20 사용자 요청)
       if(!kbd){   // 키보드를 내렸을 때: 창 맨 위부터 보이고, 말씀 칸 아래 안내 글·추가 단추까지 한 화면에 (2026-11-18 사용자 요청)
         pn.scrollTop=0;
         var pr=pn.getBoundingClientRect(), tr=cur.getBoundingClientRect(), lc=pn.lastElementChild, rest=(lc?lc.getBoundingClientRect().bottom:tr.bottom)-tr.bottom+(parseFloat(getComputedStyle(pn).paddingBottom)||0);   // 말씀 칸 아래 글·단추 높이
         var h2=Math.max(140,Math.round(vh-(tr.top-pr.top)-rest-4))+"px"; if(cur.style.height!==h2)cur.style.height=h2; return;
       }
-      var h=Math.max(140,Math.round(vtop+vh-cur.getBoundingClientRect().top-10))+"px";
+      var ab=sh.querySelector("#manual .primary"), cb=cur.getBoundingClientRect(), below=ab?Math.max(0,ab.getBoundingClientRect().bottom-cb.bottom):0;   // 말씀 칸 아래 손잡이 줄·추가 단추 높이
+      var h=Math.max(120,Math.round(vtop+vh-cb.top-below-10))+"px";   // 말씀 칸을 줄여 추가 단추가 키보드 바로 위에 보이게
       if(cur.style.height!==h)cur.style.height=h;
     }
     document.addEventListener("focusin",function(e){
@@ -18574,11 +18583,12 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     });
     document.addEventListener("focusout",function(e){
       if(e.target!==cur)return; cur=null;
-      var sh=$("addSheet"), pn=sh.querySelector(".sheetpanel"); sh.classList.remove("mtbig");
+      var sh=$("addSheet"), pn=sh.querySelector(".sheetpanel"); sh.classList.remove("mtbig","mtkbd");
       pn.style.top=""; pn.style.height=""; pn.style.maxHeight=""; e.target.classList.remove("dlbig"); e.target.style.height=""; grow(e.target);
     });
     if(window.visualViewport){window.visualViewport.addEventListener("resize",fit);window.visualViewport.addEventListener("scroll",fit)}
     window.addEventListener("resize",fit);
+    document.addEventListener("mousedown",function(e){if(cur&&e.target.closest&&e.target.closest("#addSheet.mtkbd #manual .primary"))e.preventDefault()},true);   // 추가를 누르는 순간 말씀 칸에서 나가 단추가 아래로 밀려 안 눌리는 일 없게
   })();
   var mqLater=false, mqSort=new Set();
   /* 답을 적는 칸 오른쪽에 줄(문장)마다 ⠿ 손잡이가 세로로 줄지어 뜸. 옮길 문장 옆 손잡이를 바로 잡고 위아래로 끌면 그 문장이 통째로 옮겨짐.
