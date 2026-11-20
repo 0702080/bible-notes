@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261120-srmr3d">
+<meta name="app-build" content="ab-20261120-srmrhint">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14933,7 +14933,7 @@ body.tafocus #toTop{display:none!important}
     var sv=document.createElement("span"); sv.className="srmrsaved"; sv.setAttribute("aria-live","polite"); row.appendChild(sv);
     var cp=document.createElement("button"); cp.type="button"; cp.className="srmrcopy"; cp.textContent="📋 복사"; row.appendChild(cp);
     v.appendChild(row);
-    var hint=document.createElement("p"); hint.className="srmrhint"; hint.textContent=(String(x.resp||"").trim()?(srmRespEd?"두 번 누르면 읽기 · ":"두 번 누르면 고치기 · "):"")+"← 오른쪽으로 밀면 설교 메모로 돌아가요"; v.appendChild(hint);
+    /* 아래 안내 글(.srmrhint)은 지움 (2026-11-20 사용자 요청) */
     return v;
   }
   // 🔍 찾은 낱말 표시: 금빛 사각형이 부드럽게 깜박임 (2026-11-08 사용자 요청)
