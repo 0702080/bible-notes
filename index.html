@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261120-praytop">
+<meta name="app-build" content="ab-20261121-nohead">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -7668,7 +7668,7 @@ body.tafocus #toTop{display:none!important}
     var list=n.prays.slice().sort(function(a,b){return b.at-a.at});   // 최근 것 위. 응답돼도 자리가 바뀌지 않게 (2026-11-06 사용자 요청: 감사 기도 쓰고 앞면으로 오면 자리가 바뀌어 헷갈림)
     if(!list.length&&!box.querySelector(".pempty")){box.innerHTML='<p class="pempty">이 말씀을 붙들고 드리는 기도를 적어 보세요. 응답되면 🙌 응답을 눌러 기록해요.</p>';return}
     var em=box.querySelector(".pempty"); if(em&&list.length)em.remove();
-    var pfx=false; n.prays.forEach(function(x){if(String(x.t||"").indexOf("하나님 아버지\n")===0){x.t="전능하신 나의 아버지 하나님"+x.t.slice(7);pfx=true} var t2=prayTop(x.t); if(t2!==x.t){x.t=t2;pfx=true}});   // 예전 기도문 첫 줄 → 새 첫 줄 (다른 기기·클라우드에서 온 것도, 2026-10-30)
+    var pfx=false; n.prays.forEach(function(x){if(String(x.t||"").indexOf("하나님 아버지\n")===0){x.t="전능하신 나의 아버지 하나님"+x.t.slice(7);pfx=true} var t2=prayTop(x.t); if(t2!==x.t){x.t=t2;pfx=true} if(x.t.replace(/\s+/g,"")===(PRAY_TOP+"전능하신 나의 아버지 하나님"+PRAY_TAIL).replace(/\s+/g,"")){x.t=PRAY_TPL;pfx=true}});   // 아직 적지 않은 예전 틀이면 새 틀로 (2026-11-21)   // 예전 기도문 첫 줄 → 새 첫 줄 (다른 기기·클라우드에서 온 것도, 2026-10-30)
     if(pfx)setTimeout(function(){scheduleSave(n.id)},0);
     list.forEach(function(x,i){
       var d=have.get(x.id); have.delete(x.id);
@@ -12907,7 +12907,7 @@ body.tafocus #toTop{display:none!important}
   /* ---------- 🙌 기도 응답 연표 (2026-10-24 사용자 요청): 응답된 기도만 모아 언제 기도했고 며칠 만에 응답됐는지 ---------- */
   var ans=null;
   function prayClean(t){   // 기도문 틀(하나님 아버지 … 아멘)은 빼고 내가 적은 부분만
-    var tl=PRAY_TPL.split("\n").map(function(x){return x.trim()}).filter(Boolean).concat(["하나님 아버지"],PRAY_OLDTAIL);   // 예전 틀 첫 줄도 빼기
+    var tl=PRAY_TPL.split("\n").map(function(x){return x.trim()}).filter(Boolean).concat(["하나님 아버지","전능하신 나의 아버지 하나님"],PRAY_OLDTAIL);   // 예전 틀 첫 줄도 빼기
     return String(t||"").split("\n").filter(function(l){return tl.indexOf(l.trim())<0}).join("\n").trim();
   }
   function ansItems(){
@@ -15572,7 +15572,7 @@ body.tafocus #toTop{display:none!important}
   }
   var PRAY_TOP="빛이신 예수여\n내 안에 오시옵소서\n내 안에 있는 모든 어둠을 몰아내소서";   // 기도문 맨 위에 늘 있는 문구 (2026-11-20 사용자 요청)
   function prayTop(v){v=String(v||""); if(!v.trim())return v; if(v.replace(/\s+/g,"").indexOf(PRAY_TOP.replace(/\s+/g,""))===0)return v; return PRAY_TOP+"\n\n"+v.replace(/^\s+/,"")}
-  var PRAY_HEAD=PRAY_TOP+"\n\n전능하신 나의 아버지 하나님\n\n";   /* 기도문 첫 줄 (2026-10-30 사용자 요청, 전에는 "하나님 아버지") */
+  var PRAY_HEAD=PRAY_TOP+"\n\n";   // 가운데 "전능하신 나의 아버지 하나님" 줄은 틀에서 뺌 (2026-11-21 사용자 요청)   /* 기도문 첫 줄 (2026-10-30 사용자 요청, 전에는 "하나님 아버지") */
   var PRAY_TAIL="길이요 진리요\n내 인생의 빛이 되시며\n생명 되신 나의 주\n예수님 이름으로 기도합니다\n아멘";   // 기도문 끝맺음 — 기도문 칸 끝에 꼭 들어감 (2026-11-14 사용자 요청)
   var PRAY_TPL=PRAY_HEAD+"\n\n"+PRAY_TAIL;
   var PRAY_OLDTAIL=["길이요 진리요 생명 되신 나의 주","예수님 이름으로 기도 합니다","예수님 이름으로 기도합니다","아멘"];
