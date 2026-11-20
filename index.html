@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-icone">
+<meta name="app-build" content="2026-11-20-sayref">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -17887,6 +17887,18 @@ body.tafocus #toTop{display:none!important}
       var wi=document.createElement("input"); wi.className="field saywho"; wi.maxLength=24; wi.value=cur.who||""; wi.placeholder=sayMode==="m"?"본문 (예: 요한복음 6:1-15)":sayMode==="v"?"구절 (예: 로마서 12:21)":sayMode==="g"?"어디서·누구에게 (예: 주일 예배)":"말한 분 (예: 하용조 목사님)"; wi.setAttribute("aria-label","말한 분");
       var ti=document.createElement("input"); ti.className="field saytopic"; ti.maxLength=sayMode==="m"?40:16; ti.value=cur.topic||""; ti.placeholder=sayMode==="m"?"제목 (선택)":"주제 (선택)"; ti.setAttribute("aria-label","주제");
       row.appendChild(wi); row.appendChild(ti); form.appendChild(row);
+      if(sayMode==="v"||sayMode==="m"){   // 📋 "(요한복음 6장 / 개역개정)\n33. …"을 붙이면 구절 칸을 저절로 채우고 머리 줄·절 번호는 말씀에서 뺌 (2026-11-20 사용자 요청)
+        var refFill=function(){
+          var cw=wi.value.trim(); if(cw&&cw!==wi._auto)return;
+          var d=refDetect(ta.value); if(!d)return;
+          if(cw!==d.ref){wi.value=d.ref; wi._auto=d.ref}
+          if(sayMode!=="v")return;
+          var L=ta.value.split("\n"), body=L.slice(d.hi+1);
+          if(!/[-–]/.test(d.ref)&&body.length&&/^\s*\d{1,3}\s*[.:)]?\s+/.test(body[0]))body[0]=body[0].replace(/^\s*\d{1,3}\s*[.:)]?\s+/,"");   // 한 절이면 절 번호도 뺌
+          var nv=body.join("\n").replace(/^\s*\n/,""); if(nv!==ta.value){ta.value=nv; try{ta.setSelectionRange(nv.length,nv.length)}catch(e){} setTimeout(function(){ta.dispatchEvent(new Event("input",{bubbles:true}))},0)}
+        };
+        ta.addEventListener("input",refFill); ta.addEventListener("paste",function(){setTimeout(refFill,0)}); setTimeout(refFill,0);
+      }
       if(sayMode==="g")row.hidden=true;   // 은혜: 어디서·누구에게·주제 칸 숨김 (2026-11-07 사용자 요청, 값은 그대로 둠)
       if(sayMode==="v"||sayMode==="m")form.insertBefore(bookPicker(wi),row);
       var hvl=document.createElement("label"); hvl.className="sayhvl";
