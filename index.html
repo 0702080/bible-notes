@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-sayref">
+<meta name="app-build" content="2026-11-20-hymtap">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -23497,8 +23497,12 @@ body.tafocus #toTop{display:none!important}
   // 👆👆 두 번 누르기: 읽기 가사 → 고치기(누른 줄에 커서), 고치기 가사 칸 → 저장하고 읽기 (2026-11-15 사용자 요청)
   var hymEditLine=-1;
   function hymDbl(el,fn){
-    var dt={t:0,x:0,y:0};
+    var dt={t:0,x:0,y:0}, st={t:0,x:0,y:0,sc:0};
+    // 굴리던 손길은 누르기로 세지 않음 — 가사 고치다 굴리면 읽기로 바뀌던 것 (2026-11-20 사용자 요청)
+    if(!window._hymScrollAt){window._hymScrollAt=1; document.addEventListener("scroll",function(){window._hymLastScroll=Date.now()},true)}
+    el.addEventListener("touchstart",function(e){var c=e.touches[0]; if(!c)return; st={t:Date.now(),x:c.clientX,y:c.clientY,sc:window._hymLastScroll||0}},{passive:true});
     el.addEventListener("touchend",function(e){var c=e.changedTouches[0]; if(!c||e.touches.length)return; var nw=Date.now();
+      if(nw-st.t>350||Math.abs(c.clientX-st.x)>10||Math.abs(c.clientY-st.y)>10||(window._hymLastScroll||0)>st.sc||st.t-st.sc<250){dt.t=0; return}
       if(nw-dt.t<480&&Math.abs(c.clientX-dt.x)<60&&Math.abs(c.clientY-dt.y)<80){dt.t=0; if(e.cancelable)e.preventDefault(); el._dblAt=nw; buzz(10); fn(e)} else dt={t:nw,x:c.clientX,y:c.clientY}},{passive:false});
     el.addEventListener("dblclick",function(e){if(Date.now()-(el._dblAt||0)<800)return; e.preventDefault(); fn(e)});
   }
