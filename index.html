@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="b20261119-savelikecancel">
+<meta name="app-build" content="2026-11-20-shot">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -7501,7 +7501,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     return (t.className||"")+"|"+((holder&&holder.dataset.id)||"")+"|"+(t.placeholder||"");
   }
   function grow(t){
-    if(!t||t.tagName!=="TEXTAREA"||!t.offsetParent||t.classList.contains("dlbig"))return;   // 크게 펼친 기록칸은 글자에 따라 줄이지 않음
+    if(!t||t.tagName!=="TEXTAREA"||t.classList.contains("dlbig")||!t.offsetParent)return;   // dlbig를 먼저 봄 — offsetParent는 화면 배치를 다시 재게 함 (2026-11-20)   // 크게 펼친 기록칸은 글자에 따라 줄이지 않음
     var h=manualH.get(taKey(t));
     if(h){t.style.height=h;return}
     taAuto(t);
@@ -8783,6 +8783,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     function draw(){
       raf=0;
       if(!ta||!ta.isConnected||document.activeElement!==ta&&!drag){hide();return}
+      if(!drag&&nogrip(ta)){layer.hidden=true; layer.textContent=""; ta.classList.remove("lhpad"); return}   // ⠿가 없으면 잴 것도 없음 (2026-11-20)
       var m=measure(), lines=m.lines, cs=m.cs;
       var real=lines.filter(function(t){return t.trim()}).length;
       if(real<2&&!drag){layer.hidden=true; layer.textContent=""; ta.classList.remove("lhpad"); return}
@@ -9060,7 +9061,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     }
     document.addEventListener("focusin",function(e){var t=e.target; if(skip(t))return; ta=t; setTimeout(place,0)});
     document.addEventListener("focusout",function(e){if(e.target===ta)setTimeout(function(){if(document.activeElement!==ta){cb.hidden=true; ta=null}},150)});
-    document.addEventListener("input",function(e){if(e.target===ta)place()},true);
+    var plT=0; document.addEventListener("input",function(e){if(e.target===ta){clearTimeout(plT); plT=setTimeout(place,300)}},true);   // 글자마다 자리를 재지 않고 손을 멈추면 (2026-11-20 타이핑 느림)
     window.addEventListener("scroll",function(){if(ta)place()},true);
     window.addEventListener("resize",function(){if(ta)setTimeout(place,60)});
     cb.addEventListener("pointerdown",function(e){e.preventDefault()});   // 글 칸 커서를 잃지 않게
@@ -14502,6 +14503,25 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
       while((t=tw.nextNode())){var pe=t.parentElement; if(!pe||pe.closest("button,.hits,[hidden]"))continue; var cs=getComputedStyle(pe); if(cs.display==="none"||cs.visibility==="hidden")continue; segs.push({t:t.nodeValue,c:cs.color,w:+cs.fontWeight>=600?"800":"400"})}
     }
     if(!segs.length)segs=[{t:String(n.text||""),c:vcs?vcs.color:"#F4A45E",w:"400"}];
+    // 화면(읽기 모드)에 보이는 글자 자리를 그대로 옮겨 그림 — 절 번호 칸·들여쓰기·줄바꿈·빈 줄까지 똑같게 (2026-11-20 사용자 요청)
+    var dom=[], vr=v&&v.getBoundingClientRect(), dTop=1e9, dBot=-1e9, dL=1e9, dR=-1e9;
+    if(v&&vr&&vr.width){
+      var rg=document.createRange(), tw2=document.createTreeWalker(v,NodeFilter.SHOW_TEXT,null), tn;
+      while((tn=tw2.nextNode())){
+        var pe2=tn.parentElement; if(!pe2||pe2.closest("button,.hits,[hidden]"))continue;
+        var cs2=getComputedStyle(pe2); if(cs2.display==="none"||cs2.visibility==="hidden"||+cs2.opacity===0)continue;
+        var f2=cs2.fontWeight+" "+cs2.fontSize+" "+cs2.fontFamily, tv=tn.nodeValue;
+        for(var ci=0;ci<tv.length;){
+          var cp=tv.codePointAt(ci), len=cp>0xFFFF?2:1, ch=tv.substr(ci,len);
+          if(!/\s/.test(ch)){rg.setStart(tn,ci); rg.setEnd(tn,ci+len); var rs=rg.getClientRects(), r0=rs[rs.length-1];
+            if(r0&&r0.width){var x0=r0.left-vr.left, y0=r0.top-vr.top; dom.push({t:ch,x:x0,y:y0+r0.height/2,f:f2,c:cs2.color}); dTop=Math.min(dTop,y0); dBot=Math.max(dBot,y0+r0.height); dL=Math.min(dL,x0); dR=Math.max(dR,r0.right-vr.left)}}
+          ci+=len;
+        }
+      }
+    }
+    if(dom.length){   // 카드 폭은 화면 말씀 칸 폭에 맞춤
+      var vw=Math.ceil(Math.max(vr.width,dR)); W=Math.max(300,Math.round(vw+mar*2+pad*2-Math.max(0,dL))); maxW=W-mar*2-pad*2;
+    }
     var rows=[[]], rw=0;
     segs.forEach(function(sg){sg.t.split(/(\n| )/).forEach(function(k){
       if(!k)return;
@@ -14513,7 +14533,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     })});
     while(rows.length>1&&!rows[rows.length-1].length)rows.pop();
     while(rows.length>1&&!rows[0].length)rows.shift();
-    var refH=34, top=mar+pad, H=Math.round(top+refH+14+rows.length*lh+pad-6+mar);
+    var refH=34, top=mar+pad, bodyH=dom.length?Math.ceil(dBot-dTop):rows.length*lh, H=Math.round(top+refH+14+bodyH+pad-6+mar+(dom.length?6:0));
     var c=document.createElement("canvas"); c.width=W*sc; c.height=H*sc; var g=c.getContext("2d"); g.scale(sc,sc);
     g.fillStyle="#15131A"; g.fillRect(0,0,W,H);
     var ecs=el?getComputedStyle(el):null, rr=function(){g.beginPath(); if(g.roundRect)g.roundRect(mar,mar,W-mar*2,H-mar*2,18); else g.rect(mar,mar,W-mar*2,H-mar*2)};
@@ -14536,7 +14556,8 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
       if(num){g.fillStyle=nEl?getComputedStyle(nEl).color:"#fff"; g.fillText(" "+num,bxp+12+lw,top+refH/2+1)}
       bxp+=w2+8;
     });
-    rows.forEach(function(r,i){var y=top+refH+14+i*lh+lh/2; r.forEach(function(k){g.font=fnt(k.w,fs); g.fillStyle=k.c; g.fillText(k.t,mar+pad+k.x,y)})});
+    if(dom.length){var ox=mar+pad-Math.max(0,dL), oy=top+refH+14-dTop; dom.forEach(function(k){g.font=k.f; g.fillStyle=k.c; g.fillText(k.t,ox+k.x,oy+k.y)})}
+    else rows.forEach(function(r,i){var y=top+refH+14+i*lh+lh/2; r.forEach(function(k){g.font=fnt(k.w,fs); g.fillStyle=k.c; g.fillText(k.t,mar+pad+k.x,y)})});
     var nm=(String(n.ref||"말씀").replace(/[\\/:*?"<>|\s]+/g,"_"))+".png";
     srmShotsSave([srmPngFile(c,nm)],rt);
   }
@@ -20979,6 +21000,8 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
   // 휴대폰: 버튼을 누르는 순간 선택이 풀려도 쓸 수 있게 마지막 선택을 기억
   var lastPickSel=null;
   document.addEventListener("selectionchange",function(){
+    var ae=document.activeElement; if(ae&&(ae.tagName==="TEXTAREA"||ae.tagName==="INPUT"))return;   // 글 칸에 적는 중엔 볼 것 없음 — 글자마다 화면 전체 배치를 다시 재서 기도문 타이핑이 아주 느리던 문제 (2026-11-20)
+    if(!document.querySelector(".verse.picking"))return;
     var sel=window.getSelection&&window.getSelection(); if(!sel||sel.isCollapsed||!sel.rangeCount)return;
     var node=sel.anchorNode, v=node&&(node.nodeType===1?node:node.parentElement); v=v&&v.closest&&v.closest(".verse.picking");
     if(v){var r=selRangeIn(v); if(r)lastPickSel={v:v,r:r,at:Date.now()}}
@@ -23296,9 +23319,12 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
 
   // 🔘 단추 입체감 붙이기: 색 있는 바탕 + 그라데이션이 없는 단추에만 .bvol (2026-11-01 사용자 요청)
   (function(){
-    var Q="button:not([data-bv]),summary.tbtn:not([data-bv]),a.addbtn:not([data-bv])", pend=0;
+    var Q="button:not([data-bv]),summary.tbtn:not([data-bv]),a.addbtn:not([data-bv])", pend=0, roots=null;
     function scan(){pend=0;
-      document.querySelectorAll(Q).forEach(function(b){
+      var rs=roots, list=[]; roots=null;   // 새로 붙은 것만 봄 — 글자마다 화면 전체 단추를 다시 찾아 타이핑이 느리던 문제 (2026-11-20)
+      if(!rs)list=document.querySelectorAll(Q);
+      else rs.forEach(function(r){if(!r.isConnected)return; if(r.matches(Q))list.push(r); if(r.firstElementChild)Array.prototype.push.apply(list,r.querySelectorAll(Q))});
+      Array.prototype.forEach.call(list,function(b){
         var cs=getComputedStyle(b), bg=cs.backgroundColor||"", m=bg.match(/rgba?\(([^)]+)\)/), a=1;
         if(m){var p=m[1].split(/[ ,\/]+/).filter(Boolean); if(p.length>=4)a=parseFloat(p[3])}
         var ok=cs.backgroundImage==="none"&&!/transparent/.test(bg)&&a>0.05;
@@ -23306,14 +23332,21 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
       });
     }
     function later(){if(!pend)pend=requestAnimationFrame(scan)}
-    later(); new MutationObserver(later).observe(document.body,{childList:true,subtree:true});
+    later(); new MutationObserver(function(ms){
+      var add=null;
+      for(var i=0;i<ms.length;i++){var an=ms[i].addedNodes; for(var j=0;j<an.length;j++){if(an[j].nodeType===1){if(!add)add=[]; add.push(an[j])}}}
+      if(!add)return;
+      if(pend&&!roots)return;   // 이미 전체를 볼 차례
+      roots=(roots||[]).concat(add); if(roots.length>400)roots=null;
+      if(!pend)pend=requestAnimationFrame(scan);
+    }).observe(document.body,{childList:true,subtree:true});
   })();
   /* ---------- ✍ 적는 자리(커서) 따라가기: 글 칸이 길어져 커서가 키보드 밑으로 들어가면 화면을 굴려 보이게 (2026-11-07 사용자 요청) ---------- */
   (function(){
     if(window.matchMedia&&matchMedia("(min-width:900px)").matches)return;
     var mir=null, T=0;
     function caretY(ta){   // 칸 안에서 커서 줄의 아래 끝 위치(px)
-      if(!mir){mir=document.createElement("div"); mir.setAttribute("aria-hidden","true"); mir.style.cssText="position:absolute;left:-9999px;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all"; document.body.appendChild(mir)}
+      if(!mir){mir=document.createElement("div"); mir.setAttribute("aria-hidden","true"); mir.style.cssText="position:absolute;left:0;top:0;visibility:hidden;white-space:pre-wrap;overflow-wrap:break-word;word-break:keep-all"; var box=document.createElement("div"); box.setAttribute("aria-hidden","true"); box.style.cssText="position:absolute;left:-9999px;top:0;width:0;height:0;overflow:hidden;contain:strict;pointer-events:none"; box.appendChild(mir); document.body.appendChild(box)}
       var cs=getComputedStyle(ta);
       ["fontFamily","fontSize","fontWeight","lineHeight","letterSpacing","wordSpacing","paddingTop","paddingLeft","paddingRight","borderTopWidth","borderLeftWidth","borderRightWidth","boxSizing","wordBreak","textIndent"].forEach(function(k){mir.style[k]=cs[k]});
       mir.style.width=ta.offsetWidth+"px";
@@ -23323,6 +23356,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     function follow(ta){
       if(!ta||ta.tagName!=="TEXTAREA"||document.activeElement!==ta)return;
       if(ta.readOnly||document.body.classList.contains("lnpicking"))return;
+      if(ta.classList.contains("dlbig"))return;   // 화면을 채운 큰 칸(기도문 등)은 칸 안에서 브라우저가 커서를 따라감 — 글자마다 재면 타이핑이 아주 느렸음 (2026-11-20)
       if(ta.selectionEnd!==ta.selectionStart)return;   // 글자를 고르는 중엔 화면을 움직이지 않음 — 여러 줄을 고를 때 고른 끝으로 굴러가 엉뚱한 곳에 가던 문제 (2026-11-15 사용자 요청)
       var vv=window.visualViewport, vtop=vv?vv.offsetTop:0, vbot=vv?vtop+vv.height:innerHeight;
       var fullH=Math.max(innerHeight,(screen&&screen.height)||0); if(vv&&vv.height>fullH*0.8)vbot=vtop+Math.round(vv.height*0.55);   // 키보드가 보이는 높이를 안 줄이는 기기
