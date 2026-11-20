@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-icbtn">
+<meta name="app-build" content="2026-11-20-icpin">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -15339,7 +15339,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
     }
     if(!nm&&!memo)return false;   // 새 칸이 비어 있으면 그냥 닫음
     if(!nm)nm=memo.split("\n")[0].slice(0,40);   // 제목 없이 기도 제목만 적었으면 첫 줄을 제목으로
-    o.items.push({id:qid(),name:nm,memo:memo,nid:nid,at:Date.now(),u:Date.now(),log:[],ans:0,an:""}); icSave(o); toast("명단에 넣었어요"); return true;
+    o.items.push({id:qid(),name:nm,memo:memo,nid:nid,at:Date.now(),u:Date.now(),log:[],ans:0,an:"",pinDay:dkey(Date.now())}); icSave(o); toast("오늘 기도제목에 넣었어요"); return true;   // 새로 쓴 기도는 그날 '오늘 기도제목'에 바로 (2026-11-20 사용자 요청)
   }
   function icClick(e){
     var b=e.target.closest("button"); if(!b||!icv.contains(b)||b.classList.contains("icclose"))return;
