@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-ichead">
+<meta name="app-build" content="2026-11-20-icnofill">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14987,7 +14987,8 @@ body.tafocus #toTop{display:none!important}
     var done=live.filter(function(x){return x.log.indexOf(day)>=0});
     var rest=live.filter(function(x){return x.log.indexOf(day)<0}).sort(function(a,b){var la=icLastBefore(a,day), lb=icLastBefore(b,day); return la<lb?-1:la>lb?1:a.at-b.at});
     if(skip&&rest.length){var sk=((skip%rest.length)+rest.length)%rest.length; rest=rest.slice(sk).concat(rest.slice(0,sk))}
-    return pin.concat(done,rest.slice(0,Math.max(0,o.per-done.length)));   // 끌어 넣은 것은 하루 몇 개에 세지 않고 더해짐
+    var gone=o.items.filter(function(x){return !x.ans&&!x.no&&x.skipDay===day&&x.pinDay!==day&&x.log.indexOf(day)<0}).length;   // 오늘 칸에서 끌어 뺀 것도 자리를 차지 — 빈자리를 다른 기도로 채우지 않음 (2026-11-20 사용자 요청)
+    return pin.concat(done,rest.slice(0,Math.max(0,o.per-done.length-gone)));   // 끌어 넣은 것은 하루 몇 개에 세지 않고 더해짐
   }
   function icToggle(id,day){
     var o=icData(), x=o.items.find(function(y){return y.id===id}); if(!x)return false;
@@ -15190,8 +15191,8 @@ body.tafocus #toTop{display:none!important}
     var day=dkey(Date.now()), hdr=icv.querySelector(".icbody .ichead.ichall:not(.icanshd):not(.icnohd)"), cx=o.items.find(function(y){return y.id===c.dataset.id});
     if(cx&&!cx.ans&&!cx.no){
       var wasToday=icPick(o,day).some(function(y){return y.id===cx.id}), nowToday=!hdr||!!(c.compareDocumentPosition(hdr)&Node.DOCUMENT_POSITION_FOLLOWING);
-      if(nowToday&&!wasToday){cx.pinDay=day; delete cx.skipDay; icTouch(cx); ch=true}
-      else if(!nowToday&&wasToday){cx.skipDay=day; delete cx.pinDay; icTouch(cx); ch=true}
+      if(nowToday&&!wasToday){if(cx.skipDay===day&&cx.pinDay!==day)delete cx.skipDay; else{cx.pinDay=day; delete cx.skipDay} icTouch(cx); ch=true}   // 오늘 칸에서 뺐던 것을 되돌리면 원래 자리로
+      else if(!nowToday&&wasToday){cx.skipDay=day; icTouch(cx); ch=true}   // 뺀 자리는 비워 둠 — 다른 기도가 올라와 채우지 않음 (2026-11-20 사용자 요청)
     }
     ids.forEach(function(id,i){var x=o.items.find(function(y){return y.id===id}); if(x&&x.ord!==i*10){x.ord=i*10; icTouch(x); ch=true}});
     if(ch){icSave(o); buzz(8)}
@@ -15297,7 +15298,7 @@ body.tafocus #toTop{display:none!important}
     if(!icLive.length){var e=document.createElement("p"); e.className="icempty"; e.textContent="기도해 줄 사람을 명단에 넣어 보세요. 하루에 몇 명씩, 오래 기도하지 못한 사람부터 차례로 보여 드려요."; body.appendChild(e)}
     pick.slice().sort(icOrd).forEach(function(x){body.appendChild(icEdit===x.id?icForm(x):icPerson(x,today,true))});
     var pid0=pick.map(function(x){return x.id});
-    if(icLive.some(function(x){return pid0.indexOf(x.id)<0})){var t=document.createElement("div"); t.className="ichead ichall"; t.innerHTML='<b>나머지 명단</b>'; body.appendChild(t)}   // 오늘 칸에 다 나오면 비어 있는 제목은 감춤
+    if(icLive.some(function(x){return pid0.indexOf(x.id)<0})){var t=document.createElement("div"); t.className="ichead ichall"; t.innerHTML='<b>지난 기도</b>'; body.appendChild(t)}   // 오늘 칸에 다 나오면 비어 있는 제목은 감춤
     var pid=pick.map(function(x){return x.id});
     icLive.slice().sort(icOrd).forEach(function(x){
       if(pid.indexOf(x.id)>=0)return;
