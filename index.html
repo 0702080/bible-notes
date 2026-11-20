@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261120-nobtx">
+<meta name="app-build" content="ab-20261120-praytop">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6191,7 +6191,7 @@ body.tafocus #toTop{display:none!important}
       serms:Array.isArray(n.serms)?n.serms.filter(function(x){return x&&x.id}).slice(0,100).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,4000),at:+x.at||Date.now()}}):[],
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,8000)}}):[]}}):[],
-      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){var tt=String(x.t||"").slice(0,2000); if(tt.indexOf("하나님 아버지\n")===0)tt="전능하신 나의 아버지 하나님"+tt.slice(7);   /* 예전 기도문 첫 줄을 새 첫 줄로 (2026-10-30) */ return {id:String(x.id),t:tt,at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),sh:x.sh?1:0}}):[],
+      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){var tt=String(x.t||"").slice(0,2000); if(tt.indexOf("하나님 아버지\n")===0)tt="전능하신 나의 아버지 하나님"+tt.slice(7);   /* 예전 기도문 첫 줄을 새 첫 줄로 (2026-10-30) */ if(tt.trim()&&tt.replace(/\s+/g,"").indexOf("빛이신예수여내안에오시옵소서")!==0)tt="빛이신 예수여\n내 안에 오시옵소서\n내 안에 있는 모든 어둠을 몰아내소서\n\n"+tt.replace(/^\s+/,"");   /* 기도문 맨 위 고정 문구 (2026-11-20 사용자 요청) */ return {id:String(x.id),t:tt,at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),sh:x.sh?1:0}}):[],
       loci:Array.isArray(n.loci)?n.loci.slice(0,12).map(function(x){return String(x||"").slice(0,20)}):[],   // 🏠 장소로 외우기의 장소 이름
       fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
@@ -7668,7 +7668,7 @@ body.tafocus #toTop{display:none!important}
     var list=n.prays.slice().sort(function(a,b){return b.at-a.at});   // 최근 것 위. 응답돼도 자리가 바뀌지 않게 (2026-11-06 사용자 요청: 감사 기도 쓰고 앞면으로 오면 자리가 바뀌어 헷갈림)
     if(!list.length&&!box.querySelector(".pempty")){box.innerHTML='<p class="pempty">이 말씀을 붙들고 드리는 기도를 적어 보세요. 응답되면 🙌 응답을 눌러 기록해요.</p>';return}
     var em=box.querySelector(".pempty"); if(em&&list.length)em.remove();
-    var pfx=false; n.prays.forEach(function(x){if(String(x.t||"").indexOf("하나님 아버지\n")===0){x.t="전능하신 나의 아버지 하나님"+x.t.slice(7);pfx=true}});   // 예전 기도문 첫 줄 → 새 첫 줄 (다른 기기·클라우드에서 온 것도, 2026-10-30)
+    var pfx=false; n.prays.forEach(function(x){if(String(x.t||"").indexOf("하나님 아버지\n")===0){x.t="전능하신 나의 아버지 하나님"+x.t.slice(7);pfx=true} var t2=prayTop(x.t); if(t2!==x.t){x.t=t2;pfx=true}});   // 예전 기도문 첫 줄 → 새 첫 줄 (다른 기기·클라우드에서 온 것도, 2026-10-30)
     if(pfx)setTimeout(function(){scheduleSave(n.id)},0);
     list.forEach(function(x,i){
       var d=have.get(x.id); have.delete(x.id);
@@ -7687,7 +7687,7 @@ body.tafocus #toTop{display:none!important}
       // 🙏 감사 기도 쪽 (응답된 기도를 옆으로 밀면, 2026-11-06 사용자 요청)
       var thOn=prThx.has(x.id); d.classList.toggle("thxside",thOn);
       var f1=prFold1.has(x.id)&&!prEdit.has(x.id); d.classList.toggle("pf1d",f1);   // 기도문 하나씩 접기 (2026-11-07 사용자 요청)
-      if(f1){var fl=(thOn&&(x.th||"").trim()?x.th:x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean), fz=fl.filter(function(s){return !/^전능하신 나의 아버지 하나님/.test(s)});
+      if(f1){var fl=(thOn&&(x.th||"").trim()?x.th:x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean), fz=fl.filter(function(s){return !/^전능하신 나의 아버지 하나님|^빛이신 예수여$|^내 안에 오시옵소서$|^내 안에 있는 모든 어둠을 몰아내소서$/.test(s)});
         d.querySelector(".pflt").textContent=(thOn?"🙏 응답 감사 기도 · ":(x.ans?"🙌 ":""))+((fz[0]||fl[0])||"(빈 기도)")} d.querySelector(".pthx").hidden=!thOn;
       setVal(d.querySelector(".pth"),x.th||""); d.querySelector(".pthxd").textContent=x.ans?"응답 "+dlabel(dkey(x.ans)):"";
       d.classList.toggle("hasthx",!!(x.th||"").trim());
@@ -15570,12 +15570,14 @@ body.tafocus #toTop{display:none!important}
     t=String(t||""); if(t.indexOf("S 말씀")<0)return false;
     return !t.split("\n").map(function(l){return l.replace(/^\s*(📖\s*)?S\s*말씀|^\s*(🔍\s*)?O\s*관찰|^\s*(🌱\s*)?A\s*적용|^\s*(🙏\s*)?P\s*기도/,"").replace(/^\s*[—:\-–]\s*/,"").trim()}).join("");
   }
-  var PRAY_HEAD="전능하신 나의 아버지 하나님\n\n";   /* 기도문 첫 줄 (2026-10-30 사용자 요청, 전에는 "하나님 아버지") */
+  var PRAY_TOP="빛이신 예수여\n내 안에 오시옵소서\n내 안에 있는 모든 어둠을 몰아내소서";   // 기도문 맨 위에 늘 있는 문구 (2026-11-20 사용자 요청)
+  function prayTop(v){v=String(v||""); if(!v.trim())return v; if(v.replace(/\s+/g,"").indexOf(PRAY_TOP.replace(/\s+/g,""))===0)return v; return PRAY_TOP+"\n\n"+v.replace(/^\s+/,"")}
+  var PRAY_HEAD=PRAY_TOP+"\n\n전능하신 나의 아버지 하나님\n\n";   /* 기도문 첫 줄 (2026-10-30 사용자 요청, 전에는 "하나님 아버지") */
   var PRAY_TAIL="길이요 진리요\n내 인생의 빛이 되시며\n생명 되신 나의 주\n예수님 이름으로 기도합니다\n아멘";   // 기도문 끝맺음 — 기도문 칸 끝에 꼭 들어감 (2026-11-14 사용자 요청)
   var PRAY_TPL=PRAY_HEAD+"\n\n"+PRAY_TAIL;
   var PRAY_OLDTAIL=["길이요 진리요 생명 되신 나의 주","예수님 이름으로 기도 합니다","예수님 이름으로 기도합니다","아멘"];
   function prayEnd(v){   // 적은 기도문 끝에 끝맺음이 없으면 붙임 (예전 끝맺음은 새 것으로 바꿈)
-    v=String(v||""); var nz=function(x){return x.replace(/\s+/g,"")};
+    v=prayTop(v); var nz=function(x){return x.replace(/\s+/g,"")};
     if(!v.trim()||nz(v)===nz(PRAY_HEAD))return v;
     if(nz(v).slice(-nz(PRAY_TAIL).length)===nz(PRAY_TAIL))return v;
     var L=v.replace(/\s+$/,"").split("\n"), tl=PRAY_TAIL.split("\n").map(nz), ol=PRAY_OLDTAIL.map(nz);
