@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-rgobleft">
+<meta name="app-build" content="2026-11-20-ichead">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14952,12 +14952,15 @@ body.tafocus #toTop{display:none!important}
      사람마다 기도 제목·붙든 말씀을 두고, 하루에 몇 명씩 돌아가며 기도한다 (오래 못 한 사람부터).
      저장 bible-intercede {items:[{id,name,memo,nid,at,u,log:[날짜],ans,an}],per,del:{id:시각}}, 클라우드 줄 "__icp" (나만 보기) */
   var IC_KEY="bible-intercede";
+  var IC_HEAD="빛이신 예수여\n내 안에 오시옵소서\n내 안에 있는 모든 어둠을 몰아내소서";
+  function icHeadOff(m){m=String(m||""); var t=m.replace(/\r/g,""); return t.indexOf(IC_HEAD)===0?t.slice(IC_HEAD.length).trim():t.trim()}
+  function icHead(m){var r=icHeadOff(m); return IC_HEAD+"\n\n"+r}
   function icData(){
     var o=null; try{o=JSON.parse(localStorage.getItem(IC_KEY)||"null")}catch(e){}
     if(!o||!Array.isArray(o.items))o={items:[],per:3,del:{}};
     if(!o.del||typeof o.del!=="object")o.del={};
     o.per=Math.max(1,Math.min(10,+o.per||3));
-    o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,100),memo:String(x.memo||"").slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
+    o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,100),memo:(function(m){m=String(m||"");return m.trim()?icHead(m).trim():""})(x.memo).slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
       log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,no:+x.no||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord,pinDay:/^\d{4}-\d{2}-\d{2}$/.test(x.pinDay||"")?x.pinDay:undefined,skipDay:/^\d{4}-\d{2}-\d{2}$/.test(x.skipDay||"")?x.skipDay:undefined}});
     return o;
   }
@@ -15252,7 +15255,8 @@ body.tafocus #toTop{display:none!important}
       '<select class="field icfv" aria-label="붙들 말씀">'+icNoteOpts(x?x.nid:"")+'</select>'+
       (x&&x.ans?'<textarea class="field icfa" rows="2" maxlength="1000" placeholder="어떻게 응답하셨는지" aria-label="응답"></textarea>':'')+
       '<div class="icfbtn">'+(x?'<button type="button" class="icdel">지우기</button>':'<span></span>')+'<span><button type="button" class="iccancel">취소</button><button type="button" class="icok">'+(x?"저장":"＋ 명단에 넣기")+'</button></span></div>';
-    if(x){f.querySelector(".icfn").value=x.name; f.querySelector(".icfm").value=x.memo; f.querySelector(".icfm").rows=1; var fa=f.querySelector(".icfa"); if(fa)fa.value=x.an}
+    if(x){f.querySelector(".icfn").value=x.name; f.querySelector(".icfm").value=icHead(x.memo); f.querySelector(".icfm").rows=1; var fa=f.querySelector(".icfa"); if(fa)fa.value=x.an}
+    else f.querySelector(".icfm").value=IC_HEAD+"\n\n";   // 🙏 기도문 맨 위 고정 문구 (2026-11-20 사용자 요청)
     var fv=f.querySelector(".icfv"); fv.hidden=true; fv.parentNode.insertBefore(noteFinder(fv,{inline:true,max:8,ph:"📖 붙들 말씀 찾기 (책·장절·낱말)"}),fv.nextSibling);   // 긴 목록 대신 찾아서 고르기 (2026-11-07 사용자 요청)
     return f;
   }
@@ -15333,15 +15337,17 @@ body.tafocus #toTop{display:none!important}
   function icCommit(f){
     if(!f||!f.isConnected)return false;
     var o=icData(), id=f.dataset.id, x=id?o.items.find(function(y){return y.id===id}):null;
-    var nm=f.querySelector(".icfn").value.trim(), memo=f.querySelector(".icfm").value.trim(), nid=f.querySelector(".icfv").value, fa=f.querySelector(".icfa");
+    var nm=f.querySelector(".icfn").value.trim(), memo=icHeadOff(f.querySelector(".icfm").value), nid=f.querySelector(".icfv").value, fa=f.querySelector(".icfa");
     if(x){
       if(!nm)nm=x.name;   // 제목을 비우고 나가면 원래 제목 그대로
+      memo=memo?IC_HEAD+"\n\n"+memo:"";
       var an=fa?fa.value.trim():x.an;
       if(x.name===nm&&x.memo===memo&&(x.nid||"")===nid&&x.an===an)return false;
       x.name=nm; x.memo=memo; x.nid=nid; x.an=an; icTouch(x); icSave(o); toast("저장했어요"); return true;
     }
     if(!nm&&!memo)return false;   // 새 칸이 비어 있으면 그냥 닫음
-    if(!nm)nm=memo.split("\n")[0].slice(0,40);   // 제목 없이 기도 제목만 적었으면 첫 줄을 제목으로
+    if(!nm)nm=memo.split("\n")[0].slice(0,40);
+    memo=memo?IC_HEAD+"\n\n"+memo:"";   // 제목 없이 기도 제목만 적었으면 첫 줄을 제목으로
     o.items.push({id:qid(),name:nm,memo:memo,nid:nid,at:Date.now(),u:Date.now(),log:[],ans:0,an:"",pinDay:dkey(Date.now())}); icSave(o); toast("오늘 기도제목에 넣었어요"); return true;   // 새로 쓴 기도는 그날 '오늘 기도제목'에 바로 (2026-11-20 사용자 요청)
   }
   function icClick(e){
