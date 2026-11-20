@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-srmback">
+<meta name="app-build" content="2026-11-20-rgobleft">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5344,6 +5344,9 @@ body:not(.boardon) .fwrap::before{content:"";position:absolute;left:-16px;right:
 @keyframes pgslR{from{transform:translateX(-60px);opacity:.15}to{transform:none;opacity:1}}
 .srmsheet .dlbar .srmrgob:not([hidden])+.srmhcopy{margin-left:0}
 .srmsheet .dlbar .srmrgob{margin-left:auto}
+/* 읽기 화면에서는 🙏를 📷 바로 옆(왼쪽 묶음)으로 (2026-11-20 사용자 요청) */
+.srmsheet .dlbar .srmfbtn:not([hidden])~.srmrgob{margin-left:0}
+.srmsheet .dlbar .srmfbtn:not([hidden])~.srmrgob:not([hidden])+.srmhcopy{margin-left:auto}
 .srmrv .srmrlines.pgslL{animation:pgslL .32s cubic-bezier(.2,.8,.3,1)}
 .srmrv .srmrlines.pgslR{animation:pgslR .32s cubic-bezier(.2,.8,.3,1)}
 /* 🌙 하루 돌아보기: 달력을 다 접으면 손잡이 줄도 없앰 · 고치기 단추들 입체 (2026-11-11 사용자 요청) */
