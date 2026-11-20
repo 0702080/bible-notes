@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-icpin">
+<meta name="app-build" content="2026-11-20-nohas">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3497,7 +3497,7 @@ mark.srmhit{background:rgba(255,205,80,.5);color:inherit;border-radius:4px;paddi
 .sayform .saycpy.done{background:var(--gold)!important;color:#1E1608}
 .sayrow2 .field{flex:1 1 150px;min-width:0;height:40px;font-size:14px}
 .saysave{flex:0 0 auto;height:40px;padding:0 18px;border:0;border-radius:20px;background:var(--gold);color:#141416;font-size:14px;font-weight:700}
-.sayrow2:has(.saydelx){flex-wrap:nowrap}.sayrow2:has(.saydelx)>:first-child{flex:1 1 0;min-width:0}
+.sayrow2.hasdel{flex-wrap:nowrap}.sayrow2.hasdel>:first-child{flex:1 1 0;min-width:0}
 .saydelx{padding:0 12px!important;color:var(--pink)!important;border-color:color-mix(in srgb,var(--pink) 45%,#34333A)!important}
 .saydelx.sure{background:color-mix(in srgb,var(--pink) 18%,transparent)!important}
 .saycancel{flex:0 0 auto;height:40px;padding:0 14px;border:1px solid #34333A;border-radius:20px;background:transparent;color:var(--muted);font-size:13px}
@@ -5059,8 +5059,8 @@ body.reorder .ref .lclisten{display:none}
 @media (hover:hover){.board4>.bcol.bfold:hover{background:#2F2C39!important}}
 /* 믿음의 한 마디·짧은 말씀·기도 읽기·기도제목·기도 응답 연표·하루 돌아보기 창: 뒤 화면은 감추고 앱 배경 이미지가 비치게 (2026-11-05 사용자 요청) */
 .rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet){background:rgba(10,10,13,.42)}
-body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull):not([hidden])) main.wrap,
-body:has(:is(.rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull):not([hidden])) #fab{visibility:hidden}
+body.glassopen main.wrap,
+body.glassopen #fab{visibility:hidden}
 .saysheet>.dlbar,.prd>.dlbar,.daily:not(.wksheet)>.dlbar{background:rgba(11,11,13,.62)}
 .prd>.dlbar{background:rgba(11,11,13,.22)!important;border-bottom:0!important;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}   /* 기도 읽기 윗줄: 아래 비치는 배경과 어울리게 옅은 유리 (2026-11-08 사용자 요청) */
 .saycard.saytint{background:color-mix(in srgb,color-mix(in srgb,var(--sc) 16%,#18171B) 84%,transparent)}
@@ -5937,7 +5937,7 @@ body.boardon #toTop{display:none}
 /* 기도문을 읽는 글로 돌아오면 손잡이 띠는 안 보이게 (2026-11-19 사용자 요청: 읽기 칸 아래 띠만 남음) */
 .prays>.pri:not(.editing)>textarea.pt+.tagripbar,textarea[hidden]+.tagripbar{display:none!important}
 /* ⬆ 맨 위로 단추는 글을 적는 동안(글 칸에 커서) 숨김 — 기도문 칸 아래를 가림 (2026-11-19 사용자 요청) */
-body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!important}
+body.tafocus #toTop{display:none!important}
 .hymsearch{padding-right:54px!important}
 </style>
 </head>
@@ -17899,7 +17899,7 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
       } else row2.appendChild(noteFinder(sel));
       var sv=document.createElement("button"); sv.type="button"; sv.className="saysave"; sv.dataset.act="save"; sv.textContent="저장";
       var cn=document.createElement("button"); cn.type="button"; cn.className="saycancel"; cn.dataset.act="cancel"; cn.textContent="취소";
-      if(sayEdit!=="new"){var dx=document.createElement("button"); dx.type="button"; dx.className="saycancel saydelx"; dx.dataset.act="del"; dx.dataset.id=sayEdit; dx.textContent="🗑"; dx.title="이 한 마디 지우기"; dx.setAttribute("aria-label","지우기"); row2.appendChild(dx)}
+      if(sayEdit!=="new"){var dx=document.createElement("button"); dx.type="button"; dx.className="saycancel saydelx"; dx.dataset.act="del"; dx.dataset.id=sayEdit; dx.textContent="🗑"; dx.title="이 한 마디 지우기"; dx.setAttribute("aria-label","지우기"); row2.appendChild(dx); row2.classList.add("hasdel")}
       row2.appendChild(cn); row2.appendChild(sv); form.appendChild(row2);
     }
     if(keep&&keep.focus){var nt=form.querySelector(".sayt"); if(nt){try{nt.focus({preventScroll:true}); nt.setSelectionRange(keep.ss,keep.se)}catch(e){}}}
@@ -19553,6 +19553,8 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
   $("openGraphBtn").addEventListener("click",function(){openGraph(null)});
   /* ---------- 🖼️ 앱 배경 바꾸기 (PC ⋯ 메뉴, 2026-11-01 사용자 요청): 기본 사진·색 배경·내 사진, 어둡기 조절. 이 기기에만 저장 */
   /* 비치는 창이 맨 위일 때 그 밑의 전체 화면 창은 감춤: 안 그러면 기도제목 뒤로 하루 돌아보기 카드가 보임 (2026-11-05 사용자 요청) */
+  document.addEventListener("focusin",function(e){var t=e.target; if(t&&(t.tagName==="TEXTAREA"||t.tagName==="INPUT"))document.body.classList.add("tafocus")});
+  document.addEventListener("focusout",function(){setTimeout(function(){var a=document.activeElement; document.body.classList.toggle("tafocus",!!a&&(a.tagName==="TEXTAREA"||a.tagName==="INPUT"))},0)});
   (function glassStack(){
     var ALL=".rvq,.cch,.daily,#topicSheet.tsfull", GLASS=".rvq.prd,.cch.icv,.cch.ansv,.daily:not(.wksheet),#topicSheet.tsfull";
     function sync(){
@@ -19561,10 +19563,14 @@ body:has(textarea:focus) #toTop,body:has(input:focus) #toTop{display:none!import
       var glass=top&&top.matches(GLASS);
       els.forEach(function(x){x.classList.toggle("gsunder",!!glass&&x!==top)});
       Array.prototype.forEach.call(document.querySelectorAll(".gsunder"),function(x){if(x.hidden)x.classList.remove("gsunder")});
+      document.body.classList.toggle("glassopen",els.some(function(x){return x.matches(GLASS)}));   // 예전 body:has(…) 대신 (2026-11-20 앱 느림)
     }
+    var pend=0; function later(){if(!pend)pend=requestAnimationFrame(function(){pend=0; sync()})}
     new MutationObserver(function(ms){
-      if(ms.some(function(m){return m.target.matches&&m.target.matches(ALL)}))sync();
-    }).observe(document.body,{subtree:true,attributes:true,attributeFilter:["hidden"]});
+      if(ms.some(function(m){return m.type==="childList"||(m.target.matches&&m.target.matches(ALL))}))later();
+    }).observe(document.body,{subtree:true,attributes:true,attributeFilter:["hidden","class"]});
+    new MutationObserver(later).observe(document.body,{childList:true});   // 창이 새로 붙을 때
+    later();
   })();
   var ABG_KEY="bible-appbg", ABG_PHOTO="bible-appbg-photo";
   var ABG_LIST=[
