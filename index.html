@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-20-say40s">
+<meta name="app-build" content="ab-20261120-srmr3d">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -3362,6 +3362,11 @@ textarea.srmresp:focus{outline:none;border-color:var(--pink)}
 .srmrrow{display:flex;align-items:center;gap:8px}
 .srmrrow .srmrsaved{flex:1;text-align:center;color:var(--faint);font-size:12.5px}
 .srmrback,.srmrcopy{height:38px;padding:0 14px;border-radius:19px;border:1px solid #3A3942;background:#24232B;color:var(--ink);font:inherit;font-size:14px}
+/* 뒷면(이 설교를 듣고) 아래 ← 설교 메모·📋 복사도 입체 알약 — 빛·그늘 + 아래 4px 두께, 누르면 눌림 (2026-11-20 사용자 요청) */
+.srmsheet .srmrrow .srmrback,.srmsheet .srmrrow .srmrcopy{position:relative;top:0;height:40px;padding:0 16px;border-radius:20px;border:1px solid #4A4856;
+  background:radial-gradient(120% 70% at 50% 0%,rgba(255,255,255,.16),rgba(255,255,255,0) 60%),linear-gradient(180deg,#3A3946,#26252F 60%,#1E1D25)!important;
+  box-shadow:0 4px 0 #121118,0 6px 12px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.18),inset 0 -2px 3px rgba(0,0,0,.35);transition:top .08s,box-shadow .08s}
+.srmsheet .srmrrow .srmrback:active,.srmsheet .srmrrow .srmrcopy:active{top:3px;box-shadow:0 1px 0 #121118,0 2px 5px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.12),inset 0 -1px 2px rgba(0,0,0,.3)}
 .srmrhint{margin:0;text-align:center;color:var(--faint);font-size:12px}
 .srmrgo{display:block;width:100%;margin:6px 0 24px;height:44px;border-radius:22px;border:1px solid color-mix(in srgb,var(--pink) 45%,#2A2930);background:color-mix(in srgb,var(--pink) 16%,#1A1A20);color:var(--pink);font:inherit;font-size:14.5px;font-weight:700}
 .srmcard .srmrspc{color:color-mix(in srgb,var(--pink) 75%,#fff)}
