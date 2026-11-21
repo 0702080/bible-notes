@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261121-vdbl2">
+<meta name="app-build" content="ab-20261121-mkfix">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -21063,11 +21063,28 @@ body.tafocus #toTop{display:none!important}
       v.appendChild(sp); wi++;
     });
   }
-  function marksOf(n){return (n.marks&&n.marks.src===n.text)?n.marks.idx:[]}
+  // 🎨 말씀 글자를 고치면 진하게(색) 칠한 자리를 새 글로 옮겨 줌 — 예전엔 글이 한 글자라도 바뀌면(고치기에서 번호 칸 공백 등) 칠한 게 모두 풀렸음 (2026-11-21 사용자 요청)
+  function marksSync(n){
+    var mk=n&&n.marks; if(!mk||typeof mk.src!=="string"||mk.src===n.text||typeof n.text!=="string")return;
+    var O=mk.src, N=n.text, om=new Array(O.length).fill(false), ws=wordSpans(O);
+    (mk.idx||[]).forEach(function(i){var w=ws[i];if(w)for(var k=w[0];k<w[1];k++)om[k]=true});
+    (mk.rng||[]).forEach(function(r){for(var k=Math.max(0,r[0]);k<Math.min(O.length,r[1]);k++)om[k]=true});
+    var nm=new Array(N.length).fill(false), p=0; while(p<O.length&&p<N.length&&O[p]===N[p]){nm[p]=om[p];p++}
+    var q=0; while(q<O.length-p&&q<N.length-p&&O[O.length-1-q]===N[N.length-1-q]){nm[N.length-1-q]=om[O.length-1-q];q++}
+    var A=O.slice(p,O.length-q), B=N.slice(p,N.length-q);
+    if(A.length&&B.length&&A.length*B.length<=4e6){   // 가운데 바뀐 부분은 같은 글자끼리 짝지어(LCS) 옮김
+      var W=B.length+1, L=new Uint16Array((A.length+1)*W), i, j;
+      for(i=A.length-1;i>=0;i--)for(j=B.length-1;j>=0;j--)L[i*W+j]=A[i]===B[j]?L[(i+1)*W+j+1]+1:Math.max(L[(i+1)*W+j],L[i*W+j+1]);
+      i=0;j=0; while(i<A.length&&j<B.length){if(A[i]===B[j]){nm[p+j]=om[p+i];i++;j++}else if(L[(i+1)*W+j]>=L[i*W+j+1])i++;else j++}
+    }
+    var rng=[],st=-1; for(var k=0;k<=N.length;k++){if(k<N.length&&nm[k]&&!/\s/.test(N[k])){if(st<0)st=k}else if(st>=0){rng.push([st,k]);st=-1}}
+    n.marks={src:N,idx:[],rng:rng}; try{scheduleSave(n.id)}catch(e){}
+  }
+  function marksOf(n){marksSync(n); return (n.marks&&n.marks.src===n.text)?n.marks.idx:[]}
   /* 진하게 볼 말: 낱말 단위(idx) + 글자 범위(rng, 드래그로 고른 부분)를 글자마다 참/거짓으로 */
   function wordSpans(text){var out=[],at=0;tokens(text).forEach(function(tok){if(!/^\s+$/.test(tok))out.push([at,at+tok.length]);at+=tok.length});return out}
   function markMask(n){
-    var m=new Array(n.text.length).fill(false); if(!n.marks||n.marks.src!==n.text)return m;
+    marksSync(n); var m=new Array(n.text.length).fill(false); if(!n.marks||n.marks.src!==n.text)return m;
     var ws=wordSpans(n.text);
     (n.marks.idx||[]).forEach(function(i){var w=ws[i];if(w)for(var k=w[0];k<w[1];k++)m[k]=true});
     (n.marks.rng||[]).forEach(function(r){for(var k=Math.max(0,r[0]);k<Math.min(m.length,r[1]);k++)m[k]=true});
