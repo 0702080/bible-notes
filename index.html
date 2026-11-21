@@ -5789,7 +5789,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .hymimg{position:relative;min-height:60px;border-radius:12px;overflow:hidden;background:#fff;color:#777;font-size:13px;display:grid;place-items:center}
 .hymimg img{display:block;width:100%;height:auto}
 .hymimgs:not(.hymedimgs) .hymimg{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
-.hymimgs:not(.hymedimgs) .hymimg img{-webkit-user-drag:none;pointer-events:auto}
+.hymimgs:not(.hymedimgs) .hymimg img{-webkit-user-drag:none;pointer-events:none}   /* 사진 자체는 손가락을 안 받게 — 브라우저 "이미지 복사/다운로드" 메뉴가 안 뜸 */
 .hymlpov{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;padding:16px}
 .hymlpbox{width:100%;max-width:480px;display:flex;flex-direction:column;gap:10px;padding-bottom:env(safe-area-inset-bottom)}
 .hymlpb{border:0;border-radius:16px;padding:16px;font-size:18px;font-weight:600;background:#2a2836;color:#f3ece0}
@@ -23565,10 +23565,10 @@ body.tafocus #toTop{display:none!important}
     var st=null, tm=0;
     function end(){clearTimeout(tm); st=null}
     g.addEventListener("pointerdown",function(e){var d=e.target.closest(".hymimg"); if(!d||!d.dataset.iid)return; st={x:e.clientX,y:e.clientY,d:d};
-      tm=setTimeout(function(){if(!st)return; var dd=st.d; st=null; hymLPAt=Date.now(); buzz(15); hymImgMenu(hid,dd.dataset.iid)},550)});
+      tm=setTimeout(function(){if(!st||Date.now()-hymLPAt<800)return; var dd=st.d; st=null; hymLPAt=Date.now(); buzz(15); hymImgMenu(hid,dd.dataset.iid)},550)});
     g.addEventListener("pointermove",function(e){if(st&&(Math.abs(e.clientX-st.x)>10||Math.abs(e.clientY-st.y)>10))end()});
     ["pointerup","pointercancel","pointerleave"].forEach(function(t){g.addEventListener(t,end)});
-    g.addEventListener("contextmenu",function(e){e.preventDefault()});
+    g.addEventListener("contextmenu",function(e){e.preventDefault(); var d=e.target.closest(".hymimg"); if(d&&d.dataset.iid&&Date.now()-hymLPAt>800){end(); hymLPAt=Date.now(); buzz(15); hymImgMenu(hid,d.dataset.iid)}});
   }
   function hymImgMenu(hid,iid){
     var ov=document.createElement("div"); ov.className="hymlpov";
@@ -23592,7 +23592,7 @@ body.tafocus #toTop{display:none!important}
   function hymClick(e){
     var c=e.target.closest(".hymcard"); if(c){hymView=c.dataset.open; hymDraw(); var bd=hym.querySelector(".dlbody"); if(bd)bd.scrollTop=0; return}
     var b=e.target.closest("[data-act]"); if(b&&hym.contains(b)){if(b.dataset.act==="list"){hymView="";hymDraw()} else if(b.dataset.act==="edit"){hymEdit=hymView;hymDraw()} return}
-    var im=e.target.closest(".hymimgs:not(.hymedimgs) img"); if(im&&Date.now()-hymLPAt<700)return; if(im){   // 악보를 누르면 크게 — 두 손가락으로 키워 볼 수 있음
+    var hi=e.target.closest(".hymimgs:not(.hymedimgs) .hymimg"), im=hi&&hi.querySelector("img"); if(im&&Date.now()-hymLPAt<700)return; if(im){   // 악보를 누르면 크게 — 두 손가락으로 키워 볼 수 있음
       var ov=document.createElement("div"); ov.className="hymzoom"; var i2=document.createElement("img"); i2.src=im.src; i2.alt="악보"; ov.appendChild(i2);
       var xb=document.createElement("button"); xb.type="button"; xb.className="hymzx"; xb.textContent="✕"; xb.setAttribute("aria-label","닫기"); ov.appendChild(xb);
       xb.addEventListener("click",function(){ov.remove()}); document.body.appendChild(ov);
