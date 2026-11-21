@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261121-hymlp2">
+<meta name="app-build" content="ab-20261121-hymlp3">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5790,10 +5790,10 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .hymimg img{display:block;width:100%;height:auto}
 .hymimgs:not(.hymedimgs) .hymimg{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .hymimgs:not(.hymedimgs) .hymimg img{-webkit-user-drag:none;pointer-events:none}   /* 사진 자체는 손가락을 안 받게 — 브라우저 "이미지 복사/다운로드" 메뉴가 안 뜸 */
-.hymlpov{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;padding:0 16px calc(28px + env(safe-area-inset-bottom))}
-.hymlpbox{width:100%;max-width:280px;display:flex;flex-direction:column;gap:9px;padding:12px;border-radius:20px;background:linear-gradient(180deg,#34313F,#24222C);border:1px solid rgba(255,255,255,.08);box-shadow:0 14px 36px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);animation:hymlpIn .18s ease-out}
+.hymlpov{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.4)}
+.hymlpbox{position:absolute;width:196px;display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:20px;background:linear-gradient(180deg,#34313F,#24222C);border:1px solid rgba(255,255,255,.08);box-shadow:0 14px 36px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);animation:hymlpIn .18s ease-out}
 @keyframes hymlpIn{from{transform:translateY(14px) scale(.96);opacity:0}to{transform:none;opacity:1}}
-.hymlpb{position:relative;border:0;border-radius:999px;padding:10px 14px;font-size:14.5px;font-weight:600;letter-spacing:-.2px;color:#F3ECE0;background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),linear-gradient(180deg,#4A4658,#353241);box-shadow:0 4px 0 #1C1A22,0 6px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .08s,box-shadow .08s}
+.hymlpb{position:relative;border:0;border-radius:999px;padding:9px 10px;font-size:14px;white-space:nowrap;font-weight:600;letter-spacing:-.2px;color:#F3ECE0;background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),linear-gradient(180deg,#4A4658,#353241);box-shadow:0 4px 0 #1C1A22,0 6px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .08s,box-shadow .08s}
 .hymlpb:active{transform:translateY(3px);box-shadow:0 1px 0 #1C1A22,0 2px 5px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.12)}
 .hymlpadd{color:#2A2110;background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.45),rgba(255,255,255,0) 55%),linear-gradient(180deg,#F2D48A,#D9AE52);box-shadow:0 4px 0 #8C6B28,0 6px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.5)}
 .hymlpadd:active{box-shadow:0 1px 0 #8C6B28,0 2px 5px rgba(0,0,0,.3)}
@@ -23571,15 +23571,17 @@ body.tafocus #toTop{display:none!important}
     var st=null, tm=0;
     function end(){clearTimeout(tm); st=null}
     g.addEventListener("pointerdown",function(e){var d=e.target.closest(".hymimg"); if(!d||!d.dataset.iid)return; st={x:e.clientX,y:e.clientY,d:d};
-      tm=setTimeout(function(){if(!st||Date.now()-hymLPAt<800)return; var dd=st.d; st=null; hymLPAt=Date.now(); buzz(15); hymImgMenu(hid,dd.dataset.iid)},550)});
+      tm=setTimeout(function(){if(!st||Date.now()-hymLPAt<800)return; var dd=st.d; st=null; hymLPAt=Date.now(); buzz(15); hymImgMenu(hid,dd.dataset.iid,dd)},550)});
     g.addEventListener("pointermove",function(e){if(st&&(Math.abs(e.clientX-st.x)>10||Math.abs(e.clientY-st.y)>10))end()});
     ["pointerup","pointercancel","pointerleave"].forEach(function(t){g.addEventListener(t,end)});
-    g.addEventListener("contextmenu",function(e){e.preventDefault(); var d=e.target.closest(".hymimg"); if(d&&d.dataset.iid&&Date.now()-hymLPAt>800){end(); hymLPAt=Date.now(); buzz(15); hymImgMenu(hid,d.dataset.iid)}});
+    g.addEventListener("contextmenu",function(e){e.preventDefault(); var d=e.target.closest(".hymimg"); if(d&&d.dataset.iid&&Date.now()-hymLPAt>800){end(); hymLPAt=Date.now(); buzz(15); hymImgMenu(hid,d.dataset.iid,d)}});
   }
-  function hymImgMenu(hid,iid){try{getSelection().removeAllRanges()}catch(e){} 
+  function hymImgMenu(hid,iid,el){try{getSelection().removeAllRanges()}catch(e){} 
     var ov=document.createElement("div"); ov.className="hymlpov";
     ov.innerHTML='<div class="hymlpbox" role="dialog" aria-label="악보 사진"><button type="button" class="hymlpb hymlpadd">🎼 악보 사진 더 넣기<input type="file" accept="image/*" multiple hidden></button><button type="button" class="hymlpb hymlpdel">🗑 이 사진 지우기</button><button type="button" class="hymlpb hymlpno">취소</button></div>';
     document.body.appendChild(ov);
+    (function(){var bx=ov.querySelector('.hymlpbox'), vw=innerWidth, vh=innerHeight, cx=vw/2, cy=vh/2; if(el){var rc=el.getBoundingClientRect(), t=Math.max(rc.top,0), b=Math.min(rc.bottom,vh); cx=(Math.max(rc.left,0)+Math.min(rc.right,vw))/2; if(b>t)cy=(t+b)/2}
+      var w=bx.offsetWidth, h=bx.offsetHeight; bx.style.left=Math.max(8,Math.min(vw-w-8,cx-w/2))+'px'; bx.style.top=Math.max(8,Math.min(vh-h-8,cy-h/2))+'px'})();   // 누른 악보의 보이는 부분 정가운데
     function close(){ov.remove()}
     ov.addEventListener("click",function(e){if(e.target===ov)close()});
     ov.querySelector(".hymlpno").onclick=close;
@@ -23591,7 +23593,7 @@ body.tafocus #toTop{display:none!important}
         var ar=(it.imgs||[]).slice(), k=ar.indexOf(iid); ar.splice(k<0?ar.length:k+1,0,...added); it.imgs=ar; it.at=Math.max(Date.now(),(+it.at||0)+1); hymSave(o); hymDraw(); toast("악보를 넣었어요 🎼")
       }).catch(function(){toast("사진을 넣지 못했어요")})});
     var del=ov.querySelector(".hymlpdel");
-    del.onclick=function(){if(!del.dataset.sure){del.dataset.sure="1"; del.textContent="🗑 한 번 더 누르면 지워요"; return}
+    del.onclick=function(){if(!del.dataset.sure){del.dataset.sure="1"; del.textContent="한 번 더 누르면 지워요"; return}
       var o=hymData(), it=o.items.filter(function(i){return i.id===hid})[0]; close(); if(!it)return;
       it.imgs=(it.imgs||[]).filter(function(v){return v!==iid}); it.at=Math.max(Date.now(),(+it.at||0)+1); hymSave(o); hymImgDel(iid); hymDraw(); toast("사진을 지웠어요")};
   }
