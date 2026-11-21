@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261121-hymttl">
+<meta name="app-build" content="ab-20261121-bjtail">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -15592,9 +15592,19 @@ body.tafocus #toTop{display:none!important}
   var PRAY_TAIL="길이요 진리요\n내 인생의 빛이 되시며\n생명 되신 나의 주\n예수님 이름으로 기도합니다\n아멘";   // 기도문 끝맺음 — 기도문 칸 끝에 꼭 들어감 (2026-11-14 사용자 요청)
   var PRAY_TPL=PRAY_HEAD+"\n\n"+PRAY_TAIL;
   var PRAY_OLDTAIL=["길이요 진리요 생명 되신 나의 주","예수님 이름으로 기도 합니다","예수님 이름으로 기도합니다","아멘"];
+  // ⌨ 글 칸에서 'ㅂㅈ' + 스페이스 → 기도 끝맺음 세 줄 (2026-11-21 사용자 요청). 캡처 단계라 칸의 저장 처리는 바뀐 글로 그대로 일어남
+  var BJ_TAIL="빛이요 길이요 진리요 생명이신\n나의 예수 그리스도의 이름으로 기도 했습니다.\n아멘";
+  document.addEventListener("input",function(e){
+    var t=e.target; if(!t||t.tagName!=="TEXTAREA"||t.readOnly)return;
+    var v=t.value, c=t.selectionEnd; if(typeof c!=="number"||c<3)return;
+    var m=v.slice(0,c).match(/(^|\s)ㅂㅈ[ \u00A0]$/); if(!m)return;
+    var st=c-3, out=BJ_TAIL;
+    t.value=v.slice(0,st)+out+v.slice(c); var nc=st+out.length; try{t.setSelectionRange(nc,nc)}catch(_){}
+  },true);
   function prayEnd(v){   // 적은 기도문 끝에 끝맺음이 없으면 붙임 (예전 끝맺음은 새 것으로 바꿈)
     v=prayTop(v); var nz=function(x){return x.replace(/\s+/g,"")};
     if(!v.trim()||nz(v)===nz(PRAY_HEAD))return v;
+    if(nz(v).slice(-nz(BJ_TAIL).length)===nz(BJ_TAIL))return v;   // ㅂㅈ 끝맺음으로 끝났으면 그대로
     if(nz(v).slice(-nz(PRAY_TAIL).length)===nz(PRAY_TAIL))return v;
     var L=v.replace(/\s+$/,"").split("\n"), tl=PRAY_TAIL.split("\n").map(nz), ol=PRAY_OLDTAIL.map(nz);
     while(L.length&&(ol.indexOf(nz(L[L.length-1]))>=0||tl.indexOf(nz(L[L.length-1]))>=0||!L[L.length-1].trim()))L.pop();
