@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261121-hymlp">
+<meta name="app-build" content="ab-20261121-hymlp2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5790,12 +5790,18 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .hymimg img{display:block;width:100%;height:auto}
 .hymimgs:not(.hymedimgs) .hymimg{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 .hymimgs:not(.hymedimgs) .hymimg img{-webkit-user-drag:none;pointer-events:none}   /* 사진 자체는 손가락을 안 받게 — 브라우저 "이미지 복사/다운로드" 메뉴가 안 뜸 */
-.hymlpov{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;padding:16px}
-.hymlpbox{width:100%;max-width:480px;display:flex;flex-direction:column;gap:10px;padding-bottom:env(safe-area-inset-bottom)}
-.hymlpb{border:0;border-radius:16px;padding:16px;font-size:18px;font-weight:600;background:#2a2836;color:#f3ece0}
-.hymlpdel{color:#ff8a9a}
-.hymlpdel[data-sure]{background:#c8283c;color:#fff}
-.hymlpno{background:#1c1b22;color:#bbb}
+.hymlpov{position:fixed;inset:0;z-index:210;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;padding:0 16px calc(28px + env(safe-area-inset-bottom))}
+.hymlpbox{width:100%;max-width:280px;display:flex;flex-direction:column;gap:9px;padding:12px;border-radius:20px;background:linear-gradient(180deg,#34313F,#24222C);border:1px solid rgba(255,255,255,.08);box-shadow:0 14px 36px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.08);animation:hymlpIn .18s ease-out}
+@keyframes hymlpIn{from{transform:translateY(14px) scale(.96);opacity:0}to{transform:none;opacity:1}}
+.hymlpb{position:relative;border:0;border-radius:999px;padding:10px 14px;font-size:14.5px;font-weight:600;letter-spacing:-.2px;color:#F3ECE0;background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.22),rgba(255,255,255,0) 55%),linear-gradient(180deg,#4A4658,#353241);box-shadow:0 4px 0 #1C1A22,0 6px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .08s,box-shadow .08s}
+.hymlpb:active{transform:translateY(3px);box-shadow:0 1px 0 #1C1A22,0 2px 5px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.12)}
+.hymlpadd{color:#2A2110;background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.45),rgba(255,255,255,0) 55%),linear-gradient(180deg,#F2D48A,#D9AE52);box-shadow:0 4px 0 #8C6B28,0 6px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.5)}
+.hymlpadd:active{box-shadow:0 1px 0 #8C6B28,0 2px 5px rgba(0,0,0,.3)}
+.hymlpdel{color:#fff;background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.35),rgba(255,255,255,0) 55%),linear-gradient(180deg,#EE8DA0,#C95870);box-shadow:0 4px 0 #7E2F42,0 6px 12px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.4)}
+.hymlpdel:active{box-shadow:0 1px 0 #7E2F42,0 2px 5px rgba(0,0,0,.3)}
+.hymlpdel[data-sure]{background:radial-gradient(120% 90% at 50% 0%,rgba(255,255,255,.3),rgba(255,255,255,0) 55%),linear-gradient(180deg,#E0485E,#B3243A);box-shadow:0 4px 0 #6A1222,0 6px 12px rgba(0,0,0,.35)}
+.hymlpno{margin-top:2px;font-weight:500;color:#C9C3D6}
+.hymnsheet .dltitle,.hymnsheet .hymimgs{-webkit-user-select:none;user-select:none}
 .hymedimgs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .hymedimgs .hymimg{min-height:80px}
 .hymimx{position:absolute;top:6px;right:6px;z-index:2;width:36px;height:36px;border-radius:50%;border:2px solid #fff;background:rgba(200,40,60,.9);color:#fff;font-size:17px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.4)}
@@ -23570,7 +23576,7 @@ body.tafocus #toTop{display:none!important}
     ["pointerup","pointercancel","pointerleave"].forEach(function(t){g.addEventListener(t,end)});
     g.addEventListener("contextmenu",function(e){e.preventDefault(); var d=e.target.closest(".hymimg"); if(d&&d.dataset.iid&&Date.now()-hymLPAt>800){end(); hymLPAt=Date.now(); buzz(15); hymImgMenu(hid,d.dataset.iid)}});
   }
-  function hymImgMenu(hid,iid){
+  function hymImgMenu(hid,iid){try{getSelection().removeAllRanges()}catch(e){} 
     var ov=document.createElement("div"); ov.className="hymlpov";
     ov.innerHTML='<div class="hymlpbox" role="dialog" aria-label="악보 사진"><button type="button" class="hymlpb hymlpadd">🎼 악보 사진 더 넣기<input type="file" accept="image/*" multiple hidden></button><button type="button" class="hymlpb hymlpdel">🗑 이 사진 지우기</button><button type="button" class="hymlpb hymlpno">취소</button></div>';
     document.body.appendChild(ov);
