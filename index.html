@@ -9232,7 +9232,7 @@ body.tafocus #toTop{display:none!important}
     if(!d.moved)return;
     var n=notes.get(d.nid); if(!n)return;
     Array.prototype.forEach.call(d.box.children,function(c,i){var m=n.meds.find(function(x){return x.id===c.dataset.mid});if(m)m.o=i});
-    scheduleSave(n.id); render(); toast("묵상 순서를 바꿨어요");
+    scheduleSave(n.id); render()
   }
   document.addEventListener("pointerup",endMDrag);
   document.addEventListener("pointercancel",endMDrag);
@@ -15166,7 +15166,7 @@ body.tafocus #toTop{display:none!important}
       all.forEach(function(x,i){if(mine.indexOf(x.id)>=0)slots.push(i)});   // 오늘 칸에 있던 자리끼리만 바꿈 (나머지 명단 순서는 그대로)
       slots.forEach(function(si,k){all[si]=o.items.find(function(y){return y.id===mine[k]})});
       var ch=false; all.forEach(function(x,i){if(x&&x.ord!==i*10){x.ord=i*10; icTouch(x); ch=true}});
-      if(ch){icSave(o); toast("순서를 바꿨어요")}
+      if(ch){icSave(o)}
       drawDaily();
     }
     document.addEventListener("pointerup",end); document.addEventListener("pointercancel",function(e){if(dlIcD&&dlIcD.on&&e.pointerId===dlIcD.pid)return; end(e)});
@@ -16313,7 +16313,7 @@ body.tafocus #toTop{display:none!important}
       var o=dailyData(), k=0, byId={};
       o.items.forEach(function(it){byId[it.id]=it});
       o.items=o.items.map(function(it){return it.g===d.g&&byId[ids[k]]?byId[ids[k++]]:it});
-      saveDaily(o); drawDaily(); toast("순서를 바꿨어요");
+      saveDaily(o); drawDaily()
     }
     list.addEventListener("pointerup",end); list.addEventListener("pointercancel",end);
     // 묶음 자체를 끌어서 차례 바꾸기 — 손잡이(⠿)를 끌거나 묶음 이름을 꾹 눌러 끌면 된다 (2026-10-17 사용자 요청)
@@ -18311,7 +18311,7 @@ body.tafocus #toTop{display:none!important}
       var ids=[].slice.call(list.querySelectorAll(".saycard")).map(function(c){return c.dataset.id});
       var o=sayData(), old=sayOrdered(o).map(function(x){return x.id}).filter(function(id){return ids.indexOf(id)>=0});
       if(old.join()===ids.join())return;
-      o.ord=ids.concat((Array.isArray(o.ord)?o.ord:[]).filter(function(x){return ids.indexOf(x)<0})); o.ordAt=Date.now(); saveSay(o); renderReviewBar(); toast("순서를 바꿨어요");   // 다른 코너(한 마디/말씀/은혜) 순서는 그대로 — 예전엔 이 줄이 주석에 묻혀 저장이 안 됐음 (2026-11-07)
+      o.ord=ids.concat((Array.isArray(o.ord)?o.ord:[]).filter(function(x){return ids.indexOf(x)<0})); o.ordAt=Date.now(); saveSay(o); renderReviewBar()   // 다른 코너(한 마디/말씀/은혜) 순서는 그대로 — 예전엔 이 줄이 주석에 묻혀 저장이 안 됐음 (2026-11-07)
     }
     // 카드를 두 번 누르면 바로 고치기 (2026-11-06 사용자 요청)
     var dtap={id:"",t:0};
@@ -23031,7 +23031,7 @@ body.tafocus #toTop{display:none!important}
       var byId={}; n.acts.forEach(function(x){byId[x.id]=x});
       var nx=ids.map(function(i){return byId[i]}).filter(Boolean);
       n.acts.forEach(function(x){if(nx.indexOf(x)<0)nx.push(x)});
-      n.acts=nx; scheduleSave(n.id); toast("실천 순서를 바꿨어요");
+      n.acts=nx; scheduleSave(n.id)
     }
     render();
     var c=cards.get(a.nid), it=c&&c.querySelector('.act[data-aid="'+a.aid+'"]'); if(it){var r=it.getBoundingClientRect(); if(r.top<60||r.top>window.innerHeight-80)it.scrollIntoView({block:"center"})}
