@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261121-mkfix">
+<meta name="app-build" content="ab-20261121-calpray">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -23662,6 +23662,9 @@ body.tafocus #toTop{display:none!important}
      달력을 옆으로 밀면 이전·다음 달, 맨 위 달 이름을 누르면 오늘. 날을 누르면 아래에 그날 담은 것 목록 → 누르면 그 자리로. */
   var CALT={note:["📖","말씀","#8FB8F0"],med:["✍️","묵상","#B7A0F0"],pray:["🙏","기도","#F0B07A"],ans:["🙌","응답","#F2C94C"],srm:["🎤","설교","#E3A6BC"],btx:["📜","본문","#C9A8E8"],say:["💬","한 마디","#A9B6E8"],grace:["🌿","은혜","#93D3A2"],scene:["🌄","장면","#F6C79A"],verse:["📖","짧은 말씀","#8FD0CC"],ic:["🙏","기도제목","#93C9A3"],p1:["🙏","한 줄 기도","#E8A0C8"],hym:["🎵","찬양","#F2C1D9"]};
   var cal=null, calY=0, calM=0, calSel="", calIdx=null;
+  // 달력의 기도 줄: 맨 위 공통 문구(빛이신 예수여 …)와 '전능하신…' 줄은 건너뛰고 그 다음 첫 문장 (2026-11-21 사용자 요청)
+  var CAL_SKIP=["빛이신 예수여","내 안에 오시옵소서","내 안에 있는 모든 어둠을 몰아내소서"];
+  function calPray(s,n){var L=String(s||"").split(/\r?\n/).filter(function(x){x=x.replace(/\*\*|\[\[[^:\]]*:|\]\]/g,"").trim(); return x&&CAL_SKIP.indexOf(x)<0&&!/^전능하신/.test(x)}); return calLine(L.join("\n"),n)}
   function calLine(s,n){s=String(s||"").replace(/\*\*|\[\[[^:\]]*:|\]\]/g,"").split(/\r?\n/).map(function(x){return x.trim()}).filter(Boolean)[0]||""; return s.length>(n||40)?s.slice(0,n||40)+"…":s}
   function calBuild(){
     var M={}; function add(t,k,chip,txt,go){if(!t)return; var d=typeof t==="string"?t:dkey(t); (M[d]=M[d]||[]).push({k:k,chip:chip,txt:txt,go:go,at:typeof t==="number"?t:0})}
@@ -23669,14 +23672,14 @@ body.tafocus #toTop{display:none!important}
     try{notes.forEach(function(n){var r=ab(n.ref)||calLine(n.text,10)||"말씀";
       add(+n.createdAt,"note",r,(n.ref?n.ref+" · ":"")+calLine(n.text),function(){openNoteFocus(n.id)});
       (n.meds||[]).forEach(function(m){if(String(m.text||"").trim())add(+m.at,"med",r,calLine(m.text),function(){openNoteFocus(n.id,"m")})});
-      (n.prays||[]).forEach(function(x){if(!String(x.t||"").trim())return; var tx=calLine(String(x.t).replace(/^전능하신[^\n]*\n/,""));
+      (n.prays||[]).forEach(function(x){if(!String(x.t||"").trim())return; var tx=calPray(x.t);
         add(+x.at,"pray",r,tx,function(){openNoteFocus(n.id,"p")}); if(x.ans>1e12)add(+x.ans,"ans",r,tx,function(){openNoteFocus(n.id,"p")})});
     })}catch(e){}
     try{srmData().items.forEach(function(x){var b=x.cat==="b"; add(x.d,b?"btx":"srm",x.title||x.ref||(b?"본문":"설교"),[x.title,x.who,x.ref].filter(Boolean).join(" · ")||calLine(x.body),function(){openSermon(b?"b":"s"); srmEdit=x.id; srmRead=true; srmResp=false; srmDraw()})})}catch(e){}
     try{sayData().items.forEach(function(x){if(!x||!x.id||!String(x.t||"").trim())return; var k=x.hv?"verse":x.sc?"scene":x.gr?"grace":"say", md=x.hv?"v":x.sc?"m":x.gr?"g":"s";
       add(+x.at,k,(k==="scene"&&x.topic)||calLine(x.t,12),calLine(x.t),function(){openSay(null,md); setTimeout(function(){var sc=document.querySelector('.saysheet .saycard[data-id="'+x.id+'"]'); if(!sc)return; sc.scrollIntoView({block:"center"}); sc.classList.remove("sayfound"); void sc.offsetWidth; sc.classList.add("sayfound")},180)})})}catch(e){}
-    try{icData().items.forEach(function(x){add(+x.at,"ic",x.name,x.name+(x.memo?" · "+calLine(x.memo,30):""),function(){openIntercede()}); if(x.ans>1e12)add(+x.ans,"ans",x.name,x.name,function(){openIntercede()})})}catch(e){}
-    try{p1Data().items.forEach(function(x){if(!x.t.trim())return; add(+x.at,"p1",calLine(x.t,12),calLine(x.t),function(){openPrayRead()}); if(x.ans>1e12)add(+x.ans,"ans",calLine(x.t,12),calLine(x.t),function(){openPrayRead()})})}catch(e){}
+    try{icData().items.forEach(function(x){add(+x.at,"ic",x.name,x.name+(calPray(x.memo,30)?" · "+calPray(x.memo,30):""),function(){openIntercede()}); if(x.ans>1e12)add(+x.ans,"ans",x.name,x.name,function(){openIntercede()})})}catch(e){}
+    try{p1Data().items.forEach(function(x){if(!x.t.trim())return; add(+x.at,"p1",calPray(x.t,12),calPray(x.t),function(){openPrayRead()}); if(x.ans>1e12)add(+x.ans,"ans",calLine(x.t,12),calLine(x.t),function(){openPrayRead()})})}catch(e){}
     try{hymData().items.forEach(function(x){add(+x.at,"hym",x.title||"찬양",(x.no?"찬송가 "+x.no+"장 · ":"")+(x.title||""),function(){openHymn(x.id)})})}catch(e){}
     Object.keys(M).forEach(function(d){M[d].sort(function(a,b){return a.at-b.at})});
     return M;
