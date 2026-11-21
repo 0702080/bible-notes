@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261121-vdbl">
+<meta name="app-build" content="ab-20261121-vdbl2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -9452,6 +9452,21 @@ body.tafocus #toTop{display:none!important}
     flushNow(id); render();
     var n=notes.get(id); if(n&&vEditFrom[id]!==n.text+"|"+n.ref)toast("말씀을 고쳤어요"); delete vEditFrom[id];
   }
+  // 👆👆 말씀 고치기 칸(.etext)을 두 번 누르면 저장하고 읽기로 (2026-11-21 사용자 요청). 연 뒤 0.9초는 무시(고치기를 연 두 번 누르기가 이어 오는 것)
+  (function(){
+    var lt=null, vEdAt=0;
+    var _ent=enterVerseEdit; enterVerseEdit=function(){vEdAt=Date.now(); return _ent.apply(this,arguments)};
+    function done(t,e){var card=t.closest(".note"); if(!card||!card.classList.contains("vediting"))return; if(e&&e.cancelable)e.preventDefault(); try{getSelection().removeAllRanges()}catch(_){} lt=null; buzz(10); t.blur(); exitVerseEdit(card.dataset.id)}
+    list.addEventListener("touchstart",function(e){var t=e.target.closest&&e.target.closest(".note.vediting .etext"); if(!t||e.touches.length>1){lt=null;return} var c=e.touches[0]; t._ts={x:c.clientX,y:c.clientY,t:Date.now()}},{passive:true});
+    list.addEventListener("touchend",function(e){
+      var t=e.target.closest&&e.target.closest(".note.vediting .etext"); if(!t||!t._ts)return;
+      var c=e.changedTouches[0], now=Date.now(), s0=t._ts; t._ts=null;
+      if(now-vEdAt<900||now-s0.t>350||Math.abs(c.clientX-s0.x)>10||Math.abs(c.clientY-s0.y)>10){lt=null;return}
+      if(lt&&lt.el===t&&now-lt.t<480&&Math.abs(c.clientX-lt.x)<40&&Math.abs(c.clientY-lt.y)<40){done(t,e);return}
+      lt={el:t,t:now,x:c.clientX,y:c.clientY};
+    },{passive:false});
+    list.addEventListener("dblclick",function(e){var t=e.target.closest&&e.target.closest(".note.vediting .etext"); if(!t||Date.now()-vEdAt<900)return; done(t,e)});
+  })();
   list.addEventListener("focusout",function(e){
     var eb=e.target.closest&&e.target.closest(".note.vediting .editbox"); if(!eb)return;
     if(e.relatedTarget&&eb.contains(e.relatedTarget))return;   // 구절 칸 ↔ 말씀 칸 이동은 그대로
