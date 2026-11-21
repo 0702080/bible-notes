@@ -5790,7 +5790,7 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .hymimg img{display:block;width:100%;height:auto}
 .hymedimgs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .hymedimgs .hymimg{min-height:80px}
-.hymimx{position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:0;background:rgba(0,0,0,.65);color:#fff;font-size:13px}
+.hymimx{position:absolute;top:6px;right:6px;z-index:2;width:36px;height:36px;border-radius:50%;border:2px solid #fff;background:rgba(200,40,60,.9);color:#fff;font-size:17px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,.4)}
 .hymform{display:flex;flex-direction:column;gap:10px}
 .hymrow{display:flex;gap:8px}.hymrow .hymkind{flex:0 0 110px}.hymrow .hymno{flex:1}
 .hymform .hymt{min-height:240px;font-size:16px;line-height:1.8}
@@ -23448,7 +23448,7 @@ body.tafocus #toTop{display:none!important}
   function hymShrink(file){   // 악보 사진은 긴 변 1800px JPEG로 줄여 저장
     return new Promise(function(ok){var u=URL.createObjectURL(file), im=new Image(); im.onload=function(){var m=1800, w=im.naturalWidth, h=im.naturalHeight, k=Math.min(1,m/Math.max(w,h)); var cv=document.createElement("canvas"); cv.width=Math.round(w*k); cv.height=Math.round(h*k); var cx=cv.getContext("2d"); cx.fillStyle="#fff"; cx.fillRect(0,0,cv.width,cv.height); cx.drawImage(im,0,0,cv.width,cv.height); URL.revokeObjectURL(u); cv.toBlob(function(b){ok(b||file)},"image/jpeg",.85)}; im.onerror=function(){URL.revokeObjectURL(u); ok(file)}; im.src=u});
   }
-  function hymImgInto(holder,id){hymImgGet(id).then(function(b){if(!b||!holder.isConnected)return; var im=document.createElement("img"); im.alt="악보"; im.src=URL.createObjectURL(b); im.dataset.iid=id; holder.textContent=""; holder.appendChild(im)})}
+  function hymImgInto(holder,id){hymImgGet(id).then(function(b){if(!b||!holder.isConnected)return; var im=document.createElement("img"); im.alt="악보"; im.src=URL.createObjectURL(b); im.dataset.iid=id; [].slice.call(holder.childNodes).forEach(function(n){if(!(n.nodeType===1&&n.tagName==="BUTTON"))n.remove()}); holder.insertBefore(im,holder.firstChild)})}   // ✕ 버튼은 남김 (예전엔 사진이 뜨면서 지우기 버튼까지 지워졌음, 2026-11-21)
   function openHymn(id){
     if(!hym){
       hym=document.createElement("div"); hym.className="daily hymnsheet"; hym.setAttribute("role","dialog"); hym.hidden=true;
@@ -23533,7 +23533,7 @@ body.tafocus #toTop{display:none!important}
         var lh=parseFloat(getComputedStyle(ta).lineHeight)||40, bd=hym.querySelector(".dlbody"), tr=ta.getBoundingClientRect(); if(bd)bd.scrollTop+=tr.top+li*lh-innerHeight*0.3}catch(e){}},60);
       var opened=Date.now(); hymDbl(ta,function(){if(Date.now()-opened<900)return; f.querySelector(".hymsave").click()})})();
     var g=f.querySelector(".hymedimgs");
-    function drawImgs(){g.textContent=""; imgs.forEach(function(iid,k){var d=document.createElement("div"); d.className="hymimg"; g.appendChild(d); hymImgInto(d,iid); var xb=document.createElement("button"); xb.type="button"; xb.className="hymimx"; xb.textContent="✕"; xb.setAttribute("aria-label","이 사진 빼기"); xb.addEventListener("click",function(){imgs.splice(k,1); drawImgs()}); d.appendChild(xb)})}
+    function drawImgs(){g.textContent=""; imgs.forEach(function(iid,k){var d=document.createElement("div"); d.className="hymimg"; g.appendChild(d); hymImgInto(d,iid); var xb=document.createElement("button"); xb.type="button"; xb.className="hymimx"; xb.textContent="✕"; xb.setAttribute("aria-label","이 사진 빼기"); xb.addEventListener("click",function(){var fi=fresh.indexOf(iid); if(fi>=0){fresh.splice(fi,1); hymImgDel(iid)} imgs.splice(k,1); drawImgs(); toast("사진을 뺐어요 — 저장을 눌러야 반영돼요")}); d.appendChild(xb)})}
     drawImgs();
     f.querySelector(".hympick input").addEventListener("change",function(){var fs=[].slice.call(this.files||[]); this.value=""; if(!fs.length)return; toast("악보를 넣는 중…");
       fs.reduce(function(p,file){return p.then(function(){return hymShrink(file).then(function(b){var iid="hi"+Date.now().toString(36)+Math.random().toString(36).slice(2,6); return hymImgPut(iid,b).then(function(){imgs.push(iid); fresh.push(iid)})})})},Promise.resolve()).then(drawImgs).catch(function(){toast("사진을 넣지 못했어요")})});
