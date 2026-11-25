@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-nohym">
+<meta name="app-build" content="ab-20261125-rdtimer">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -1583,13 +1583,33 @@ body.reorder .note .copyv{display:none}
 .chead .copyv:hover{color:var(--ink)}
 .chead .copyv.ok{color:var(--green);background:color-mix(in srgb,var(--green) 14%,transparent)}
 .note:not(.open) .chead .copyv{display:none}
-.chead .shotv{flex:0 0 auto;align-self:center;width:30px!important;height:30px!important;padding:0;margin:0 4px;border:1px solid #4A4856;border-radius:50%;background-color:#2A2933!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 0 rgba(0,0,0,.45),0 3px 6px rgba(0,0,0,.3)!important;display:grid;place-items:center;color:var(--gold);transition:transform .08s}
-.chead .shotv svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.chead .shotv:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 rgba(0,0,0,.4)!important}
+.chead .shotv,.chead .timev{flex:0 0 auto;align-self:center;width:30px!important;height:30px!important;padding:0;margin:0 4px;border:1px solid #4A4856;border-radius:50%;background-color:#2A2933!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 0 rgba(0,0,0,.45),0 3px 6px rgba(0,0,0,.3)!important;display:grid;place-items:center;color:var(--gold);transition:transform .08s}
+.chead .shotv svg,.chead .timev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.chead .shotv:active,.chead .timev:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 rgba(0,0,0,.4)!important}
 .chead .shotv.ok{color:#7FD99A;border-color:#7FD99A}
-.note:not(.open) .chead .shotv{width:24px!important;height:24px!important;margin-top:-1.5px;align-self:flex-start}
-.note:not(.open) .chead .shotv svg{width:13px;height:13px}   /* 접힌 카드: 암송 N 알약과 같은 줄 높이·가운데 (2026-11-19 사용자 요청) */
-body.reorder .note .chead .shotv{display:none}   /* 🖼 말씀 카드 그림 저장 (접힌 카드에도 보임, 2026-11-19) */
+.chead .timev{color:#8FD0F0;margin-right:0}
+/* ⏱ 낭독 시간 재기 (2026-11-25 사용자 요청: 사람들 앞에서 축복기도를 정한 시간 안에 읽기) */
+#rdTimer{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 8px);transform:translateX(-50%);z-index:9500;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 10px 7px;border:1px solid #4A4856;border-radius:22px;background:rgba(24,23,30,.94);box-shadow:0 8px 24px rgba(0,0,0,.55);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);user-select:none;-webkit-user-select:none;max-width:calc(100vw - 16px);box-sizing:border-box}
+#rdTimer[hidden]{display:none}
+#rdTimer .rtrow{display:flex;align-items:center;gap:6px}
+#rdTimer button{flex:0 0 auto;width:36px;height:36px;padding:0;border:1px solid #4A4856;border-radius:50%;background:linear-gradient(180deg,#3A3946,#26252E);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 3px 0 #111015;color:var(--ink);font-size:17px;line-height:1;display:grid;place-items:center;font-family:inherit}
+#rdTimer button:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 1px 0 #111015}
+#rdTimer .rtgo{background:linear-gradient(180deg,#6FCB8A,#3F9A5C);color:#0F1E14;border-color:#3F9A5C;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 3px 0 #1F5A33}
+#rdTimer.run .rtgo{background:linear-gradient(180deg,#F2C46A,#C9953A);border-color:#C9953A;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 3px 0 #7A5620}
+#rdTimer .rtx{width:30px;height:30px;font-size:14px;color:#F0A0B8}
+#rdTimer .rtt{min-width:104px;padding:0 4px;text-align:center;font-size:36px;font-weight:700;letter-spacing:1px;font-variant-numeric:tabular-nums;color:#EDE7DA;line-height:1.1;cursor:pointer}
+#rdTimer.warn .rtt{color:#F2B25A}
+#rdTimer.late .rtt{color:#FF6B6B;animation:rtPulse 1s ease-in-out infinite}
+#rdTimer.over{border-color:#FF6B6B}
+@keyframes rtPulse{50%{opacity:.55}}
+#rdTimer .rtsub{font-size:11.5px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+#rdTimer .rtbar{width:100%;height:4px;border-radius:2px;background:#33323C;overflow:hidden}
+#rdTimer .rtbar i{display:block;height:100%;width:100%;background:#6FCB8A;transform-origin:left;transition:transform .25s linear}
+#rdTimer.warn .rtbar i{background:#F2B25A}
+#rdTimer.late .rtbar i{background:#FF6B6B}
+.note:not(.open) .chead .shotv,.note:not(.open) .chead .timev{width:24px!important;height:24px!important;margin-top:-1.5px;align-self:flex-start}
+.note:not(.open) .chead .shotv svg,.note:not(.open) .chead .timev svg{width:13px;height:13px}   /* 접힌 카드: 암송 N 알약과 같은 줄 높이·가운데 (2026-11-19 사용자 요청) */
+body.reorder .note .chead .shotv,body.reorder .note .chead .timev{display:none}   /* 🖼 말씀 카드 그림 저장 (접힌 카드에도 보임, 2026-11-19) */
 body.reorder .note .chead .copyv{display:none}
 .chead .ref{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 @media (max-width:380px){.chead .copyv,.chead .memopen,.chead .fopen,.chead .pinbtn,.chead .hchev{width:29px}.chead{gap:2px}}
@@ -5974,8 +5994,8 @@ body.boardon #toTop{display:none}
 .note.open .chead .memopen.on:active,.note.open .chead .fopen[aria-expanded="true"]:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)!important}
 .note.open .chead .memopen:not(.on),.note.open .chead .fopen:not([aria-expanded="true"]){background:transparent!important;box-shadow:none!important;border-color:transparent!important}
 /* 펼친 카드의 🖼 그림 저장 단추는 켜고 끄는 단추가 아니라서 평소엔 동그라미 없이 아이콘만 — 동그라미는 켜 둔 아이콘에만 (2026-11-19 사용자 요청: ⌖를 켜도 그림 단추 동그라미가 같이 보여 헷갈림). 누르는 순간·저장되면(초록) 잠깐 동그라미 */
-.note.open .chead .shotv:not(:active):not(.ok):not(.sel){background:transparent!important;background-image:none!important;box-shadow:none!important;border-color:transparent!important;color:var(--faint)}
-.note.open .chead .shotv svg{width:18px;height:18px;stroke-width:1.8}
+.note.open .chead .shotv:not(:active):not(.ok):not(.sel),.note.open .chead .timev:not(:active):not(.ok):not(.sel){background:transparent!important;background-image:none!important;box-shadow:none!important;border-color:transparent!important;color:var(--faint)}
+.note.open .chead .shotv svg,.note.open .chead .timev svg{width:18px;height:18px;stroke-width:1.8}
 /* 기도문을 읽는 글로 돌아오면 손잡이 띠는 안 보이게 (2026-11-19 사용자 요청: 읽기 칸 아래 띠만 남음) */
 .prays>.pri:not(.editing)>textarea.pt+.tagripbar,textarea[hidden]+.tagripbar{display:none!important}
 /* ⬆ 맨 위로 단추는 글을 적는 동안(글 칸에 커서) 숨김 — 기도문 칸 아래를 가림 (2026-11-19 사용자 요청) */
@@ -8007,7 +8027,7 @@ body.tafocus #toTop{display:none!important}
     var el=document.createElement("article");
     el.className="note"; el.dataset.id=n.id;
     el.innerHTML=
-      '<div class="chead"><button type="button" class="grip" aria-label="길게 끌어서 순서 바꾸기 (위아래 화살표 키로도 옮길 수 있어요)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><div class="ref"></div><span class="saved" aria-live="polite"></span><button type="button" class="copyv" aria-label="말씀 복사" title="말씀 복사"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg></button><button type="button" class="memopen" aria-expanded="false" aria-label="말씀 암송" title="말씀 암송"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 4.5a3 3 0 0 0-3 2.6A3 3 0 0 0 4.5 10a3 3 0 0 0 .8 2.1A3.2 3.2 0 0 0 5 13.5a3 3 0 0 0 2 2.8A3 3 0 0 0 10 19.5h.2a1.8 1.8 0 0 0 1.8-1.8V6.3a1.8 1.8 0 0 0-1.8-1.8z"/><path d="M14.5 4.5a3 3 0 0 1 3 2.6 3 3 0 0 1 2 2.9 3 3 0 0 1-.8 2.1 3.2 3.2 0 0 1 .3 1.4 3 3 0 0 1-2 2.8 3 3 0 0 1-3 3.2h-.2a1.8 1.8 0 0 1-1.8-1.8"/></svg></button><button type="button" class="fopen" aria-expanded="false" aria-label="집중해서 보기" title="집중해서 보기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"/><circle cx="12" cy="12" r="2.6"/></svg></button><button type="button" class="shotv" aria-label="이미지로 저장" title="이미지로 저장"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5l-5-5-9 9"/></svg></button><button type="button" class="pinbtn" aria-pressed="false" aria-label="맨 위에 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 4 4v2h-5v6l-1 1-1-1v-6H6v-2l4-4z"/></svg></button><button type="button" class="hcal" aria-label="구글 캘린더로 암송 알림" title="구글 캘린더로 암송 알림"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/><path d="M10 14.8l1.6 1.6 3-3"/></svg></button><button type="button" class="hchev" aria-label="펼치기"><span class="chev" aria-hidden="true"></span></button>'+
+      '<div class="chead"><button type="button" class="grip" aria-label="길게 끌어서 순서 바꾸기 (위아래 화살표 키로도 옮길 수 있어요)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><div class="ref"></div><span class="saved" aria-live="polite"></span><button type="button" class="copyv" aria-label="말씀 복사" title="말씀 복사"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg></button><button type="button" class="memopen" aria-expanded="false" aria-label="말씀 암송" title="말씀 암송"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 4.5a3 3 0 0 0-3 2.6A3 3 0 0 0 4.5 10a3 3 0 0 0 .8 2.1A3.2 3.2 0 0 0 5 13.5a3 3 0 0 0 2 2.8A3 3 0 0 0 10 19.5h.2a1.8 1.8 0 0 0 1.8-1.8V6.3a1.8 1.8 0 0 0-1.8-1.8z"/><path d="M14.5 4.5a3 3 0 0 1 3 2.6 3 3 0 0 1 2 2.9 3 3 0 0 1-.8 2.1 3.2 3.2 0 0 1 .3 1.4 3 3 0 0 1-2 2.8 3 3 0 0 1-3 3.2h-.2a1.8 1.8 0 0 1-1.8-1.8"/></svg></button><button type="button" class="fopen" aria-expanded="false" aria-label="집중해서 보기" title="집중해서 보기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V5a1 1 0 0 1 1-1h4M15 4h4a1 1 0 0 1 1 1v4M20 15v4a1 1 0 0 1-1 1h-4M9 20H5a1 1 0 0 1-1-1v-4"/><circle cx="12" cy="12" r="2.6"/></svg></button><button type="button" class="timev" aria-label="낭독 시간 재기" title="낭독 시간 재기"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 9.5v4l2.6 1.8M9.5 2.8h5M12 2.8v3"/></svg></button><button type="button" class="shotv" aria-label="이미지로 저장" title="이미지로 저장"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5l-5-5-9 9"/></svg></button><button type="button" class="pinbtn" aria-pressed="false" aria-label="맨 위에 고정"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 4 4v2h-5v6l-1 1-1-1v-6H6v-2l4-4z"/></svg></button><button type="button" class="hcal" aria-label="구글 캘린더로 암송 알림" title="구글 캘린더로 암송 알림"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/><path d="M10 14.8l1.6 1.6 3-3"/></svg></button><button type="button" class="hchev" aria-label="펼치기"><span class="chev" aria-hidden="true"></span></button>'+
         '<details class="menu cmenu"><summary class="more" aria-label="노트 메뉴">⋯</summary><div class="pop">'+
           '<button type="button" class="medit">본문 고치기</button>'+
           '<button type="button" class="mcopy">말씀 복사</button>'+
@@ -9744,6 +9764,7 @@ body.tafocus #toTop{display:none!important}
     if(b.classList.contains("donedit")){exitVerseEdit(id);return}
     if(b.classList.contains("grip")){return}
     if(b.classList.contains("copyv")){copyVerse(n,b);return}
+    if(b.classList.contains("timev")){rdTimerOpen(n);return}   /* ⏱ 낭독 시간 재기 (2026-11-25) */
     if(b.classList.contains("shotv")){shotSel.add(id); if(memOpen.has(id)||focusOpen.has(id)||focusMode.get(id)){memOpen.delete(id);focusOpen.delete(id);focusMode.delete(id);setFmsg(card,"");render()} else{var sv0=(cards.get(id)||card).querySelector(".chead .shotv"); if(sv0)sv0.classList.add("sel")}   // 라디오 단추처럼: 🖼를 고르면 🖼에만 동그라미, 🧠·⌖는 꺼짐 (2026-11-19 사용자 요청)
       b=(cards.get(id)||card).querySelector(".chead .shotv")||b; try{cardShot(n); b.classList.add("ok"); setTimeout(function(){b.classList.remove("ok")},1200)}catch(err){toast("그림을 만들지 못했어요")} return}   // 🖼 카드 머리의 그림 저장 단추 (2026-11-19 사용자 요청)
     if(b.classList.contains("medprog")){openMedProgress();return}
@@ -24028,5 +24049,40 @@ document.addEventListener("scroll",function(e){var b=e.target; if(!b||!b.classLi
   function chk(){q=0; b.classList.toggle("on",window.scrollY>innerHeight*1.2)}
   window.addEventListener("scroll",function(){if(!q)q=requestAnimationFrame(chk)},{passive:true});
   b.addEventListener("click",function(){window.scrollTo(0,0); var se=document.scrollingElement; if(se)se.scrollTop=0; b.classList.remove("on")});   /* 바로 맨 위로 */ chk()})();
+</script>
+<script>
+/* ---------- ⏱ 낭독 시간 재기 (2026-11-25 사용자 요청: 사람들 앞에서 축복기도를 정한 시간 안에 소리 내어 읽기)
+   카드 머리 ⏱ → 화면 맨 위에 떠 있는 남은 시간. −/+ 30초, ▶ 시작·⏸ 멈춤(숫자 눌러도), ↺ 처음으로, ✕ 닫기. 0이 되면 진동하고 넘긴 시간(+0:05)을 빨갛게.
+   정한 시간은 카드마다 이 기기에 기억(bible-rd-timer), 처음엔 글 길이로 어림(1초에 4글자). 도는 동안 화면이 꺼지지 않게(Wake Lock) */
+var rdTimerOpen=(function(){
+  var KEY="bible-rd-timer", M={}; try{M=JSON.parse(localStorage.getItem(KEY)||"{}")||{}}catch(e){M={}}
+  var el=null, st={id:"",dur:120,left:120,run:false,end:0,iv:0,buzzed:false}, wl=null;
+  function est(n){var t=String(n.text||"").replace(/\s+/g,""); return Math.max(10,Math.round(t.length/4))}
+  function fmt(s){var neg=s<0; s=Math.abs(Math.round(s)); return (neg?"+":"")+Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+  function save(){M[st.id]=st.dur; try{localStorage.setItem(KEY,JSON.stringify(M))}catch(e){}}
+  function lock(on){try{if(on&&navigator.wakeLock&&!wl){navigator.wakeLock.request("screen").then(function(l){wl=l; l.addEventListener("release",function(){wl=null})}).catch(function(){})} else if(!on&&wl){wl.release(); wl=null}}catch(e){}}
+  function tick(){if(st.run)st.left=(st.end-Date.now())/1000; draw();
+    if(st.run&&st.left<=0&&!st.buzzed){st.buzzed=true; try{navigator.vibrate&&navigator.vibrate([250,120,250])}catch(e){}}}
+  function draw(){if(!el)return; var l=st.left, t=el.querySelector(".rtt");
+    t.textContent=l<0?fmt(l):fmt(Math.ceil(l-0.001));
+    el.classList.toggle("run",st.run); el.classList.toggle("warn",l>0&&l<=Math.min(30,st.dur*0.25)); el.classList.toggle("late",l<=0); el.classList.toggle("over",l<0);
+    var g=el.querySelector(".rtgo"); g.textContent=st.run?"⏸":"▶"; g.setAttribute("aria-label",st.run?"멈춤":"시작");
+    el.querySelector(".rtbar i").style.transform="scaleX("+Math.max(0,Math.min(1,l/st.dur))+")"}
+  function start(){if(st.left<=0){st.left=st.dur; st.buzzed=false} st.end=Date.now()+st.left*1000; st.run=true; clearInterval(st.iv); st.iv=setInterval(tick,200); lock(true); draw()}
+  function pause(){if(!st.run)return; st.left=(st.end-Date.now())/1000; st.run=false; clearInterval(st.iv); lock(false); draw()}
+  function reset(){pause(); st.left=st.dur; st.buzzed=false; draw()}
+  function step(d){var used=st.dur-(st.run?(st.end-Date.now())/1000:st.left); var nd=Math.max(30,Math.min(3600,Math.round((st.dur+d)/30)*30)); st.dur=nd; save();
+    st.left=nd-used; if(st.run)st.end=Date.now()+st.left*1000; st.buzzed=st.left<=0; draw()}
+  function close(){pause(); if(el)el.hidden=true}
+  function build(){el=document.createElement("div"); el.id="rdTimer"; el.setAttribute("role","timer");
+    el.innerHTML='<div class="rtrow"><button type="button" class="rtx" aria-label="닫기">✕</button><button type="button" class="rtm" aria-label="30초 줄이기">−</button><div class="rtt">2:00</div><button type="button" class="rtp" aria-label="30초 늘리기">＋</button><button type="button" class="rtgo" aria-label="시작">▶</button><button type="button" class="rtr" aria-label="처음으로">↺</button></div><div class="rtbar"><i></i></div><div class="rtsub"></div>';
+    el.addEventListener("click",function(e){var b=e.target.closest("button,.rtt"); if(!b)return; e.stopPropagation();
+      if(b.classList.contains("rtx"))close(); else if(b.classList.contains("rtm"))step(-30); else if(b.classList.contains("rtp"))step(30); else if(b.classList.contains("rtr"))reset(); else {if(st.run)pause(); else start(); if(b.classList.contains("rtt"))try{buzz(15)}catch(err){}}});
+    document.addEventListener("visibilitychange",function(){if(!document.hidden&&st.run){lock(true); tick()}});
+    document.body.appendChild(el)}
+  return function(n){if(!el)build(); if(st.id!==n.id||el.hidden){pause(); st.id=n.id; var e0=est(n); st.dur=+M[n.id]||Math.max(30,Math.ceil(e0/30)*30); st.left=st.dur; st.buzzed=false;
+      el.querySelector(".rtsub").textContent=(String(n.ref||"").trim()||"낭독")+" · 읽기 어림 "+fmt(e0)}
+    el.hidden=false; draw()};
+})();
 </script>
 </body></html>
