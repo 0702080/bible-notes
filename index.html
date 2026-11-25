@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-pin3d">
+<meta name="app-build" content="ab-20261126-sayclr2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -18520,13 +18520,13 @@ body.tafocus #toTop{display:none!important}
     var hlF=document.createElement("div"); hlF.className="srmhl srmhlfloat sayhlf"; hlF.hidden=true; hlF.setAttribute("role","toolbar"); hlF.setAttribute("aria-label","고른 글자 색");
     hlF.innerHTML='<button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button>'+[["금","var(--gold)"],["분홍","var(--pink)"],["하늘","var(--sky)"],["초록","var(--green)"],["주황","var(--orange)"],["보라","#C9A8FF"]].map(function(c){return '<button type="button" class="hlbtn hldot" data-hl="'+c[0]+'" style="--d:'+c[1]+'" title="'+c[0]+'" aria-label="'+c[0]+'"></button>'}).join("")+'<button type="button" class="hlbtn hlclr" data-hl="x" title="색 지우기">지우기</button>';
     document.body.appendChild(hlF);
-    var hlTa=null;
+    var hlTa=null, hlSel=null;
     function hlGone(){return !box.isConnected}
     function hlPlace(){
       if(hlGone()){hlF.remove(); document.removeEventListener("selectionchange",hlPlace); return}
       var t=document.activeElement;
       if(!t||!t.classList||!t.classList.contains("sayle")||!box.contains(t)||t.selectionStart===t.selectionEnd||(lnPick&&lnPick.box===box)){hlF.hidden=true;return}
-      hlTa=t; var r=t.getBoundingClientRect(), vv=window.visualViewport, vh=vv?vv.height+vv.offsetTop:innerHeight;
+      hlTa=t; hlSel=[t.selectionStart,t.selectionEnd]; var r=t.getBoundingClientRect(), vv=window.visualViewport, vh=vv?vv.height+vv.offsetTop:innerHeight;
       hlF.hidden=false; var h=hlF.offsetHeight||40, top=r.bottom+8;
       if(top+h>vh-6)top=Math.max(8,r.top-h-60);
       hlF.style.top=Math.round(top)+"px";
@@ -18534,16 +18534,22 @@ body.tafocus #toTop{display:none!important}
     document.addEventListener("selectionchange",hlPlace);
     box.addEventListener("focusout",function(){setTimeout(hlPlace,140)});
     ["pointerdown","mousedown","touchstart"].forEach(function(ev){hlF.addEventListener(ev,function(e){e.preventDefault()},{passive:false})});   // 눌러도 고른 글자가 풀리지 않게
+    // 휴대폰: touchstart를 막으면 click이 안 생겨서 손을 뗄 때(touchend) 바로 칠함 (2026-11-26 — 색을 눌러도 안 바뀌던 것)
+    var hlTouchAt=0;
+    hlF.addEventListener("touchend",function(e){var hb=e.target.closest(".hlbtn"); if(!hb)return; if(e.cancelable)e.preventDefault(); e.stopPropagation(); hlTouchAt=Date.now(); hlApply(hb)},{passive:false});
     hlF.addEventListener("click",function(e){
       var hb=e.target.closest(".hlbtn"); if(!hb)return; e.preventDefault(); e.stopPropagation();
+      if(Date.now()-hlTouchAt<700)return; hlApply(hb);
+    });
+    function hlApply(hb){
       var t=(document.activeElement&&document.activeElement.classList.contains("sayle")&&box.contains(document.activeElement))?document.activeElement:hlTa;
       if(!t||!t.isConnected){toast("색을 바꿀 글자를 먼저 골라 주세요");return}
-      var v=t.value, a=t.selectionStart, b=t.selectionEnd; if(a===b){a=0;b=v.length}
-      if(a===b)return;
+      var v=t.value, a=t.selectionStart, b=t.selectionEnd; if(a===b&&t===hlTa&&hlSel&&hlSel[1]>hlSel[0]&&hlSel[1]<=v.length){a=hlSel[0];b=hlSel[1]} if(a===b){a=0;b=v.length}
+      if(a===b)return; hlSel=null;
       t.value=v.slice(0,a)+hlMark(v.slice(a,b),hb.dataset.hl)+v.slice(b);
       sayEditAt=Date.now(); buzz(8); hang(); sync();
       try{t.blur()}catch(err){} hlF.hidden=true; vwAll();
-    });
+    }
     function vw(r){
       var v=r._hv; HL_RE.lastIndex=0; var has=HL_RE.test(r.value); HL_RE.lastIndex=0;
       r.classList.toggle("hlhas",has);
