@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-sheetx">
+<meta name="app-build" content="ab-20261126-rdsame">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5295,7 +5295,7 @@ body.glassopen #fab{visibility:hidden}
 .srmhl.srmhlfloat{position:fixed;left:50%;transform:translateX(-50%);z-index:120;margin:0;padding:6px 8px;gap:6px;flex-wrap:nowrap;border:1px solid #4A4953;border-radius:22px;background:rgba(24,23,30,.96);box-shadow:0 8px 24px rgba(0,0,0,.55)}
 .srmhl.srmhlfloat[hidden]{display:none}
 .srmbox.srmpinbox{padding-bottom:8px!important}
-.srmrv .srmrlines.srmpinned{scrollbar-width:none;padding-top:0;padding-bottom:0}   /* 메모 칸 높이 = 줄 칸 N개 딱 맞게 (위아래 여백 없앰, 2026-11-08) */   /* overscroll-behavior:contain 은 휴대폰에서 바깥으로 넘어가는 굴림을 막아 화면이 멈춰서 뺌 (2026-11-08) */
+.srmrv .srmrlines.srmpinned{scrollbar-width:none;padding-top:6px;padding-bottom:6px}   /* 위아래 여백은 고치기 칸과 같은 6px — 읽기·고치기 줄 위치 같게 (2026-11-26 사용자 요청) */   /* 메모 칸 높이 = 줄 칸 N개 딱 맞게 (위아래 여백 없앰, 2026-11-08) */   /* overscroll-behavior:contain 은 휴대폰에서 바깥으로 넘어가는 굴림을 막아 화면이 멈춰서 뺌 (2026-11-08) */
 .srmrv .srmrlines.srmpinned::-webkit-scrollbar{display:none}
 .srmrv .srmpgno{text-align:center;margin:8px 0 4px;font-size:13px;font-weight:700;color:color-mix(in srgb,var(--gold) 80%,#fff);letter-spacing:.5px;opacity:.85}   /* 지금 쪽 / 전체 쪽 (2026-11-08 사용자 요청) */
 .srmrv .srmpgno[hidden]{display:none}
@@ -5329,6 +5329,10 @@ mark.srmhit.srmcur{outline:2px solid var(--gold);outline-offset:1px}
 /* 📖 설교 메모 읽기: ⠿ 없이, 문장을 꾹 눌러 끌어 옮기기 (2026-11-11 사용자 요청) */
 .srmrv .srmrgrip{display:none}
 .srmrv .srmrli{padding-left:14px}
+/* 📏 읽기 = 고치기 (2026-11-26 사용자 요청): 한 줄(문장)이 글 칸 폭을 넘어 넘어간 화면 줄(.lncont)은 고치기 글 칸처럼 줄 사이 틈(4px+점선) 없이 40px 간격으로 붙고, 가는 실선만 */
+.srmlines .srmline.lncont{margin-top:-5px;border-top:1px solid color-mix(in srgb,var(--violet) 16%,transparent)!important;border-radius:0}
+.srmrv .srmrlines .srmline.lnhascont{box-shadow:none!important}   /* 바로 아래 넘어간 줄과 겹쳐 어두운 띠가 생기지 않게 */
+.srmsheet.srmreading .srmrv .srmline.lncont{border-top-color:color-mix(in srgb,var(--gold) 12%,transparent)!important}
 .srmrv .srmline.srmmv{position:relative;z-index:6;background:color-mix(in srgb,var(--gold) 22%,#1E1A12);box-shadow:0 10px 24px rgba(0,0,0,.6);border-radius:8px}
 .srmrv .srmrlines.srmmoving{touch-action:none}
 .srmrv .srmline.srmdropat{box-shadow:inset 0 2px 0 var(--gold)}
@@ -13804,36 +13808,53 @@ body.tafocus #toTop{display:none!important}
     var info=bibleHang(tas.map(function(t){return t.value}),function(x){return cx.measureText(x).width});
     tas.forEach(function(t,i){var h=info[i], pw=Math.round(h.pw); t.style.paddingLeft=pw?(14+pw)+"px":""; t.style.textIndent=h.first&&pw?(-pw)+"px":""; srmFit(t)});
   }
+  /* 📏 읽기 줄 칸 나누기 = 고치기 글 칸(textarea)과 똑같이 (2026-11-26 사용자 요청: 읽기·고치기의 문장 위치·띄어쓰기·빈 칸·빈 줄이 100% 같아야 함)
+     예전엔 낱말 폭을 캔버스로 재서 나눴는데, 줄 맨 앞 띄어쓰기를 지우고 아주 긴 낱말은 안 꺾는 등 글 칸과 달랐음 →
+     글 칸과 같은 글꼴·폭·pre-wrap·keep-all·break-word인 숨은 거울 칸에 글을 넣고, 글자마다 실제 놓인 줄을 재서 그대로 나눔. 줄 칸은 white-space:pre라 띄어쓰기도 그대로 */
+  var lnMir=null;
   function lineRows(box){
     if(!box||!box.isConnected||!box._lines)return;
     box._pend=0;
     var mk=box._mk, lines=box._lines, sel=box._sel;
     box.textContent=""; var probe=mk([{t:"가"}]); box.appendChild(probe);
-    var sp=probe.querySelector(sel), cs=getComputedStyle(sp), pl0=parseFloat(cs.paddingLeft)||0, w=sp.clientWidth-pl0-(parseFloat(cs.paddingRight)||0), fs=cs.fontSize, ff=cs.fontFamily, fw=cs.fontWeight;   // 글꼴은 칸을 지우기 전에 읽어 둠 (지우면 값이 비어 버림)
+    var sp=probe.querySelector(sel), cs=getComputedStyle(sp), pl0=parseFloat(cs.paddingLeft)||0, w=sp.clientWidth-pl0-(parseFloat(cs.paddingRight)||0);
+    var font={fontFamily:cs.fontFamily,fontSize:cs.fontSize,fontWeight:cs.fontWeight,fontStyle:cs.fontStyle,letterSpacing:cs.letterSpacing,wordSpacing:cs.wordSpacing,lineHeight:cs.lineHeight,fontKerning:cs.fontKerning,fontVariantLigatures:cs.fontVariantLigatures};   // 글꼴은 칸을 지우기 전에 읽어 둠 (지우면 값이 비어 버림)
     box.textContent=""; if(w<=20){lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); if((box._retry=(box._retry||0)+1)<20){box._pend=1; setTimeout(function(){if(box._pend)lineRows(box)},150)} return}   // 아직 폭이 안 잡혔으면(창이 막 바뀌는 중) 조금 뒤 다시 나눔 — 저장 직후 줄 칸이 안 나뉘던 것
+    if(!lnMir){lnMir=document.createElement("div"); lnMir.setAttribute("aria-hidden","true"); lnMir.style.cssText="position:absolute;left:-10000px;top:0;visibility:hidden;pointer-events:none;contain:layout style;white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word;line-break:auto;box-sizing:border-box;border:0;margin:0;padding:0;text-indent:0"}
+    document.body.appendChild(lnMir); var mr=lnMir;
+    for(var k in font)mr.style[k]=font[k];
     if(!lnCv)lnCv=document.createElement("canvas"); var cx=lnCv.getContext("2d");
-    var wd=function(t,bold){cx.font=(bold?"800":fw)+" "+fs+" "+ff; return cx.measureText(t).width};
-    var hang=box._hang?bibleHang(lines,function(t){return wd(t)}):null;
+    var hang=box._hang?bibleHang(lines,function(t){cx.font=font.fontWeight+" "+font.fontSize+" "+font.fontFamily; return cx.measureText(t).width}):null;
+    var lh=parseFloat(font.lineHeight); if(!(lh>0))lh=parseFloat(font.fontSize)*1.5;
     lines.forEach(function(line,li){
-      var hg=hang&&hang[li], pw=hg?Math.round(hg.pw):0, nrow=0;   // data-li: 화면 줄이 원래 몇 번째 줄인지 (읽기에서 두 번 누르면 그 줄로 고치기, 2026-11-08)
-      var segs=hlParse(line), toks=[];
-      segs.forEach(function(g){g.t.split(/( )/).forEach(function(x){if(x)toks.push({t:x,b:g.b,c:g.c,w:wd(x,g.b)})})});
-      var row=[], rw=0;
-      function push(){
-        while(row.length&&row[row.length-1].t===" "){rw-=row[row.length-1].w; row.pop()}
-        var m2=[]; row.forEach(function(k){var l=m2[m2.length-1]; if(l&&l.b===k.b&&l.c===k.c)l.t+=k.t; else m2.push({t:k.t,b:k.b,c:k.c})});
-        var e=mk(m2); e.dataset.li=li; if(pw&&(nrow>0||!hg.first)){var q=e.querySelector(sel); if(q)q.style.paddingLeft=(pl0+pw)+"px"} box.appendChild(e); row=[]; rw=0; nrow++;
-      }
-      function lim(){return pw&&(nrow>0||!hg.first)?w-pw:w}
-      if(!toks.length){var e0=mk([]); e0.dataset.li=li; box.appendChild(e0);return}
-      toks.forEach(function(k){
-        if(!row.length&&k.t===" ")return;
-        if(rw+k.w>lim()&&row.length)push();
-        if(!row.length&&k.t===" ")return;
-        row.push(k); rw+=k.w;
+      var hg=hang&&hang[li], pw=hg?Math.round(hg.pw):0, segs=hlParse(line);
+      var emit=function(m2,nrow){
+        while(m2.length&&/^ *$/.test(m2[m2.length-1].t))m2.pop();   // 줄 끝에 걸린 띄어쓰기는 안 보이므로 뺌 (글 칸에서도 안 보임)
+        if(m2.length)m2[m2.length-1].t=m2[m2.length-1].t.replace(/ +$/,"");
+        var e=mk(m2); e.dataset.li=li; var q=e.querySelector(sel);
+        if(q){q.style.whiteSpace="pre"; if(pw&&(nrow>0||!hg.first))q.style.paddingLeft=(pl0+pw)+"px"}
+        if(nrow>0){e.classList.add("lncont"); if(box.lastElementChild)box.lastElementChild.classList.add("lnhascont")}   // 글 칸 안에서 넘어간 줄: 줄 사이 틈 없이 붙음 (고치기와 같은 높이)
+        box.appendChild(e);
+      };
+      if(!line.length){emit([],0);return}
+      mr.style.width=w+"px"; mr.style.paddingLeft=pw?pw+"px":"0"; mr.style.textIndent=(pw&&hg.first)?(-pw)+"px":"0";
+      hlFill(mr,segs);
+      if(mr.offsetHeight<=lh*1.5){emit(segs.map(function(g){return {t:g.t,b:g.b,c:g.c}}),0);return}   // 한 줄이면 재지 않음
+      // 글자마다 놓인 줄(위치)을 재서 나눔
+      var rows=[], cur=null, rg=document.createRange(), si=0;
+      [].forEach.call(mr.childNodes,function(nd){
+        var g=segs[si++]||{t:"",b:false,c:null}, tn=nd.nodeType===3?nd:nd.firstChild; if(!tn)return; var tx=tn.data;
+        for(var i=0;i<tx.length;i++){
+          var ch=tx.charAt(i), y=null;
+          if(ch!==" "){rg.setStart(tn,i); rg.setEnd(tn,i+1); var rs=rg.getClientRects(); if(rs.length)y=rs[rs.length-1].top}
+          if(y!=null&&cur&&cur.y===-1e9)cur.y=y; else if(y!=null&&(!cur||Math.abs(y-cur.y)>lh*0.5)){cur={y:y,segs:[]}; rows.push(cur)}
+          if(!cur){cur={y:-1e9,segs:[]}; rows.push(cur)}
+          var l=cur.segs[cur.segs.length-1]; if(l&&l.b===g.b&&l.c===g.c)l.t+=ch; else cur.segs.push({t:ch,b:g.b,c:g.c});
+        }
       });
-      if(row.length)push();
+      rows.forEach(function(r,i){emit(r.segs,i)});
     });
+    mr.textContent=""; if(mr.parentNode)mr.parentNode.removeChild(mr);
     if(box._after)box._after(box);   // 다시 나눈 뒤 찾은 낱말 표시 등 (2026-11-08)
   }
   function lineRowsSet(box,lines,mk,sel,lazy){box._lines=lines; box._mk=mk; box._sel=sel; if(!lazy)lines.forEach(function(t,li){var e=mk(hlParse(t)); e.dataset.li=li; box.appendChild(e)}); box._pend=1; setTimeout(function(){if(box._pend)lineRows(box)},60)}   // 이미 나눴으면 다시 안 함 (2026-11-08)
@@ -14535,7 +14556,7 @@ body.tafocus #toTop{display:none!important}
       for(var g=0;g<3;g++){
         var off=pinOff(); if(Math.abs(off)<0.5)break;
         var mh=parseFloat(bd.style.maxHeight)||bd.clientHeight, diff=mh-bd.clientHeight, C=mh+off-diff;
-        if(P){   // 줄 칸 높이를 1~6px 늘이거나 줄여 메모 칸을 빈틈없이 채움 — 줄일 만하면 한 줄 더 (2026-11-11 사용자 요청)
+        if(false&&P){   // (2026-11-26 끔: 줄 칸 높이를 늘이거나 줄이면 고치기 화면과 줄 위치가 달라짐 — 읽기·고치기 100% 같게) 예전: 줄 칸 높이를 1~6px 늘이거나 줄여 메모 칸을 빈틈없이 채움 (2026-11-11 사용자 요청)
           var n0=Math.max(1,Math.floor((C+gap+0.5)/P)), n1=n0+1, n=((n1*P-gap-C)/n1<=6)?n1:n0, rh=(C+gap)/n-gap;
           bd.style.setProperty("--rh",rh.toFixed(2)+"px"); bd.classList.add("srmfit"); bd.style.maxHeight=(C+diff)+"px"}
         else bd.style.maxHeight=(mh+off)+"px";
