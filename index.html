@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-icswdel">
+<meta name="app-build" content="ab-20261125-noactchk">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -1151,6 +1151,9 @@ body.reorder .note .topics{display:none}
 .kwon{color:color-mix(in srgb,var(--orange) 62%,var(--sheet))!important}
 .kwon .tk{color:var(--hi)}
 /* ===== 실천 체크표 ===== */
+/* 🗓 실천 체크표(7·21·40일 도장 칸과 목표 단추)는 안 보이게 — 2026-11-25 사용자 요청.
+   한 줄 기록·지우기 단추는 그대로 두고, 그동안 체크한 자료도 지우지 않아서 언제든 되살릴 수 있다. */
+.board .bhead,.board .bbody{display:none!important}
 .act{grid-template-columns:32px 1fr auto auto;row-gap:2px}
 .act .dela[hidden]{display:none}
 .act{grid-template-columns:22px 32px 1fr auto auto}
