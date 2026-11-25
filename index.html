@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-hympinch">
+<meta name="app-build" content="ab-20261125-scenepg">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -18185,7 +18185,8 @@ body.tafocus #toTop{display:none!important}
     var vh=window.visualViewport?visualViewport.height:innerHeight, bar=say&&say.querySelector(".dlbar"), sr=say&&say.querySelector(".saysearch");
     var srw=sr&&(sr.closest(".saysrow")||sr), top=(bar?bar.getBoundingClientRect().bottom:60)+(srw&&srw.offsetHeight?srw.offsetHeight+12:0)+10;
     var chrome=c.offsetHeight-box.offsetHeight+52+14;
-    var H=Math.max(200,Math.round(vh-top-chrome)), P=[0], PH=[0], acc=0;
+    var rowH=Math.min((rows[0]&&rows[0].offsetHeight)||40,44);   // 한 줄 높이 (넘어간 줄이 긴 칸은 글줄 하나만큼만)
+    var H=Math.max(200,Math.round(vh-top-chrome)+rowH), P=[0], PH=[0], acc=0;   // 한 줄을 더 담아 쪽이 세로로 꽉 차게 (2026-11-25 사용자 요청)
     rows.forEach(function(r,i){var h=r.offsetHeight; if(acc+h>H&&acc>0){P.push(i); PH.push(0); acc=0} acc+=h; PH[PH.length-1]=acc});
     if(sayQ&&box._qk!==sayQ){box._qk=sayQ; var fm=box.querySelector("mark.srmhit"); if(fm){var ri=rows.indexOf(fm.closest(".sayln")), kk=0; while(kk+1<P.length&&P[kk+1]<=ri)kk++; sayPg[id]=kk}}   // 찾은 낱말이 있는 쪽을 먼저 보여 줌
     var tot=P.length, pg=c.querySelector(".saypgno");
@@ -18484,7 +18485,14 @@ body.tafocus #toTop{display:none!important}
     // 휴대폰은 손가락이 움직이면 브라우저가 pointer를 끊어서(pointercancel) touch 이벤트로 잼
     var sw=null;
     function swStart(c,x,y,t){sw=c?{c:c,x:x,y:y,t:t}:null}
-    function swDelOK(c){return (sayMode==="g"||sayMode==="v"||sayMode==="m")&&c&&!sayBack[c.dataset.id]&&!sayEdit&&!sayDrag}
+    function sayPaged(c){var q=c&&c.querySelector(".saylines"); return !!(q&&q._pgGo)}   // 쪽이 여러 장인 카드
+    // 쪽이 있는 카드는 밀어서 지우지 않는다 — 미는 건 쪽 넘김이다 (2026-11-25 사용자 요청: 펼친 카드를 밀면 지워졌음)
+    function swDelOK(c){return (sayMode==="g"||sayMode==="v"||sayMode==="m")&&c&&!sayBack[c.dataset.id]&&!sayEdit&&!sayDrag&&!sayPaged(c)}
+    function sayFoldToList(id){   // 첫 쪽에서 더 밀면: 카드를 접고 목록으로
+      sayFold[id]=1; if(sayFocusId===id){sayFocusId=""; sayFoldBack(id)}
+      try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){}
+      buzz(10); drawSay();
+    }
     function swSnap(c){c.style.transition="transform .2s,opacity .2s"; c.style.transform=""; c.style.opacity=""; c.classList.remove("srmswarm"); setTimeout(function(){c.style.transition=""},220)}
     list.addEventListener("touchmove",function(e){   // 은혜 앞면: 오른쪽으로 미는 동안 카드가 손가락을 따라감
       var w=sw; if(!w||!w.t||!swDelOK(w.c))return; var t=e.touches[0]; if(!t)return;
@@ -18501,7 +18509,15 @@ body.tafocus #toTop{display:none!important}
         if(dx>110){dc.style.transition="transform .2s ease-in,opacity .2s"; dc.style.transform="translateX(110%)"; dc.style.opacity="0"; setTimeout(function(){sayDelete(dc.dataset.id)},190)} else swSnap(dc);
         return}
       if(Math.abs(dx)<45||Math.abs(dx)<Math.abs(dy)*1.3)return;
-      if(!sayBack[w.c.dataset.id]){var pq=w.c.querySelector(".saylines"); if(pq&&pq._pgGo&&!(dx>0&&swDelOK(w.c))&&pq._pgGo(dx<0?1:-1)){saySwAt=Date.now(); return}}   // 📄 쪽이 있으면 밀어서 쪽 넘김, 끝 쪽에서 더 밀면 예전처럼 뒷면
+      if(!sayBack[w.c.dataset.id]){
+        var pq=w.c.querySelector(".saylines");
+        if(pq&&pq._pgGo){   // 📄 쪽이 있는 카드 (2026-11-25 사용자 요청)
+          saySwAt=Date.now();
+          if(pq._pgGo(dx<0?1:-1))return;                      // ← 다음 쪽 / → 이전 쪽
+          if(dx>0){sayFoldToList(w.c.dataset.id); return}     // 첫 쪽에서 더 오른쪽으로 밀면 접고 목록으로
+          // 마지막 쪽에서 더 왼쪽으로 밀면 예전처럼 뒷면으로
+        }
+      }
       if(dx>0&&swDelOK(w.c)){if(!w.t&&dx>110){saySwAt=Date.now(); sayDelete(w.c.dataset.id)} return}   // 은혜 앞면은 왼쪽으로 밀어야 뒷면 (PC 마우스는 오른쪽으로 크게 끌면 지움)
       var id=w.c.dataset.id; saySwAt=Date.now(); clearTimeout(hold); pend=null;
       var ua=document.activeElement; if(ua&&ua.classList&&ua.classList.contains("sayuse")){sayUseSave(ua); ua.blur()}
