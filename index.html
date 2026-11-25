@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-sayclr">
+<meta name="app-build" content="ab-20261126-pin3d">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6060,6 +6060,12 @@ body.tafocus #toTop{display:none!important}
 .sayhlf{z-index:200!important}
 .sayles.saylesort .saylview{display:none}
 .sayles.saylesort textarea.sayle.hlhas{color:var(--ink)}
+
+/* 📌 접힌 말씀 카드 머리의 고정 단추도 옆 ⏱·🖼처럼 둥근 입체 (2026-11-26 사용자 요청) */
+.note:not(.open):not(.vediting) .chead .pinbtn{flex:0 0 auto;align-self:flex-start;width:24px!important;height:24px!important;margin:-1.5px 0 0 4px!important;padding:0;opacity:1;border:1px solid #4A4856;border-radius:50%;background-color:#2A2933!important;background-image:linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.07) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.24) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 2px 0 rgba(0,0,0,.45),0 3px 6px rgba(0,0,0,.3)!important;display:grid!important;place-items:center;color:var(--faint);transition:transform .08s}
+.note:not(.open):not(.vediting) .chead .pinbtn svg{width:13px;height:13px}
+.note:not(.open):not(.vediting) .chead .pinbtn[aria-pressed="true"]{color:var(--tc,var(--violet))}
+.note:not(.open):not(.vediting) .chead .pinbtn:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 rgba(0,0,0,.4)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
