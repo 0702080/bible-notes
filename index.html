@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-scenepg">
+<meta name="app-build" content="ab-20261125-srmgrip">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5225,7 +5225,7 @@ body.glassopen #fab{visibility:hidden}
 .saylg{flex:0 0 30px;height:40px;display:grid;place-items:center;color:var(--faint);font-size:17px;opacity:.35}
 .saylt{flex:1;min-width:0;min-height:40px;box-sizing:border-box;padding:8px 10px 8px 0;font-family:var(--serif);font-size:16px;line-height:1.5;color:var(--ink);white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word}
 /* 설교 메모 목록 카드 정렬: ⠿는 카드 왼쪽 가운데에 따로, 제목·날짜·메모·본문은 모두 같은 왼쪽 선 (2026-11-08 사용자 요청) */
-.srmlist>.srmcard{position:relative;padding:12px 14px 12px 30px!important}
+.srmlist>.srmcard{position:relative;padding:12px 14px!important}   /* ⠿ 자리 없앰 (2026-11-25 사용자 요청) */
 .srmcard .srmmeta .srmcgrip{position:absolute;left:7px;top:0;bottom:0;margin:0;width:18px;padding:0;display:flex;align-items:center;justify-content:center}
 .srmcard .srmmeta{column-gap:8px;row-gap:3px}
 .srmcard .srmmeta .srmttl{font-size:13px;line-height:1.35}
@@ -14903,7 +14903,7 @@ body.tafocus #toTop{display:none!important}
       var fd=true; c.classList.add("srmfolded");   // 목록은 늘 접힌 모양(제목·날짜·설교자만), 누르면 바로 읽기 (2026-11-11 사용자 요청)
       var m=document.createElement("span"); m.className="srmmeta";
       // 맨 위에 제목, 그 아래 줄에 날짜·설교자 (2026-11-08 사용자 요청)
-      var gr=document.createElement("span"); gr.className="srmcgrip"; gr.textContent="⠿"; gr.title="끌어서 순서 바꾸기"; gr.setAttribute("aria-hidden","true"); m.appendChild(gr);
+      // ⠿ 손잡이는 없앴다 — 카드를 꾹 눌러 끌면 순서가 바뀐다 (2026-11-25 사용자 요청)
       var t=document.createElement("span"); t.className="srmttl"; t.textContent=x.title.trim()||"(제목 없음)"; m.appendChild(t);
       var cbx=document.createElement("span"); cbx.className="srmcbtns";   // 단추는 오른쪽에 세로로 → 제목을 넓게 (2026-11-11 사용자 요청)
       var dx=document.createElement("span"); dx.className="srmcdel"; dx.setAttribute("role","button"); dx.textContent="삭제"; dx.title="이 설교 메모 지우기";   // 목록에서 바로 지우기 (2026-11-08 사용자 요청)
