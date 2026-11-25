@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-mtfix">
+<meta name="app-build" content="ab-20261126-prd3d">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6031,6 +6031,16 @@ body.boardon #toTop{display:none}
 /* ⬆ 맨 위로 단추는 글을 적는 동안(글 칸에 커서) 숨김 — 기도문 칸 아래를 가림 (2026-11-19 사용자 요청) */
 body.tafocus #toTop{display:none!important}
 .hymsearch{padding-right:54px!important}
+
+/* 🧊 기도 읽기 단추 입체 (2026-11-26 사용자 요청): 한 줄 기도 아래 줄(응답 표시·고치기·지우기)·말씀 기도 응답 표시(.prdansb)·접기(.prdtf) — 빛·그늘 + 아래 4px 두께, 누르면 3px 눌림 */
+.prd .p1foot button[data-p1],.prd .prdit .prdansb,.prd .prdtf{border:1px solid rgba(255,255,255,.14)!important;background:linear-gradient(180deg,#4A4858 0%,#34323F 55%,#2A2834 100%)!important;color:#E6E2F0!important;font-weight:600!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 4px 0 #16151B,0 6px 10px rgba(0,0,0,.45)!important;margin-bottom:4px;transition:transform .08s,box-shadow .08s}
+.prd .p1foot button[data-p1]:active,.prd .prdit .prdansb:active,.prd .prdtf:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 1px 0 #16151B,0 2px 4px rgba(0,0,0,.4)!important}
+.prd .prdansb,.prd .p1foot [data-p1="ans"]{color:#B9B4C8!important}
+.prd .answered .prdansb,.prd .answered .p1foot [data-p1="ans"]{border-color:#F3D27A!important;background:linear-gradient(180deg,#F6DA8A 0%,#E2B54C 55%,#C9982E 100%)!important;color:#2A1F08!important;font-weight:700!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 4px 0 #6E5114,0 6px 10px rgba(0,0,0,.45)!important}
+.prd .answered .prdansb:active,.prd .answered .p1foot [data-p1="ans"]:active{box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 1px 0 #6E5114,0 2px 4px rgba(0,0,0,.4)!important}
+.prd .p1foot [data-p1="del"]{color:#E9A9B6!important}
+.prd .p1foot [data-p1="del"][data-sure]{color:#FFD3DB!important;background:linear-gradient(180deg,#9A4A5C 0%,#7A3446 55%,#652A39 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 4px 0 #3A1620,0 6px 10px rgba(0,0,0,.45)!important}
+.prd .prdtf{height:28px!important;padding:0 12px!important;border-radius:14px!important;font-size:12px!important;color:color-mix(in srgb,var(--ic,#C9A8FF) 55%,#fff)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
