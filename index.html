@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-prdmode3">
+<meta name="app-build" content="ab-20261125-nohym">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -7392,7 +7392,7 @@ body.tafocus #toTop{display:none!important}
   function renderDailyHits(){
     var box=$("dlFind"); if(!box)return 0;
     var wo=!!(filterText&&findWordOnly);   // 말씀만 찾을 때도 🎵 찬양 가사는 찾아 보여 줌 (2026-11-15 사용자 요청)
-    if(wo&&!hymHits(1).length){box.hidden=true;box.textContent="";var gr0=$("dlFGrip");if(gr0)gr0.hidden=true;return 0}
+    if(wo){box.hidden=true;box.textContent="";var gr0=$("dlFGrip");if(gr0)gr0.hidden=true;return 0}
     if(filterText&&bookQ()){box.hidden=true;box.textContent="";return 0}   // 책 이름 초성으로 찾을 때는 기록 찾기 칸을 띄우지 않음
     if(!box._wired){
       box._wired=1;
@@ -7437,7 +7437,7 @@ body.tafocus #toTop{display:none!important}
     box.textContent=""; renderRecent();
     if(!filterText){box.hidden=true;if(grip)grip.hidden=true;return 0}
     pushRecent(filterText);
-    var dh=(wo||findNoDaily)?[]:dailyHits(24), ph=wo?[]:prayHits(24), ah=wo?[]:actHits(24), th=wo?{med:[],qa:[],doc:[]}:textHits(24), sh=wo?[]:sayHits(24), rq=wo?null:refQuery(), hh=hymHits(24);
+    var dh=(wo||findNoDaily)?[]:dailyHits(24), ph=wo?[]:prayHits(24), ah=wo?[]:actHits(24), th=wo?{med:[],qa:[],doc:[]}:textHits(24), sh=wo?[]:sayHits(24), rq=wo?null:refQuery(), hh=wo?[]:hymHits(24);   /* 말씀만 찾을 땐 찬양 안 나옴 (2026-11-25) */
     var total=dh.length+ph.length+ah.length+th.med.length+th.qa.length+th.doc.length+sh.length+hh.length+(rq?1:0);
     box.hidden=!total; if(grip)grip.hidden=!total;
     if(!total)return 0;
