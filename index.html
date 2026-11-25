@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-nosum">
+<meta name="app-build" content="ab-20261126-ans3d">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6043,6 +6043,14 @@ body.tafocus #toTop{display:none!important}
 .prd .prdtf{height:28px!important;padding:0 12px!important;border-radius:14px!important;font-size:12px!important;color:color-mix(in srgb,var(--ic,#C9A8FF) 55%,#fff)!important}
 /* 🙌 기도 읽기 '응답 연표' 탭의 숫자 칸 3개(응답된 기도·평균 기다린 날·기다리는 기도)는 뺌 — 바로 맞춰지지 않아서, 위 탭(기다리는 기도·응답된 기도)과 겹침 (2026-11-26 사용자 요청) */
 .prdtlbody .anssum{display:none!important}
+
+/* 기도 응답 연표 카드 아래 단추 입체 (2026-11-26) */
+.ansundo,.ansgo,.ansmark{border:1px solid rgba(255,255,255,.14)!important;background:linear-gradient(180deg,#4A4858 0%,#34323F 55%,#2A2834 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 4px 0 #16151B,0 6px 10px rgba(0,0,0,.45)!important;margin-bottom:4px!important;border-radius:999px!important;padding:6px 14px!important;font-size:12.5px;transition:transform .08s,box-shadow .08s}
+.ansundo:active,.ansgo:active,.ansmark:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 0 #16151B,0 2px 4px rgba(0,0,0,.4)!important}
+.ansgo{color:var(--sky)!important}
+.ansundo{color:#C9C6D6!important}
+.ansmark{color:var(--gold)!important}
+.ansundo[data-sure]{color:#fff!important;border-color:rgba(255,190,220,.4)!important;background:linear-gradient(180deg,#C86A92 0%,#A24E74 55%,#873E5F 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 4px 0 #4E2236,0 6px 10px rgba(0,0,0,.45)!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
