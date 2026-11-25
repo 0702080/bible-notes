@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-ans3d">
+<meta name="app-build" content="ab-20261126-sayclr">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6051,6 +6051,15 @@ body.tafocus #toTop{display:none!important}
 .ansundo{color:#C9C6D6!important}
 .ansmark{color:var(--gold)!important}
 .ansundo[data-sure]{color:#fff!important;border-color:rgba(255,190,220,.4)!important;background:linear-gradient(180deg,#C86A92 0%,#A24E74 55%,#873E5F 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 4px 0 #4E2236,0 6px 10px rgba(0,0,0,.45)!important}
+
+/* 🎨 한 마디·은혜·장면 고치기 글자 색 (2026-11-26) */
+.sayles.sayhlbox{position:relative}
+.sayles textarea.sayle.hlhas:not(:focus){color:transparent}
+.saylview{position:absolute;pointer-events:none;box-sizing:border-box;margin:0;font-family:var(--serif);font-size:16px;line-height:40px;white-space:pre-wrap;word-break:keep-all;overflow-wrap:break-word;color:var(--ink);z-index:1}
+.saylview .hlb{font-weight:800}
+.sayhlf{z-index:200!important}
+.sayles.saylesort .saylview{display:none}
+.sayles.saylesort textarea.sayle.hlhas{color:var(--ink)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -17909,7 +17918,7 @@ body.tafocus #toTop{display:none!important}
     var lb=document.createElement("span"); lb.className="saylbl"; lb.textContent=sd.hv?"짧은 말씀":"오늘의 한 마디"; sb.appendChild(lb);
     var q=document.createElement("span"); q.className="sayq1";
     var wi=0;   // 내가 나눈 줄(엔터)은 그대로 보여 줌 (2026-11-01 사용자 요청)
-    sayLines(sd.t).split("\n").forEach(function(ln,li){
+    sayLines(hlStrip(sd.t)).split("\n").forEach(function(ln,li){
       if(li)q.appendChild(document.createElement("br"));
       ln.split(" ").forEach(function(w,i,a){
         var sp=document.createElement("span"); sp.className="sw"; sp.style.setProperty("--i",Math.min(wi++,24)); sp.textContent=w+(i<a.length-1?" ":""); q.appendChild(sp);
@@ -18499,6 +18508,53 @@ body.tafocus #toTop{display:none!important}
       function mu(){document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); lvEnd()}
       document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu);
     });
+    /* 🎨 고치기에서 문장 소절 글자 색 (2026-11-26 사용자 요청): 줄에서 글자를 고르면(안 고르면 그 줄 전체) 그 줄 아래 떠 있는 B·색 6가지·지우기.
+       설교 메모와 같은 기호(**굵게**, [[분홍:글]])로 저장 → 읽기 줄 칸은 이미 색으로 보임. 커서가 없는 줄은 기호 대신 색 글자를 겹쳐 보여 줌(.saylview) */
+    box.classList.add("sayhlbox");
+    var hlF=document.createElement("div"); hlF.className="srmhl srmhlfloat sayhlf"; hlF.hidden=true; hlF.setAttribute("role","toolbar"); hlF.setAttribute("aria-label","고른 글자 색");
+    hlF.innerHTML='<button type="button" class="hlbtn hlbold" data-hl="b" title="굵게">B</button>'+[["금","var(--gold)"],["분홍","var(--pink)"],["하늘","var(--sky)"],["초록","var(--green)"],["주황","var(--orange)"],["보라","#C9A8FF"]].map(function(c){return '<button type="button" class="hlbtn hldot" data-hl="'+c[0]+'" style="--d:'+c[1]+'" title="'+c[0]+'" aria-label="'+c[0]+'"></button>'}).join("")+'<button type="button" class="hlbtn hlclr" data-hl="x" title="색 지우기">지우기</button>';
+    document.body.appendChild(hlF);
+    var hlTa=null;
+    function hlGone(){return !box.isConnected}
+    function hlPlace(){
+      if(hlGone()){hlF.remove(); document.removeEventListener("selectionchange",hlPlace); return}
+      var t=document.activeElement;
+      if(!t||!t.classList||!t.classList.contains("sayle")||!box.contains(t)||t.selectionStart===t.selectionEnd||(lnPick&&lnPick.box===box)){hlF.hidden=true;return}
+      hlTa=t; var r=t.getBoundingClientRect(), vv=window.visualViewport, vh=vv?vv.height+vv.offsetTop:innerHeight;
+      hlF.hidden=false; var h=hlF.offsetHeight||40, top=r.bottom+8;
+      if(top+h>vh-6)top=Math.max(8,r.top-h-60);
+      hlF.style.top=Math.round(top)+"px";
+    }
+    document.addEventListener("selectionchange",hlPlace);
+    box.addEventListener("focusout",function(){setTimeout(hlPlace,140)});
+    ["pointerdown","mousedown","touchstart"].forEach(function(ev){hlF.addEventListener(ev,function(e){e.preventDefault()},{passive:false})});   // 눌러도 고른 글자가 풀리지 않게
+    hlF.addEventListener("click",function(e){
+      var hb=e.target.closest(".hlbtn"); if(!hb)return; e.preventDefault(); e.stopPropagation();
+      var t=(document.activeElement&&document.activeElement.classList.contains("sayle")&&box.contains(document.activeElement))?document.activeElement:hlTa;
+      if(!t||!t.isConnected){toast("색을 바꿀 글자를 먼저 골라 주세요");return}
+      var v=t.value, a=t.selectionStart, b=t.selectionEnd; if(a===b){a=0;b=v.length}
+      if(a===b)return;
+      t.value=v.slice(0,a)+hlMark(v.slice(a,b),hb.dataset.hl)+v.slice(b);
+      sayEditAt=Date.now(); buzz(8); hang(); sync();
+      try{t.blur()}catch(err){} hlF.hidden=true; vwAll();
+    });
+    function vw(r){
+      var v=r._hv; HL_RE.lastIndex=0; var has=HL_RE.test(r.value); HL_RE.lastIndex=0;
+      r.classList.toggle("hlhas",has);
+      if(!has||!r.isConnected){if(v){v.remove(); r._hv=null} return}
+      if(!v){v=r._hv=document.createElement("div"); v.className="saylview"; v.setAttribute("aria-hidden","true"); box.appendChild(v)}
+      var cs=getComputedStyle(r);
+      v.style.top=(r.offsetTop+r.clientTop)+"px"; v.style.left=(r.offsetLeft+r.clientLeft)+"px"; v.style.width=r.offsetWidth+"px";
+      v.style.paddingLeft=cs.paddingLeft; v.style.paddingRight=cs.paddingRight; v.style.textIndent=cs.textIndent;
+      v.style.display=r===document.activeElement?"none":"";
+      hlFill(v,hlParse(r.value));
+    }
+    function vwAll(){if(hlGone())return; [].forEach.call(box.querySelectorAll(".saylview"),function(v){if(!v._keep)v._stale=1}); rows().forEach(function(r){if(r._hv)r._hv._stale=0; vw(r); if(r._hv)r._hv._stale=0}); [].forEach.call(box.querySelectorAll(".saylview"),function(v){if(v._stale)v.remove()})}
+    var vwQ=0; function vwSoon(){cancelAnimationFrame(vwQ); vwQ=requestAnimationFrame(vwAll)}
+    box.addEventListener("focusin",vwSoon); box.addEventListener("focusout",function(){setTimeout(vwAll,30)});
+    box.addEventListener("input",vwSoon);
+    var hang0=hang; hang=function(){hang0(); vwSoon()};
+    setTimeout(vwAll,150); setTimeout(vwAll,500); if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){if(!hlGone())vwAll()});
     // 📐 적는 동안 칸을 키보드 위까지 늘려 아래 단추 줄이 키보드 바로 위에 (휴대폰)
     var on=false;
     function fill(){
@@ -19250,7 +19306,7 @@ body.tafocus #toTop{display:none!important}
     var pinned=sayPinned(), isPin=!!(pinned&&pinned.id===sd.id);
     var q=document.createElement("button"); q.type="button"; q.className="bsq"; q.title="믿음의 한 마디 모두 보기";
     if(next)BS.ci=(BS.ci+1)%BS_COL.length; var bth=sayTheme(sd); q.style.setProperty("--bsc",bth?bth.c:BS_COL[BS.ci]);
-    q.textContent=(sd.hv?"📖  ":"💬  “")+String(sd.t).replace(/\s+/g," ")+(sd.hv?"":"”");
+    q.textContent=(sd.hv?"📖  ":"💬  “")+hlStrip(String(sd.t)).replace(/\s+/g," ")+(sd.hv?"":"”");
     if(sd.hv){q.classList.add("bshv"); q.style.setProperty("--bsc","#FFD36B"); q.title="짧은 말씀 (10분마다)"}
     if(sd.who){var w=document.createElement("small"); w.textContent="— "+sd.who; q.appendChild(w)}
     var pb=document.createElement("button"); pb.type="button"; pb.className="saypin"+(isPin?" on":""); pb.dataset.sid=sd.id;
