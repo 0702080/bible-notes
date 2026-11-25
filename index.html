@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-icbtnwrap">
+<meta name="app-build" content="ab-20261125-prdmode3">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -4561,8 +4561,16 @@ body.boardon .fscrow{display:none}
 .prdansb,.p1foot [data-p1="ans"]{height:30px;padding:0 13px;border:1px solid color-mix(in srgb,var(--gold) 55%,#34333A);border-radius:15px;background:color-mix(in srgb,var(--gold) 14%,transparent);color:var(--gold);font-family:inherit;font-size:12.5px;font-weight:700;white-space:nowrap}
 .answered .prdansb,.answered .p1foot [data-p1="ans"]{border-color:#34333A;background:transparent;color:var(--faint);font-weight:500}
 /* 24 고치기 칸은 읽을 때와 똑같은 자리·글자 */
-.prded{min-height:0;margin:8px 0 0;padding:0;border:0;border-radius:8px;background:transparent;outline:1px dashed color-mix(in srgb,var(--ic,var(--orange)) 55%,transparent);outline-offset:5px;font-size:16.5px;line-height:1.75;color:color-mix(in srgb,var(--ic,var(--orange)) 48%,#fff);word-break:keep-all;overflow-wrap:break-word;resize:none;overflow:hidden}
-.prded:focus{outline-style:solid}
+.prded{min-height:0;margin:2px -6px 0;width:calc(100% + 12px)!important;padding:5px;border:1px dashed color-mix(in srgb,var(--ic,var(--orange)) 55%,transparent);border-radius:8px;background:transparent;outline:0;font-size:16.5px;line-height:1.75;color:color-mix(in srgb,var(--ic,var(--orange)) 48%,#fff);word-break:keep-all;overflow-wrap:break-word;resize:none;overflow:hidden}
+.prded:focus{border-style:solid;outline:0}
+.prd .tagripbar{max-width:none!important;--tgc:color-mix(in srgb,var(--ic,var(--orange)) 55%,transparent)!important;border-color:var(--tgc)!important;border-top:0!important;border-radius:0 0 8px 8px}
+/* ✏️ 고치기 | ✋ 줄 옮기기 (2026-11-25 사용자 요청) */
+.prdmode{display:inline-flex;margin-left:auto;padding:3px;gap:3px;border-radius:17px;background:#0E0D12;box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+.prdmode button{height:28px;padding:0 11px;border:0;border-radius:14px;background:transparent;color:var(--faint);font-family:inherit;font-size:12.5px;white-space:nowrap}
+.prdmode button.on[data-m="sel"]{background:linear-gradient(#5A8FC0,#3E6E9C);color:#fff;font-weight:700;box-shadow:0 2px 0 #24435F}
+.prdmode button.on[data-m="move"]{background:linear-gradient(#E8B85A,#C8913A);color:#1B1408;font-weight:700;box-shadow:0 2px 0 #7A5620}
+.prded[data-lmode="move"]{border-color:color-mix(in srgb,var(--gold) 70%,transparent)!important;border-style:solid;caret-color:transparent;cursor:grab}
+
 .pri textarea.pt{padding:12px 14px;border-radius:12px;font-size:17px;line-height:1.8;word-break:keep-all;overflow-wrap:break-word}
 /* 12·22 걷기 암송 설정 */
 .wkgaprow{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
@@ -7832,6 +7840,7 @@ body.tafocus #toTop{display:none!important}
         if(prd._swAt&&Date.now()-prd._swAt<450)return;   // 옆으로 민 손길은 누르기로 세지 않음
         var tg=e.target.closest(".prdthgo,.prdthback");   // 앞면 ↔ 뒷면(응답 감사 기도)
         if(tg){var tc=tg.closest(".prdcard"); prdThx=tg.classList.contains("prdthgo")?{nid:tc.dataset.nid,pid:tc.dataset.pid}:{nid:"",pid:""}; var ae0=document.activeElement; if(ae0&&ae0.blur)ae0.blur(); drawPrayRead(); var nc=prd.querySelector('.prdcard[data-pid="'+tc.dataset.pid+'"]'); if(nc)nc.classList.add("prdflipin"); return}
+        var pmb=e.target.closest(".prdmode button"); if(pmb){prd._lm=pmb.dataset.m; prdModeSet(pmb.closest(".prdcard")||prd,prd._lm); if(prd._lm==="move")toast("✋ 문장을 잡고 위아래로 끌어 옮겨요"); return}
         if(e.target.closest(".prdedok")){prdEdSave();return}
         if(e.target.closest(".prdedno")){prdEd={nid:"",pid:""};drawPrayRead();return}
         var a=e.target.closest(".prdcard"); if(!a||a.classList.contains("prdthx")||e.target.closest("button,textarea"))return;
@@ -7897,11 +7906,14 @@ body.tafocus #toTop{display:none!important}
   var prdEd={nid:"",pid:""}, prdTap={k:"",t:0}, prdTF=new Set(), prdThx={nid:"",pid:""};   // prdThx: 뒷면(응답 감사 기도)을 연 기도 (2026-11-12)   // prdTF: 접어 둔 기도문
   try{JSON.parse(localStorage.getItem("bible-prd-tfold")||"[]").forEach(function(x){prdTF.add(String(x))})}catch(e){}
   function prdEdOpen(nid,pid){
-    if(prd)prd._edAt=Date.now();
+    if(prd){prd._edAt=Date.now(); prd._lm="sel"}   /* 열 때마다 ✏️ 고치기부터 */
     prdEd={nid:nid,pid:pid}; drawPrayRead();
     var t=prd.querySelector(".prded"); if(!t)return;
     grow(t); t.focus(); var cp=t.value.indexOf(PRAY_HEAD)===0?PRAY_HEAD.length:t.value.length; try{t.setSelectionRange(cp,cp)}catch(e){}
   }
+  function prdModeSet(root,m){var te=root.querySelector(".prded"); if(!te)return; te.dataset.lmode=m; te.inputMode=m==="move"?"none":"";
+    if(m==="move"&&document.activeElement===te)te.blur();
+    root.querySelectorAll(".prdmode button").forEach(function(b){b.classList.toggle("on",b.dataset.m===m)})}   // ✏️ 고치기=꾹 누르면 글 고르기, ✋ 줄 옮기기=문장을 잡자마자 끌기·키보드 안 뜸 (2026-11-25 사용자 요청)
   function prdEdSave(){
     var t=prd&&prd.querySelector(".prded"), n=notes.get(prdEd.nid), x=n&&(n.prays||[]).find(function(y){return y.id===prdEd.pid});
     if(t)t.value=prayEnd(t.value);   // 끝맺음 꼭 (2026-11-14)
@@ -7965,10 +7977,10 @@ body.tafocus #toTop{display:none!important}
         a.style.setProperty("--ic",ANSCOL[(pi+list.children.length)%ANSCOL.length]);   // 기도문마다 다른 색 (2026-11-04 사용자 요청)
         var ed=prdEd.nid===n.id&&prdEd.pid===x.id;   // 읽기 모드에서 바로 고치기 (2026-10-24 사용자 요청)
         a.innerHTML='<div class="prdmeta"></div>'+(ed?'<textarea class="prded" aria-label="기도 고치기"></textarea><div class="prdedb"><button type="button" class="prdedno">취소</button><button type="button" class="prdedok">저장</button></div>':'<p class="prdtext"></p>')+(x.ans?'<div class="prdans"><b>🙌 응답 <span></span></b><p></p></div>':'')+(ed?'':'<div class="prdfoot">'+(x.ans?'<button type="button" class="prdthgo">'+((x.th||"").trim()?"🙏 감사 기도 보기":"🙏 감사 기도 쓰기")+'</button>':'')+'<button type="button" class="prdansb"></button></div>');
-        a.querySelector(".prdmeta").innerHTML='<span></span>'+(ed?'':'<button type="button" class="prdtf"></button>');
+        a.querySelector(".prdmeta").innerHTML='<span></span>'+(ed?'<span class="prdmode"><button type="button" data-m="sel">✏️ 고치기</button><button type="button" data-m="move">✋ 옮기기</button></span>':'<button type="button" class="prdtf"></button>');
         a.querySelector(".prdmeta span").textContent=dateLabel(x.at)+(x.ans?"":"  ·  기다리는 기도");
         if(!ed){a.querySelector(".prdtf").textContent=prdTF.has(x.id)?"펼치기 ▾":"접기 ▴"; a.querySelector(".prdansb").textContent=x.ans?"🙌 응답됨 ✓":"응답 표시"}
-        if(ed)a.querySelector(".prded").value=x.t; else a.querySelector(".prdtext").textContent=x.t;
+        if(ed){var te=a.querySelector(".prded"); te.value=x.t; prdModeSet(a,prd._lm||"sel")} else a.querySelector(".prdtext").textContent=x.t;
         if(x.ans){a.querySelector(".prdans span").textContent=dlabel(dkey(x.ans));var ap=a.querySelector(".prdans p");if((x.an||"").trim())ap.textContent=x.an;else ap.remove()}
         sec.appendChild(a);
       });
@@ -8871,17 +8883,18 @@ body.tafocus #toTop{display:none!important}
     var lpg={t:0};
     document.addEventListener("touchstart",function(e){
       var t=e.target; if(!ok(t)||!nogrip(t)||e.touches.length!==1||drag)return;
-      var p=e.touches[0]; clearTimeout(lpg.t); lpg={t:0,ta:t,x:p.clientX,y:p.clientY,fired:false};
+      var lm=t.dataset.lmode||""; if(lm==="sel")return;   // ✏️ 고치기 모드: 꾹 누르면 휴대폰 글 고르기만 (2026-11-25)
+      var p=e.touches[0]; clearTimeout(lpg.t); lpg={t:0,ta:t,x:p.clientX,y:p.clientY,fired:false,mv:lm==="move"};
       lpg.t=setTimeout(function(){
         lpg.t=0; var tt=lpg.ta; if(!tt||!tt.isConnected)return;
         if(ta&&ta!==tt)ta.classList.remove("lhpad"); ta=tt; mKey=""; measure();
         var best=null,bd=1e9; geo.forEach(function(g){if(g.empty)return; var d=Math.abs(mid(g)-lpg.y); if(d<bd){bd=d;best=g}});
         if(!best||bd>best.h)return;
-        if(document.activeElement===tt){var ca=tt.selectionStart, st0=tt.value.split("\n").slice(0,best.i).join("\n").length+(best.i?1:0), en0=st0+mLines[best.i].length; if(ca>=st0&&ca<=en0&&tt.selectionStart===tt.selectionEnd)return}   // 커서가 있는 줄은 휴대폰 글 고르기 그대로
+        if(!lpg.mv&&document.activeElement===tt){var ca=tt.selectionStart, st0=tt.value.split("\n").slice(0,best.i).join("\n").length+(best.i?1:0), en0=st0+mLines[best.i].length; if(ca>=st0&&ca<=en0&&tt.selectionStart===tt.selectionEnd)return}   // 커서가 있는 줄은 휴대폰 글 고르기 그대로
         lpg.fired=true; try{window.getSelection().removeAllRanges()}catch(err){}
         drag={i:best.i,y:lpg.y,moved:false,raf:0,touch:true,foc:document.activeElement===tt};
         layer.classList.add("dragging"); buzz(14); draw(); drag.raf=requestAnimationFrame(tick);
-      },400);
+      },lpg.mv?150:400);   // ✋ 줄 옮기기 모드는 잡자마자(0.15초)
     },{passive:true,capture:true});
     document.addEventListener("touchmove",function(e){
       var p=e.touches[0]; if(!p)return;
