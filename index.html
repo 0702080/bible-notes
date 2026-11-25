@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-srmgrip">
+<meta name="app-build" content="ab-20261125-icrest">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -4735,6 +4735,8 @@ textarea.dlicfull.dlicedit:focus{outline-style:solid}
 textarea.ictht{display:block;width:100%;min-height:180px;box-sizing:border-box;padding:10px 12px;border:1px solid color-mix(in srgb,var(--ic0) 45%,#3A3944);border-radius:12px;background:rgba(0,0,0,.22);color:var(--ink);font:inherit;font-size:16px;line-height:1.8;resize:none;overflow:hidden}
 textarea.ictht:focus{outline:none;border-color:color-mix(in srgb,var(--ic0) 75%,#fff)}
 .icthtip{margin:10px 0 0;color:var(--muted);font-size:12px;text-align:right}
+  .icmv{border-color:color-mix(in srgb,var(--sky) 45%,#45434F)!important;color:var(--sky)!important}
+  .icback{border-color:color-mix(in srgb,var(--green) 50%,#45434F)!important;color:var(--green)!important}
 .icthmark{margin-left:auto;margin-right:8px;color:color-mix(in srgb,var(--ic0) 60%,#fff);font-size:12.5px;opacity:.85}
 .wklock{background:#000!important}   /* 화면을 켜 둔 채 주머니에: 완전히 까맣게 해서 배터리를 아낌 */
 .wkcnt{padding:1px 9px;border-radius:12px;background:color-mix(in srgb,var(--sky) 18%,transparent);color:var(--sky);font-weight:700}
@@ -15047,7 +15049,7 @@ body.tafocus #toTop{display:none!important}
     if(!o.del||typeof o.del!=="object")o.del={};
     o.per=Math.max(1,Math.min(10,+o.per||3));
     o.items=o.items.filter(function(x){return x&&x.id&&String(x.name||"").trim()}).map(function(x){return {id:String(x.id),name:String(x.name).trim().slice(0,100),memo:(function(m){m=String(m||"");return m.trim()?icHead(m).trim():""})(x.memo).slice(0,8000),nid:String(x.nid||""),at:+x.at||Date.now(),u:+x.u||+x.at||0,
-      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,no:+x.no||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord,pinDay:/^\d{4}-\d{2}-\d{2}$/.test(x.pinDay||"")?x.pinDay:undefined,skipDay:/^\d{4}-\d{2}-\d{2}$/.test(x.skipDay||"")?x.skipDay:undefined}});
+      log:Array.isArray(x.log)?x.log.filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(-400):[],ans:+x.ans||0,no:+x.no||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord,rest:x.rest?1:0,pinDay:/^\d{4}-\d{2}-\d{2}$/.test(x.pinDay||"")?x.pinDay:undefined,skipDay:/^\d{4}-\d{2}-\d{2}$/.test(x.skipDay||"")?x.skipDay:undefined}});
     return o;
   }
   function icSave(o){try{localStorage.setItem(IC_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__icp")}
@@ -15067,7 +15069,7 @@ body.tafocus #toTop{display:none!important}
   }
   function icLastBefore(x,day){var l=(x.log||[]).filter(function(d){return d<day}); return l.length?l[l.length-1]:""}
   function icPick(o,day,skip){   // 그날 기도할 사람: 그날 이미 기도한 사람 + 오래 못 한 사람부터 per명까지 (skip=옆으로 넘긴 수)
-    var live=o.items.filter(function(x){return !x.ans&&!x.no&&x.skipDay!==day});   // 그날 나머지로 뺀 것(skipDay)은 빼고
+    var live=o.items.filter(function(x){return !x.ans&&!x.no&&!x.rest&&x.skipDay!==day});   // 지난 기도에 둔 것(rest)과 그날 나머지로 뺀 것(skipDay)은 빼고
     var pin=live.filter(function(x){return x.pinDay===day&&x.log.indexOf(day)<0});   // 그날 오늘 칸으로 끌어 넣은 것(pinDay)은 늘 들어감
     live=live.filter(function(x){return pin.indexOf(x)<0});
     var done=live.filter(function(x){return x.log.indexOf(day)>=0});
@@ -15280,8 +15282,8 @@ body.tafocus #toTop{display:none!important}
     var day=dkey(Date.now()), hdr=icv.querySelector(".icbody .ichead.ichall:not(.icanshd):not(.icnohd)"), cx=o.items.find(function(y){return y.id===c.dataset.id});
     if(cx&&!cx.ans&&!cx.no){
       var wasToday=icPick(o,day).some(function(y){return y.id===cx.id}), nowToday=!hdr||!!(c.compareDocumentPosition(hdr)&Node.DOCUMENT_POSITION_FOLLOWING);
-      if(nowToday&&!wasToday){if(cx.skipDay===day&&cx.pinDay!==day)delete cx.skipDay; else{cx.pinDay=day; delete cx.skipDay} icTouch(cx); ch=true}   // 오늘 칸에서 뺐던 것을 되돌리면 원래 자리로
-      else if(!nowToday&&wasToday){cx.skipDay=day; icTouch(cx); ch=true}   // 뺀 자리는 비워 둠 — 다른 기도가 올라와 채우지 않음 (2026-11-20 사용자 요청)
+      if(nowToday&&!wasToday){delete cx.rest; if(cx.skipDay===day&&cx.pinDay!==day)delete cx.skipDay; else{cx.pinDay=day; delete cx.skipDay} icTouch(cx); ch=true}   // 오늘 칸에서 뺐던 것을 되돌리면 원래 자리로
+      else if(!nowToday&&wasToday){cx.skipDay=day; cx.rest=1; delete cx.pinDay; icTouch(cx); ch=true}   // 뺀 자리는 비워 둠, 다음 날에도 안 올라옴 (2026-11-20, 2026-11-25 사용자 요청)
     }
     ids.forEach(function(id,i){var x=o.items.find(function(y){return y.id===id}); if(x&&x.ord!==i*10){x.ord=i*10; icTouch(x); ch=true}});
     if(ch){icSave(o); buzz(8)}
@@ -15323,6 +15325,11 @@ body.tafocus #toTop{display:none!important}
     function B(cls,t){var b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=t; bt.appendChild(b); return b}
     if(x.th.trim()){var tm=document.createElement("span"); tm.className="icthmark"; tm.textContent="🙏 감사"; tm.title="감사 기도 있음 · 옆으로 밀면 보여요"; bt.appendChild(tm)}
     if(big&&!x.ans&&!x.no)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
+    // ↕ 오늘의 기도 ↔ 지난 기도 한 번에 옮기기 (2026-11-25 사용자 요청)
+    if(!x.ans&&!x.no){
+      if(big)B("icmv icrest","🕘 지난 기도로").title="오늘의 기도에서 내려 둬요 (다음 날에도 안 올라와요)";
+      else B("icmv icback","🙏 오늘의 기도로").title="오늘의 기도 칸으로 올려요";
+    }
     var ansB=B("icans"+(x.ans?" on":""),x.ans?"🙌 응답됨 ✓":"응답 표시"); ansB.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답을 받았으면 눌러 표시해요";
     if(!x.ans){var noB=B("icno"+(x.no?" on":""),x.no?"🕊 응답 안 됨 ✓":"응답 안 됨"); noB.title=x.no?"응답 안 된 기도로 표시했어요 · 누르면 다시 기다리는 기도로":"구한 대로 응답되지 않고 마무리된 기도면 눌러 표시해요";   // 응답 안 된 기도 표시 (2026-11-13 사용자 요청)
       if(!x.no)bt.insertBefore(noB,ansB)}   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
@@ -15447,6 +15454,8 @@ body.tafocus #toTop{display:none!important}
     if(b.classList.contains("icfold"))return;   // 접기·펼치기는 카드 누르기(한 번/두 번 셈)에서
     if(b.classList.contains("icpm")){o.per=Math.max(1,Math.min(10,(o.per||3)+(+b.dataset.d))); o.perSet=1; icSave(o); buzz(6); icDraw(); return}   // 하루 몇 명 (2026-10-24 다듬음)
     if(b.classList.contains("icpray")){var on=icToggle(id,today); buzz(on?[12,40,18]:8);   /* 기도했어요 알림은 안 띄움 (2026-11-20 사용자 요청) */ icDraw(); return}
+    if(b.classList.contains("icrest")&&x){x.rest=1; x.skipDay=today; delete x.pinDay; icTouch(x); icSave(o); buzz(10); toast("🕘 지난 기도로 내렸어요"); icDraw(); return}   // (2026-11-25 사용자 요청)
+    if(b.classList.contains("icback")&&x){delete x.rest; delete x.skipDay; x.pinDay=today; icTouch(x); icSave(o); buzz([10,30,10]); toast("🙏 오늘의 기도로 올렸어요"); icDraw(); return}
     if(b.classList.contains("icansv")){icShowAns=!icShowAns; icEdit=""; icv.querySelector(".icbody").scrollTop=0; icDraw(); return}
     if(b.classList.contains("icadd")){icShowAns=false; icEdit="new"; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfn"); if(f)f.focus()},30); return}
     if(b.classList.contains("icedit")){icEdit=id; icDraw(); return}
