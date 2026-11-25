@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-rdsame">
+<meta name="app-build" content="ab-20261126-lstrip">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -13726,13 +13726,15 @@ body.tafocus #toTop{display:none!important}
      예배 때 듣는 설교를 적어 두는 칸. 날짜·설교자·제목·본문·메모·나의 적용. 적는 대로 바로 저장(0.6초).
      저장 bible-sermons {items:[{id,d,who,title,ref,nid,body,apply,yt,at,u,ord}],del:{id:시각}}, 클라우드 줄 "__sermons" (나만 보기), 백업 sermons */
   var SRM_KEY="bible-sermons";
+  // ✂ 줄(문장) 맨 앞 띄어쓰기는 모두 뺌 — 설교 메모·성경 본문·이 설교를 듣고 (2026-11-26 사용자 요청: 문장 앞에 공백이 들어간 것 모두 제거). 읽을 때마다 빼므로 예전 기록·다른 기기에서 받은 것도 그대로 정리됨
+  function srmLStrip(t){return String(t).replace(/^[ \t\u00A0\u3000]+/gm,"")}
   function srmData(){
     var o=null; try{o=JSON.parse(localStorage.getItem(SRM_KEY)||"null")}catch(e){}
     if(!o||!Array.isArray(o.items))o={items:[],del:{}};
     if(!o.del||typeof o.del!=="object")o.del={};
     o.items=o.items.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),d:/^\d{4}-\d{2}-\d{2}$/.test(x.d||"")?x.d:dkey(+x.at||Date.now()),
       who:String(x.who||"").slice(0,60),title:String(x.title||"").slice(0,200),ref:String(x.ref||"").slice(0,120),nid:String(x.nid||""),
-      body:String(x.body||"").slice(0,40000),apply:String(x.apply||"").slice(0,8000),yt:String(x.yt||"").slice(0,500),resp:String(x.resp||"").slice(0,40000),cat:x.cat==="b"?"b":"",at:+x.at||Date.now(),u:+x.u||+x.at||0,ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord,pinDay:/^\d{4}-\d{2}-\d{2}$/.test(x.pinDay||"")?x.pinDay:undefined,skipDay:/^\d{4}-\d{2}-\d{2}$/.test(x.skipDay||"")?x.skipDay:undefined}});
+      body:srmLStrip(String(x.body||"")).slice(0,40000),apply:String(x.apply||"").slice(0,8000),yt:String(x.yt||"").slice(0,500),resp:srmLStrip(String(x.resp||"")).slice(0,40000),cat:x.cat==="b"?"b":"",at:+x.at||Date.now(),u:+x.u||+x.at||0,ord:(x.ord==null||!isFinite(+x.ord))?null:+x.ord,pinDay:/^\d{4}-\d{2}-\d{2}$/.test(x.pinDay||"")?x.pinDay:undefined,skipDay:/^\d{4}-\d{2}-\d{2}$/.test(x.skipDay||"")?x.skipDay:undefined}});
     return o;
   }
   function srmSave(o){try{localStorage.setItem(SRM_KEY,JSON.stringify(o))}catch(e){toast("저장 공간이 부족해요")} if(typeof sbMark==="function")sbMark("__sermons")}
