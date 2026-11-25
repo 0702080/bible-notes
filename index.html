@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-lstrip">
+<meta name="app-build" content="ab-20261126-shotall">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -4666,13 +4666,15 @@ body.boardon .fscrow{display:none}
 .saysrow{display:flex;align-items:center;gap:8px;margin-bottom:12px}
 .saysheet:not(.sayfinding) .saysrow,.saysheet:not(.sayfinding) .saybox>.saysearch{display:none!important}   /* 🔍 단추를 눌렀을 때만 찾기 칸 (2026-11-14) */
 .saysheet .dlbar .dlclose.saysbtn{color:var(--muted)}
+.saysheet .dlbar .dlclose.sayshotall{color:#F3D27A;display:inline-grid;place-items:center}   /* 📷 카드 여러 장 그림으로 (2026-11-26) */
+.sayshotall svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linejoin:round}
 .saysheet .dlbar .dlclose.sayfoldtop{color:#BFE6C8;background-color:#1F3328!important;border-color:#4E8A62!important;display:inline-grid;place-items:center}
 .saysheet .dlbar .dlclose.sayfoldtop[hidden]{display:none}
 .saysheet .dlbar .dlclose.sayadd,.saysheet .dlbar .dlclose.sayclose{display:inline-grid;place-items:center}
 .saysheet .dlbar .dlclose.sayadd svg,.saysheet .dlbar .dlclose.sayclose svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
 .saysheet .dlbar .dlclose.sayclose{color:#F2A7BE}
 body .saysheet>.dlbar{background:rgba(44,40,58,.9)!important;border:1px solid color-mix(in srgb,var(--violet) 32%,#3A3648)!important;box-shadow:0 6px 18px rgba(0,0,0,.35)!important}   /* 윗줄 바탕을 아래 카드(보라빛 짙은 바탕)와 어울리게 (2026-11-15 사용자 요청) */
-.saysheet .dlbar .dlclose.saysbtn,.saysheet .dlbar .dlclose.sayfoldtop,.saysheet .dlbar .dlclose.saylock,.saysheet .dlbar .dlclose.sayadd,.saysheet .dlbar .dlclose.sayclose{width:38px!important;min-width:38px;height:38px!important;padding:0!important;border-radius:50%!important;flex:none}   /* 맨 위 단추는 모두 같은 동그라미 (2026-11-15) */
+.saysheet .dlbar .dlclose.saysbtn,.saysheet .dlbar .dlclose.sayshotall,.saysheet .dlbar .dlclose.sayfoldtop,.saysheet .dlbar .dlclose.saylock,.saysheet .dlbar .dlclose.sayadd,.saysheet .dlbar .dlclose.sayclose{width:38px!important;min-width:38px;height:38px!important;padding:0!important;border-radius:50%!important;flex:none}   /* 맨 위 단추는 모두 같은 동그라미 (2026-11-15) */
 .sayfoldtop svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .saysheet .dlbar .dlclose.saysbtn.on{background-color:#2E2A40!important;border-color:#6A5FA0!important;color:#fff}
 .saysrow .saysearch{flex:1 1 auto;min-width:0;margin-bottom:0}
@@ -14735,7 +14737,7 @@ body.tafocus #toTop{display:none!important}
     srmShotsSave([srmPngFile(c,nm)],rt);
   }
   // 🖼 짧은 말씀 카드 하나를 그림으로 — 카드 색·왼쪽 띠·말씀 줄·— 구절 이름 그대로 (2026-11-19 사용자 요청)
-  function sayShot(x,card){
+  function sayShot(x,card,noSave){
     var W=380, sc=3, mar=18, padL=30, padR=26, padT=28, fs=20, lh=Math.round(fs*1.8), maxW=W-mar*2-padL-padR;
     var tEl=card&&(card.querySelector(".saylt")||card.querySelector(".sayq")), wEl=card&&card.querySelector(".sayf>b");
     var ff=getComputedStyle(tEl||document.body).fontFamily, tcol=tEl?getComputedStyle(tEl).color:"#F3E9D2";
@@ -14761,8 +14763,32 @@ body.tafocus #toTop{display:none!important}
     g.textBaseline="middle";
     rows.forEach(function(r,i){var y=mar+padT+i*lh+lh/2; r.forEach(function(k){g.font=fnt(k.b?"800":"400",fs); g.fillStyle=k.c?COL[k.c]:tcol; g.fillText(k.t,mar+padL+k.x,y)})});
     if(who){g.font=fnt("700",17); g.fillStyle=wEl?getComputedStyle(wEl).color:"#B79CFF"; var wt="— "+who; while(g.measureText(wt).width>maxW&&wt.length>3)wt=wt.slice(0,-2)+"…"; g.fillText(wt,mar+padL,mar+padT+rows.length*lh+14+footH/2-6)}
+    if(noSave)return c;
     var kind=x.hv?"짧은 말씀":"믿음의 한 마디";
     srmShotsSave([srmPngFile(c,(who||kind).replace(/[\\/:*?"<>|\s]+/g,"_")+".png")],who||kind);
+  }
+  // 📷 지금 목록에 보이는 카드 여러 장을 휴대폰 화면 크기 그림에 차례로 담기 — 한 장에 들어가는 만큼, 넘치면 다음 장 (2026-11-26 사용자 요청)
+  function sayShotAll(){
+    if(!say)return; var all=sayData().items, by={}; all.forEach(function(y){by[y.id]=y});
+    var seen={}, cards=[].slice.call(say.querySelectorAll(".saylist .saycard[data-id]")).filter(function(el){var id=el.dataset.id; if(!by[id]||seen[id])return false; seen[id]=1; return true});
+    if(!cards.length){toast("그림으로 담을 카드가 없어요");return}
+    var sc=3, W=380, vw=Math.max(320,window.innerWidth||390), vh=Math.max(480,window.innerHeight||844), H=Math.round(W*vh/vw), mar=18, top=6;   // 그림 한 장 = 이 휴대폰 화면 비율
+    var pages=[], cur=null;
+    function newPage(){var c=document.createElement("canvas"); c.width=W*sc; c.height=H*sc; var g=c.getContext("2d"); g.fillStyle="#15131A"; g.fillRect(0,0,c.width,c.height); cur={c:c,g:g,y:top,n:0}; pages.push(cur)}
+    cards.forEach(function(el){
+      var cc; try{cc=sayShot(by[el.dataset.id],el,true)}catch(e){cc=null} if(!cc)return;
+      var ch=cc.height/sc;   // 카드 그림 높이(위아래 여백 18 포함)
+      if(ch>H){   // 한 장보다 긴 카드는 혼자 한 장에, 줄여서
+        newPage(); var k=H/ch, w2=W*k; cur.g.drawImage(cc,(W-w2)/2*sc,0,w2*sc,H*sc); cur.n=1; cur=null; return;
+      }
+      if(!cur||(cur.n&&cur.y+ch>H))newPage();
+      cur.g.drawImage(cc,0,cur.y*sc); cur.y+=ch-mar; cur.n++;   // 다음 카드는 여백 하나만 띄우고 바로 아래
+    });
+    if(!pages.length){toast("그림을 만들지 못했어요");return}
+    var kind=sayMode==="v"?"짧은말씀":sayMode==="g"?"주님의은혜":sayMode==="m"?"장면묵상":"믿음의한마디", d=new Date(), stamp=(d.getMonth()+1)+"월"+d.getDate()+"일";
+    var files=pages.map(function(p,i){return srmPngFile(p.c,kind+"-"+stamp+"-"+(i+1)+".png")});
+    toast("📷 카드 "+cards.length+"장 → 그림 "+files.length+"장");
+    srmShotsSave(files,kind.replace(/(믿음의|주님의|짧은|장면)/,"$1 "));
   }
   // 🖼 기도제목 카드 하나를 그림으로 — 카드 바탕·테두리·제목 색·기도문(빈 줄 그대로) (2026-11-19 사용자 요청)
   function icShot(x,card){
@@ -17961,10 +17987,11 @@ body.tafocus #toTop{display:none!important}
     sayMode=mode==="v"?"v":mode==="g"?"g":mode==="m"?"m":"s";
     if(!say){
       say=document.createElement("div"); say.className="daily saysheet"; say.setAttribute("role","dialog"); say.setAttribute("aria-modal","true"); say.hidden=true;
-      say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose saysbtn" aria-label="찾기" title="찾기">🔍</button><button type="button" class="dlclose sayfoldtop" hidden aria-label="모두 접기"></button><button type="button" class="dlclose saylock"></button><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose" aria-label="닫기" title="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'+
+      say.innerHTML='<div class="dlbar"><b class="dltitle">💬 믿음의 한 마디</b><button type="button" class="dlclose saysbtn" aria-label="찾기" title="찾기">🔍</button><button type="button" class="dlclose sayshotall" aria-label="카드 여러 장을 화면 크기 그림으로 저장" title="카드 여러 장 그림으로 저장"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8.5a2 2 0 0 1 2-2h2.2l1.4-2h4.8l1.4 2H18a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.6" r="3.4"/></svg></button><button type="button" class="dlclose sayfoldtop" hidden aria-label="모두 접기"></button><button type="button" class="dlclose saylock"></button><button type="button" class="dlclose sayadd">+ 한 마디 담기</button><button type="button" class="dlclose sayclose" aria-label="닫기" title="닫기"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>'+
         '<div class="dlbody"><div class="saybox"><input class="field saysearch" type="search" placeholder="🔍 찾기 (초성 예: ㄱㅅ)" aria-label="한 마디 찾기 (글·말한 분·주제)"><div class="sayform" hidden></div><div class="saylist"></div></div></div>';
       document.body.appendChild(say);
       say.querySelector(".sayclose").addEventListener("click",closeSay);
+      say.querySelector(".sayshotall").addEventListener("click",function(){try{sayShotAll()}catch(e){toast("그림을 만들지 못했어요")}});
       say.querySelector(".saysbtn").addEventListener("click",function(){   // 🔍 누를 때만 찾기 칸이 나옴 — 평소엔 숨겨 카드가 화면을 꽉 채움 (2026-11-14 사용자 요청)
         sayFindOn=!sayFindOn; say.classList.toggle("sayfinding",sayFindOn); this.classList.toggle("on",sayFindOn);
         var si=say.querySelector(".saysearch");
