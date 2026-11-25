@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-noprogqk">
+<meta name="app-build" content="ab-20261126-sheetx">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -8590,6 +8590,7 @@ body.tafocus #toTop{display:none!important}
     setTimeout(function(){ if(!$("searchArea").hidden)$("q").focus(); else $("mText").focus(); },80);   // 말씀 칸에 먼저 커서 (2026-11-19 사용자 요청)
   }
   function closeSheet(){
+    var ae=document.activeElement; if(ae&&ae!==document.body&&$("addSheet").contains(ae))try{ae.blur()}catch(e){}   // 적던 칸에서 먼저 나가 창 크기(mtbig·mtkbd)·키보드를 원래대로 (2026-11-26 사용자 요청)
     $("addSheet").hidden=true; $("fab").hidden=reorderMode; document.body.style.overflow=""; addToCol="";
     if(lastAdded&&(addToBefore||addToAfter)&&boardOn){try{lmApply(null,[lastAdded],addToBefore,addToAfter)}catch(e){}}   // 누른 칸 맨 위로
     addToBefore=""; addToAfter="";
@@ -8633,6 +8634,10 @@ body.tafocus #toTop{display:none!important}
   document.addEventListener("focusout",function(){setTimeout(function(){var a=document.activeElement;if(!(a&&(a.tagName==="INPUT"||a.tagName==="TEXTAREA"||a.isContentEditable)))document.body.classList.remove("typing")},120)});
   $("emptyAdd").addEventListener("click",openSheet);
   $("sheetClose").addEventListener("click",closeSheet);
+  // ✕를 한 번만 눌러도 닫힘 (2026-11-26 사용자 요청): 말씀 칸에 커서가 있으면 누르는 순간 칸에서 나가며 창이 원래 크기로 돌아가 ✕가 자리를 옮겨 누름이 빗나갔음 → 누르는 순간 칸에서 나가지 않게 막고, 손을 떼면 바로 닫음
+  $("sheetClose").addEventListener("mousedown",function(e){e.preventDefault()});
+  $("sheetClose").addEventListener("touchstart",function(e){e.preventDefault()},{passive:false});
+  $("sheetClose").addEventListener("touchend",function(e){e.preventDefault(); if($("addSheet").hidden)return; try{buzz(10)}catch(err){} closeSheet()},{passive:false});
   $("sheetBack").addEventListener("click",closeSheet);
   document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("addSheet").hidden)closeSheet()});
   function openManual(v){
