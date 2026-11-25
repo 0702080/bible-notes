@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-praytop2">
+<meta name="app-build" content="ab-20261125-meddbl">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -9466,6 +9466,29 @@ body.tafocus #toTop{display:none!important}
       lt={el:t,t:now,x:c.clientX,y:c.clientY};
     },{passive:false});
     list.addEventListener("dblclick",function(e){var t=e.target.closest&&e.target.closest(".note.vediting .etext"); if(!t||Date.now()-vEdAt<900)return; done(t,e)});
+  })();
+  // 👆👆 묵상 적는 칸(.med)을 두 번 누르면 저장하고 접어서 읽기로 (2026-11-25 사용자 요청) — 말씀 칸과 같은 방식
+  (function(){
+    var lt=null;
+    function done(t,e){
+      var mi=t.closest(".medi"); if(!mi||mi.classList.contains("folded"))return;
+      var card=mi.closest(".note"); if(!card)return;
+      if(e&&e.cancelable)e.preventDefault();
+      try{getSelection().removeAllRanges()}catch(_){}
+      lt=null; buzz(10); t.blur();
+      flushNow(card.dataset.id);   // 적던 글을 먼저 저장하고 접는다
+      var mid=mi.dataset.mid; medFold.add(mid); saveMFold(); render();
+    }
+    function tgt(e){return e.target.closest&&e.target.closest(".medi:not(.folded) .med")}
+    list.addEventListener("touchstart",function(e){var t=tgt(e); if(!t||e.touches.length>1){lt=null;return} var c=e.touches[0]; t._mts={x:c.clientX,y:c.clientY,t:Date.now()}},{passive:true});
+    list.addEventListener("touchend",function(e){
+      var t=tgt(e); if(!t||!t._mts)return;
+      var c=e.changedTouches[0], now=Date.now(), s0=t._mts; t._mts=null;
+      if(now-s0.t>350||Math.abs(c.clientX-s0.x)>10||Math.abs(c.clientY-s0.y)>10){lt=null;return}
+      if(lt&&lt.el===t&&now-lt.t<480&&Math.abs(c.clientX-lt.x)<40&&Math.abs(c.clientY-lt.y)<40){done(t,e);return}
+      lt={el:t,t:now,x:c.clientX,y:c.clientY};
+    },{passive:false});
+    list.addEventListener("dblclick",function(e){var t=tgt(e); if(t)done(t,e)});
   })();
   list.addEventListener("focusout",function(e){
     var eb=e.target.closest&&e.target.closest(".note.vediting .editbox"); if(!eb)return;
