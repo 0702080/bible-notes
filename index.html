@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-meddbl">
+<meta name="app-build" content="ab-20261125-hympinch">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5812,8 +5812,12 @@ body .hymnsheet .hymrtop button.hymcpok{background:radial-gradient(120% 110% at 
 .hymform .hymt{min-height:240px;font-size:16px;line-height:1.8}
 .hympick{align-self:flex-start;padding:10px 16px;border-radius:20px;border:1px dashed var(--pink);color:var(--pink);font-size:14px}
 .hymfoot{display:flex;gap:8px;justify-content:flex-end}
-.hymzoom{position:fixed;inset:0;z-index:200;background:#000;overflow:auto;touch-action:pan-x pan-y pinch-zoom;display:flex;align-items:flex-start;justify-content:center}
-.hymzoom img{width:100%;height:auto;background:#fff}
+/* 🎼 악보 크게 보기 — 두 손가락으로 벌려 키우고 끌어서 옮긴다 (2026-11-25 사용자 요청).
+   앱이 브라우저 확대를 막아 두어(user-scalable=no) 손가락 처리는 아래 hymZoom 이 직접 한다. */
+.hymzoom{position:fixed;inset:0;z-index:200;background:#000;overflow:hidden;touch-action:none;-webkit-user-select:none;user-select:none}
+.hymzoom img{position:absolute;left:0;top:0;width:100%;height:auto;background:#fff;transform-origin:0 0;will-change:transform;-webkit-user-drag:none}
+.hymzhint{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:201;
+  padding:7px 14px;border-radius:16px;background:rgba(0,0,0,.6);color:#fff;font-size:12.5px;pointer-events:none;transition:opacity .4s}
 .hymzx{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:10px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(0,0,0,.6);color:#fff;font-size:18px;z-index:201}
 /* ＋ 말씀 담기: 글이 길어도 '추가' 단추가 창 아래에 늘 떠 있게 (2026-11-18 사용자 요청) */
 #addSheet #manual .primary{position:static;display:block;box-shadow:0 6px 18px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.25)!important}
@@ -23703,7 +23707,73 @@ body.tafocus #toTop{display:none!important}
       var ov=document.createElement("div"); ov.className="hymzoom"; var i2=document.createElement("img"); i2.src=im.src; i2.alt="악보"; ov.appendChild(i2);
       var xb=document.createElement("button"); xb.type="button"; xb.className="hymzx"; xb.textContent="✕"; xb.setAttribute("aria-label","닫기"); ov.appendChild(xb);
       xb.addEventListener("click",function(){ov.remove()}); document.body.appendChild(ov);
+      var hint=document.createElement("div"); hint.className="hymzhint"; hint.textContent="두 손가락으로 벌리면 커져요 · 두 번 누르면 확대"; ov.appendChild(hint);
+      setTimeout(function(){hint.style.opacity="0"},2600); setTimeout(function(){if(hint.parentNode)hint.remove()},3200);
+      hymZoom(ov,i2);
     }
+  }
+  /* 🎼 악보 크게 보기의 손가락 확대·축소·옮기기 (2026-11-25 사용자 요청)
+     브라우저 확대를 앱이 막아 두어서(user-scalable=no) 여기서 직접 한다.
+     · 두 손가락을 벌리면 그 가운데를 기준으로 커지고 오므리면 작아진다 (1~6배)
+     · 한 손가락으로 끌면 옮겨 보고, 두 번 누르면 확대 ↔ 원래대로
+     · 사진이 화면보다 작으면 가운데에, 크면 가장자리 밖으로 안 나가게 잡아 준다 */
+  function hymZoom(ov,img){
+    var sc=1, tx=0, ty=0, MIN=1, MAX=6, pts=new Map(), base=null, tap=null, multi=false;
+    function size(){
+      var ow=ov.clientWidth||1, oh=ov.clientHeight||1;
+      var nw=img.naturalWidth||ow, nh=img.naturalHeight||oh;
+      return {w:ow, h:ow*nh/nw, ow:ow, oh:oh};
+    }
+    function apply(){
+      var s=size(), w=s.w*sc, h=s.h*sc;
+      tx = w<=s.ow ? (s.ow-w)/2 : Math.min(0,Math.max(s.ow-w,tx));
+      ty = h<=s.oh ? (s.oh-h)/2 : Math.min(0,Math.max(s.oh-h,ty));
+      img.style.transform="translate("+tx+"px,"+ty+"px) scale("+sc+")";
+    }
+    function zoomAt(ns,cx,cy){
+      ns=Math.min(MAX,Math.max(MIN,ns)); if(!isFinite(ns))return;
+      var r=ov.getBoundingClientRect(), x=cx-r.left, y=cy-r.top;
+      tx = x-(x-tx)*(ns/sc); ty = y-(y-ty)*(ns/sc); sc=ns; apply();
+    }
+    function pair(){var a=[]; pts.forEach(function(v){a.push(v)}); return a}
+    img.addEventListener("load",function(){sc=1;tx=0;ty=0;apply()});
+    ov.addEventListener("pointerdown",function(e){
+      if(e.target.closest(".hymzx"))return;
+      try{ov.setPointerCapture(e.pointerId)}catch(_){}
+      pts.set(e.pointerId,{x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY,t:Date.now()});
+      if(pts.size>1){multi=true; var a=pair(); base={d:Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y),sc:sc}}
+    });
+    ov.addEventListener("pointermove",function(e){
+      var p=pts.get(e.pointerId); if(!p)return;
+      var px=p.x, py=p.y; p.x=e.clientX; p.y=e.clientY;
+      if(pts.size>1&&base){
+        var a=pair(), d=Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);
+        if(base.d>4)zoomAt(base.sc*(d/base.d),(a[0].x+a[1].x)/2,(a[0].y+a[1].y)/2);
+        return;
+      }
+      tx+=e.clientX-px; ty+=e.clientY-py; apply();
+    });
+    function up(e){
+      var p=pts.get(e.pointerId); pts.delete(e.pointerId);
+      if(pts.size<2)base=null;
+      if(!p)return;
+      if(pts.size===0){
+        var quick=!multi&&Date.now()-p.t<260&&Math.abs(e.clientX-p.x0)<10&&Math.abs(e.clientY-p.y0)<10;
+        multi=false;
+        if(quick){
+          var now=Date.now();
+          if(tap&&now-tap.t<320&&Math.abs(e.clientX-tap.x)<40&&Math.abs(e.clientY-tap.y)<40){
+            tap=null; zoomAt(sc>1.2?1:2.6,e.clientX,e.clientY); buzz(8);
+          }else tap={t:now,x:e.clientX,y:e.clientY};
+        }else tap=null;
+      }
+    }
+    ov.addEventListener("pointerup",up);
+    ov.addEventListener("pointercancel",up);
+    ov.addEventListener("wheel",function(e){e.preventDefault(); zoomAt(sc*(e.deltaY<0?1.12:1/1.12),e.clientX,e.clientY)},{passive:false});
+    var rz=function(){apply()}; window.addEventListener("resize",rz);
+    new MutationObserver(function(_,o){if(!ov.isConnected){window.removeEventListener("resize",rz); o.disconnect()}}).observe(document.body,{childList:true});
+    apply();
   }
   /* ---------- 🗓️ 달력 (2026-11-18 사용자 요청) ----------
      한 달 달력에 그날 담은 것(말씀·묵상·기도·응답·설교 메모·성경 본문·한 마디·은혜·장면·짧은 말씀·기도제목·한 줄 기도·찬양)을 색 이름표로 보여 줌.
