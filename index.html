@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261121-calpray">
+<meta name="app-build" content="ab-20261125-praytop2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6207,7 +6207,7 @@ body.tafocus #toTop{display:none!important}
       serms:Array.isArray(n.serms)?n.serms.filter(function(x){return x&&x.id}).slice(0,100).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,4000),at:+x.at||Date.now()}}):[],
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,8000)}}):[]}}):[],
-      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){var tt=String(x.t||"").slice(0,2000); if(tt.indexOf("하나님 아버지\n")===0)tt="전능하신 나의 아버지 하나님"+tt.slice(7);   /* 예전 기도문 첫 줄을 새 첫 줄로 (2026-10-30) */ if(tt.trim()&&tt.replace(/\s+/g,"").indexOf("빛이신예수여내안에오시옵소서")!==0)tt="빛이신 예수여\n내 안에 오시옵소서\n내 안에 있는 모든 어둠을 몰아내소서\n\n"+tt.replace(/^\s+/,"");   /* 기도문 맨 위 고정 문구 (2026-11-20 사용자 요청) */ return {id:String(x.id),t:tt,at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),sh:x.sh?1:0}}):[],
+      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){var tt=String(x.t||"").slice(0,2000); if(tt.indexOf("하나님 아버지\n")===0)tt="전능하신 나의 아버지 하나님"+tt.slice(7);   /* 예전 기도문 첫 줄을 새 첫 줄로 (2026-10-30) */ tt=prayTop(tt);   /* 기도문 맨 위 고정 문구 (2026-11-20, 2026-11-25 세 줄 더함) */ return {id:String(x.id),t:tt,at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),sh:x.sh?1:0}}):[],
       loci:Array.isArray(n.loci)?n.loci.slice(0,12).map(function(x){return String(x||"").slice(0,20)}):[],   // 🏠 장소로 외우기의 장소 이름
       fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
@@ -7703,7 +7703,7 @@ body.tafocus #toTop{display:none!important}
       // 🙏 감사 기도 쪽 (응답된 기도를 옆으로 밀면, 2026-11-06 사용자 요청)
       var thOn=prThx.has(x.id); d.classList.toggle("thxside",thOn);
       var f1=prFold1.has(x.id)&&!prEdit.has(x.id); d.classList.toggle("pf1d",f1);   // 기도문 하나씩 접기 (2026-11-07 사용자 요청)
-      if(f1){var fl=(thOn&&(x.th||"").trim()?x.th:x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean), fz=fl.filter(function(s){return !/^전능하신 나의 아버지 하나님|^빛이신 예수여$|^내 안에 오시옵소서$|^내 안에 있는 모든 어둠을 몰아내소서$/.test(s)});
+      if(f1){var fl=(thOn&&(x.th||"").trim()?x.th:x.t||"").split("\n").map(function(s){return s.trim()}).filter(Boolean), fz=fl.filter(function(s){return !/^전능하신 나의 아버지 하나님/.test(s)&&!prayTopLine(s)});
         d.querySelector(".pflt").textContent=(thOn?"🙏 응답 감사 기도 · ":(x.ans?"🙌 ":""))+((fz[0]||fl[0])||"(빈 기도)")} d.querySelector(".pthx").hidden=!thOn;
       setVal(d.querySelector(".pth"),x.th||""); d.querySelector(".pthxd").textContent=x.ans?"응답 "+dlabel(dkey(x.ans)):"";
       d.classList.toggle("hasthx",!!(x.th||"").trim());
@@ -15001,8 +15001,18 @@ body.tafocus #toTop{display:none!important}
      사람마다 기도 제목·붙든 말씀을 두고, 하루에 몇 명씩 돌아가며 기도한다 (오래 못 한 사람부터).
      저장 bible-intercede {items:[{id,name,memo,nid,at,u,log:[날짜],ans,an}],per,del:{id:시각}}, 클라우드 줄 "__icp" (나만 보기) */
   var IC_KEY="bible-intercede";
-  var IC_HEAD="빛이신 예수여\n내 안에 오시옵소서\n내 안에 있는 모든 어둠을 몰아내소서";
-  function icHeadOff(m){m=String(m||""); var t=m.replace(/\r/g,""); return t.indexOf(IC_HEAD)===0?t.slice(IC_HEAD.length).trim():t.trim()}
+  /* 기도문 맨 위에 늘 들어가는 문구. 2026-11-25 사용자 요청으로 뒤 세 줄이 더해졌다 —
+     예전에 적어 둔 기도문(앞 세 줄만 있는 것)은 열 때 그 아래로 새 세 줄이 끼워진다. */
+  var PRAY_TOP1="빛이신 예수여\n내 안에 오시옵소서\n내 안에 있는 모든 어둠을 몰아내소서";
+  var PRAY_TOP2="성경 말씀이 온전히 믿어지도록\n저에게 믿음의 은사를,\n믿음의 영을 부어 주소서.";
+  var PRAY_TOP=PRAY_TOP1+"\n\n"+PRAY_TOP2;
+  var IC_HEAD=PRAY_TOP;
+  function icHeadOff(m){
+    var t=String(m||"").replace(/\r/g,"");
+    if(t.indexOf(IC_HEAD)===0)return t.slice(IC_HEAD.length).trim();
+    if(t.indexOf(PRAY_TOP1)===0)return t.slice(PRAY_TOP1.length).trim();   // 예전 세 줄짜리
+    return t.trim();
+  }
   function icHead(m){var r=icHeadOff(m); return IC_HEAD+"\n\n"+r}
   function icData(){
     var o=null; try{o=JSON.parse(localStorage.getItem(IC_KEY)||"null")}catch(e){}
@@ -15606,8 +15616,24 @@ body.tafocus #toTop{display:none!important}
     t=String(t||""); if(t.indexOf("S 말씀")<0)return false;
     return !t.split("\n").map(function(l){return l.replace(/^\s*(📖\s*)?S\s*말씀|^\s*(🔍\s*)?O\s*관찰|^\s*(🌱\s*)?A\s*적용|^\s*(🙏\s*)?P\s*기도/,"").replace(/^\s*[—:\-–]\s*/,"").trim()}).join("");
   }
-  var PRAY_TOP="빛이신 예수여\n내 안에 오시옵소서\n내 안에 있는 모든 어둠을 몰아내소서";   // 기도문 맨 위에 늘 있는 문구 (2026-11-20 사용자 요청)
-  function prayTop(v){v=String(v||""); if(!v.trim())return v; if(v.replace(/\s+/g,"").indexOf(PRAY_TOP.replace(/\s+/g,""))===0)return v; return PRAY_TOP+"\n\n"+v.replace(/^\s+/,"")}
+  /* PRAY_TOP 은 위(IC_HEAD 옆)에서 정한다 */
+  function prayNz(s){return String(s||"").replace(/\s+/g,"")}
+  function prayTopLine(s){s=String(s||"").trim(); if(!s)return false; return PRAY_TOP.split("\n").some(function(x){return x.trim()===s})}
+  function prayTop(v){
+    v=String(v||""); if(!v.trim())return v;
+    var f=prayNz(v);
+    if(f.indexOf(prayNz(PRAY_TOP))===0)return v;            // 이미 여섯 줄 다 있음
+    if(f.indexOf(prayNz(PRAY_TOP1))===0){                   // 예전 세 줄만 — 그 아래로 새 세 줄을 끼운다
+      var L=v.replace(/\r/g,"").split("\n"), out=[], seen=0, done=false;
+      for(var i=0;i<L.length;i++){
+        out.push(L[i]);
+        if(!done&&L[i].trim())seen++;
+        if(!done&&seen===3){out.push("");out=out.concat(PRAY_TOP2.split("\n"));done=true}
+      }
+      return out.join("\n");
+    }
+    return PRAY_TOP+"\n\n"+v.replace(/^\s+/,"");
+  }
   var PRAY_HEAD=PRAY_TOP+"\n\n";   // 가운데 "전능하신 나의 아버지 하나님" 줄은 틀에서 뺌 (2026-11-21 사용자 요청)   /* 기도문 첫 줄 (2026-10-30 사용자 요청, 전에는 "하나님 아버지") */
   var PRAY_TAIL="길이요 진리요\n내 인생의 빛이 되시며\n생명 되신 나의 주\n예수님 이름으로 기도합니다\n아멘";   // 기도문 끝맺음 — 기도문 칸 끝에 꼭 들어감 (2026-11-14 사용자 요청)
   var PRAY_TPL=PRAY_HEAD+"\n\n"+PRAY_TAIL;
@@ -23663,7 +23689,7 @@ body.tafocus #toTop{display:none!important}
   var CALT={note:["📖","말씀","#8FB8F0"],med:["✍️","묵상","#B7A0F0"],pray:["🙏","기도","#F0B07A"],ans:["🙌","응답","#F2C94C"],srm:["🎤","설교","#E3A6BC"],btx:["📜","본문","#C9A8E8"],say:["💬","한 마디","#A9B6E8"],grace:["🌿","은혜","#93D3A2"],scene:["🌄","장면","#F6C79A"],verse:["📖","짧은 말씀","#8FD0CC"],ic:["🙏","기도제목","#93C9A3"],p1:["🙏","한 줄 기도","#E8A0C8"],hym:["🎵","찬양","#F2C1D9"]};
   var cal=null, calY=0, calM=0, calSel="", calIdx=null;
   // 달력의 기도 줄: 맨 위 공통 문구(빛이신 예수여 …)와 '전능하신…' 줄은 건너뛰고 그 다음 첫 문장 (2026-11-21 사용자 요청)
-  var CAL_SKIP=["빛이신 예수여","내 안에 오시옵소서","내 안에 있는 모든 어둠을 몰아내소서"];
+  var CAL_SKIP=PRAY_TOP.split("\n").map(function(x){return x.trim()}).filter(Boolean);
   function calPray(s,n){var L=String(s||"").split(/\r?\n/).filter(function(x){x=x.replace(/\*\*|\[\[[^:\]]*:|\]\]/g,"").trim(); return x&&CAL_SKIP.indexOf(x)<0&&!/^전능하신/.test(x)}); return calLine(L.join("\n"),n)}
   function calLine(s,n){s=String(s||"").replace(/\*\*|\[\[[^:\]]*:|\]\]/g,"").split(/\r?\n/).map(function(x){return x.trim()}).filter(Boolean)[0]||""; return s.length>(n||40)?s.slice(0,n||40)+"…":s}
   function calBuild(){
