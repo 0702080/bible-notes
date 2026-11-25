@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-rdtimer">
+<meta name="app-build" content="ab-20261125-rdtimer2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -1607,6 +1607,17 @@ body.reorder .note .copyv{display:none}
 #rdTimer .rtbar i{display:block;height:100%;width:100%;background:#6FCB8A;transform-origin:left;transition:transform .25s linear}
 #rdTimer.warn .rtbar i{background:#F2B25A}
 #rdTimer.late .rtbar i{background:#FF6B6B}
+/* 화면 가운데쯤·반투명 — 뒤 기도문이 비쳐 읽히게, 숫자만 또렷이 (2026-11-25 사용자 요청). 숫자를 위아래로 끌면 자리 옮김(bible-rd-timer-y) */
+#rdTimer{top:50%;transform:translate(-50%,-50%);background:rgba(16,15,22,.22);border-color:rgba(255,255,255,.12);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;pointer-events:none}
+#rdTimer button,#rdTimer .rtt{pointer-events:auto}
+#rdTimer button{background:rgba(44,43,54,.42);border-color:rgba(255,255,255,.16);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 2px 0 rgba(0,0,0,.35);color:rgba(237,231,218,.85);transition:opacity .3s}
+#rdTimer .rtgo{background:rgba(70,170,105,.55);border-color:rgba(111,203,138,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 0 rgba(20,70,40,.5)}
+#rdTimer.run .rtgo{background:rgba(201,149,58,.5);border-color:rgba(242,196,106,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 2px 0 rgba(90,60,20,.5)}
+#rdTimer.run button:not(.rtgo){opacity:.4}
+#rdTimer .rtt{color:rgba(237,231,218,.82);text-shadow:0 1px 4px rgba(0,0,0,.75);touch-action:none}
+#rdTimer .rtbar{background:rgba(255,255,255,.12)}
+#rdTimer .rtbar i{opacity:.75}
+#rdTimer .rtsub{color:rgba(237,231,218,.55);text-shadow:0 1px 3px rgba(0,0,0,.7)}
 .note:not(.open) .chead .shotv,.note:not(.open) .chead .timev{width:24px!important;height:24px!important;margin-top:-1.5px;align-self:flex-start}
 .note:not(.open) .chead .shotv svg,.note:not(.open) .chead .timev svg{width:13px;height:13px}   /* 접힌 카드: 암송 N 알약과 같은 줄 높이·가운데 (2026-11-19 사용자 요청) */
 body.reorder .note .chead .shotv,body.reorder .note .chead .timev{display:none}   /* 🖼 말씀 카드 그림 저장 (접힌 카드에도 보임, 2026-11-19) */
@@ -24076,7 +24087,13 @@ var rdTimerOpen=(function(){
   function close(){pause(); if(el)el.hidden=true}
   function build(){el=document.createElement("div"); el.id="rdTimer"; el.setAttribute("role","timer");
     el.innerHTML='<div class="rtrow"><button type="button" class="rtx" aria-label="닫기">✕</button><button type="button" class="rtm" aria-label="30초 줄이기">−</button><div class="rtt">2:00</div><button type="button" class="rtp" aria-label="30초 늘리기">＋</button><button type="button" class="rtgo" aria-label="시작">▶</button><button type="button" class="rtr" aria-label="처음으로">↺</button></div><div class="rtbar"><i></i></div><div class="rtsub"></div>';
-    el.addEventListener("click",function(e){var b=e.target.closest("button,.rtt"); if(!b)return; e.stopPropagation();
+    try{var y0=+localStorage.getItem("bible-rd-timer-y"); if(y0>0)el.style.top=Math.min(innerHeight-60,Math.max(60,y0))+"px"}catch(err){}
+    var dg=null, rt=el.querySelector(".rtt");   /* 숫자를 위아래로 끌면 자리 옮김 */
+    rt.addEventListener("pointerdown",function(e){dg={y:e.clientY,t0:el.getBoundingClientRect().top+el.offsetHeight/2,moved:false}; try{rt.setPointerCapture(e.pointerId)}catch(err){}});
+    rt.addEventListener("pointermove",function(e){if(!dg)return; var d=e.clientY-dg.y; if(!dg.moved&&Math.abs(d)<8)return; dg.moved=true; el.style.top=Math.min(innerHeight-50,Math.max(50,dg.t0+d))+"px"});
+    rt.addEventListener("pointerup",function(){if(dg&&dg.moved){el._noTap=Date.now(); try{localStorage.setItem("bible-rd-timer-y",String(parseFloat(el.style.top)))}catch(err){}} dg=null});
+    rt.addEventListener("pointercancel",function(){dg=null});
+    el.addEventListener("click",function(e){var b=e.target.closest("button,.rtt"); if(!b)return; e.stopPropagation(); if(b===rt&&Date.now()-(el._noTap||0)<400)return;
       if(b.classList.contains("rtx"))close(); else if(b.classList.contains("rtm"))step(-30); else if(b.classList.contains("rtp"))step(30); else if(b.classList.contains("rtr"))reset(); else {if(st.run)pause(); else start(); if(b.classList.contains("rtt"))try{buzz(15)}catch(err){}}});
     document.addEventListener("visibilitychange",function(){if(!document.hidden&&st.run){lock(true); tick()}});
     document.body.appendChild(el)}
