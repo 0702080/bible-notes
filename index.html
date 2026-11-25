@@ -14073,7 +14073,7 @@ body.tafocus #toTop{display:none!important}
       if(A==="end"){lnPickEnd();return}
       if(A==="all"){var rs=[].slice.call(box.querySelectorAll(sel)), on=!rs.every(function(r){return r.classList.contains("lnsel")}); rs.forEach(function(r){r.classList.toggle("lnsel",on)}); cnt(); return}
       var t=txt(); if(!t&&!picked().length)return;
-      if(A==="copy"){var nc=picked().length; copy(hlStrip?hlStrip(t):t,function(){});   // 알림은 띄우지 않음 — 휴대폰이 "복사했어요"를 따로 띄움 (2026-11-26 사용자 요청) lnPickEnd(); return}   // 줄 수는 끝내기 전에 셈 — 예전엔 끝낸 뒤에 세어 늘 0줄로 나왔음
+      if(A==="copy"){var nc=picked().length; copy(hlStrip?hlStrip(t):t,function(){}); /* 알림은 띄우지 않음 — 휴대폰이 "복사했어요"를 따로 띄움 (2026-11-26 사용자 요청) */ lnPickEnd(); return}   // 줄 수는 끝내기 전에 셈 — 예전엔 끝낸 뒤에 세어 늘 0줄로 나왔음
       if(A==="cut"){
         var pk=picked(), n=pk.length; copy(hlStrip?hlStrip(t):t);
         var all=[].slice.call(box.querySelectorAll(sel)), keep=all.filter(function(r){return pk.indexOf(r)<0});
