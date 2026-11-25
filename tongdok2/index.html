@@ -93,7 +93,7 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 /* 책 목록: 접지 않고 모두 펼친다. 책 이름 아래 10칸짜리 표 */
 .books{margin-top:2px}
 .bk{margin-top:18px}
-.bk-h{display:flex;align-items:baseline;gap:8px;padding:0 2px 7px}
+.bk-h{display:flex;align-items:center;gap:8px;padding:0 2px 7px}   /* 책 이름을 오른쪽 진행 동그라미와 같은 높이로 (2026-11-25 사용자 요청) */
 .bk-name{font-size:16px;font-weight:700}
 .bk-cnt{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
 /* 책 이름은 갈래마다 다른 색 (율법서, 역사서, 시가서, 선지서, 복음서, 서신서…) */
@@ -108,8 +108,8 @@ button{font-family:inherit;font-size:inherit;color:inherit}
 .bk[data-g="rev"] .bk-name{color:#E99BD0}
 .bk.full .bk-name::after{content:" ✓";color:var(--green)}
 /* 책 접기·펴기 */
-.bk-tg{display:flex;align-items:baseline;gap:8px;min-width:0;padding:4px 2px;margin:-4px -2px;background:none;border:0;color:inherit;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.bk-chev{align-self:center;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-2px);transition:transform .2s;flex:0 0 auto;margin-right:2px}
+.bk-tg{display:flex;align-items:center;gap:8px;min-width:0;padding:4px 2px;margin:-4px -2px;background:none;border:0;color:inherit;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bk-chev{align-self:center;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .2s;flex:0 0 auto;margin-right:2px}
 .bk.shut .bk-chev{transform:rotate(-45deg)}
 .bk.shut .bk-body{display:none}
 .bk.shut .bk-h{padding-bottom:0}
