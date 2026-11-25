@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-lnbar3d">
+<meta name="app-build" content="ab-20261126-sayswdel">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -18309,7 +18309,7 @@ body.tafocus #toTop{display:none!important}
   function sayTrash(){try{var a=JSON.parse(localStorage.getItem(SAY_TRASH)||"[]"); return Array.isArray(a)?a.filter(function(t){return t&&t.x&&t.x.id&&Date.now()-t.at<60*864e5}):[]}catch(e){return []}}
   function sayTrashSet(a){try{localStorage.setItem(SAY_TRASH,JSON.stringify(a.slice(0,60)))}catch(e){}}
   function sayTrashDraw(list){
-    if((sayMode!=="g"&&sayMode!=="v"&&sayMode!=="m")||sayQ)return; var tr=sayTrash().filter(function(t){return sayMode==="v"?!!t.x.hv:sayMode==="m"?(!!t.x.sc&&!t.x.hv):(!!t.x.gr&&!t.x.hv&&!t.x.sc)}); if(!tr.length)return;
+    if((sayMode!=="g"&&sayMode!=="v"&&sayMode!=="m"&&sayMode!=="s")||sayQ)return; var tr=sayTrash().filter(function(t){return sayMode==="v"?!!t.x.hv:sayMode==="m"?(!!t.x.sc&&!t.x.hv):sayMode==="s"?(!t.x.gr&&!t.x.hv&&!t.x.sc):(!!t.x.gr&&!t.x.hv&&!t.x.sc)}); if(!tr.length)return;
     var tb=document.createElement("div"); tb.className="srmtrash saytrash";
     var th=document.createElement("button"); th.type="button"; th.className="srmtrashh"; th.dataset.act="trash"; th.textContent="🗑 지운 것 "+tr.length+"개 "+(sayTrashOpen?"▴":"▾"); tb.appendChild(th);
     if(sayTrashOpen)tr.forEach(function(t){var r=document.createElement("div"); r.className="srmtrow";
@@ -18720,7 +18720,7 @@ body.tafocus #toTop{display:none!important}
     function swStart(c,x,y,t){sw=c?{c:c,x:x,y:y,t:t}:null}
     function sayPaged(c){var q=c&&c.querySelector(".saylines"); return !!(q&&q._pgGo)}   // 쪽이 여러 장인 카드
     // 쪽이 있는 카드는 밀어서 지우지 않는다 — 미는 건 쪽 넘김이다 (2026-11-25 사용자 요청: 펼친 카드를 밀면 지워졌음)
-    function swDelOK(c){return (sayMode==="g"||sayMode==="v"||sayMode==="m")&&c&&!sayBack[c.dataset.id]&&!sayEdit&&!sayDrag&&!sayPaged(c)}
+    function swDelOK(c){return (sayMode==="g"||sayMode==="v"||sayMode==="m"||sayMode==="s")&&c&&!sayBack[c.dataset.id]&&!sayEdit&&!sayDrag&&!sayPaged(c)}
     function sayFoldToList(id){   // 첫 쪽에서 더 밀면: 카드를 접고 목록으로
       sayFold[id]=1; if(sayFocusId===id){sayFocusId=""; sayFoldBack(id)}
       try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){}
