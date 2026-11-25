@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-shotall">
+<meta name="app-build" content="ab-20261126-mtfix">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -865,6 +865,18 @@ html,body,button,input,textarea,select{font-family:"Binggrae","Noto Sans KR","Ap
 @media (max-width:899px){#topicSheet.tsfull .sheetpanel{top:0;max-height:none;border-radius:0;border-top:0;padding-top:calc(14px + env(safe-area-inset-top,0px))}#topicSheet.tsfull .sheetpanel::before{display:none}}
 .sheetback{position:absolute;inset:0;background:rgba(0,0,0,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}   /* 뒤 화면은 뿌옇게 (2026-10-24 사용자 요청) */
 #addSheet.mtbig .sheetpanel{bottom:auto;border-radius:0}
+/* 📐 휴대폰 말씀 담기 창은 늘 같은 크기·모양 (2026-11-26 사용자 요청: 키보드가 올라왔을 때 모양 그대로) — 화면 맨 위에 붙고, 말씀 칸은 118px로 고정, 바로 아래 '추가', 그 아래 성경 구절 */
+@media (max-width:899px){
+  #addSheet.mtfix .sheetpanel{top:0;bottom:auto;border-radius:0 0 20px 20px}
+  #addSheet.mtfix #mText{height:118px!important;min-height:118px!important;max-height:118px!important;resize:none;overflow-y:auto}
+  #addSheet.mtfix .sheethint{display:none}
+  #addSheet.mtfix #manual{display:flex;flex-direction:column}
+  #addSheet.mtfix #manual>*{order:5}
+  #addSheet.mtfix #manual>label[for="mText"]{order:0}
+  #addSheet.mtfix #manual>#mText{order:1}
+  #addSheet.mtfix #manual>.tagripbar{order:2}
+  #addSheet.mtfix #manual>.primary{order:3;margin-bottom:14px}
+}
 #addSheet.mtbig #mText{resize:none;overflow-y:auto}
 #addSheet.mtbig .sheethint{display:none}
 /* 키보드가 올라와 있는 동안: 말씀 칸 바로 아래에 '추가' 단추 (구절 칸은 그 아래로, 2026-11-20 사용자 요청) */
@@ -8593,6 +8605,7 @@ body.tafocus #toTop{display:none!important}
   var lastAdded=null;
   function openSheet(){
     $("addSheet").hidden=false; $("fab").hidden=true; document.body.style.overflow="hidden";
+    $("addSheet").classList.toggle("mtfix",!(window.matchMedia&&matchMedia("(min-width:900px)").matches));   // 📐 휴대폰은 늘 같은 크기 (2026-11-26)
     setTimeout(function(){ if(!$("searchArea").hidden)$("q").focus(); else $("mText").focus(); },80);   // 말씀 칸에 먼저 커서 (2026-11-19 사용자 요청)
   }
   function closeSheet(){
@@ -18847,6 +18860,7 @@ body.tafocus #toTop{display:none!important}
       if(!cur||document.activeElement!==cur)return;
       var vv=window.visualViewport, vh=vv?vv.height:innerHeight, vtop=vv?vv.offsetTop:0;
       var sh=$("addSheet"), pn=sh.querySelector(".sheetpanel");
+      if(sh.classList.contains("mtfix")){pn.style.top=Math.round(vtop)+"px"; pn.style.height=""; pn.style.maxHeight=Math.round(vh)+"px"; return}   // 📐 늘 같은 크기: 창은 보이는 화면 맨 위에 붙이기만, 말씀 칸 높이는 그대로 (2026-11-26 사용자 요청)
       pn.style.top=Math.round(vtop)+"px"; pn.style.height=Math.round(vh)+"px"; pn.style.maxHeight="none";
       var lb=sh.querySelector('label[for="mText"]'), dy=lb.getBoundingClientRect().top-(pn.getBoundingClientRect().top+8);
       if(Math.abs(dy)>2)pn.scrollTop+=dy;   // 말씀 칸부터 위에 보이게 (2026-11-19 사용자 요청: 말씀 칸이 위, 성경 구절이 아래)
