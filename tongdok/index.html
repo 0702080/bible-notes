@@ -1036,12 +1036,23 @@ var BABBR=["창","출","레","민","신","수","삿","룻","삼상","삼하","�
 var LOG_KEY=KP+"log", readLog={};
 try{readLog=JSON.parse(localStorage.getItem(LOG_KEY)||"{}")||{}}catch(e){readLog={}}
 function saveLog(){try{localStorage.setItem(LOG_KEY,JSON.stringify(readLog))}catch(e){}}
+/* ✍️ 필사한 장만 따로 — 말씀 노트 달력에서 통독과 필사를 나눠 보여 주려고 (2026-11-25 사용자 요청).
+   readLog 는 예전 그대로 둘을 합한 수다. */
+var LOGP_KEY=KP+"logp", pilLog={};
+try{pilLog=JSON.parse(localStorage.getItem(LOGP_KEY)||"{}")||{}}catch(e){pilLog={}}
+function savePilLog(){try{localStorage.setItem(LOGP_KEY,JSON.stringify(pilLog))}catch(e){}}
 function dayKey(t){var d=new Date(t||Date.now());return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2)}
-function logRead(d){
+function logRead(d,isP){
   var k=dayKey(); var v=Math.max(0,(+readLog[k]||0)+d);
   if(v)readLog[k]=v; else delete readLog[k];
   var ks=Object.keys(readLog).sort(); while(ks.length>400){delete readLog[ks.shift()]}
   saveLog();
+  if(isP){   // 필사한 장은 따로도 세어 둔다
+    var pv=Math.max(0,(+pilLog[k]||0)+d);
+    if(pv)pilLog[k]=pv; else delete pilLog[k];
+    var pks=Object.keys(pilLog).sort(); while(pks.length>400){delete pilLog[pks.shift()]}
+    savePilLog();
+  }
 }
 var ovwOpen=false;
 function renderOverview(){
@@ -1397,7 +1408,7 @@ document.addEventListener("click",function(ev){
     }
     var before=everCount(), wasFull=bookDone(bi2)===BOOKS[bi2][1];
     me[idx]=me[idx]?0:1;
-    logRead(me[idx]?1:-1);
+    logRead(me[idx]?1:-1,pMode);
     save();
     repaintBook(bi2);
     renderSummary();renderShelf();

@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261125-icrest">
+<meta name="app-build" content="ab-20261125-caltd">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -23804,7 +23804,7 @@ body.tafocus #toTop{display:none!important}
      한 달 달력에 그날 담은 것(말씀·묵상·기도·응답·설교 메모·성경 본문·한 마디·은혜·장면·짧은 말씀·기도제목·한 줄 기도·찬양)을 색 이름표로 보여 줌.
      달력과 아래 날짜 칸 사이 손잡이를 위아래로 끌면 달력 크기가 바뀜 — 크게 하면 칸마다 이름표가 더 많이, 작게 하면 점으로 (저장 bible-cal-h, 이 기기만).
      달력을 옆으로 밀면 이전·다음 달, 맨 위 달 이름을 누르면 오늘. 날을 누르면 아래에 그날 담은 것 목록 → 누르면 그 자리로. */
-  var CALT={note:["📖","말씀","#8FB8F0"],med:["✍️","묵상","#B7A0F0"],pray:["🙏","기도","#F0B07A"],ans:["🙌","응답","#F2C94C"],srm:["🎤","설교","#E3A6BC"],btx:["📜","본문","#C9A8E8"],say:["💬","한 마디","#A9B6E8"],grace:["🌿","은혜","#93D3A2"],scene:["🌄","장면","#F6C79A"],verse:["📖","짧은 말씀","#8FD0CC"],ic:["🙏","기도제목","#93C9A3"],p1:["🙏","한 줄 기도","#E8A0C8"],hym:["🎵","찬양","#F2C1D9"]};
+  var CALT={note:["📖","말씀","#8FB8F0"],med:["✍️","묵상","#B7A0F0"],pray:["🙏","기도","#F0B07A"],ans:["🙌","응답","#F2C94C"],srm:["🎤","설교","#E3A6BC"],btx:["📜","본문","#C9A8E8"],say:["💬","한 마디","#A9B6E8"],grace:["🌿","은혜","#93D3A2"],scene:["🌄","장면","#F6C79A"],verse:["📖","짧은 말씀","#8FD0CC"],ic:["🙏","기도제목","#93C9A3"],p1:["🙏","한 줄 기도","#E8A0C8"],hym:["🎵","찬양","#F2C1D9"],read:["📖","통독","#9AD3B8"],pil:["✍️","필사","#D9C08F"]};   /* 통독·필사 (2026-11-25 사용자 요청) */
   var cal=null, calY=0, calM=0, calSel="", calIdx=null;
   // 달력의 기도 줄: 맨 위 공통 문구(빛이신 예수여 …)와 '전능하신…' 줄은 건너뛰고 그 다음 첫 문장 (2026-11-21 사용자 요청)
   var CAL_SKIP=PRAY_TOP.split("\n").map(function(x){return x.trim()}).filter(Boolean);
@@ -23813,6 +23813,17 @@ body.tafocus #toTop{display:none!important}
   function calBuild(){
     var M={}; function add(t,k,chip,txt,go){if(!t)return; var d=typeof t==="string"?t:dkey(t); (M[d]=M[d]||[]).push({k:k,chip:chip,txt:txt,go:go,at:typeof t==="number"?t:0})}
     function ab(ref){var m=String(ref||"").match(/^([가-힣]+)\s*(.*)$/); if(!m)return ref; var b=bookIndex(m[1]); return b>=0&&ABBR[b]?ABBR[b]+" "+m[2]:ref}   // 이름표는 짧게: 마태복음 5:3 → 마 5:3
+    try{   // 📖 통독·✍️ 필사: 통독표(tongdok2)가 날마다 적어 둔 장 수 (2026-11-25 사용자 요청)
+      var tlog={}, plog={};
+      try{tlog=JSON.parse(localStorage.getItem("bible-tongdok2-log")||"{}")||{}}catch(e){}
+      try{plog=JSON.parse(localStorage.getItem("bible-tongdok2-logp")||"{}")||{}}catch(e){}
+      Object.keys(tlog).forEach(function(d){
+        if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return;
+        var tot=Math.max(0,+tlog[d]||0), pl=Math.max(0,Math.min(tot,+plog[d]||0)), rd=tot-pl;
+        if(rd>0)add(d,"read",rd+"장",rd+"장 읽었어요 (성경 통독표)",function(){location.href="tongdok2/?from=notes"});
+        if(pl>0)add(d,"pil",pl+"장",pl+"장 썼어요 (성경 필사)",function(){location.href="tongdok2/?from=notes"});
+      });
+    }catch(e){}
     try{notes.forEach(function(n){var r=ab(n.ref)||calLine(n.text,10)||"말씀";
       add(+n.createdAt,"note",r,(n.ref?n.ref+" · ":"")+calLine(n.text),function(){openNoteFocus(n.id)});
       (n.meds||[]).forEach(function(m){if(String(m.text||"").trim())add(+m.at,"med",r,calLine(m.text),function(){openNoteFocus(n.id,"m")})});
