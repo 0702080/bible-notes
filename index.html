@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-timerro">
+<meta name="app-build" content="ab-20261126-lprayclamp">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6117,7 +6117,7 @@ body .icv .icform.icinline .field.icfm{font-size:14.5px!important;line-height:23
 body .icv .icform.icinline .tagripbar{max-width:none!important}
 
 /* 📜 '모든 칸' 목록의 접힌 카드는 긴 말씀(축복기도 등)을 5줄까지만 보이고 아래는 흐리게 — 눌러 펼치면 전부, 📁 칸을 골라 열면(낭독용) 전부 (2026-11-26 사용자 요청) */
-body:not(.colsel) #list>.note:not(.open):not(.vediting) .verse.vlines{max-height:calc(31.5px * 5);overflow:hidden;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent)}
+body:not(.colsel) #list>.note.lpray:not(.open):not(.vediting) .verse.vlines{max-height:calc(31.5px * 5);overflow:hidden;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent)}
 body.rdtimeron .toolbar,body.rdtimeron #topicBar,body.rdtimeron #colBar,body.rdtimeron .fwrap,body.rdtimeron #fScopeRow{display:none!important}
 body.rdtimeron .topverse{display:none!important}
 body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
@@ -8351,6 +8351,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     return d;
   }
   function updateCard(el,n){
+    el.classList.toggle("lpray",/축복\s*기도|시종\s*기도/.test((n.ref||"")+" "+(n.col||"")));
     if(typeof flipIds!=="undefined"&&flipIds.has(n.id))fillBack(el,n);
     markInto(el.querySelector(".ref"),n.ref||"구절 미입력",filterText&&has(n.ref)?filterText:"");
     // 오늘 적은 한 줄 기록 수를 실천 이름으로: "감사 5" (내일이 되면 다시 0부터, 오늘 안 적으면 안 보임)
