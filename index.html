@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-ptense2">
+<meta name="app-build" content="2026-11-27-calttl">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6169,6 +6169,12 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 .prays>.pri.editing>.ptense{width:auto;height:34px;padding:0 12px;border-radius:17px;font-size:12.5px;gap:4px;right:74px}
 .prays>.pri.editing>.ptense::before{content:none}
 .prays>.pri.thxside>.ptense,.prays>.pri.pf1d>.ptense{display:none}
+/* ✏️ 달력 목록 제목 고치기 (2026-11-27 사용자 요청) */
+.calit .caledit{flex:none;width:26px;height:26px;padding:0;border-radius:50%;font-size:12px;line-height:1;display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,#4A4658,#2C2A36)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 2px 0 #17161C;margin-left:auto}
+.calit .caledit:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.16)}
+.calit .calitx{flex:1;min-width:0}
+.calit .calitin{flex:1;min-width:0;font:inherit;font-size:15px;color:#F3EEF8;background:#1B1A22;border:1px solid var(--cc);border-radius:8px;padding:6px 8px;outline:none}
+.calit.calediting .caledit{display:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -6413,7 +6419,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       serms:Array.isArray(n.serms)?n.serms.filter(function(x){return x&&x.id}).slice(0,100).map(function(x){return {id:String(x.id),t:String(x.t||"").slice(0,4000),at:+x.at||Date.now()}}):[],
       vids:Array.isArray(n.vids)?n.vids.filter(function(x){return x&&x.id&&/^https?:\/\//i.test(String(x.url||""))}).map(function(x){return {id:String(x.id),url:String(x.url),title:String(x.title||"")}}):[],
       acts:Array.isArray(n.acts)?n.acts.filter(function(x){return x&&x.id}).map(function(x){return {id:String(x.id),t:String(x.t||""),done:!!x.done,doneAt:x.done?(+x.doneAt||0):0,goal:[7,21,40].indexOf(+x.goal)>=0?+x.goal:21,stamps:Array.isArray(x.stamps)?x.stamps.map(String).filter(function(d,i,a){return /^\d{4}-\d{2}-\d{2}$/.test(d)&&a.indexOf(d)===i}).sort().slice(0,40):[],logs:Array.isArray(x.logs)?x.logs.filter(function(l){return l&&String(l.t||"").trim()}).slice(-500).map(function(l){return {id:String(l.id||("l"+(+l.at||0))),at:+l.at||Date.now(),t:String(l.t).slice(0,8000)}}):[]}}):[],
-      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){var tt=String(x.t||"").slice(0,2000); if(tt.indexOf("하나님 아버지\n")===0)tt="전능하신 나의 아버지 하나님"+tt.slice(7);   /* 예전 기도문 첫 줄을 새 첫 줄로 (2026-10-30) */ tt=prayTop(tt);   /* 기도문 맨 위 고정 문구 (2026-11-20, 2026-11-25 세 줄 더함) */ return {id:String(x.id),t:tt,at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),sh:x.sh?1:0}}):[],
+      prays:Array.isArray(n.prays)?n.prays.filter(function(x){return x&&x.id}).slice(0,300).map(function(x){var tt=String(x.t||"").slice(0,2000); if(tt.indexOf("하나님 아버지\n")===0)tt="전능하신 나의 아버지 하나님"+tt.slice(7);   /* 예전 기도문 첫 줄을 새 첫 줄로 (2026-10-30) */ tt=prayTop(tt);   /* 기도문 맨 위 고정 문구 (2026-11-20, 2026-11-25 세 줄 더함) */ return {id:String(x.id),t:tt,at:+x.at||Date.now(),ans:+x.ans||0,an:String(x.an||"").slice(0,1000),th:String(x.th||"").slice(0,4000),sh:x.sh?1:0,ti:String(x.ti||"").slice(0,80)}}):[],
       loci:Array.isArray(n.loci)?n.loci.slice(0,12).map(function(x){return String(x||"").slice(0,20)}):[],   // 🏠 장소로 외우기의 장소 이름
       fruits:Array.isArray(n.fruits)?n.fruits.filter(function(x){return x&&x.id&&String(x.t||"").trim()}).slice(-300).map(function(x){return {id:String(x.id),at:+x.at||Date.now(),t:String(x.t).slice(0,300)}}):[],   // 🍇 이 말씀이 내 삶에서 일한 순간
       mcnt:Math.max(0,Math.min(99999,Math.floor(+n.mcnt||0))),   // 이 말씀을 암송 코치로 끝까지 연습한 누적 횟수
@@ -24313,11 +24319,24 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   var CALT={note:["📖","말씀","#8FB8F0"],med:["✍️","묵상","#B7A0F0"],pray:["🙏","기도","#F0B07A"],ans:["🙌","응답","#F2C94C"],srm:["🎤","설교","#E3A6BC"],btx:["📜","본문","#C9A8E8"],say:["💬","한 마디","#A9B6E8"],grace:["🌿","은혜","#93D3A2"],scene:["🌄","장면","#F6C79A"],verse:["📖","짧은 말씀","#8FD0CC"],ic:["🙏","기도제목","#93C9A3"],p1:["🙏","한 줄 기도","#E8A0C8"],hym:["🎵","찬양","#F2C1D9"],read:["📖","통독","#9AD3B8"],pil:["✍️","필사","#D9C08F"]};   /* 통독·필사 (2026-11-25 사용자 요청) */
   var cal=null, calY=0, calM=0, calSel="", calIdx=null;
   // 달력의 기도 줄: 맨 위 공통 문구(빛이신 예수여 …)와 '전능하신…' 줄은 건너뛰고 그 다음 첫 문장 (2026-11-21 사용자 요청)
-  var CAL_SKIP=PRAY_TOP.split("\n").map(function(x){return x.trim()}).filter(Boolean);
+  var CAL_SKIP=(PRAY_TOP+"\n"+PRAY_TOP1C+"\n"+PRAY_TOP2C).split("\n").map(function(x){return x.trim()}).filter(Boolean);
   function calPray(s,n){var L=String(s||"").split(/\r?\n/).filter(function(x){x=x.replace(/\*\*|\[\[[^:\]]*:|\]\]/g,"").trim(); return x&&CAL_SKIP.indexOf(x)<0&&!/^전능하신/.test(x)}); return calLine(L.join("\n"),n)}
+  function calTtl(){try{return JSON.parse(localStorage.getItem("bible-cal-ttl")||"{}")||{}}catch(e){return {}}}   /* ✏️ 달력 목록 제목 고치기 — 기도 말고는 이 기기에만 (2026-11-27 사용자 요청) */
+  function calTtlSet(k,v){var o=calTtl(); if(v)o[k]=v; else delete o[k]; try{localStorage.setItem("bible-cal-ttl",JSON.stringify(o))}catch(e){}}
+  function calEditTitle(r,x){
+    var tx=r.querySelector(".calitx"); if(!tx||r.querySelector(".calitin"))return;
+    var inp=document.createElement("input"); inp.className="calitin"; inp.value=tx.textContent; inp.maxLength=80; inp.setAttribute("enterkeyhint","done");
+    tx.hidden=true; r.insertBefore(inp,tx); r.classList.add("calediting"); setTimeout(function(){inp.focus(); try{inp.select()}catch(e){}},0);
+    var done=false; function fin(save){if(done)return; done=true; var v=inp.value.trim();
+      if(save){var def=x.ed?x.ed.def:x.def; if(v===def)v=""; if(x.ed)x.ed.set(v); else calTtlSet(x.ky,v); tx.textContent=v||def||tx.textContent; x.txt=tx.textContent}
+      inp.remove(); tx.hidden=false; r.classList.remove("calediting")}
+    inp.addEventListener("keydown",function(e){if(e.key==="Enter"&&!e.isComposing){e.preventDefault(); fin(true)} else if(e.key==="Escape"){e.preventDefault(); fin(false)}});
+    inp.addEventListener("blur",function(){fin(true)});
+    inp.addEventListener("click",function(e){e.stopPropagation()});
+  }
   function calLine(s,n){s=String(s||"").replace(/\*\*|\[\[[^:\]]*:|\]\]/g,"").split(/\r?\n/).map(function(x){return x.trim()}).filter(Boolean)[0]||""; return s.length>(n||40)?s.slice(0,n||40)+"…":s}
   function calBuild(){
-    var M={}; function add(t,k,chip,txt,go){if(!t)return; var d=typeof t==="string"?t:dkey(t); (M[d]=M[d]||[]).push({k:k,chip:chip,txt:txt,go:go,at:typeof t==="number"?t:0})}
+    var M={}, TT=calTtl(); function add(t,k,chip,txt,go,ky,ed){if(!t)return; var d=typeof t==="string"?t:dkey(t); var def=txt; if(ky&&!ed&&TT[ky])txt=TT[ky]; (M[d]=M[d]||[]).push({k:k,chip:chip,txt:txt,def:def,go:go,at:typeof t==="number"?t:0,ky:ky||"",ed:ed||null})}
     function ab(ref){var m=String(ref||"").match(/^([가-힣]+)\s*(.*)$/); if(!m)return ref; var b=bookIndex(m[1]); return b>=0&&ABBR[b]?ABBR[b]+" "+m[2]:ref}   // 이름표는 짧게: 마태복음 5:3 → 마 5:3
     try{   // 📖 통독·✍️ 필사: 통독표(tongdok2)가 날마다 적어 둔 장 수 (2026-11-25 사용자 요청)
       var tlog={}, plog={};
@@ -24331,17 +24350,18 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       });
     }catch(e){}
     try{notes.forEach(function(n){var r=ab(n.ref)||calLine(n.text,10)||"말씀";
-      add(+n.createdAt,"note",r,(n.ref?n.ref+" · ":"")+calLine(n.text),function(){openNoteFocus(n.id)});
-      (n.meds||[]).forEach(function(m){if(String(m.text||"").trim())add(+m.at,"med",r,calLine(m.text),function(){openNoteFocus(n.id,"m")})});
-      (n.prays||[]).forEach(function(x){if(!String(x.t||"").trim())return; var tx=calPray(x.t);
-        add(+x.at,"pray",r,tx,function(){openNoteFocus(n.id,"p")}); if(x.ans>1e12)add(+x.ans,"ans",r,tx,function(){openNoteFocus(n.id,"p")})});
+      add(+n.createdAt,"note",r,(n.ref?n.ref+" · ":"")+calLine(n.text),function(){openNoteFocus(n.id)},"note:"+n.id);
+      (n.meds||[]).forEach(function(m){if(String(m.text||"").trim())add(+m.at,"med",r,calLine(m.text),function(){openNoteFocus(n.id,"m")},"med:"+m.id)});
+      (n.prays||[]).forEach(function(x){if(!String(x.t||"").trim())return; var tx=(x.ti||"").trim()||calPray(x.t);
+        var ed={def:calPray(x.t),set:function(v){x.ti=v; n.updatedAt=Date.now(); scheduleSave(n.id)}};   /* ✏️ 달력에서 고친 제목은 기도의 ti (2026-11-27 사용자 요청) */
+        add(+x.at,"pray",r,tx,function(){openNoteFocus(n.id,"p")},"pray:"+x.id,ed); if(x.ans>1e12)add(+x.ans,"ans",r,tx,function(){openNoteFocus(n.id,"p")},"pray:"+x.id,ed)});
     })}catch(e){}
-    try{srmData().items.forEach(function(x){var b=x.cat==="b"; add(x.d,b?"btx":"srm",x.title||x.ref||(b?"본문":"설교"),[x.title,x.who,x.ref].filter(Boolean).join(" · ")||calLine(x.body),function(){openSermon(b?"b":"s"); srmEdit=x.id; srmRead=true; srmResp=false; srmDraw()})})}catch(e){}
+    try{srmData().items.forEach(function(x){var b=x.cat==="b"; add(x.d,b?"btx":"srm",x.title||x.ref||(b?"본문":"설교"),[x.title,x.who,x.ref].filter(Boolean).join(" · ")||calLine(x.body),function(){openSermon(b?"b":"s"); srmEdit=x.id; srmRead=true; srmResp=false; srmDraw()},"srm:"+x.id)})}catch(e){}
     try{sayData().items.forEach(function(x){if(!x||!x.id||!String(x.t||"").trim())return; var k=x.hv?"verse":x.sc?"scene":x.gr?"grace":"say", md=x.hv?"v":x.sc?"m":x.gr?"g":"s";
-      add(+x.at,k,(k==="scene"&&x.topic)||calLine(x.t,12),calLine(x.t),function(){openSay(null,md); setTimeout(function(){var sc=document.querySelector('.saysheet .saycard[data-id="'+x.id+'"]'); if(!sc)return; sc.scrollIntoView({block:"center"}); sc.classList.remove("sayfound"); void sc.offsetWidth; sc.classList.add("sayfound")},180)})})}catch(e){}
-    try{icData().items.forEach(function(x){add(+x.at,"ic",x.name,x.name+(calPray(x.memo,30)?" · "+calPray(x.memo,30):""),function(){openIntercede()}); if(x.ans>1e12)add(+x.ans,"ans",x.name,x.name,function(){openIntercede()})})}catch(e){}
-    try{p1Data().items.forEach(function(x){if(!x.t.trim())return; add(+x.at,"p1",calPray(x.t,12),calPray(x.t),function(){openPrayRead()}); if(x.ans>1e12)add(+x.ans,"ans",calLine(x.t,12),calLine(x.t),function(){openPrayRead()})})}catch(e){}
-    try{hymData().items.forEach(function(x){add(+x.at,"hym",x.title||"찬양",(x.no?"찬송가 "+x.no+"장 · ":"")+(x.title||""),function(){openHymn(x.id)})})}catch(e){}
+      add(+x.at,k,(k==="scene"&&x.topic)||calLine(x.t,12),calLine(x.t),function(){openSay(null,md); setTimeout(function(){var sc=document.querySelector('.saysheet .saycard[data-id="'+x.id+'"]'); if(!sc)return; sc.scrollIntoView({block:"center"}); sc.classList.remove("sayfound"); void sc.offsetWidth; sc.classList.add("sayfound")},180)},"say:"+x.id)})}catch(e){}
+    try{icData().items.forEach(function(x){add(+x.at,"ic",x.name,x.name+(calPray(x.memo,30)?" · "+calPray(x.memo,30):""),function(){openIntercede()},"ic:"+x.id); if(x.ans>1e12)add(+x.ans,"ans",x.name,x.name,function(){openIntercede()})})}catch(e){}
+    try{p1Data().items.forEach(function(x){if(!x.t.trim())return; add(+x.at,"p1",calPray(x.t,12),calPray(x.t),function(){openPrayRead()},"p1:"+x.id); if(x.ans>1e12)add(+x.ans,"ans",calLine(x.t,12),calLine(x.t),function(){openPrayRead()})})}catch(e){}
+    try{hymData().items.forEach(function(x){add(+x.at,"hym",x.title||"찬양",(x.no?"찬송가 "+x.no+"장 · ":"")+(x.title||""),function(){openHymn(x.id)},"hym:"+x.id)})}catch(e){}
     Object.keys(M).forEach(function(d){M[d].sort(function(a,b){return a.at-b.at})});
     return M;
   }
@@ -24499,7 +24519,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     LL.forEach(function(x){
       if(byK&&L.length>1&&x.k!==lastK){lastK=x.k; var gh=document.createElement("div"); gh.className="calgh"; gh.style.setProperty("--cc",CALT[x.k][2]); var gsv=x.k==="scene"&&document.querySelector("#openSceneBtn .scnico"); if(gsv){gh.appendChild(gsv.cloneNode(true)); gh.appendChild(document.createTextNode(" "+CALT[x.k][1]+"  "+cnt[x.k]))} else gh.textContent=CALT[x.k][0]+" "+CALT[x.k][1]+"  "+cnt[x.k]; ls.appendChild(gh)}   /* 종류별 머리도 장면은 해·산 그림 (2026-11-26 사용자 요청) */var t=CALT[x.k], r=document.createElement("div"); r.className="calit"; r.style.setProperty("--cc",t[2]); r._go=x.go;
       var a=document.createElement("span"); a.className="calik"; var sv=x.k==="scene"&&document.querySelector("#openSceneBtn .scnico"); if(sv){a.appendChild(sv.cloneNode(true)); a.appendChild(document.createTextNode(" "+t[1]))} else a.textContent=t[0]+" "+t[1];   /* 장면은 이모지 대신 앱의 해·산 그림 (2026-11-18 사용자 요청) */ var tx=document.createElement("span"); tx.className="calitx"; tx.textContent=x.txt||x.chip;
-      r.appendChild(a); r.appendChild(tx); if(x.at){var tm=document.createElement("small"); var q=new Date(x.at); tm.textContent=("0"+q.getHours()).slice(-2)+":"+("0"+q.getMinutes()).slice(-2); r.appendChild(tm)} ls.appendChild(r)});
+      r.appendChild(a); r.appendChild(tx); if(x.ky){var eb=document.createElement("button"); eb.type="button"; eb.className="caledit"; eb.setAttribute("aria-label","제목 고치기"); eb.title="제목 고치기"; eb.textContent="✏️"; (function(rr,xx){eb.addEventListener("click",function(e){e.stopPropagation(); calEditTitle(rr,xx)})})(r,x); r.appendChild(eb)} if(x.at){var tm=document.createElement("small"); var q=new Date(x.at); tm.textContent=("0"+q.getHours()).slice(-2)+":"+("0"+q.getMinutes()).slice(-2); r.appendChild(tm)} ls.appendChild(r)});
     var dl=document.createElement("button"); dl.type="button"; dl.className="caldl"; dl.textContent="🌙 이 날 하루 돌아보기"; ls.appendChild(dl);
   }
   try{$("calBtn").addEventListener("click",function(){try{$("topMenu").open=false}catch(e){} openCal()})}catch(e){}
