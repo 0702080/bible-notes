@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-ictense">
+<meta name="app-build" content="ab-20261126-icopenswipe">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -15366,6 +15366,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       icv.addEventListener("pointermove",function(e){
         var d=sw; if(icDrag){if(d&&d.on)icSnap(d.c); sw=null; return} if(!d||e.pointerId!==d.id||icThx[d.c.dataset.id])return;
         var dx=e.clientX-d.x, dy=e.clientY-d.y;
+        if(d.c.classList.contains("open")&&dx>0)return;   /* 펼친 카드는 오른쪽으로 밀어도 안 따라가고 안 지움 — 손 떼면 접혀 목록으로 (2026-11-26 사용자 요청) */
         if(!d.on){if(dx>14&&dx>Math.abs(dy)*1.5){d.on=true; icLPcancel(); d.c.style.transition="none"} else return}
         var x=Math.max(0,dx); d.c.style.transform="translateX("+x+"px)"; d.c.style.opacity=String(Math.max(.3,1-x/340));
         var arm=x>110; if(arm!==!!d.arm){d.arm=arm; d.c.classList.toggle("icswarm",arm); if(arm)buzz(8)}
@@ -15374,6 +15375,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       icv.addEventListener("pointerup",function(e){
         var d=sw; sw=null; if(!d||e.pointerId!==d.id)return;
         var dx=e.clientX-d.x, dy=e.clientY-d.y;
+        if(d.c.classList.contains("open")&&!icThx[d.c.dataset.id]&&dx>60&&dx>Math.abs(dy)*1.5){icSwAt=Date.now(); icFoldList(d.c.dataset.id); return}
         if(d.on){icSwAt=Date.now();
           if(dx>110){var dc=d.c; dc.style.transition="transform .2s ease-in,opacity .2s"; dc.style.transform="translateX(110%)"; dc.style.opacity="0"; setTimeout(function(){icDelete(dc.dataset.id)},190)}
           else icSnap(d.c);
@@ -15386,6 +15388,8 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
         if(icThx[id]){var nt=icv.querySelector('.icp[data-id="'+id+'"] textarea.ictht'); if(nt){grow(nt); try{nt.focus({preventScroll:true})}catch(err){}}}
       });
       icv.addEventListener("pointercancel",function(){if(sw&&sw.on)icSnap(sw.c); sw=null});
+      function icFoldList(id){icOpen={}; buzz(10); icDraw();
+        var nc=icv.querySelector('.icp[data-id="'+id+'"]'), bd=icv.querySelector(".icbody"); if(nc&&bd){var r=nc.getBoundingClientRect(), br=bd.getBoundingClientRect(); if(r.top<br.top+8||r.bottom>br.bottom-8)bd.scrollTop+=r.top-br.top-Math.max(40,(br.height-r.height)/2)}}
       icv.addEventListener("click",function(e){
         if(e.target.closest(".ictrashh")){e.stopPropagation(); icTrashOpen=!icTrashOpen; icDraw(); return}
         var rsb=e.target.closest(".ictres"); if(rsb){e.stopPropagation(); icRestore(rsb.dataset.id); return}
@@ -15487,7 +15491,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     /* 잡은 채 오른쪽으로 밀면 지우기 (2026-11-25 사용자 요청) — 110px 넘으면 손을 뗄 때 지움 */
     var dx=(x==null||icDrag.x0==null)?0:Math.max(0,x-icDrag.x0);
     icDrag.dx=dx;
-    var arm=dx>110; if(arm!==!!icDrag.arm){icDrag.arm=arm; c.classList.toggle("icdelarm",arm); buzz(arm?14:6)}
+    var arm=dx>110&&!c.classList.contains("open"); if(arm!==!!icDrag.arm){icDrag.arm=arm; c.classList.toggle("icdelarm",arm); buzz(arm?14:6)}
     c.style.transform="translate("+dx+"px,"+(y-icDrag.y0)+"px)";
     c.style.opacity=dx>14?String(Math.max(.35,1-dx/340)):"";
     if(dx>14)return;   // 옆으로 미는 중에는 자리 바꾸기를 하지 않는다
