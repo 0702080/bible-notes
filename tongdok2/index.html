@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-domshot">
+<meta name="app-build" content="td-2026-11-26-shotbg">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1375,11 +1375,32 @@ function shotLayers(bi){   // background-image를 겹 단위로 자름
 }
 function shotRR(x,l,t,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2)); x.beginPath(); if(x.roundRect)x.roundRect(l,t,w,h,r); else x.rect(l,t,w,h)}
 function domShotCard(card,skip){
-  var R0=card.getBoundingClientRect(), S=Math.min((WALK_W-48)/R0.width,(WALK_H-96)/R0.height);
+  var R0=card.getBoundingClientRect(), S=Math.min((WALK_W-120)/R0.width,(WALK_H-300)/R0.height);
   var cv=document.createElement("canvas"); cv.width=WALK_W; cv.height=WALK_H;
   var x=cv.getContext("2d");
-  x.fillStyle="#3A2F24"; x.fillRect(0,0,WALK_W,WALK_H);   // 화면의 짙은 갈색 바탕
-  var ox=(WALK_W-R0.width*S)/2, oy=(WALK_H-R0.height*S)/2;
+  // 🎨 바깥 바탕: 카드(크림)와 다른 깊은 초록→호두빛 저녁 하늘 + 위쪽 금빛 빛무리·은은한 빛 방울 (2026-11-26 사용자 요청: 배경과 카드 색을 다르게, 아름답게)
+  var bg=x.createLinearGradient(0,0,WALK_W*0.35,WALK_H);
+  bg.addColorStop(0,"#1E3A34"); bg.addColorStop(.45,"#2C4A3B"); bg.addColorStop(.8,"#4A3A2A"); bg.addColorStop(1,"#5A3D2A");
+  x.fillStyle=bg; x.fillRect(0,0,WALK_W,WALK_H);
+  function glow(cx,cy,r,col){var g=x.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,col);g.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=g;x.fillRect(0,0,WALK_W,WALK_H)}
+  glow(WALK_W*0.78,120,900,"rgba(246,204,120,.30)");
+  glow(WALK_W*0.1,WALK_H*0.92,800,"rgba(214,150,90,.22)");
+  glow(WALK_W*0.15,WALK_H*0.35,500,"rgba(140,200,160,.12)");
+  [[160,190,46,.10],[930,520,30,.12],[70,1250,38,.08],[1010,1650,52,.09],[130,2290,34,.10],[960,2260,22,.14],[250,2100,18,.12],[980,90,20,.16]].forEach(function(b){
+    x.beginPath(); x.arc(b[0],b[1],b[2],0,Math.PI*2); x.fillStyle="rgba(255,236,190,"+b[3]+")"; x.fill();
+  });
+  var ox=(WALK_W-R0.width*S)/2, oy=Math.max(70,(WALK_H-170-R0.height*S)/2);
+  // 카드 그림자 (떠 있는 종이처럼)
+  x.save(); x.shadowColor="rgba(10,20,15,.45)"; x.shadowBlur=60; x.shadowOffsetY=24;
+  var crad=(parseFloat(getComputedStyle(card).borderTopLeftRadius)||12)*S;
+  shotRR(x,ox,oy,R0.width*S,R0.height*S,crad); x.fillStyle="#FBF1DC"; x.fill(); x.restore();
+  // 아래 이름표
+  var t=new Date(), ff=getComputedStyle(document.body).fontFamily||"sans-serif";
+  x.textAlign="center"; x.textBaseline="middle";
+  x.fillStyle="rgba(250,228,180,.92)"; x.font="700 40px "+ff;
+  x.fillText((typeof ME_LABEL==="string"&&ME_LABEL?ME_LABEL+" · ":"")+(pMode?"✍️ 필사":"📖 통독"),WALK_W/2,oy+R0.height*S+82);
+  x.fillStyle="rgba(250,228,180,.6)"; x.font="500 32px "+ff;
+  x.fillText(t.getFullYear()+"."+("0"+(t.getMonth()+1)).slice(-2)+"."+("0"+t.getDate()).slice(-2),WALK_W/2,oy+R0.height*S+136);
   x.setTransform(S,0,0,S,ox-R0.left*S,oy-R0.top*S);
   function opa(el){var o=1;for(var e=el;e&&e!==document.body;e=e.parentElement)o*=+getComputedStyle(e).opacity;return o}
   function box(el){
