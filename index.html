@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-calfx">
+<meta name="app-build" content="ab-20261126-calzoomin">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6144,16 +6144,6 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 @media (max-width:400px){.caldh b{font-size:18px}.caldh{gap:6px;padding:4px 12px 8px}.calsort button{padding:0 8px;font-size:12.5px}}
 .calv.calzoom .calbar{touch-action:none;cursor:grab}
 
-/* 🗓️ 달력 목록 항목 여는 효과 (2026-11-26 사용자 요청) */
-.calit{position:relative;overflow:hidden}
-.calit .calrip{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:color-mix(in srgb,var(--cc) 55%,#fff);opacity:.55;pointer-events:none;animation:calRip .5s ease-out forwards}
-@keyframes calRip{to{transform:scale(60);opacity:0}}
-.calit.calpick{transform:scale(.97);transition:transform .16s ease;box-shadow:0 0 0 2px color-mix(in srgb,var(--cc) 60%,transparent),0 6px 22px color-mix(in srgb,var(--cc) 35%,transparent)}
-.calfx{position:fixed;z-index:99999;border-radius:12px;border-left:4px solid var(--cc);overflow:hidden;pointer-events:none;box-shadow:0 10px 40px rgba(0,0,0,.45);transition:left .4s cubic-bezier(.2,.8,.2,1),top .4s cubic-bezier(.2,.8,.2,1),width .4s cubic-bezier(.2,.8,.2,1),height .4s cubic-bezier(.2,.8,.2,1),border-radius .4s ease,background-color .4s ease,opacity .36s ease}
-.calfxin{display:flex;align-items:center;gap:8px;padding:10px 12px;transition:transform .4s cubic-bezier(.2,.8,.2,1),opacity .3s ease}
-.calfx.go{background-color:color-mix(in srgb,var(--cc) 18%,#1F1E27)!important}
-.calfx.go .calfxin{transform:translateY(40vh) scale(1.25);opacity:0}
-.calfx.out{opacity:0}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -24150,19 +24140,14 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
      한 달 달력에 그날 담은 것(말씀·묵상·기도·응답·설교 메모·성경 본문·한 마디·은혜·장면·짧은 말씀·기도제목·한 줄 기도·찬양)을 색 이름표로 보여 줌.
      달력과 아래 날짜 칸 사이 손잡이를 위아래로 끌면 달력 크기가 바뀜 — 크게 하면 칸마다 이름표가 더 많이, 작게 하면 점으로 (저장 bible-cal-h, 이 기기만).
      달력을 옆으로 밀면 이전·다음 달, 맨 위 달 이름을 누르면 오늘. 날을 누르면 아래에 그날 담은 것 목록 → 누르면 그 자리로. */
-  function calOpenFx(r,e,go){   /* 🗓️ 달력 목록 항목을 누르면 물결 + 그 줄이 화면 가득 펼쳐지며 열림 (2026-11-26 사용자 요청) */
-    var rc=r.getBoundingClientRect(), cc=getComputedStyle(r).getPropertyValue("--cc")||"#A45EE5", bg=getComputedStyle(r).backgroundColor;
-    try{buzz(12)}catch(_){}
-    var rp=document.createElement("i"); rp.className="calrip"; var px=(e.clientX||rc.left+rc.width/2)-rc.left, py=(e.clientY||rc.top+rc.height/2)-rc.top;
-    rp.style.left=px+"px"; rp.style.top=py+"px"; r.appendChild(rp); r.classList.add("calpick");
-    var ov=document.createElement("div"); ov.className="calfx"; ov.style.setProperty("--cc",cc);
-    ov.style.cssText+=";left:"+rc.left+"px;top:"+rc.top+"px;width:"+rc.width+"px;height:"+rc.height+"px;background:"+bg;
-    ov.innerHTML='<div class="calfxin"></div>'; ov.firstChild.innerHTML=r.innerHTML; var rr=ov.querySelector(".calrip"); if(rr)rr.remove();
-    setTimeout(function(){document.body.appendChild(ov); void ov.offsetWidth;
-      var vw=window.innerWidth, vh=(window.visualViewport?visualViewport.height:window.innerHeight);
-      ov.classList.add("go"); ov.style.left="0px"; ov.style.top="0px"; ov.style.width=vw+"px"; ov.style.height=vh+"px"; ov.style.borderRadius="0px";
-      setTimeout(function(){closeCal(); cal._opening=0; try{go()}catch(_){}
-        requestAnimationFrame(function(){ov.classList.add("out"); setTimeout(function(){ov.remove()},380)})},400)},170)
+  function calOpenFx(r,e,go){   /* 🗓️ 달력 목록 항목을 누르면 그 자리에서 열린 창이 자연스럽게 줌인 (2026-11-26 사용자 요청: 물결·빈 판 없이) */
+    var rc=r.getBoundingClientRect(), ox=(e&&e.clientX)||rc.left+rc.width/2, oy=rc.top+rc.height/2;
+    function vis(el){if(el.hidden)return false; var cs=getComputedStyle(el); return cs.display!=="none"&&cs.visibility!=="hidden"&&el.getBoundingClientRect().height>40}
+    var before=new Set(); Array.prototype.forEach.call(document.body.children,function(el){if(vis(el))before.add(el)});
+    closeCal(); cal._opening=0; try{go()}catch(_){}
+    var tries=0; (function look(){var nw=null; Array.prototype.forEach.call(document.body.children,function(el){if(!nw&&el!==cal&&!before.has(el)&&el.tagName!=="SCRIPT"&&vis(el))nw=el});
+      if(!nw){if(++tries<8)return setTimeout(look,30); return}
+      var b=nw.getBoundingClientRect(); try{nw.animate([{transformOrigin:(ox-b.left)+"px "+(oy-b.top)+"px",transform:"scale(.4)",opacity:0},{transformOrigin:(ox-b.left)+"px "+(oy-b.top)+"px",transform:"scale(1)",opacity:1}],{duration:380,easing:"cubic-bezier(.2,.8,.25,1)"})}catch(_){}})();
   }
   var CALT={note:["📖","말씀","#8FB8F0"],med:["✍️","묵상","#B7A0F0"],pray:["🙏","기도","#F0B07A"],ans:["🙌","응답","#F2C94C"],srm:["🎤","설교","#E3A6BC"],btx:["📜","본문","#C9A8E8"],say:["💬","한 마디","#A9B6E8"],grace:["🌿","은혜","#93D3A2"],scene:["🌄","장면","#F6C79A"],verse:["📖","짧은 말씀","#8FD0CC"],ic:["🙏","기도제목","#93C9A3"],p1:["🙏","한 줄 기도","#E8A0C8"],hym:["🎵","찬양","#F2C1D9"],read:["📖","통독","#9AD3B8"],pil:["✍️","필사","#D9C08F"]};   /* 통독·필사 (2026-11-25 사용자 요청) */
   var cal=null, calY=0, calM=0, calSel="", calIdx=null;
