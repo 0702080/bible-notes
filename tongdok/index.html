@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-card">
+<meta name="app-build" content="td-2026-11-26-bar">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -594,6 +594,15 @@ body{background:transparent}
 .pinned .bk{background:transparent;border:0;box-shadow:none;padding:0 0 4px}
 .pinned .chips:not(.fchips){background:rgba(150,120,90,.10);--rule:rgba(140,110,80,.22);box-shadow:0 0 0 1px rgba(140,110,80,.22)}
 .pinned .chip{background:rgba(255,251,242,.75)}
+/* 📊 진도는 동그라미 대신 책 이름 줄 가운데 막대(높이 = 책 이름 글자), 📌는 맨 오른쪽 (2026-11-26 사용자 요청) */
+.bk-h .bk-tg{flex:0 0 auto;min-width:166px}   /* 막대 시작 자리를 책마다 같게 */
+.bk-h .bk-prog,.pinned .bk-h .bk-prog{order:1;flex:1 1 auto;min-width:56px;width:auto;height:18px;margin:0 12px 0 4px!important;border-radius:9px;display:block;position:relative;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.35)!important;
+  background:linear-gradient(90deg,var(--c) 0,var(--c) calc(var(--p)*1%),rgba(255,228,186,.16) calc(var(--p)*1%))!important}
+.bk-h .bk-prog b,.pinned .bk-h .bk-prog b{position:absolute;inset:0;width:auto;height:auto;border-radius:0;background:none!important;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;line-height:1;color:#FFF7E6!important;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+.bk-h .bk-prog[data-st="none"] b{color:rgba(241,226,198,.6)!important}
+.bk-h .bk-pin{order:2;margin-left:0}
+.pinned .bk-h .bk-prog{background:linear-gradient(90deg,var(--c) 0,var(--c) calc(var(--p)*1%),rgba(120,96,70,.16) calc(var(--p)*1%))!important;box-shadow:inset 0 1px 2px rgba(80,60,30,.25)!important}
+.pinned .bk-h .bk-prog[data-st="none"] b{color:#8C7A62!important;text-shadow:none}
 </style>
 </head>
 <body>
@@ -1001,7 +1010,7 @@ function syncFoldAll(){
 /* 책 오른쪽 끝: 진행 상황을 링(색)과 숫자로 — 안 읽음 회색, 읽는 중 금빛 %, 다 읽음 초록 ✓ (2026-10-11 사용자 요청) */
 function progBadge(done,total,r){
   var p=Math.round(done/total*100), st=done===0?"none":done===total?"full":"part";
-  var txt=done===total?(r?"×"+(r+1):"✓"):done===0?"0":p+"%";
+  var txt=done===total?(r?"✓ "+(r+1)+"회":"✓ 100%"):p+"%";
   return '<span class="bk-prog" data-st="'+st+'" style="--p:'+(done/total*100).toFixed(1)+'" role="img" aria-label="'+(done===total?"다 읽음":p+"% 읽음")+'"><b>'+txt+'</b></span>';
 }
 // 표의 바깥 모서리(계단으로 꺾이는 자리 포함)를 둥글게 할 칸 고르기 (2026-10-17 사용자 요청)
