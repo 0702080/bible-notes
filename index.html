@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-shotcorner">
+<meta name="app-build" content="2026-11-27-ptense2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6160,6 +6160,15 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 .saypickbar .spsave{color:#2A2010;background:linear-gradient(180deg,#F6DE97,#D4AC52);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 3px 0 #8A6A22,0 4px 8px rgba(0,0,0,.35)}
 .saypickbar .spsave:disabled{opacity:.45}
 .saypickbar .spx{width:32px;height:32px;padding:0;color:#F4A3C0}
+/* 🕯/✨ 말씀 카드 기도문 구함 ↔ 고백 (2026-11-27 사용자 요청): 읽을 땐 오른쪽 위 📋 아래 28px 동그라미, 적는 중엔 칸 아래 📋 왼쪽 알약 */
+.prays>.pri>.ptense{position:absolute;top:80px;right:8px;z-index:2;width:28px;height:28px;padding:0;border-radius:50%;font-size:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid #6E6A82;color:#E8E2D6;background:linear-gradient(180deg,#4A4658,#2C2A36)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #1A1920}
+.prays>.pri>.ptense:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 0 #1A1920}
+.prays>.pri>.ptense.on{background:linear-gradient(180deg,#F6D77A,#D9A93A)!important;color:#3A2A08;border-color:#B88A2A;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 3px 0 #7A5A14}
+.prays>.pri>.ptense::before{content:"🕯";font-size:14px;line-height:1}
+.prays>.pri>.ptense.on::before{content:"✨"}
+.prays>.pri.editing>.ptense{width:auto;height:34px;padding:0 12px;border-radius:17px;font-size:12.5px;gap:4px;right:74px}
+.prays>.pri.editing>.ptense::before{content:none}
+.prays>.pri.thxside>.ptense,.prays>.pri.pf1d>.ptense{display:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -7891,7 +7900,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       var d=have.get(x.id); have.delete(x.id);
       if(!d){
         d=document.createElement("div"); d.className="pri"; d.dataset.pid=x.id;
-        d.innerHTML='<div class="pfline" role="button" title="눌러서 펼치기"><span class="pflt"></span><b>▾</b></div><button type="button" class="pfone pf1" title="이 기도만 접기" aria-label="이 기도 접기">▴</button><button type="button" class="pcopy" title="이 기도문 전체 복사" aria-label="이 기도문 전체 복사"></button><div class="prv" title="두 번 누르면 고치기"><p class="prvt"></p><div class="prva"><b>🙌 응답</b><p></p></div></div>'+
+        d.innerHTML='<div class="pfline" role="button" title="눌러서 펼치기"><span class="pflt"></span><b>▾</b></div><button type="button" class="pfone pf1" title="이 기도만 접기" aria-label="이 기도 접기">▴</button><button type="button" class="pcopy" title="이 기도문 전체 복사" aria-label="이 기도문 전체 복사"></button><button type="button" class="ptense"></button><div class="prv" title="두 번 누르면 고치기"><p class="prvt"></p><div class="prva"><b>🙌 응답</b><p></p></div></div>'+
           '<textarea class="pt" rows="1" placeholder="기도 제목 (예: 이 말씀처럼 가족을 하나님께 맡기게 하소서)" aria-label="기도"></textarea>'+
           '<div class="pans" hidden><span class="panl">🙌 응답</span><textarea class="pan" rows="1" placeholder="어떻게 응답하셨는지 적어 보세요" aria-label="응답"></textarea></div>'+
           '<div class="pthx" hidden><div class="pthxh"><b>🙏 응답 감사 기도</b><span class="pthxd"></span><button type="button" class="pfone" title="이 기도만 접기" aria-label="이 기도 접기">▴</button><button type="button" class="pthxback">← 기도문</button></div><div class="pthxask"><p>아직 응답 표시가 안 된 기도예요.</p><button type="button" class="pthxmark" title="응답된 기도로 표시하고 응답 감사 기도를 적어요">🙌 기도문 쓰기</button></div><p class="pthv" title="두 번 누르면 고치기"></p><textarea class="pth" rows="3" placeholder="응답해 주신 하나님께 감사 기도를 적어 보세요" aria-label="응답 감사 기도"></textarea><p class="pthxtip">두 번 누르면 고치기 · 옆으로 밀면 기도문</p></div>'+
@@ -7915,6 +7924,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       // 기본은 읽기, 두 번 누르면 고치기
       var ed=prEdit.has(x.id); d.classList.toggle("editing",ed);
       var ptx=d.querySelector(".pt"); if(ed&&!x.t.trim()&&!ptx.value.trim()&&document.activeElement!==ptx)ptx.value=PRAY_TPL;   // 고치는 중인 빈 기도도 기도문 틀로 (적어야 저장)
+      ptenseSync(d,ed?ptx.value:x.t);   // 🕯/✨ 구함 ↔ 고백 (2026-11-27 사용자 요청)
       var pv=d.querySelector(".prvt"); pv.textContent=x.t.trim()?x.t:"(빈 기도) 두 번 눌러 적어 보세요"; pv.classList.toggle("empty",!x.t.trim());
       var pa=d.querySelector(".prva"); pa.hidden=!x.ans||!(x.an||"").trim(); pa.querySelector("p").textContent=x.an||"";
       d.querySelector(".pdl").textContent=dateLabel(x.at)+(x.ans?"  ·  응답 "+dlabel(dkey(x.ans)):"");
@@ -16060,11 +16070,33 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   }
   /* PRAY_TOP 은 위(IC_HEAD 옆)에서 정한다 */
   function prayNz(s){return String(s||"").replace(/\s+/g,"")}
+  function ptensePlace(d){var b=d&&d.querySelector(".ptense"), t=d&&d.querySelector(".pt"); if(!b)return; if(!d.classList.contains("editing")||!t){b.style.top="";return} b.style.top=Math.max(8,t.offsetTop+t.offsetHeight-48)+"px"}
+  ["focusin","input"].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target; if(t&&t.classList&&t.classList.contains("pt")){var d=t.closest(".pri"); requestAnimationFrame(function(){ptensePlace(d)}); setTimeout(function(){ptensePlace(d)},350)}})});
+  window.addEventListener("resize",function(){var t=document.activeElement; if(t&&t.classList&&t.classList.contains("pt"))ptensePlace(t.closest(".pri"))});
+  function ptenseSync(d,v){var b=d&&d.querySelector(".ptense"); if(!b)return; ptensePlace(d); var c=icIsC(v); b.hidden=!icHasTop(v); b.classList.toggle("on",c); b.textContent=c?"✨ 고백":"🕯 구함"; b.title=c?"믿음의 고백 — 누르면 구하는 기도로":"구하는 기도 — 누르면 믿음의 고백으로"}
+  (function(){   /* 🕯/✨ 말씀 카드 기도문 맨 위 문구 구함 ↔ 고백 (2026-11-27 사용자 요청: 🙏 기도 창처럼). 적는 중이면 칸에서 나가지 않게 */
+    function go(b){var pr=b.closest(".pri"), nt=b.closest(".note"); if(!pr||!nt)return; var n=notes.get(nt.dataset.id); if(!n)return;
+      var x=(n.prays||[]).find(function(y){return y.id===pr.dataset.pid}); if(!x)return; buzz(12);
+      var t=pr.querySelector(".pt");
+      if(pr.classList.contains("editing")&&t){var p=t.selectionStart, v0=t.value; t.value=icFlip(v0); try{var np=Math.max(0,p+t.value.length-v0.length); t.setSelectionRange(np,np)}catch(er){} t.dispatchEvent(new Event("input",{bubbles:true})); ptenseSync(pr,t.value); return}
+      x.t=icFlip(x.t); ptenseSync(pr,x.t); var pv=pr.querySelector(".prvt"); if(pv)pv.textContent=x.t; scheduleSave(n.id)}
+    var tAt=0;
+    document.addEventListener("touchstart",function(e){var b=e.target.closest&&e.target.closest(".ptense"); if(b&&b.closest(".prays"))e.preventDefault()},{passive:false,capture:true});
+    document.addEventListener("touchend",function(e){var b=e.target.closest&&e.target.closest(".ptense"); if(b&&b.closest(".prays")){e.preventDefault(); tAt=Date.now(); go(b)}},{passive:false,capture:true});
+    document.addEventListener("mousedown",function(e){var b=e.target.closest&&e.target.closest(".ptense"); if(b&&b.closest(".prays"))e.preventDefault()},true);
+    document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".ptense"); if(b&&b.closest(".prays")){e.stopPropagation(); if(Date.now()-tAt>600)go(b)}},true);
+  })();
   function prayTopLine(s){s=String(s||"").trim(); if(!s)return false; return PRAY_TOP.split("\n").some(function(x){return x.trim()===s})}
   function prayTop(v){
     v=String(v||""); if(!v.trim())return v;
     var f=prayNz(v);
     if(f.indexOf(prayNz(PRAY_TOP))===0)return v;            // 이미 여섯 줄 다 있음
+    if(PRAY_TOP1C&&f.indexOf(prayNz(PRAY_TOP1C))===0){     // ✨ 믿음의 고백 모양 (2026-11-27) — 고백 세 줄만 있으면 그 아래 고백 세 줄을
+      if(f.indexOf(prayNz(PRAY_TOP1C+PRAY_TOP2C))===0)return v;
+      var LC=v.replace(/\r/g,"").split("\n"), oc=[], sc=0, dc=false;
+      for(var j=0;j<LC.length;j++){oc.push(LC[j]); if(!dc&&LC[j].trim())sc++; if(!dc&&sc===3){oc.push("");oc=oc.concat(PRAY_TOP2C.split("\n"));dc=true}}
+      return oc.join("\n");
+    }
     if(f.indexOf(prayNz(PRAY_TOP1))===0){                   // 예전 세 줄만 — 그 아래로 새 세 줄을 끼운다
       var L=v.replace(/\r/g,"").split("\n"), out=[], seen=0, done=false;
       for(var i=0;i<L.length;i++){
