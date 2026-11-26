@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-longfold">
+<meta name="app-build" content="ab-20261126-timerhidehdr">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6118,6 +6118,7 @@ body .icv .icform.icinline .tagripbar{max-width:none!important}
 
 /* 📜 '모든 칸' 목록의 접힌 카드는 긴 말씀(축복기도 등)을 5줄까지만 보이고 아래는 흐리게 — 눌러 펼치면 전부, 📁 칸을 골라 열면(낭독용) 전부 (2026-11-26 사용자 요청) */
 body:not(.colsel) #list>.note:not(.open):not(.vediting) .verse.vlines{max-height:calc(31.5px * 5);overflow:hidden;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent)}
+body.rdtimeron .toolbar,body.rdtimeron #topicBar,body.rdtimeron #colBar,body.rdtimeron .fwrap,body.rdtimeron #fScopeRow{display:none!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -24308,7 +24309,8 @@ var rdTimerOpen=(function(){
   function reset(){pause(); st.left=st.dur; st.buzzed=false; draw()}
   function step(d){var used=st.dur-(st.run?(st.end-Date.now())/1000:st.left); var nd=Math.max(30,Math.min(3600,Math.round((st.dur+d)/30)*30)); st.dur=nd; save();
     st.left=nd-used; if(st.run)st.end=Date.now()+st.left*1000; st.buzzed=st.left<=0; draw()}
-  function close(){pause(); if(el)el.hidden=true}
+  function hdr(on){var c=st.id&&document.querySelector('#list>.note[data-id="'+st.id+'"]'),y=c?c.getBoundingClientRect().top:0; document.body.classList.toggle("rdtimeron",on); if(c){var d=c.getBoundingClientRect().top-y; if(d)window.scrollBy(0,d)}}
+  function close(){pause(); if(el)el.hidden=true; hdr(false)}
   function build(){el=document.createElement("div"); el.id="rdTimer"; el.setAttribute("role","timer");
     el.innerHTML='<div class="rtrow"><button type="button" class="rtx" aria-label="닫기">✕</button><button type="button" class="rtm" aria-label="30초 줄이기">−</button><div class="rtt">2:00</div><button type="button" class="rtp" aria-label="30초 늘리기">＋</button><button type="button" class="rtgo" aria-label="시작">▶</button><button type="button" class="rtr" aria-label="처음으로">↺</button></div><div class="rtbar"><i></i></div><div class="rtsub"></div>';
     try{var y0=+localStorage.getItem("bible-rd-timer-y"); if(y0>0)el.style.top=Math.min(innerHeight-60,Math.max(60,y0))+"px"}catch(err){}
@@ -24326,7 +24328,7 @@ var rdTimerOpen=(function(){
   return function(n){if(!el)build(); if(!el.hidden&&st.id===n.id){close(); return}   /* ⏱ 같은 카드의 시계 단추를 다시 누르면 닫힘 — 토글 (2026-11-26 사용자 요청) */
     if(st.id!==n.id||el.hidden){pause(); st.id=n.id; var e0=est(n); st.dur=+M[n.id]||Math.max(30,Math.ceil(e0/30)*30); st.left=st.dur; st.buzzed=false;
       el.querySelector(".rtsub").textContent=(String(n.ref||"").trim()||"낭독")+" · 읽기 어림 "+fmt(e0)}
-    el.hidden=false; draw()};
+    el.hidden=false; hdr(true); draw()};
 })();
 </script>
 </body></html>
