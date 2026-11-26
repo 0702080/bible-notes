@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-27-full80">
+<meta name="app-build" content="td-2026-11-27-sum3d">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -727,6 +727,18 @@ body{background:transparent}
 .bk-h .bk-prog,.pinned .bk-h .bk-prog{height:14.7px!important;border-radius:7.35px!important}
 .bk-h .bk-prog>span,.bk-h .bk-prog b,.bk-h .bk-prog em{line-height:14.7px!important;font-size:10.5px!important}
 .bk-h .bk-prog[data-st="full"] b,.bk-h .bk-prog[data-st="full"]>span,.bk-h .bk-prog[data-st="full"] em{font-size:8.4px!important}
+.sum .meter{position:relative;height:18px!important;border-radius:9px!important;overflow:hidden}
+.sum .meter i{border-radius:0}
+.sum .mpct{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding:0 7px;font:800 11px/1 var(--sans);font-variant-numeric:tabular-nums;color:#7A5A12;white-space:nowrap}
+.sum .mpct.in{transform:translateX(-100%);color:#FFF8E6;text-shadow:0 1px 1px rgba(0,0,0,.3)}
+.sum .cloud.on{display:none!important}
+.sum-top{align-items:center}
+.sumfr{margin-left:6px;margin-right:auto;width:26px;height:26px;border-radius:50%;border:0;padding:0;font-size:13px;line-height:26px;cursor:pointer;background:linear-gradient(180deg,#FFFDF8,#F1E4C8);box-shadow:inset 0 1px 0 #fff,0 2px 0 #C9B48C,0 3px 5px rgba(90,60,20,.22)}
+.sumfr:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #fff,0 0 0 #C9B48C}
+.sumfr[hidden]{display:none}
+.sum .half{background:linear-gradient(180deg,color-mix(in srgb,var(--orange) 5%,#FFFDF8),color-mix(in srgb,var(--orange) 16%,#F3E6CF))!important;border:1px solid color-mix(in srgb,var(--orange) 30%,#E2D2B2)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 3px 0 color-mix(in srgb,var(--orange) 34%,#BFA77E),0 5px 9px rgba(90,60,20,.18)!important}
+.sum .half+.half{background:linear-gradient(180deg,color-mix(in srgb,var(--sky) 5%,#FDFEFF),color-mix(in srgb,var(--sky) 18%,#E7ECEA))!important;border-color:color-mix(in srgb,var(--sky) 32%,#D3DAD8)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 3px 0 color-mix(in srgb,var(--sky) 38%,#9DAFB4),0 5px 9px rgba(40,70,90,.18)!important}
+.sum .halves{margin-bottom:4px}
 </style>
 </head>
 <body>
@@ -758,10 +770,10 @@ body{background:transparent}
 
   <section class="sum" aria-live="polite">
     <div class="sum-top">
-      <span class="sum-now" id="who">내 진도</span>
+      <span class="sum-now" id="who">내 진도</span><button type="button" class="sumfr" data-act="friends" aria-label="친구" title="친구" hidden>👥</button>
       <span class="sum-cnt" id="cnt"></span>
     </div>
-    <div class="meter"><i class="both" id="mBoth"></i><i class="me" id="mMe"></i></div>
+    <div class="meter"><i class="both" id="mBoth"></i><i class="me" id="mMe"></i><b class="mpct" id="mPct"></b></div>
     <p class="sum-cum" id="cumCnt" hidden></p>
     <div class="halves">
       <div class="half"><b>구약 39권</b><span id="otCnt"></span></div>
@@ -1202,11 +1214,12 @@ function renderSummary(){
     $("mMe").style.width=(Math.max(0,mine-both)/TOTAL*100)+"%";
   }else{
     $("who").textContent=(myName?myName+"의 ":"내 ")+(pMode?"필사":"진도");
-    $("cnt").textContent=mine+" / "+TOTAL+"장 ("+Math.round(mine/TOTAL*100)+"%)";
-    $("cumCnt").hidden=cum===mine; $("cumCnt").textContent="다시 "+(pMode?"쓴":"읽은")+" 장까지 모두 "+cum.toLocaleString()+"장 "+(pMode?"썼어요":"읽었어요");
+    $("cnt").textContent=mine.toLocaleString()+" / "+TOTAL.toLocaleString()+"장";
+    $("cumCnt").hidden=cum===mine; $("cumCnt").textContent=cum.toLocaleString()+"장 "+(pMode?"썼어요":"읽었어요");
     $("mBoth").style.width="0%";
     $("mMe").style.width=pctMe+"%";
   }
+  (function(){var pb=$("mPct");if(!pb)return;var one=!(VF.length);pb.hidden=!one;if(one){var pc=Math.round(pctMe);pb.textContent=pc+"%";pb.style.left=Math.max(pctMe,0)+"%";pb.classList.toggle("in",pctMe>=14)}})();
   $("barCnt").textContent=mine.toLocaleString()+" / "+TOTAL.toLocaleString();
   $("otCnt").textContent=covRange(0,OT_TOTAL)+" / "+OT_TOTAL+"장";
   $("ntCnt").textContent=covRange(OT_TOTAL,TOTAL)+" / "+NT_TOTAL+"장";
@@ -2133,6 +2146,7 @@ function drawCloud(){
   if(cloudState.noRows&&cloudState.noRows.length)h+='<br><small>'+esc(cloudState.noRows.join(", "))+'님은 아직 통독표를 안 열었어요 (한 번 열면 보여요)</small>';
   h+=' <button type="button" class="cl-re" data-act="friends">👥 친구</button>';
   el.innerHTML=h; el.className="cloud on";
+  var sf=document.querySelector(".sumfr"); if(sf)sf.hidden=false;
 }
 document.addEventListener("change",function(ev){if(ev.target.classList&&ev.target.classList.contains("cl-pick")){cloudPick=ev.target.value;try{localStorage.setItem(KP+"cloudpick",cloudPick)}catch(e){}compare=true;applyCloudFriend();renderAll()}});
 document.addEventListener("click",function(ev){
