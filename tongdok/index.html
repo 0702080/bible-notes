@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-27-nochev">
+<meta name="app-build" content="td-2026-11-27-slide">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1145,7 +1145,17 @@ function saveFold(){try{localStorage.setItem(FOLD_KEY,JSON.stringify(Object.keys
 function setFold(bi,shut){
   if(shut)folded[bi]=1;else delete folded[bi];
   var sec=document.querySelector('.bk[data-b="'+bi+'"]'); if(!sec)return;
+  var anim=arguments[2]&&sec.classList.contains("shut")!==shut&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
+  if(sec._fa){clearTimeout(sec._fa); sec.style.transition=sec.style.height=sec.style.overflow=""; sec._fa=0}
+  var h0=anim?sec.getBoundingClientRect().height:0;
   sec.classList.toggle("shut",shut); sec.querySelector(".bk-tg").setAttribute("aria-expanded",String(!shut));
+  if(anim){   /* ↕ 책 펼치기·접기는 위아래로 미끄러지듯 (2026-11-27 사용자 요청) */
+    var h1=sec.getBoundingClientRect().height, bd=sec.querySelector(".bk-body");
+    if(shut&&bd){bd.style.display="block"}   // 접는 동안은 표가 보이다가 덮이게
+    sec.style.overflow="hidden"; sec.style.height=h0+"px"; void sec.offsetHeight;
+    sec.style.transition="height .32s cubic-bezier(.2,.8,.2,1)"; sec.style.height=h1+"px";
+    sec._fa=setTimeout(function(){sec.style.transition=sec.style.height=sec.style.overflow=""; if(bd)bd.style.display=""; sec._fa=0},340);
+  }
 }
 function syncFoldAll(){
   [["ot",0,OT_N],["nt",OT_N,BOOKS.length],["all",0,BOOKS.length]].forEach(function(t){
@@ -1848,10 +1858,10 @@ document.addEventListener("click",function(ev){
     renderBooks(); if(pins[pb])window.scrollTo({top:0,behavior:"smooth"});
     return;
   }
-  if(act==="fold"){var fb=+el.dataset.b;setFold(fb,!folded[fb]);saveFold();syncFoldAll();return}
+  if(act==="fold"){var fb=+el.dataset.b;setFold(fb,!folded[fb],1);saveFold();syncFoldAll();return}
   if(act==="foldall"){
     var t=el.dataset.t, a=t==="nt"?OT_N:0, z=t==="ot"?OT_N:BOOKS.length, shutAll=/접기$/.test(el.textContent);
-    for(var fb2=a;fb2<z;fb2++)setFold(fb2,shutAll); saveFold(); syncFoldAll(); return;
+    for(var fb2=a;fb2<z;fb2++){var se2=document.querySelector('.bk[data-b="'+fb2+'"]'), rr=se2&&se2.getBoundingClientRect(); setFold(fb2,shutAll,rr&&rr.bottom>0&&rr.top<innerHeight)} saveFold(); syncFoldAll(); return;
   }
 
   if(act==="round"||act==="unround"){
