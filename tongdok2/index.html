@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-mapcream">
+<meta name="app-build" content="td-2026-11-26-yrplain">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -703,6 +703,8 @@ body{background:transparent}
 .tlv .tl-yr span::after{content:"";display:inline-block;width:7px;height:7px;margin-left:5px;border-radius:50%;background:#C98A12;vertical-align:4px}
 /* 🎨 안쪽 원 판은 순백 대신 카드 황토빛과 어울리는 따뜻한 크림 (2026-11-26 사용자 요청: 흰색이 배경과 안 어울림) */
 .ovw-map{background:#FBF4E6!important;border:1px solid rgba(176,138,80,.35)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 1px 2px rgba(120,84,30,.08)!important}
+/* 📅 연도 옆 금빛 점·줄은 뺌 (2026-11-26 사용자 요청) */
+.tlv .tl-yr::after,.tlv .tl-yr span::after{display:none!important;content:none!important}
 </style>
 </head>
 <body>
@@ -1383,9 +1385,7 @@ function walkCanvas(nodes,pg,P,font){
       var ys=i?fs(54):76, yx=80, yb=i?cy(i)-dot/2-10*k:P.top-6;
       x.font="900 "+ys+"px "+font; x.fillStyle="rgba(120,80,20,.18)"; x.fillText(yy,yx+1,yb+3);
       x.fillStyle="#5A3A08"; x.fillText(yy,yx,yb);
-      var yw=x.measureText(yy).width; x.beginPath(); x.arc(yx+yw+14,yb-ys*0.12,ys*0.1,0,Math.PI*2); x.fillStyle="#C98A12"; x.fill();
-      var lx=yx+yw+34, lg=x.createLinearGradient(lx,0,WALK_W-80,0); lg.addColorStop(0,"rgba(140,98,0,.75)"); lg.addColorStop(.6,"rgba(196,150,60,.35)"); lg.addColorStop(1,"rgba(196,150,60,0)");
-      x.fillStyle=lg; x.fillRect(lx,yb-ys*0.12-2,WALK_W-80-lx,4);
+
     }
     var y=cy(i), c=COL[nd.m];
     x.beginPath(); x.arc(dx,y,dot/2,0,Math.PI*2); x.fillStyle="#FFF8EA"; x.fill();
