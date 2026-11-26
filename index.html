@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-lprayclamp">
+<meta name="app-build" content="ab-20261126-ictense">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6121,6 +6121,7 @@ body:not(.colsel) #list>.note.lpray:not(.open):not(.vediting) .verse.vlines{max-
 body.rdtimeron .toolbar,body.rdtimeron #topicBar,body.rdtimeron #colBar,body.rdtimeron .fwrap,body.rdtimeron #fScopeRow{display:none!important}
 body.rdtimeron .topverse{display:none!important}
 body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
+.icv .icbtns .ictense.on{background:linear-gradient(180deg,#F6D77A,#D9A93A)!important;color:#3A2A08!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -14909,7 +14910,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       if(!line.trim()){out.push("");return} cx.font=fnt(w,sz); var cur="";
       line.split(/(\s+)/).forEach(function(k){if(!k)return; var t=cur+k; if(cx.measureText(t).width>maxW&&cur.trim()){out.push(cur.replace(/\s+$/,"")); cur=k.trim()?k:""; while(cx.measureText(cur).width>maxW&&cur.length>1){var i=cur.length; while(i>1&&cx.measureText(cur.slice(0,i)).width>maxW)i--; out.push(cur.slice(0,i)); cur=cur.slice(i)}} else cur=t});
       out.push(cur.replace(/\s+$/,""))}); return out}
-    var tl=wrap(x.name,"700",18), ml=wrap(x.memo,"400",fs), tlh=27;
+    var tl=wrap(x.name,"700",18), ml=wrap(icTense[x.id]?icConfess(x.memo):x.memo,"400",fs), tlh=27;
     var H=Math.round(mar+pad+tl.length*tlh+(ml.length?16+ml.length*lh:0)+pad-4+mar);
     var c=document.createElement("canvas"); c.width=W*sc; c.height=H*sc; var g=c.getContext("2d"); g.scale(sc,sc);
     g.fillStyle="#15131A"; g.fillRect(0,0,W,H);
@@ -15251,6 +15252,12 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   var PRAY_TOP1="빛이신 예수여\n내 안에 오시옵소서\n내 안에 있는 모든 어둠을 몰아내소서";
   var PRAY_TOP2="성경 말씀이 온전히 믿어지도록\n저에게 믿음의 은사를,\n믿음의 영을 부어 주소서.";
   var PRAY_TOP=PRAY_TOP1+"\n\n"+PRAY_TOP2;
+  /* ✨ 구하는 기도 ↔ 믿음의 고백 (2026-11-26 사용자 요청): 맨 위 고정 문구 A·B를 현재·과거형으로 바꿔 보여 줌 — 저장된 글은 그대로 */
+  var PRAY_TOP1C="빛이신 예수여\n내 안에 계셔 주시니\n내 안에 있는 모든 어둠이 떠난 줄 믿습니다";
+  var PRAY_TOP2C="성경 말씀이 온전히 믿어지도록\n저에게 믿음의 은사를,\n믿음의 영을 부어 주신 줄 믿습니다.";
+  var icTense={}; try{icTense=JSON.parse(localStorage.getItem("bible-ic-tense")||"{}")||{}}catch(e){}
+  function icHasTop(m){m=String(m||""); return m.indexOf(PRAY_TOP1)>=0||m.indexOf(PRAY_TOP2)>=0}
+  function icConfess(m){return String(m||"").split(PRAY_TOP1).join(PRAY_TOP1C).split(PRAY_TOP2).join(PRAY_TOP2C)}
   var IC_HEAD=PRAY_TOP;
   function icHeadOff(m){
     var t=String(m||"").replace(/\r/g,"");
@@ -15539,7 +15546,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     d.innerHTML='<button type="button" class="ictop icfold" aria-expanded="'+op+'" title="눌러서 '+(op?"접기":"펼치기")+'"><b class="icname"></b><span class="icmeta"></span><span class="icchev" aria-hidden="true"></span></button><button type="button" class="icshot" aria-label="이미지로 저장" title="이미지로 저장"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5l-5-5-9 9"/></svg></button><p class="icmemo"></p><div class="icverse" hidden></div><div class="icbtns"></div>';
     d.querySelector(".icname").textContent=x.name;
     d.querySelector(".icmeta").textContent=x.ans?"🙌 응답 "+dlabel(dkey(x.ans)):x.no?"🕊 응답 안 됨 "+dlabel(dkey(x.no)):(x.log.length?x.log.length+"번 기도"+(last?" · 마지막 "+dlabel(last):""):"아직 기도 전");
-    var mm=d.querySelector(".icmemo"); if(x.memo.trim())mm.textContent=x.memo; else mm.remove();
+    var mm=d.querySelector(".icmemo"); if(x.memo.trim())mm.textContent=icTense[x.id]?icConfess(x.memo):x.memo; else mm.remove();
     var vn=x.nid&&notes.get(x.nid); if(vn){var v=d.querySelector(".icverse"); v.hidden=false; v.innerHTML='<b></b><span></span>'; v.querySelector("b").textContent="📖 "+vn.ref; v.querySelector("span").textContent=String(vn.text||"").replace(/\s+/g," ").slice(0,140)}
     var bt=d.querySelector(".icbtns");
     var dt=document.createElement("span"); dt.className="icdate"; var ad=new Date(x.at);   // 기도를 적은 날 (2026-10-24 사용자 요청)
@@ -15556,6 +15563,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       if(big)BI("icmv icrest","🕘","지난 기도로 — 오늘의 기도에서 내려 둬요");
       else BI("icmv icback","☀️","오늘의 기도로 올리기");
     }
+    if(icHasTop(x.memo))BI("ictense"+(icTense[x.id]?" on":""),icTense[x.id]?"✨":"🕯",icTense[x.id]?"믿음의 고백 — 누르면 구하는 기도로":"구하는 기도 — 누르면 믿음의 고백으로");
     var ansB=BI("icans"+(x.ans?" on":""),"🙌",x.ans?"응답됨 — 누르면 응답 취소":"응답 표시");
     if(!x.ans){var noB=BI("icno"+(x.no?" on":""),"🕊",x.no?"응답 안 됨 — 누르면 다시 기다리는 기도로":"응답 안 됨 표시");   // 응답 안 된 기도 표시 (2026-11-13 사용자 요청)
       if(!x.no)bt.insertBefore(noB,ansB)}   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
@@ -15689,6 +15697,9 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     if(b.classList.contains("icadd")){icShowAns=false; icEdit="new"; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfn"); if(f)f.focus()},30); return}
     if(b.classList.contains("icedit")){icEdit=id; icDraw(); return}
     if(b.classList.contains("iccancel")){icEdit=""; icDraw(); return}
+    if(b.classList.contains("ictense")&&x){var on=!icTense[x.id]; if(on)icTense[x.id]=1; else delete icTense[x.id]; try{localStorage.setItem("bible-ic-tense",JSON.stringify(icTense))}catch(e){}
+      var cd=b.closest(".icp"), me=cd&&cd.querySelector(".icmemo"); if(me)me.textContent=on?icConfess(x.memo):x.memo;
+      b.classList.toggle("on",on); b.textContent=on?"✨":"🕯"; var lb=on?"믿음의 고백 — 누르면 구하는 기도로":"구하는 기도 — 누르면 믿음의 고백으로"; b.title=lb; b.setAttribute("aria-label",lb); toast(on?"✨ 믿음의 고백으로":"🕯 구하는 기도로"); return}
     if(b.classList.contains("icans")&&x){if(x.ans){x.ans=0}else{x.ans=Date.now(); x.no=0; toast("🙌 응답된 기도로 옮겼어요")} icTouch(x); icSave(o); icDraw(); return}
     if(b.classList.contains("icno")&&x){if(x.no){x.no=0; toast("다시 기다리는 기도로 옮겼어요")}else{x.no=Date.now(); x.ans=0; toast("🕊 응답 안 된 기도로 옮겼어요")} icTouch(x); icSave(o); icDraw(); return}
     if(b.classList.contains("icdel")){
