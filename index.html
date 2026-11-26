@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-icgap">
+<meta name="app-build" content="ab-20261126-icshotb">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6100,6 +6100,12 @@ body.tafocus #toTop{display:none!important}
 .icv .icp .icbtns button.icico.icans.on{background:#E2AE3E!important}
 .icv .icp .icbtns button.icico.icno.on{background:#767C94!important}
 .icv .icp .icbtns{column-gap:16px!important}
+
+/* 🖼 기도 카드 아래 줄 이미지 저장 단추 (2026-11-26) */
+.icv .icp .icbtns .icshot.icshotb{display:grid!important;position:static!important;color:var(--gold)!important;border-color:color-mix(in srgb,var(--gold) 55%,#4A4856)!important}
+.icv .icp.thx .icbtns .icshot.icshotb{display:none!important}
+.icv .icp .icbtns .icshotb svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.icv .icp .icbtns .icshotb.ok{color:#7FD99A!important;border-color:#7FD99A!important}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -15532,6 +15538,9 @@ body.tafocus #toTop{display:none!important}
     var ansB=BI("icans"+(x.ans?" on":""),"🙌",x.ans?"응답됨 — 누르면 응답 취소":"응답 표시");
     if(!x.ans){var noB=BI("icno"+(x.no?" on":""),"🕊",x.no?"응답 안 됨 — 누르면 다시 기다리는 기도로":"응답 안 됨 표시");   // 응답 안 된 기도 표시 (2026-11-13 사용자 요청)
       if(!x.no)bt.insertBefore(noB,ansB)}   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
+    // 🖼 아래 아이콘 줄 맨 앞에도 '이미지로 저장' (2026-11-26 사용자 요청) — 위 .icshot과 같은 동작(클릭 처리기가 .icshot을 봄)
+    var shB=BI("icshot icshotb","","이 기도문을 이미지로 저장"); shB.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="M20.5 15.5l-5-5-9 9"/></svg>';
+    var fb0=bt.querySelector("button:not(.icshotb)"); if(fb0)bt.insertBefore(shB,fb0);
     // 뒷면: 응답 감사 기도 — 적은 게 있으면 읽는 글, 없으면 바로 적는 칸 (2026-11-06 사용자 요청)
     var bk=document.createElement("div"); bk.className="icthx";
     bk.innerHTML='<div class="icthxh"><b>🙏 응답 감사 기도</b><button type="button" class="icthback">← 기도문</button></div>';
