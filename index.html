@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-calzoom">
+<meta name="app-build" content="ab-20261126-calzoom2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6133,6 +6133,14 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 .calv .calzback{flex:none;height:32px;padding:0 12px;margin-right:10px;border-radius:999px;border:1px solid #5A5470;color:#E8E2F6;font-size:13px;background:linear-gradient(180deg,#4A4560,#2E2B3C)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #1A1822}
 .calv .calzback:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 0 #1A1822}
 .calv .calgrid{touch-action:pan-x pan-y}
+.caldh{flex-wrap:nowrap;min-width:0}
+.caldh>b,.caldh>span{white-space:nowrap;flex:none}
+.calsort{flex:none}.calsort button{white-space:nowrap;padding:0 10px}
+.calv.calzoom .calday{position:relative;margin:6px 10px 12px;border-radius:14px;background:rgba(164,94,229,.16);box-shadow:inset 0 0 0 1.5px rgba(201,168,255,.55),0 6px 18px rgba(0,0,0,.35);overflow:hidden;padding-top:8px}
+.calv.calzoom .caldh{padding:4px 12px 8px;gap:6px;align-items:center}
+.calv.calzoom .caldh b{font-size:19px}
+.calv .calzback{width:32px;height:32px;padding:0!important;margin-right:2px!important;display:inline-flex;align-items:center;justify-content:center;font-size:15px!important}
+@media (max-width:400px){.caldh b{font-size:18px}.caldh{gap:6px;padding:4px 12px 8px}.calsort button{padding:0 8px;font-size:12.5px}}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -24173,7 +24181,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       document.body.appendChild(cal);
       cal.querySelector(".calx").addEventListener("click",closeCal);
       cal.querySelector(".calttl").addEventListener("click",function(){var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now()); calDraw()});
-      [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){if(cal._zoom){var p=calSel.split("-"), nd=new Date(+p[0],+p[1]-1,+p[2]+(+b.dataset.d)); calZoom(dkey(nd.getTime())); return} calSlide(+b.dataset.d,0)})});   /* 크게 본 날에서는 ‹ › = 어제·내일 */
+      [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){if(cal._zoom){var p=calSel.split("-"), nd=new Date(+p[0],+p[1]-1,+p[2]+(+b.dataset.d)); calZoom(dkey(nd.getTime()),1); return} calSlide(+b.dataset.d,0)})});   /* 크게 본 날에서는 ‹ › = 어제·내일 */
       var grid=cal.querySelector(".calgrid");
       grid.addEventListener("click",function(e){if(Date.now()-(grid._sw||0)<350)return; var c=e.target.closest(".calc"); if(!c)return; calSel=c.dataset.d; buzz(10); var p=c.dataset.d.split("-"); if(+p[1]-1!==calM){calY=+p[0]; calM=+p[1]-1} calDraw()});
       // 손잡이 끌기 (휴대폰 touch, PC mouse)
@@ -24224,9 +24232,20 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now()); cal._zoom=0;
     calIdx=calBuild(); cal.hidden=false; document.body.style.overflow="hidden"; calDraw();
   }
-  function calZoom(d){
+  function calZoom(d,nav){   /* 🔍 날짜 칸이 달력 자리로 커지며 그날 목록이 그 안에 (2026-11-26 사용자 요청: 애니메이션) */
+    var R0=null;
+    if(!nav){var src=cal._zoom?cal.querySelector(".calday"):cal.querySelector('.calc[data-d="'+(d||calSel)+'"]'); if(src)R0=src.getBoundingClientRect()}
     if(d){calSel=d; var p=d.split("-"); if(+p[1]-1!==calM||+p[0]!==calY){calY=+p[0]; calM=+p[1]-1} cal._zoom=1}else cal._zoom=0;
     buzz(d?[8,20,8]:10); calDraw(); var ls=cal.querySelector(".calls"); if(ls)ls.scrollTop=0;
+    if(!R0||!R0.width)return;
+    var el=cal._zoom?cal.querySelector(".calday"):cal.querySelector('.calc[data-d="'+calSel+'"]'); if(!el)return;
+    var R1=el.getBoundingClientRect(); if(!R1.width||!R1.height)return;
+    var sx=R0.width/R1.width, sy=R0.height/R1.height;
+    el.style.transition="none"; el.style.transformOrigin="0 0"; el.style.position=el.style.position||""; el.style.zIndex="5";
+    el.style.transform="translate("+(R0.left-R1.left)+"px,"+(R0.top-R1.top)+"px) scale("+sx+","+sy+")"; el.style.opacity=cal._zoom?".55":"1";
+    void el.offsetWidth;
+    el.style.transition="transform .34s cubic-bezier(.2,.8,.2,1),opacity .3s ease"; el.style.transform="none"; el.style.opacity="1";
+    setTimeout(function(){el.style.transition=""; el.style.transform=""; el.style.opacity=""; el.style.zIndex=""; el.style.transformOrigin=""},380);
   }
   function closeCal(){if(!cal||cal.hidden)return; cal.hidden=true; document.body.style.overflow=""}
   function calSlide(d,from){   // 달 넘기기 미끄럼: 지금 달이 밀려 나가고 다음 달이 반대쪽에서 들어옴
@@ -24259,7 +24278,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     var col=false; try{col=localStorage.getItem("bible-cal-col")==="1"}catch(e){} cal.classList.toggle("calcol",col);
     var h=Math.max(calMinH(),Math.min(calMaxH(),Math.round(calAvail()*calHGet()))); grid.style.height=h+"px"; calFill(h); calDay();
     cal.classList.toggle("calzoom",!!cal._zoom);
-    if(cal._zoom){var dh=cal.querySelector(".caldh"), zb=document.createElement("button"); zb.type="button"; zb.className="calzback"; zb.textContent="🗓 달력"; zb.title="달력으로 돌아가기 (두 손가락으로 오므려도 돼요)"; zb.addEventListener("click",function(){calZoom(null)}); dh.insertBefore(zb,dh.firstChild)}
+    if(cal._zoom){var dh=cal.querySelector(".caldh"), zb=document.createElement("button"); zb.type="button"; zb.className="calzback"; zb.textContent="🗓"; zb.setAttribute("aria-label","달력으로"); zb.title="달력으로 돌아가기 (두 손가락으로 오므려도 돼요)"; zb.addEventListener("click",function(){calZoom(null)}); dh.insertBefore(zb,dh.firstChild)}
   }
   function calFill(h){   // 칸 높이에 맞춰 이름표 몇 개 보일지 (작으면 점)
     var grid=cal.querySelector(".calgrid"), rows=calRows(), rh=h/rows, n=Math.floor((rh-26)/17);
