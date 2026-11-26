@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-calzx">
+<meta name="app-build" content="ab-20261126-caltapzoom">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -24183,7 +24183,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       cal.querySelector(".calttl").addEventListener("click",function(){var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now()); calDraw()});
       [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){if(cal._zoom){var p=calSel.split("-"), nd=new Date(+p[0],+p[1]-1,+p[2]+(+b.dataset.d)); calZoom(dkey(nd.getTime()),1); return} calSlide(+b.dataset.d,0)})});   /* 크게 본 날에서는 ‹ › = 어제·내일 */
       var grid=cal.querySelector(".calgrid");
-      grid.addEventListener("click",function(e){if(Date.now()-(grid._sw||0)<350)return; var c=e.target.closest(".calc"); if(!c)return; calSel=c.dataset.d; buzz(10); var p=c.dataset.d.split("-"); if(+p[1]-1!==calM){calY=+p[0]; calM=+p[1]-1} calDraw()});
+      grid.addEventListener("click",function(e){if(Date.now()-(grid._sw||0)<350)return; var c=e.target.closest(".calc"); if(!c)return; calZoom(c.dataset.d)});   /* 날짜 칸을 한 번 누르면 그 칸이 커지며 그날 것만 (2026-11-26 사용자 요청) */
       // 손잡이 끌기 (휴대폰 touch, PC mouse)
       var gr=cal.querySelector(".calgrip"), g0=null;
       // 달력 칸 위에서도: 옆으로 밀면 달 넘기기, 위아래로 끌면 달력 크기 조절 (2026-11-18 사용자 요청)
