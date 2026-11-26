@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-ictense2">
+<meta name="app-build" content="ab-20261126-ictense3">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6122,9 +6122,11 @@ body.rdtimeron .toolbar,body.rdtimeron #topicBar,body.rdtimeron #colBar,body.rdt
 body.rdtimeron .topverse{display:none!important}
 body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 .icv .icbtns .ictense.on{background:linear-gradient(180deg,#F6D77A,#D9A93A)!important;color:#3A2A08!important}
-.icv .icfbtn .icftense{margin-left:auto;margin-right:8px;height:36px;padding:0 12px;border-radius:999px;border:1px solid #6E6A82;color:#E8E2D6;font-size:13px;background:linear-gradient(180deg,#4A4658,#2C2A36)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #1A1920}
-.icv .icfbtn .icftense:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 0 #1A1920}
-.icv .icfbtn .icftense.on{background:linear-gradient(180deg,#F6D77A,#D9A93A)!important;color:#3A2A08;border-color:#B88A2A;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 3px 0 #7A5A14}
+.icv .icform .icftense{margin-left:auto;margin-right:8px;height:36px;padding:0 12px;border-radius:999px;border:1px solid #6E6A82;color:#E8E2D6;font-size:13px;background:linear-gradient(180deg,#4A4658,#2C2A36)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #1A1920}
+.icv .icform .icftense:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 0 #1A1920}
+.icv .icform .icftense.on{background:linear-gradient(180deg,#F6D77A,#D9A93A)!important;color:#3A2A08;border-color:#B88A2A;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 3px 0 #7A5A14}
+.icv .icform .icftrow{display:flex;justify-content:flex-start;margin:-4px 0 -6px}
+.icv .icform .icftrow .icftense{margin:0!important;height:30px;font-size:12.5px}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -15607,6 +15609,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     if(x){f.querySelector(".icfn").value=x.name; f.querySelector(".icfm").value=icHead(x.memo); f.querySelector(".icfm").rows=1; var fa=f.querySelector(".icfa"); if(fa)fa.value=x.an}
     else f.querySelector(".icfm").value=IC_HEAD+"\n\n";   // 🙏 기도문 맨 위 고정 문구 (2026-11-20 사용자 요청)
     icFTense(f);
+    (function(){var tb=f.querySelector(".icftense"), fm=f.querySelector(".icfm"); if(!tb||!fm)return; var rw=document.createElement("div"); rw.className="icftrow"; rw.appendChild(tb); fm.parentNode.insertBefore(rw,fm)})();   /* 🕯/✨ 단추는 제목 칸과 기도문 칸 사이 왼쪽 (2026-11-26 사용자 요청) */
     var fv=f.querySelector(".icfv"); fv.hidden=true; fv.parentNode.insertBefore(noteFinder(fv,{inline:true,max:8,ph:"📖 붙들 말씀 찾기 (책·장절·낱말)"}),fv.nextSibling);   // 긴 목록 대신 찾아서 고르기 (2026-11-07 사용자 요청)
     return f;
   }
