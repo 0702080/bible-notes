@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-27-slide">
+<meta name="app-build" content="td-2026-11-27-fade">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1146,15 +1146,17 @@ function setFold(bi,shut){
   if(shut)folded[bi]=1;else delete folded[bi];
   var sec=document.querySelector('.bk[data-b="'+bi+'"]'); if(!sec)return;
   var anim=arguments[2]&&sec.classList.contains("shut")!==shut&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
-  if(sec._fa){clearTimeout(sec._fa); sec.style.transition=sec.style.height=sec.style.overflow=""; sec._fa=0}
+  if(sec._fa){clearTimeout(sec._fa); sec.style.transition=sec.style.height=sec.style.overflow=""; var bd0=sec.querySelector(".bk-body"); if(bd0)bd0.style.display=bd0.style.opacity=bd0.style.transition=""; sec._fa=0}
   var h0=anim?sec.getBoundingClientRect().height:0;
   sec.classList.toggle("shut",shut); sec.querySelector(".bk-tg").setAttribute("aria-expanded",String(!shut));
   if(anim){   /* ↕ 책 펼치기·접기는 위아래로 미끄러지듯 (2026-11-27 사용자 요청) */
     var h1=sec.getBoundingClientRect().height, bd=sec.querySelector(".bk-body");
     if(shut&&bd){bd.style.display="block"}   // 접는 동안은 표가 보이다가 덮이게
+    if(bd){bd.style.transition="none"; bd.style.opacity=shut?"1":"0"}   // 표는 부드럽게 나타나고 사라짐 (2026-11-27 사용자 요청)
     sec.style.overflow="hidden"; sec.style.height=h0+"px"; void sec.offsetHeight;
-    sec.style.transition="height .32s cubic-bezier(.2,.8,.2,1)"; sec.style.height=h1+"px";
-    sec._fa=setTimeout(function(){sec.style.transition=sec.style.height=sec.style.overflow=""; if(bd)bd.style.display=""; sec._fa=0},340);
+    sec.style.transition="height .36s cubic-bezier(.2,.8,.2,1)"; sec.style.height=h1+"px";
+    if(bd){bd.style.transition=shut?"opacity .24s ease-out":"opacity .36s ease-in .06s"; bd.style.opacity=shut?"0":"1"}
+    sec._fa=setTimeout(function(){sec.style.transition=sec.style.height=sec.style.overflow=""; if(bd){bd.style.display=bd.style.opacity=bd.style.transition=""} sec._fa=0},440);
   }
 }
 function syncFoldAll(){
