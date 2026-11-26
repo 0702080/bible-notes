@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-ovpanel2">
+<meta name="app-build" content="td-2026-11-26-tlring">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -253,7 +253,7 @@ h2.tg[hidden],.foldbar[hidden],.bk[hidden],.sum[hidden],.shelf[hidden]{display:n
 .tl-n:only-child::before{display:none}
 .tl-ms{--c:#8BBF8F} .tl-mr{--c:#E2A93B} .tl-mp{--c:var(--violet)}
 .tl-d{height:18px;font-size:12px;font-weight:700;color:var(--c)}
-.tl-dot{position:relative;z-index:1;display:grid;place-items:center;width:40px;height:40px;margin:2px 0 6px;border-radius:50%;background:color-mix(in srgb,var(--c) 18%,var(--sheet));border:2px solid var(--c);font-size:18px}
+.tl-dot{position:relative;z-index:1;display:grid;place-items:center;width:40px;height:40px;margin:2px 0 6px;border-radius:50%;background:color-mix(in srgb,var(--c) 18%,var(--sheet));border:3.5px solid var(--c);font-size:18px}
 .tl-t{font-size:12.5px;line-height:1.35;color:var(--ink);word-break:keep-all}
 .tl-s{margin-top:2px;font-size:11px;color:var(--muted)}
 .ovw-sum{display:flex;flex-wrap:wrap;gap:6px 14px;margin:2px 0 8px;font-size:12px;color:var(--muted)}
@@ -1330,7 +1330,7 @@ function walkCanvas(nodes,pg,P,font){
   list.forEach(function(nd,i){
     var y=cy(i), c=COL[nd.m];
     x.beginPath(); x.arc(dx,y,dot/2,0,Math.PI*2); x.fillStyle="#FFF8EA"; x.fill();
-    x.fillStyle=c+"2E"; x.fill(); x.lineWidth=Math.max(3,7*k); x.strokeStyle=c; x.stroke();
+    x.fillStyle=c+"2E"; x.fill(); x.lineWidth=Math.max(3,dot*0.0875); x.strokeStyle=c; x.stroke();
     x.textAlign="center"; x.textBaseline="middle"; x.font=Math.round(dot*0.46)+"px "+font; x.fillStyle="#000";
     x.fillText(walkIcon(nd.m),dx,y+2);
     x.textAlign="right"; x.font="700 "+fs(40)+"px "+font; x.fillStyle=DCOL[nd.m]; x.fillText(walkDate(nd.d),dx-dot/2-26*k,y);
