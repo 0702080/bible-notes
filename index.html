@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-sayswfold">
+<meta name="app-build" content="ab-20261126-nowait">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -7889,7 +7889,7 @@ body.tafocus #toTop{display:none!important}
     if(!prd){
       prd=document.createElement("div"); prd.className="rvq prd"; prd.setAttribute("role","dialog"); prd.setAttribute("aria-modal","true"); prd.hidden=true;
       prd.innerHTML='<div class="dlbar"><b class="dltitle">🙏 기도 읽기</b><span class="rqcnt prdcnt"></span><button type="button" class="dlclose prdclose" aria-label="닫기" title="닫기">✕</button></div>'+
-        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><div class="prdseg"><button type="button" data-f="all">전체</button><button type="button" data-f="wait">기다리는 기도</button><button type="button" data-f="ans">응답된 기도</button><button type="button" data-f="tl">응답 연표</button></div><button type="button" class="prdall"></button></div>'+
+        '<div class="prdbody"><div class="prdfil" role="group" aria-label="보기"><div class="prdseg"><button type="button" data-f="all">전체</button><button type="button" data-f="ans">응답된 기도</button><button type="button" data-f="tl">응답 연표</button></div><button type="button" class="prdall"></button></div>'+
         '<form class="p1add" autocomplete="off"><input class="p1in" type="text" maxlength="500" enterkeyhint="done" placeholder="✏️ 한 줄 기도 적기" aria-label="한 줄 기도"><button type="submit" class="p1go" aria-label="한 줄 기도 추가" title="추가">＋</button></form>'+
         '<div class="prdlist"></div></div>';
       document.body.appendChild(prd);
