@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-walkyr">
+<meta name="app-build" content="td-2026-11-26-pastel">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -679,6 +679,23 @@ body{background:transparent}
 .tlv .tl-yr:not(.tl-yr0)::before{content:"";position:absolute;top:0;bottom:0;left:76.5px;width:3px;background:color-mix(in srgb,#C9A060 70%,#4A3218)}
 .tlv .tl-yr:not(.tl-yr0) span{background:#EAD5AE;position:relative;z-index:1;width:max-content;padding-right:6px}
 .tlv .tl-yr0+.tl-n::before{top:20px}
+/* 🎨 전체 진행표 원: 서로 어울리는 파스텔 (2026-11-26 사용자 요청) — 바탕 --gc는 고운 파스텔, 글자 --gd는 같은 빛깔의 짙은 색 */
+.ovc[data-g="law"],.ovlg [data-g="law"]{--gc:#F2C38B;--gd:#8A5A1A}
+.ovc[data-g="hist"],.ovlg [data-g="hist"]{--gc:#9CCBEB;--gd:#2D6A93}
+.ovc[data-g="poem"],.ovlg [data-g="poem"]{--gc:#C6B4EE;--gd:#5B479C}
+.ovc[data-g="major"],.ovlg [data-g="major"]{--gc:#F2AFC2;--gd:#9A3E5A}
+.ovc[data-g="minor"],.ovlg [data-g="minor"]{--gc:#AFD9A6;--gd:#3E7A38}
+.ovc[data-g="gospel"],.ovlg [data-g="gospel"]{--gc:#F4D98E;--gd:#86660C}
+.ovc[data-g="paul"],.ovlg [data-g="paul"]{--gc:#AEBDEF;--gd:#3F55A0}
+.ovc[data-g="general"],.ovlg [data-g="general"]{--gc:#F5BBA0;--gd:#9A4E2E}
+.ovc[data-g="rev"],.ovlg [data-g="rev"]{--gc:#E0B0D6;--gd:#8A3E7C}
+.ovc[data-g]{background:conic-gradient(from -90deg,var(--gc) calc(var(--f,0) * 360deg),color-mix(in srgb,var(--gc) 38%,#F6F0E4) 0)!important}
+.ovc[data-g] i{background:color-mix(in srgb,var(--gc) 10%,#FFFDF8)!important}
+.ovc[data-g] b{color:color-mix(in srgb,var(--gd) 70%,#9A8C76)}
+.ovc[data-g][data-st="part"] i{background:color-mix(in srgb,var(--gc) 22%,#FFFDF8)!important}
+.ovc[data-g][data-st="part"] b{color:var(--gd)}
+.ovc[data-g][data-st="full"]{background:var(--gc)!important}
+.ovc[data-g][data-st="full"] b{color:var(--gd);font-weight:800}
 </style>
 </head>
 <body>
