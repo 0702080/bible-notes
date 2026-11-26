@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-calzoomin">
+<meta name="app-build" content="ab-20261126-saypick">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6144,6 +6144,22 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 @media (max-width:400px){.caldh b{font-size:18px}.caldh{gap:6px;padding:4px 12px 8px}.calsort button{padding:0 8px;font-size:12.5px}}
 .calv.calzoom .calbar{touch-action:none;cursor:grab}
 
+
+/* 📷 한 마디 창 카드 골라 한 장으로 (2026-11-26 사용자 요청) */
+.saysheet.saypicking .saylist .saycard{cursor:pointer;-webkit-user-select:none;user-select:none;transition:transform .15s ease,box-shadow .15s ease,opacity .15s ease}
+.saysheet.saypicking .saylist .saycard *{pointer-events:none}
+.saysheet.saypicking .saylist .saycard:not(.saypicked){opacity:.62}
+.saysheet.saypicking .saylist .saycard.saypicked{box-shadow:0 0 0 2.5px #F3D27A,0 8px 24px rgba(243,210,122,.22)!important;transform:scale(.985)}
+.saysheet.saypicking .saylist .saycard.saypicked::after{content:"✓";position:absolute;top:10px;right:12px;width:26px;height:26px;border-radius:50%;background:#F3D27A;color:#2A2010;font-weight:800;font-size:15px;display:grid;place-items:center;box-shadow:0 2px 6px rgba(0,0,0,.4);z-index:3}
+.saysheet.saypicking .saylist .saycard{position:relative}
+.saysheet.saypicking .sayshotall{background:linear-gradient(180deg,#F6DE97,#C9A24A)!important;color:#2A2010!important}
+.saypickbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:8px;padding:8px 10px 8px 14px;border-radius:999px;background:rgba(34,30,46,.94);border:1px solid rgba(243,210,122,.45);box-shadow:0 10px 30px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);white-space:nowrap;max-width:calc(100vw - 20px)}
+.saypickbar .spn{font-size:13px;color:#EDE6F7;margin-right:2px}
+.saypickbar button{border:0;border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;font-weight:700;color:#EDE6F7;background:linear-gradient(180deg,#4A4560,#34304A);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 3px 0 #1E1B2A,0 4px 8px rgba(0,0,0,.35);transform:translateY(0);transition:transform .08s,box-shadow .08s}
+.saypickbar button:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.1),0 0 0 #1E1B2A,0 1px 3px rgba(0,0,0,.3)}
+.saypickbar .spsave{color:#2A2010;background:linear-gradient(180deg,#F6DE97,#D4AC52);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 3px 0 #8A6A22,0 4px 8px rgba(0,0,0,.35)}
+.saypickbar .spsave:disabled{opacity:.45}
+.saypickbar .spx{width:32px;height:32px;padding:0;color:#F4A3C0}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -14900,12 +14916,48 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     srmShotsSave([srmPngFile(c,(who||kind).replace(/[\\/:*?"<>|\s]+/g,"_")+".png")],who||kind);
   }
   // 📷 지금 목록에 보이는 카드 여러 장을 휴대폰 화면 크기 그림에 차례로 담기 — 한 장에 들어가는 만큼, 넘치면 다음 장 (2026-11-26 사용자 요청)
-  function sayShotAll(){
+  /* 📷 카드 골라 한 장으로 (2026-11-26 사용자 요청: 카드 3개를 한 그림에): 📷를 누르면 고르기 — 카드를 누를 때마다 ✓, 아래 줄 '한 장으로 저장' */
+  var sayPick=null;
+  function sayPickSync(){if(!say||!sayPick)return; var n=0; [].forEach.call(say.querySelectorAll(".saylist .saycard[data-id]"),function(el){var on=!!sayPick.ids[el.dataset.id]; el.classList.toggle("saypicked",on); if(on)n++});
+    var k=Object.keys(sayPick.ids).length; sayPick.bar.querySelector(".spn").textContent=k?k+"개 골랐어요":"카드를 눌러 고르세요"; sayPick.bar.querySelector(".spsave").disabled=!k}
+  function sayPickEnd(){if(!sayPick)return; var p=sayPick; sayPick=null; try{p.mo.disconnect()}catch(e){} p.bar.remove(); say.classList.remove("saypicking");
+    ["click","touchstart","touchend","touchmove","pointerdown","pointerup","mousedown","dblclick","contextmenu"].forEach(function(t){say.removeEventListener(t,p.eat,true)});
+    [].forEach.call(say.querySelectorAll(".saypicked"),function(el){el.classList.remove("saypicked")})}
+  function sayPickStart(){
+    if(!say)return; if(sayPick){sayPickEnd();return}
+    var bar=document.createElement("div"); bar.className="saypickbar";
+    bar.innerHTML='<span class="spn"></span><button type="button" class="spall">모두</button><button type="button" class="spsave">📷 한 장으로</button><button type="button" class="spx" aria-label="그만">✕</button>';
+    var p={ids:{},bar:bar,tx:0,ty:0,mv:false};
+    p.eat=function(e){var c=e.target.closest&&e.target.closest(".saylist .saycard[data-id]"); if(!c)return;
+      if(e.type==="touchstart"){var t=e.touches[0]; p.tx=t.clientX; p.ty=t.clientY; p.mv=false}
+      if(e.type==="touchmove"){var t2=e.touches[0]; if(Math.abs(t2.clientX-p.tx)+Math.abs(t2.clientY-p.ty)>10)p.mv=true}
+      e.stopPropagation();
+      if(e.type==="click"){e.preventDefault(); if(p.mv){p.mv=false;return} var id=c.dataset.id; if(p.ids[id])delete p.ids[id]; else p.ids[id]=1; try{buzz(10)}catch(_){} sayPickSync()}
+      if(e.type==="dblclick"||e.type==="contextmenu")e.preventDefault()};
+    ["click","touchstart","touchend","touchmove","pointerdown","pointerup","mousedown","dblclick","contextmenu"].forEach(function(t){say.addEventListener(t,p.eat,{capture:true,passive:false})});
+    bar.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return;
+      if(b.classList.contains("spx")){sayPickEnd();return}
+      if(b.classList.contains("spall")){var cs=[].slice.call(say.querySelectorAll(".saylist .saycard[data-id]")), allOn=cs.every(function(el){return p.ids[el.dataset.id]}); p.ids={}; if(!allOn)cs.forEach(function(el){p.ids[el.dataset.id]=1}); sayPickSync(); return}
+      if(b.classList.contains("spsave")){var ids=p.ids; sayPickEnd(); try{sayShotAll(ids)}catch(_){toast("그림을 만들지 못했어요")}}});
+    sayPick=p; say.classList.add("saypicking"); say.appendChild(bar);
+    p.mo=new MutationObserver(function(){if(sayPick===p)sayPickSync()}); var ls=say.querySelector(".saylist")||say; p.mo.observe(ls,{childList:true,subtree:true});
+    sayPickSync(); toast("한 그림에 담을 카드를 눌러 고르세요");
+  }
+  function sayShotAll(pick){
     if(!say)return; var all=sayData().items, by={}; all.forEach(function(y){by[y.id]=y});
-    var seen={}, cards=[].slice.call(say.querySelectorAll(".saylist .saycard[data-id]")).filter(function(el){var id=el.dataset.id; if(!by[id]||seen[id])return false; seen[id]=1; return true});
+    var seen={}, cards=[].slice.call(say.querySelectorAll(".saylist .saycard[data-id]")).filter(function(el){var id=el.dataset.id; if(!by[id]||seen[id]||(pick&&!pick[id]))return false; seen[id]=1; return true});
     if(!cards.length){toast("그림으로 담을 카드가 없어요");return}
     var sc=3, W=380, vw=Math.max(320,window.innerWidth||390), vh=Math.max(480,window.innerHeight||844), H=Math.round(W*vh/vw), mar=18, top=6;   // 그림 한 장 = 이 휴대폰 화면 비율
     var pages=[], cur=null;
+    if(pick){   /* 고른 카드는 길이와 상관없이 한 장에 위에서 아래로 */
+      var ccs=[]; cards.forEach(function(el){var cc; try{cc=sayShot(by[el.dataset.id],el,true)}catch(e){cc=null} if(cc)ccs.push(cc)});
+      if(!ccs.length){toast("그림을 만들지 못했어요");return}
+      var TH=top; ccs.forEach(function(cc,i){TH+=cc.height/sc-(i<ccs.length-1?mar:0)}); TH=Math.max(TH,Math.round(H*0.3));
+      var one=document.createElement("canvas"); one.width=W*sc; one.height=Math.round(TH*sc); var og=one.getContext("2d"); og.fillStyle="#15131A"; og.fillRect(0,0,one.width,one.height);
+      var yy=top; ccs.forEach(function(cc){og.drawImage(cc,0,Math.round(yy*sc)); yy+=cc.height/sc-mar});
+      var kd=sayMode==="v"?"짧은말씀":sayMode==="g"?"주님의은혜":sayMode==="m"?"장면묵상":"믿음의한마디", dd=new Date();
+      srmShotsSave([srmPngFile(one,kd+"-"+(dd.getMonth()+1)+"월"+dd.getDate()+"일-"+ccs.length+"장.png")],kd.replace(/(믿음의|주님의|짧은|장면)/,"$1 ")); return;
+    }
     function newPage(){var c=document.createElement("canvas"); c.width=W*sc; c.height=H*sc; var g=c.getContext("2d"); g.fillStyle="#15131A"; g.fillRect(0,0,c.width,c.height); cur={c:c,g:g,y:top,n:0}; pages.push(cur)}
     cards.forEach(function(el){
       var cc; try{cc=sayShot(by[el.dataset.id],el,true)}catch(e){cc=null} if(!cc)return;
@@ -18141,7 +18193,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   var sayAutoT=0, sayFormPend=false;
   document.addEventListener("visibilitychange",function(){if(document.hidden)sayAutoSave()});
   window.addEventListener("pagehide",function(){sayAutoSave()});
-  function closeSay(){if(!say)return; clearTimeout(sayAutoT); sayAutoSave(); var sae=document.activeElement; if(sae&&say.contains(sae))sae.blur();   /* 뒷면 칸에 커서가 남은 채 닫으면 다음에 열 때 목록이 안 바뀌던 문제 (2026-11-07) */ say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
+  function closeSay(){if(!say)return; try{sayPickEnd()}catch(e){} clearTimeout(sayAutoT); sayAutoSave(); var sae=document.activeElement; if(sae&&say.contains(sae))sae.blur();   /* 뒷면 칸에 커서가 남은 채 닫으면 다음에 열 때 목록이 안 바뀌던 문제 (2026-11-07) */ say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
   // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 10분마다 나옴
   var sayMode="s";
   function openSay(focus,mode){
@@ -18153,7 +18205,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
         '<div class="dlbody"><div class="saybox"><input class="field saysearch" type="search" placeholder="🔍 찾기 (초성 예: ㄱㅅ)" aria-label="한 마디 찾기 (글·말한 분·주제)"><div class="sayform" hidden></div><div class="saylist"></div></div></div>';
       document.body.appendChild(say);
       say.querySelector(".sayclose").addEventListener("click",closeSay);
-      say.querySelector(".sayshotall").addEventListener("click",function(){try{sayShotAll()}catch(e){toast("그림을 만들지 못했어요")}});
+      say.querySelector(".sayshotall").addEventListener("click",function(){try{sayPickStart()}catch(e){toast("그림을 만들지 못했어요")}});   /* 📷 = 카드 골라 한 장으로 (2026-11-26) */
       say.querySelector(".saysbtn").addEventListener("click",function(){   // 🔍 누를 때만 찾기 칸이 나옴 — 평소엔 숨겨 카드가 화면을 꽉 채움 (2026-11-14 사용자 요청)
         sayFindOn=!sayFindOn; say.classList.toggle("sayfinding",sayFindOn); this.classList.toggle("on",sayFindOn);
         var si=say.querySelector(".saysearch");
