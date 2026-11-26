@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-nowait">
+<meta name="app-build" content="ab-20261126-icico">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6079,6 +6079,17 @@ body.tafocus #toTop{display:none!important}
 .saypin.saypinsvg svg{width:13px;height:13px}
 .saypin.saypinsvg.on{color:var(--violet)!important}
 .saypin.saypinsvg:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 0 0 rgba(0,0,0,.4)!important}
+
+/* 🔘 🙏 기도 창 카드 아래 단추 = 둥근 아이콘 (2026-11-26 사용자 요청) */
+.icv .icp .icbtns{flex-wrap:nowrap!important;justify-content:flex-end;gap:10px!important}
+.icbtns button.icico{flex:none!important;width:40px!important;min-width:0!important;height:40px!important;padding:0!important;border-radius:50%!important;display:grid;place-items:center;font-size:19px!important;line-height:1;border:1px solid rgba(255,255,255,.16)!important;border-style:solid!important;background:linear-gradient(180deg,#4A4858 0%,#34323F 55%,#2A2834 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 3px 0 #16151B,0 5px 9px rgba(0,0,0,.45)!important;margin-bottom:3px;color:#fff!important;transition:transform .08s,box-shadow .08s}
+.icbtns button.icico:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 0 0 #16151B,0 2px 4px rgba(0,0,0,.4)!important}
+.icbtns button.icico.icpray{border-color:color-mix(in srgb,var(--sky) 70%,transparent)!important}
+.icbtns button.icico.icpray.on{background:linear-gradient(180deg,#9EDBF7 0%,#62BCE8 55%,#3E9FD0 100%)!important;color:#0B1A24!important;font-weight:900;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 3px 0 #2B6E94,0 5px 9px rgba(0,0,0,.45)!important}
+.icbtns button.icico.icans{border-color:color-mix(in srgb,var(--gold) 55%,transparent)!important}
+.icbtns button.icico.icans.on{background:linear-gradient(180deg,#F6D27A 0%,#E2AE3E 55%,#B8862A 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 3px 0 #6E4F14,0 5px 9px rgba(0,0,0,.45)!important}
+.icbtns button.icico.icno.on{background:linear-gradient(180deg,#9AA0B8 0%,#767C94 55%,#5C6178 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 3px 0 #33374A,0 5px 9px rgba(0,0,0,.45)!important}
+.icbtns button.icico:not(.on).icno{filter:saturate(.6)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -15499,15 +15510,17 @@ body.tafocus #toTop{display:none!important}
     var mt=d.querySelector(".icmeta"); mt.textContent+=" · "+adt;   // 적은 날은 정보 줄 끝으로, 아래 줄은 단추만 (2026-11-13 사용자 요청)
     dt.textContent=""; bt.appendChild(dt);
     function B(cls,t){var b=document.createElement("button"); b.type="button"; b.className=cls; b.textContent=t; bt.appendChild(b); return b}
+    // 🔘 아래 줄 단추는 글자 대신 둥근 아이콘 (2026-11-26 사용자 요청) — 이름은 aria-label·title
+    function BI(cls,ic,lb){var b=B(cls+" icico",ic); b.setAttribute("aria-label",lb); b.title=lb; return b}
     if(x.th.trim()){var tm=document.createElement("span"); tm.className="icthmark"; tm.textContent="🙏 감사"; tm.title="감사 기도 있음 · 옆으로 밀면 보여요"; bt.appendChild(tm)}
-    if(big&&!x.ans&&!x.no)B("icpray"+(did?" on":""),did?"✓ 오늘 기도했어요":"🙏 기도했어요");
+    if(big&&!x.ans&&!x.no)BI("icpray"+(did?" on":""),did?"✓":"🙏",did?"오늘 기도했어요 (누르면 취소)":"기도했어요");
     // ↕ 오늘의 기도 ↔ 지난 기도 한 번에 옮기기 (2026-11-25 사용자 요청)
     if(!x.ans&&!x.no){
-      if(big)B("icmv icrest","🕘 지난 기도로").title="오늘의 기도에서 내려 둬요 (다음 날에도 안 올라와요)";
-      else B("icmv icback","🙏 오늘의 기도로").title="오늘의 기도 칸으로 올려요";
+      if(big)BI("icmv icrest","🕘","지난 기도로 — 오늘의 기도에서 내려 둬요");
+      else BI("icmv icback","☀️","오늘의 기도로 올리기");
     }
-    var ansB=B("icans"+(x.ans?" on":""),x.ans?"🙌 응답됨 ✓":"응답 표시"); ansB.title=x.ans?"응답된 기도예요 · 누르면 응답을 취소해요":"응답을 받았으면 눌러 표시해요";
-    if(!x.ans){var noB=B("icno"+(x.no?" on":""),x.no?"🕊 응답 안 됨 ✓":"응답 안 됨"); noB.title=x.no?"응답 안 된 기도로 표시했어요 · 누르면 다시 기다리는 기도로":"구한 대로 응답되지 않고 마무리된 기도면 눌러 표시해요";   // 응답 안 된 기도 표시 (2026-11-13 사용자 요청)
+    var ansB=BI("icans"+(x.ans?" on":""),"🙌",x.ans?"응답됨 — 누르면 응답 취소":"응답 표시");
+    if(!x.ans){var noB=BI("icno"+(x.no?" on":""),"🕊",x.no?"응답 안 됨 — 누르면 다시 기다리는 기도로":"응답 안 됨 표시");   // 응답 안 된 기도 표시 (2026-11-13 사용자 요청)
       if(!x.no)bt.insertBefore(noB,ansB)}   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
     // 뒷면: 응답 감사 기도 — 적은 게 있으면 읽는 글, 없으면 바로 적는 칸 (2026-11-06 사용자 요청)
     var bk=document.createElement("div"); bk.className="icthx";
