@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-onepage">
+<meta name="app-build" content="td-2026-11-26-domshot">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1352,12 +1352,95 @@ function ovwCanvas(font){
   x.fillText("성경 통독표",WALK_W/2,WALK_H-80);
   return cv;
 }
+/* 📸 화면에 보이는 카드를 그대로 그림으로 (2026-11-26 사용자 요청: 화면에 보이는 그대로)
+   카드와 그 안 칸마다 바탕(단색·linear/conic 그라데이션)·테두리·둥근 모서리·글자를 화면에서 재서 캔버스에 옮김 */
+function shotCol(c){
+  if(!c)return "";
+  var m=/^color\(srgb\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)(?:\s*\/\s*([\d.%]+))?\)/.exec(c);
+  if(m){var a=m[4]==null?1:(/%$/.test(m[4])?parseFloat(m[4])/100:+m[4]);return "rgba("+Math.round(m[1]*255)+","+Math.round(m[2]*255)+","+Math.round(m[3]*255)+","+a+")"}
+  return c;
+}
+function shotStops(str){   // "rgba(...) 10%, #fff 50%" → [[색, 위치(0~1 또는 null)]]
+  var re=/(rgba?\([^)]*\)|color\([^)]*\)|#[0-9a-fA-F]{3,8}|transparent)\s*(-?[\d.]+%)?(?:\s+(-?[\d.]+%))?/g, m, out=[];
+  while((m=re.exec(str))){out.push([shotCol(m[1]),m[2]!=null?parseFloat(m[2])/100:null]); if(m[3]!=null)out.push([shotCol(m[1]),parseFloat(m[3])/100])}
+  if(!out.length)return out;
+  if(out[0][1]==null)out[0][1]=0; if(out[out.length-1][1]==null)out[out.length-1][1]=1;
+  for(var i=1;i<out.length;i++)if(out[i][1]==null){var j=i;while(out[j][1]==null)j++;for(var k=i;k<j;k++)out[k][1]=out[i-1][1]+(out[j][1]-out[i-1][1])*(k-i+1)/(j-i+1)}
+  for(var q=1;q<out.length;q++)if(out[q][1]<out[q-1][1])out[q][1]=out[q-1][1];
+  return out;
+}
+function shotLayers(bi){   // background-image를 겹 단위로 자름
+  var L=[],d=0,st=0; for(var i=0;i<bi.length;i++){var c=bi[i]; if(c==="(")d++; else if(c===")")d--; else if(c===","&&d===0){L.push(bi.slice(st,i).trim());st=i+1}}
+  L.push(bi.slice(st).trim()); return L.filter(function(x){return x&&x!=="none"});
+}
+function shotRR(x,l,t,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2)); x.beginPath(); if(x.roundRect)x.roundRect(l,t,w,h,r); else x.rect(l,t,w,h)}
+function domShotCard(card,skip){
+  var R0=card.getBoundingClientRect(), S=Math.min((WALK_W-48)/R0.width,(WALK_H-96)/R0.height);
+  var cv=document.createElement("canvas"); cv.width=WALK_W; cv.height=WALK_H;
+  var x=cv.getContext("2d");
+  x.fillStyle="#3A2F24"; x.fillRect(0,0,WALK_W,WALK_H);   // 화면의 짙은 갈색 바탕
+  var ox=(WALK_W-R0.width*S)/2, oy=(WALK_H-R0.height*S)/2;
+  x.setTransform(S,0,0,S,ox-R0.left*S,oy-R0.top*S);
+  function opa(el){var o=1;for(var e=el;e&&e!==document.body;e=e.parentElement)o*=+getComputedStyle(e).opacity;return o}
+  function box(el){
+    var cs=getComputedStyle(el); if(cs.display==="none"||cs.visibility==="hidden")return;
+    var r=el.getBoundingClientRect(); if(!r.width||!r.height)return;
+    var rad=cs.borderTopLeftRadius, rr=/%$/.test(rad)?parseFloat(rad)/100*r.width:parseFloat(rad)||0;
+    x.save(); x.globalAlpha=opa(el);
+    shotRR(x,r.left,r.top,r.width,r.height,rr); x.save(); x.clip();
+    var bg=shotCol(cs.backgroundColor); if(bg&&!/rgba\([^)]*,\s*0\)$/.test(bg)&&bg!=="transparent"){x.fillStyle=bg; x.fillRect(r.left,r.top,r.width,r.height)}
+    shotLayers(cs.backgroundImage).reverse().forEach(function(ly){
+      var m=/^(linear|conic)-gradient\((.*)\)$/.exec(ly); if(!m)return;
+      var body=m[2], g, stops;
+      if(m[1]==="linear"){
+        var ang=180, am=/^\s*(-?[\d.]+)deg\s*,/.exec(body); if(am){ang=+am[1]; body=body.slice(am[0].length)}
+        else if(/^\s*to /.test(body)){body=body.replace(/^\s*to [^,]+,/,"")}
+        var a=(ang-90)*Math.PI/180, cx=r.left+r.width/2, cy=r.top+r.height/2, half=Math.abs(r.width/2*Math.cos(a))+Math.abs(r.height/2*Math.sin(a));
+        g=x.createLinearGradient(cx-Math.cos(a)*half,cy-Math.sin(a)*half,cx+Math.cos(a)*half,cy+Math.sin(a)*half);
+      }else{
+        var fm=/from\s+(-?[\d.]+)deg/.exec(body), from=fm?+fm[1]:0; body=body.replace(/^[^,]*?from[^,]*,/,"");
+        if(!x.createConicGradient)return;
+        g=x.createConicGradient((from-90)*Math.PI/180,r.left+r.width/2,r.top+r.height/2);
+        body=body.replace(/(-?[\d.]+)deg/g,function(_,d){return (+d/3.6)+"%"});
+      }
+      stops=shotStops(body); if(!stops.length)return;
+      stops.forEach(function(sp,i){var pos=Math.max(0,Math.min(1,sp[1])); if(i&&sp[1]===stops[i-1][1])pos=Math.min(1,pos+1e-4); try{g.addColorStop(pos,sp[0])}catch(e){}});
+      x.fillStyle=g; x.fillRect(r.left,r.top,r.width,r.height);
+    });
+    x.restore();
+    var bw=parseFloat(cs.borderTopWidth)||0, bc=shotCol(cs.borderTopColor);
+    if(bw>0&&cs.borderTopStyle!=="none"&&bc&&!/,\s*0\)$/.test(bc)){x.lineWidth=bw; x.strokeStyle=bc; shotRR(x,r.left+bw/2,r.top+bw/2,r.width-bw,r.height-bw,Math.max(0,rr-bw/2)); x.stroke()}
+    x.restore();
+  }
+  function text(tn){
+    var el=tn.parentElement, cs=getComputedStyle(el); if(!tn.nodeValue.trim())return;
+    var rg=document.createRange(), t=tn.nodeValue;
+    x.save(); x.globalAlpha=opa(el); x.fillStyle=shotCol(cs.color);
+    x.font=cs.fontStyle+" "+cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily; x.textBaseline="middle"; x.textAlign="left";
+    for(var i=0;i<t.length;i++){   // 글자마다 화면 자리 그대로
+      var c=t[i]; if(/\s/.test(c))continue;
+      var j=i+1; if(c.charCodeAt(0)>=0xD800&&c.charCodeAt(0)<0xDC00)j++;
+      while(j<t.length&&/[\uFE0F\u200D\uDC00-\uDFFF]/.test(t[j]))j++;
+      rg.setStart(tn,i); rg.setEnd(tn,j); var rs=rg.getClientRects(); i=j-1;
+      if(!rs.length)continue; var q=rs[0]; x.fillText(t.slice(rg.startOffset,j),q.left,q.top+q.height/2);
+    }
+    x.restore();
+  }
+  (function walk(el){
+    if(skip&&skip(el))return;
+    box(el);
+    for(var n=el.firstChild;n;n=n.nextSibling){if(n.nodeType===1)walk(n); else if(n.nodeType===3)text(n)}
+  })(card);
+  return cv;
+}
 function saveOvwImage(btn){
   var font=getComputedStyle(document.body).fontFamily||"sans-serif";
   var old=btn.textContent; btn.disabled=true; btn.textContent="만드는 중…";
   var ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
   ready.then(function(){
-    var cv=ovwCanvas(font);
+    var card=document.getElementById("ovw");
+    btn.style.display="none";   // 저장 단추 자리는 그림에서 빼고 화면 그대로
+    var cv; try{cv=card?domShotCard(card,function(el){return el.classList.contains("ovw-chev")}):ovwCanvas(font)}finally{btn.style.display=""}
     return new Promise(function(ok){cv.toBlob(function(b){ok(b)},"image/png")});
   }).then(function(b){
     var a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="전체진행표-"+(pMode?"필사-":"통독-")+dayKey()+".png";
