@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-timertb">
+<meta name="app-build" content="ab-20261126-longfold">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6115,6 +6115,9 @@ body .icv .icform.icinline .field.icfn{font-size:13px!important;font-weight:700;
 body .icv .icform.icinline .field.icfm{font-size:14.5px!important;line-height:23.2px!important;padding:10px 4px 8px 12px!important;margin-top:9.92px!important;margin-left:-9px!important;margin-right:-5px!important;width:calc(100% + 14px)!important;max-width:none!important;box-sizing:border-box!important;word-break:normal!important;overflow-wrap:break-word!important;white-space:pre-wrap!important;letter-spacing:normal!important}
 .icv .icp .icmemo{overflow-wrap:break-word}
 body .icv .icform.icinline .tagripbar{max-width:none!important}
+
+/* 📜 '모든 칸' 목록의 접힌 카드는 긴 말씀(축복기도 등)을 5줄까지만 보이고 아래는 흐리게 — 눌러 펼치면 전부, 📁 칸을 골라 열면(낭독용) 전부 (2026-11-26 사용자 요청) */
+body:not(.colsel) #list>.note:not(.open):not(.vediting) .verse.vlines{max-height:calc(31.5px * 5);overflow:hidden;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent)}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
