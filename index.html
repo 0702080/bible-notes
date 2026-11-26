@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-caldbl">
+<meta name="app-build" content="ab-20261126-calscn">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5979,6 +5979,7 @@ body .icform .tagripbar i{background:rgba(201,168,255,.75)!important}   /* 왼�
 .calik{flex:none;font-size:12px;color:var(--cc);font-weight:700}
 .calitx{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14.5px}
 .calik .scnico{width:16px;height:16px;vertical-align:-3px}
+.calgh .scnico{width:1.15em;height:1.15em;vertical-align:-.2em}
 .calit small{flex:none;font-size:11.5px;color:#8F89A3}
 .calempty{color:#8F89A3;font-size:14px;padding:10px 6px 14px;border-left:4px solid #3A3846;padding-left:12px;margin:4px 4px 12px}
 .caldl{display:block;margin:10px auto 0;height:38px;padding:0 18px;border-radius:19px;border:1px solid #4A3F6A!important;background:#2A2440!important;color:#D7C8FF;font:inherit;font-size:13.5px}
@@ -24325,7 +24326,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     if(byK&&L.length>1){LL=L.slice().sort(function(a,b){return KO.indexOf(a.k)-KO.indexOf(b.k)||(a.at||0)-(b.at||0)})}
     var lastK=null, cnt={}; L.forEach(function(x){cnt[x.k]=(cnt[x.k]||0)+1});
     LL.forEach(function(x){
-      if(byK&&L.length>1&&x.k!==lastK){lastK=x.k; var gh=document.createElement("div"); gh.className="calgh"; gh.style.setProperty("--cc",CALT[x.k][2]); gh.textContent=CALT[x.k][0]+" "+CALT[x.k][1]+"  "+cnt[x.k]; ls.appendChild(gh)}var t=CALT[x.k], r=document.createElement("div"); r.className="calit"; r.style.setProperty("--cc",t[2]); r._go=x.go;
+      if(byK&&L.length>1&&x.k!==lastK){lastK=x.k; var gh=document.createElement("div"); gh.className="calgh"; gh.style.setProperty("--cc",CALT[x.k][2]); var gsv=x.k==="scene"&&document.querySelector("#openSceneBtn .scnico"); if(gsv){gh.appendChild(gsv.cloneNode(true)); gh.appendChild(document.createTextNode(" "+CALT[x.k][1]+"  "+cnt[x.k]))} else gh.textContent=CALT[x.k][0]+" "+CALT[x.k][1]+"  "+cnt[x.k]; ls.appendChild(gh)}   /* 종류별 머리도 장면은 해·산 그림 (2026-11-26 사용자 요청) */var t=CALT[x.k], r=document.createElement("div"); r.className="calit"; r.style.setProperty("--cc",t[2]); r._go=x.go;
       var a=document.createElement("span"); a.className="calik"; var sv=x.k==="scene"&&document.querySelector("#openSceneBtn .scnico"); if(sv){a.appendChild(sv.cloneNode(true)); a.appendChild(document.createTextNode(" "+t[1]))} else a.textContent=t[0]+" "+t[1];   /* 장면은 이모지 대신 앱의 해·산 그림 (2026-11-18 사용자 요청) */ var tx=document.createElement("span"); tx.className="calitx"; tx.textContent=x.txt||x.chip;
       r.appendChild(a); r.appendChild(tx); if(x.at){var tm=document.createElement("small"); var q=new Date(x.at); tm.textContent=("0"+q.getHours()).slice(-2)+":"+("0"+q.getMinutes()).slice(-2); r.appendChild(tm)} ls.appendChild(r)});
     var dl=document.createElement("button"); dl.type="button"; dl.className="caldl"; dl.textContent="🌙 이 날 하루 돌아보기"; ls.appendChild(dl);
