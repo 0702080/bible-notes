@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-timertoggle">
+<meta name="app-build" content="ab-20261126-timertb">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -24317,7 +24317,9 @@ var rdTimerOpen=(function(){
     el.addEventListener("click",function(e){var b=e.target.closest("button,.rtt"); if(!b)return; e.stopPropagation(); if(b===rt&&Date.now()-(el._noTap||0)<400)return;
       if(b.classList.contains("rtx"))close(); else if(b.classList.contains("rtm"))step(-30); else if(b.classList.contains("rtp"))step(30); else if(b.classList.contains("rtr"))reset(); else {if(st.run)pause(); else start(); if(b.classList.contains("rtt"))try{buzz(15)}catch(err){}}});
     document.addEventListener("visibilitychange",function(){if(!document.hidden&&st.run){lock(true); tick()}});
-    document.body.appendChild(el)}
+    document.body.appendChild(el)
+    /* 맨 위 동그라미 줄(메뉴 바로가기 등) 단추를 누르면 시계는 닫힘 — 다른 창으로 가니까 (2026-11-26 사용자 요청) */
+    document.addEventListener("click",function(e){if(!el||el.hidden)return; var t=e.target; if(t.closest&&t.closest(".toolbar button,.toolbar summary,.toolbar a"))close()},true)}
   return function(n){if(!el)build(); if(!el.hidden&&st.id===n.id){close(); return}   /* ⏱ 같은 카드의 시계 단추를 다시 누르면 닫힘 — 토글 (2026-11-26 사용자 요청) */
     if(st.id!==n.id||el.hidden){pause(); st.id=n.id; var e0=est(n); st.dur=+M[n.id]||Math.max(30,Math.ceil(e0/30)*30); st.left=st.dur; st.buzzed=false;
       el.querySelector(".rtsub").textContent=(String(n.ref||"").trim()||"낭독")+" · 읽기 어림 "+fmt(e0)}
