@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-tlline">
+<meta name="app-build" content="td-2026-11-26-tlclean">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -576,6 +576,12 @@ body{background:transparent}
 .tlv .tl-s{grid-column:3;margin-top:1px}
 .tlv .tl-n::before{background:color-mix(in srgb,var(--c) 70%,#4A3218)!important}
 .tlv .tl-d{color:color-mix(in srgb,var(--c) 55%,#2E1E0C);font-size:13px;font-weight:800}
+/* 걸어온 길 정리: 다 읽음/다 씀 빼고 날짜·원·책 이름을 같은 높이로 (2026-11-26 사용자 요청) */
+.tlv .tl-s{display:none}
+.tlv .tl-n{align-items:center}
+.tlv .tl-d,.tlv .tl-t{grid-row:1;padding-top:0;align-self:center}
+.tlv .tl-dot{grid-row:1}
+.tlv .tl-n::before{left:76.5px}
 /* 🧱 책마다 한 장의 카드로, 표는 늘 10칸 꽉 찬 네모 — 들쭉날쭉하지 않게 (2026-11-26 사용자 요청: 어지러움) */
 .bk{margin-top:10px;padding:10px 10px 10px;border-radius:14px;background:rgba(38,29,21,.58);border:1px solid rgba(255,226,180,.13);box-shadow:0 4px 12px rgba(10,6,2,.22)}
 .bk.shut{margin-top:8px;padding:8px 10px}
@@ -1336,11 +1342,10 @@ function walkCanvas(nodes,pg,P,font){
     x.textAlign="center"; x.textBaseline="middle"; x.font=Math.round(dot*0.46)+"px "+font; x.fillStyle="#000";
     x.fillText(walkIcon(nd.m),dx,y+2);
     x.textAlign="right"; x.font="700 "+fs(40)+"px "+font; x.fillStyle=DCOL[nd.m]; x.fillText(walkDate(nd.d),dx-dot/2-26*k,y);
-    x.textAlign="left"; x.textBaseline="alphabetic";
+    x.textAlign="left"; x.textBaseline="middle";
     x.font="800 "+fs(48)+"px "+font; x.fillStyle="#2E2820";
     var tt=nd.t; if(x.measureText(tt).width>maxW){while(tt.length>1&&x.measureText(tt+"…").width>maxW)tt=tt.slice(0,-1); tt+="…"}
-    x.fillText(tt,tx,y-4*k);
-    x.font="500 "+fs(36)+"px "+font; x.fillStyle="#8A7C68"; x.fillText(nd.sub,tx,y+44*k);
+    x.fillText(tt,tx,y);   // '다 읽음/다 씀'은 뺌, 날짜·원과 같은 높이 (2026-11-26 사용자 요청)
   });
   x.textAlign="center"; x.font="600 32px "+font; x.fillStyle="#B8A483";
   x.fillText("성경 통독표",WALK_W/2,WALK_H-110);
