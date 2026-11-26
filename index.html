@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-ictense3">
+<meta name="app-build" content="ab-20261126-calzoom">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6127,6 +6127,12 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 .icv .icform .icftense.on{background:linear-gradient(180deg,#F6D77A,#D9A93A)!important;color:#3A2A08;border-color:#B88A2A;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 3px 0 #7A5A14}
 .icv .icform .icftrow{display:flex;justify-content:flex-start;margin:-4px 0 -6px}
 .icv .icform .icftrow .icftense{margin:0!important;height:30px;font-size:12.5px}
+.calv.calzoom .calwk,.calv.calzoom .calgrid,.calv.calzoom .calgrip{display:none!important}
+.calv.calzoom .calday{flex:1 1 auto;min-height:0}
+.calv.calzoom .caldh b{font-size:22px}
+.calv .calzback{flex:none;height:32px;padding:0 12px;margin-right:10px;border-radius:999px;border:1px solid #5A5470;color:#E8E2F6;font-size:13px;background:linear-gradient(180deg,#4A4560,#2E2B3C)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #1A1822}
+.calv .calzback:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 0 #1A1822}
+.calv .calgrid{touch-action:pan-x pan-y}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -24167,7 +24173,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       document.body.appendChild(cal);
       cal.querySelector(".calx").addEventListener("click",closeCal);
       cal.querySelector(".calttl").addEventListener("click",function(){var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now()); calDraw()});
-      [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){calSlide(+b.dataset.d,0)})});
+      [].forEach.call(cal.querySelectorAll(".calnav"),function(b){b.addEventListener("click",function(){if(cal._zoom){var p=calSel.split("-"), nd=new Date(+p[0],+p[1]-1,+p[2]+(+b.dataset.d)); calZoom(dkey(nd.getTime())); return} calSlide(+b.dataset.d,0)})});   /* 크게 본 날에서는 ‹ › = 어제·내일 */
       var grid=cal.querySelector(".calgrid");
       grid.addEventListener("click",function(e){if(Date.now()-(grid._sw||0)<350)return; var c=e.target.closest(".calc"); if(!c)return; calSel=c.dataset.d; buzz(10); var p=c.dataset.d.split("-"); if(+p[1]-1!==calM){calY=+p[0]; calM=+p[1]-1} calDraw()});
       // 손잡이 끌기 (휴대폰 touch, PC mouse)
@@ -24201,12 +24207,26 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       gr.addEventListener("touchmove",function(e){e.preventDefault(); gm(e.touches[0].clientY)},{passive:false});
       gr.addEventListener("touchend",function(e){if(e.cancelable)e.preventDefault(); ge()});
       gr.addEventListener("mousedown",function(e){e.preventDefault(); gs(e.clientY); function mm(ev){gm(ev.clientY)} function mu(){document.removeEventListener("mousemove",mm); document.removeEventListener("mouseup",mu); ge()} document.addEventListener("mousemove",mm); document.addEventListener("mouseup",mu)});
+      // 🔍 두 손가락으로 날짜 칸을 벌리면 그 날 기록만 화면 가득 목록으로, 오므리면 달력으로 (2026-11-26 사용자 요청)
+      var pz=null; function pd(e){var a=e.touches[0],b=e.touches[1]; return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)}
+      cal.addEventListener("touchstart",function(e){if(e.touches.length!==2){pz=null;return} var a=e.touches[0],b=e.touches[1], mx=(a.clientX+b.clientX)/2, my=(a.clientY+b.clientY)/2;
+        var el=document.elementFromPoint(mx,my), c=el&&el.closest&&el.closest(".calc");
+        if(!cal._zoom&&!c){var ca=document.elementFromPoint(a.clientX,a.clientY), cb=document.elementFromPoint(b.clientX,b.clientY); c=(ca&&ca.closest&&ca.closest(".calc"))||(cb&&cb.closest&&cb.closest(".calc"))}
+        pz={d0:pd(e),c:c,done:false}; if(e.cancelable)e.preventDefault()},{passive:false});
+      cal.addEventListener("touchmove",function(e){if(!pz||e.touches.length!==2)return; if(e.cancelable)e.preventDefault(); if(pz.done)return; var dd=pd(e)-pz.d0;
+        if(!cal._zoom&&dd>45&&pz.c){pz.done=true; calZoom(pz.c.dataset.d)}
+        else if(cal._zoom&&dd<-45){pz.done=true; calZoom(null)}},{passive:false});
+      cal.addEventListener("touchend",function(e){if(pz&&e.touches.length<2){if(pz.done){var g=cal.querySelector(".calgrid"); g._sw=Date.now()} pz=null}});
       cal.querySelector(".calls").addEventListener("click",function(e){var r=e.target.closest(".calit"); if(r&&r._go){var go=r._go; closeCal(); setTimeout(go,30); return} if(e.target.closest(".caldl")){closeCal(); openDaily(calSel)}});
       window.addEventListener("resize",function(){if(cal&&!cal.hidden)calDraw()});
       document.addEventListener("keydown",function(e){if(e.key==="Escape"&&cal&&!cal.hidden)closeCal()});
     }
-    var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now());
+    var t=new Date(); calY=t.getFullYear(); calM=t.getMonth(); calSel=dkey(Date.now()); cal._zoom=0;
     calIdx=calBuild(); cal.hidden=false; document.body.style.overflow="hidden"; calDraw();
+  }
+  function calZoom(d){
+    if(d){calSel=d; var p=d.split("-"); if(+p[1]-1!==calM||+p[0]!==calY){calY=+p[0]; calM=+p[1]-1} cal._zoom=1}else cal._zoom=0;
+    buzz(d?[8,20,8]:10); calDraw(); var ls=cal.querySelector(".calls"); if(ls)ls.scrollTop=0;
   }
   function closeCal(){if(!cal||cal.hidden)return; cal.hidden=true; document.body.style.overflow=""}
   function calSlide(d,from){   // 달 넘기기 미끄럼: 지금 달이 밀려 나가고 다음 달이 반대쪽에서 들어옴
@@ -24238,6 +24258,8 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     }
     var col=false; try{col=localStorage.getItem("bible-cal-col")==="1"}catch(e){} cal.classList.toggle("calcol",col);
     var h=Math.max(calMinH(),Math.min(calMaxH(),Math.round(calAvail()*calHGet()))); grid.style.height=h+"px"; calFill(h); calDay();
+    cal.classList.toggle("calzoom",!!cal._zoom);
+    if(cal._zoom){var dh=cal.querySelector(".caldh"), zb=document.createElement("button"); zb.type="button"; zb.className="calzback"; zb.textContent="🗓 달력"; zb.title="달력으로 돌아가기 (두 손가락으로 오므려도 돼요)"; zb.addEventListener("click",function(){calZoom(null)}); dh.insertBefore(zb,dh.firstChild)}
   }
   function calFill(h){   // 칸 높이에 맞춰 이름표 몇 개 보일지 (작으면 점)
     var grid=cal.querySelector(".calgrid"), rows=calRows(), rh=h/rows, n=Math.floor((rh-26)/17);
