@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-dleft">
+<meta name="app-build" content="td-2026-11-26-dright">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -707,6 +707,11 @@ body{background:transparent}
 .tlv .tl-yr::after,.tlv .tl-yr span::after{display:none!important;content:none!important}
 /* 📅 날짜를 연도(2026) 왼쪽 끝에 딱 맞춤 (2026-11-26 사용자 요청) */
 .tlv .tl-d{text-align:left!important}
+/* 📅 날짜 오른쪽 끝 = 연도(2026) 오른쪽 끝 (2026-11-26 사용자 요청) */
+.tlv{--yw:46px}
+.tlv .tl-n{grid-template-columns:var(--yw) 40px 1fr!important}
+.tlv .tl-d{text-align:right!important}
+.tlv .tl-n::before,.tlv .tl-n:first-child::before,.tlv .tl-yr:not(.tl-yr0)::before{left:calc(var(--yw) + 30.5px)!important}
 </style>
 </head>
 <body>
@@ -1310,6 +1315,9 @@ function renderWalk(){
     row.appendChild(li);
   });
   wrap.appendChild(row); body.appendChild(wrap);
+  // 📅 날짜 칸 폭 = 연도 글자 폭 → 날짜 오른쪽 끝이 연도 오른쪽 끝에 딱 맞음 (2026-11-26 사용자 요청)
+  var fitYr=function(){var ys=wrap.querySelector(".tl-yr0 span"); if(!ys)return; var w=ys.getBoundingClientRect().width; if(w>20)wrap.style.setProperty("--yw",w.toFixed(1)+"px")};
+  fitYr(); requestAnimationFrame(fitYr); if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitYr);
 }
 /* 걸어온 길 기록: 책마다 '다 끝낸 횟수'(회차 + 지금 다 채웠으면 1)가 늘면 그날을 적고, 줄면(되돌리기·체크 풀기) 지운다 */
 var HIST_KEY=KP+"hist", HIST={snap:null,ev:[]};
@@ -1380,6 +1388,7 @@ function walkCanvas(nodes,pg,P,font){
     x.fillStyle=COL[nd.m]+"99"; x.fillRect(dx-Math.max(2,4*k),cy(i),Math.max(4,8*k),last?(R/2+40):R);
   });
   var cyr="";   // 📅 연도 머리 (2026-11-26 사용자 요청)
+  x.font="900 76px "+font; var yrW=Math.min(x.measureText(walkYear((list.find(function(n){return n.d})||{}).d)||String(new Date().getFullYear())).width,dx-dot/2-100);
   list.forEach(function(nd,i){
     var yy=walkYear(nd.d)||(i?"":String(new Date().getFullYear()));
     if(yy&&yy!==cyr){
@@ -1394,7 +1403,7 @@ function walkCanvas(nodes,pg,P,font){
     x.fillStyle=c+"2E"; x.fill(); x.lineWidth=Math.max(3,dot*0.0875); x.strokeStyle=c; x.stroke();
     x.textAlign="center"; x.textBaseline="middle"; x.font=Math.round(dot*0.46)+"px "+font; x.fillStyle="#000";
     x.fillText(walkIcon(nd.m),dx,y+2);
-    x.textAlign="left"; x.font="700 "+fs(40)+"px "+font; x.fillStyle=DCOL[nd.m]; x.fillText(walkDate(nd.d),80,y);   // 연도 왼쪽 끝에 맞춤
+    x.textAlign="right"; x.font="700 "+fs(40)+"px "+font; x.fillStyle=DCOL[nd.m]; x.fillText(walkDate(nd.d),80+yrW,y);   // 연도 오른쪽 끝에 맞춤
     x.textAlign="left"; x.textBaseline="middle";
     x.font="800 "+fs(48)+"px "+font; x.fillStyle="#2E2820";
     var tt=nd.t; if(x.measureText(tt).width>maxW){while(tt.length>1&&x.measureText(tt+"…").width>maxW)tt=tt.slice(0,-1); tt+="…"}
