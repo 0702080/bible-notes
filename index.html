@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-icshotb">
+<meta name="app-build" content="ab-20261126-icshottop">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -5577,7 +5577,7 @@ body:not(.boardon) #addQuick{margin:0!important}
 .icv .icp .ictop:active .icchev{transform:translateY(2px)!important;box-shadow:inset 0 2px 4px rgba(0,0,0,.4),0 1px 0 rgba(0,0,0,.4)}
 .icv .icp{position:relative}
 .icv .icp .icshot{display:none;position:absolute;top:44px;right:14px;width:24.2px;height:24.2px;padding:0;margin:0;border:1px solid #4A4953;border-radius:50%;background:#2F2E38 linear-gradient(180deg,rgba(255,255,255,.22) 0%,rgba(255,255,255,.06) 45%,rgba(0,0,0,.08) 55%,rgba(0,0,0,.26) 100%)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 0 rgba(0,0,0,.28),0 3px 0 rgba(0,0,0,.45),0 5px 9px rgba(0,0,0,.4)!important;place-items:center;color:var(--gold);z-index:2;transition:transform .08s}
-.icv .icp.open:not(.thx) .icshot{display:grid}
+.icv .icp.open:not(.thx) .icshot:not(.icshotb){display:none}   /* 위 오른쪽 🖼는 숨김 — 아래 줄 단추로 (2026-11-26 사용자 요청) */
 .icv .icp .icshot svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .icv .icp .icshot:active{transform:translateY(2px)}
 .icv .icp .icshot.ok{color:#7FD99A;border-color:#7FD99A}   /* 🖼 기도제목 카드 그림 저장: 펼친 카드의 접기 단추 바로 아래 (2026-11-19) */
