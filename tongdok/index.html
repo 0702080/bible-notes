@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-tlcenter">
+<meta name="app-build" content="td-2026-11-26-ovflat">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -653,7 +653,7 @@ body{background:transparent}
 .ovc[data-g] b{color:color-mix(in srgb,var(--gc) 62%,#7C6C54);font-weight:700}
 .ovc[data-g][data-st="part"] i{background:color-mix(in srgb,var(--gc) 13%,#FFF9EE)!important}
 .ovc[data-g][data-st="part"] b{color:color-mix(in srgb,var(--gc) 78%,#2E2010);font-weight:800}
-.ovc[data-g][data-st="full"]{background:linear-gradient(150deg,color-mix(in srgb,var(--gc) 62%,#fff) 0%,var(--gc) 52%,color-mix(in srgb,var(--gc) 78%,#1a1208) 100%)!important}
+.ovc[data-g][data-st="full"]{background:var(--gc)!important;box-shadow:none!important}
 .ovc[data-g][data-st="full"] i{inset:0!important;background:transparent!important}
 .ovc[data-g][data-st="full"] b{color:#fff;font-weight:800}
 .ovlg{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;margin:10px 0 2px;font-size:11.5px;color:#8A7A62}
