@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-27-bkgap">
+<meta name="app-build" content="td-2026-11-27-noline">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -718,6 +718,8 @@ body{background:transparent}
 #ot>.bk .chips,#nt>.bk .chips{border-radius:0!important;border-left:0!important;border-right:0!important}
 /* 📐 펼친 책의 장 번호 표 아래와 다음 책 줄 사이 여백을 2배로 (12px→24px, 2026-11-27 사용자 요청) */
 #ot>.bk:not(.shut),#nt>.bk:not(.shut){padding-bottom:24px!important}
+/* 📐 펼친 책 아래 여백 속 가로줄(다음 책과의 구분선) 없앰 — 표 아래 줄 하나만 남김 (2026-11-27 사용자 요청) */
+#ot>.bk:not(.shut)+.bk,#nt>.bk:not(.shut)+.bk{border-top:0!important}
 </style>
 </head>
 <body>
