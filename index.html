@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-saypick">
+<meta name="app-build" content="ab-20261126-domshot">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14885,7 +14885,57 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     srmShotsSave([srmPngFile(c,nm)],rt);
   }
   // 🖼 짧은 말씀 카드 하나를 그림으로 — 카드 색·왼쪽 띠·말씀 줄·— 구절 이름 그대로 (2026-11-19 사용자 요청)
+  /* 🖼 화면에 보이는 카드를 그대로 그림으로 (2026-11-26 사용자 요청: 카드와 그대로) — 바탕·테두리(왼쪽 띠·점선)·둥근 모서리·글자 자리를 화면에서 재서 캔버스에 옮김, 단추는 뺌 */
+  function domCol(v){v=String(v||""); var m=v.match(/^color\(srgb\s+([\d.e-]+)\s+([\d.e-]+)\s+([\d.e-]+)(?:\s*\/\s*([\d.e%-]+))?\)/);
+    if(m){var al=m[4]==null?1:(/%/.test(m[4])?parseFloat(m[4])/100:+m[4]); return "rgba("+Math.round(+m[1]*255)+","+Math.round(+m[2]*255)+","+Math.round(+m[3]*255)+","+al+")"} return v}
+  function domShot(root,o){
+    o=o||{}; var mar=o.mar==null?18:o.mar, sc=o.sc||3, bg=o.bg||"#15131A";
+    var sv=[root.style.transition,root.style.transform]; root.style.transition="none"; root.style.transform="none"; void root.offsetWidth;
+    var R=root.getBoundingClientRect(), W=Math.ceil(R.width+mar*2), H=Math.ceil(R.height+mar*2);
+    var c=document.createElement("canvas"); c.width=W*sc; c.height=H*sc; var g=c.getContext("2d"); g.scale(sc,sc);
+    g.fillStyle=bg; g.fillRect(0,0,W,H);
+    var ox=mar-R.left, oy=mar-R.top;
+    function skip(e){return !!(e.closest&&e.closest("button,svg,[hidden],.cpybtn,.saypgno"))}
+    function rad(cs,w,h){var r=parseFloat(cs.borderTopLeftRadius)||0; if(/%/.test(cs.borderTopLeftRadius))r=Math.min(w,h)*r/100; return Math.min(r,w/2,h/2)}
+    function rrp(x,y,w,h,r){g.beginPath(); if(g.roundRect)g.roundRect(x,y,w,h,r); else g.rect(x,y,w,h)}
+    function box(e){
+      var cs=getComputedStyle(e); if(cs.display==="none"||cs.visibility==="hidden")return;
+      var r=e.getBoundingClientRect(); if(!r.width||!r.height)return;
+      var x=r.left+ox, y=r.top+oy, w=r.width, h=r.height, rr=rad(cs,w,h), op=+cs.opacity;
+      var bgc=domCol(cs.backgroundColor), sides=[["Top",0],["Right",1],["Bottom",2],["Left",3]].map(function(s){return {w:parseFloat(cs["border"+s[0]+"Width"])||0,st:cs["border"+s[0]+"Style"],c:domCol(cs["border"+s[0]+"Color"]),i:s[1]}});
+      var hasBg=!/rgba\(0, ?0, ?0, ?0\)|transparent/.test(bgc), hasB=sides.some(function(s){return s.w>0&&s.st!=="none"});
+      if(!hasBg&&!hasB)return;
+      g.save(); if(op<1)g.globalAlpha=op; rrp(x,y,w,h,rr); g.clip();
+      if(hasBg){g.fillStyle=bgc; g.fillRect(x,y,w,h)}
+      sides.forEach(function(s){if(!(s.w>0)||s.st==="none")return; g.fillStyle=s.c; g.strokeStyle=s.c;
+        if(s.st==="dashed"||s.st==="dotted"){g.lineWidth=s.w; g.setLineDash(s.st==="dotted"?[s.w,s.w*2]:[s.w*3,s.w*3]); g.beginPath();
+          if(s.i===0){g.moveTo(x,y+s.w/2); g.lineTo(x+w,y+s.w/2)} else if(s.i===2){g.moveTo(x,y+h-s.w/2); g.lineTo(x+w,y+h-s.w/2)} else if(s.i===3){g.moveTo(x+s.w/2,y); g.lineTo(x+s.w/2,y+h)} else {g.moveTo(x+w-s.w/2,y); g.lineTo(x+w-s.w/2,y+h)}
+          g.stroke(); g.setLineDash([]); return}
+        if(s.i===0)g.fillRect(x,y,w,s.w); else if(s.i===2)g.fillRect(x,y+h-s.w,w,s.w); else if(s.i===3)g.fillRect(x,y,s.w,h); else g.fillRect(x+w-s.w,y,s.w,h)});
+      g.restore();
+      if(hasB&&rr>0){   /* 둥근 테두리는 둥근 선으로 한 번 더 — 모서리가 각지지 않게 */
+        var tw=sides[0].w, same=sides.every(function(s){return s.w===tw&&s.c===sides[0].c&&s.st==="solid"});
+        if(same&&tw>0){g.save(); if(op<1)g.globalAlpha=op; g.lineWidth=tw; g.strokeStyle=sides[0].c; rrp(x+tw/2,y+tw/2,w-tw,h-tw,Math.max(0,rr-tw/2)); g.stroke(); g.restore()}
+      }
+    }
+    box(root); [].forEach.call(root.querySelectorAll("*"),function(e){if(!skip(e))box(e)});
+    var rg=document.createRange(), tw=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,null), tn;
+    g.textBaseline="middle"; g.textAlign="left";
+    while((tn=tw.nextNode())){
+      var pe=tn.parentElement; if(!pe||skip(pe))continue; var cs=getComputedStyle(pe); if(cs.display==="none"||cs.visibility==="hidden"||+cs.opacity===0)continue;
+      var tv=tn.nodeValue; if(!tv||!tv.trim())continue;
+      g.font=cs.fontStyle+" "+cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily; g.fillStyle=domCol(cs.color);
+      var cl=pe.closest(".saylt,.sayq,.saysc")||root, clr=cl.getBoundingClientRect();
+      var segs=[]; if(window.Intl&&Intl.Segmenter){var it=new Intl.Segmenter("ko",{granularity:"grapheme"}).segment(tv), sg; for(sg of it)segs.push([sg.index,sg.segment])} else {for(var k=0;k<tv.length;){var cp=tv.codePointAt(k), ln=cp>0xFFFF?2:1; segs.push([k,tv.substr(k,ln)]); k+=ln}}
+      segs.forEach(function(sp){var i=sp[0], ch=sp[1]; if(/^\s+$/.test(ch))return;
+        rg.setStart(tn,i); rg.setEnd(tn,i+ch.length); var rs=rg.getClientRects(), r0=rs[rs.length-1];
+        if(r0&&r0.width&&r0.right<=clr.right+2&&r0.bottom<=clr.bottom+2)g.fillText(ch,r0.left+ox,r0.top+r0.height/2+oy)});
+    }
+    root.style.transition=sv[0]; root.style.transform=sv[1];
+    return c;
+  }
   function sayShot(x,card,noSave){
+    if(card&&card.getBoundingClientRect().width&&!card.classList.contains("sayback")){try{var dc=domShot(card); if(noSave)return dc; var kd0=x.hv?"짧은 말씀":"믿음의 한 마디", wh0=String(x.who||"").trim(); srmShotsSave([srmPngFile(dc,(wh0||kd0).replace(/[\\/:*?"<>|\s]+/g,"_")+".png")],wh0||kd0); return}catch(e){}}   /* 화면 카드 그대로 (2026-11-26) */
     var W=380, sc=3, mar=18, padL=30, padR=26, padT=28, fs=20, lh=Math.round(fs*1.8), maxW=W-mar*2-padL-padR;
     var tEl=card&&(card.querySelector(".saylt")||card.querySelector(".sayq")), wEl=card&&card.querySelector(".sayf>b");
     var ff=getComputedStyle(tEl||document.body).fontFamily, tcol=tEl?getComputedStyle(tEl).color:"#F3E9D2";
@@ -14952,9 +15002,9 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     if(pick){   /* 고른 카드는 길이와 상관없이 한 장에 위에서 아래로 */
       var ccs=[]; cards.forEach(function(el){var cc; try{cc=sayShot(by[el.dataset.id],el,true)}catch(e){cc=null} if(cc)ccs.push(cc)});
       if(!ccs.length){toast("그림을 만들지 못했어요");return}
-      var TH=top; ccs.forEach(function(cc,i){TH+=cc.height/sc-(i<ccs.length-1?mar:0)}); TH=Math.max(TH,Math.round(H*0.3));
-      var one=document.createElement("canvas"); one.width=W*sc; one.height=Math.round(TH*sc); var og=one.getContext("2d"); og.fillStyle="#15131A"; og.fillRect(0,0,one.width,one.height);
-      var yy=top; ccs.forEach(function(cc){og.drawImage(cc,0,Math.round(yy*sc)); yy+=cc.height/sc-mar});
+      var TH=0; ccs.forEach(function(cc,i){TH+=cc.height/sc-(i<ccs.length-1?mar:0)});
+      var CW=0; ccs.forEach(function(cc){CW=Math.max(CW,cc.width)}); var one=document.createElement("canvas"); one.width=CW; one.height=Math.round(TH*sc); var og=one.getContext("2d"); og.fillStyle="#15131A"; og.fillRect(0,0,one.width,one.height);
+      var yy=0; ccs.forEach(function(cc){og.drawImage(cc,Math.round((CW-cc.width)/2),Math.round(yy*sc)); yy+=cc.height/sc-mar});
       var kd=sayMode==="v"?"짧은말씀":sayMode==="g"?"주님의은혜":sayMode==="m"?"장면묵상":"믿음의한마디", dd=new Date();
       srmShotsSave([srmPngFile(one,kd+"-"+(dd.getMonth()+1)+"월"+dd.getDate()+"일-"+ccs.length+"장.png")],kd.replace(/(믿음의|주님의|짧은|장면)/,"$1 ")); return;
     }
