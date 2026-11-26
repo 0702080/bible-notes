@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-ovlight">
+<meta name="app-build" content="td-2026-11-26-walkyr">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -673,6 +673,12 @@ body{background:transparent}
 /* 책 이름 줄 진도 막대 높이 = 책 이름 글자 높이(14px) (2026-11-26 사용자 요청) */
 .bk-h .bk-prog,.pinned .bk-h .bk-prog{height:14px!important;border-radius:7px!important;align-self:center}
 .bk-h .bk-prog>span,.bk-h .bk-prog b,.bk-h .bk-prog em{line-height:14px!important;font-size:10px!important}
+/* 📅 걸어온 길 연도 머리 (2026-11-26 사용자 요청) */
+.tlv .tl-yr{position:relative;display:grid;grid-template-columns:46px 40px 1fr;column-gap:12px;padding:2px 0 12px;list-style:none}
+.tlv .tl-yr span{grid-column:1/3;font-size:18px;font-weight:900;color:#8C6200;letter-spacing:.3px;white-space:nowrap;line-height:1.2}
+.tlv .tl-yr:not(.tl-yr0)::before{content:"";position:absolute;top:0;bottom:0;left:76.5px;width:3px;background:color-mix(in srgb,#C9A060 70%,#4A3218)}
+.tlv .tl-yr:not(.tl-yr0) span{background:#EAD5AE;position:relative;z-index:1;width:max-content;padding-right:6px}
+.tlv .tl-yr0+.tl-n::before{top:20px}
 </style>
 </head>
 <body>
@@ -1225,7 +1231,8 @@ function renderOverview(){
 }
 /* 👣 걸어온 길 (따로 떼어 낸 카드, 2026-11-26 사용자 요청) */
 var walkOpen=false; try{walkOpen=localStorage.getItem(KP+"walkopen")==="1"}catch(e){}
-function walkDate(d){return d?(d.slice(0,4)===String(new Date().getFullYear())?d.slice(5):d.slice(2)).replace(/-/g,"."):"이전"}
+function walkDate(d){return d?d.slice(5).replace(/-/g,"."):"이전"}   // 해는 위 연도 머리로 (2026-11-26 사용자 요청)
+function walkYear(d){return d?d.slice(0,4):""}
 function walkIcon(m){return m==="s"?"🌱":m==="r"?"📖":"✍️"}
 function walkNodes(){   // 가장 최근이 맨 앞
   // ② 걸어온 길: 책을 다 읽은(쓴) 날을 왼쪽→오른쪽 한 줄 연표로 (2026-10-21 사용자 요청, 날짜별 칸 그림·숫자 요약 대신)
@@ -1260,7 +1267,13 @@ function renderWalk(){
   sv.textContent="🖼️ 이미지로 저장"; body.appendChild(sv);
   var wrap=document.createElement("div"); wrap.className="tl tlv";
   var row=document.createElement("ol"); row.className="tl-row";
+  var yr="";   // 📅 연도 머리: 맨 위 + 해가 바뀌는 자리 (2026-11-26 사용자 요청)
   nodes.forEach(function(nd,ix){
+    var y=walkYear(nd.d)||(ix?"":String(new Date().getFullYear()));
+    if(y&&y!==yr){
+      var yh=document.createElement("li"); yh.className="tl-yr"+(ix?"":" tl-yr0");
+      yh.innerHTML='<span></span>'; yh.firstChild.textContent=y; row.appendChild(yh); yr=y;
+    }
     var li=document.createElement("li"); li.className="tl-n tl-m"+nd.m;
     li.innerHTML='<span class="tl-d"></span><span class="tl-dot"></span><b class="tl-t"></b><span class="tl-s"></span>';
     li.querySelector(".tl-d").textContent=walkDate(nd.d);
@@ -1338,7 +1351,13 @@ function walkCanvas(nodes,pg,P,font){
     if(last&&!more)return;
     x.fillStyle=COL[nd.m]+"99"; x.fillRect(dx-Math.max(2,4*k),cy(i),Math.max(4,8*k),last?(R/2+40):R);
   });
+  var cyr="";   // 📅 연도 머리 (2026-11-26 사용자 요청)
   list.forEach(function(nd,i){
+    var yy=walkYear(nd.d)||(i?"":String(new Date().getFullYear()));
+    if(yy&&yy!==cyr){
+      cyr=yy; x.textAlign="right"; x.textBaseline="alphabetic"; x.fillStyle="#8C6200";
+      x.font="900 "+(i?fs(40):46)+"px "+font; x.fillText(yy,dx-dot/2-26*k,i?cy(i)-dot/2-8*k:P.top-14);
+    }
     var y=cy(i), c=COL[nd.m];
     x.beginPath(); x.arc(dx,y,dot/2,0,Math.PI*2); x.fillStyle="#FFF8EA"; x.fill();
     x.fillStyle=c+"2E"; x.fill(); x.lineWidth=Math.max(3,dot*0.0875); x.strokeStyle=c; x.stroke();
