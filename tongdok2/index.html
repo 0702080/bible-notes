@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-06-pinclear">
+<meta name="app-build" content="td-2026-11-26-histv">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -547,6 +547,33 @@ body{background:transparent}
 .shelf{background:linear-gradient(160deg,color-mix(in srgb,var(--violet) 11%,var(--sheetg)),var(--sheetg) 70%)}
 .pinned{background:color-mix(in srgb,var(--pink) 6%,var(--sheetg))}
 .chip{background:rgba(255,251,242,.6)}   /* 장 번호 표도 살짝 비침. 마지막 줄 빈칸은 칸처럼 보이지 않게 그대로 투명 (2026-11-05) */
+/* 🎨 어두운 갈색 바탕과 어울리게 색 맞춤 (2026-11-26 사용자 요청: 회색빛 아이보리가 탁해 보임) — 장 번호 표는 따뜻한 갈색 유리, 위 카드는 맑은 크림 종이 */
+.bar{background:rgba(52,40,30,.92);box-shadow:0 1px 0 rgba(255,226,180,.12),0 4px 14px rgba(0,0,0,.25)}
+:root{--sheetg:rgba(255,247,232,.93)}
+.sum,.ovw{background:linear-gradient(160deg,#FFF6E3 0%,#FBF0DC 60%,#F6E8D2 100%);border-color:rgba(214,178,120,.55);box-shadow:0 6px 18px rgba(20,12,4,.28)}
+.chips{--rule:rgba(255,228,186,.16)}
+.chip{background:rgba(70,52,36,.62);color:#7A6650}
+.chip::before{background:#F4E8D0;border-color:#E3CFAA}
+.chips .chip{box-shadow:inset -.5px -.5px 0 0 var(--rule)}
+.chips{box-shadow:0 0 0 1px rgba(255,226,180,.18),0 6px 16px rgba(20,12,4,.25)}
+.bk-pin{background:rgba(255,236,205,.12);border-color:rgba(255,226,180,.3);opacity:.9}
+.bk-prog{background:conic-gradient(var(--c) calc(var(--p)*1%),rgba(255,228,186,.26) 0)}
+.bk-prog b{background:#3E3024}
+.bk-prog[data-st="none"] b,.bk-prog:not([data-st="full"]) b{color:#F1E2C6}
+.tg-all{background-color:#F6EAD3;color:#6E5A42}
+/* 걸어온 길: 세로 연표, 가장 최근이 맨 위 (2026-11-26 사용자 요청) */
+.tl.tlv{overflow:visible;padding:6px 0 2px}
+.tlv .tl-row{display:block;min-width:0}
+.tlv .tl-n{display:grid;grid-template-columns:46px 40px 1fr;column-gap:12px;align-items:start;text-align:left;padding:0 0 16px}
+.tlv .tl-n:last-child{padding-bottom:0}
+.tlv .tl-n::before{top:0;bottom:0;left:83.5px;right:auto;width:3px;height:auto}
+.tlv .tl-n:first-child::before{top:20px;left:83.5px}
+.tlv .tl-n:last-child::before{bottom:auto;height:20px;right:auto}
+.tlv .tl-n:first-child:last-child::before{display:none}
+.tlv .tl-d{grid-column:1;grid-row:1/3;height:auto;padding-top:11px;text-align:right;white-space:nowrap}
+.tlv .tl-dot{grid-column:2;grid-row:1/3;margin:0}
+.tlv .tl-t{grid-column:3;padding-top:3px}
+.tlv .tl-s{grid-column:3;margin-top:1px}
 </style>
 </head>
 <body>
@@ -1100,7 +1127,8 @@ function renderOverview(){
     none.textContent="아직 기록이 없어요. 한 권을 끝까지 읽거나 쓰면 그날이 여기에 하나씩 이어져요.";
     body.appendChild(none); return;
   }
-  var wrap=document.createElement("div"); wrap.className="tl";
+  nodes.reverse();   // 세로 연표: 가장 최근이 맨 위 (2026-11-26 사용자 요청)
+  var wrap=document.createElement("div"); wrap.className="tl tlv";
   var row=document.createElement("ol"); row.className="tl-row";
   nodes.forEach(function(nd,ix){
     var li=document.createElement("li"); li.className="tl-n tl-m"+nd.m;
@@ -1111,7 +1139,6 @@ function renderOverview(){
     row.appendChild(li);
   });
   wrap.appendChild(row); body.appendChild(wrap);
-  setTimeout(function(){wrap.scrollLeft=wrap.scrollWidth},0);   // 가장 최근(오른쪽 끝)이 보이게
 }
 /* 걸어온 길 기록: 책마다 '다 끝낸 횟수'(회차 + 지금 다 채웠으면 1)가 늘면 그날을 적고, 줄면(되돌리기·체크 풀기) 지운다 */
 var HIST_KEY=KP+"hist", HIST={snap:null,ev:[]};
