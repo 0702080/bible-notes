@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-shotbg3">
+<meta name="app-build" content="ab-20261126-shotcorner">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14930,12 +14930,14 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       g.save(); if(op<1)g.globalAlpha=op; rrp(x,y,w,h,rr); g.clip();
       if(hasBg){g.fillStyle=bgc; g.fillRect(x,y,w,h)}
       if(hasB){   /* 테두리는 바깥 둥근 칸과 안쪽 둥근 칸 사이에만 — 왼쪽 띠도 모서리에서 화면처럼 휘어짐 */
-        var bt=sides[0].w,brr=sides[1].w,bb=sides[2].w,bl=sides[3].w, ir=Math.max(0,rr-Math.max(bt,bl));
-        g.beginPath(); if(g.roundRect){g.roundRect(x,y,w,h,rr); g.roundRect(x+bl,y+bt,Math.max(0,w-bl-brr),Math.max(0,h-bt-bb),ir)} else {g.rect(x,y,w,h); g.rect(x+bl,y+bt,w-bl-brr,h-bt-bb)} g.clip("evenodd")}
+        var bt=sides[0].w,brr=sides[1].w,bb=sides[2].w,bl=sides[3].w, P=function(a,b){return {x:Math.max(0,rr-a),y:Math.max(0,rr-b)}};
+        g.beginPath(); if(g.roundRect){g.roundRect(x,y,w,h,rr); try{g.roundRect(x+bl,y+bt,Math.max(0,w-bl-brr),Math.max(0,h-bt-bb),[P(bl,bt),P(brr,bt),P(brr,bb),P(bl,bb)])}catch(e){g.roundRect(x+bl,y+bt,Math.max(0,w-bl-brr),Math.max(0,h-bt-bb),Math.max(0,rr-Math.max(bt,bl)))}} else {g.rect(x,y,w,h); g.rect(x+bl,y+bt,w-bl-brr,h-bt-bb)} g.clip("evenodd")}
+      var kk=Math.min(w,h)/2, QUAD=[[[x,y],[x+w,y],[x+w-kk,y+kk],[x+kk,y+kk]],[[x+w,y],[x+w,y+h],[x+w-kk,y+h-kk],[x+w-kk,y+kk]],[[x,y+h],[x+w,y+h],[x+w-kk,y+h-kk],[x+kk,y+h-kk]],[[x,y],[x+kk,y+kk],[x+kk,y+h-kk],[x,y+h]]];   /* 둥근 모서리의 테두리도 칠하게 — 변마다 모서리 대각선까지 (2026-11-26 사용자 요청: 모서리 선이 빠짐) */
       sides.forEach(function(s){if(!(s.w>0)||s.st==="none")return; g.fillStyle=s.c; g.strokeStyle=s.c;
         if(s.st==="dashed"||s.st==="dotted"){g.lineWidth=s.w; g.setLineDash(s.st==="dotted"?[s.w,s.w*2]:[s.w*3,s.w*3]); g.beginPath();
           if(s.i===0){g.moveTo(x,y+s.w/2); g.lineTo(x+w,y+s.w/2)} else if(s.i===2){g.moveTo(x,y+h-s.w/2); g.lineTo(x+w,y+h-s.w/2)} else if(s.i===3){g.moveTo(x+s.w/2,y); g.lineTo(x+s.w/2,y+h)} else {g.moveTo(x+w-s.w/2,y); g.lineTo(x+w-s.w/2,y+h)}
           g.stroke(); g.setLineDash([]); return}
+        if(rr>0){var q=QUAD[s.i]; g.beginPath(); g.moveTo(q[0][0],q[0][1]); for(var qi=1;qi<4;qi++)g.lineTo(q[qi][0],q[qi][1]); g.closePath(); g.fill(); return}
         if(s.i===0)g.fillRect(x,y,w,s.w); else if(s.i===2)g.fillRect(x,y+h-s.w,w,s.w); else if(s.i===3)g.fillRect(x,y,s.w,h); else g.fillRect(x+w-s.w,y,s.w,h)});
       g.restore();
       if(hasB&&rr>0){   /* 둥근 테두리는 둥근 선으로 한 번 더 — 모서리가 각지지 않게 */
