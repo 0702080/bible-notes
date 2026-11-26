@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-timerhidehdr">
+<meta name="app-build" content="ab-20261126-timerro">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6119,6 +6119,8 @@ body .icv .icform.icinline .tagripbar{max-width:none!important}
 /* 📜 '모든 칸' 목록의 접힌 카드는 긴 말씀(축복기도 등)을 5줄까지만 보이고 아래는 흐리게 — 눌러 펼치면 전부, 📁 칸을 골라 열면(낭독용) 전부 (2026-11-26 사용자 요청) */
 body:not(.colsel) #list>.note:not(.open):not(.vediting) .verse.vlines{max-height:calc(31.5px * 5);overflow:hidden;-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 40px),transparent)}
 body.rdtimeron .toolbar,body.rdtimeron #topicBar,body.rdtimeron #colBar,body.rdtimeron .fwrap,body.rdtimeron #fScopeRow{display:none!important}
+body.rdtimeron .topverse{display:none!important}
+body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -9601,6 +9603,7 @@ body.rdtimeron .toolbar,body.rdtimeron #topicBar,body.rdtimeron #colBar,body.rdt
     }catch(e){return -1}
   }
   function enterVerseEdit(id,x,y){
+    if(document.body.classList.contains("rdtimeron"))return;
     var card=cards.get(id), n=notes.get(id); if(!card||!n)return;
     if(!openIds.has(id)){openOne(id);render()}
     var v=card.querySelector(".verse"), at=x!=null?verseOffset(v,x,y,n.text||""):-1;
@@ -9791,6 +9794,7 @@ body.rdtimeron .toolbar,body.rdtimeron #topicBar,body.rdtimeron #colBar,body.rdt
       return;
     }
     var tapCard=e.target.closest(".note");
+    if(tapCard&&document.body.classList.contains("rdtimeron")&&!e.target.closest("button"))return;   /* ⏱ 낭독 중에는 읽기 전용 */
     if(tapCard&&!e.target.closest("button,textarea,input,select,a,details,summary,.pop,.editbox,.xpanel,.focusrow,.chip,.sugg,.himgs,.pastezone,.sform,.hsheets,.essays,.topics,.verse.picking,.verse.picking .w,.verse.memv,.mempanel,.usepanel")){
       var tid=tapCard.dataset.id, isOpen=openIds.has(tid);
       var vtap=e.target.closest(".verse");
@@ -11935,6 +11939,7 @@ body.rdtimeron .toolbar,body.rdtimeron #topicBar,body.rdtimeron #colBar,body.rdt
   var CC_STEPS=["읽기","첫 글자","가리기","떠올리기"];
   var ccBack=[];   // 밀어서 넘어온 말씀들 (왼쪽→오른쪽으로 밀면 하나씩 되돌아감)
   function openCoach(n,opt){
+    if(document.body.classList.contains("rdtimeron"))return;
     opt=opt||{}; if(!opt.nav)ccBack=[];
     if(!wordsOf(n.text||"").length){toast("먼저 말씀 본문을 넣어 주세요");return}
     if(!ccBox){
