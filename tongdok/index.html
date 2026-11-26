@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-dright">
+<meta name="app-build" content="td-2026-11-27-gridw">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -712,6 +712,10 @@ body{background:transparent}
 .tlv .tl-n{grid-template-columns:var(--yw) 40px 1fr!important}
 .tlv .tl-d{text-align:right!important}
 .tlv .tl-n::before,.tlv .tl-n:first-child::before,.tlv .tl-yr:not(.tl-yr0)::before{left:calc(var(--yw) + 30.5px)!important}
+/* 📐 장 번호 표를 판 양끝까지 넓혀 왼쪽 끝을 위 카드(걸어온 길·구약 글자) 왼쪽 줄에 맞춤 (2026-11-27 사용자 요청) */
+#ot>.bk,#nt>.bk,#ot>.bk.shut,#nt>.bk.shut{padding-left:0!important;padding-right:0!important}
+#ot>.bk>.bk-h,#nt>.bk>.bk-h{padding-left:14px!important;padding-right:14px!important}
+#ot>.bk .chips,#nt>.bk .chips{border-radius:0!important;border-left:0!important;border-right:0!important}
 </style>
 </head>
 <body>
