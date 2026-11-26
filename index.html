@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-domshot">
+<meta name="app-build" content="ab-20261126-shotbg2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14888,13 +14888,29 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   /* 🖼 화면에 보이는 카드를 그대로 그림으로 (2026-11-26 사용자 요청: 카드와 그대로) — 바탕·테두리(왼쪽 띠·점선)·둥근 모서리·글자 자리를 화면에서 재서 캔버스에 옮김, 단추는 뺌 */
   function domCol(v){v=String(v||""); var m=v.match(/^color\(srgb\s+([\d.e-]+)\s+([\d.e-]+)\s+([\d.e-]+)(?:\s*\/\s*([\d.e%-]+))?\)/);
     if(m){var al=m[4]==null?1:(/%/.test(m[4])?parseFloat(m[4])/100:+m[4]); return "rgba("+Math.round(+m[1]*255)+","+Math.round(+m[2]*255)+","+Math.round(+m[3]*255)+","+al+")"} return v}
+  /* 그림 바탕도 화면처럼: 앱 배경 사진(#appbg)과 그 위 어두운 막·창 바탕을 깔아 카드 모서리·카드 사이가 화면과 같게 (2026-11-26 사용자 요청) */
+  var abgImg=null, abgSrc="";
+  function abgPreload(){try{var a=document.getElementById("appbg"); if(!a)return; var m=getComputedStyle(a).backgroundImage.match(/url\(["']?([^"')]+)["']?\)/); if(!m||m[1]===abgSrc)return; abgSrc=m[1]; var im=new Image(); if(!/^(data|blob):/.test(abgSrc)&&new URL(abgSrc,location.href).origin!==location.origin)im.crossOrigin="anonymous"; im.onload=function(){abgImg=im}; im.onerror=function(){abgImg=null}; abgImg=null; im.src=abgSrc}catch(e){}}
+  function domBackdrop(g,root,ox,oy,W,H){
+    var a=document.getElementById("appbg"), drew=false;
+    if(a){var as=getComputedStyle(a), r=a.getBoundingClientRect();
+      g.fillStyle=domCol(as.backgroundColor)||"#0B0B0D"; g.fillRect(0,0,W,H);
+      if(abgImg&&abgImg.naturalWidth){var k=Math.max(r.width/abgImg.naturalWidth,r.height/abgImg.naturalHeight), iw=abgImg.naturalWidth*k, ih=abgImg.naturalHeight*k;
+        g.save(); try{g.drawImage(abgImg,r.left+(r.width-iw)/2+ox,r.top+(r.height-ih)/2+oy,iw,ih); g.getImageData(0,0,1,1); drew=true}catch(e){drew=false} g.restore()}
+      (as.backgroundImage.match(/linear-gradient\(([^()]*\([^()]*\)[^()]*)+\)/g)||[]).forEach(function(gr){var c=gr.match(/rgba?\([^)]*\)/); if(c){g.fillStyle=c[0]; g.fillRect(0,0,W,H)}});
+    }
+    if(!a){g.fillStyle="#15131A"; g.fillRect(0,0,W,H)}
+    var chain=[]; for(var e=root.parentElement;e&&e!==document.body;e=e.parentElement)chain.unshift(e);
+    chain.forEach(function(e){var c=domCol(getComputedStyle(e).backgroundColor); if(!/rgba\(0, ?0, ?0, ?0\)|transparent/.test(c)){var r=e.getBoundingClientRect(); g.fillStyle=c; g.fillRect(r.left+ox,r.top+oy,r.width,r.height)}});
+    return drew;
+  }
   function domShot(root,o){
     o=o||{}; var mar=o.mar==null?18:o.mar, sc=o.sc||3, bg=o.bg||"#15131A";
     var sv=[root.style.transition,root.style.transform]; root.style.transition="none"; root.style.transform="none"; void root.offsetWidth;
     var R=root.getBoundingClientRect(), W=Math.ceil(R.width+mar*2), H=Math.ceil(R.height+mar*2);
     var c=document.createElement("canvas"); c.width=W*sc; c.height=H*sc; var g=c.getContext("2d"); g.scale(sc,sc);
-    g.fillStyle=bg; g.fillRect(0,0,W,H);
     var ox=mar-R.left, oy=mar-R.top;
+    if(o.bg){g.fillStyle=bg; g.fillRect(0,0,W,H)} else { try{domBackdrop(g,root,ox,oy,W,H)}catch(e){g.fillStyle=bg; g.fillRect(0,0,W,H)} }
     function skip(e){return !!(e.closest&&e.closest("button,svg,[hidden],.cpybtn,.saypgno"))}
     function rad(cs,w,h){var r=parseFloat(cs.borderTopLeftRadius)||0; if(/%/.test(cs.borderTopLeftRadius))r=Math.min(w,h)*r/100; return Math.min(r,w/2,h/2)}
     function rrp(x,y,w,h,r){g.beginPath(); if(g.roundRect)g.roundRect(x,y,w,h,r); else g.rect(x,y,w,h)}
@@ -14907,6 +14923,9 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       if(!hasBg&&!hasB)return;
       g.save(); if(op<1)g.globalAlpha=op; rrp(x,y,w,h,rr); g.clip();
       if(hasBg){g.fillStyle=bgc; g.fillRect(x,y,w,h)}
+      if(hasB){   /* 테두리는 바깥 둥근 칸과 안쪽 둥근 칸 사이에만 — 왼쪽 띠도 모서리에서 화면처럼 휘어짐 */
+        var bt=sides[0].w,brr=sides[1].w,bb=sides[2].w,bl=sides[3].w, ir=Math.max(0,rr-Math.max(bt,bl));
+        g.beginPath(); if(g.roundRect){g.roundRect(x,y,w,h,rr); g.roundRect(x+bl,y+bt,Math.max(0,w-bl-brr),Math.max(0,h-bt-bb),ir)} else {g.rect(x,y,w,h); g.rect(x+bl,y+bt,w-bl-brr,h-bt-bb)} g.clip("evenodd")}
       sides.forEach(function(s){if(!(s.w>0)||s.st==="none")return; g.fillStyle=s.c; g.strokeStyle=s.c;
         if(s.st==="dashed"||s.st==="dotted"){g.lineWidth=s.w; g.setLineDash(s.st==="dotted"?[s.w,s.w*2]:[s.w*3,s.w*3]); g.beginPath();
           if(s.i===0){g.moveTo(x,y+s.w/2); g.lineTo(x+w,y+s.w/2)} else if(s.i===2){g.moveTo(x,y+h-s.w/2); g.lineTo(x+w,y+h-s.w/2)} else if(s.i===3){g.moveTo(x+s.w/2,y); g.lineTo(x+s.w/2,y+h)} else {g.moveTo(x+w-s.w/2,y); g.lineTo(x+w-s.w/2,y+h)}
@@ -14974,7 +14993,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     ["click","touchstart","touchend","touchmove","pointerdown","pointerup","mousedown","dblclick","contextmenu"].forEach(function(t){say.removeEventListener(t,p.eat,true)});
     [].forEach.call(say.querySelectorAll(".saypicked"),function(el){el.classList.remove("saypicked")})}
   function sayPickStart(){
-    if(!say)return; if(sayPick){sayPickEnd();return}
+    if(!say)return; abgPreload(); if(sayPick){sayPickEnd();return}
     var bar=document.createElement("div"); bar.className="saypickbar";
     bar.innerHTML='<span class="spn"></span><button type="button" class="spall">모두</button><button type="button" class="spsave">📷 한 장으로</button><button type="button" class="spx" aria-label="그만">✕</button>';
     var p={ids:{},bar:bar,tx:0,ty:0,mv:false};
@@ -18246,7 +18265,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   function closeSay(){if(!say)return; try{sayPickEnd()}catch(e){} clearTimeout(sayAutoT); sayAutoSave(); var sae=document.activeElement; if(sae&&say.contains(sae))sae.blur();   /* 뒷면 칸에 커서가 남은 채 닫으면 다음에 열 때 목록이 안 바뀌던 문제 (2026-11-07) */ say.hidden=true; document.body.style.overflow=""; $("fab").hidden=reorderMode; renderReviewBar()}
   // 📖 짧은 말씀 한 구절 (2026-10-24 사용자 요청): 믿음의 한 마디와 같은 창을 '말씀' 모드로. 여기 담은 구절(hv:1)은 10분마다 나옴
   var sayMode="s";
-  function openSay(focus,mode){
+  function openSay(focus,mode){ try{abgPreload()}catch(e){}
     sayFocusId="";
     sayMode=mode==="v"?"v":mode==="g"?"g":mode==="m"?"m":"s";
     if(!say){
