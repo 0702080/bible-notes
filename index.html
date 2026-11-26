@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-icopenswipe">
+<meta name="app-build" content="ab-20261126-ictense2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6122,6 +6122,9 @@ body.rdtimeron .toolbar,body.rdtimeron #topicBar,body.rdtimeron #colBar,body.rdt
 body.rdtimeron .topverse{display:none!important}
 body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 .icv .icbtns .ictense.on{background:linear-gradient(180deg,#F6D77A,#D9A93A)!important;color:#3A2A08!important}
+.icv .icfbtn .icftense{margin-left:auto;margin-right:8px;height:36px;padding:0 12px;border-radius:999px;border:1px solid #6E6A82;color:#E8E2D6;font-size:13px;background:linear-gradient(180deg,#4A4658,#2C2A36)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 3px 0 #1A1920}
+.icv .icfbtn .icftense:active{transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 0 #1A1920}
+.icv .icfbtn .icftense.on{background:linear-gradient(180deg,#F6D77A,#D9A93A)!important;color:#3A2A08;border-color:#B88A2A;box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 3px 0 #7A5A14}
 </style>
 </head>
 <body><div id="appbg" aria-hidden="true"></div>
@@ -15256,16 +15259,23 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   var PRAY_TOP1C="빛이신 예수여\n내 안에 계셔 주시니\n내 안에 있는 모든 어둠이 떠난 줄 믿습니다";
   var PRAY_TOP2C="성경 말씀이 온전히 믿어지도록\n저에게 믿음의 은사를,\n믿음의 영을 부어 주신 줄 믿습니다.";
   var icTense={}; try{icTense=JSON.parse(localStorage.getItem("bible-ic-tense")||"{}")||{}}catch(e){}
-  function icHasTop(m){m=String(m||""); return m.indexOf(PRAY_TOP1)>=0||m.indexOf(PRAY_TOP2)>=0}
-  function icConfess(m){return String(m||"").split(PRAY_TOP1).join(PRAY_TOP1C).split(PRAY_TOP2).join(PRAY_TOP2C)}
+  var IC_HEADC=PRAY_TOP1C+"\n\n"+PRAY_TOP2C;
+  function icIsC(m){m=String(m||""); return m.indexOf(PRAY_TOP1C)>=0||m.indexOf(PRAY_TOP2C)>=0}
+  function icHasTop(m){m=String(m||""); return m.indexOf(PRAY_TOP1)>=0||m.indexOf(PRAY_TOP2)>=0||icIsC(m)}
+  function icFlip(m){var Z="\u0001",Y="\u0002";   /* 구하는 기도 ↔ 믿음의 고백 서로 바꿈 */
+    return String(m||"").split(PRAY_TOP1C).join(Z).split(PRAY_TOP2C).join(Y).split(PRAY_TOP1).join(PRAY_TOP1C).split(PRAY_TOP2).join(PRAY_TOP2C).split(Z).join(PRAY_TOP1).split(Y).join(PRAY_TOP2)}
+  function icConfess(m){return icFlip(m)}
   var IC_HEAD=PRAY_TOP;
   function icHeadOff(m){
     var t=String(m||"").replace(/\r/g,"");
     if(t.indexOf(IC_HEAD)===0)return t.slice(IC_HEAD.length).trim();
     if(t.indexOf(PRAY_TOP1)===0)return t.slice(PRAY_TOP1.length).trim();   // 예전 세 줄짜리
+    if(t.indexOf(IC_HEADC)===0)return t.slice(IC_HEADC.length).trim();   // ✨ 믿음의 고백 모양
+    if(t.indexOf(PRAY_TOP1C)===0)return t.slice(PRAY_TOP1C.length).trim();
     return t.trim();
   }
-  function icHead(m){var r=icHeadOff(m); return IC_HEAD+"\n\n"+r}
+  function icHeadOf(m){var t=String(m||"").replace(/\r/g,"").trim(); return t.indexOf(PRAY_TOP1C)===0?IC_HEADC:IC_HEAD}
+  function icHead(m){var r=icHeadOff(m); return icHeadOf(m)+"\n\n"+r}
   function icData(){
     var o=null; try{o=JSON.parse(localStorage.getItem(IC_KEY)||"null")}catch(e){}
     if(!o||!Array.isArray(o.items))o={items:[],per:3,del:{}};
@@ -15567,7 +15577,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       if(big)BI("icmv icrest","🕘","지난 기도로 — 오늘의 기도에서 내려 둬요");
       else BI("icmv icback","☀️","오늘의 기도로 올리기");
     }
-    if(icHasTop(x.memo))BI("ictense"+(icTense[x.id]?" on":""),icTense[x.id]?"✨":"🕯",icTense[x.id]?"믿음의 고백 — 누르면 구하는 기도로":"구하는 기도 — 누르면 믿음의 고백으로");
+    if(icHasTop(x.memo)){var shC=icIsC(icTense[x.id]?icFlip(x.memo):x.memo); BI("ictense"+(shC?" on":""),shC?"✨":"🕯",shC?"믿음의 고백 — 누르면 구하는 기도로":"구하는 기도 — 누르면 믿음의 고백으로")}
     var ansB=BI("icans"+(x.ans?" on":""),"🙌",x.ans?"응답됨 — 누르면 응답 취소":"응답 표시");
     if(!x.ans){var noB=BI("icno"+(x.no?" on":""),"🕊",x.no?"응답 안 됨 — 누르면 다시 기다리는 기도로":"응답 안 됨 표시");   // 응답 안 된 기도 표시 (2026-11-13 사용자 요청)
       if(!x.no)bt.insertBefore(noB,ansB)}   // 오늘 기도할 카드에도 늘 보임 (2026-11-04 사용자 요청)
@@ -15586,15 +15596,17 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     if(icThx[x.id])d.classList.add("thx");
     return d;
   }
+  function icFTense(f){var t=f.querySelector(".icfm"), b=f.querySelector(".icftense"); if(!t||!b)return; var c=icIsC(t.value); b.hidden=!icHasTop(t.value); b.classList.toggle("on",c); b.textContent=c?"✨ 고백":"🕯 구함"; b.title=c?"믿음의 고백 — 누르면 구하는 기도로":"구하는 기도 — 누르면 믿음의 고백으로"}
   function icForm(x){
     var f=document.createElement("div"); f.className="icform"+(x?" icinline":""); f.dataset.id=x?x.id:"";
     f.innerHTML='<input class="field icfn" maxlength="100" placeholder="제목 (예: 어머니 무릎 회복, 김○○ 집사님 아들)" aria-label="이름">'+
       '<textarea class="field icfm" rows="10" maxlength="8000" placeholder="기도 제목 (예: 수술 회복, 믿음이 자라도록)" aria-label="기도 제목"></textarea>'+
       '<select class="field icfv" aria-label="붙들 말씀">'+icNoteOpts(x?x.nid:"")+'</select>'+
       (x&&x.ans?'<textarea class="field icfa" rows="2" maxlength="1000" placeholder="어떻게 응답하셨는지" aria-label="응답"></textarea>':'')+
-      '<div class="icfbtn">'+(x?'<button type="button" class="icdel">지우기</button>':'<span></span>')+'<span><button type="button" class="iccancel">취소</button><button type="button" class="icok">'+(x?"저장":"＋ 명단에 넣기")+'</button></span></div>';
+      '<div class="icfbtn">'+(x?'<button type="button" class="icdel">지우기</button>':'<span></span>')+'<button type="button" class="icftense"></button><span><button type="button" class="iccancel">취소</button><button type="button" class="icok">'+(x?"저장":"＋ 명단에 넣기")+'</button></span></div>';
     if(x){f.querySelector(".icfn").value=x.name; f.querySelector(".icfm").value=icHead(x.memo); f.querySelector(".icfm").rows=1; var fa=f.querySelector(".icfa"); if(fa)fa.value=x.an}
     else f.querySelector(".icfm").value=IC_HEAD+"\n\n";   // 🙏 기도문 맨 위 고정 문구 (2026-11-20 사용자 요청)
+    icFTense(f);
     var fv=f.querySelector(".icfv"); fv.hidden=true; fv.parentNode.insertBefore(noteFinder(fv,{inline:true,max:8,ph:"📖 붙들 말씀 찾기 (책·장절·낱말)"}),fv.nextSibling);   // 긴 목록 대신 찾아서 고르기 (2026-11-07 사용자 요청)
     return f;
   }
@@ -15675,17 +15687,17 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   function icCommit(f){
     if(!f||!f.isConnected)return false;
     var o=icData(), id=f.dataset.id, x=id?o.items.find(function(y){return y.id===id}):null;
-    var nm=f.querySelector(".icfn").value.trim(), memo=icHeadOff(f.querySelector(".icfm").value), nid=f.querySelector(".icfv").value, fa=f.querySelector(".icfa");
+    var nm=f.querySelector(".icfn").value.trim(), hd0=icHeadOf(f.querySelector(".icfm").value), memo=icHeadOff(f.querySelector(".icfm").value), nid=f.querySelector(".icfv").value, fa=f.querySelector(".icfa");
     if(x){
       if(!nm)nm=x.name;   // 제목을 비우고 나가면 원래 제목 그대로
-      memo=memo?IC_HEAD+"\n\n"+memo:"";
+      memo=memo?hd0+"\n\n"+memo:"";
       var an=fa?fa.value.trim():x.an;
       if(x.name===nm&&x.memo===memo&&(x.nid||"")===nid&&x.an===an)return false;
       x.name=nm; x.memo=memo; x.nid=nid; x.an=an; icTouch(x); icSave(o); toast("저장했어요"); return true;
     }
     if(!nm&&!memo)return false;   // 새 칸이 비어 있으면 그냥 닫음
     if(!nm)nm=memo.split("\n")[0].slice(0,40);
-    memo=memo?IC_HEAD+"\n\n"+memo:"";   // 제목 없이 기도 제목만 적었으면 첫 줄을 제목으로
+    memo=memo?hd0+"\n\n"+memo:"";   // 제목 없이 기도 제목만 적었으면 첫 줄을 제목으로
     o.items.push({id:qid(),name:nm,memo:memo,nid:nid,at:Date.now(),u:Date.now(),log:[],ans:0,an:"",pinDay:dkey(Date.now())}); icSave(o); toast("오늘의 기도에 넣었어요"); return true;   // 새로 쓴 기도는 그날 '오늘 기도제목'에 바로 (2026-11-20 사용자 요청)
   }
   function icClick(e){
@@ -15700,10 +15712,11 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     if(b.classList.contains("icansv")){icShowAns=!icShowAns; icEdit=""; icv.querySelector(".icbody").scrollTop=0; icDraw(); return}
     if(b.classList.contains("icadd")){icShowAns=false; icEdit="new"; icDraw(); setTimeout(function(){var f=icv.querySelector(".icfn"); if(f)f.focus()},30); return}
     if(b.classList.contains("icedit")){icEdit=id; icDraw(); return}
+    if(b.classList.contains("icftense")){var ff=b.closest(".icform"), ft=ff&&ff.querySelector(".icfm"); if(ft){var p=ft.selectionStart, v0=ft.value; ft.value=icFlip(v0); try{var np=Math.max(0,p+ft.value.length-v0.length); ft.setSelectionRange(np,np)}catch(er){} ft.dispatchEvent(new Event("input",{bubbles:true})); icFTense(ff)} return}
     if(b.classList.contains("iccancel")){icEdit=""; icDraw(); return}
     if(b.classList.contains("ictense")&&x){var on=!icTense[x.id]; if(on)icTense[x.id]=1; else delete icTense[x.id]; try{localStorage.setItem("bible-ic-tense",JSON.stringify(icTense))}catch(e){}
       var cd=b.closest(".icp"), me=cd&&cd.querySelector(".icmemo"); if(me)me.textContent=on?icConfess(x.memo):x.memo;
-      b.classList.toggle("on",on); b.textContent=on?"✨":"🕯"; var lb=on?"믿음의 고백 — 누르면 구하는 기도로":"구하는 기도 — 누르면 믿음의 고백으로"; b.title=lb; b.setAttribute("aria-label",lb); toast(on?"✨ 믿음의 고백으로":"🕯 구하는 기도로"); return}
+      var shC=icIsC(on?icFlip(x.memo):x.memo); b.classList.toggle("on",shC); b.textContent=shC?"✨":"🕯"; var lb=shC?"믿음의 고백 — 누르면 구하는 기도로":"구하는 기도 — 누르면 믿음의 고백으로"; b.title=lb; b.setAttribute("aria-label",lb); toast(shC?"✨ 믿음의 고백으로":"🕯 구하는 기도로"); return}
     if(b.classList.contains("icans")&&x){if(x.ans){x.ans=0}else{x.ans=Date.now(); x.no=0; toast("🙌 응답된 기도로 옮겼어요")} icTouch(x); icSave(o); icDraw(); return}
     if(b.classList.contains("icno")&&x){if(x.no){x.no=0; toast("다시 기다리는 기도로 옮겼어요")}else{x.no=Date.now(); x.ans=0; toast("🕊 응답 안 된 기도로 옮겼어요")} icTouch(x); icSave(o); icDraw(); return}
     if(b.classList.contains("icdel")){
