@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-walk">
+<meta name="app-build" content="td-2026-11-26-onepage">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1158,6 +1158,8 @@ function renderOverview(){
   if(tg)tg.setAttribute("aria-expanded",String(ovwOpen));
   body.hidden=!ovwOpen; if(!ovwOpen)return;
   body.textContent="";
+  var sv=document.createElement("button"); sv.type="button"; sv.className="walk-save"; sv.id="ovwSave";
+  sv.textContent="🖼️ 이미지로 저장"; body.appendChild(sv);
   // ① 66권 지도
   [["구약 39권",0,OT_N],["신약 27권",OT_N,BOOKS.length]].forEach(function(part){
     var h=document.createElement("p"); h.className="ovw-h"; h.textContent=part[0];
@@ -1251,6 +1253,7 @@ function histSync(){
   tg.addEventListener("click",function(){ovwOpen=!ovwOpen;renderOverview()});
   var body=document.getElementById("ovwBody");
   body.addEventListener("click",function(e){
+    if(e.target.closest("#ovwSave")){saveOvwImage(e.target.closest("#ovwSave"));return}
     var c=e.target.closest(".ovc"); if(!c)return;
     var bi=+c.dataset.b; setFold(bi,false); saveFold&&saveFold();
     var sec=document.querySelector('.bk[data-b="'+bi+'"]');
@@ -1266,11 +1269,9 @@ function histSync(){
 })();
 /* 🖼️ 걸어온 길을 갤럭시 S23 화면 크기(1080×2340) 이미지로 저장. 한 장에 다 안 들어가면 여러 장으로 나눔 (2026-11-26 사용자 요청) */
 var WALK_W=1080, WALK_H=2340;
-function walkPages(n){
-  var top=430, bottom=WALK_H-200, avail=bottom-top, maxH=175, minH=132;
-  var per=Math.max(1,Math.floor(avail/minH)), pages=Math.max(1,Math.ceil(n/per));
-  per=Math.ceil(n/pages);
-  return {pages:pages, per:per, top:top, rowH:Math.min(maxH,Math.floor(avail/per))};
+function walkPages(n){   // 늘 한 장: 줄이 많으면 줄 높이·글자를 줄여 화면 한 장에 다 넣음 (2026-11-26 사용자 요청)
+  var top=430, bottom=WALK_H-200, avail=bottom-top;
+  return {pages:1, per:Math.max(1,n), top:top, rowH:Math.min(175,avail/Math.max(1,n))};
 }
 function walkCanvas(nodes,pg,P,font){
   var cv=document.createElement("canvas"); cv.width=WALK_W; cv.height=WALK_H;
@@ -1287,29 +1288,82 @@ function walkCanvas(nodes,pg,P,font){
   x.fillStyle="rgba(140,110,70,.22)"; x.fillRect(80,368,WALK_W-160,3);
   // 연표
   var COL={s:"#7DB582",r:"#E2A93B",p:"#8A68C9"}, DCOL={s:"#5E9A64",r:"#C98A12",p:"#7553B8"};
-  var list=nodes.slice(pg*P.per,(pg+1)*P.per), R=P.rowH, dot=Math.min(104,R-26), dx=330, tx=420, maxW=WALK_W-tx-70;
+  var list=nodes.slice(pg*P.per,(pg+1)*P.per), R=P.rowH, k=Math.min(1,R/150), dot=Math.min(104,R*0.72), dx=330, tx=420, maxW=WALK_W-tx-70;
+  function fs(n){return Math.max(12,Math.round(n*k))}
   function cy(i){return P.top+R*i+R/2}
   list.forEach(function(nd,i){   // 줄 먼저 (동그라미 뒤로)
     var last=(i===list.length-1), more=(pg*P.per+i<nodes.length-1);
     if(last&&!more)return;
-    x.fillStyle=COL[nd.m]+"99"; x.fillRect(dx-4,cy(i),8,last?(R/2+40):R);
+    x.fillStyle=COL[nd.m]+"99"; x.fillRect(dx-Math.max(2,4*k),cy(i),Math.max(4,8*k),last?(R/2+40):R);
   });
   list.forEach(function(nd,i){
     var y=cy(i), c=COL[nd.m];
     x.beginPath(); x.arc(dx,y,dot/2,0,Math.PI*2); x.fillStyle="#FFF8EA"; x.fill();
-    x.fillStyle=c+"2E"; x.fill(); x.lineWidth=7; x.strokeStyle=c; x.stroke();
+    x.fillStyle=c+"2E"; x.fill(); x.lineWidth=Math.max(3,7*k); x.strokeStyle=c; x.stroke();
     x.textAlign="center"; x.textBaseline="middle"; x.font=Math.round(dot*0.46)+"px "+font; x.fillStyle="#000";
     x.fillText(walkIcon(nd.m),dx,y+2);
-    x.textAlign="right"; x.font="700 40px "+font; x.fillStyle=DCOL[nd.m]; x.fillText(walkDate(nd.d),dx-dot/2-26,y);
+    x.textAlign="right"; x.font="700 "+fs(40)+"px "+font; x.fillStyle=DCOL[nd.m]; x.fillText(walkDate(nd.d),dx-dot/2-26*k,y);
     x.textAlign="left"; x.textBaseline="alphabetic";
-    x.font="800 48px "+font; x.fillStyle="#2E2820";
+    x.font="800 "+fs(48)+"px "+font; x.fillStyle="#2E2820";
     var tt=nd.t; if(x.measureText(tt).width>maxW){while(tt.length>1&&x.measureText(tt+"…").width>maxW)tt=tt.slice(0,-1); tt+="…"}
-    x.fillText(tt,tx,y-4);
-    x.font="500 36px "+font; x.fillStyle="#8A7C68"; x.fillText(nd.sub,tx,y+44);
+    x.fillText(tt,tx,y-4*k);
+    x.font="500 "+fs(36)+"px "+font; x.fillStyle="#8A7C68"; x.fillText(nd.sub,tx,y+44*k);
   });
   x.textAlign="center"; x.font="600 32px "+font; x.fillStyle="#B8A483";
   x.fillText("성경 통독표",WALK_W/2,WALK_H-110);
   return cv;
+}
+/* 🖼️ 전체 진행표(66권)를 휴대폰 화면 한 장(1080×2340)에 꽉 차게 (2026-11-26 사용자 요청) */
+function ovwCanvas(font){
+  var cv=document.createElement("canvas"); cv.width=WALK_W; cv.height=WALK_H;
+  var x=cv.getContext("2d");
+  var g=x.createLinearGradient(0,0,WALK_W*0.4,WALK_H); g.addColorStop(0,"#FFF6E3"); g.addColorStop(.6,"#FBF0DC"); g.addColorStop(1,"#F3E2C8");
+  x.fillStyle=g; x.fillRect(0,0,WALK_W,WALK_H);
+  var t=new Date(), who=(typeof ME_LABEL==="string"&&ME_LABEL)?ME_LABEL+" · ":"";
+  x.textBaseline="alphabetic"; x.textAlign="left";
+  x.fillStyle="#8C6200"; x.font="800 64px "+font; x.fillText("🗺️ 전체 진행표",72,210);
+  x.textAlign="right"; x.fillStyle=pMode?"#7553B8":"#C98A12"; x.font="800 40px "+font; x.fillText(pMode?"✍️ 필사":"📖 통독",WALK_W-72,210);
+  x.textAlign="left"; x.fillStyle="#8A7C68"; x.font="500 34px "+font;
+  x.fillText(who+t.getFullYear()+"."+("0"+(t.getMonth()+1)).slice(-2)+"."+("0"+t.getDate()).slice(-2)+" 기준",76,270);
+  var COLS=6, L=72, Wd=WALK_W-2*L, cw=Wd/COLS, top=330, bottom=WALK_H-150, hdr=86, gap=40;
+  var rowsOT=Math.ceil(OT_N/COLS), rowsNT=Math.ceil((BOOKS.length-OT_N)/COLS);
+  var ch=Math.min(cw,(bottom-top-2*hdr-gap)/(rowsOT+rowsNT)), d=Math.min(cw,ch)*0.84, y=top;
+  [["구약 39권",0,OT_N],["신약 27권",OT_N,BOOKS.length]].forEach(function(part,pi){
+    var nf=0,nr=0; for(var j=part[1];j<part[2];j++){var dd=bookDone(j); if(dd>=BOOKS[j][1])nf++; else if(dd>0)nr++}
+    x.textAlign="left"; x.textBaseline="middle"; x.fillStyle="#6E5A3C"; x.font="800 42px "+font; x.fillText(part[0],L,y+hdr/2);
+    x.textAlign="right"; x.font="700 34px "+font;
+    var s2=(pMode?"쓰는 중 ":"읽는 중 ")+nr+"권", s1="✓ "+nf+"권", wx=WALK_W-L;
+    if(nr){x.fillStyle="#B07A0A"; x.fillText(s2,wx,y+hdr/2); wx-=x.measureText(s2).width+30}
+    x.fillStyle="#2E8A55"; x.fillText(s1,wx,y+hdr/2);
+    y+=hdr;
+    for(var bi=part[1];bi<part[2];bi++){
+      var ix=bi-part[1], cx=L+cw*(ix%COLS)+cw/2, cy=y+ch*Math.floor(ix/COLS)+ch/2;
+      var tot=BOOKS[bi][1], dn=bookDone(bi), f=tot?dn/tot:0, full=dn>=tot, r=d/2;
+      x.beginPath(); x.arc(cx,cy,r,0,Math.PI*2); x.fillStyle=full?"#3E9E64":"#E8DCC4"; x.fill();
+      if(!full&&f>0){x.beginPath(); x.moveTo(cx,cy); x.arc(cx,cy,r,-Math.PI/2,-Math.PI/2+f*Math.PI*2); x.closePath(); x.fillStyle="#E3B53A"; x.fill()}
+      if(!full){x.beginPath(); x.arc(cx,cy,r-Math.max(6,d*0.075),0,Math.PI*2); x.fillStyle=f>0?"#FBF1DA":"#FBF6EC"; x.fill()}
+      var ab=BABBR[bi]||BOOKS[bi][0].slice(0,2);
+      x.textAlign="center"; x.textBaseline="middle"; x.font="700 "+Math.round(d*(ab.length>1?0.3:0.36))+"px "+font;
+      x.fillStyle=full?"#fff":f>0?"#5A3F12":"#9A8B74"; x.fillText(ab,cx,cy+2);
+    }
+    y+=ch*(pi?rowsNT:rowsOT)+gap;
+  });
+  x.textAlign="center"; x.textBaseline="alphabetic"; x.font="600 32px "+font; x.fillStyle="#B8A483";
+  x.fillText("성경 통독표",WALK_W/2,WALK_H-80);
+  return cv;
+}
+function saveOvwImage(btn){
+  var font=getComputedStyle(document.body).fontFamily||"sans-serif";
+  var old=btn.textContent; btn.disabled=true; btn.textContent="만드는 중…";
+  var ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
+  ready.then(function(){
+    var cv=ovwCanvas(font);
+    return new Promise(function(ok){cv.toBlob(function(b){ok(b)},"image/png")});
+  }).then(function(b){
+    var a=document.createElement("a"); a.href=URL.createObjectURL(b); a.download="전체진행표-"+(pMode?"필사-":"통독-")+dayKey()+".png";
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){URL.revokeObjectURL(a.href)},4000);
+    btn.textContent="✓ 저장했어요"; setTimeout(function(){btn.textContent=old; btn.disabled=false},2200);
+  }).catch(function(){btn.textContent="만들지 못했어요"; setTimeout(function(){btn.textContent=old; btn.disabled=false},2200)});
 }
 function saveWalkImage(btn){
   var nodes=walkNodes(); if(!nodes.length)return;
