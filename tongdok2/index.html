@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-simple">
+<meta name="app-build" content="td-2026-11-26-pin">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -626,6 +626,9 @@ body{background:transparent}
 .chips:not(.fchips){box-shadow:0 0 0 1px rgba(255,226,180,.12)}
 .bk.shut .bk-h{padding-bottom:0}
 #ot>.bk.shut,#nt>.bk.shut{padding:10px 14px}
+/* 📌 더 작게, 장 수 글자 단순하게 (2026-11-26 사용자 요청) */
+.bk-h .bk-pin{width:22px;height:22px;font-size:11px;opacity:.3}
+.bk-cnt{font-size:11.5px;letter-spacing:0}
 </style>
 </head>
 <body>
@@ -800,7 +803,7 @@ var RCOL_R=["#EE8467","#4FAE78","#6F8FE8","#A57BD8","#E46FA6","#2FB3A6","#4C5FB8
 var RCOL_P=["#D2558F","#3E9E64","#2E9BCB","#E07F2E","#1F9C8F","#4C5FB8","#C9443F","#6E9E2A","#A86F45"];
 function rcol(r){if(!r)return "";var A=pMode?RCOL_P:RCOL_R;return A[(r-1)%A.length]}
 function rcAttr(bi){var r=rndOf(bi);return r?' data-rc="'+r+'" style="--rc:'+rcol(r)+'"':''}
-function cntText(bi,done,total){var r=rndOf(bi);return done+' / '+total+(r?' · '+(r+1)+'회째':'')}
+function cntText(bi,done,total){return done+'/'+total}   /* 회차는 막대 안에 (2026-11-26 사용자 요청: 단순하게) */
 /* 한 번이라도 다 읽은 책은 다 읽은 것으로 센다 (다시 읽느라 칸을 비워도 축하가 또 뜨지 않게) */
 function everCount(){var n=0,R0=rounds();for(var bi=0;bi<BOOKS.length;bi++)n+=R0[bi]?BOOKS[bi][1]:bookDone(bi);return n}
 function roundCtl(bi){
@@ -1033,7 +1036,7 @@ function syncFoldAll(){
 /* 책 오른쪽 끝: 진행 상황을 링(색)과 숫자로 — 안 읽음 회색, 읽는 중 금빛 %, 다 읽음 초록 ✓ (2026-10-11 사용자 요청) */
 function progBadge(done,total,r){
   var p=Math.round(done/total*100), st=done===0?"none":done===total?"full":"part";
-  var txt=done===total?(r?"✓ "+(r+1)+"회":"✓ 100%"):p+"%";
+  var txt=done===total?(r?"✓ "+(r+1)+"회":"✓ 100%"):(r?(r+1)+"회째 · ":"")+p+"%";
   return '<span class="bk-prog" data-st="'+st+'" style="--p:'+(done/total*100).toFixed(1)+'" role="img" aria-label="'+(done===total?"다 읽음":p+"% 읽음")+'"><b>'+txt+'</b></span>';
 }
 // 표의 바깥 모서리(계단으로 꺾이는 자리 포함)를 둥글게 할 칸 고르기 (2026-10-17 사용자 요청)
