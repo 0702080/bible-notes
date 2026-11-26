@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-pastel">
+<meta name="app-build" content="td-2026-11-26-yrbig">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -696,6 +696,11 @@ body{background:transparent}
 .ovc[data-g][data-st="part"] b{color:var(--gd)}
 .ovc[data-g][data-st="full"]{background:var(--gc)!important}
 .ovc[data-g][data-st="full"] b{color:var(--gd);font-weight:800}
+/* 📅 걸어온 길 연도 머리: 더 크고 짙게, 오른쪽으로 금빛 줄 (2026-11-26 사용자 요청) */
+.tlv .tl-yr{display:flex!important;align-items:center;gap:10px;padding:4px 0 14px!important}
+.tlv .tl-yr span{font-size:30px!important;font-weight:900!important;color:#5A3A08!important;letter-spacing:1.5px!important;line-height:1!important;font-variant-numeric:tabular-nums;text-shadow:0 1px 0 rgba(255,246,224,.9),0 2px 4px rgba(120,80,20,.18)}
+.tlv .tl-yr::after{content:"";flex:1;height:2px;border-radius:2px;background:linear-gradient(90deg,rgba(140,98,0,.75),rgba(196,150,60,.35) 60%,rgba(196,150,60,0));position:relative;z-index:1}
+.tlv .tl-yr span::after{content:"";display:inline-block;width:7px;height:7px;margin-left:5px;border-radius:50%;background:#C98A12;vertical-align:4px}
 </style>
 </head>
 <body>
@@ -1342,7 +1347,7 @@ function histSync(){
 /* 🖼️ 걸어온 길을 갤럭시 S23 화면 크기(1080×2340) 이미지로 저장. 한 장에 다 안 들어가면 여러 장으로 나눔 (2026-11-26 사용자 요청) */
 var WALK_W=1080, WALK_H=2340;
 function walkPages(n){   // 늘 한 장: 줄이 많으면 줄 높이·글자를 줄여 화면 한 장에 다 넣음 (2026-11-26 사용자 요청)
-  var top=430, bottom=WALK_H-200, avail=bottom-top;
+  var top=480, bottom=WALK_H-200, avail=bottom-top;
   return {pages:1, per:Math.max(1,n), top:top, rowH:Math.min(175,avail/Math.max(1,n))};
 }
 function walkCanvas(nodes,pg,P,font){
@@ -1372,8 +1377,13 @@ function walkCanvas(nodes,pg,P,font){
   list.forEach(function(nd,i){
     var yy=walkYear(nd.d)||(i?"":String(new Date().getFullYear()));
     if(yy&&yy!==cyr){
-      cyr=yy; x.textAlign="right"; x.textBaseline="alphabetic"; x.fillStyle="#8C6200";
-      x.font="900 "+(i?fs(40):46)+"px "+font; x.fillText(yy,dx-dot/2-26*k,i?cy(i)-dot/2-8*k:P.top-14);
+      cyr=yy; x.textAlign="left"; x.textBaseline="alphabetic";
+      var ys=i?fs(54):76, yx=80, yb=i?cy(i)-dot/2-10*k:P.top-6;
+      x.font="900 "+ys+"px "+font; x.fillStyle="rgba(120,80,20,.18)"; x.fillText(yy,yx+1,yb+3);
+      x.fillStyle="#5A3A08"; x.fillText(yy,yx,yb);
+      var yw=x.measureText(yy).width; x.beginPath(); x.arc(yx+yw+14,yb-ys*0.12,ys*0.1,0,Math.PI*2); x.fillStyle="#C98A12"; x.fill();
+      var lx=yx+yw+34, lg=x.createLinearGradient(lx,0,WALK_W-80,0); lg.addColorStop(0,"rgba(140,98,0,.75)"); lg.addColorStop(.6,"rgba(196,150,60,.35)"); lg.addColorStop(1,"rgba(196,150,60,0)");
+      x.fillStyle=lg; x.fillRect(lx,yb-ys*0.12-2,WALK_W-80-lx,4);
     }
     var y=cy(i), c=COL[nd.m];
     x.beginPath(); x.arc(dx,y,dot/2,0,Math.PI*2); x.fillStyle="#FFF8EA"; x.fill();
