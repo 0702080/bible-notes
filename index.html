@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="ab-20261126-shotbg2">
+<meta name="app-build" content="ab-20261126-shotbg3">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14890,7 +14890,13 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     if(m){var al=m[4]==null?1:(/%/.test(m[4])?parseFloat(m[4])/100:+m[4]); return "rgba("+Math.round(+m[1]*255)+","+Math.round(+m[2]*255)+","+Math.round(+m[3]*255)+","+al+")"} return v}
   /* 그림 바탕도 화면처럼: 앱 배경 사진(#appbg)과 그 위 어두운 막·창 바탕을 깔아 카드 모서리·카드 사이가 화면과 같게 (2026-11-26 사용자 요청) */
   var abgImg=null, abgSrc="";
-  function abgPreload(){try{var a=document.getElementById("appbg"); if(!a)return; var m=getComputedStyle(a).backgroundImage.match(/url\(["']?([^"')]+)["']?\)/); if(!m||m[1]===abgSrc)return; abgSrc=m[1]; var im=new Image(); if(!/^(data|blob):/.test(abgSrc)&&new URL(abgSrc,location.href).origin!==location.origin)im.crossOrigin="anonymous"; im.onload=function(){abgImg=im}; im.onerror=function(){abgImg=null}; abgImg=null; im.src=abgSrc}catch(e){}}
+  var abgWait=[];
+  function abgPreload(){try{var a=document.getElementById("appbg"); if(!a)return; var m=getComputedStyle(a).backgroundImage.match(/url\(["']?([^"')]+)["']?\)/); if(!m){abgDone();return} if(m[1]===abgSrc&&(abgImg||abgSrc._busy))return; abgSrc=m[1]; var im=new Image(); if(!/^(data|blob):/.test(abgSrc)&&new URL(abgSrc,location.href).origin!==location.origin)im.crossOrigin="anonymous"; im.onload=function(){abgImg=im; abgDone()}; im.onerror=function(){abgImg=null; abgDone()}; abgImg=null; im.src=abgSrc}catch(e){abgDone()}}
+  function abgDone(){var w=abgWait; abgWait=[]; w.forEach(function(f){try{f()}catch(e){}})}
+  function abgReady(fn){   /* 배경 사진을 다 받은 뒤 그림을 만듦 — 받기 전에 만들면 모서리·카드 사이가 까맣게 나왔음 (2026-11-26) */
+    abgPreload(); if(abgImg&&abgImg.complete&&abgImg.naturalWidth){fn();return}
+    var done=false, go=function(){if(done)return; done=true; fn()}; abgWait.push(go); setTimeout(go,2500);
+  }
   function domBackdrop(g,root,ox,oy,W,H){
     var a=document.getElementById("appbg"), drew=false;
     if(a){var as=getComputedStyle(a), r=a.getBoundingClientRect();
@@ -15007,7 +15013,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     bar.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return;
       if(b.classList.contains("spx")){sayPickEnd();return}
       if(b.classList.contains("spall")){var cs=[].slice.call(say.querySelectorAll(".saylist .saycard[data-id]")), allOn=cs.every(function(el){return p.ids[el.dataset.id]}); p.ids={}; if(!allOn)cs.forEach(function(el){p.ids[el.dataset.id]=1}); sayPickSync(); return}
-      if(b.classList.contains("spsave")){var ids=p.ids; sayPickEnd(); try{sayShotAll(ids)}catch(_){toast("그림을 만들지 못했어요")}}});
+      if(b.classList.contains("spsave")){var ids=p.ids; sayPickEnd(); abgReady(function(){try{sayShotAll(ids)}catch(_){toast("그림을 만들지 못했어요")}})}});
     sayPick=p; say.classList.add("saypicking"); say.appendChild(bar);
     p.mo=new MutationObserver(function(){if(sayPick===p)sayPickSync()}); var ls=say.querySelector(".saylist")||say; p.mo.observe(ls,{childList:true,subtree:true});
     sayPickSync(); toast("한 그림에 담을 카드를 눌러 고르세요");
@@ -19064,7 +19070,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     if(act==="undo"){var ub0=b.closest(".sayundo"); if(ub0&&ub0.dataset.id)sayRestore(ub0.dataset.id); return}
     if(act==="cancel"){sayEdit="";drawSay();return}
     if(act==="foldall"){var ids=(b.dataset.ids||"").split(",").filter(Boolean), unf=b.dataset.on==="1"; ids.forEach(function(i){if(unf)delete sayFold[i]; else sayFold[i]=1}); sayFocusId=""; try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
-    if(act==="shot"){var si=sayData().items.filter(function(y){return y.id===id})[0]; if(si)try{sayShot(si,b.closest(".saycard"))}catch(err){toast("그림을 만들지 못했어요")} return}
+    if(act==="shot"){var si=sayData().items.filter(function(y){return y.id===id})[0]; if(si){var sc0=b.closest(".saycard"); abgReady(function(){try{sayShot(si,sc0)}catch(err){toast("그림을 만들지 못했어요")}})} return}
     if(act==="copyall"){var ci=sayData().items.filter(function(y){return y.id===id})[0]; if(ci){copyText(hlStrip(String(ci.t||"")).replace(/\s+$/,"")).then(function(ok){if(ok===false){toast("복사하지 못했어요");return} b.classList.add("done"); setTimeout(function(){b.classList.remove("done")},1200); toast("글 전체를 복사했어요 📋")})} return}
     if(act==="hint"){toast("꾹 누르면 지울 수 있어요");return}
     if(act==="fold"){if(sayFold[id]){delete sayFold[id]; sayFocusId=id} else {sayFold[id]=1; if(sayFocusId===id){sayFocusId=""; sayFoldBack(id)}} try{localStorage.setItem("bible-say-fold",JSON.stringify(sayFold))}catch(err){} drawSay(); return}
