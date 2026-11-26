@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-shotbg">
+<meta name="app-build" content="td-2026-11-26-ovcolor">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -636,6 +636,29 @@ body{background:transparent}
 /* 📌 고정 안 한 핀도 어두운 바탕에서 잘 보이게 밝은 색으로 (2026-11-26 사용자 요청) */
 .bk-h .bk-pin[aria-pressed="false"]{filter:grayscale(1) brightness(2.6);opacity:.85}
 .pinned .bk-h .bk-pin[aria-pressed="false"]{filter:grayscale(1);opacity:.5}
+
+/* 🎨 전체 진행표 원: 성경 묶음마다 고운 색 (2026-11-26 사용자 요청: 성경 목록 원을 더 예쁘게)
+   안 읽은 책=묶음 색이 살짝 비친 크림 고리, 읽는 중=묶음 색 고리가 읽은 만큼, 다 읽음=묶음 색 그라데이션으로 꽉 찬 원 */
+.ovc[data-g="law"],.ovlg [data-g="law"]{--gc:#D9962A}
+.ovc[data-g="hist"],.ovlg [data-g="hist"]{--gc:#3A97BF}
+.ovc[data-g="poem"],.ovlg [data-g="poem"]{--gc:#8B6AD6}
+.ovc[data-g="major"],.ovlg [data-g="major"]{--gc:#D65C7C}
+.ovc[data-g="minor"],.ovlg [data-g="minor"]{--gc:#35A276}
+.ovc[data-g="gospel"],.ovlg [data-g="gospel"]{--gc:#D9A010}
+.ovc[data-g="paul"],.ovlg [data-g="paul"]{--gc:#5675D4}
+.ovc[data-g="general"],.ovlg [data-g="general"]{--gc:#D5744A}
+.ovc[data-g="rev"],.ovlg [data-g="rev"]{--gc:#B2549A}
+.ovc[data-g]{background:conic-gradient(from -90deg,var(--gc) calc(var(--f,0) * 360deg),color-mix(in srgb,var(--gc) 22%,#F1E7D3) 0)!important}
+.ovc[data-g] i{inset:3.5px!important;background:color-mix(in srgb,var(--gc) 5%,#FFFCF5)!important}
+.ovc[data-g] b{color:color-mix(in srgb,var(--gc) 45%,#8C7C64);font-weight:700}
+.ovc[data-g][data-st="part"] i{background:color-mix(in srgb,var(--gc) 13%,#FFF9EE)!important}
+.ovc[data-g][data-st="part"] b{color:color-mix(in srgb,var(--gc) 78%,#2E2010);font-weight:800}
+.ovc[data-g][data-st="full"]{background:linear-gradient(150deg,color-mix(in srgb,var(--gc) 62%,#fff) 0%,var(--gc) 52%,color-mix(in srgb,var(--gc) 78%,#1a1208) 100%)!important}
+.ovc[data-g][data-st="full"] i{inset:0!important;background:transparent!important}
+.ovc[data-g][data-st="full"] b{color:#fff;font-weight:800}
+.ovlg{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;margin:10px 0 2px;font-size:11.5px;color:#8A7A62}
+.ovlg span{display:inline-flex;align-items:center;gap:5px}
+.ovlg i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--gc)}
 </style>
 </head>
 <body>
@@ -1169,7 +1192,7 @@ function renderOverview(){
     var map=document.createElement("div"); map.className="ovw-map";
     for(var bi=part[1];bi<part[2];bi++){
       var total=BOOKS[bi][1], done=bookDone(bi), f=total?done/total:0;
-      var c=document.createElement("button"); c.type="button"; c.className="ovc"; c.dataset.b=String(bi);
+      var c=document.createElement("button"); c.type="button"; c.className="ovc"; c.dataset.b=String(bi); c.dataset.g=bookGroup(bi);
       c.dataset.st=done===0?"none":done>=total?"full":"part";
       c.style.setProperty("--f",f.toFixed(3));
       c.innerHTML='<i></i><b></b>';
@@ -1179,6 +1202,11 @@ function renderOverview(){
       map.appendChild(c);
     }
     body.appendChild(map);
+    var lg=document.createElement("div"); lg.className="ovlg";   // 묶음 색 이름표 (2026-11-26 사용자 요청: 원을 예쁘게)
+    (part[1]?[["gospel","복음서"],["paul","바울서신"],["general","일반서신"],["rev","예언서"]]:[["law","율법서"],["hist","역사서"],["poem","시가서"],["major","대선지서"],["minor","소선지서"]]).forEach(function(g){
+      var sp=document.createElement("span"); sp.dataset.g=g[0]; sp.innerHTML="<i></i>"; sp.appendChild(document.createTextNode(g[1])); lg.appendChild(sp);
+    });
+    body.appendChild(lg);
   });
 }
 /* 👣 걸어온 길 (따로 떼어 낸 카드, 2026-11-26 사용자 요청) */
