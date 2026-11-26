@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-pin2">
+<meta name="app-build" content="td-2026-11-26-walk">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -629,6 +629,10 @@ body{background:transparent}
 /* 📌 더 작게, 장 수 글자 단순하게 (2026-11-26 사용자 요청) */
 .bk-h .bk-pin{width:22px;height:22px;font-size:11px;opacity:.3}
 .bk-cnt{font-size:11.5px;letter-spacing:0}
+/* 👣 걸어온 길 카드 + 이미지로 저장 단추 (2026-11-26 사용자 요청) */
+.walk-save{display:block;margin:2px 0 14px auto;padding:7px 14px;border:1px solid rgba(214,178,120,.6);border-radius:999px;background:linear-gradient(180deg,#FFFDF6,#F6E8CF);color:#7A5410;font-size:13px;font-weight:700;box-shadow:0 2px 0 rgba(120,80,30,.15)}
+.walk-save:active{transform:translateY(1px)}
+.walk-save:disabled{opacity:.7}
 /* 📌 고정 안 한 핀도 어두운 바탕에서 잘 보이게 밝은 색으로 (2026-11-26 사용자 요청) */
 .bk-h .bk-pin[aria-pressed="false"]{filter:grayscale(1) brightness(2.6);opacity:.85}
 .pinned .bk-h .bk-pin[aria-pressed="false"]{filter:grayscale(1);opacity:.5}
@@ -689,6 +693,14 @@ body{background:transparent}
       <b>🗺️ 전체 진행표</b><span class="ovw-sub">창세기부터 요한계시록까지 한눈에</span><span class="ovw-chev" aria-hidden="true"></span>
     </button>
     <div class="ovw-body" id="ovwBody" hidden></div>
+  </section>
+
+  <!-- 👣 걸어온 길: 전체 진행표에서 따로 떼어 낸 카드 + 이미지로 저장 (2026-11-26 사용자 요청) -->
+  <section class="ovw walk" id="walk">
+    <button class="ovw-tg" id="walkTg" type="button" aria-expanded="false" aria-controls="walkBody">
+      <b>👣 걸어온 길</b><span class="ovw-sub">책을 다 읽은 날, 다 쓴 날</span><span class="ovw-chev" aria-hidden="true"></span>
+    </button>
+    <div class="ovw-body" id="walkBody" hidden></div>
   </section>
 
   <section class="shelf" hidden>   <!-- 모은 책 뱃지는 보이지 않게 (2026-10-21 사용자 요청). 코드는 남겨 둠 -->
@@ -1112,7 +1124,7 @@ function renderSummary(){
   $("btnCmp").hidden=!viewFriends().length;
   $("btnCmp").textContent=compare?"비교 끄기":"비교 켜기";
 }
-function renderAll(){renderBooks();renderSummary();renderShelf();applyFind();renderOverview()}
+function renderAll(){renderBooks();renderSummary();renderShelf();applyFind();renderOverview();renderWalk()}
 /* ── 전체 진행표 ───────────────────────────────
    ① 66권 지도: 창세기부터 요한계시록까지 읽은 만큼 칸이 찬다
    ② 날짜별 기록: 오늘부터 쌓이는 "하루에 몇 장" 막대 */
@@ -1166,8 +1178,13 @@ function renderOverview(){
     }
     body.appendChild(map);
   });
+}
+/* 👣 걸어온 길 (따로 떼어 낸 카드, 2026-11-26 사용자 요청) */
+var walkOpen=false; try{walkOpen=localStorage.getItem(KP+"walkopen")==="1"}catch(e){}
+function walkDate(d){return d?(d.slice(0,4)===String(new Date().getFullYear())?d.slice(5):d.slice(2)).replace(/-/g,"."):"이전"}
+function walkIcon(m){return m==="s"?"🌱":m==="r"?"📖":"✍️"}
+function walkNodes(){   // 가장 최근이 맨 앞
   // ② 걸어온 길: 책을 다 읽은(쓴) 날을 왼쪽→오른쪽 한 줄 연표로 (2026-10-21 사용자 요청, 날짜별 칸 그림·숫자 요약 대신)
-  var h2=document.createElement("p"); h2.className="ovw-h"; h2.textContent="걸어온 길"; body.appendChild(h2);
   histSync();
   var lk=Object.keys(readLog).sort(), nodes=[];
   if(lk.length)nodes.push({d:lk[0],m:"s",t:"시작",sub:"처음 체크한 날"});
@@ -1180,19 +1197,30 @@ function renderOverview(){
     var nm=ord.map(function(b){return BOOKS[b][0]+(top[b]>1?" "+top[b]+"회":"")});
     nodes.push({d:g.d,m:g.m,t:nm.slice(0,2).join(" · ")+(nm.length>2?" 외 "+(nm.length-2)+"권":""),sub:g.m==="r"?"다 읽음":"다 씀"});
   });
+  nodes.reverse();   // 세로 연표: 가장 최근이 맨 위 (2026-11-26 사용자 요청)
+  return nodes;
+}
+function renderWalk(){
+  var body=document.getElementById("walkBody"); if(!body)return;
+  var tg=document.getElementById("walkTg");
+  if(tg)tg.setAttribute("aria-expanded",String(walkOpen));
+  body.hidden=!walkOpen; if(!walkOpen)return;
+  body.textContent="";
+  var nodes=walkNodes();
   if(!nodes.length){
     var none=document.createElement("p"); none.className="ovw-none";
     none.textContent="아직 기록이 없어요. 한 권을 끝까지 읽거나 쓰면 그날이 여기에 하나씩 이어져요.";
     body.appendChild(none); return;
   }
-  nodes.reverse();   // 세로 연표: 가장 최근이 맨 위 (2026-11-26 사용자 요청)
+  var sv=document.createElement("button"); sv.type="button"; sv.className="walk-save"; sv.id="walkSave";
+  sv.textContent="🖼️ 이미지로 저장"; body.appendChild(sv);
   var wrap=document.createElement("div"); wrap.className="tl tlv";
   var row=document.createElement("ol"); row.className="tl-row";
   nodes.forEach(function(nd,ix){
     var li=document.createElement("li"); li.className="tl-n tl-m"+nd.m;
     li.innerHTML='<span class="tl-d"></span><span class="tl-dot"></span><b class="tl-t"></b><span class="tl-s"></span>';
-    li.querySelector(".tl-d").textContent=nd.d?(nd.d.slice(0,4)===String(new Date().getFullYear())?nd.d.slice(5):nd.d.slice(2)).replace(/-/g,"."):"이전";
-    li.querySelector(".tl-dot").textContent=nd.m==="s"?"🌱":nd.m==="r"?"📖":"✍️";
+    li.querySelector(".tl-d").textContent=walkDate(nd.d);
+    li.querySelector(".tl-dot").textContent=walkIcon(nd.m);
     li.querySelector(".tl-t").textContent=nd.t; li.querySelector(".tl-s").textContent=nd.sub;
     row.appendChild(li);
   });
@@ -1229,6 +1257,85 @@ function histSync(){
     if(sec)sec.scrollIntoView({block:"start",behavior:"smooth"});
   });
 })();
+(function(){
+  var tg=document.getElementById("walkTg"); if(!tg)return;
+  tg.addEventListener("click",function(){walkOpen=!walkOpen;try{localStorage.setItem(KP+"walkopen",walkOpen?"1":"0")}catch(e){}renderWalk()});
+  document.getElementById("walkBody").addEventListener("click",function(e){
+    if(e.target.closest("#walkSave"))saveWalkImage(e.target.closest("#walkSave"));
+  });
+})();
+/* 🖼️ 걸어온 길을 갤럭시 S23 화면 크기(1080×2340) 이미지로 저장. 한 장에 다 안 들어가면 여러 장으로 나눔 (2026-11-26 사용자 요청) */
+var WALK_W=1080, WALK_H=2340;
+function walkPages(n){
+  var top=430, bottom=WALK_H-200, avail=bottom-top, maxH=175, minH=132;
+  var per=Math.max(1,Math.floor(avail/minH)), pages=Math.max(1,Math.ceil(n/per));
+  per=Math.ceil(n/pages);
+  return {pages:pages, per:per, top:top, rowH:Math.min(maxH,Math.floor(avail/per))};
+}
+function walkCanvas(nodes,pg,P,font){
+  var cv=document.createElement("canvas"); cv.width=WALK_W; cv.height=WALK_H;
+  var x=cv.getContext("2d");
+  var g=x.createLinearGradient(0,0,WALK_W*0.4,WALK_H); g.addColorStop(0,"#FFF6E3"); g.addColorStop(.6,"#FBF0DC"); g.addColorStop(1,"#F3E2C8");
+  x.fillStyle=g; x.fillRect(0,0,WALK_W,WALK_H);
+  // 제목
+  x.textBaseline="alphabetic"; x.textAlign="left";
+  x.fillStyle="#8C6200"; x.font="800 68px "+font; x.fillText("👣 걸어온 길",80,250);
+  x.fillStyle="#8A7C68"; x.font="500 36px "+font;
+  var t=new Date(), who=(typeof ME_LABEL==="string"&&ME_LABEL)?ME_LABEL+" · ":"";
+  x.fillText(who+t.getFullYear()+"."+("0"+(t.getMonth()+1)).slice(-2)+"."+("0"+t.getDate()).slice(-2)+" 기준",84,318);
+  if(P.pages>1){x.textAlign="right"; x.fillStyle="#B09A78"; x.font="700 36px "+font; x.fillText((pg+1)+" / "+P.pages,WALK_W-80,250); x.textAlign="left"}
+  x.fillStyle="rgba(140,110,70,.22)"; x.fillRect(80,368,WALK_W-160,3);
+  // 연표
+  var COL={s:"#7DB582",r:"#E2A93B",p:"#8A68C9"}, DCOL={s:"#5E9A64",r:"#C98A12",p:"#7553B8"};
+  var list=nodes.slice(pg*P.per,(pg+1)*P.per), R=P.rowH, dot=Math.min(104,R-26), dx=330, tx=420, maxW=WALK_W-tx-70;
+  function cy(i){return P.top+R*i+R/2}
+  list.forEach(function(nd,i){   // 줄 먼저 (동그라미 뒤로)
+    var last=(i===list.length-1), more=(pg*P.per+i<nodes.length-1);
+    if(last&&!more)return;
+    x.fillStyle=COL[nd.m]+"99"; x.fillRect(dx-4,cy(i),8,last?(R/2+40):R);
+  });
+  list.forEach(function(nd,i){
+    var y=cy(i), c=COL[nd.m];
+    x.beginPath(); x.arc(dx,y,dot/2,0,Math.PI*2); x.fillStyle="#FFF8EA"; x.fill();
+    x.fillStyle=c+"2E"; x.fill(); x.lineWidth=7; x.strokeStyle=c; x.stroke();
+    x.textAlign="center"; x.textBaseline="middle"; x.font=Math.round(dot*0.46)+"px "+font; x.fillStyle="#000";
+    x.fillText(walkIcon(nd.m),dx,y+2);
+    x.textAlign="right"; x.font="700 40px "+font; x.fillStyle=DCOL[nd.m]; x.fillText(walkDate(nd.d),dx-dot/2-26,y);
+    x.textAlign="left"; x.textBaseline="alphabetic";
+    x.font="800 48px "+font; x.fillStyle="#2E2820";
+    var tt=nd.t; if(x.measureText(tt).width>maxW){while(tt.length>1&&x.measureText(tt+"…").width>maxW)tt=tt.slice(0,-1); tt+="…"}
+    x.fillText(tt,tx,y-4);
+    x.font="500 36px "+font; x.fillStyle="#8A7C68"; x.fillText(nd.sub,tx,y+44);
+  });
+  x.textAlign="center"; x.font="600 32px "+font; x.fillStyle="#B8A483";
+  x.fillText("성경 통독표",WALK_W/2,WALK_H-110);
+  return cv;
+}
+function saveWalkImage(btn){
+  var nodes=walkNodes(); if(!nodes.length)return;
+  var font=getComputedStyle(document.body).fontFamily||"sans-serif";
+  var old=btn.textContent; btn.disabled=true; btn.textContent="만드는 중…";
+  var ready=(document.fonts&&document.fonts.ready)?document.fonts.ready:Promise.resolve();
+  ready.then(function(){
+    var P=walkPages(nodes.length), files=[], day=dayKey();
+    var jobs=[];
+    for(var pg=0;pg<P.pages;pg++)(function(pg){
+      var cv=walkCanvas(nodes,pg,P,font);
+      jobs.push(new Promise(function(ok){cv.toBlob(function(b){ok({b:b,name:"걸어온길-"+day+(P.pages>1?"-"+(pg+1):"")+".png"})},"image/png")}));
+    })(pg);
+    return Promise.all(jobs);
+  }).then(function(list){
+    list.forEach(function(it,i){
+      setTimeout(function(){
+        var a=document.createElement("a"); a.href=URL.createObjectURL(it.b); a.download=it.name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function(){URL.revokeObjectURL(a.href)},4000);
+      },i*600);
+    });
+    btn.textContent=list.length>1?"✓ "+list.length+"장 저장":"✓ 저장했어요";
+    setTimeout(function(){btn.textContent=old; btn.disabled=false},2200);
+  }).catch(function(){btn.textContent="만들지 못했어요"; setTimeout(function(){btn.textContent=old; btn.disabled=false},2200)});
+}
 
 
 /* ── 성경 책 찾기 (초성도 됨) ───────────────────── */
