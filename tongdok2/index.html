@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-26-yrplain">
+<meta name="app-build" content="td-2026-11-26-dleft">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -705,6 +705,8 @@ body{background:transparent}
 .ovw-map{background:#FBF4E6!important;border:1px solid rgba(176,138,80,.35)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 1px 2px rgba(120,84,30,.08)!important}
 /* 📅 연도 옆 금빛 점·줄은 뺌 (2026-11-26 사용자 요청) */
 .tlv .tl-yr::after,.tlv .tl-yr span::after{display:none!important;content:none!important}
+/* 📅 날짜를 연도(2026) 왼쪽 끝에 딱 맞춤 (2026-11-26 사용자 요청) */
+.tlv .tl-d{text-align:left!important}
 </style>
 </head>
 <body>
@@ -1392,7 +1394,7 @@ function walkCanvas(nodes,pg,P,font){
     x.fillStyle=c+"2E"; x.fill(); x.lineWidth=Math.max(3,dot*0.0875); x.strokeStyle=c; x.stroke();
     x.textAlign="center"; x.textBaseline="middle"; x.font=Math.round(dot*0.46)+"px "+font; x.fillStyle="#000";
     x.fillText(walkIcon(nd.m),dx,y+2);
-    x.textAlign="right"; x.font="700 "+fs(40)+"px "+font; x.fillStyle=DCOL[nd.m]; x.fillText(walkDate(nd.d),dx-dot/2-26*k,y);
+    x.textAlign="left"; x.font="700 "+fs(40)+"px "+font; x.fillStyle=DCOL[nd.m]; x.fillText(walkDate(nd.d),80,y);   // 연도 왼쪽 끝에 맞춤
     x.textAlign="left"; x.textBaseline="middle";
     x.font="800 "+fs(48)+"px "+font; x.fillStyle="#2E2820";
     var tt=nd.t; if(x.measureText(tt).width>maxW){while(tt.length>1&&x.measureText(tt+"…").width>maxW)tt=tt.slice(0,-1); tt+="…"}
