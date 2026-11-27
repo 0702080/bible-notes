@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-srmpinch">
+<meta name="app-build" content="2026-11-27-srmsmooth">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14560,15 +14560,15 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     srmDrawDepth++; try{srmDrawRaw()}finally{srmDrawDepth--}
     if(!srmDrawDepth)srmLastEdit=srmEdit;
     if(!fx||srmDrawDepth)return;
-    var D=fx.open?320:160, E=fx.open?"cubic-bezier(.25,.8,.25,1)":"cubic-bezier(.2,.7,.25,1)", box=srm.querySelector(".srmbox");   /* 열기: 누른 카드 자리에서 위아래로 펼쳐지며 아래 카드를 밀어냄 (2026-11-27 사용자 요청) */
+    var D=fx.open?520:160, E=fx.open?"cubic-bezier(.45,.05,.2,1)":"cubic-bezier(.2,.7,.25,1)", box=srm.querySelector(".srmbox");   /* 열기: 누른 카드 자리에서 위아래로 펼쳐지며 아래 카드를 밀어냄 (2026-11-27 사용자 요청) */
     try{
       if(fx.open){if(!box||!box.animate||srmEdit!==now)return;
         var br=fx.br, r=fx.r, H=br.height, cT=Math.max(0,r.top-br.top), cB=Math.min(H,r.bottom-br.top), cH=Math.max(1,cB-cT);
         var gT=fx.gT, gB=fx.gB; gT.style.clipPath="inset(0 0 "+(H-cB)+"px 0)"; gB.style.clipPath="inset("+cB+"px 0 0 0)";
         srm.appendChild(gT); srm.appendChild(gB);
         var pos0=box.style.position, z0=box.style.zIndex; if(getComputedStyle(box).position==="static")box.style.position="relative"; box.style.zIndex="2";
-        var a=box.animate([{transform:"translateY("+cT+"px)",clipPath:"inset(0 0 "+(H-cH)+"px 0 round 14px)",opacity:.35},{transform:"none",clipPath:"inset(0 0 0 0 round 0px)",opacity:1}],{duration:D,easing:E});
-        gB.animate([{transform:"none",opacity:1},{transform:"translateY("+(H-cB)+"px)",opacity:.2}],{duration:D,easing:E,fill:"forwards"});
+        var a=box.animate([{transform:"translateY("+cT+"px)",clipPath:"inset(0 0 "+(H-cH)+"px 0 round 14px)",opacity:0},{opacity:.85,offset:.45},{transform:"none",clipPath:"inset(0 0 0 0 round 0px)",opacity:1}],{duration:D,easing:E});
+        gB.animate([{transform:"none",opacity:1},{transform:"translateY("+(H-cB)+"px)",opacity:0}],{duration:D,easing:E,fill:"forwards"});
         gT.animate([{opacity:1},{opacity:0}],{duration:D*.8,easing:E,fill:"forwards"});
         var done=function(){box.style.position=pos0; box.style.zIndex=z0; if(gT.parentNode)gT.remove(); if(gB.parentNode)gB.remove()};
         a.onfinish=a.oncancel=done; setTimeout(done,D+250);
