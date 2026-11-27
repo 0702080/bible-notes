@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-srmfast3">
+<meta name="app-build" content="2026-11-27-srmpush">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14545,7 +14545,11 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     var prev=srmLastEdit, now=srmEdit, box0=srm&&srm.querySelector(".srmbox"), fx=null;
     if(!srmDrawDepth&&box0&&!srm.hidden&&prev!==now&&(!prev||!now)&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){
       try{
-        if(!prev){var cd=box0.querySelector('.srmcard[data-id="'+now+'"]'); if(cd)fx={open:1,r:cd.getBoundingClientRect()}}
+        var mkG=function(br){var g=document.createElement("div"); g.className="srmghostv";
+          g.style.cssText="position:fixed;left:"+br.left+"px;top:"+br.top+"px;width:"+br.width+"px;height:"+br.height+"px;overflow:hidden;pointer-events:none;z-index:1";
+          var inner=document.createElement("div"); inner.style.cssText="transform:translateY("+(-box0.scrollTop)+"px)";
+          [].forEach.call(box0.children,function(k){inner.appendChild(k.cloneNode(true))}); g.appendChild(inner); return g};
+        if(!prev){var cd=box0.querySelector('.srmcard[data-id="'+now+'"]'); if(cd){var bro=box0.getBoundingClientRect(); fx={open:1,r:cd.getBoundingClientRect(),br:bro,gT:mkG(bro),gB:mkG(bro)}}}
         else{var br=box0.getBoundingClientRect(), g=document.createElement("div"); g.className="srmghostv";
           g.style.cssText="position:fixed;left:"+br.left+"px;top:"+br.top+"px;width:"+br.width+"px;height:"+br.height+"px;overflow:hidden;pointer-events:none;z-index:50;transform-origin:0 0";
           var inner=document.createElement("div"); inner.style.cssText="transform:translateY("+(-box0.scrollTop)+"px)";
@@ -14556,13 +14560,18 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     srmDrawDepth++; try{srmDrawRaw()}finally{srmDrawDepth--}
     if(!srmDrawDepth)srmLastEdit=srmEdit;
     if(!fx||srmDrawDepth)return;
-    var D=fx.open?110:160, E="cubic-bezier(.2,.7,.25,1)", box=srm.querySelector(".srmbox");   /* 더 빠르게 (2026-11-27 사용자 요청) */
+    var D=fx.open?320:160, E=fx.open?"cubic-bezier(.25,.8,.25,1)":"cubic-bezier(.2,.7,.25,1)", box=srm.querySelector(".srmbox");   /* 열기: 누른 카드 자리에서 위아래로 펼쳐지며 아래 카드를 밀어냄 (2026-11-27 사용자 요청) */
     try{
       if(fx.open){if(!box||!box.animate||srmEdit!==now)return;
-        var b=box.getBoundingClientRect(), r=fx.r, sc=Math.max(.3,Math.min(1,r.width/b.width));
-        box.style.transformOrigin="0 0";
-        var a=box.animate([{transform:"translate("+(r.left-b.left)+"px,"+(r.top-b.top)+"px) scale("+sc+")",opacity:0},{transform:"none",opacity:1}],{duration:D,easing:E});
-        a.onfinish=a.oncancel=function(){box.style.transformOrigin=""};
+        var br=fx.br, r=fx.r, H=br.height, cT=Math.max(0,r.top-br.top), cB=Math.min(H,r.bottom-br.top), cH=Math.max(1,cB-cT);
+        var gT=fx.gT, gB=fx.gB; gT.style.clipPath="inset(0 0 "+(H-cB)+"px 0)"; gB.style.clipPath="inset("+cB+"px 0 0 0)";
+        srm.appendChild(gT); srm.appendChild(gB);
+        var pos0=box.style.position, z0=box.style.zIndex; if(getComputedStyle(box).position==="static")box.style.position="relative"; box.style.zIndex="2";
+        var a=box.animate([{transform:"translateY("+cT+"px)",clipPath:"inset(0 0 "+(H-cH)+"px 0 round 14px)",opacity:.35},{transform:"none",clipPath:"inset(0 0 0 0 round 0px)",opacity:1}],{duration:D,easing:E});
+        gB.animate([{transform:"none",opacity:1},{transform:"translateY("+(H-cB)+"px)",opacity:.2}],{duration:D,easing:E,fill:"forwards"});
+        gT.animate([{opacity:1},{opacity:0}],{duration:D*.8,easing:E,fill:"forwards"});
+        var done=function(){box.style.position=pos0; box.style.zIndex=z0; if(gT.parentNode)gT.remove(); if(gB.parentNode)gB.remove()};
+        a.onfinish=a.oncancel=done; setTimeout(done,D+250);
         var ft=srm.querySelector(".srmfoot"); if(ft&&!ft.hidden&&ft.animate)ft.animate([{opacity:0},{opacity:1}],{duration:D,easing:E,fill:"backwards"});
       }else{var g=fx.g; if(srmEdit||!box){return}
         var cd=box.querySelector('.srmcard[data-id="'+prev+'"]');
@@ -14575,7 +14584,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
         var ga=g.animate([{transform:"none",opacity:1},{transform:to,opacity:0}],{duration:D,easing:E,fill:"forwards"});
         var rm=function(){if(g.parentNode)g.remove()}; ga.onfinish=ga.oncancel=rm; setTimeout(rm,D+250);
       }
-    }catch(e){if(fx.g&&fx.g.parentNode)fx.g.remove()}
+    }catch(e){[fx.g,fx.gT,fx.gB].forEach(function(q){if(q&&q.parentNode)q.remove()})}
   }
   function srmDrawRaw(){
     setTimeout(srmHistSync,0);
