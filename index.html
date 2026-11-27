@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-ccswlist">
+<meta name="app-build" content="2026-11-27-calrev">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -24495,7 +24495,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     try{icData().items.forEach(function(x){add(+x.at,"ic",x.name,x.name+(calPray(x.memo,30)?" · "+calPray(x.memo,30):""),function(){openIntercede()},"ic:"+x.id); if(x.ans>1e12)add(+x.ans,"ans",x.name,x.name,function(){openIntercede()})})}catch(e){}
     try{p1Data().items.forEach(function(x){if(!x.t.trim())return; add(+x.at,"p1",calPray(x.t,12),calPray(x.t),function(){openPrayRead()},"p1:"+x.id); if(x.ans>1e12)add(+x.ans,"ans",calLine(x.t,12),calLine(x.t),function(){openPrayRead()})})}catch(e){}
     try{hymData().items.forEach(function(x){add(+x.at,"hym",x.title||"찬양",(x.no?"찬송가 "+x.no+"장 · ":"")+(x.title||""),function(){openHymn(x.id)},"hym:"+x.id)})}catch(e){}
-    Object.keys(M).forEach(function(d){M[d].sort(function(a,b){return a.at-b.at})});
+    Object.keys(M).forEach(function(d){M[d].sort(function(a,b){return b.at-a.at})});   // 최근 것이 맨 위 (2026-11-27 사용자 요청)
     return M;
   }
   function calHGet(){var v=0; try{v=+localStorage.getItem("bible-cal-h")||0}catch(e){} return v>0.15&&v<1?v:0.5}
@@ -24647,7 +24647,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     ls.textContent="";
     if(!L.length){var em=document.createElement("div"); em.className="calempty"; em.textContent="담은 것이 없어요."; ls.appendChild(em)}
     var LL=L, KO=Object.keys(CALT);
-    if(byK&&L.length>1){LL=L.slice().sort(function(a,b){return KO.indexOf(a.k)-KO.indexOf(b.k)||(a.at||0)-(b.at||0)})}
+    if(byK&&L.length>1){LL=L.slice().sort(function(a,b){return KO.indexOf(a.k)-KO.indexOf(b.k)||(b.at||0)-(a.at||0)})}
     var lastK=null, cnt={}; L.forEach(function(x){cnt[x.k]=(cnt[x.k]||0)+1});
     LL.forEach(function(x){
       if(byK&&L.length>1&&x.k!==lastK){lastK=x.k; var gh=document.createElement("div"); gh.className="calgh"; gh.style.setProperty("--cc",CALT[x.k][2]); var gsv=x.k==="scene"&&document.querySelector("#openSceneBtn .scnico"); if(gsv){gh.appendChild(gsv.cloneNode(true)); gh.appendChild(document.createTextNode(" "+CALT[x.k][1]+"  "+cnt[x.k]))} else gh.textContent=CALT[x.k][0]+" "+CALT[x.k][1]+"  "+cnt[x.k]; ls.appendChild(gh)}   /* 종류별 머리도 장면은 해·산 그림 (2026-11-26 사용자 요청) */var t=CALT[x.k], r=document.createElement("div"); r.className="calit"; r.style.setProperty("--cc",t[2]); r._go=x.go;
