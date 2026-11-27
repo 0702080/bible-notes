@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-27-fade">
+<meta name="app-build" content="td-2026-11-27-cardslide">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1270,6 +1270,29 @@ function logRead(d,isP){
   }
 }
 var ovwOpen=false;
+/* ↕ 전체 진행표·걸어온 길 카드도 위아래로 미끄러지며 페이드 인·아웃 (2026-11-27 사용자 요청) */
+function cardSlide(card,body,open,render){
+  var rm=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if(card._fa){clearTimeout(card._fa); card._fa=0; card.style.transition=card.style.height=card.style.overflow=""; body.style.opacity=body.style.transition=""; if(card._fin){var f0=card._fin; card._fin=null; f0()}}
+  if(rm){render();return}
+  var h0=card.getBoundingClientRect().height;
+  function done(){card.style.transition=card.style.height=card.style.overflow=""; body.style.opacity=body.style.transition=""; card._fa=0}
+  if(open){
+    render(); var h1=card.getBoundingClientRect().height;
+    card.style.overflow="hidden"; card.style.height=h0+"px"; body.style.transition="none"; body.style.opacity="0"; void card.offsetHeight;
+    card.style.transition="height .4s cubic-bezier(.2,.8,.2,1)"; card.style.height=h1+"px";
+    body.style.transition="opacity .4s ease-in .06s"; body.style.opacity="1";
+    card._fa=setTimeout(done,480);
+  }else{
+    var tg=card.querySelector(".ovw-tg"), cs=getComputedStyle(card);
+    var h1=tg.getBoundingClientRect().height+parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom)+parseFloat(cs.borderTopWidth)+parseFloat(cs.borderBottomWidth);
+    if(tg.setAttribute)tg.setAttribute("aria-expanded","false");
+    card.style.overflow="hidden"; card.style.height=h0+"px"; void card.offsetHeight;
+    card.style.transition="height .36s cubic-bezier(.2,.8,.2,1)"; card.style.height=h1+"px";
+    body.style.transition="opacity .24s ease-out"; body.style.opacity="0";
+    card._fin=render; card._fa=setTimeout(function(){var f=card._fin; card._fin=null; if(f)f(); done()},380);
+  }
+}
 function renderOverview(){
   var body=document.getElementById("ovwBody"); if(!body)return;
   var tg=document.getElementById("ovwTg");
@@ -1383,7 +1406,7 @@ function histSync(){
 }
 (function(){
   var tg=document.getElementById("ovwTg"); if(!tg)return;
-  tg.addEventListener("click",function(){ovwOpen=!ovwOpen;renderOverview()});
+  tg.addEventListener("click",function(){ovwOpen=!ovwOpen;cardSlide(document.getElementById("ovw"),document.getElementById("ovwBody"),ovwOpen,renderOverview)});
   var body=document.getElementById("ovwBody");
   body.addEventListener("click",function(e){
     if(e.target.closest("#ovwSave")){saveOvwImage(e.target.closest("#ovwSave"));return}
@@ -1395,7 +1418,7 @@ function histSync(){
 })();
 (function(){
   var tg=document.getElementById("walkTg"); if(!tg)return;
-  tg.addEventListener("click",function(){walkOpen=!walkOpen;try{localStorage.setItem(KP+"walkopen",walkOpen?"1":"0")}catch(e){}renderWalk()});
+  tg.addEventListener("click",function(){walkOpen=!walkOpen;try{localStorage.setItem(KP+"walkopen",walkOpen?"1":"0")}catch(e){}cardSlide(document.getElementById("walk"),document.getElementById("walkBody"),walkOpen,renderWalk)});
   document.getElementById("walkBody").addEventListener("click",function(e){
     if(e.target.closest("#walkSave"))saveWalkImage(e.target.closest("#walkSave"));
   });
