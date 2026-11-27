@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-27-walkwide">
+<meta name="app-build" content="td-2026-11-27-celonce">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1864,21 +1864,25 @@ function maybeCheer(bi,c){
 }
 
 /* 달라진 만큼만 축하한다 */
+// 한 번 본 축하 창은 다시 안 띄움 — 체크를 풀었다 다시 해도 (2026-11-27 사용자 요청), 통독·필사 따로 이 기기에 기억
+var CEL_SEEN_KEY=KP+"celseen", celSeen={};
+try{celSeen=JSON.parse(localStorage.getItem(CEL_SEEN_KEY)||"{}")||{}}catch(e){celSeen={}}
+function celOnce(k){k=(pMode?"p:":"r:")+k; if(celSeen[k])return false; celSeen[k]=1; try{localStorage.setItem(CEL_SEEN_KEY,JSON.stringify(celSeen))}catch(e){} return true}
 function checkMilestones(before,after,finishedBooks){
   // 책 한 권 완독 축하 창은 뺌 (2026-10-24 사용자 요청)
   for(var m=0;m<MILES.length;m++){
     var x=MILES[m];
-    if(before<x.n&&after>=x.n){
+    if(before<x.n&&after>=x.n&&celOnce(x.n)){
       pushCel({icon:x.n===TOTAL?"♕":"✦",t:x.t,
         s:after+" / "+TOTAL+"장을 읽었어요.",b:x.b,r:x.r});
     }
   }
   var obT=countRange(me,0,OT_TOTAL);
-  if(obT===OT_TOTAL&&before<after&&lastOT!==OT_TOTAL)
+  if(obT===OT_TOTAL&&before<after&&lastOT!==OT_TOTAL&&celOnce("ot"))
     pushCel({icon:"✵",t:"구약 39권 완독",s:OT_TOTAL+"장을 모두 읽었어요.",
       b:"긴 길을 끝까지 걸어오셨어요. 그 수고를 하나님이 아십니다.",r:"시편 126:5"});
   var nbT=countRange(me,OT_TOTAL,TOTAL);
-  if(nbT===NT_TOTAL&&before<after&&lastNT!==NT_TOTAL)
+  if(nbT===NT_TOTAL&&before<after&&lastNT!==NT_TOTAL&&celOnce("nt"))
     pushCel({icon:"✵",t:"신약 27권 완독",s:NT_TOTAL+"장을 모두 읽었어요.",
       b:"끝까지 읽어 내신 그 마음에 기쁨이 가득하기를.",r:"요한복음 20:31"});
   lastOT=obT;lastNT=nbT;
