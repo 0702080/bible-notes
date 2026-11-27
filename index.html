@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-sayfade3">
+<meta name="app-build" content="2026-11-27-sayfade5">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -18420,6 +18420,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
         var h1=c.getBoundingClientRect().height; if(!h1||Math.abs(h1-p0.h)<2)return;
         var open=!c.classList.contains("sayfolded"), D=open?520:440, E="cubic-bezier(.45,.05,.25,1)";
         var old=p0.el.cloneNode(true); old.removeAttribute("data-id"); old.classList.add("sayghost");
+        [].forEach.call(old.querySelectorAll(".sayf,.saypgno,button"),function(b){b.style.visibility="hidden"});   // 겹친 예전 모습엔 단추를 빼서 아이콘은 제자리에서 위아래로만 (2026-11-27 사용자 요청: 좌우로 움직여 보임)
         old.style.cssText+=";position:absolute;left:0;top:0;width:100%;height:"+p0.h+"px;margin:0;pointer-events:none;z-index:2;box-sizing:border-box";
         var cs=getComputedStyle(c), bl=parseFloat(cs.borderLeftWidth)||0, bt=parseFloat(cs.borderTopWidth)||0;
         old.style.left=(-bl)+"px"; old.style.top=(-bt)+"px"; old.style.width=c.offsetWidth+"px";
@@ -18427,6 +18428,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
         c.style.overflow="hidden"; c.appendChild(old);
         var an=c.animate([{height:p0.h+"px"},{height:h1+"px"}],{duration:D,easing:E});
         old.animate([{opacity:1},{opacity:0}],{duration:D,easing:E,fill:"forwards"});
+        [].forEach.call(c.querySelectorAll(":scope>.sayf,:scope .saypgno"),function(k){if(old.contains(k))return; k.animate([{transform:"translateY("+(p0.h-h1)+"px)"},{transform:"none"}],{duration:D,easing:E})});   // 아이콘 줄은 카드 아래끝을 따라 위아래로만 (2026-11-27 사용자 요청)
         [].forEach.call(c.children,function(k){if(k===old||k.classList.contains("sayf"))return; var op=getComputedStyle(k).opacity; if(op==="0")return;
           k.animate([{opacity:0},{opacity:op}],{duration:D,easing:E,fill:"backwards"})});
         function done(){c.style.overflow=""; c.style.position=pos0; if(old.parentNode)old.remove()}
