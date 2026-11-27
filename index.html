@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-srmpush">
+<meta name="app-build" content="2026-11-27-srmpinch">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14586,6 +14586,25 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       }
     }catch(e){[fx.g,fx.gT,fx.gB].forEach(function(q){if(q&&q.parentNode)q.remove()})}
   }
+  /* 🤏 설교 메모·성경 본문: 메모를 연 동안 두 손가락으로 오므리면(좁히면) 목록으로 — 오므리는 만큼 메모가 살짝 작아지며 따라옴 (2026-11-27 사용자 요청) */
+  (function(){var P=null;
+    function dist(t){var a=t[0],b=t[1];return Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY)}
+    function reset(){var bx=srm&&srm.querySelector(".srmbox"); if(bx){bx.style.transform="";bx.style.transformOrigin="";bx.style.opacity=""}}
+    document.addEventListener("touchstart",function(e){
+      if(!srm||srm.hidden||!srmEdit||e.touches.length!==2||!srm.contains(e.target)){if(P&&e.touches.length!==2){P=null;reset()}return}
+      P={d0:dist(e.touches),done:false};
+    },{capture:true,passive:true});
+    document.addEventListener("touchmove",function(e){
+      if(!P||P.done||e.touches.length!==2)return;
+      var r=dist(e.touches)/Math.max(1,P.d0); if(r>=1){reset();return}
+      e.preventDefault();
+      var bx=srm.querySelector(".srmbox"); if(bx){bx.style.transformOrigin="50% 40%"; bx.style.transform="scale("+Math.max(.86,.5+r*.5)+")"; bx.style.opacity=String(Math.max(.55,r))}
+      if(r<.62){P.done=true; reset(); try{buzz(12)}catch(err){}
+        try{if(srmResp)srmRespFlush()}catch(err){} try{srmCommit()}catch(err){} srmResp=false; srmEdit=""; srmDraw()}
+    },{capture:true,passive:false});
+    document.addEventListener("touchend",function(e){if(P&&e.touches.length<2){if(!P.done)reset(); P=null}},{capture:true,passive:true});
+    document.addEventListener("touchcancel",function(){if(P){if(!P.done)reset(); P=null}},{capture:true,passive:true});
+  })();
   function srmDrawRaw(){
     setTimeout(srmHistSync,0);
     var box=srm.querySelector(".srmbox"), foot=srm.querySelector(".srmfoot"); box.textContent=""; foot.textContent=""; foot.hidden=!srmEdit;
