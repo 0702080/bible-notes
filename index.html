@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-calmem">
+<meta name="app-build" content="2026-11-27-ptalign">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -9323,6 +9323,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       var mic=document.querySelector(".micbtn"), hasMic=mic&&!mic.hidden;
       cb.style.left=Math.max(4,Math.min(innerWidth-48,r.right-46-sbw)-(hasMic?48:0))+"px";
       cb.style.top=Math.max(vt+4,Math.min(innerHeight-48,vb-48))+"px";
+      if(window.__cpyMoved)window.__cpyMoved();
     }
     document.addEventListener("focusin",function(e){var t=e.target; if(skip(t))return; ta=t; setTimeout(place,0)});
     document.addEventListener("focusout",function(e){if(e.target===ta)setTimeout(function(){if(document.activeElement!==ta){cb.hidden=true; ta=null}},150)});
@@ -16142,7 +16143,11 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   }
   /* PRAY_TOP 은 위(IC_HEAD 옆)에서 정한다 */
   function prayNz(s){return String(s||"").replace(/\s+/g,"")}
-  function ptensePlace(d){var b=d&&d.querySelector(".ptense"), t=d&&d.querySelector(".pt"); if(!b)return; if(!d.classList.contains("editing")||!t){b.style.top="";return} b.style.top=Math.max(8,t.offsetTop+t.offsetHeight-48)+"px"}
+  function ptensePlace(d){var b=d&&d.querySelector(".ptense"), t=d&&d.querySelector(".pt"); if(!b)return; if(!d.classList.contains("editing")||!t){b.style.top="";return}
+    var cb=document.querySelector(".cpybtn"), op=b.offsetParent;   /* 🕯 구함 알약은 떠 있는 📋와 세로 가운데를 맞춤 (2026-11-27 사용자 요청: 수평 정렬) */
+    if(cb&&!cb.hidden&&op&&document.activeElement===t){var cr=cb.getBoundingClientRect(), orr=op.getBoundingClientRect(); b.style.top=(cr.top+cr.height/2-orr.top-op.clientTop-b.offsetHeight/2)+"px"; return}
+    b.style.top=Math.max(8,t.offsetTop+t.offsetHeight-48)+"px"}
+  window.__cpyMoved=function(){var t=document.activeElement; if(t&&t.classList&&t.classList.contains("pt"))ptensePlace(t.closest(".pri"))};
   ["focusin","input"].forEach(function(ev){document.addEventListener(ev,function(e){var t=e.target; if(t&&t.classList&&t.classList.contains("pt")){var d=t.closest(".pri"); requestAnimationFrame(function(){ptensePlace(d)}); setTimeout(function(){ptensePlace(d)},350)}})});
   window.addEventListener("resize",function(){var t=document.activeElement; if(t&&t.classList&&t.classList.contains("pt"))ptensePlace(t.closest(".pri"))});
   function ptenseSync(d,v){var b=d&&d.querySelector(".ptense"); if(!b)return; ptensePlace(d); var c=icIsC(v); b.hidden=!icHasTop(v); b.classList.toggle("on",c); b.textContent=c?"✨ 고백":"🕯 구함"; b.title=c?"믿음의 고백 — 누르면 구하는 기도로":"구하는 기도 — 누르면 믿음의 고백으로"}
