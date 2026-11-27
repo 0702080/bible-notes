@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-srmfade">
+<meta name="app-build" content="2026-11-27-sayaddfocus">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -18373,7 +18373,11 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       say.querySelector(".saylock").addEventListener("click",function(){sayLocked=!sayLocked; try{localStorage.setItem("bible-say-lock",sayLocked?"1":"")}catch(e){} buzz(10); toast(sayLocked?"📌 카드를 고정했어요":"이제 카드를 끌어서 옮길 수 있어요"); drawSay()});
       say.querySelector(".saysearch").addEventListener("input",function(){sayQ=this.value.trim(); drawSay()});
       say.querySelector(".sayadd").addEventListener("pointerdown",function(e){var fm=say.querySelector(".sayform"); if(sayEdit&&fm&&!fm.hidden&&document.activeElement&&fm.contains(document.activeElement))e.preventDefault()});   /* 적는 중 담기를 눌러도 키보드가 먼저 내려가며 화면이 밀려 누름이 빗나가지 않게 (2026-11-14) */
-      say.querySelector(".sayadd").addEventListener("click",function(){var fm=say.querySelector(".sayform"), ft=fm&&!fm.hidden&&fm.querySelector(".sayt"), fs=fm&&fm.querySelector(".saysave"); if(sayEdit&&ft&&fs&&ft.value.trim()){if(document.activeElement)document.activeElement.blur(); fs.click(); return}   /* 적는 중에 위 담기를 누르면 적은 것을 저장 (2026-11-14 사용자 요청) */ sayEdit="new";drawSay();var ta=say.querySelector(".sayt");if(ta)setTimeout(function(){ta.focus()},30)});
+      say.querySelector(".sayadd").addEventListener("click",function(){var fm=say.querySelector(".sayform"), ft=fm&&!fm.hidden&&fm.querySelector(".sayt"), fs=fm&&fm.querySelector(".saysave"); if(sayEdit&&ft&&fs&&ft.value.trim()){if(document.activeElement)document.activeElement.blur(); fs.click(); return}   /* 적는 중에 위 담기를 누르면 적은 것을 저장 (2026-11-14 사용자 요청) */ sayEdit="new";drawSay();   /* + 누르면 바로 적는 칸에 커서·키보드 (2026-11-27 사용자 요청) — 줄 칸 고치기면 숨은 .sayt 대신 첫 줄 칸(.sayle)에 */
+        var pick=function(){var f=say.querySelector(".sayform"); if(!f)return null; var t=f.querySelector("textarea.sayle"); if(t&&t.offsetParent)return t; t=f.querySelector("textarea.sayt"); return t&&t.offsetParent?t:null};
+        var ta=pick(); if(ta){try{ta.focus({preventScroll:true})}catch(e){ta.focus()} try{var n=ta.value.length; ta.setSelectionRange(n,n)}catch(e){}}
+        var bx=say.querySelector(".saybox")||say; try{bx.scrollTop=0}catch(e){}
+        setTimeout(function(){var t2=pick(); if(t2&&document.activeElement!==t2){try{t2.focus({preventScroll:true})}catch(e){t2.focus()}}},60)});
       say.querySelector(".saybox").addEventListener("click",sayClick);
       sayDragInit();
       say.querySelector(".saybox").addEventListener("paste",function(e){
