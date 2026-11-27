@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-caledit">
+<meta name="app-build" content="2026-11-27-sayfade">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -18409,7 +18409,25 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     l.addEventListener("click",function(e){var b=e.target.closest("[data-nt]"); if(!b)return; e.preventDefault(); e.stopPropagation(); sel.value=b.dataset.nt; sel.dispatchEvent(new Event("change",{bubbles:true})); sync(); l.hidden=true; buzz(8); q.blur()});
     return w;
   }
+  /* ↕ 한 마디·은혜·장면·짧은 말씀 카드 접기·펼치기도 부드럽게 미끄러지며 페이드 인 (2026-11-27 사용자 요청) */
   function drawSay(){
+    var pre=null;
+    try{if(say&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){pre={}; [].forEach.call(say.querySelectorAll(".saycard[data-id]"),function(c){pre[c.dataset.id]={f:c.classList.contains("sayfolded"),h:c.getBoundingClientRect().height}})}}catch(e){pre=null}
+    var r=drawSayRaw.apply(this,arguments);
+    if(pre&&say)try{
+      [].forEach.call(say.querySelectorAll(".saycard[data-id]"),function(c){
+        var p0=pre[c.dataset.id]; if(!p0||p0.f===c.classList.contains("sayfolded")||!c.animate)return;
+        var h1=c.getBoundingClientRect().height; if(!h1||Math.abs(h1-p0.h)<2)return;
+        var open=!c.classList.contains("sayfolded");
+        c.style.overflow="hidden";
+        var an=c.animate([{height:p0.h+"px"},{height:h1+"px"}],{duration:open?380:320,easing:"cubic-bezier(.2,.8,.2,1)"});
+        an.onfinish=an.oncancel=function(){c.style.overflow=""};
+        [].forEach.call(c.children,function(k){if(k.classList.contains("sayf"))return; k.animate([{opacity:0,transform:"translateY("+(open?-6:4)+"px)"},{opacity:1,transform:"none"}],{duration:open?420:300,delay:open?60:0,easing:"ease-out",fill:"backwards"})});
+      });
+    }catch(e){}
+    return r;
+  }
+  function drawSayRaw(){
     if(!say)return;
     var ua=document.activeElement; if(ua&&ua.classList&&ua.classList.contains("sayuse")&&say.contains(ua)){sayUsePend=true; return}   // 뒷면에 적는 중엔 다시 그리지 않음
     var fa=document.activeElement, fm0=say.querySelector(".sayform");
