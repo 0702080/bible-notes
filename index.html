@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-srmfast2">
+<meta name="app-build" content="2026-11-27-srmfast3">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -14556,7 +14556,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     srmDrawDepth++; try{srmDrawRaw()}finally{srmDrawDepth--}
     if(!srmDrawDepth)srmLastEdit=srmEdit;
     if(!fx||srmDrawDepth)return;
-    var D=fx.open?180:160, E="cubic-bezier(.2,.7,.25,1)", box=srm.querySelector(".srmbox");   /* 더 빠르게 (2026-11-27 사용자 요청) */
+    var D=fx.open?110:160, E="cubic-bezier(.2,.7,.25,1)", box=srm.querySelector(".srmbox");   /* 더 빠르게 (2026-11-27 사용자 요청) */
     try{
       if(fx.open){if(!box||!box.animate||srmEdit!==now)return;
         var b=box.getBoundingClientRect(), r=fx.r, sc=Math.max(.3,Math.min(1,r.width/b.width));
