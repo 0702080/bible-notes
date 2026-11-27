@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-pdlalign">
+<meta name="app-build" content="2026-11-27-ccswlist">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -12036,9 +12036,18 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
         if(!e.target.closest(".ccverse"))ccGapMoved=false;   // 말씀 밖에서 시작한 밀기는 빈 줄 끌기가 아님
         sw=false; if(!C||C.edit||C.revealing||e.button>0)return;
         if(e.target.closest("button,textarea,input,a,.ccfoot"))return;
-        sx=e.clientX; sy=e.clientY; sw=true;
+        sx=e.clientX; sy=e.clientY; sw=true; ccSwOut=ccOutside(e.clientX,e.clientY,e.target);
       });
-      var swAt=0;
+      var swAt=0, ccSwOut=false;   // 말씀 밖 빈 곳에서 시작한 밀기인지 (2026-11-27)
+      function ccOutside(x,y,t){   // 말씀 글자·구절 이름 둘레(16px)보다 밖이면 빈 곳
+        if(t&&t.closest&&t.closest(".ccvref,.ccnum,.ccres,.ccsteps,.bqbar,.cceye"))return false;
+        var v=ccBox.querySelector(".ccverse"); if(!v)return true;
+        var T=1e9,B=-1e9,L=1e9,R=-1e9;
+        v.querySelectorAll(".ccw,.ccvn").forEach(function(w){var r=w.getBoundingClientRect(); if(!r.height)return; T=Math.min(T,r.top);B=Math.max(B,r.bottom);L=Math.min(L,r.left);R=Math.max(R,r.right)});
+        if(B<T){var r0=v.getBoundingClientRect();T=r0.top;B=r0.bottom;L=r0.left;R=r0.right}
+        var hd=ccBox.querySelector(".ccvref"); if(hd){var rh=hd.getBoundingClientRect(); if(rh.height)T=Math.min(T,rh.top)}
+        return !(y>=T-16&&y<=B+16&&x>=L-16&&x<=R+16);
+      }
       // 👁 말씀이 길어 화면이 스크롤될 때는 위아래 밀기가 스크롤이 되므로, 오른쪽 아래 떠 있는 단추로 ○○○ ↔ 말씀 전체 보기 (2026-11-01 사용자 요청)
       var eye=document.createElement("button"); eye.type="button"; eye.className="cceye"; eye.hidden=true;
       ccBox.insertBefore(eye,ccBox.querySelector(".ccfoot"));   // 말씀 아래 화면 맨 밑 가운데에 고정 (2026-11-01 사용자 요청)
@@ -12051,14 +12060,15 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
           var vv=ccBox.querySelector(".ccverse"); var cb=ccBox.querySelector(".ccbody"); if(!vv||!vv.querySelector(".ccw.hid")||C.paint||(cb&&cb.scrollHeight>cb.clientHeight+2))return;   // 말씀이 길어 화면이 스크롤되면 그냥 스크롤
           swAt=Date.now(); ccToggleAll(); return;
         }
-        if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3&&Date.now()-swAt>600){swAt=Date.now();try{window.getSelection().removeAllRanges()}catch(err){} if(dx<0)ccGoNext();else ccGoPrev()}}
+        if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3&&Date.now()-swAt>600){swAt=Date.now();try{window.getSelection().removeAllRanges()}catch(err){} if(dx<0&&ccSwOut){buzz(12);closeCoach();return}   // 말씀 밖 빈 곳을 왼쪽으로 밀면 목록으로 (2026-11-27 사용자 요청)
+          if(dx<0)ccGoNext();else ccGoPrev()}}
       ccBox.addEventListener("pointerup",function(e){
         if(!sw||!C||C.edit)return; sw=false; ccSwipe(e.clientX-sx,e.clientY-sy);
       });
       ccBox.addEventListener("pointercancel",function(){sw=false});
       // 휴대폰: 손가락 밀기는 터치로도 한 번 더 받아 둔다 (브라우저가 포인터를 중간에 끊어도 넘어가게)
       var tx0=0,ty0=0,tOn=false;
-      ccBox.addEventListener("touchstart",function(e){tOn=false;if(!C||C.edit||C.revealing||e.touches.length!==1||e.target.closest("button,textarea,input,a,.ccfoot"))return;tx0=e.touches[0].clientX;ty0=e.touches[0].clientY;tOn=true},{passive:true});
+      ccBox.addEventListener("touchstart",function(e){tOn=false;if(!C||C.edit||C.revealing||e.touches.length!==1||e.target.closest("button,textarea,input,a,.ccfoot"))return;tx0=e.touches[0].clientX;ty0=e.touches[0].clientY;tOn=true;ccSwOut=ccOutside(e.touches[0].clientX,e.touches[0].clientY,e.target)},{passive:true});
       ccBox.addEventListener("touchend",function(e){if(!tOn||!C||C.edit)return;tOn=false;var t=e.changedTouches[0];ccSwipe(t.clientX-tx0,t.clientY-ty0)},{passive:true});
       ccBox.querySelector(".ccfoot").addEventListener("click",function(e){var b=e.target.closest("button");if(b&&!b.disabled)ccAct(b.dataset.a)});
       // 위 단계 줄(읽기·첫 글자·가리기·떠올리기)을 누르면 그 단계부터 연습 (2026-10-23 사용자 요청)
