@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-sayfade2">
+<meta name="app-build" content="2026-11-27-sayfade3">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -18409,21 +18409,28 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     l.addEventListener("click",function(e){var b=e.target.closest("[data-nt]"); if(!b)return; e.preventDefault(); e.stopPropagation(); sel.value=b.dataset.nt; sel.dispatchEvent(new Event("change",{bubbles:true})); sync(); l.hidden=true; buzz(8); q.blur()});
     return w;
   }
-  /* ↕ 한 마디·은혜·장면·짧은 말씀 카드 접기·펼치기도 부드럽게 미끄러지며 페이드 인 (2026-11-27 사용자 요청) */
+  /* ↕ 한 마디·은혜·장면·짧은 말씀 카드 접기·펼치기: 카드 높이와 글이 같은 시간·같은 곡선으로 함께 — 예전 모습은 겹쳐서 페이드 아웃, 새 모습은 페이드 인 (2026-11-27 사용자 요청) */
   function drawSay(){
     var pre=null;
-    try{if(say&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){pre={}; [].forEach.call(say.querySelectorAll(".saycard[data-id]"),function(c){pre[c.dataset.id]={f:c.classList.contains("sayfolded"),h:c.getBoundingClientRect().height}})}}catch(e){pre=null}
+    try{if(say&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){pre={}; [].forEach.call(say.querySelectorAll(".saycard[data-id]"),function(c){pre[c.dataset.id]={f:c.classList.contains("sayfolded"),h:c.getBoundingClientRect().height,el:c}})}}catch(e){pre=null}
     var r=drawSayRaw.apply(this,arguments);
     if(pre&&say)try{
       [].forEach.call(say.querySelectorAll(".saycard[data-id]"),function(c){
         var p0=pre[c.dataset.id]; if(!p0||p0.f===c.classList.contains("sayfolded")||!c.animate)return;
         var h1=c.getBoundingClientRect().height; if(!h1||Math.abs(h1-p0.h)<2)return;
-        var open=!c.classList.contains("sayfolded");
-        c.style.overflow="hidden";
-        var an=c.animate([{height:p0.h+"px"},{height:h1+"px"}],{duration:open?520:380,easing:"cubic-bezier(.45,.05,.25,1)"});   // 처음부터 천천히 가속해 부드럽게 (2026-11-27 사용자 요청: 딱 끊어지듯 열림)
-        an.onfinish=an.oncancel=function(){c.style.overflow=""};
-        [].forEach.call(c.children,function(k){if(k.classList.contains("sayf"))return; var op=getComputedStyle(k).opacity; if(op==="0")return;   // 끝 투명도는 원래 값 그대로 — 1까지 갔다가 툭 흐려지던 것
-          k.animate([{opacity:0,transform:"translateY("+(open?-8:4)+"px)"},{opacity:op,transform:"none"}],{duration:open?560:320,delay:open?80:0,easing:"cubic-bezier(.3,0,.2,1)",fill:"backwards"})});
+        var open=!c.classList.contains("sayfolded"), D=open?520:440, E="cubic-bezier(.45,.05,.25,1)";
+        var old=p0.el.cloneNode(true); old.removeAttribute("data-id"); old.classList.add("sayghost");
+        old.style.cssText+=";position:absolute;left:0;top:0;width:100%;height:"+p0.h+"px;margin:0;pointer-events:none;z-index:2;box-sizing:border-box";
+        var cs=getComputedStyle(c), bl=parseFloat(cs.borderLeftWidth)||0, bt=parseFloat(cs.borderTopWidth)||0;
+        old.style.left=(-bl)+"px"; old.style.top=(-bt)+"px"; old.style.width=c.offsetWidth+"px";
+        var pos0=c.style.position; if(cs.position==="static")c.style.position="relative";
+        c.style.overflow="hidden"; c.appendChild(old);
+        var an=c.animate([{height:p0.h+"px"},{height:h1+"px"}],{duration:D,easing:E});
+        old.animate([{opacity:1},{opacity:0}],{duration:D,easing:E,fill:"forwards"});
+        [].forEach.call(c.children,function(k){if(k===old||k.classList.contains("sayf"))return; var op=getComputedStyle(k).opacity; if(op==="0")return;
+          k.animate([{opacity:0},{opacity:op}],{duration:D,easing:E,fill:"backwards"})});
+        function done(){c.style.overflow=""; c.style.position=pos0; if(old.parentNode)old.remove()}
+        an.onfinish=an.oncancel=done; setTimeout(done,D+200);
       });
     }catch(e){}
     return r;
