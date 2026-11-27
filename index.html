@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-srmsmooth">
+<meta name="app-build" content="2026-11-27-calmem">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -24414,7 +24414,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
       if(!nw){if(++tries<8)return setTimeout(look,30); return}
       var b=nw.getBoundingClientRect(); try{nw.animate([{transformOrigin:(ox-b.left)+"px "+(oy-b.top)+"px",transform:"scale(.4)",opacity:0},{transformOrigin:(ox-b.left)+"px "+(oy-b.top)+"px",transform:"scale(1)",opacity:1}],{duration:380,easing:"cubic-bezier(.2,.8,.25,1)"})}catch(_){}})();
   }
-  var CALT={note:["📖","말씀","#8FB8F0"],med:["✍️","묵상","#B7A0F0"],pray:["🙏","기도","#F0B07A"],ans:["🙌","응답","#F2C94C"],srm:["🎤","설교","#E3A6BC"],btx:["📜","본문","#C9A8E8"],say:["💬","한 마디","#A9B6E8"],grace:["🌿","은혜","#93D3A2"],scene:["🌄","장면","#F6C79A"],verse:["📖","짧은 말씀","#8FD0CC"],ic:["🙏","기도제목","#93C9A3"],p1:["🙏","한 줄 기도","#E8A0C8"],hym:["🎵","찬양","#F2C1D9"],read:["📖","통독","#9AD3B8"],pil:["✍️","필사","#D9C08F"]};   /* 통독·필사 (2026-11-25 사용자 요청) */
+  var CALT={note:["📖","말씀","#8FB8F0"],med:["✍️","묵상","#B7A0F0"],pray:["🙏","기도","#F0B07A"],ans:["🙌","응답","#F2C94C"],srm:["🎤","설교","#E3A6BC"],btx:["📜","본문","#C9A8E8"],say:["💬","한 마디","#A9B6E8"],grace:["🌿","은혜","#93D3A2"],scene:["🌄","장면","#F6C79A"],verse:["📖","짧은 말씀","#8FD0CC"],ic:["🙏","기도제목","#93C9A3"],p1:["🙏","한 줄 기도","#E8A0C8"],hym:["🎵","찬양","#F2C1D9"],mem:["🧠","암송","#B8E07A"],read:["📖","통독","#9AD3B8"],pil:["✍️","필사","#D9C08F"]};   /* 통독·필사 (2026-11-25 사용자 요청) */
   var cal=null, calY=0, calM=0, calSel="", calIdx=null;
   // 달력의 기도 줄: 맨 위 공통 문구(빛이신 예수여 …)와 '전능하신…' 줄은 건너뛰고 그 다음 첫 문장 (2026-11-21 사용자 요청)
   var CAL_SKIP=(PRAY_TOP+"\n"+PRAY_TOP1C+"\n"+PRAY_TOP2C).split("\n").map(function(x){return x.trim()}).filter(Boolean);
@@ -24449,6 +24449,8 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
     }catch(e){}
     try{notes.forEach(function(n){var r=ab(n.ref)||calLine(n.text,10)||"말씀";
       add(+n.createdAt,"note",r,(n.ref?n.ref+" · ":"")+calLine(n.text),function(){openNoteFocus(n.id)},"note:"+n.id);
+      (function(){var dd={}; (n.drill||[]).forEach(function(d){var k=dkey(+d.at); if(!dd[k])dd[k]={c:0,at:0}; dd[k].c++; dd[k].at=Math.max(dd[k].at,+d.at)});   /* 🧠 암송한 날 (2026-11-27 사용자 요청) */
+        Object.keys(dd).forEach(function(k){var o=dd[k]; add(o.at,"mem",r,(n.ref||r)+" 암송"+(o.c>1?" "+o.c+"번":""),function(){openNoteFocus(n.id)})})})();
       (n.meds||[]).forEach(function(m){if(String(m.text||"").trim())add(+m.at,"med",r,calLine(m.text),function(){openNoteFocus(n.id,"m")},"med:"+m.id)});
       (n.prays||[]).forEach(function(x){if(!String(x.t||"").trim())return; var tx=(x.ti||"").trim()||calPray(x.t);
         var ed={def:calPray(x.t),set:function(v){x.ti=v; n.updatedAt=Date.now(); scheduleSave(n.id)}};   /* ✏️ 달력에서 고친 제목은 기도의 ti (2026-11-27 사용자 요청) */
