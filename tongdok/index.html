@@ -1867,6 +1867,10 @@ function maybeCheer(bi,c){
 // 한 번 본 축하 창은 다시 안 띄움 — 체크를 풀었다 다시 해도 (2026-11-27 사용자 요청), 통독·필사 따로 이 기기에 기억
 var CEL_SEEN_KEY=KP+"celseen", celSeen={};
 try{celSeen=JSON.parse(localStorage.getItem(CEL_SEEN_KEY)||"{}")||{}}catch(e){celSeen={}}
+setTimeout(function(){try{   // 이미 넘은 자리는 본 것으로 (지금 100장이면 100장 창은 다시 안 뜸)
+  [["r",RB],["p",PB]].forEach(function(x){var c=countRange(x[1],0,TOTAL); MILES.forEach(function(m){if(c>=m.n)celSeen[x[0]+":"+m.n]=1}); if(countRange(x[1],0,OT_TOTAL)===OT_TOTAL)celSeen[x[0]+":ot"]=1; if(countRange(x[1],OT_TOTAL,TOTAL)===NT_TOTAL)celSeen[x[0]+":nt"]=1});
+  localStorage.setItem(CEL_SEEN_KEY,JSON.stringify(celSeen));
+}catch(e){}},0);
 function celOnce(k){k=(pMode?"p:":"r:")+k; if(celSeen[k])return false; celSeen[k]=1; try{localStorage.setItem(CEL_SEEN_KEY,JSON.stringify(celSeen))}catch(e){} return true}
 function checkMilestones(before,after,finishedBooks){
   // 책 한 권 완독 축하 창은 뺌 (2026-10-24 사용자 요청)
