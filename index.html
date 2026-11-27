@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-calrev2">
+<meta name="app-build" content="2026-11-27-caltd">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -24469,15 +24469,31 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
   function calBuild(){
     var M={}, TT=calTtl(); function add(t,k,chip,txt,go,ky,ed){if(!t)return; var d=typeof t==="string"?t:dkey(t); var def=txt; if(ky&&!ed&&TT[ky])txt=TT[ky]; (M[d]=M[d]||[]).push({k:k,chip:chip,txt:txt,def:def,go:go,at:typeof t==="number"?t:0,ky:ky||"",ed:ed||null})}
     function ab(ref){var m=String(ref||"").match(/^([가-힣]+)\s*(.*)$/); if(!m)return ref; var b=bookIndex(m[1]); return b>=0&&ABBR[b]?ABBR[b]+" "+m[2]:ref}   // 이름표는 짧게: 마태복음 5:3 → 마 5:3
-    try{   // 📖 통독·✍️ 필사: 통독표(tongdok2)가 날마다 적어 둔 장 수 (2026-11-25 사용자 요청)
-      var tlog={}, plog={};
-      try{tlog=JSON.parse(localStorage.getItem("bible-tongdok2-log")||"{}")||{}}catch(e){}
-      try{plog=JSON.parse(localStorage.getItem("bible-tongdok2-logp")||"{}")||{}}catch(e){}
-      Object.keys(tlog).forEach(function(d){
-        if(!/^\d{4}-\d{2}-\d{2}$/.test(d))return;
-        var tot=Math.max(0,+tlog[d]||0), pl=Math.max(0,Math.min(tot,+plog[d]||0)), rd=tot-pl;
-        if(rd>0)add(d,"read",rd+"장",rd+"장 읽었어요 (성경 통독표)",function(){location.href="tongdok2/?from=notes"});
-        if(pl>0)add(d,"pil",pl+"장",pl+"장 썼어요 (성경 필사)",function(){location.href="tongdok2/?from=notes"});
+    try{   // 📖 통독·✍️ 필사: 통독표가 날마다 적어 둔 장 (2026-11-25, 2026-11-27 장 이름까지·tongdok/도 같이)
+      function J(k){try{return JSON.parse(localStorage.getItem(k)||"{}")||{}}catch(e){return {}}}
+      var PF=["bible-tongdok2-","bible-tongdok-"], DL={}, CNT={};
+      PF.forEach(function(pf){
+        var dl=J(pf+"dayl"), tl=J(pf+"log"), pl=J(pf+"logp");
+        Object.keys(dl).forEach(function(d){["r","p"].forEach(function(sd){var S=(dl[d]||{})[sd]||{}, tt=+(dl[d]||{})["t"+sd]||0; if(tt){var oo=DL[d]=DL[d]||{}; oo["t"+sd]=Math.max(+oo["t"+sd]||0,tt)}
+          Object.keys(S).forEach(function(b){var o=((DL[d]=DL[d]||{})[sd]=DL[d][sd]||{}), A=o[b]=o[b]||[];
+            (S[b]||[]).forEach(function(c){if(A.indexOf(+c)<0)A.push(+c)})})})});
+        Object.keys(tl).forEach(function(d){var tot=Math.max(0,+tl[d]||0), p=Math.max(0,Math.min(tot,+pl[d]||0)), o=CNT[d]=CNT[d]||{r:0,p:0};
+          o.r=Math.max(o.r,tot-p); o.p=Math.max(o.p,p)});
+      });
+      function rng(A){A=A.slice().sort(function(a,b){return a-b}); var out=[],s0=null,pv=null;
+        A.forEach(function(c){if(s0===null){s0=pv=c}else if(c===pv+1)pv=c; else{out.push(s0===pv?s0:s0+"–"+pv); s0=pv=c}});
+        if(s0!==null)out.push(s0===pv?s0:s0+"–"+pv); return out.join(", ")}
+      var GO=function(){location.href="tongdok2/?from=notes"};
+      Object.keys(CNT).concat(Object.keys(DL)).filter(function(d,i,a){return a.indexOf(d)===i&&/^\d{4}-\d{2}-\d{2}$/.test(d)}).forEach(function(d){
+        [["r","read","읽었어요"],["p","pil","썼어요"]].forEach(function(z){
+          var S=(DL[d]||{})[z[0]]||{}, bk=Object.keys(S).filter(function(b){return S[b].length}), n=0;
+          bk.forEach(function(b){n+=S[b].length});
+          if(bk.length){
+            var txt=bk.map(function(b){return b+" "+rng(S[b])+"장"}).join(" · ");
+            var chip=bk.length===1?(ab(bk[0]+" ")||bk[0]).trim()+" "+n+"장":n+"장";
+            var tt=+(DL[d]||{})["t"+z[0]]||0; add(tt&&dkey(tt)===d?tt:d,z[1],chip,txt+" "+z[2],GO);
+          }else{var c=(CNT[d]||{})[z[0]]||0; if(c>0)add(d,z[1],c+"장",c+"장 "+z[2]+(z[0]==="r"?" (성경 통독표)":" (성경 필사)"),GO)}
+        });
       });
     }catch(e){}
     try{notes.forEach(function(n){var r=ab(n.ref)||calLine(n.text,10)||"말씀";

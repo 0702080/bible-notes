@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-27-celonce">
+<meta name="app-build" content="td-2026-11-27-dayl">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -1288,6 +1288,21 @@ function logRead(d,isP){
     savePilLog();
   }
 }
+/* 🗓️ 날마다 체크한 장 — 말씀 노트 달력에 "잠언 1–4, 26–28장"처럼 보이게 (2026-11-27 사용자 요청)
+   {날짜:{r:{책 이름:[장…]},p:{…}}} */
+var DAYL_KEY=KP+"dayl", dayL={};
+try{dayL=JSON.parse(localStorage.getItem(DAYL_KEY)||"{}")||{}}catch(e){dayL={}}
+function dayMark(idx,on,isP){
+  try{
+    var k=dayKey(), bi=bookOf(idx), nm=BOOKS[bi][0], ch=idx-OFF[bi]+1, side=isP?"p":"r";
+    var D0=dayL[k]=dayL[k]||{}, S=D0[side]=D0[side]||{}, A=S[nm]=S[nm]||[], j=A.indexOf(ch);
+    if(on){D0["t"+side]=Date.now(); if(j<0){A.push(ch);A.sort(function(x,y){return x-y})}}
+    else if(j>=0)A.splice(j,1);
+    if(!A.length)delete S[nm]; if(!Object.keys(S).length){delete D0[side];delete D0["t"+side]} if(!Object.keys(D0).filter(function(x){return x==="r"||x==="p"}).length)delete dayL[k];
+    var ks=Object.keys(dayL).sort(); while(ks.length>400){delete dayL[ks.shift()]}
+    localStorage.setItem(DAYL_KEY,JSON.stringify(dayL));
+  }catch(e){}
+}
 var ovwOpen=false;
 /* ↕ 전체 진행표·걸어온 길 카드도 위아래로 미끄러지며 페이드 인·아웃 (2026-11-27 사용자 요청) */
 function cardSlide(card,body,open,render){
@@ -1938,7 +1953,7 @@ document.addEventListener("click",function(ev){
     if(me[idx]&&bookDone(bi2)===BOOKS[bi2][1]){
       R1[bi2]=(+R1[bi2]||0)+1;
       for(var k1=OFF[bi2];k1<OFF[bi2]+BOOKS[bi2][1];k1++)me[k1]=0;
-      me[idx]=1; save(); saveRnd(); repaintBook(bi2); renderSummary(); renderShelf();
+      me[idx]=1; logRead(1,pMode); dayMark(idx,true,pMode); save(); saveRnd(); repaintBook(bi2); renderSummary(); renderShelf();
       if(!pMode){lastOT=countRange(me,0,OT_TOTAL);lastNT=countRange(me,OT_TOTAL,TOTAL)}
       var sp=document.querySelector('.chip[data-i="'+idx+'"]'); if(sp)sparkle(sp); tick();
       hint("🔁 "+BOOKS[bi2][0]+" "+(R1[bi2]+1)+"회째 시작","잘못 눌렀으면 같은 칸을 한 번 더 누르면 돌아가요");
@@ -1956,6 +1971,7 @@ document.addEventListener("click",function(ev){
     var before=everCount(), wasFull=bookDone(bi2)===BOOKS[bi2][1];
     me[idx]=me[idx]?0:1;
     logRead(me[idx]?1:-1,pMode);
+    dayMark(idx,!!me[idx],pMode);
     save();
     repaintBook(bi2);
     renderSummary();renderShelf();
@@ -1992,6 +2008,7 @@ document.addEventListener("click",function(ev){
     var i=+c.dataset.i; if(D.done[i])return; D.done[i]=1;
     if(!!me[i]===!!D.fill)return;
     me[i]=D.fill; D.books[bookOf(i)]=1; D.n++;
+    logRead(D.fill?1:-1,pMode); dayMark(i,!!D.fill,pMode);
     if(D.fill){tick();c.setAttribute("data-s","me");c.classList.remove("got5");void c.offsetWidth;c.classList.add("got5")}else c.removeAttribute("data-s");
     c.setAttribute("aria-pressed",String(!!D.fill)); buzzz(6);
   }
