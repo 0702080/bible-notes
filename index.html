@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-caltd">
+<meta name="app-build" content="2026-11-27-caltd2">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -24489,7 +24489,7 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
           var S=(DL[d]||{})[z[0]]||{}, bk=Object.keys(S).filter(function(b){return S[b].length}), n=0;
           bk.forEach(function(b){n+=S[b].length});
           if(bk.length){
-            var txt=bk.map(function(b){return b+" "+rng(S[b])+"장"}).join(" · ");
+            var txt=bk.map(function(b){return b+" "+rng(S[b])+"장"}).join(" · "), more=((CNT[d]||{})[z[0]]||0)-n; if(more>0)txt+=" · 그 밖 "+more+"장";
             var chip=bk.length===1?(ab(bk[0]+" ")||bk[0]).trim()+" "+n+"장":n+"장";
             var tt=+(DL[d]||{})["t"+z[0]]||0; add(tt&&dkey(tt)===d?tt:d,z[1],chip,txt+" "+z[2],GO);
           }else{var c=(CNT[d]||{})[z[0]]||0; if(c>0)add(d,z[1],c+"장",c+"장 "+z[2]+(z[0]==="r"?" (성경 통독표)":" (성경 필사)"),GO)}

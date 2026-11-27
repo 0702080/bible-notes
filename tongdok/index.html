@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-27-dayl">
+<meta name="app-build" content="td-2026-11-27-dayl2">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -983,11 +983,12 @@ var meAt=0;   // 내 체크를 마지막으로 바꾼 시각 (여러 기기에�
 function stamp(old){return Math.max(Date.now(),(+old||0)+1)}
 function storePil(){try{localStorage.setItem(PIL_KEY,JSON.stringify({b:toB64(PB),t:pilAt}))}catch(e){}}
 function save(){
-  if(pMode){pilAt=stamp(pilAt);storePil();if(typeof cloudPush==="function")cloudPush();return}
+  if(pMode){pilAt=stamp(pilAt);storePil();if(typeof cloudPush==="function")cloudPush();setTimeout(daySweep,0);return}
   var b=toB64(me), old=null; try{old=JSON.parse(localStorage.getItem(LS)||"null")}catch(e){}
   if(!old||old.b!==b)meAt=stamp(meAt);
   try{localStorage.setItem(LS,JSON.stringify({n:myName,b:b,t:meAt}))}catch(e){}
   if(typeof cloudPush==="function")cloudPush();
+  setTimeout(daySweep,0);
 }
 function load(){
   try{
@@ -1303,6 +1304,30 @@ function dayMark(idx,on,isP){
     localStorage.setItem(DAYL_KEY,JSON.stringify(dayL));
   }catch(e){}
 }
+/* 🗓️ 하루 시작 때 상태와 지금을 견줘, 오늘 새로 체크된 장도 dayl에 넣음 — 예전 버전·다른 기기(클라우드)에서 체크한 것까지 (2026-11-27) */
+function daySweep(){
+  try{
+    var t=dayKey(), cur={r:toB64(RB),p:toB64(PB)}, end=null, base=null;
+    try{end=JSON.parse(localStorage.getItem(KP+"dayend")||"null")}catch(e){}
+    try{base=JSON.parse(localStorage.getItem(KP+"daybase")||"null")}catch(e){}
+    if(!base||base.d!==t){base={d:t,r:end?end.r:cur.r,p:end?end.p:cur.p}; localStorage.setItem(KP+"daybase",JSON.stringify(base))}
+    var ch=false;
+    [["r",RB],["p",PB]].forEach(function(z){
+      var B=base[z[0]]?fromB64(base[z[0]]):null, C=z[1]; if(!B||!C)return;
+      var D0=dayL[t]||{}, S=D0[z[0]]||{};
+      for(var i=0;i<TOTAL;i++)if(C[i]&&!B[i]){
+        var bi=bookOf(i), nm=BOOKS[bi][0], c=i-OFF[bi]+1;
+        if(!(S[nm]&&S[nm].indexOf(c)>=0)){
+          D0=dayL[t]=dayL[t]||{}; S=D0[z[0]]=D0[z[0]]||{}; (S[nm]=S[nm]||[]).push(c); S[nm].sort(function(x,y){return x-y});
+          if(!D0["t"+z[0]])D0["t"+z[0]]=Date.now(); ch=true;
+        }
+      }
+    });
+    if(ch)localStorage.setItem(DAYL_KEY,JSON.stringify(dayL));
+    localStorage.setItem(KP+"dayend",JSON.stringify({d:t,r:cur.r,p:cur.p}));
+  }catch(e){}
+}
+setTimeout(daySweep,300); setInterval(daySweep,60000); document.addEventListener("visibilitychange",function(){if(!document.hidden)setTimeout(daySweep,1500)});
 var ovwOpen=false;
 /* ↕ 전체 진행표·걸어온 길 카드도 위아래로 미끄러지며 페이드 인·아웃 (2026-11-27 사용자 요청) */
 function cardSlide(card,body,open,render){
