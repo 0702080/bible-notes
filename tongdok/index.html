@@ -3,7 +3,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>성경 통독표</title>
-<meta name="app-build" content="td-2026-11-27-walk1line">
+<meta name="app-build" content="td-2026-11-27-walkwide">
 <script>
 /* 새 버전 확인: 브라우저가 예전 파일(최대 10분)을 쓰고 있으면 새 파일을 받아 한 번 새로고침 (2026-10-24, 고친 것이 바로 보이게) */
 (function(){try{
@@ -743,9 +743,9 @@ body{background:transparent}
 .bk-h .bk-chev{display:none!important}
 
 /* 👣 걸어온 길 다시 배치 (2026-11-27 사용자 요청: 안정감 있고 아름답게) — 날짜 두 줄, 작은 동그라미, 오른쪽은 둥근 카드에 책 이름 + 다 읽음/다 씀 이름표 */
-.tlv .tl-n{grid-template-columns:var(--yw) 34px minmax(0,1fr)!important;column-gap:12px!important;padding:0 0 10px!important;align-items:center!important}
+.tlv .tl-n{grid-template-columns:var(--yw) 30px minmax(0,1fr)!important;column-gap:8px!important;margin-right:-6px;padding:0 0 10px!important;align-items:center!important}
 .tlv .tl-n:last-child{padding-bottom:0!important}
-.tlv .tl-n::before,.tlv .tl-yr:not(.tl-yr0)::before{left:calc(var(--yw) + 27.5px)!important;width:3px!important;top:0!important;bottom:0!important;height:auto!important;border-radius:0}
+.tlv .tl-n::before,.tlv .tl-yr:not(.tl-yr0)::before{left:calc(var(--yw) + 21.5px)!important;width:3px!important;top:0!important;bottom:0!important;height:auto!important;border-radius:0}
 .tlv .tl-yr0+.tl-n::before{top:calc(50% - 5px)!important}
 .tlv .tl-n:last-child::before{bottom:50%!important}
 .tlv .tl-yr0+.tl-n:last-child::before{display:none}
@@ -754,10 +754,10 @@ body{background:transparent}
 .tlv .tl-d small{font-size:11px;font-weight:800;opacity:.72}
 .tlv .tl-d small:empty{display:none}
 .tlv .tl-d.tl-dpre b{font-size:14px;font-weight:800}
-.tlv .tl-dot{width:34px!important;height:34px!important;border-width:3px!important;font-size:15px!important;box-shadow:0 2px 3px rgba(110,74,20,.18)}
-.tlv .tl-c{grid-column:3;grid-row:1;min-width:0;display:flex;flex-wrap:nowrap;align-items:center;column-gap:8px;row-gap:4px;min-height:46px;box-sizing:border-box;padding:9px 12px 9px 14px;border-radius:14px;background:rgba(255,250,238,.78);border:1px solid color-mix(in srgb,var(--c) 34%,rgba(140,100,40,.16));border-left:4px solid var(--c);box-shadow:0 2px 6px rgba(110,74,20,.09)}
+.tlv .tl-dot{width:30px!important;height:30px!important;border-width:3px!important;font-size:13px!important;box-shadow:0 2px 3px rgba(110,74,20,.18)}
+.tlv .tl-c{grid-column:3;grid-row:1;min-width:0;display:flex;flex-wrap:nowrap;align-items:center;column-gap:6px;row-gap:4px;min-height:46px;box-sizing:border-box;padding:9px 8px 9px 10px;border-radius:14px;background:rgba(255,250,238,.78);border:1px solid color-mix(in srgb,var(--c) 34%,rgba(140,100,40,.16));border-left:4px solid var(--c);box-shadow:0 2px 6px rgba(110,74,20,.09)}
 .tlv .tl-c .tl-t{flex:1 1 auto;min-width:0;padding:0!important;font-size:15px;font-weight:800;line-height:1.3;color:#3A2810;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.2px}
-.tlv .tl-c .tl-s{display:inline-block!important;flex:none;margin:0 0 0 auto!important;padding:3px 8px;border-radius:999px;font-size:10.5px;font-weight:800;white-space:nowrap;color:color-mix(in srgb,var(--c) 62%,#2E1E0C);background:color-mix(in srgb,var(--c) 17%,transparent)}
+.tlv .tl-c .tl-s{display:inline-block!important;flex:none;margin:0 0 0 auto!important;padding:3px 6px;border-radius:999px;font-size:10.5px;font-weight:800;white-space:nowrap;color:color-mix(in srgb,var(--c) 62%,#2E1E0C);background:color-mix(in srgb,var(--c) 17%,transparent)}
 .tlv .tl-yr{padding-bottom:12px!important}
 .tlv .tl-yr:not(.tl-yr0){padding-top:6px!important}
 </style>
@@ -1404,9 +1404,9 @@ function renderWalk(){
   // 📅 날짜 칸 폭 = 연도 글자 폭 → 날짜 오른쪽 끝이 연도 오른쪽 끝에 딱 맞음 (2026-11-26 사용자 요청)
   var fitYr=function(){var ys=wrap.querySelector(".tl-yr0 span"); if(!ys)return; var w=ys.getBoundingClientRect().width; if(w>20)wrap.style.setProperty("--yw",w.toFixed(1)+"px")};
   // 오른쪽 카드 책 이름은 한 줄 — 넘치면 글자를 12px까지 줄이고, 그래도 넘치면 … (2026-11-27 사용자 요청)
-  var fitT=function(){wrap.querySelectorAll(".tl-c .tl-t").forEach(function(t){t.style.fontSize=""; var fs=15; while(fs>12&&t.scrollWidth>t.clientWidth+1){fs-=.5; t.style.fontSize=fs+"px"}})};
+  var fitT=function(){wrap.querySelectorAll(".tl-c .tl-t").forEach(function(t){t.style.fontSize=""; var fs=15; while(fs>10.5&&t.scrollWidth>t.clientWidth+1){fs-=.5; t.style.fontSize=fs+"px"}})};
   var fitAll=function(){fitYr(); fitT()};
-  fitAll(); requestAnimationFrame(fitAll); if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitAll);
+  fitAll(); requestAnimationFrame(fitAll); if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitAll); setTimeout(fitAll,400); try{if(window.ResizeObserver){var lw=0; new ResizeObserver(function(){var w=wrap.clientWidth; if(w&&w!==lw){lw=w; fitT()}}).observe(wrap)}}catch(e){}
 }
 /* 걸어온 길 기록: 책마다 '다 끝낸 횟수'(회차 + 지금 다 채웠으면 1)가 늘면 그날을 적고, 줄면(되돌리기·체크 풀기) 지운다 */
 var HIST_KEY=KP+"hist", HIST={snap:null,ev:[]};
