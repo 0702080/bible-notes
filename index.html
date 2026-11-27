@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#0B0B0D">
 <link rel="icon" href="icon-192.png?v=5">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=5">
-<meta name="app-build" content="2026-11-27-pfootgap">
+<meta name="app-build" content="2026-11-27-pdlalign">
 <script>
 /* ✍ 글 칸 높이 맞추기에서 화면이 흔들리지 않게 (2026-11-14 사용자 요청): height=auto로 잠깐 줄어들 때 굴림 상자가 위로 튀었다가 다시 내려오던 것 — 줄이기 전 바깥 굴림 위치를 적어 두었다가 그대로 되돌림 */
 function taAuto(t,calc){
@@ -6185,7 +6185,8 @@ body.rdtimeron #list>.note .verse{-webkit-user-select:none;user-select:none}
 .prays>.pri.editing>.ptense.on{background:radial-gradient(120% 70% at 50% 0%,rgba(255,255,255,.4),rgba(255,255,255,0) 60%),linear-gradient(180deg,#F6D77A,#D9A93A)!important;border-color:#B88A2A;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 4px 0 #7A5A14,0 7px 12px rgba(0,0,0,.4)!important}
 
 /* 🧊 말씀 카드 기도문 아래 줄 '🔒 나만/👥 친구'·'응답 표시'·'지우기' 입체 알약 (2026-11-27 사용자 요청) */
-.prays .pfoot .pshare,.prays .pfoot .pansbtn,.prays .pfoot .pdel{height:30px!important;padding:0 12px!important;border-radius:15px!important;border:1px solid #5E5A72!important;border-style:solid!important;background:radial-gradient(120% 70% at 50% 0%,rgba(255,255,255,.16),rgba(255,255,255,0) 60%),linear-gradient(180deg,#4A4658,#2A2833)!important;color:#E8E2D6!important;font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 3px rgba(0,0,0,.3),0 4px 0 #15141A,0 6px 10px rgba(0,0,0,.4)!important;transition:transform .08s,box-shadow .08s;margin-bottom:20px}   /* 다음 기도문 카드와 틈 16→32px (2026-11-27 사용자 요청: 2배) */
+.prays .pfoot .pshare,.prays .pfoot .pansbtn,.prays .pfoot .pdel{height:30px!important;padding:0 12px!important;border-radius:15px!important;border:1px solid #5E5A72!important;border-style:solid!important;background:radial-gradient(120% 70% at 50% 0%,rgba(255,255,255,.16),rgba(255,255,255,0) 60%),linear-gradient(180deg,#4A4658,#2A2833)!important;color:#E8E2D6!important;font-weight:700;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 3px rgba(0,0,0,.3),0 4px 0 #15141A,0 6px 10px rgba(0,0,0,.4)!important;transition:transform .08s,box-shadow .08s;margin-bottom:0}   /* 다음 기도문 카드와 틈 16→32px (2026-11-27 사용자 요청: 2배) */
+.prays .pfoot{padding-bottom:20px}
 .prays .pfoot .pshare:active,.prays .pfoot .pansbtn:active,.prays .pfoot .pdel:active{transform:translateY(3px);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 1px 0 #15141A,0 2px 4px rgba(0,0,0,.35)!important}
 .prays .pfoot .pshare.on{color:var(--sky)!important;border-color:color-mix(in srgb,var(--sky) 45%,#3A3940)!important}
 .prays .pfoot .pansbtn:not(.on){color:var(--gold)!important}
